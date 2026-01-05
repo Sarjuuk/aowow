@@ -99,20 +99,19 @@ class VideoMgr
          * unique: bool || null
          */
 
-        $videos = DB::Aowow()->select(
+        if ($userId)
+            $where = [['v.`userIdOwner` = %i', $userId]];
+        else
+            $where = [['v.`type` = %i', $type], ['v.`typeId` = %i', $typeId]];
+
+        $videos = DB::Aowow()->selectAssoc(
            'SELECT    v.`id`, a.`username` AS "user", v.`date`, v.`videoId`, v.`type`, v.`typeId`, v.`caption`, v.`status` AS "flags", v.`url`, v.`name`
-            FROM      ?_videos v
-            LEFT JOIN ?_account a ON v.`userIdOwner` = a.`id`
-            WHERE
-                    { v.`type` = ?d }
-                    { AND v.`typeId` = ?d }
-                    { v.`userIdOwner` = ?d }
-          { LIMIT    ?d }
+            FROM      ::videos v
+            LEFT JOIN ::account a ON v.`userIdOwner` = a.`id`
+            WHERE     %and
+                      %lmt
             ORDER BY  `type`, `typeId`, `pos` ASC',
-            $userId ? DBSIMPLE_SKIP : $type,
-            $userId ? DBSIMPLE_SKIP : $typeId,
-            $userId ? $userId : DBSIMPLE_SKIP,
-            $userId || $type ? DBSIMPLE_SKIP : 100
+            $where, $userId || $type ? PHP_INT_MAX : 100
         );
 
         $num = [];
@@ -176,15 +175,7 @@ class VideoMgr
     {
         // i GUESS .. vi_getALL ? everything : pending
         $nFound = 0;
-        $pages  = DB::Aowow()->select(
-           'SELECT   v.`type`, v.`typeId`, COUNT(1) AS "count", MIN(v.`date`) AS "date"
-            FROM     ?_videos v
-          { WHERE    (v.`status` & ?d) = 0 }
-            GROUP BY v.`type`, v.`typeId`',
-            $all ? DBSIMPLE_SKIP : CC_FLAG_APPROVED | CC_FLAG_DELETED
-        );
-
-        if ($pages)
+        if ($pages = DB::Aowow()->selectAssoc('SELECT `type`, `typeId`, COUNT(1) AS "count", MIN(`date`) AS "date" FROM ::videos %if', !$all, 'WHERE (`status` & %i) = 0', CC_FLAG_APPROVED | CC_FLAG_DELETED, '%end GROUP BY `type`, `typeId`'))
         {
             // limit to one actually existing type each
             foreach (array_unique(array_column($pages, 'type')) as $t)

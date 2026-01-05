@@ -467,7 +467,7 @@ class StatsContainer implements \Countable
 
     public function fromDB(int $type, int $typeId, int $fieldFlags = Stat::FLAG_NONE) : self
     {
-        foreach (DB::Aowow()->selectRow('SELECT (?#) FROM ?_item_stats WHERE `type` = ?d AND `typeId` = ?d', Stat::getJsonStringsFor($fieldFlags ?: (Stat::FLAG_ITEM | Stat::FLAG_SERVERSIDE)), $type, $typeId) as $key => $amt)
+        foreach (DB::Aowow()->selectRow('SELECT (%n) FROM ::item_stats WHERE `type` = %i AND `typeId` = %i', Stat::getJsonStringsFor($fieldFlags ?: (Stat::FLAG_ITEM | Stat::FLAG_SERVERSIDE)), $type, $typeId) as $key => $amt)
         {
             if ($amt === null)
                 continue;

@@ -38,7 +38,7 @@ class ProfilePowerResponse extends TextResponse implements ICache
             if (preg_match('/([^\-]+)-(\d+)/i', $this->subjectName, $m))
                 [, $this->subjectName, $renameItr] = $m;
 
-            if ($x = DB::Aowow()->selectCell('SELECT `id` FROM ?_profiler_profiles WHERE `realm` = ?d AND `custom` = 0 AND `name` = ? AND `renameItr` = ?d', $this->realmId, Util::ucWords($this->subjectName), $renameItr ?? 0))
+            if ($x = DB::Aowow()->selectCell('SELECT `id` FROM ::profiler_profiles WHERE `realm` = %i AND `custom` = 0 AND `name` = %s AND `renameItr` = %i', $this->realmId, Util::ucWords($this->subjectName), $renameItr ?? 0))
                 $this->typeId = $x;
         }
 

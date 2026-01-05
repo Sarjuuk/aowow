@@ -21,10 +21,10 @@ CLISetup::registerSetup('sql', new class extends SetupScript
     protected $worldDependency    = ['dbc_achievement', 'disables'];
     protected $setupAfter         = [['icons'], []];
 
-    public function generate(array $ids = []) : bool
+    public function generate() : bool
     {
-        DB::Aowow()->query('TRUNCATE ?_achievement');
-        DB::Aowow()->query('TRUNCATE ?_achievementcategory');
+        DB::Aowow()->qry('TRUNCATE ::achievement');
+        DB::Aowow()->qry('TRUNCATE ::achievementcategory');
 
         /**************/
         /* categories */
@@ -32,7 +32,7 @@ CLISetup::registerSetup('sql', new class extends SetupScript
 
         CLI::write('[achievement] - resolving categories');
 
-        DB::Aowow()->query('INSERT INTO ?_achievementcategory SELECT ac.id, GREATEST(ac.parentcategory, 0), GREATEST(IFNULL(ac1.parentcategory, 0), 0) FROM dbc_achievement_category ac LEFT JOIN dbc_achievement_category ac1 ON ac1.id = ac.parentCategory');
+        DB::Aowow()->qry('INSERT INTO ::achievementcategory SELECT ac.id, GREATEST(ac.parentcategory, 0), GREATEST(IFNULL(ac1.parentcategory, 0), 0) FROM dbc_achievement_category ac LEFT JOIN dbc_achievement_category ac1 ON ac1.id = ac.parentCategory');
 
         /************/
         /* dbc data */
@@ -40,8 +40,8 @@ CLISetup::registerSetup('sql', new class extends SetupScript
 
         CLI::write('[achievement] - basic dbc data');
 
-        DB::Aowow()->query(
-           'INSERT INTO ?_achievement
+        DB::Aowow()->qry(
+           'INSERT INTO ::achievement
             SELECT      a.id,
                         2 - a.faction,
                         a.map,
@@ -64,9 +64,7 @@ CLISetup::registerSetup('sql', new class extends SetupScript
             FROM        dbc_achievement a
             LEFT JOIN   dbc_achievement_category ac ON ac.id = a.category
             LEFT JOIN   dbc_spellicon si ON si.id = a.iconId
-            LEFT JOIN   ?_icons i ON LOWER(SUBSTRING_INDEX(si.iconPath, "\\\\", -1)) = i.name_source
-            { WHERE a.id IN (?a) }',
-            $ids ?: DBSIMPLE_SKIP
+            LEFT JOIN   ::icons i ON LOWER(SUBSTRING_INDEX(si.iconPath, "\\", -1)) = i.name_source',
         );
 
 
@@ -76,9 +74,7 @@ CLISetup::registerSetup('sql', new class extends SetupScript
 
         CLI::write('[achievement] - serverside achievement data');
 
-        $serverAchievements = DB::World()->select('SELECT `ID` AS "id", IF(`requiredFaction` = -1, 3, IF(`requiredFaction` = 0, 2, 1)) AS "faction", `mapID` AS "map", `points`, `flags`, `count` AS "reqCriteriaCount", `refAchievement` FROM achievement_dbc{ WHERE `id` IN (?a)}',
-            $ids ?: DBSIMPLE_SKIP
-        );
+        $serverAchievements = DB::World()->selectAssoc('SELECT `ID` AS "id", IF(`requiredFaction` = -1, 3, IF(`requiredFaction` = 0, 2, 1)) AS "faction", `mapID` AS "map", `points`, `flags`, `count` AS "reqCriteriaCount", `refAchievement` FROM achievement_dbc');
 
         foreach ($serverAchievements as &$sa)
         {
@@ -91,7 +87,7 @@ CLISetup::registerSetup('sql', new class extends SetupScript
         unset($sa);
 
         foreach ($serverAchievements as $sa)
-            DB::Aowow()->query('INSERT INTO ?_achievement (?#) VALUES (?a)', array_keys($sa), array_values($sa));
+            DB::Aowow()->qry('INSERT INTO ::achievement %v', $sa);
 
 
         /********************************/
@@ -104,7 +100,7 @@ CLISetup::registerSetup('sql', new class extends SetupScript
         foreach ($parents as $chainId => $next)
         {
             $tree = [null, $next];
-            while ($next = DB::Aowow()->selectCell('SELECT `id` FROM dbc_achievement WHERE `previous` = ?d', $next))
+            while ($next = DB::Aowow()->selectCell('SELECT `id` FROM dbc_achievement WHERE `previous` = %i', $next))
                 $tree[] = $next;
 
             foreach ($tree as $idx => $aId)
@@ -112,7 +108,7 @@ CLISetup::registerSetup('sql', new class extends SetupScript
                 if (!$aId)
                     continue;
 
-                DB::Aowow()->query('UPDATE ?_achievement SET `cuFlags` = `cuFlags` | ?d, `chainId` = ?d, `chainPos` = ?d WHERE `id` = ?d',
+                DB::Aowow()->qry('UPDATE ::achievement SET `cuFlags` = `cuFlags` | %i, `chainId` = %i, `chainPos` = %i WHERE `id` = %i',
                     $idx == 1 ? ACHIEVEMENT_CU_FIRST_SERIES : (count($tree) == $idx + 1 ? ACHIEVEMENT_CU_LAST_SERIES : 0),
                     $chainId + 1,
                     $idx,
@@ -129,7 +125,7 @@ CLISetup::registerSetup('sql', new class extends SetupScript
         CLI::write('[achievement] - disabling disabled achievements from table disables');
 
         if ($criteria = DB::World()->selectCol('SELECT `entry` FROM disables WHERE `sourceType` = 4'))
-            DB::Aowow()->query('UPDATE ?_achievement a JOIN ?_achievementcriteria ac ON a.`id` = ac.`refAchievementId` SET a.`cuFlags` = ?d WHERE ac.`id` IN (?a)', CUSTOM_DISABLED, $criteria);
+            DB::Aowow()->qry('UPDATE ::achievement a JOIN ::achievementcriteria ac ON a.`id` = ac.`refAchievementId` SET a.`cuFlags` = %i WHERE ac.`id` IN %in', CUSTOM_DISABLED, $criteria);
 
         $this->reapplyCCFlags('achievement', Type::ACHIEVEMENT);
 

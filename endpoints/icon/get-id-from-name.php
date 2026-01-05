@@ -21,7 +21,7 @@ class IconGetidfromnameResponse extends TextResponse
         }
 
         $this->result = 0;
-        if ($id = DB::Aowow()->selectCell('SELECT `id` FROM ?_icons WHERE `name` = ?', $this->_get['name']))
+        if ($id = DB::Aowow()->selectCell('SELECT `id` FROM ::icons WHERE `name` = %s', $this->_get['name']))
             $this->result = $id;
     }
 }

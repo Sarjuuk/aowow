@@ -187,7 +187,7 @@ abstract class Util
             '/\$g\s*([^:;]*)\s*:\s*([^:;]*)\s*(:?[^:;]*);/ui',// directed gender-reference                      $g<male>:<female>:<refVariable>
             '/\$t([^;]+);/ui',                              // HK rank. $t<male>:<female>; (maybe male/female if pvp unranked? Gets replaced with current HK rank.)
             '/<([^\"=\/>]+\s[^\"=\/>]+)>/ui',               // emotes (workaround: at least one whitespace and never " or = between brackets)
-            '/\$(\d+)w/ui',                                 // worldState(?)-ref found on some pageTexts        $1234w
+            '/\$(\d+)w/ui',                                 // worldState(%d)-ref found on some pageTexts        $1234w
             '/\$c/i',                                       // class-ref
             '/\$r/i',                                       // race-ref
             '/\$n/i',                                       // name-ref
@@ -627,8 +627,8 @@ abstract class Util
                 if (empty($miscData['id']) || empty($miscData['voterId']))
                     return false;
 
-                DB::Aowow()->query(                         // delete old votes the user has cast
-                    'DELETE FROM ?_account_reputation WHERE sourceA = ?d AND sourceB = ?d AND userId = ?d AND action IN (?a)',
+                DB::Aowow()->qry(                         // delete old votes the user has cast
+                    'DELETE FROM ::account_reputation WHERE sourceA = %i AND sourceB = %i AND userId = %i AND action IN %in',
                     $miscData['id'],
                     $miscData['voterId'],
                     $user,
@@ -672,13 +672,13 @@ abstract class Util
                 break;
         }
 
-        $x = array_merge($x, array(
+        $x += array(
             'userId' => $user,
             'action' => $action,
-            'date'   => !empty($miscData['date']) ? $miscData['date'] : time()
-        ));
+            'date'   => $miscData['date'] ?? time()
+        );
 
-        return DB::Aowow()->query('INSERT IGNORE INTO ?_account_reputation (?#) VALUES (?a)', array_keys($x), array_values($x));
+        return DB::Aowow()->qry('INSERT IGNORE INTO ::account_reputation %v', $x);
     }
 
     public static function toJSON($data, $forceFlags = 0)
@@ -697,37 +697,6 @@ abstract class Util
         return $json;
     }
 
-    public static function createSqlBatchInsert(array $data) : array
-    {
-        if (!count($data) || !is_array(reset($data)))
-            return [];
-
-        $nRows  = 100;
-        $nItems = count(reset($data));
-        $result = [];
-        $buff   = [];
-
-        foreach ($data as $d)
-        {
-            if (count($d) != $nItems)
-                return [];
-
-            $d = array_map(fn($x) => $x === null ? 'NULL' : DB::Aowow()->escape($x), $d);
-
-            $buff[] = implode(',', $d);
-
-            if (count($buff) >= $nRows)
-            {
-                $result[] = '('.implode('),(', $buff).')';
-                $buff = [];
-            }
-        }
-
-        if ($buff)
-            $result[] = '('.implode('),(', $buff).')';
-
-        return $result;
-    }
 
     /*****************/
     /* file handling */
@@ -881,7 +850,7 @@ abstract class Util
     {
         // prepare score-lookup
         if (empty(self::$perfectGems))
-            self::$perfectGems = DB::World()->selectCol('SELECT perfectItemType FROM skill_perfect_item_template WHERE requiredSpecialization = ?d', 55534);
+            self::$perfectGems = DB::World()->selectCol('SELECT perfectItemType FROM skill_perfect_item_template WHERE requiredSpecialization = %i', 55534);
 
         // epic - WotLK - increased stats / profession specific (Dragon's Eyes)
         if ($profSpec)

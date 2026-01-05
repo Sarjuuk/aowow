@@ -290,7 +290,7 @@ class ProfileListFilter extends Filter
             $lower  = $this->tokenizeString([$k.'.name'], Util::lower($_v['na']),   $_v['ex'] == 'on', true);
             $proper = $this->tokenizeString([$k.'.name'], Util::ucWords($_v['na']), $_v['ex'] == 'on', true);
 
-            $parts[] = ['OR', $lower, $proper];
+            $parts[] = [DB::OR, $lower, $proper];
         }
 
         // side [list]
@@ -331,7 +331,7 @@ class ProfileListFilter extends Filter
         if ($this->useLocalList)
         {
             $this->extraOpts[$k] = array(
-                'j' => [sprintf('?_profiler_completion_skills %1$s ON `%1$s`.`id` = p.`id` AND `%1$s`.`skillId` = %2$d AND `%1$s`.`value` %3$s %4$d', $k, $skillId, $crs, $crv), true],
+                'j' => [sprintf('::profiler_completion_skills %1$s ON `%1$s`.`id` = p.`id` AND `%1$s`.`skillId` = %2$d AND `%1$s`.`value` %3$s %4$d', $k, $skillId, $crs, $crv), true],
                 's' => [', '.$k.'.`value` AS "'.$col.'"']
             );
             return [$k.'.skillId', null, '!'];
@@ -358,7 +358,7 @@ class ProfileListFilter extends Filter
 
         if ($this->useLocalList)
         {
-            $this->extraOpts[$k] = ['j' => [sprintf('?_profiler_completion_achievements %1$s ON `%1$s`.`id` = p.`id` AND `%1$s`.`achievementId` = %2$d', $k, $crv), true]];
+            $this->extraOpts[$k] = ['j' => [sprintf('::profiler_completion_achievements %1$s ON `%1$s`.`id` = p.`id` AND `%1$s`.`achievementId` = %2$d', $k, $crv), true]];
             return [$k.'.achievementId', null, '!'];
         }
         else
@@ -378,7 +378,7 @@ class ProfileListFilter extends Filter
 
         $k = 'i_'.Util::createHash(12);
 
-        $this->extraOpts[$k] = ['j' => [sprintf('?_profiler_items %1$s ON `%1$s`.`id` = p.`id` AND `%1$s`.`item` = %2$d', $k, $crv), true]];
+        $this->extraOpts[$k] = ['j' => [sprintf('::profiler_items %1$s ON `%1$s`.`id` = p.`id` AND `%1$s`.`item` = %2$d', $k, $crv), true]];
         return [$k.'.item', null, '!'];
     }
 
@@ -407,7 +407,7 @@ class ProfileListFilter extends Filter
     protected function cbTeamName(int $cr, int $crs, string $crv, $size) : ?array
     {
         if ($_ = $this->tokenizeString(['at.name'], $crv))
-            return ['AND', ['at.type', $size], $_];
+            return [DB::AND, ['at.type', $size], $_];
 
         return null;
     }
@@ -417,7 +417,7 @@ class ProfileListFilter extends Filter
         if (!Util::checkNumeric($crv, NUM_CAST_INT) || !$this->int2Op($crs))
             return null;
 
-        return ['AND', ['at.type', $size], ['at.rating', $crv, $crs]];
+        return [DB::AND, ['at.type', $size], ['at.rating', $crv, $crs]];
     }
 
     protected function cbAchievs(int $cr, int $crs, string $crv) : ?array
@@ -515,10 +515,10 @@ class RemoteProfileList extends ProfileList
             if ($curTpl['at_login'] & 0x1)
             {
                 if (!isset($this->rnItr[$curTpl['name']]))
-                    $this->rnItr[$curTpl['name']] = DB::Aowow()->selectCell('SELECT MAX(`renameItr`) FROM ?_profiler_profiles WHERE `realm` = ?d AND `custom` = 0 AND `name` = ?', $r, $curTpl['name']) ?: 0;
+                    $this->rnItr[$curTpl['name']] = DB::Aowow()->selectCell('SELECT MAX(`renameItr`) FROM ::profiler_profiles WHERE `realm` = %i AND `custom` = 0 AND `name` = %s', $r, $curTpl['name']) ?: 0;
 
                 // already saved as "pending rename"
-                if ($rnItr = DB::Aowow()->selectCell('SELECT `renameItr` FROM ?_profiler_profiles WHERE `realm` = ?d AND `realmGUID` = ?d', $r, $g))
+                if ($rnItr = DB::Aowow()->selectCell('SELECT `renameItr` FROM ::profiler_profiles WHERE `realm` = %i AND `realmGUID` = %i', $r, $g))
                     $curTpl['renameItr'] = $rnItr;
                 // not yet recognized: get max itr
                 else
@@ -531,9 +531,9 @@ class RemoteProfileList extends ProfileList
         }
 
         foreach ($talentLookup as $realm => $chars)
-            $talentLookup[$realm] = DB::Characters($realm)->selectCol('SELECT `guid` AS ARRAY_KEY, `spell` AS ARRAY_KEY2, `talentGroup` FROM character_talent ct WHERE `guid` IN (?a)', array_keys($chars));
+            $talentLookup[$realm] = DB::Characters($realm)->selectCol('SELECT `guid` AS ARRAY_KEY, `spell` AS ARRAY_KEY2, `talentGroup` FROM character_talent ct WHERE `guid` IN %in', array_keys($chars));
 
-        $talentSpells = DB::Aowow()->select('SELECT `spell` AS ARRAY_KEY, `tab`, `rank` FROM ?_talents WHERE `class` IN (?a)', array_unique($talentSpells));
+        $talentSpells = DB::Aowow()->selectAssoc('SELECT `spell` AS ARRAY_KEY, `tab`, `rank` FROM ::talents WHERE `class` IN %in', array_unique($talentSpells));
 
         // equalize subject distribution across realms
         $limit = 0;
@@ -590,63 +590,73 @@ class RemoteProfileList extends ProfileList
 
     public function initializeLocalEntries() : void
     {
+        if (!$this->templates)
+            return;
+
         $baseData = $guildData = [];
         foreach ($this->iterate() as $guid => $__)
         {
             $realmId   = $this->getField('realm');
             $guildGUID = $this->getField('guild');
 
-            $baseData[$guid] = array(
-                'realm'     => $realmId,
-                'realmGUID' => $this->getField('guid'),
-                'name'      => $this->getField('name'),
-                'renameItr' => $this->getField('renameItr'),
-                'race'      => $this->getField('race'),
-                'class'     => $this->getField('class'),
-                'level'     => $this->getField('level'),
-                'gender'    => $this->getField('gender'),
-                'guild'     => $guildGUID ?: null,
-                'guildrank' => $guildGUID ? $this->getField('guildrank') : null,
-                'stub'      => 1
-            );
+            $baseData['realm'][$guid]     = $realmId;
+            $baseData['realmGUID'][$guid] = $this->getField('guid');
+            $baseData['name'][$guid]      = $this->getField('name');
+            $baseData['renameItr'][$guid] = $this->getField('renameItr');
+            $baseData['race'][$guid]      = $this->getField('race');
+            $baseData['class'][$guid]     = $this->getField('class');
+            $baseData['level'][$guid]     = $this->getField('level');
+            $baseData['gender'][$guid]    = $this->getField('gender');
+            $baseData['guild'][$guid]     = $guildGUID ?: null;
+            $baseData['guildrank'][$guid] = $guildGUID ? $this->getField('guildrank') : null;
+            $baseData['stub'][$guid]      = 1;
 
-            if ($guildGUID && empty($guildData[$realmId.'-'.$guildGUID]))
-                $guildData[$realmId.'-'.$guildGUID] = array(
-                    'realm'     => $realmId,
-                    'realmGUID' => $guildGUID,
-                    'name'      => $this->getField('guildname'),
-                    'nameUrl'   => Profiler::urlize($this->getField('guildname')),
-                    'stub'      => 1
-                );
+            if ($guildGUID)
+            {
+                $guildData['realm'][$realmId.'-'.$guildGUID]     = $realmId;
+                $guildData['realmGUID'][$realmId.'-'.$guildGUID] = $guildGUID;
+                $guildData['name'][$realmId.'-'.$guildGUID]      = $this->getField('guildname');
+                $guildData['nameUrl'][$realmId.'-'.$guildGUID]   = Profiler::urlize($this->getField('guildname'));
+                $guildData['stub'][$realmId.'-'.$guildGUID]      = 1;
+            }
         }
 
         // basic guild data (satisfying table constraints)
         if ($guildData)
         {
-            foreach (Util::createSqlBatchInsert($guildData) as $ins)
-                DB::Aowow()->query('INSERT INTO ?_profiler_guild (?#) VALUES '.$ins.' ON DUPLICATE KEY UPDATE `id` = `id`', array_keys(reset($guildData)));
+            DB::Aowow()->qry('INSERT INTO ::profiler_guild %m ON DUPLICATE KEY UPDATE `id` = `id`', $guildData);
 
             // merge back local ids
-            $localGuilds = DB::Aowow()->selectCol('SELECT `realm` AS ARRAY_KEY, `realmGUID` AS ARRAY_KEY2, `id` FROM ?_profiler_guild WHERE `realm` IN (?a) AND `realmGUID` IN (?a)',
-                array_column($guildData, 'realm'), array_column($guildData, 'realmGUID')
+            $localGuilds = DB::Aowow()->selectCol('SELECT `realm` AS ARRAY_KEY, `realmGUID` AS ARRAY_KEY2, `id` FROM ::profiler_guild WHERE `realm` IN %in AND `realmGUID` IN %in',
+                $guildData['realm'], $guildData['realmGUID']
             );
 
-            foreach ($baseData as &$bd)
-                if ($bd['guild'])
-                    $bd['guild'] = $localGuilds[$bd['realm']][$bd['guild']];
+            foreach ($baseData['guild'] as $i => &$g)
+                $g = $localGuilds[$baseData['realm'][$i]][$baseData['guild'][$i]] ?? null;
         }
 
         // basic char data (enough for tooltips)
         if ($baseData)
         {
-            foreach ($baseData as $ins)
-                DB::Aowow()->query('INSERT INTO ?_profiler_profiles (?#) VALUES (?a) ON DUPLICATE KEY UPDATE `name` = ?, `renameItr` = ?d', array_keys($ins), array_values($ins), $ins['name'], $ins['renameItr']);
+            // this could have been an INSERT ON DUPLICATE KEY UPDATE if MariaDB and MySQL would behave for once!
+            $existing = DB::Aowow()->selectAssoc('SELECT `realmId` AS ARRAY_KEY, `realmGUID` AS ARRAY_KEY2, 1 FROM ::profiler_profiles WHERE `realmId IN (%i) AND `realmGUID` IN (%i)', $baseData['realm'], $baseData['realmGUID']);
+            foreach ($baseData['realm'] as $guid => $_)
+            {
+                if (!isset($existing[$baseData['realm'][$guid]][$baseData['realmGUID'][$guid]]))
+                    continue;
+
+                // ... ON DUPLICATE KEY UPDATE
+                DB::Aowow()->qry('UPDATE ::profiler_profiles SET `name` = %s, `renameItr` = %i WHERE `realm` = %i AND `realmGUID` = %i', $baseData['name'][$guid], $baseData['renameItr'][$guid], $baseData['realm'][$guid], $baseData['realmGUID'][$guid]);
+                foreach($baseData as $col => $__)
+                    unset($baseData[$col][$guid]);
+            }
+
+            // INSERT ...
+            DB::Aowow()->qry('INSERT INTO ::profiler_profiles %m', $baseData);
 
             // merge back local ids
-            $localIds = DB::Aowow()->select(
-               'SELECT CONCAT(`realm`, ":", `realmGUID`) AS ARRAY_KEY, `id`, `gearscore` FROM ?_profiler_profiles WHERE `custom` = 0 AND `realm` IN (?a) AND `realmGUID` IN (?a)',
-                array_column($baseData, 'realm'),
-                array_column($baseData, 'realmGUID')
+            $localIds = DB::Aowow()->selectAssoc('SELECT CONCAT(`realm`, ":", `realmGUID`) AS ARRAY_KEY, `id`, `gearscore` FROM ::profiler_profiles WHERE `custom` = 0 AND `realm` IN %in AND `realmGUID` IN %in',
+                $baseData['realm'], $baseData['realmGUID']
             );
 
             foreach ($this->iterate() as $guid => &$_curTpl)
@@ -659,13 +669,13 @@ class RemoteProfileList extends ProfileList
 
 class LocalProfileList extends ProfileList
 {
-    protected string $queryBase = 'SELECT p.*, p.`id` AS ARRAY_KEY FROM ?_profiler_profiles p';
+    protected string $queryBase = 'SELECT p.*, p.`id` AS ARRAY_KEY FROM ::profiler_profiles p';
     protected array  $queryOpts = array(
                         'p'   => [['g'], 'g' => 'p.`id`'],
-                        'ap'  => ['j' => ['?_account_profiles ap ON ap.`profileId` = p.`id`', true], 's' => ', (IFNULL(ap.`extraFlags`, 0) | p.`cuFlags`) AS "cuFlags"'],
-                        'atm' => ['j' => ['?_profiler_arena_team_member atm ON atm.`profileId` = p.`id`', true], 's' => ', atm.`captain`, atm.`personalRating` AS "rating", atm.`seasonGames`, atm.`seasonWins`'],
-                        'at'  => [['atm'], 'j' => ['?_profiler_arena_team at ON at.`id` = atm.`arenaTeamId`', true], 's' => ', at.`type`'],
-                        'g'   => ['j' => ['?_profiler_guild g ON g.`id` = p.`guild`', true], 's' => ', g.`name` AS "guildname"']
+                        'ap'  => ['j' => ['::account_profiles ap ON ap.`profileId` = p.`id`', true], 's' => ', (IFNULL(ap.`extraFlags`, 0) | p.`cuFlags`) AS "cuFlags"'],
+                        'atm' => ['j' => ['::profiler_arena_team_member atm ON atm.`profileId` = p.`id`', true], 's' => ', atm.`captain`, atm.`personalRating` AS "rating", atm.`seasonGames`, atm.`seasonWins`'],
+                        'at'  => [['atm'], 'j' => ['::profiler_arena_team at ON at.`id` = atm.`arenaTeamId`', true], 's' => ', at.`type`'],
+                        'g'   => ['j' => ['::profiler_guild g ON g.`id` = p.`guild`', true], 's' => ', g.`name` AS "guildname"']
                     );
 
     public function __construct(array $conditions = [], array $miscData = [])
@@ -682,8 +692,8 @@ class LocalProfileList extends ProfileList
 
         if ($conditions && $realmIds)
         {
-            array_unshift($conditions, 'AND');
-            $conditions = ['AND', ['realm', $realmIds], $conditions];
+            array_unshift($conditions, DB::AND);
+            $conditions = [DB::AND, ['realm', $realmIds], $conditions];
         }
         else if ($realmIds)
             $conditions = [['realm', $realmIds]];

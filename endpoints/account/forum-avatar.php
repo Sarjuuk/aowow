@@ -48,7 +48,7 @@ class AccountForumavatarResponse extends TextResponse
 
     private function unset() : string
     {
-        $x = DB::Aowow()->query('UPDATE ?_account SET `avatar` = 0 WHERE `id` = ?d', User::$id);
+        $x = DB::Aowow()->qry('UPDATE ::account SET `avatar` = 0 WHERE `id` = %i', User::$id);
         if ($x === null || $x === false)
             return Lang::main('genericError');
 
@@ -64,17 +64,17 @@ class AccountForumavatarResponse extends TextResponse
 
         $icon = strtolower(trim($this->_post['wowicon']));
 
-        if (!DB::Aowow()->selectCell('SELECT 1 FROM ?_icons WHERE `name` = ?', $icon))
+        if (!DB::Aowow()->selectCell('SELECT 1 FROM ::icons WHERE `name` = %s', $icon))
             return Lang::account('updateMessage', 'avNotFound');
 
-        $x = DB::Aowow()->query('UPDATE ?_account SET `avatar` = 1, `wowicon` = ? WHERE `id` = ?d', strtolower($icon), User::$id);
-        if ($x === null || $x === false)
+        $x = DB::Aowow()->qry('UPDATE ::account SET `avatar` = 1, `wowicon` = %s WHERE `id` = %i', $icon, User::$id);
+        if (is_null($x))
             return Lang::main('genericError');
 
         $this->success = true;
 
         $msg = Lang::account('updateMessage', $x === 0 ? 'avNoChange' : 'avSuccess');
-        if (($qty = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ?_account WHERE `wowicon` = ?', $icon)) > 1)
+        if (($qty = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ::account WHERE `wowicon` = %s', $icon)) > 1)
             $msg .= ' '.Lang::account('updateMessage', 'avNthUser', [$qty]);
         else
             $msg .= ' '.Lang::account('updateMessage', 'av1stUser');
@@ -92,11 +92,11 @@ class AccountForumavatarResponse extends TextResponse
 
         $customIcon = $this->_post['customicon'] ?? $this->_get['customicon'];
 
-        $x = DB::Aowow()->query('UPDATE ?_account_avatars SET `current` = IF(`id` = ?d, 1, 0) WHERE `userId` = ?d AND `status` <> ?d', $customIcon, User::$id, AvatarMgr::STATUS_REJECTED);
+        $x = DB::Aowow()->qry('UPDATE ::account_avatars SET `current` = IF(`id` = %i, 1, 0) WHERE `userId` = %i AND `status` <> %i', $customIcon, User::$id, AvatarMgr::STATUS_REJECTED);
         if (!is_int($x))
             return Lang::main('genericError');
 
-        if (!is_int(DB::Aowow()->query('UPDATE ?_account SET `avatar` = 2 WHERE `id` = ?d', User::$id)))
+        if (!is_int(DB::Aowow()->qry('UPDATE ::account SET `avatar` = 2 WHERE `id` = %i', User::$id)))
             return Lang::main('intError');
 
         $this->success = true;

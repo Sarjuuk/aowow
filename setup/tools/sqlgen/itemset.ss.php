@@ -185,17 +185,17 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         $data['contentGroup'] = reset($items)['note'];
     }
 
-    public function generate(array $ids = []) : bool
+    public function generate() : bool
     {
         // find events associated with holidayIds
-        if ($pairs = DB::World()->selectCol('SELECT `holiday` AS ARRAY_KEY, `eventEntry` FROM game_event WHERE `holiday` IN (?a)', array_values($this->setToHoliday)))
+        if ($pairs = DB::World()->selectCol('SELECT `holiday` AS ARRAY_KEY, `eventEntry` FROM game_event WHERE `holiday` IN %in', array_values($this->setToHoliday)))
             foreach ($this->setToHoliday as &$hId)
                 $hId = !empty($pairs[$hId]) ? $pairs[$hId] : 0;
 
-        DB::Aowow()->query('TRUNCATE TABLE ?_itemset');
+        DB::Aowow()->qry('TRUNCATE TABLE ::itemset');
 
         $virtualId = 0;
-        $sets      = DB::Aowow()->select('SELECT *, `id` AS ARRAY_KEY FROM dbc_itemset');
+        $sets      = DB::Aowow()->selectAssoc('SELECT *, `id` AS ARRAY_KEY FROM dbc_itemset');
 
         foreach ($sets as $setId => $setData)
         {
@@ -260,7 +260,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             /* determine type and reuse from pieces */
             /****************************************/
 
-            $pieces = DB::World()->select('SELECT `entry`, `name`, `class`, `subclass`, `Quality`, `AllowableClass`, `ItemLevel`, `RequiredLevel`, `itemset`, IF (`Flags` & ?d, 1, 0) AS "heroic", IF(`InventoryType` = 15, 26, IF(`InventoryType` = 5, 20, `InventoryType`)) AS "slot", `entry` AS ARRAY_KEY FROM item_template WHERE `itemset` = ?d', ITEM_FLAG_HEROIC, $setId);
+            $pieces = DB::World()->selectAssoc('SELECT `entry`, `name`, `class`, `subclass`, `Quality`, `AllowableClass`, `ItemLevel`, `RequiredLevel`, `itemset`, IF (`Flags` & %i, 1, 0) AS "heroic", IF(`InventoryType` = 15, 26, IF(`InventoryType` = 5, 20, `InventoryType`)) AS "slot", `entry` AS ARRAY_KEY FROM item_template WHERE `itemset` = %i', ITEM_FLAG_HEROIC, $setId);
 
             /*
                 possible cases:
@@ -272,7 +272,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             if (count($pieces) < 2)
             {
                 $row['cuFlags'] = CUSTOM_EXCLUDE_FOR_LISTVIEW;
-                DB::Aowow()->query('INSERT INTO ?_itemset (?#) VALUES (?a)', array_keys($row), array_values($row));
+                DB::Aowow()->qry('INSERT INTO ::itemset %v', $row);
                 CLI::write('[item set] '.str_pad('['.$setId.']', 7).CLI::bold($setData['name_loc0']).' has no associated items', CLI::LOG_INFO);
                 continue;
             }
@@ -294,7 +294,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                 else if (in_array($data['slot'], [INVTYPE_WEAPON, INVTYPE_FINGER, INVTYPE_TRINKET]))
                     $sorted[$k][-$data['slot']] = $data;
                 // slot confict. If item is being sold, replace old item (imperfect solution :/)
-                else if (DB::World()->selectCell('SELECT SUM(`n`) FROM (SELECT COUNT(1) AS "n" FROM npc_vendor WHERE `item` = ?d UNION SELECT COUNT(1) AS "n" FROM game_event_npc_vendor WHERE `item` = ?d) x', $data['entry'], $data['entry']))
+                else if (DB::World()->selectCell('SELECT SUM(`n`) FROM (SELECT COUNT(1) AS "n" FROM npc_vendor WHERE `item` = %i UNION SELECT COUNT(1) AS "n" FROM game_event_npc_vendor WHERE `item` = %i) x', $data['entry'], $data['entry']))
                     $sorted[$k][$data['slot']] = $data;
             }
 
@@ -311,7 +311,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                 if ($i++)
                     $vRow['id'] = --$virtualId;
 
-                DB::Aowow()->query('INSERT INTO ?_itemset (?#) VALUES (?a)', array_keys($vRow), array_values($vRow));
+                DB::Aowow()->qry('INSERT INTO ::itemset %v', $vRow);
             }
         }
 

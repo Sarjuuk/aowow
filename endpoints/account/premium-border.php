@@ -28,8 +28,8 @@ class AccountPremiumborderResponse extends TextResponse
         if (!$this->assertPOST('avatarborder'))
             return;
 
-        $x = DB::Aowow()->query('UPDATE ?_account SET `avatarborder` = ?d WHERE `id` = ?d', $this->_post['avatarborder'], User::$id);
-        if (!is_int($x))
+        $x = DB::Aowow()->qry('UPDATE ::account SET `avatarborder` = %i WHERE `id` = %i', $this->_post['avatarborder'], User::$id);
+        if (is_null($x))
             $_SESSION['msg'] = ['premiumborder', false, Lang::main('genericError')];
         else if (!$x)
             $_SESSION['msg'] = ['premiumborder', true, Lang::account('updateMessage', 'avNoChange')];

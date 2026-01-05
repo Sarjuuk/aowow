@@ -237,13 +237,13 @@ abstract class Filter
 
             if ($filters)                                   // if a filter uses criteria it must have a [ma]tch selector
             {
-                $filters[] = empty($this->values['ma']) ? 'AND' : 'OR';
+                $filters[] = empty($this->values['ma']) ? DB::AND : DB::OR;
                 $this->cndSet[] = $filters;
             }
         }
 
         if ($this->cndSet)
-            array_unshift($this->cndSet, 'AND');
+            array_unshift($this->cndSet, DB::AND);
 
         return $this->cndSet;
     }
@@ -593,7 +593,7 @@ abstract class Filter
             if (!$sub)
                 continue;
             else if (count($sub) > 1)
-                array_unshift($sub, 'AND');
+                array_unshift($sub, DB::AND);
             else
                 $sub = $sub[0];
 
@@ -607,7 +607,7 @@ abstract class Filter
             $this->error = true;
         }
         else if (count($qry) > 1)
-            array_unshift($qry, 'OR');
+            array_unshift($qry, DB::OR);
         else
             $qry = $qry[0];
 
@@ -657,7 +657,7 @@ abstract class Filter
             $this->error = true;
         }
         else if (count($qry) > 1)
-            array_unshift($qry, 'OR');
+            array_unshift($qry, DB::OR);
         else
             $qry = $qry[0];
 

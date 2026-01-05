@@ -89,26 +89,26 @@ class ProfileSaveResponse extends TextResponse
         if ($_ = $this->_post['copy'])                      // gets set to source profileId when "save as" is clicked. Whats the difference to 'source' though?
         {
             // get character origin info if possible
-            if ($r = DB::Aowow()->selectCell('SELECT `realm` FROM ?_profiler_profiles WHERE `id` = ?d AND `custom` = 0', $_))
+            if ($r = DB::Aowow()->selectCell('SELECT `realm` FROM ::profiler_profiles WHERE `id` = %i AND `custom` = 0', $_))
                 $cuProfile['realm'] = $r;
 
             $cuProfile['sourceId'] = $_;
         }
 
         if (!empty($cuProfile['sourceId']))
-            $cuProfile['sourceName'] = DB::Aowow()->selectCell('SELECT `name` FROM ?_profiler_profiles WHERE `id` = ?d', $cuProfile['sourceId']);
+            $cuProfile['sourceName'] = DB::Aowow()->selectCell('SELECT `name` FROM ::profiler_profiles WHERE `id` = %i', $cuProfile['sourceId']);
 
         $charId = -1;
         if ($id = $this->_get['id'][0])                     // update
         {
-            if ($charId = DB::Aowow()->selectCell('SELECT `id` FROM ?_profiler_profiles WHERE `id` = ?d', $id))
-                DB::Aowow()->query('UPDATE ?_profiler_profiles SET ?a WHERE `id` = ?d', $cuProfile, $id);
+            if ($charId = DB::Aowow()->selectCell('SELECT `id` FROM ::profiler_profiles WHERE `id` = %i', $id))
+                DB::Aowow()->qry('UPDATE ::profiler_profiles SET %a WHERE `id` = %i', $cuProfile, $id);
         }
         else                                                // new
         {
-            $nProfiles = DB::Aowow()->selectCell('SELECT COUNT(*) FROM ?_profiler_profiles WHERE `user` = ?d AND `deleted` = 0 AND `custom` = 1', User::$id);
+            $nProfiles = DB::Aowow()->selectCell('SELECT COUNT(*) FROM ::profiler_profiles WHERE `user` = %i AND `deleted` = 0 AND `custom` = 1', User::$id);
             if ($nProfiles < 10 || User::isPremium())
-                if ($newId = DB::Aowow()->query('INSERT INTO ?_profiler_profiles (?#) VALUES (?a)', array_keys($cuProfile), array_values($cuProfile)))
+                if ($newId = DB::Aowow()->qry('INSERT INTO ::profiler_profiles %v', $cuProfile))
                     $charId = $newId;
         }
 
@@ -148,7 +148,7 @@ class ProfileSaveResponse extends TextResponse
 
                     if ($slot + 1 == array_sum($itemData))  // only slot definition set => empty slot
                     {
-                        DB::Aowow()->query('DELETE FROM ?_profiler_items WHERE `id` = ?d AND `slot` = ?d', $charId, $itemData[0]);
+                        DB::Aowow()->qry('DELETE FROM ::profiler_items WHERE `id` = %i AND `slot` = %i', $charId, $itemData[0]);
                         continue;
                     }
 
@@ -176,7 +176,7 @@ class ProfileSaveResponse extends TextResponse
 
                     // looks good
                     array_unshift($itemData, $charId);
-                    DB::Aowow()->query('REPLACE INTO ?_profiler_items (?#) VALUES (?a)', $keys, $itemData);
+                    DB::Aowow()->qry('REPLACE INTO ::profiler_items %v', array_combine($keys, $itemData));
                 }
             }
         }

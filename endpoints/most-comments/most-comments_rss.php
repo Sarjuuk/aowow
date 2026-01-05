@@ -27,8 +27,8 @@ class MostcommentsRssResponse extends TextResponse
         foreach (Type::getClassesFor() as $type => $classStr)
         {
             $comments = DB::Aowow()->selectCol(
-               'SELECT   `typeId` AS ARRAY_KEY, COUNT(1) FROM ?_comments
-                WHERE    `replyTo` = 0 AND (`flags` & ?d) = 0 AND `type`= ?d AND `date` > (UNIX_TIMESTAMP() - ?d)
+               'SELECT   `typeId` AS ARRAY_KEY, COUNT(1) FROM ::comments
+                WHERE    `replyTo` = 0 AND (`flags` & %i) = 0 AND `type`= %i AND `date` > (UNIX_TIMESTAMP() - %i)
                 GROUP BY `type`, `typeId`
                 LIMIT    100',
                 CC_FLAG_DELETED,

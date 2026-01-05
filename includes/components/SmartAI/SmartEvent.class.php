@@ -276,7 +276,7 @@ class SmartEvent
                         case 530: $this->param[10] = Lang::maps('Outland');         break;
                         case 571: $this->param[10] = Lang::maps('Northrend');       break;
                         default:
-                            if ($aId = DB::Aowow()->selectCell('SELECT `id` FROM ?_zones WHERE `mapId` = ?d', $this->param[1]))
+                            if ($aId = DB::Aowow()->selectCell('SELECT `id` FROM ::zones WHERE `mapId` = %i', $this->param[1]))
                             {
                                 $this->param[11] = $aId;
                                 $this->jsGlobals[Type::ZONE][$aId] = $aId;
@@ -290,18 +290,16 @@ class SmartEvent
 
                 break;
             case self::EVENT_LINK:                          // 61  -  Used to link together multiple events as a chain of events.
-                if ($links = DB::World()->selectCol('SELECT `id` FROM smart_scripts WHERE `link` = ?d AND `entryorguid` = ?d AND `source_type` = ?d', $this->id, $this->smartAI->entry, $this->smartAI->srcType))
+                if ($links = DB::World()->selectCol('SELECT `id` FROM smart_scripts WHERE `link` = %i AND `entryorguid` = %i AND `source_type` = %i', $this->id, $this->smartAI->entry, $this->smartAI->srcType))
                     $this->param[10] = Lang::concat($links, Lang::CONCAT_OR, fn($x) => "#[b]".$x."[/b]");
                 break;
             case self::EVENT_GOSSIP_SELECT:                 // 62  -  On gossip clicked (gossip_menu_option335).
                 $gmo = DB::World()->selectRow(
-                   'SELECT    gmo.`OptionText` AS "text_loc0" {, gmol.`OptionText` AS text_loc?d }
+                   'SELECT    gmo.`OptionText` AS "text_loc0" %if', Lang::getLocale() != Locale::EN, ', gmol.`OptionText` AS %s', 'text_loc' . Lang::getLocale()->value, '%end
                     FROM      gossip_menu_option gmo
-                    LEFT JOIN gossip_menu_option_locale gmol ON gmo.`MenuID` = gmol.`MenuID` AND gmo.`OptionID` = gmol.`OptionID` AND gmol.`Locale` = ?d
-                    WHERE     gmo.`MenuId` = ?d AND gmo.`OptionID` = ?d',
-                    Lang::getLocale() != Locale::EN ? Lang::getLocale()->value : DBSIMPLE_SKIP,
-                    Lang::getLocale()->json(),
-                    $this->param[0], $this->param[1]
+                    LEFT JOIN gossip_menu_option_locale gmol ON gmo.`MenuID` = gmol.`MenuID` AND gmo.`OptionID` = gmol.`OptionID` AND gmol.`Locale` = %i
+                    WHERE     gmo.`MenuId` = %i AND gmo.`OptionID` = %i',
+                    Lang::getLocale()->json(), $this->param[0], $this->param[1]
                 );
 
                 if ($gmo)

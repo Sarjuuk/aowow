@@ -126,6 +126,14 @@ CLISetup::registerUtility(new class extends UtilityScript
             CLI::write();
 
             set_time_limit($this->defaultExecTime);         // reset to default for the next script
+
+            // try to free memory
+            unset($scriptRef, $this->generators[$cmd]);
+            if (gc_enabled())
+            {
+                gc_collect_cycles();
+                gc_mem_caches();
+            }
         }
 
         return $allOk;

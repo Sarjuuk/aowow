@@ -48,7 +48,7 @@ class GuildList extends DBTypeList
         if (!$guilds)
             return;
 
-        $stats = DB::Aowow()->select('SELECT `guild` AS ARRAY_KEY, `id` AS ARRAY_KEY2, `level`, `gearscore`, `achievementpoints` FROM ?_profiler_profiles WHERE `guild` IN (?a) AND `stub` = 0 ORDER BY `gearscore` DESC', $guilds);
+        $stats = DB::Aowow()->selectAssoc('SELECT `guild` AS ARRAY_KEY, `id` AS ARRAY_KEY2, `level`, `gearscore`, `achievementpoints` FROM ::profiler_profiles WHERE `guild` IN %in AND `stub` = 0 ORDER BY `gearscore` DESC', $guilds);
         foreach ($this->iterate() as &$_curTpl)
         {
             $id = $_curTpl['id'];
@@ -218,27 +218,25 @@ class RemoteGuildList extends GuildList
 
     public function initializeLocalEntries() : void
     {
+        if (!$this->templates)
+            return;
+
         $data = [];
         foreach ($this->iterate() as $guid => $__)
         {
-            $data[$guid] = array(
-                'realm'     => $this->getField('realm'),
-                'realmGUID' => $this->getField('guildid'),
-                'name'      => $this->getField('name'),
-                'nameUrl'   => Profiler::urlize($this->getField('name')),
-                'stub'      => 1
-            );
+            $data['realm'][$guid]     = $this->getField('realm');
+            $data['realmGUID'][$guid] = $this->getField('guildid');
+            $data['name'][$guid]      = $this->getField('name');
+            $data['nameUrl'][$guid]   = Profiler::urlize($this->getField('name'));
+            $data['stub'][$guid]      = 1;
         }
 
         // basic guild data
-        foreach (Util::createSqlBatchInsert($data) as $ins)
-            DB::Aowow()->query('INSERT INTO ?_profiler_guild (?#) VALUES '.$ins.' ON DUPLICATE KEY UPDATE `id` = `id`', array_keys(reset($data)));
+        DB::Aowow()->qry('INSERT INTO ::profiler_guild %m ON DUPLICATE KEY UPDATE `id` = `id`', $data);
 
         // merge back local ids
-        $localIds = DB::Aowow()->selectCol(
-           'SELECT CONCAT(`realm`, ":", `realmGUID`) AS ARRAY_KEY, `id` FROM ?_profiler_guild WHERE `realm` IN (?a) AND `realmGUID` IN (?a)',
-            array_column($data, 'realm'),
-            array_column($data, 'realmGUID')
+        $localIds = DB::Aowow()->selectCol('SELECT CONCAT(`realm`, ":", `realmGUID`) AS ARRAY_KEY, `id` FROM ::profiler_guild WHERE `realm` IN %in AND `realmGUID` IN %in',
+            $data['realm'], $data['realmGUID']
         );
 
         foreach ($this->iterate() as $guid => &$_curTpl)
@@ -250,7 +248,7 @@ class RemoteGuildList extends GuildList
 
 class LocalGuildList extends GuildList
 {
-    protected string $queryBase = 'SELECT g.*, g.`id` AS ARRAY_KEY FROM ?_profiler_guild g';
+    protected string $queryBase = 'SELECT g.*, g.`id` AS ARRAY_KEY FROM ::profiler_guild g';
 
     public function __construct(array $conditions = [], array $miscData = [])
     {
@@ -271,8 +269,8 @@ class LocalGuildList extends GuildList
 
         if ($conditions)
         {
-            array_unshift($conditions, 'AND');
-            $conditions = ['AND', ['realm', array_keys($realms)], $conditions];
+            array_unshift($conditions, DB::AND);
+            $conditions = [DB::AND, ['realm', array_keys($realms)], $conditions];
         }
         else
             $conditions = [['realm', array_keys($realms)]];

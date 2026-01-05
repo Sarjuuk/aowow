@@ -32,12 +32,12 @@ class ArenaTeamResyncResponse extends TextResponse
         if (!$this->assertGET('id'))
             return;
 
-        if ($teams = DB::Aowow()->select('SELECT `realm`, `realmGUID` FROM ?_profiler_arena_team WHERE `id` IN (?a)', $this->_get['id']))
+        if ($teams = DB::Aowow()->selectAssoc('SELECT `realm`, `realmGUID` FROM ::profiler_arena_team WHERE `id` IN %in', $this->_get['id']))
             foreach ($teams as $t)
                 Profiler::scheduleResync(Type::ARENA_TEAM, $t['realm'], $t['realmGUID']);
 
         if ($this->_get['profile'])
-            if ($chars = DB::Aowow()->select('SELECT `realm`, `realmGUID` FROM ?_profiler_profiles p JOIN ?_profiler_arena_team_member atm ON atm.`profileId` = p.`id` WHERE atm.`arenaTeamId` IN (?a)', $this->_get['id']))
+            if ($chars = DB::Aowow()->selectAssoc('SELECT `realm`, `realmGUID` FROM ::profiler_profiles p JOIN ::profiler_arena_team_member atm ON atm.`profileId` = p.`id` WHERE atm.`arenaTeamId` IN %in', $this->_get['id']))
                 foreach ($chars as $c)
                     Profiler::scheduleResync(Type::PROFILE, $c['realm'], $c['realmGUID']);
 

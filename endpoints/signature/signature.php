@@ -46,7 +46,7 @@ class SignatureBaseResponse extends TemplateResponse
 
         $realms = Profiler::getRealms();
         if ($rId = array_find_key($realms, fn($x) => $x['region'] == $region && $x['name'] == $realm))
-            return DB::Aowow()->selectCell('SELECT `id` FROM ?_profiler_profiles WHERE `realm` = ?d AND `custom` = 0 AND `name` = ?', $rId, urldecode($char)) ?: null;
+            return DB::Aowow()->selectCell('SELECT `id` FROM ::profiler_profiles WHERE `realm` = %i AND `custom` = 0 AND `name` = %s', $rId, urldecode($char)) ?: null;
 
         return null;
     }

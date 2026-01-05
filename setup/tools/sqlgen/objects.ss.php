@@ -18,7 +18,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
     protected $dbcSourceFiles  = ['lock'];
     protected $worldDependency = ['gameobject_template', 'gameobject_template_addon', 'gameobject_template_locale', 'gameobject_questitem'];
 
-    public function generate(array $ids = []) : bool
+    public function generate() : bool
     {
         $baseQuery =
            'SELECT    go.entry,
@@ -63,33 +63,30 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             LEFT JOIN gameobject_template_locale gtl6 ON go.entry = gtl6.entry AND gtl6.`locale` = "esES"
             LEFT JOIN gameobject_template_locale gtl8 ON go.entry = gtl8.entry AND gtl8.`locale` = "ruRU"
             LEFT JOIN gameobject_questitem gqi ON gqi.GameObjectEntry = go.entry
-           { WHERE     go.entry IN (?a) }
             GROUP BY  go.entry
-            LIMIT     ?d, ?d';
+            LIMIT     %i, %i';
 
-        DB::Aowow()->query('TRUNCATE ?_objects');
-        DB::Aowow()->query('SET SESSION innodb_ft_enable_stopword = OFF');
+        DB::Aowow()->qry('TRUNCATE ::objects');
+        DB::Aowow()->qry('SET SESSION innodb_ft_enable_stopword = OFF');
 
         $i = 0;
-        while ($objects = DB::World()->select($baseQuery, $ids ?: DBSIMPLE_SKIP, CLISetup::SQL_BATCH * $i, CLISetup::SQL_BATCH))
+        while ($objects = DB::World()->selectAssoc($baseQuery, CLISetup::SQL_BATCH * $i, CLISetup::SQL_BATCH))
         {
             CLI::write(' * batch #' . ++$i . ' (' . count($objects) . ')', CLI::LOG_BLANK, true, true);
 
             foreach ($objects as $object)
-                DB::Aowow()->query('INSERT INTO ?_objects VALUES (?a)', array_values($object));
+                DB::Aowow()->qry('INSERT INTO ::objects VALUES %l', $object);
         }
 
         // apply typeCat and reqSkill depending on locks
-        DB::Aowow()->query(
-            'UPDATE    ?_objects o
+        DB::Aowow()->qry(
+           'UPDATE    ::objects o
             LEFT JOIN dbc_lock l ON l.id = IF(o.`type` = 3, lockId, null)
             SET       typeCat  = IF(`type` = 3 AND (l.properties1 = 1 OR l.properties2 = 1), -5,    -- footlocker
                                  IF(`type` = 3 AND (l.properties1 = 2), -3,                         -- herb
                                  IF(`type` = 3 AND (l.properties1 = 3), -4, typeCat))),             -- ore
                       reqSkill = IF(`type` = 3 AND l.properties1 IN (1, 2, 3), IF(l.reqSkill1 > 1, l.reqSkill1, 1),
-                                 IF(`type` = 3 AND l.properties2 = 1, IF(l.reqSkill2 > 1, l.reqSkill2, 1), 0))
-          { WHERE     o.id IN (?a) }',
-            $ids ?: DBSIMPLE_SKIP
+                                 IF(`type` = 3 AND l.properties2 = 1, IF(l.reqSkill2 > 1, l.reqSkill2, 1), 0))',
         );
 
         $this->reapplyCCFlags('objects', Type::OBJECT);

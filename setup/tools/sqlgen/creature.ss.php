@@ -18,11 +18,11 @@ CLISetup::registerSetup("sql", new class extends SetupScript
     protected $dbcSourceFiles  = ['creaturedisplayinfo', 'creaturedisplayinfoextra'];
     protected $worldDependency = ['creature_template', 'creature_template_locale', 'creature_template_resistance', 'creature_template_spell', 'creature_classlevelstats', 'creature_default_trainer', 'trainer', 'instance_encounters'];
 
-    public function generate(array $ids = []) : bool
+    public function generate() : bool
     {
         $baseQuery =
            'SELECT    ct.entry,
-                      IF(ie.creditEntry IS NULL, 0, ?d) AS cuFlags,
+                      IF(ie.creditEntry IS NULL, 0, %i) AS cuFlags,
                       difficulty_entry_1, difficulty_entry_2, difficulty_entry_3,
                       KillCredit1, KillCredit2,
                       modelid1, modelid2, modelid3, modelid4,
@@ -99,24 +99,23 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             LEFT JOIN creature_template_resistance ctr4 ON ct.entry = ctr4.CreatureID AND ctr4.School = 4
             LEFT JOIN creature_template_resistance ctr5 ON ct.entry = ctr5.CreatureID AND ctr5.School = 5
             LEFT JOIN creature_template_resistance ctr6 ON ct.entry = ctr6.CreatureID AND ctr6.School = 6
-           { WHERE     ct.entry IN (?a) }
-            LIMIT     ?d, ?d';
+            LIMIT     %i, %i';
 
-        DB::Aowow()->query('TRUNCATE ?_creature');
-        DB::Aowow()->query('SET SESSION innodb_ft_enable_stopword = OFF');
+        DB::Aowow()->qry('TRUNCATE ::creature');
+        DB::Aowow()->qry('SET SESSION innodb_ft_enable_stopword = OFF');
 
         $i = 0;
-        while ($npcs = DB::World()->select($baseQuery, NPC_CU_INSTANCE_BOSS, $ids ?: DBSIMPLE_SKIP, CLISetup::SQL_BATCH * $i, CLISetup::SQL_BATCH))
+        while ($npcs = DB::World()->selectAssoc($baseQuery, NPC_CU_INSTANCE_BOSS, CLISetup::SQL_BATCH * $i, CLISetup::SQL_BATCH))
         {
             CLI::write(' * batch #' . ++$i . ' (' . count($npcs) . ')', CLI::LOG_BLANK, true, true);
 
             foreach ($npcs as $npc)
-                DB::Aowow()->query('INSERT INTO ?_creature VALUES (?a)', array_values($npc));
+                DB::Aowow()->qry('INSERT INTO ::creature VALUES %l', $npc);
         }
 
         // apply "textureString", "modelId" and "iconSring"
-        DB::Aowow()->query(
-           'UPDATE    ?_creature c
+        DB::Aowow()->qry(
+           'UPDATE    ::creature c
             JOIN      dbc_creaturedisplayinfo cdi ON c.displayId1 = cdi.id
             LEFT JOIN dbc_creaturedisplayinfoextra cdie ON cdi.extraInfoId = cdie.id
             SET       c.textureString = IFNULL(cdie.textureString, cdi.skin1),
@@ -126,21 +125,21 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         );
 
         // apply cuFlag: difficultyDummy
-        DB::Aowow()->query(
-           'UPDATE ?_creature a
-            JOIN   (SELECT b.difficultyEntry1 AS dummy FROM ?_creature b UNION
-                    SELECT c.difficultyEntry2 AS dummy FROM ?_creature c UNION
-                    SELECT d.difficultyEntry3 AS dummy FROM ?_creature d) j
-            SET    a.cuFlags = a.cuFlags | ?d
+        DB::Aowow()->qry(
+           'UPDATE ::creature a
+            JOIN   (SELECT b.difficultyEntry1 AS dummy FROM ::creature b UNION
+                    SELECT c.difficultyEntry2 AS dummy FROM ::creature c UNION
+                    SELECT d.difficultyEntry3 AS dummy FROM ::creature d) j
+            SET    a.cuFlags = a.cuFlags | %i
             WHERE  a.id = j.dummy',
             NPC_CU_DIFFICULTY_DUMMY | CUSTOM_EXCLUDE_FOR_LISTVIEW
         );
 
         // apply cuFlag: excludeFromListview [for trigger-creatures]
-        DB::Aowow()->query('UPDATE ?_creature SET cuFlags = cuFlags | ?d WHERE flagsExtra & ?d', CUSTOM_EXCLUDE_FOR_LISTVIEW, 0x80);
+        DB::Aowow()->qry('UPDATE ::creature SET cuFlags = cuFlags | %i WHERE flagsExtra & %i', CUSTOM_EXCLUDE_FOR_LISTVIEW, 0x80);
 
         // apply cuFlag: exCludeFromListview [for nameparts indicating internal usage]
-        DB::Aowow()->query('UPDATE ?_creature SET cuFlags = cuFlags | ?d WHERE name_loc0 LIKE "%[%" OR name_loc0 LIKE "%(%" OR name_loc0 LIKE "%visual%" OR name_loc0 LIKE "%trigger%" OR name_loc0 LIKE "%credit%" OR name_loc0 LIKE "%marker%"', CUSTOM_EXCLUDE_FOR_LISTVIEW);
+        DB::Aowow()->qry('UPDATE ::creature SET cuFlags = cuFlags | %i WHERE name_loc0 LIKE "%[%" OR name_loc0 LIKE "%(%" OR name_loc0 LIKE "%visual%" OR name_loc0 LIKE "%trigger%" OR name_loc0 LIKE "%credit%" OR name_loc0 LIKE "%marker%"', CUSTOM_EXCLUDE_FOR_LISTVIEW);
 
         $this->reapplyCCFlags('creature', Type::NPC);
 

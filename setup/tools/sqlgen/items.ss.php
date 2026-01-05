@@ -29,7 +29,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         SKILL_ALCHEMY      =>  6
     );
 
-    public function generate(array $ids = []) : bool
+    public function generate() : bool
     {
         $baseQuery =
            'SELECT    it.entry,
@@ -127,37 +127,36 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             LEFT JOIN item_template_locale itl8 ON it.entry = itl8.ID AND itl8.locale = "ruRU"
             LEFT JOIN spell_group sg ON sg.spell_id = it.spellid_1 AND it.class = 0 AND it.subclass = 2 AND sg.id IN (1, 2)
             LEFT JOIN game_event ge ON ge.holiday = it.HolidayId AND it.HolidayId > 0
-          { WHERE     it.entry IN (?a) }
-            LIMIT     ?d, ?d';
+            LIMIT     %i, %i';
 
-        DB::Aowow()->query('TRUNCATE ?_items');
-        DB::Aowow()->query('SET SESSION innodb_ft_enable_stopword = OFF');
+        DB::Aowow()->qry('TRUNCATE ::items');
+        DB::Aowow()->qry('SET SESSION innodb_ft_enable_stopword = OFF');
 
         $i = 0;
-        while ($items = DB::World()->select($baseQuery, $ids ?: DBSIMPLE_SKIP, CLISetup::SQL_BATCH * $i, CLISetup::SQL_BATCH))
+        while ($items = DB::World()->selectAssoc($baseQuery, CLISetup::SQL_BATCH * $i, CLISetup::SQL_BATCH))
         {
             CLI::write(' * batch #' . ++$i . ' (' . count($items) . ')', CLI::LOG_BLANK, true, true);
 
             foreach ($items as $item)
-                DB::Aowow()->query('INSERT INTO ?_items VALUES (?a)', array_values($item));
+                DB::Aowow()->qry('INSERT INTO ::items VALUES %l', $item);
         }
 
         // merge with gemProperties
-        DB::Aowow()->query('UPDATE ?_items i, dbc_gemproperties gp SET i.gemEnchantmentId = gp.enchantmentId, i.gemColorMask = gp.colorMask WHERE i.gemColorMask = gp.id');
+        DB::Aowow()->qry('UPDATE ::items i, dbc_gemproperties gp SET i.gemEnchantmentId = gp.enchantmentId, i.gemColorMask = gp.colorMask WHERE i.gemColorMask = gp.id');
 
         // get modelString
-        DB::Aowow()->query('UPDATE ?_items i, dbc_itemdisplayinfo idi SET i.model = IF(idi.leftModelName = "", idi.rightModelName, idi.leftModelName) WHERE i.displayId = idi.id');
+        DB::Aowow()->qry('UPDATE ::items i, dbc_itemdisplayinfo idi SET i.model = IF(idi.leftModelName = "", idi.rightModelName, idi.leftModelName) WHERE i.displayId = idi.id');
 
         // get iconId
-        DB::Aowow()->query('UPDATE ?_items i, dbc_itemdisplayinfo idi, ?_icons ic SET i.iconId = ic.id WHERE i.displayId = idi.id AND LOWER(idi.inventoryIcon1) = ic.name_source');
+        DB::Aowow()->qry('UPDATE ::items i, dbc_itemdisplayinfo idi, ::icons ic SET i.iconId = ic.id WHERE i.displayId = idi.id AND LOWER(idi.inventoryIcon1) = ic.name_source');
 
         // unify slots:  Robes => Chest; Ranged (right) => Ranged
-        DB::Aowow()->query('UPDATE ?_items SET slot = ?d WHERE slotbak = ?d', INVTYPE_RANGED, INVTYPE_RANGEDRIGHT);
-        DB::Aowow()->query('UPDATE ?_items SET slot = ?d WHERE slotbak = ?d', INVTYPE_CHEST, INVTYPE_ROBE);
+        DB::Aowow()->qry('UPDATE ::items SET slot = %i WHERE slotbak = %i', INVTYPE_RANGED, INVTYPE_RANGEDRIGHT);
+        DB::Aowow()->qry('UPDATE ::items SET slot = %i WHERE slotbak = %i', INVTYPE_CHEST, INVTYPE_ROBE);
 
         // custom sub-classes
-        DB::Aowow()->query(
-           'UPDATE ?_items SET subclass = IF(
+        DB::Aowow()->qry(
+           'UPDATE ::items SET subclass = IF(
                 slotbak = 4, -8, IF(                                  -- shirt
                     slotbak = 19, -7, IF(                             -- tabard
                         slotbak = 16, -6, IF(                         -- cloak
@@ -169,49 +168,49 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         );
 
         // move alchemist stones to trinkets (Armor)
-        DB::Aowow()->query('UPDATE ?_items SET class = 4, subClass = -4 WHERE classBak = 7 AND subClassBak = 11 AND slotBak = ?d', INVTYPE_TRINKET);
+        DB::Aowow()->qry('UPDATE ::items SET class = 4, subClass = -4 WHERE classBak = 7 AND subClassBak = 11 AND slotBak = %i', INVTYPE_TRINKET);
 
         // mark keys as key (if not quest items)
-        DB::Aowow()->query('UPDATE ?_items SET class = 13, subClass = 0 WHERE classBak IN (0, 15) AND bagFamily & 0x100');
+        DB::Aowow()->qry('UPDATE ::items SET class = 13, subClass = 0 WHERE classBak IN (0, 15) AND bagFamily & 0x100');
 
         // set subSubClass for Glyphs (major/minor)
-        DB::Aowow()->query('UPDATE ?_items i, dbc_spell s, dbc_glyphproperties gp SET i.subSubClass = IF(gp.typeFlags & 0x1, 2, 1) WHERE i.spellId1 = s.id AND s.effect1MiscValue = gp.id AND i.classBak = 16');
+        DB::Aowow()->qry('UPDATE ::items i, dbc_spell s, dbc_glyphproperties gp SET i.subSubClass = IF(gp.typeFlags & 0x1, 2, 1) WHERE i.spellId1 = s.id AND s.effect1MiscValue = gp.id AND i.classBak = 16');
 
         // filter misc(class:15) junk(subclass:0) to appropriate categories
 
         // assign pets and mounts to category
-        DB::Aowow()->query('UPDATE ?_items i, dbc_spell s SET subClass = IF(effect1AuraId <> 78, 2, IF(effect2AuraId = 207 OR effect3AuraId = 207 OR (s.id <> 65917 AND effect2AuraId = 4 AND effect3Id = 77), -7, 5)) WHERE s.id = spellId2 AND class = 15 AND spellId1 IN (?a)', LEARN_SPELLS);
+        DB::Aowow()->qry('UPDATE ::items i, dbc_spell s SET subClass = IF(effect1AuraId <> 78, 2, IF(effect2AuraId = 207 OR effect3AuraId = 207 OR (s.id <> 65917 AND effect2AuraId = 4 AND effect3Id = 77), -7, 5)) WHERE s.id = spellId2 AND class = 15 AND spellId1 IN %in', LEARN_SPELLS);
 
         // more corner cases (mounts that are not actualy learned)
-        DB::Aowow()->query('UPDATE ?_items i, dbc_spell s SET i.subClass = -7 WHERE (effect1Id = 64 OR (effect1AuraId = 78 AND effect2AuraId = 4 AND effect3Id = 77) OR effect1AuraId = 207 OR effect2AuraId = 207 OR effect3AuraId = 207) AND s.id = i.spellId1 AND i.class = 15 AND i.subClass = 5');
-        DB::Aowow()->query('UPDATE ?_items i, dbc_spell s SET i.subClass =  5 WHERE s.effect1AuraId = 78 AND s.id = i.spellId1 AND i.class = 15 AND i.subClass = 0');
+        DB::Aowow()->qry('UPDATE ::items i, dbc_spell s SET i.subClass = -7 WHERE (effect1Id = 64 OR (effect1AuraId = 78 AND effect2AuraId = 4 AND effect3Id = 77) OR effect1AuraId = 207 OR effect2AuraId = 207 OR effect3AuraId = 207) AND s.id = i.spellId1 AND i.class = 15 AND i.subClass = 5');
+        DB::Aowow()->qry('UPDATE ::items i, dbc_spell s SET i.subClass =  5 WHERE s.effect1AuraId = 78 AND s.id = i.spellId1 AND i.class = 15 AND i.subClass = 0');
 
         // move some permanent enchantments to own category
-        DB::Aowow()->query('UPDATE ?_items i, dbc_spell s SET i.class = 0, i.subClass = 6 WHERE s.effect1Id = 53 AND s.id = i.spellId1 AND i.class = 15');
+        DB::Aowow()->qry('UPDATE ::items i, dbc_spell s SET i.class = 0, i.subClass = 6 WHERE s.effect1Id = 53 AND s.id = i.spellId1 AND i.class = 15');
 
         // move temporary enchantments to own category
-        DB::Aowow()->query('UPDATE ?_items i, dbc_spell s SET i.subClass = -3 WHERE s.effect1Id = 54 AND s.id = i.spellId1 AND i.class = 0 AND i.subClassBak = 8');
+        DB::Aowow()->qry('UPDATE ::items i, dbc_spell s SET i.subClass = -3 WHERE s.effect1Id = 54 AND s.id = i.spellId1 AND i.class = 0 AND i.subClassBak = 8');
 
         // move armor tokens to own category
-        DB::Aowow()->query('UPDATE ?_items SET subClass = -2 WHERE quality = 4 AND class = 15 AND subClassBak = 0 AND requiredClass > 0');
+        DB::Aowow()->qry('UPDATE ::items SET subClass = -2 WHERE quality = 4 AND class = 15 AND subClassBak = 0 AND requiredClass > 0');
 
         // move some junk to holiday if it requires one
-        DB::Aowow()->query('UPDATE ?_items SET subClass = 3 WHERE classBak = 15 AND subClassBak = 0 AND eventId <> 0');
+        DB::Aowow()->qry('UPDATE ::items SET subClass = 3 WHERE classBak = 15 AND subClassBak = 0 AND eventId <> 0');
 
         // move misc items that start quests to class: quest (except Sayges scrolls for consistency)
-        DB::Aowow()->query('UPDATE ?_items SET class = 12 WHERE classBak = 15 AND startQuest <> 0 AND name_loc0 NOT LIKE "sayge\'s fortune%"');
+        DB::Aowow()->qry('UPDATE ::items SET class = 12 WHERE classBak = 15 AND startQuest <> 0 AND name_loc0 NOT LIKE "sayge\'s fortune%"');
 
         // move perm. enchantments into appropriate cat/subcat
-        DB::Aowow()->query('UPDATE ?_items i, dbc_spell s SET i.class = 0, i.subClass = 6 WHERE s.id = i.spellId1 AND s.effect1Id = 53 AND i.classBak = 12');
+        DB::Aowow()->qry('UPDATE ::items i, dbc_spell s SET i.class = 0, i.subClass = 6 WHERE s.id = i.spellId1 AND s.effect1Id = 53 AND i.classBak = 12');
 
         // move some generic recipes into appropriate sub-categories
         foreach ($this->skill2cat as $skill => $cat)
-            DB::Aowow()->query('UPDATE ?_items SET subClass = ?d WHERE classBak = 9 AND subClassBak = 0 AND requiredSkill = ?d', $cat, $skill);
+            DB::Aowow()->qry('UPDATE ::items SET subClass = %i WHERE classBak = 9 AND subClassBak = 0 AND requiredSkill = %i', $cat, $skill);
 
         // assign slot from onUse spell to item (todo (med): handle multi slot enchantments (like armor kits))
-        DB::Aowow()->query(
-            'UPDATE ?_items i
-             JOIN   (SELECT `id`, LOG(2, `equippedItemInventoryTypeMask` & ~?d) AS `mask`
+        DB::Aowow()->qry(
+            'UPDATE ::items i
+             JOIN   (SELECT `id`, LOG(2, `equippedItemInventoryTypeMask` & ~%i) AS `mask`
                      FROM dbc_spell
                      WHERE `equippedItemInventoryTypeMask` > 0
                      HAVING CAST(`mask` AS UNSIGNED) = CAST(`mask` AS FLOAT)) s
@@ -222,8 +221,8 @@ CLISetup::registerSetup("sql", new class extends SetupScript
          );
 
         // calculate durabilityCosts
-        DB::Aowow()->query(
-           'UPDATE ?_items i
+        DB::Aowow()->qry(
+           'UPDATE ::items i
             JOIN   dbc_durabilityquality dq ON dq.id = ((i.quality + 1) * 2)
             JOIN   dbc_durabilitycosts   dc ON dc.id = i.itemLevel
             SET    i.repairPrice = (durability * dq.mod * IF(i.classBak = 2,
@@ -241,9 +240,9 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         );
 
         // hide some nonsense
-        DB::Aowow()->query(
-           'UPDATE ?_items
-            SET    `cuFlags` = `cuFlags` | ?d
+        DB::Aowow()->qry(
+           'UPDATE ::items
+            SET    `cuFlags` = `cuFlags` | %i
             WHERE  `name_loc0` LIKE "Monster - %"  OR  `name_loc0` LIKE "Creature - %" OR
                    `name_loc0` LIKE "%[PH]%"       OR  `name_loc0` LIKE "% PH %"       OR
                    `name_loc0` LIKE "%(new)%"      OR  `name_loc0` LIKE "%(old)%"      OR
@@ -260,7 +259,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             [[INVTYPE_RANGED, INVTYPE_RANGEDRIGHT], [2, 3, 16, 18, 14, 19]]
         );
         foreach ($checks as [$slots, $subclasses])
-            DB::Aowow()->query('UPDATE ?_items SET `cuFlags` = `cuFlags` | ?d WHERE `class`= ?d AND `slotBak` IN (?a) AND `subClass` NOT IN (?a)', CUSTOM_EXCLUDE_FOR_LISTVIEW, ITEM_CLASS_WEAPON, $slots, $subclasses);
+            DB::Aowow()->qry('UPDATE ::items SET `cuFlags` = `cuFlags` | %i WHERE `class`= %i AND `slotBak` IN %in AND `subClass` NOT IN %in', CUSTOM_EXCLUDE_FOR_LISTVIEW, ITEM_CLASS_WEAPON, $slots, $subclasses);
 
         $this->reapplyCCFlags('items', Type::ITEM);
 

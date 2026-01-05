@@ -40,7 +40,7 @@ class ProfileLoadResponse extends TextResponse
             return;
         }
 
-        $pBase = DB::Aowow()->selectRow('SELECT pg.`name` AS "guildname", p.* FROM ?_profiler_profiles p LEFT JOIN ?_profiler_guild pg ON pg.`id` = p.`guild` WHERE p.`id` = ?d', $this->_get['id'][0]);
+        $pBase = DB::Aowow()->selectRow('SELECT pg.`name` AS "guildname", p.* FROM ::profiler_profiles p LEFT JOIN ::profiler_guild pg ON pg.`id` = p.`guild` WHERE p.`id` = %i', $this->_get['id'][0]);
         if (!$pBase)
         {
             trigger_error('ProfileLoadResponse - called with invalid profileId #'.$this->_get['id'][0], E_USER_WARNING);
@@ -111,7 +111,7 @@ class ProfileLoadResponse extends TextResponse
             $profile['sourcename']  = $pBase['sourceName'];
             $profile['description'] = $pBase['description'];
             $profile['user']        = $pBase['user'];
-            $profile['username']    = DB::Aowow()->selectCell('SELECT `username` FROM ?_account WHERE `id` = ?d', $pBase['user']);
+            $profile['username']    = DB::Aowow()->selectCell('SELECT `username` FROM ::account WHERE `id` = %i', $pBase['user']);
         }
 
         // custom profiles inherit this when copied from real char :(
@@ -123,19 +123,19 @@ class ProfileLoadResponse extends TextResponse
         }
 
         // bookmarks
-        if ($_ = DB::Aowow()->selectCol('SELECT `accountId` FROM ?_account_profiles WHERE `profileId` = ?d', $pBase['id']))
+        if ($_ = DB::Aowow()->selectCol('SELECT `accountId` FROM ::account_profiles WHERE `profileId` = %i', $pBase['id']))
             $profile['bookmarks'] = $_;
 
         // arena teams - [size(2|3|5) => name]; name gets urlized to use as link
-        if ($at = DB::Aowow()->selectCol('SELECT `type` AS ARRAY_KEY, `name` FROM ?_profiler_arena_team at JOIN ?_profiler_arena_team_member atm ON atm.`arenaTeamId` = at.`id` WHERE atm.`profileId` = ?d', $pBase['id']))
+        if ($at = DB::Aowow()->selectCol('SELECT `type` AS ARRAY_KEY, `name` FROM ::profiler_arena_team at JOIN ::profiler_arena_team_member atm ON atm.`arenaTeamId` = at.`id` WHERE atm.`profileId` = %i', $pBase['id']))
             $profile['arenateams'] = $at;
 
         // pets if hunter fields: [name:name, family:petFamily, npc:npcId, displayId:modelId, talents:talentString]
-        if ($pets = DB::Aowow()->select('SELECT `name`, `family`, `npc`, `displayId`, CONCAT("$\"", `talents`, "\"") AS "talents" FROM ?_profiler_pets WHERE `owner` = ?d', $pBase['id']))
+        if ($pets = DB::Aowow()->selectAssoc('SELECT `name`, `family`, `npc`, `displayId`, CONCAT(\'$"\', `talents`, \'"\') AS "talents" FROM ::profiler_pets WHERE `owner` = %i', $pBase['id']))
             $profile['pets'] = $pets;
 
         // source for custom profiles; profileId => [name, ownerId, iconString(optional)]
-        if ($customs = DB::Aowow()->select('SELECT `id` AS ARRAY_KEY, `name`, `user`, `icon` FROM ?_profiler_profiles WHERE `sourceId` = ?d AND `sourceId` <> `id` {AND `deleted` = ?d}', $pBase['id'], User::isInGroup(U_GROUP_STAFF) ? DBSIMPLE_SKIP : 0))
+        if ($customs = DB::Aowow()->selectAssoc('SELECT `id` AS ARRAY_KEY, `name`, `user`, `icon` FROM ::profiler_profiles WHERE `sourceId` = %i AND `sourceId` <> `id` AND `deleted` IN %in', $pBase['id'], User::isInGroup(U_GROUP_STAFF) ? [0, 1] : [0]))
         {
             foreach ($customs as $id => $cu)
             {
@@ -158,7 +158,7 @@ class ProfileLoadResponse extends TextResponse
 
         // questId => [cat1, cat2]
         $profile['quests'] = [];
-        if ($quests = DB::Aowow()->selectCol('SELECT `questId` FROM ?_profiler_completion_quests WHERE `id` = ?d', $pBase['id']))
+        if ($quests = DB::Aowow()->selectCol('SELECT `questId` FROM ::profiler_completion_quests WHERE `id` = %i', $pBase['id']))
         {
             $qList = new QuestList(array(['id', $quests]));
             if (!$qList->error)
@@ -167,28 +167,28 @@ class ProfileLoadResponse extends TextResponse
         }
 
         // skillId => [value, max]
-        $profile['skills'] = DB::Aowow()->select('SELECT `skillId` AS ARRAY_KEY, `value` AS "0", `max` AS "1" FROM ?_profiler_completion_skills WHERE `id` = ?d', $pBase['id']);
+        $profile['skills'] = DB::Aowow()->selectAssoc('SELECT `skillId` AS ARRAY_KEY, `value` AS "0", `max` AS "1" FROM ::profiler_completion_skills WHERE `id` = %i', $pBase['id']);
 
         // factionId => amount
-        $profile['reputation'] = DB::Aowow()->selectCol('SELECT `factionId` AS ARRAY_KEY, `standing` FROM ?_profiler_completion_reputation WHERE `id` = ?d', $pBase['id']);
+        $profile['reputation'] = DB::Aowow()->selectCol('SELECT `factionId` AS ARRAY_KEY, `standing` FROM ::profiler_completion_reputation WHERE `id` = %i', $pBase['id']);
 
         // titleId => 1
-        $profile['titles'] = DB::Aowow()->selectCol('SELECT `titleId` AS ARRAY_KEY, 1 FROM ?_profiler_completion_titles WHERE `id` = ?d', $pBase['id']);
+        $profile['titles'] = DB::Aowow()->selectCol('SELECT `titleId` AS ARRAY_KEY, 1 FROM ::profiler_completion_titles WHERE `id` = %i', $pBase['id']);
 
         // achievementId => js date object
-        $profile['achievements'] = DB::Aowow()->selectCol('SELECT `achievementId` AS ARRAY_KEY, CONCAT("$new Date(", `date` * 1000, ")") FROM ?_profiler_completion_achievements WHERE `id` = ?d', $pBase['id']);
+        $profile['achievements'] = DB::Aowow()->selectCol('SELECT `achievementId` AS ARRAY_KEY, CONCAT("$new Date(", `date` * 1000, ")") FROM ::profiler_completion_achievements WHERE `id` = %i', $pBase['id']);
 
         // just points
-        $profile['achievementpoints'] = $profile['achievements'] ? DB::Aowow()->selectCell('SELECT SUM(`points`) FROM ?_achievement WHERE `id` IN (?a)', array_keys($profile['achievements'])) : 0;
+        $profile['achievementpoints'] = $profile['achievements'] ? DB::Aowow()->selectCell('SELECT SUM(`points`) FROM ::achievement WHERE `id` IN %in', array_keys($profile['achievements'])) : 0;
 
         // achievementId => counter
-        $profile['statistics'] = DB::Aowow()->selectCol('SELECT `achievementId` AS ARRAY_KEY, `counter` FROM ?_profiler_completion_statistics WHERE `id` = ?d', $pBase['id']);
+        $profile['statistics'] = DB::Aowow()->selectCol('SELECT `achievementId` AS ARRAY_KEY, `counter` FROM ::profiler_completion_statistics WHERE `id` = %i', $pBase['id']);
 
         // achievementId => 1
-        $profile['activity'] = DB::Aowow()->selectCol('SELECT `achievementId` AS ARRAY_KEY, 1 FROM ?_profiler_completion_statistics WHERE `id` = ?d AND `date` > ?d', $pBase['id'], time() - MONTH);
+        $profile['activity'] = DB::Aowow()->selectCol('SELECT `achievementId` AS ARRAY_KEY, 1 FROM ::profiler_completion_statistics WHERE `id` = %i AND `date` > %i', $pBase['id'], time() - MONTH);
 
         // spellId => 1
-        $profile['spells'] = DB::Aowow()->selectCol('SELECT `spellId` AS ARRAY_KEY, 1 FROM ?_profiler_completion_spells WHERE `id` = ?d', $pBase['id']);
+        $profile['spells'] = DB::Aowow()->selectCol('SELECT `spellId` AS ARRAY_KEY, 1 FROM ::profiler_completion_spells WHERE `id` = %i', $pBase['id']);
 
 
         $gItems = [];
@@ -224,7 +224,7 @@ class ProfileLoadResponse extends TextResponse
             }
         }
 
-        if ($items = DB::Aowow()->select('SELECT * FROM ?_profiler_items WHERE `id` = ?d', $pBase['id']))
+        if ($items = DB::Aowow()->selectAssoc('SELECT * FROM ::profiler_items WHERE `id` = %i', $pBase['id']))
         {
             $itemz = new ItemList(array(['id', array_column($items, 'item')]));
             if (!$itemz->error)

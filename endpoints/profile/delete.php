@@ -35,12 +35,12 @@ class ProfileDeleteResponse extends TextResponse
             return;
         }
 
+        $where = [['`id` IN %in', $this->_get['id']], ['`custom` = 1']];
+        if (!User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
+            $where[] = ['`user` = %i', User::$id];
+
         // only flag as deleted; only custom profiles
-        DB::Aowow()->query(
-           'UPDATE ?_profiler_profiles SET `deleted` = 1 WHERE `id` IN (?a) AND `custom` = 1 {AND `user` = ?d}',
-            $this->_get['id'],
-            User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU) ? DBSIMPLE_SKIP : User::$id
-        );
+        DB::Aowow()->qry('UPDATE ::profiler_profiles SET `deleted` = 1 WHERE %and', $where);
     }
 }
 

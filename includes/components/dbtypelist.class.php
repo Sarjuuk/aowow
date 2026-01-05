@@ -17,6 +17,7 @@ abstract class DBTypeList
     protected array  $queryOpts = [];
 
     private array $itrStack = [];
+    private array $prefixes = [];
 
     public static int        $type;
     public static int        $contribute = CONTRIBUTE_ANY;
@@ -46,14 +47,14 @@ abstract class DBTypeList
     *           ['id', 45],
     *           ['name', 'test%', '!'],
     *           [
-    *               'AND',
+    *               DB::AND,
     *               ['flags', 0xFF, '&'],
     *               ['flags2', 0xF, '&'],
     *           ]
     *           [['mask', 0x3, '&'], 0],
     *           ['nameField', ['+contains*', '-excludes'], 'MATCH],
     *           ['joinedTbl.field', NULL]                   // NULL must be explicitly specified "['joinedTbl.field']" would be skipped as erroneous definition (only really usefull when left-joining)
-    *           'OR',
+    *           DB::OR,
     *           5
     *       )
     *   results in
@@ -62,7 +63,7 @@ abstract class DBTypeList
     public function __construct(array $conditions = [], array $miscData = [])
     {
         $where   = [];
-        $linking = ' AND ';
+        $linking = DB::AND;
         $limit   = 0;
 
         $calcTotal  = false;
@@ -71,136 +72,16 @@ abstract class DBTypeList
         if (!$this->queryBase || $conditions === null)
             return;
 
-        $prefixes = [];
-        if (preg_match('/FROM \??[\w\_]+( AS)?\s?`?(\w+)`?$/i', $this->queryBase, $match))
-            $prefixes['base'] = $match[2];
+        if (preg_match('/FROM (?:::)?[\w\_]+( AS)?\s?`?(\w+)`?$/i', $this->queryBase, $match))
+            $this->prefixes['base'] = $match[2];
         else
-            $prefixes['base'] = '';
+            $this->prefixes['base'] = '';
 
         if (!empty($miscData['extraOpts']))
             $this->extendQueryOpts($miscData['extraOpts']);
 
         if (!empty($miscData['calcTotal']))
             $calcTotal = true;
-
-        $resolveCondition = function (array $c, string $supLink) use (&$resolveCondition, &$prefixes) : ?string
-        {
-            $subLink = '';
-
-            if (!$c)
-                return null;
-
-            foreach ($c as $foo)
-            {
-                if ($foo === 'AND')
-                    $subLink = ' AND ';
-                else if ($foo === 'OR')                     // nessi-bug: if (0 == 'OR') was true once... w/e
-                    $subLink = ' OR ';
-            }
-
-            // need to manually set link for subgroups to be recognized as condition set
-            if ($subLink)
-            {
-                $sql = [];
-
-                foreach ($c as $foo)
-                    if (is_array($foo))
-                        if ($x = $resolveCondition($foo, $supLink))
-                            $sql[] = $x;
-
-                return $sql ? '('.implode($subLink, $sql).')' : null;
-            }
-            else
-            {
-                if ($c[0] == '1')
-                    return '1';
-                else if ($c[0] == '0')
-                    return '(0)';                           // trick if ($x = 0) into true...
-                else if (is_array($c[0]) && isset($c[1]))
-                    $field = $resolveCondition($c[0], $supLink);
-                else if ($c[0])
-                {
-                    $setPrefix = function(mixed $f) use(&$prefixes) : ?string
-                    {
-                        if (is_array($f))
-                            $f = $f[0];
-
-                        // numeric allows for formulas e.g. (1 < 3)
-                        if (Util::checkNumeric($f))
-                            return $f;
-
-                        // skip condition if fieldName contains illegal chars
-                        if (preg_match('/[^\d\w\.\_]/i', $f))
-                            return null;
-
-                        $f = explode('.', $f);
-
-                        switch (count($f))
-                        {
-                            case 2:
-                                if (!in_array($f[0], $prefixes))
-                                {
-                                    // choose table to join or return null if prefix does not exist
-                                    if (!in_array($f[0], array_keys($this->queryOpts)))
-                                        return null;
-
-                                    $prefixes[] = $f[0];
-                                }
-
-                                return '`'.$f[0].'`.`'.$f[1].'`';
-                            case 1:
-                                return '`'.$prefixes['base'].'`.`'.$f[0].'`';
-                            default:
-                                return null;
-                        }
-                    };
-
-                    // basic formulas
-                    if (preg_match('/^\([\s\+\-\*\/\w\(\)\.]+\)$/i', strtr($c[0], ['`' => '', '´' => '', '--' => ''])))
-                        $field = preg_replace_callback('/[\w\]*\.?[\w]+/i', $setPrefix, $c[0]);
-                    else
-                        $field = $setPrefix($c[0]);
-
-                    if (!$field)
-                        return null;
-                }
-                else
-                    return null;
-
-                if (is_array($c[1]) && !empty($c[1]))
-                {
-                    if (($c[2] ?? '') === 'MATCH')
-                        return 'MATCH('.$field.') AGAINST(\''.implode(' ', $c[1]).'\' IN BOOLEAN MODE)';
-
-                    array_walk($c[1], fn(&$x) => $x = Util::checkNumeric($x) ? $x : DB::Aowow()->escape($x));
-
-                    $op  = (isset($c[2]) && $c[2] == '!') ? 'NOT IN' : 'IN';
-                    $val = '('.implode(', ', $c[1]).')';
-                }
-                else if (Util::checkNumeric($c[1]))         // Note: should this be a NUM_REQ_* check?
-                {
-                    $op  = (isset($c[2]) && $c[2] == '!') ? '<>' : '=';
-                    $val = $c[1];
-                }
-                else if (is_string($c[1]))
-                {
-                    $op  = (isset($c[2]) && $c[2] == '!') ? 'NOT LIKE' : 'LIKE';
-                    $val = DB::Aowow()->escape($c[1]);
-                }
-                else if (count($c) > 1 && $c[1] === null)   // specifficly check for NULL
-                {
-                    $op  = (isset($c[2]) && $c[2] == '!') ? 'IS NOT' : 'IS';
-                    $val = 'NULL';
-                }
-                else                                        // null for example
-                    return null;
-
-                if (isset($c[2]) && $c[2] != '!')
-                    $op = $c[2];
-
-                return '('.$field.' '.$op.' '.$val.')';
-            }
-        };
 
         foreach ($conditions as $i => $c)
         {
@@ -212,27 +93,29 @@ abstract class DBTypeList
                 case 'integer':
                     if (is_numeric($c))
                         $limit = max(0, (int)$c);
-                    else
-                        $linking = $c == 'AND' ? ' AND ' : ' OR ';
+                    else if ($c === DB::AND)
+                        $linking = DB::AND;
+                    else if ($c === DB::OR)
+                        $linking = DB::OR;
                 default:
                     unset($conditions[$i]);
             }
         }
 
         foreach ($conditions as $c)
-            if ($x = $resolveCondition($c, $linking))
+            if ($x = $this->resolveCondition($c, $linking))
                 $where[] = $x;
 
         // optional query parts may require other optional parts to work
-        foreach ($prefixes as $pre)
+        foreach ($this->prefixes as $pre)
             if (isset($this->queryOpts[$pre][0]))
                 foreach ($this->queryOpts[$pre][0] as $req)
-                    if (!in_array($req, $prefixes))
-                        $prefixes[] = $req;
+                    if (!in_array($req, $this->prefixes))
+                        $this->prefixes[] = $req;
 
         // remove optional query parts, that are not required
         foreach ($this->queryOpts as $k => $arr)
-            if (!in_array($k, $prefixes))
+            if (!in_array($k, $this->prefixes))
                 unset($this->queryOpts[$k]);
 
         // prepare usage of guids if using multiple realms (which have non-zoro indizes)
@@ -250,7 +133,7 @@ abstract class DBTypeList
 
         // append conditions
         if ($where)
-            $this->queryBase .= ' WHERE ('.implode($linking, $where).')';
+            $this->queryBase .= ' WHERE '.$linking;
 
         // append grouping
         if ($g = array_filter(array_column($this->queryOpts, 'g')))
@@ -273,14 +156,15 @@ abstract class DBTypeList
             $this->queryBase .= ' LIMIT '.$limit;
 
         // execute query (finally)
-        $rows = [];
         // this is purely because of multiple realms per server
         foreach ($this->dbNames as $dbIdx => $n)
         {
-            $query = str_replace('DB_IDX', $dbIdx, $this->queryBase);
-            if ($rows  = DB::{$n}($dbIdx)->select($query))
+            try                                             // does not go through the compatibility layer as we need to be able to fetch individual rows here
             {
-                if ($calcTotal)
+                $query  = str_replace('DB_IDX', $dbIdx, $this->queryBase);
+                $result = DB::Aowow($dbIdx)->query($query, $where);
+
+                if ($calcTotal && $result->getRowCount())
                 {
                     // hackfix the inner items query to not contain duplicate column names
                     // yes i know the real solution would be to not have items and item_stats share column names
@@ -288,17 +172,21 @@ abstract class DBTypeList
                     if (get_class($this) == ItemList::class)
                         $totalQuery = str_replace([', `is`.*', ', i.`id` AS "id"'], '', $totalQuery);
 
-                    $this->matches += DB::{$n}($dbIdx)->selectCell('SELECT COUNT(*) FROM ('.$totalQuery.') x');
+                    $this->matches += DB::{$n}($dbIdx)->selectCell('SELECT COUNT(*) FROM ('.$totalQuery.') x', $where);
                 }
 
-                foreach ($rows as $id => $row)
+                foreach ($result->getIterator() as $row)
                 {
-                    if (isset($this->templates[$id]))
-                        trigger_error('GUID for List already in use #'.$id.'. Additional occurrence omitted!', E_USER_ERROR);
+                    // just .. roll with the unparsed, deprecated ARRAY_KEY, hmk?
+                    if (isset($this->templates[$row['ARRAY_KEY']]))
+                        trigger_error('GUID for List already in use #'.$row['ARRAY_KEY'].'. Additional occurrence omitted!', E_USER_ERROR);
                     else
-                        $this->templates[$id] = $row;
+                        $this->templates[$row['ARRAY_KEY']] = (array)$row;
                 }
+
+                $result->free();
             }
+            catch (\Exception $e) {}                        // logged via \Dibi\Event in DB::errorLogger
         }
 
         if (!$this->templates)
@@ -309,6 +197,102 @@ abstract class DBTypeList
 
         // all clear
         $this->error = false;
+    }
+
+    private function resolveCondition(array $c, string $supLink) : ?array
+    {
+        if (!$c)
+            return null;
+
+        // i am recursive subcondition
+        if ($subLink = array_find($c, fn($x) => $x === DB::AND || $x === DB::OR))
+        {
+            $sql = [];
+
+            foreach ($c as $foo)
+                if (is_array($foo))
+                    if ($x = $this->resolveCondition($foo, $supLink))
+                        $sql[] = $x;
+
+            return $sql ? [$subLink, $sql] : null;
+        }
+
+        [$expOrField, $value, $op] = array_pad($c, 3, null);
+
+        if (is_numeric($expOrField))
+            return [$expOrField ? 1 : 0];                   // [1] / [0]
+        if (!$expOrField)                                   // '', null, []
+            return null;
+
+        if (is_array($expOrField))
+            $field = $this->resolveCondition($expOrField, $supLink);
+        else
+        {
+            // basic formulas
+            if (preg_match('/^\([\s\+\-\*\/\w\(\)\.]+\)$/i', strtr($expOrField, ['`' => '', '´' => '', '--' => ''])))
+                $field = preg_replace_callback('/[\w\]*\.?[\w]+/i', $this->setColPrefix(...), $expOrField);
+            else
+                $field = $this->setColPrefix($expOrField);
+
+            if (!$field)
+                return null;
+        }
+
+        $neg  = $op === '!';
+        $expr = match (gettype($value))
+        {
+            'integer' => ($neg ? '<>'       : ($op ?: '=')) . ' %i',
+            'double'  => ($neg ? '<>'       : ($op ?: '=')) . ' %f',
+            'string'  => ($neg ? 'NOT LIKE' : 'LIKE')       . ' %s',
+            'NULL'    => ($neg ? 'IS NOT'   : 'IS')         . ' %sN',
+            'array'   => ($neg ? 'NOT IN'   : 'IN')         . ' %in',
+            default   => null
+        };
+
+        if (!$expr)
+            return null;
+
+        // todo: find a way to convert this into a valid \Dibi\Expression
+        // [[flags, 0x4, '&'], 0] -> (`flags` & 4) = 0
+        if (is_array($field))
+            $field = '(' . DB::Aowow()->translate($field) . ')';
+
+        if ($op == 'MATCH' && gettype($value) == 'array')
+            return ['MATCH(%n) AGAINST(\''.implode(' ', $value).'\' IN BOOLEAN MODE)', $field];
+
+        return [$field . ' ' . $expr, $value];
+    }
+
+    private function setColPrefix(mixed $colName) : ?string
+    {
+        if (is_array($colName))
+            $colName = $colName[0];
+
+        // numeric allows for formulas e.g. (1 < 3)
+        if (Util::checkNumeric($colName))
+            return $colName;
+
+        // skip condition if fieldName contains illegal chars
+        if (preg_match('/[^\d\w\.\_]/i', $colName))
+            return null;
+
+        [$prefix, $col, $err] = array_pad(explode('.', $colName), 3, null);
+
+        if ($err)                                           // more than one period
+            return null;
+        if (!$col)                                          // prefix not set, so everything is shifted to the left :/
+            return $this->prefixes['base'].'.'.$prefix;
+
+        if (!in_array($prefix, $this->prefixes))
+        {
+            // choose table to join or return null if prefix does not exist
+            if (!in_array($prefix, array_keys($this->queryOpts)))
+                return null;
+
+            $this->prefixes[] = $prefix;
+        }
+
+        return $prefix.'.'.$col;
     }
 
     /**
@@ -468,7 +452,7 @@ abstract class DBTypeList
 
     public static function getName(int $id) : ?LocString
     {
-        if ($n = DB::Aowow()->SelectRow('SELECT `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8` FROM ?# WHERE `id` = ?d', static::$dataTable, $id))
+        if ($n = DB::Aowow()->SelectRow('SELECT `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8` FROM %n WHERE `id` = %i', static::$dataTable, $id))
             return new LocString($n);
         return null;
     }
@@ -622,10 +606,10 @@ trait spawnHelper
         $this->spawnResult[SPAWNINFO_SHORT] = new \StdClass;
 
         // first get zone/floor with the most spawns
-        if ($res = DB::Aowow()->selectRow('SELECT `areaId`, `floor` FROM ?_spawns WHERE `type` = ?d AND `typeId` = ?d AND `posX` > 0 AND `posY` > 0 GROUP BY `areaId`, `floor` ORDER BY COUNT(1) DESC LIMIT 1', self::$type, $this->id))
+        if ($res = DB::Aowow()->selectRow('SELECT `areaId`, `floor` FROM ::spawns WHERE `type` = %i AND `typeId` = %i AND `posX` > 0 AND `posY` > 0 GROUP BY `areaId`, `floor` ORDER BY COUNT(1) DESC LIMIT 1', self::$type, $this->id))
         {
             // get relevant spawn points
-            $points = DB::Aowow()->select('SELECT `posX`, `posY` FROM ?_spawns WHERE `type` = ?d AND `typeId` = ?d AND `areaId` = ?d AND `floor` = ?d AND `posX` > 0 AND `posY` > 0', self::$type, $this->id, $res['areaId'], $res['floor']);
+            $points = DB::Aowow()->selectAssoc('SELECT `posX`, `posY` FROM ::spawns WHERE `type` = %i AND `typeId` = %i AND `areaId` = %i AND `floor` = %i AND `posX` > 0 AND `posY` > 0', self::$type, $this->id, $res['areaId'], $res['floor']);
             $spawns = [];
             foreach ($points as $p)
                 $spawns[] = [$p['posX'], $p['posY']];
@@ -642,15 +626,15 @@ trait spawnHelper
         $wpSum    = [];
         $wpIdx    = 0;
         $worldPos = [];
-        $spawns   = DB::Aowow()->select(
-           'SELECT CASE WHEN z.`type` = ?d THEN 1
-                        WHEN z.`type` = ?d THEN 2
-                        WHEN z.`type` = ?d THEN 2
+        $spawns   = DB::Aowow()->selectAssoc(
+           'SELECT CASE WHEN z.`type` = %i THEN 1
+                        WHEN z.`type` = %i THEN 2
+                        WHEN z.`type` = %i THEN 2
                         ELSE 0
                    END AS "mapType", s.*
-            FROM   ?_spawns s
-            JOIN   ?_zones z ON s.areaId = z.id
-            WHERE s.`type` = ?d AND s.`typeId` IN (?a) AND s.`posX` > 0 AND s.`posY` > 0',
+            FROM   ::spawns s
+            JOIN   ::zones z ON s.areaId = z.id
+            WHERE s.`type` = %i AND s.`typeId` IN %in AND s.`posX` > 0 AND s.`posY` > 0',
             MAP_TYPE_DUNGEON_HC, MAP_TYPE_MMODE_RAID, MAP_TYPE_MMODE_RAID_HC,
             self::$type, $this->getFoundIDs()
         ) ?: [];
@@ -667,7 +651,7 @@ trait spawnHelper
             // we will get a nice clusterfuck of dots if we do this for more GUIDs, than we have colors though
             if (!$skipWPs && count($spawns) < 6 && $s['type'] == Type::NPC)
             {
-                if ($wPoints = DB::Aowow()->select('SELECT * FROM ?_creature_waypoints WHERE creatureOrPath = ?d AND floor = ?d', $s['pathId'] ? -$s['pathId'] : $this->id, $s['floor']))
+                if ($wPoints = DB::Aowow()->selectAssoc('SELECT * FROM ::creature_waypoints WHERE creatureOrPath = %i AND floor = %i', $s['pathId'] ? -$s['pathId'] : $this->id, $s['floor']))
                 {
                     foreach ($wPoints as $i => $p)
                     {
@@ -802,7 +786,7 @@ trait spawnHelper
 
     private function createZoneSpawns() : void              // [zoneId1, zoneId2, ..]             for locations-column in listview
     {
-        $res = DB::Aowow()->selectCol("SELECT `typeId` AS ARRAY_KEY, GROUP_CONCAT(DISTINCT `areaId`) FROM ?_spawns WHERE `type` = ?d AND `typeId` IN (?a) AND `posX` > 0 AND `posY` > 0 GROUP BY `typeId`", self::$type, $this->getfoundIDs());
+        $res = DB::Aowow()->selectCol("SELECT `typeId` AS ARRAY_KEY, GROUP_CONCAT(DISTINCT `areaId`) FROM ::spawns WHERE `type` = %i AND `typeId` IN %in AND `posX` > 0 AND `posY` > 0 GROUP BY `typeId`", self::$type, $this->getfoundIDs());
         foreach ($res as &$r)
         {
             $r = explode(',', $r);
@@ -818,7 +802,7 @@ trait spawnHelper
         if (self::$type == Type::SOUND)
             return;
 
-        $res    = DB::Aowow()->select('SELECT `areaId`, `floor`, `typeId`, `posX`, `posY` FROM ?_spawns WHERE `type` = ?d AND `typeId` IN (?a) AND `posX` > 0 AND `posY` > 0', self::$type, $this->getFoundIDs());
+        $res    = DB::Aowow()->selectAssoc('SELECT `areaId`, `floor`, `typeId`, `posX`, `posY` FROM ::spawns WHERE `type` = %i AND `typeId` IN %in AND `posX` > 0 AND `posY` > 0', self::$type, $this->getFoundIDs());
         $spawns = [];
         foreach ($res as $data)
         {

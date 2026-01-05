@@ -26,18 +26,18 @@ CLISetup::registerSetup("sql", new class extends SetupScript
     protected $worldDependency = ['access_requirement', 'areatrigger_teleport'];
     protected $setupAfter      = [['dungeonmap', 'worldmaparea'], []];
 
-    public function generate(array $ids = []) : bool
+    public function generate() : bool
     {
-        DB::Aowow()->query('TRUNCATE ?_zones');
+        DB::Aowow()->qry('TRUNCATE ::zones');
 
-        $baseData = DB::Aowow()->query(
+        $baseData = DB::Aowow()->selectAssoc(
            'SELECT    a.id,
                       IFNULL(wmt.targetMapId, m.id) AS map,
                       m.id AS mapBak,
                       a.areaTable AS parentArea,
                       IFNULL(wmt.targetMapId, IF(m.areaType = 1, 2, IF(m.areaType = 2, 3, IF(m.areaType = 4, 9, IF(m.isBG = 1, 6, IF(m.id = 571, 10, IF(m.id = 530, 8, m.id))))))) AS category,
                       a.flags,
-                      IF(a.mapId IN (13, 25, 37, 42, 169) OR (a.mapId IN (0, 1, 530, 571) AND wma.id IS NULL) OR a.areaTable <> 0 OR (a.soundAmbience = 0 AND a.mapId IN (0, 1, 530, 571)), ?d, 0) AS cuFlags,
+                      IF(a.mapId IN (13, 25, 37, 42, 169) OR (a.mapId IN (0, 1, 530, 571) AND wma.id IS NULL) OR a.areaTable <> 0 OR (a.soundAmbience = 0 AND a.mapId IN (0, 1, 530, 571)), %i, 0) AS cuFlags,
                       IF(a.flags & 0x01000000, 5, IF(m.isBG = 1, 4, IF(m.areaType = 4, 4, IF(a.flags & 0x00000800, 3, IF(a.factionGroupMask = 6, 2, IF(a.factionGroupMask > 0, LOG2(a.factionGroupMask) - 1, 2)))))) AS faction, -- g_zone_territories
                       m.expansion,
                       IF(m.areaType = 0, 0, IF(m.isBG = 1, 4, IF(m.areaType = 4, 6, IF(md.modeMask & 0xC, 8, IF(md.minPl = 10 AND md.maxPL = 25, 7, IF(m.areaType = 2, 3, IF(m.areaType = 1 AND md.modeMask & 0x2, 5, 2))))))) AS `type`, -- g_zone_instancetypes
@@ -48,7 +48,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                       IFNULL(lfgIni.levelLFG, 0) AS `levelReqLFG`,
                       0 AS `levelHeroic`,
                       IF(a.flags & 0x8,  1, IFNULL(bm.minLevel, IFNULL(lfgIni.levelMin, IFNULL(lfgOpen.levelMin, 0)))) AS `levelMin`,
-                      IF(a.flags & 0x8, ?d, IFNULL(bm.maxLevel, IFNULL(lfgIni.levelMax, IFNULL(lfgOpen.levelMax, 0)))) AS `levelMax`,
+                      IF(a.flags & 0x8, %i, IFNULL(bm.maxLevel, IFNULL(lfgIni.levelMax, IFNULL(lfgOpen.levelMax, 0)))) AS `levelMax`,
                       "" AS `attunementsN`,
                       "" AS `attunementsH`,
                       GREATEST(m.parentMapId, 0),
@@ -79,20 +79,21 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             CUSTOM_EXCLUDE_FOR_LISTVIEW, MAX_LEVEL
         );
 
-        DB::Aowow()->query('INSERT INTO ?_zones VALUES (?a)', $baseData);
+        foreach ($baseData as $bd)
+            DB::Aowow()->qry('INSERT INTO ::zones VALUES %l', $bd);
 
 
         // set missing graveyards from areatrigger data (auto-resurrect map or just plain errors)
         // grouped because naxxramas _just has_ to be special with 4 entrances...
         if ($missingMaps = DB::Aowow()->selectCol('SELECT `id` FROM dbc_map WHERE `parentX` = 0 AND `parentY` = 0 AND `parentMapId` > -1 AND `areaType` NOT IN (0, 3, 4)'))
-            if ($triggerIds = DB::World()->selectCol('SELECT `target_map`, `id` AS ARRAY_KEY FROM areatrigger_teleport WHERE `target_map` IN (?a) GROUP BY `target_map`', $missingMaps))
-                if ($positions = DB::Aowow()->select('SELECT `id` AS `ARRAY_KEY`, `mapId` AS "parentMapId", `posX` AS "parentX", `posY` AS "parentY" FROM dbc_areatrigger WHERE `id` IN (?a)', array_keys($triggerIds)))
+            if ($triggerIds = DB::World()->selectCol('SELECT `target_map`, `id` AS ARRAY_KEY FROM areatrigger_teleport WHERE `target_map` IN %in GROUP BY `target_map`', $missingMaps))
+                if ($positions = DB::Aowow()->selectAssoc('SELECT `id` AS `ARRAY_KEY`, `mapId` AS "parentMapId", `posX` AS "parentX", `posY` AS "parentY" FROM dbc_areatrigger WHERE `id` IN %in', array_keys($triggerIds)))
                     foreach ($positions as $atId => $parentPos)
-                        DB::Aowow()->query('UPDATE ?_zones SET ?a WHERE `mapId` = ?d', $parentPos, $triggerIds[$atId]);
+                        DB::Aowow()->qry('UPDATE ::zones SET %a WHERE `mapId` = %i', $parentPos, $triggerIds[$atId]);
 
 
         // get requirements from world.access_requirement
-        $zoneReq = DB::World()->select(
+        $zoneReq = DB::World()->selectAssoc(
            'SELECT   mapId AS ARRAY_KEY,
                      MIN(level_min) AS reqLevel,
                      MAX(IF(difficulty > 0, level_min,  0)) AS heroicLevel,
@@ -108,7 +109,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             GROUP BY mapId'
         );
 
-        $heroics = DB::Aowow()->selectCol('SELECT DISTINCT mapId FROM ?_zones WHERE type IN (5, 8)');
+        $heroics = DB::Aowow()->selectCol('SELECT DISTINCT mapId FROM ::zones WHERE type IN (5, 8)');
 
         foreach ($zoneReq as $mapId => $req)
         {
@@ -167,7 +168,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                 $update['attunementsH'] = implode(' ', $aH);
             }
 
-            DB::Aowow()->query('UPDATE ?_zones SET ?a WHERE mapId = ?d', $update, $mapId);
+            DB::Aowow()->qry('UPDATE ::zones SET %a WHERE mapId = %i', $update, $mapId);
         }
 
         $this->reapplyCCFlags('zones', Type::ZONE);

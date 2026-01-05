@@ -79,12 +79,12 @@ CLISetup::registerSetup("build", new class extends SetupScript
     private function compileTexture(string $ttField, int $searchMask, int $tabIdx) : ?\GdImage
     {
         $icons = DB::Aowow()->SelectCol(
-           'SELECT   ic.`name` AS "iconString"
-            FROM     ?_icons ic
-            JOIN     ?_spell s ON s.`iconId` = ic.`id`
+           'SELECT   ic.`name`
+            FROM     ::icons ic
+            JOIN     ::spell s ON s.`iconId` = ic.`id`
             JOIN     dbc_talent t ON t.`rank1` = s.`id`
             JOIN     dbc_talenttab tt ON tt.`id` = t.`tabId`
-            WHERE    tt.?# = ?d AND tt.`tabNumber` = ?d
+            WHERE    tt.%n = %i AND tt.`tabNumber` = %i
             ORDER BY t.`row`, t.`column`, t.`id` ASC',
             $ttField, $searchMask, $tabIdx);
 

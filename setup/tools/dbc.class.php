@@ -344,8 +344,8 @@ class DBC
 
         $query .=  ') COLLATE=\'utf8mb4_unicode_ci\' ENGINE=InnoDB';
 
-        DB::Aowow()->query('DROP TABLE IF EXISTS ?#', $this->tableName);
-        DB::Aowow()->query($query);
+        DB::Aowow()->qry('DROP TABLE IF EXISTS %n', $this->tableName);
+        DB::Aowow()->qry($query);
     }
 
     private function writeToDB()
@@ -375,7 +375,9 @@ class DBC
         if ($this->isGameTable)
             array_unshift($cols, 'idx');
 
-        DB::Aowow()->query('INSERT INTO ?# (?#) VALUES (?a)', $this->tableName, $cols, $this->dataBuffer);
+        foreach ($this->dataBuffer as $row)
+            DB::Aowow()->qry('INSERT INTO %n %v', $this->tableName, array_combine($cols, $row));
+
         $this->dataBuffer = [];
     }
 

@@ -46,7 +46,7 @@ class GuildBaseResponse extends TemplateResponse
 
         // 3 possibilities
         // 1) already synced to aowow
-        if ($subject = DB::Aowow()->selectRow('SELECT `id`, `realmGUID`, `stub` FROM ?_profiler_guild WHERE `realm` = ?d AND `nameUrl` = ?', $this->realmId, Profiler::urlize($this->subjectName)))
+        if ($subject = DB::Aowow()->selectRow('SELECT `id`, `realmGUID`, `stub` FROM ::profiler_guild WHERE `realm` = %i AND `nameUrl` = %s', $this->realmId, Profiler::urlize($this->subjectName)))
         {
             $this->typeId = $subject['id'];
 
@@ -57,16 +57,15 @@ class GuildBaseResponse extends TemplateResponse
         }
 
         // 2) not yet synced but exists on realm (wont work if we get passed an urlized name, but there is nothing we can do about it)
-        $subjects = DB::Characters($this->realmId)->select('SELECT `guildid` AS "realmGUID", `name` FROM guild WHERE `name` = ?', $this->subjectName);
-        if ($subject = array_filter($subjects ?: [], fn($x) => Util::lower($x['name']) === Util::lower($this->subjectName)))
+        $subjects = DB::Characters($this->realmId)->selectAssoc('SELECT `guildid` AS "realmGUID", `name` FROM guild WHERE `name` = %s', $this->subjectName);
+        if ($subject = array_find($subjects ?: [], fn($x) => Util::lower($x['name']) === Util::lower($this->subjectName)))
         {
-            $subject = array_pop($subject);
             $subject['realm']   = $this->realmId;
             $subject['stub']    = 1;
             $subject['nameUrl'] = Profiler::urlize($subject['name']);
 
             // create entry from realm with basic info
-            DB::Aowow()->query('INSERT IGNORE INTO ?_profiler_guild (?#) VALUES (?a)', array_keys($subject), array_values($subject));
+            DB::Aowow()->qry('INSERT IGNORE INTO ::profiler_guild %v', $subject);
 
             $this->handleIncompleteData(Type::GUILD, $subject['realmGUID']);
             return;
@@ -122,7 +121,7 @@ class GuildBaseResponse extends TemplateResponse
         // statistic calculations here
 
         // smuggle the guild ranks into the html
-        if ($ranks = DB::Aowow()->selectCol('SELECT `rank` AS ARRAY_KEY, `name` FROM ?_profiler_guild_rank WHERE `guildId` = ?d', $this->typeId))
+        if ($ranks = DB::Aowow()->selectCol('SELECT `rank` AS ARRAY_KEY, `name` FROM ::profiler_guild_rank WHERE `guildId` = %i', $this->typeId))
             $this->extraHTML = '<script type="text/javascript">var guild_ranks = '.Util::toJSON($ranks).';</script>';
 
 

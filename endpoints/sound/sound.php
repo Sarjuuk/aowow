@@ -80,7 +80,7 @@ class SoundBaseResponse extends TemplateResponse implements ICache
         }
 
         // get full path in-game for sound (workaround for missing PlaySoundKit())
-        $fullpath = DB::Aowow()->selectCell('SELECT IF(sf.`path` <> "", CONCAT(sf.`path`, "\\\\", sf.`file`), sf.`file`) FROM ?_sounds_files sf JOIN ?_sounds s ON s.`soundFile1` = sf.`id` WHERE s.`id` = ?d', $this->typeId);
+        $fullpath = DB::Aowow()->selectCell('SELECT IF(sf.`path` <> "", CONCAT(sf.`path`, "\\", sf.`file`), sf.`file`) FROM ::sounds_files sf JOIN ::sounds s ON s.`soundFile1` = sf.`id` WHERE s.`id` = %i', $this->typeId);
 
         $this->redButtons = array(
             BUTTON_WOWHEAD  => true,
@@ -107,25 +107,25 @@ class SoundBaseResponse extends TemplateResponse implements ICache
         // skipping (always empty): ready, castertargeting, casterstate, targetstate
         $displayIds = DB::Aowow()->selectCol(
            'SELECT `id`
-            FROM   ?_spell_sounds
-            WHERE  `animation`   = ?d OR `precast`        = ?d OR `cast`         = ?d OR `impact`       = ?d OR `state` = ?d OR
-                   `statedone`   = ?d OR `channel`        = ?d OR `casterimpact` = ?d OR `targetimpact` = ?d OR `missiletargeting` = ?d OR
-                   `instantarea` = ?d OR `persistentarea` = ?d OR `missile`      = ?d OR `impactarea`   = ?d',
+            FROM   ::spell_sounds
+            WHERE  `animation`   = %i OR `precast`        = %i OR `cast`         = %i OR `impact`       = %i OR `state` = %i OR
+                   `statedone`   = %i OR `channel`        = %i OR `casterimpact` = %i OR `targetimpact` = %i OR `missiletargeting` = %i OR
+                   `instantarea` = %i OR `persistentarea` = %i OR `missile`      = %i OR `impactarea`   = %i',
             $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId
         );
 
         $seMiscValues = DB::Aowow()->selectCol(
            'SELECT `id`
-            FROM   ?_screeneffect_sounds
-            WHERE  `ambienceDay` = ?d OR `ambienceNight` = ?d OR `musicDay` = ?d OR `musicNight` = ?d',
+            FROM   ::screeneffect_sounds
+            WHERE  `ambienceDay` = %i OR `ambienceNight` = %i OR `musicDay` = %i OR `musicNight` = %i',
             $this->typeId, $this->typeId, $this->typeId, $this->typeId
         );
 
         $cnd = array(
-            'OR',
-            ['AND', ['effect1Id', [SPELL_EFFECT_PLAY_MUSIC, SPELL_EFFECT_PLAY_SOUND]], ['effect1MiscValue', $this->typeId]],
-            ['AND', ['effect2Id', [SPELL_EFFECT_PLAY_MUSIC, SPELL_EFFECT_PLAY_SOUND]], ['effect2MiscValue', $this->typeId]],
-            ['AND', ['effect3Id', [SPELL_EFFECT_PLAY_MUSIC, SPELL_EFFECT_PLAY_SOUND]], ['effect3MiscValue', $this->typeId]]
+            DB::OR,
+            [DB::AND, ['effect1Id', [SPELL_EFFECT_PLAY_MUSIC, SPELL_EFFECT_PLAY_SOUND]], ['effect1MiscValue', $this->typeId]],
+            [DB::AND, ['effect2Id', [SPELL_EFFECT_PLAY_MUSIC, SPELL_EFFECT_PLAY_SOUND]], ['effect2MiscValue', $this->typeId]],
+            [DB::AND, ['effect3Id', [SPELL_EFFECT_PLAY_MUSIC, SPELL_EFFECT_PLAY_SOUND]], ['effect3MiscValue', $this->typeId]]
         );
 
         if ($displayIds)
@@ -133,10 +133,10 @@ class SoundBaseResponse extends TemplateResponse implements ICache
 
         if ($seMiscValues)
             $cnd[] = array(
-                'OR',
-                ['AND', ['effect1AuraId', SPELL_AURA_SCREEN_EFFECT], ['effect1MiscValue', $seMiscValues]],
-                ['AND', ['effect2AuraId', SPELL_AURA_SCREEN_EFFECT], ['effect2MiscValue', $seMiscValues]],
-                ['AND', ['effect3AuraId', SPELL_AURA_SCREEN_EFFECT], ['effect3MiscValue', $seMiscValues]]
+                DB::OR,
+                [DB::AND, ['effect1AuraId', SPELL_AURA_SCREEN_EFFECT], ['effect1MiscValue', $seMiscValues]],
+                [DB::AND, ['effect2AuraId', SPELL_AURA_SCREEN_EFFECT], ['effect2MiscValue', $seMiscValues]],
+                [DB::AND, ['effect3AuraId', SPELL_AURA_SCREEN_EFFECT], ['effect3MiscValue', $seMiscValues]]
             );
 
         $spells = new SpellList($cnd);
@@ -148,20 +148,23 @@ class SoundBaseResponse extends TemplateResponse implements ICache
 
         // tab: Items
         $subClasses = [];
-        if ($subClassMask = DB::Aowow()->selectCell('SELECT `subClassMask` FROM ?_items_sounds WHERE `soundId` = ?d', $this->typeId))
+        if ($subClassMask = DB::Aowow()->selectCell('SELECT `subClassMask` FROM ::items_sounds WHERE `soundId` = %i', $this->typeId))
             for ($i = 0; $i <= 20; $i++)
                 if ($subClassMask & (1 << $i))
                     $subClasses[] = $i;
 
-        $itemIds = DB::Aowow()->selectCol(
-           'SELECT id
-            FROM   ?_items
-            WHERE  `pickUpSoundId` = ?d OR `dropDownSoundId` = ?d OR `sheatheSoundId` = ?d OR `unsheatheSoundId` = ?d
-                   { OR `spellVisualId` IN (?a) }
-                   { OR (IF (`soundOverrideSubclass` > 0, `soundOverrideSubclass`, `subclass`) IN (?a) AND `class` = ?d) }',
-            $this->typeId, $this->typeId, $this->typeId, $this->typeId, $displayIds ?: DBSIMPLE_SKIP, $subClasses ?: DBSIMPLE_SKIP, ITEM_CLASS_WEAPON
+        $where = array(
+            ['`pickUpSoundId` = %i', $this->typeId],
+            ['`dropDownSoundId` = %i', $this->typeId],
+            ['`sheatheSoundId` = %i', $this->typeId],
+            ['`unsheatheSoundId` = %i', $this->typeId]
         );
-        if ($itemIds)
+        if ($displayIds)
+            $where[] = ['`spellVisualId` IN %in', $displayIds];
+        if ($subClasses)
+            $where[] = [DB::AND, [['IF (`soundOverrideSubclass` > 0, `soundOverrideSubclass`, `subclass`) IN %in', $subClasses], ['`class` = %i', ITEM_CLASS_WEAPON]]];
+
+        if ($itemIds = DB::Aowow()->selectCol('SELECT `id` FROM ::items WHERE %or', $where))
         {
             $items = new ItemList(array(['id', $itemIds]));
             if (!$items->error)
@@ -172,7 +175,7 @@ class SoundBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: Zones
-        if ($zoneIds = DB::Aowow()->select('SELECT `id`, `worldStateId`, `worldStateValue` FROM ?_zones_sounds WHERE `ambienceDay` = ?d OR `ambienceNight` = ?d OR `musicDay` = ?d OR `musicNight` = ?d OR `intro` = ?d', $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId))
+        if ($zoneIds = DB::Aowow()->selectAssoc('SELECT `id`, `worldStateId`, `worldStateValue` FROM ::zones_sounds WHERE `ambienceDay` = %i OR `ambienceNight` = %i OR `musicDay` = %i OR `musicNight` = %i OR `intro` = %i', $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId))
         {
             $zones = new ZoneList(array(['id', array_column($zoneIds, 'id')]));
             if (!$zones->error)
@@ -235,7 +238,7 @@ class SoundBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: Races (VocalUISounds (containing error voice overs))
-        if ($vo = DB::Aowow()->selectCol('SELECT `raceId` FROM ?_races_sounds WHERE `soundId` = ?d GROUP BY `raceId`', $this->typeId))
+        if ($vo = DB::Aowow()->selectCol('SELECT `raceId` FROM ::races_sounds WHERE `soundId` = %i GROUP BY `raceId`', $this->typeId))
         {
             $races = new CharRaceList(array(['id', $vo]));
             if (!$races->error)
@@ -246,7 +249,7 @@ class SoundBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: Emotes (EmotesTextSound (containing emote audio))
-        if ($em = DB::Aowow()->selectCol('SELECT `emoteId` FROM ?_emotes_sounds WHERE `soundId` = ?d GROUP BY `emoteId` UNION SELECT `id` FROM ?_emotes WHERE `soundId` = ?d', $this->typeId, $this->typeId))
+        if ($em = DB::Aowow()->selectCol('SELECT `emoteId` FROM ::emotes_sounds WHERE `soundId` = %i GROUP BY `emoteId` UNION SELECT `id` FROM ::emotes WHERE `soundId` = %i', $this->typeId, $this->typeId))
         {
             $races = new EmoteList(array(['id', $em]));
             if (!$races->error)
@@ -259,7 +262,7 @@ class SoundBaseResponse extends TemplateResponse implements ICache
             }
         }
 
-        $creatureIds = DB::World()->selectCol('SELECT ct.`CreatureID` FROM creature_text ct LEFT JOIN broadcast_text bct ON bct.`ID` = ct.`BroadCastTextId` WHERE bct.`SoundEntriesID` = ?d OR ct.`Sound` = ?d', $this->typeId, $this->typeId);
+        $creatureIds = DB::World()->selectCol('SELECT ct.`CreatureID` FROM creature_text ct LEFT JOIN broadcast_text bct ON bct.`ID` = ct.`BroadCastTextId` WHERE bct.`SoundEntriesID` = %i OR ct.`Sound` = %i', $this->typeId, $this->typeId);
 
         // can objects or areatrigger play sound...?
         if ($goosp = SmartAI::getOwnerOfSoundPlayed($this->typeId, Type::NPC))
@@ -269,12 +272,12 @@ class SoundBaseResponse extends TemplateResponse implements ICache
         // skipping (always empty): transforms, footsteps
         $displayIds = DB::Aowow()->selectCol(
            'SELECT `id`
-            FROM   ?_creature_sounds
-            WHERE  `greeting`     = ?d OR `farewell`       = ?d OR `angry`     = ?d OR `exertion`  = ?d OR `exertioncritical` = ?d OR
-                   `injury`       = ?d OR `injurycritical` = ?d OR `death`     = ?d OR `stun`      = ?d OR `stand`            = ?d OR
-                   `aggro`        = ?d OR `wingflap`       = ?d OR `wingglide` = ?d OR `alert`     = ?d OR `fidget`           = ?d OR
-                   `customattack` = ?d OR `loop`           = ?d OR `jumpstart` = ?d OR `jumpend`   = ?d OR `petattack`        = ?d OR
-                   `petorder`     = ?d OR `petdismiss`     = ?d OR `birth`     = ?d OR `spellcast` = ?d OR `submerge`         = ?d OR `submerged` = ?d',
+            FROM   ::creature_sounds
+            WHERE  `greeting`     = %i OR `farewell`       = %i OR `angry`     = %i OR `exertion`  = %i OR `exertioncritical` = %i OR
+                   `injury`       = %i OR `injurycritical` = %i OR `death`     = %i OR `stun`      = %i OR `stand`            = %i OR
+                   `aggro`        = %i OR `wingflap`       = %i OR `wingglide` = %i OR `alert`     = %i OR `fidget`           = %i OR
+                   `customattack` = %i OR `loop`           = %i OR `jumpstart` = %i OR `jumpend`   = %i OR `petattack`        = %i OR
+                   `petorder`     = %i OR `petdismiss`     = %i OR `birth`     = %i OR `spellcast` = %i OR `submerge`         = %i OR `submerged` = %i',
             $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId,
             $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId,
             $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId,
@@ -297,7 +300,7 @@ class SoundBaseResponse extends TemplateResponse implements ICache
                 $extra[] = ['displayId1', $displayIds];
 
             if (count($extra) > 1)
-                array_unshift($extra, 'OR');
+                array_unshift($extra, DB::OR);
             else
                 $extra = array_pop($extra);
 

@@ -73,7 +73,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
         );
 
         foreach ($dataz as $class => &$data)
-            $data[2] = array_values(DB::Aowow()->selectRow('SELECT mle.chance*100 cMle, spl.chance*100 cSpl FROM dbc_gtchancetomeleecritbase mle, dbc_gtchancetospellcritbase spl WHERE mle.idx = spl.idx AND mle.idx = ?d', $class - 1));
+            $data[2] = array_values(DB::Aowow()->selectRow('SELECT mle.chance*100 cMle, spl.chance*100 cSpl FROM dbc_gtchancetomeleecritbase mle, dbc_gtchancetospellcritbase spl WHERE mle.idx = spl.idx AND mle.idx = %i', $class - 1));
 
         return $dataz;
     }
@@ -81,7 +81,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
     // { str, agi, sta, int, spi, raceMod1, raceMod2 }
     private function race() : array
     {
-        $raceData = DB::World()->select('SELECT `race` AS ARRAY_KEY, MIN(`str`), MIN(`agi`), MIN(`sta`), MIN(`inte`), MIN(`spi`) FROM player_levelstats WHERE `level` = 1 GROUP BY `race` ORDER BY `race` ASC');
+        $raceData = DB::World()->selectAssoc('SELECT `race` AS ARRAY_KEY, MIN(`str`), MIN(`agi`), MIN(`sta`), MIN(`inte`), MIN(`spi`) FROM player_levelstats WHERE `level` = 1 GROUP BY `race` ORDER BY `race` ASC');
         foreach ($raceData as &$rd)
             $rd = array_values($rd + [[], []]);
 
@@ -130,27 +130,27 @@ CLISetup::registerSetup("build", new class extends SetupScript
             else
                 $offset = array_values(DB::World()->selectRow('SELECT MIN(`str`), MIN(`agi`), MIN(`sta`), MIN(`inte`), MIN(`spi`) FROM player_levelstats WHERE `level` = 1 AND `race` = 1'));
 
-            $gtData = DB::Aowow()->select(
-               'SELECT mlecrt.idx - ?d AS ARRAY_KEY, mlecrt.chance * 100, splcrt.chance * 100, mlecrt.chance * 100 * ?f, baseHP5.ratio * 1, extraHP5.ratio * 1
+            $gtData = DB::Aowow()->selectAssoc(
+               'SELECT mlecrt.idx - %i AS ARRAY_KEY, mlecrt.chance * 100, splcrt.chance * 100, mlecrt.chance * 100 * %f, baseHP5.ratio * 1, extraHP5.ratio * 1
                 FROM   dbc_gtchancetomeleecrit mlecrt
                 JOIN   dbc_gtchancetospellcrit splcrt ON splcrt.idx   = mlecrt.idx
                 JOIN   dbc_gtoctregenhp baseHP5       ON baseHP5.idx  = mlecrt.idx
                 JOIN   dbc_gtregenhpperspt extraHP5   ON extraHP5.idx = mlecrt.idx
-                WHERE  mlecrt.idx BETWEEN ?d AND ?d',
+                WHERE  mlecrt.idx BETWEEN %i AND %i',
                 (($class - 1) * 100) - 1,                                   // class-offset
                 $mod,
                 (($class - 1) * 100) + 0,                                   // lvl 1
                 (($class - 1) * 100) + 79                                   // lvl 80
             );
 
-            $rows = DB::World()->select(
+            $rows = DB::World()->selectAssoc(
                'SELECT   pls.level AS ARRAY_KEY,
-                         pls.str - ?d, pls.agi - ?d, pls.sta - ?d, pls.inte - ?d, pls.spi - ?d,
+                         pls.str - %i, pls.agi - %i, pls.sta - %i, pls.inte - %i, pls.spi - %i,
                          pcls.basehp, IF(pcls.basemana <> 0, pcls.basemana, 100)
                 FROM     player_levelstats pls
                 JOIN     player_classlevelstats pcls ON pls.level = pcls.level AND pls.class = pcls.class
-                WHERE    pls.race = ?d AND
-                         pls.class = ?d
+                WHERE    pls.race = %i AND
+                         pls.class = %i
                 ORDER BY pls.level ASC',
                 $offset[0], $offset[1], $offset[2], $offset[3], $offset[4],
                 in_array($class, [3, 7, 11]) ? 6 : 1,
@@ -170,13 +170,13 @@ CLISetup::registerSetup("build", new class extends SetupScript
     // content of gtRegenMPPerSpt.dbc
     private function level() : array
     {
-        return DB::Aowow()->selectCol('SELECT idx-99 AS ARRAY_KEY, ratio FROM dbc_gtregenmpperspt WHERE idx >= 100 AND idx < 100 + ?d', MAX_LEVEL);
+        return DB::Aowow()->selectCol('SELECT idx-99 AS ARRAY_KEY, ratio FROM dbc_gtregenmpperspt WHERE idx >= 100 AND idx < 100 + %i', MAX_LEVEL);
     }
 
     // profession perks ... too lazy to formulate a search algorithm for two occurences
     private function skills() : array
     {
-        // DB::Aowow()->select(
+        // DB::Aowow()->selectAssoc(
         //    'SELECT sk.id AS "skillId", sla.reqSkillLevel, s.effect1AuraId AS "auraId", s.effect1MiscValue, s.effect1BasePoints + s.effect1DieSides AS "qty"
         //     FROM   dbc_skilllineability sla
         //     JOIN   dbc_skillline sk ON sk.id = sla.skilllineid

@@ -10,13 +10,13 @@ class FactionList extends DBTypeList
 {
     public static int    $type      = Type::FACTION;
     public static string $brickFile = 'faction';
-    public static string $dataTable = '?_factions';
+    public static string $dataTable = '::factions';
 
-    protected string $queryBase = 'SELECT f.*, f.`parentFactionId` AS "cat", f.`id` AS ARRAY_KEY FROM ?_factions f';
+    protected string $queryBase = 'SELECT f.*, f.`parentFactionId` AS "cat", f.`id` AS ARRAY_KEY FROM ::factions f';
     protected array  $queryOpts = array(
                         'f'  => [['f2']],
-                        'f2' => ['j' => ['?_factions f2 ON f.`parentFactionId` = f2.`id`', true], 's' => ', IFNULL(f2.`parentFactionId`, 0) AS "cat2"'],
-                        'ft' => ['j' => '?_factiontemplate ft ON ft.`factionId` = f.`id`']
+                        'f2' => ['j' => ['::factions f2 ON f.`parentFactionId` = f2.`id`', true], 's' => ', IFNULL(f2.`parentFactionId`, 0) AS "cat2"'],
+                        'ft' => ['j' => '::factiontemplate ft ON ft.`factionId` = f.`id`']
                     );
 
     public function __construct(array $conditions = [], array $miscData = [])

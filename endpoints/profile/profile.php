@@ -67,7 +67,7 @@ class ProfileBaseResponse extends TemplateResponse
 
         // 3 possibilities
         // 1) already synced to aowow
-        if ($subject = DB::Aowow()->selectRow('SELECT `id`, `realmGUID`, `stub` FROM ?_profiler_profiles WHERE `realm` = ?d AND `custom` = 0 AND `name` = ? AND `renameItr` = ?d', $this->realmId, Util::ucFirst($this->subjectName), $rnItr))
+        if ($subject = DB::Aowow()->selectRow('SELECT `id`, `realmGUID`, `stub` FROM ::profiler_profiles WHERE `realm` = %i AND `custom` = 0 AND `name` = %s AND `renameItr` = %i', $this->realmId, Util::ucFirst($this->subjectName), $rnItr))
         {
             $this->typeId = $subject['id'];
 
@@ -82,36 +82,35 @@ class ProfileBaseResponse extends TemplateResponse
             $this->notFound();
 
         // 2) not yet synced but exists on realm (and not a gm character)
-        $subjects = DB::Characters($this->realmId)->select(
+        $subjects = DB::Characters($this->realmId)->selectAssoc(
            'SELECT    c.`guid` AS "realmGUID", c.`name`, c.`race`, c.`class`, c.`level`, c.`gender`, c.`at_login`, g.`guildid` AS "guildGUID", IFNULL(g.`name`, "") AS "guildName", IFNULL(gm.`rank`, 0) AS "guildRank"
             FROM      characters c
             LEFT JOIN guild_member gm ON gm.`guid` = c.`guid`
             LEFT JOIN guild g ON g.`guildid` = gm.`guildid`
-            WHERE     c.`name` = ? AND `level` <= ?d AND (`extra_flags` & ?d) = 0',
+            WHERE     c.`name` = %s AND `level` <= %i AND (`extra_flags` & %i) = 0',
             Util::ucFirst($this->subjectName), MAX_LEVEL, Profiler::CHAR_GMFLAGS
         );
-        if ($subject = array_filter($subjects ?: [], fn($x) => Util::lower($x['name']) == Util::lower($this->subjectName)))
+        if ($subject = array_find($subjects ?: [], fn($x) => Util::lower($x['name']) == Util::lower($this->subjectName)))
         {
-            $subject = $subject[0];
             $subject['realm'] = $this->realmId;
             $subject['stub']  = 1;
 
             if ($subject['at_login'] & 0x1)
-                $subject['renameItr'] = DB::Aowow()->selectCell('SELECT MAX(`renameItr`) FROM ?_profiler_profiles WHERE `realm` = ?d AND `custom` = 0 AND `name` = ?', $this->realmId, $subject['name']);
+                $subject['renameItr'] = DB::Aowow()->selectCell('SELECT MAX(`renameItr`) FROM ::profiler_profiles WHERE `realm` = %i AND `custom` = 0 AND `name` = %s', $this->realmId, $subject['name']);
 
             if ($subject['guildGUID'])
             {
                 // create empty guild if necessary to satisfy foreign keys
-                $subject['guild'] = DB::Aowow()->selectCell('SELECT `id` FROM ?_profiler_guild WHERE `realm` = ?d AND `realmGUID` = ?d', $this->realmId, $subject['guildGUID']);
+                $subject['guild'] = DB::Aowow()->selectCell('SELECT `id` FROM ::profiler_guild WHERE `realm` = %i AND `realmGUID` = %i', $this->realmId, $subject['guildGUID']);
                 if (!$subject['guild'])
-                    $subject['guild'] = DB::Aowow()->query('INSERT INTO ?_profiler_guild (`realm`, `realmGUID`, `stub`, `name`, `nameUrl`) VALUES (?d, ?d, 1, ?, ?)', $this->realmId, $subject['guildGUID'], $subject['guildName'], Profiler::urlize($subject['guildName']));
+                    $subject['guild'] = DB::Aowow()->qry('INSERT INTO ::profiler_guild (`realm`, `realmGUID`, `stub`, `name`, `nameUrl`) VALUES (%i, %i, 1, %s, %s)', $this->realmId, $subject['guildGUID'], $subject['guildName'], Profiler::urlize($subject['guildName']));
             }
 
             unset($subject['guildGUID'], $subject['guildName'], $subject['at_login']);
 
             // create entry from realm with enough basic info to disply tooltips
-            DB::Aowow()->query('REPLACE INTO ?_profiler_profiles (?#) VALUES (?a)', array_keys($subject), array_values($subject));
-            $this->typeId = DB::Aowow()->selectCell('SELECT `id` FROM ?_profiler_profiles WHERE `realm` = ?d AND `realmGUID` = ?d', $this->realmId, $subject['realmGUID']);
+            DB::Aowow()->qry('REPLACE INTO ::profiler_profiles %v', $subject);
+            $this->typeId = DB::Aowow()->selectCell('SELECT `id` FROM ::profiler_profiles WHERE `realm` = %i AND `realmGUID` = %i', $this->realmId, $subject['realmGUID']);
 
             $this->handleIncompleteData(Type::PROFILE, $subject['realmGUID']);
             return;

@@ -67,7 +67,7 @@ abstract class WorldPosition
         // spawn does not really match on a map, but we need at least one result
         if (!$result)
         {
-            usort($points, function ($a, $b) { return ($a['dist'] < $b['dist']) ? -1 : 1; });
+            usort($points, fn($a, $b) => $a['dist'] <=> $b['dist']);
             $result = [1.0, $points[0]];
         }
 
@@ -81,25 +81,25 @@ abstract class WorldPosition
         switch ($type)
         {
             case Type::NPC:
-                $result = DB::World()->select('SELECT `guid` AS ARRAY_KEY,              `id`, `map`         AS `mapId`, `position_x` AS `posX`, `position_y` AS `posY` FROM creature        WHERE `guid` IN (?a)', $guids);
+                $result = DB::World()->selectAssoc('SELECT `guid` AS ARRAY_KEY,              `id`, `map`         AS `mapId`, `position_x` AS `posX`, `position_y` AS `posY` FROM creature        WHERE `guid` IN %in', $guids);
                 break;
             case Type::OBJECT:
-                $result = DB::World()->select('SELECT `guid` AS ARRAY_KEY,              `id`, `map`         AS `mapId`, `position_x` AS `posX`, `position_y` AS `posY` FROM gameobject      WHERE `guid` IN (?a)', $guids);
+                $result = DB::World()->selectAssoc('SELECT `guid` AS ARRAY_KEY,              `id`, `map`         AS `mapId`, `position_x` AS `posX`, `position_y` AS `posY` FROM gameobject      WHERE `guid` IN %in', $guids);
                 break;
             case Type::SOUND:
-                $result = DB::AoWoW()->select('SELECT `id`   AS ARRAY_KEY, `soundId` AS `id`,                  `mapId`,                 `posX`,                 `posY` FROM ?_soundemitters WHERE `id`   IN (?a)', $guids);
+                $result = DB::AoWoW()->selectAssoc('SELECT `id`   AS ARRAY_KEY, `soundId` AS `id`,                  `mapId`,                 `posX`,                 `posY` FROM ::soundemitters WHERE `id`   IN %in', $guids);
                 break;
             case Type::ZONE:
-                $result = DB::Aowow()->select('SELECT -`id`  AS ARRAY_KEY,              `id`, `parentMapId` AS `mapId`, `parentX`    AS `posX`, `parentY`    AS `posY` FROM ?_zones         WHERE -`id`  IN (?a)', $guids);
+                $result = DB::Aowow()->selectAssoc('SELECT -`id`  AS ARRAY_KEY,              `id`, `parentMapId` AS `mapId`, `parentX`    AS `posX`, `parentY`    AS `posY` FROM ::zones         WHERE -`id`  IN %in', $guids);
                 break;
             case Type::AREATRIGGER:
                 $result = [];
                 if ($base = array_filter($guids, fn($x) => $x > 0))
-                    $result = array_replace($result, DB::AoWoW()->select('SELECT `id`   AS ARRAY_KEY, `id`,    `mapId`,                 `posX`,                 `posY` FROM ?_areatrigger   WHERE `id`   IN (?a)', $base));
+                    $result = array_replace($result, DB::AoWoW()->selectAssoc('SELECT `id`   AS ARRAY_KEY, `id`,    `mapId`,                 `posX`,                 `posY` FROM ::areatrigger   WHERE `id`   IN %in', $base));
                 if ($endpoints = array_filter($guids, fn($x) => $x < 0))
-                    $result = array_replace($result, DB::World()->select(
-                       'SELECT -`ID`          AS ARRAY_KEY, ID          AS `id`,    `target_map` AS `mapId`, `target_position_x` AS `posX`, `target_position_y` AS `posY` FROM areatrigger_teleport WHERE -`id`          IN (?a) UNION
-                        SELECT -`entryorguid` AS ARRAY_KEY, entryorguid AS `id`, `action_param1` AS `mapId`, `target_x`          AS `posX`, `target_y`          AS `posY` FROM smart_scripts        WHERE -`entryorguid` IN (?a) AND `source_type` = ?d AND `action_type` = ?d',
+                    $result = array_replace($result, DB::World()->selectAssoc(
+                       'SELECT -`ID`          AS ARRAY_KEY, ID          AS `id`,    `target_map` AS `mapId`, `target_position_x` AS `posX`, `target_position_y` AS `posY` FROM areatrigger_teleport WHERE -`id`          IN %in UNION
+                        SELECT -`entryorguid` AS ARRAY_KEY, entryorguid AS `id`, `action_param1` AS `mapId`, `target_x`          AS `posX`, `target_y`          AS `posY` FROM smart_scripts        WHERE -`entryorguid` IN %in AND `source_type` = %i AND `action_type` = %i',
                         $endpoints, $endpoints, SmartAI::SRC_TYPE_AREATRIGGER, SmartAction::ACTION_TELEPORT
                      ));
                 break;
@@ -125,20 +125,20 @@ abstract class WorldPosition
                 IF(x.`defaultDungeonMapId` < 0, x.`floor` + 1, x.`floor`) AS `floor`,
                 IF(useDM.`id`   IS NOT NULL OR x.`defaultDungeonMapId` < 0, 1, 0) AS `srcPrio`,
                 IF(multiDM.`id` IS NOT NULL OR x.`defaultDungeonMapId` < 0, 1, 0) AS `multifloor`,
-                ROUND((x.`maxY` - ?d) * 100 / (x.`maxY` - x.`minY`), 1) AS `posX`,
-                ROUND((x.`maxX` - ?d) * 100 / (x.`maxX` - x.`minX`), 1) AS `posY`,
-                SQRT(POWER(ABS((x.`maxY` - ?d) * 100 / (x.`maxY` - x.`minY`) - 50), 2) +
-                     POWER(ABS((x.`maxX` - ?d) * 100 / (x.`maxX` - x.`minX`) - 50), 2)) AS `dist`
+                ROUND((x.`maxY` - %f) * 100 / (x.`maxY` - x.`minY`), 1) AS `posX`,
+                ROUND((x.`maxX` - %f) * 100 / (x.`maxX` - x.`minX`), 1) AS `posY`,
+                SQRT(POWER(ABS((x.`maxY` - %f) * 100 / (x.`maxY` - x.`minY`) - 50), 2) +
+                     POWER(ABS((x.`maxX` - %f) * 100 / (x.`maxX` - x.`minX`) - 50), 2)) AS `dist`
             FROM
-                (SELECT 0 AS `id`, `areaId`,     `mapId`, `right` AS `minY`, `left` AS `maxY`, `top` AS `maxX`, `bottom` AS `minX`, 0 AS `floor`, 0 AS `worldMapAreaId`, `defaultDungeonMapId` FROM ?_worldmaparea wma UNION
-                 SELECT   dm.`id`, `areaId`, wma.`mapId`,            `minY`,           `maxY`,          `maxX`,             `minX`,      `floor`,      `worldMapAreaId`, `defaultDungeonMapId` FROM ?_worldmaparea wma
-                 JOIN   ?_dungeonmap dm ON dm.`mapId` = wma.`mapId` WHERE wma.`mapId` NOT IN (0, 1, 530, 571) OR wma.`areaId` = 4395) x
+                (SELECT 0 AS `id`, `areaId`,     `mapId`, `right` AS `minY`, `left` AS `maxY`, `top` AS `maxX`, `bottom` AS `minX`, 0 AS `floor`, 0 AS `worldMapAreaId`, `defaultDungeonMapId` FROM aowow_worldmaparea wma UNION
+                 SELECT   dm.`id`, `areaId`, wma.`mapId`,            `minY`,           `maxY`,          `maxX`,             `minX`,      `floor`,      `worldMapAreaId`, `defaultDungeonMapId` FROM aowow_worldmaparea wma
+                 JOIN   aowow_dungeonmap dm ON dm.`mapId` = wma.`mapId` WHERE wma.`mapId` NOT IN (0, 1, 530, 571) OR wma.`areaId` = 4395) x
             LEFT JOIN
-                ?_dungeonmap useDM   ON useDM.`mapId`   = x.`mapId` AND useDM.`worldMapAreaId`   = x.`worldMapAreaId` AND useDM.`floor`   =  x.`floor` AND useDM.`worldMapAreaId`   > 0
+                aowow_dungeonmap useDM   ON useDM.`mapId`   = x.`mapId` AND useDM.`worldMapAreaId`   = x.`worldMapAreaId` AND useDM.`floor`   =  x.`floor` AND useDM.`worldMapAreaId`   > 0
             LEFT JOIN
-                ?_dungeonmap multiDM ON multiDM.`mapId` = x.`mapId` AND multiDM.`worldMapAreaId` = x.`worldMapAreaId` AND multiDM.`floor` <> x.`floor` AND multiDM.`worldMapAreaId` > 0
+                aowow_dungeonmap multiDM ON multiDM.`mapId` = x.`mapId` AND multiDM.`worldMapAreaId` = x.`worldMapAreaId` AND multiDM.`floor` <> x.`floor` AND multiDM.`worldMapAreaId` > 0
             WHERE
-                x.`mapId` = ?d AND IF(?d, x.`areaId` = ?d, x.`areaId` <> 0){ AND x.`floor` = ?d - IF(x.`defaultDungeonMapId` < 0, 1, 0)}
+                %s
             GROUP BY
                 x.`id`, x.`areaId`
             HAVING
@@ -146,10 +146,34 @@ abstract class WorldPosition
             ORDER BY
                 `srcPrio` DESC, `dist` ASC';
 
+        $where = [['x.`mapId` = %d', $mapId]];
+        if ($preferedFloor >= 0)
+            $where[] = ['x.`floor` = %d - IF(x.`defaultDungeonMapId` < 0, 1, 0)', $preferedFloor];
+        if ($preferedAreaId)
+            $where[] = ['x.`areaId` = %d', $preferedAreaId];
+        else
+            $where[] = ['x.`areaId` <> 0'];
+
+        /*
+         * dibi seems to leak memory in Translator
+         * as this query runs several 100k times during setup
+         * we use the db driver directly to avoid exceeding the memory limit
+         */
+
+        $points = [];
+        $results = DB::Aowow()->getDriver()->query(sprintf($query, $mapY, $mapX, $mapY, $mapX, implode(' AND ', array_map(fn($x) => sprintf(...$x), $where))));
+        while ($row = $results->fetch(true))
+            $points[] = $row;
+
         // dist BETWEEN 0 (center) AND 70.7 (corner)
-        $points = DB::Aowow()->select($query, $mapY, $mapX, $mapY, $mapX, $mapId, $preferedAreaId, $preferedAreaId, $preferedFloor < 0 ? DBSIMPLE_SKIP : $preferedFloor);
+        // $points = DB::Aowow()->selectAssoc($query, $mapY, $mapX, $mapY, $mapX, $where);
         if (!$points)                                       // retry: pre-instance subareas belong to the instance-maps but are displayed on the outside. There also cases where the zone reaches outside it's own map.
-            $points = DB::Aowow()->select($query, $mapY, $mapX, $mapY, $mapX, $mapId, 0, 0, DBSIMPLE_SKIP);
+        {
+            // $points = DB::Aowow()->selectAssoc($query, $mapY, $mapX, $mapY, $mapX, [['x.`mapId` = %i', $mapId], ['x.`areaId` <> 0']]);
+            $results = DB::Aowow()->getDriver()->query(sprintf($query, $mapY, $mapX, $mapY, $mapX, implode(' AND ', array_map(fn($x) => sprintf(...$x), [['x.`mapId` = %d', $mapId], ['x.`areaId` <> 0']]))));
+            while ($row = $results->fetch(true))
+                $points[] = $row;
+        }
         if (!is_array($points))
         {
             trigger_error('WorldPosition::toZonePos - query failed', E_USER_ERROR);

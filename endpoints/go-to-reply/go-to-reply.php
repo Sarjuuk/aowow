@@ -22,7 +22,7 @@ class GotoreplyBaseResponse extends TextResponse
         }
 
         // type = typeId = 0 AND replyTo <> 0 for replies
-        $reply = DB::Aowow()->selectRow('SELECT c.`id`, r.`id` AS "reply", c.`type`, c.`typeId` FROM ?_comments r JOIN ?_comments c ON r.`replyTo` = c.`id` WHERE r.`id` = ?d', $this->_get['id']);
+        $reply = DB::Aowow()->selectRow('SELECT c.`id`, r.`id` AS "reply", c.`type`, c.`typeId` FROM ::comments r JOIN ::comments c ON r.`replyTo` = c.`id` WHERE r.`id` = %i', $this->_get['id']);
         if (!$reply)
         {
             trigger_error('GotoreplyBaseResponse - reply #'.$this->_get['id'].' not found', E_USER_ERROR);

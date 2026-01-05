@@ -44,11 +44,11 @@ trait TrCustomData
     public function applyCustomData() : bool
     {
         $ok = true;
-        foreach ((DB::Aowow()->selectCol('SELECT `entry` AS ARRAY_KEY, `field` AS ARRAY_KEY2, `value` FROM ?_setup_custom_data WHERE `command` = ?', $this->getName()) ?: []) as $id => $data)
+        foreach ((DB::Aowow()->selectCol('SELECT `entry` AS ARRAY_KEY, `field` AS ARRAY_KEY2, `value` FROM ::setup_custom_data WHERE `command` = %s', $this->getName()) ?: []) as $id => $data)
         {
             try
             {
-                DB::Aowow()->query('UPDATE ?_'.$this->getName().' SET ?a WHERE id = ?d', $data, $id);
+                DB::Aowow()->qry('UPDATE %n SET %a WHERE id = %i', '::'.$this->getName(), $data, $id);
             }
             catch (\Exception $e)
             {
@@ -602,9 +602,9 @@ abstract class SetupScript
             return;
         }
 
-        DB::Aowow()->query('UPDATE ?_'.$tbl.' x, ?_comments    y SET x.`cuFlags` = x.`cuFlags` | ?d WHERE x.`id` = y.`typeId` AND y.`type` = ?d AND y.`flags`  & ?d', CUSTOM_HAS_COMMENT,    $type, CC_FLAG_APPROVED);
-        DB::Aowow()->query('UPDATE ?_'.$tbl.' x, ?_screenshots y SET x.`cuFlags` = x.`cuFlags` | ?d WHERE x.`id` = y.`typeId` AND y.`type` = ?d AND y.`status` & ?d', CUSTOM_HAS_SCREENSHOT, $type, CC_FLAG_APPROVED);
-        DB::Aowow()->query('UPDATE ?_'.$tbl.' x, ?_videos      y SET x.`cuFlags` = x.`cuFlags` | ?d WHERE x.`id` = y.`typeId` AND y.`type` = ?d AND y.`status` & ?d', CUSTOM_HAS_VIDEO,      $type, CC_FLAG_APPROVED);
+        DB::Aowow()->qry('UPDATE ::'.$tbl.' x, ::comments    y SET x.`cuFlags` = x.`cuFlags` | %i WHERE x.`id` = y.`typeId` AND y.`type` = %i AND y.`flags`  & %i', CUSTOM_HAS_COMMENT,    $type, CC_FLAG_APPROVED);
+        DB::Aowow()->qry('UPDATE ::'.$tbl.' x, ::screenshots y SET x.`cuFlags` = x.`cuFlags` | %i WHERE x.`id` = y.`typeId` AND y.`type` = %i AND y.`status` & %i', CUSTOM_HAS_SCREENSHOT, $type, CC_FLAG_APPROVED);
+        DB::Aowow()->qry('UPDATE ::'.$tbl.' x, ::videos      y SET x.`cuFlags` = x.`cuFlags` | %i WHERE x.`id` = y.`typeId` AND y.`type` = %i AND y.`status` & %i', CUSTOM_HAS_VIDEO,      $type, CC_FLAG_APPROVED);
     }
 }
 

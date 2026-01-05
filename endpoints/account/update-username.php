@@ -44,14 +44,14 @@ class AccountUpdateusernameResponse extends TextResponse
         if (!$this->assertPOST('newUsername'))
             return Lang::main('intError');
 
-        if (DB::Aowow()->selectCell('SELECT `renameCooldown` FROM ?_account WHERE `id` = ?d', User::$id) > time())
+        if (DB::Aowow()->selectCell('SELECT `renameCooldown` FROM ::account WHERE `id` = %i', User::$id) > time())
             return Lang::main('intError');                  // should have grabbed the error response..
 
         // yes, including your current name. you don't want to change into your current name, right?
-        if (DB::Aowow()->selectCell('SELECT 1 FROM ?_account WHERE LOWER(`username`) = LOWER(?)', $this->_post['newUsername']))
+        if (DB::Aowow()->selectCell('SELECT 1 FROM ::account WHERE LOWER(`username`) = LOWER(%s)', $this->_post['newUsername']))
             return Lang::account('nameInUse');
 
-        DB::Aowow()->query('UPDATE ?_account SET `username` = ?, `renameCooldown` = ?d WHERE `id` = ?d', $this->_post['newUsername'], time() + Cfg::get('acc_rename_decay'), User::$id);
+        DB::Aowow()->qry('UPDATE ::account SET `username` = %s, `renameCooldown` = %i WHERE `id` = %i', $this->_post['newUsername'], time() + Cfg::get('acc_rename_decay'), User::$id);
 
         $this->success = true;
         return Lang::account('updateMessage', 'username', [User::$username, $this->_post['newUsername']]);

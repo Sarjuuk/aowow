@@ -74,7 +74,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
         $offsets = array_map(function ($v) {                // LookupEntry(cr*GT_MAX_LEVEL+level-1)
             return $v * 100 + 60 - 1;                       // combat rating where introduced during the transition vanilla > burnig crusade. So at level 60 (at the time) the rating on the item was equal to 1% effect and is still the baseline in 3.3.5a.
         }, $ratings);
-        $base = DB::Aowow()->selectCol('SELECT CAST((idx + 1 - 60) / 100 AS UNSIGNED) AS ARRAY_KEY, ratio FROM dbc_gtcombatratings WHERE idx IN (?a)', $offsets);
+        $base = DB::Aowow()->selectCol('SELECT CAST((idx + 1 - 60) / 100 AS UNSIGNED) AS ARRAY_KEY, ratio FROM dbc_gtcombatratings WHERE idx IN %in', $offsets);
 
         /*  non-1 scaler in 3.3.5.12340
             | ratingId | classId | ratio |
@@ -88,7 +88,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
         $offsets = array_map(function ($v) {                // LookupEntry((getClass()-1)*GT_MAX_RATING+cr+1)
             return (ChrClass::WARRIOR->value - 1) * 32 + $v + 1; // should this be dynamic per pinned character? ITEM_MOD HASTE has a worse scaler for a subset of classes (see table)
         }, $ratings);
-        $mods = DB::Aowow()->selectCol('SELECT idx - 1 AS ARRAY_KEY, ratio FROM dbc_gtoctclasscombatratingscalar WHERE idx IN (?a)', $offsets);
+        $mods = DB::Aowow()->selectCol('SELECT idx - 1 AS ARRAY_KEY, ratio FROM dbc_gtoctclasscombatratingscalar WHERE idx IN %in', $offsets);
 
         foreach ($data as &$val)
             $val = Cfg::get('DEBUG') ? $base[$val].' / '.$mods[$val] : $base[$val] / $mods[$val];
@@ -115,7 +115,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             $v = $v ?: '0 AS idx'.$k;                       // NULL => 0 (plus some index so we can have 2x 0)
         });
 
-        $data = DB::Aowow()->select('SELECT id AS ARRAY_KEY, '.implode(', ', $fields).' FROM dbc_scalingstatvalues');
+        $data = DB::Aowow()->selectAssoc('SELECT id AS ARRAY_KEY, '.implode(', ', $fields).' FROM dbc_scalingstatvalues');
         foreach ($data as &$d)
             $d = array_values($d);                          // strip indizes
 
@@ -124,7 +124,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
     private function itemScalingSD() : string
     {
-        $data = DB::Aowow()->select('SELECT *, id AS ARRAY_KEY FROM dbc_scalingstatdistribution');
+        $data = DB::Aowow()->selectAssoc('SELECT *, id AS ARRAY_KEY FROM dbc_scalingstatdistribution');
         foreach ($data as &$row)
         {
             $row = array_values($row);

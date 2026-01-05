@@ -12,13 +12,13 @@ class TitleList extends DBTypeList
 
     public static int    $type      = Type::TITLE;
     public static string $brickFile = 'title';
-    public static string $dataTable = '?_titles';
+    public static string $dataTable = '::titles';
     public        array  $sources   = [];
 
-    protected string $queryBase = 'SELECT t.*, t.`id` AS ARRAY_KEY FROM ?_titles t';
+    protected string $queryBase = 'SELECT t.*, t.`id` AS ARRAY_KEY FROM ::titles t';
     protected array  $queryOpts = array(
                         't'   => [['src']],                 //    11: Type::TITLE
-                        'src' => ['j' => ['?_source src ON `type` = 11 AND `typeId` = t.`id`', true], 's' => ', `src13`, `moreType`, `moreTypeId`']
+                        'src' => ['j' => ['::source src ON `type` = 11 AND `typeId` = t.`id`', true], 's' => ', `src13`, `moreType`, `moreTypeId`']
                     );
 
     public function __construct(array $conditions = [], array $miscData = [])
@@ -55,7 +55,7 @@ class TitleList extends DBTypeList
 
     public static function getName(int $id) : ?LocString
     {
-        if ($n = DB::Aowow()->SelectRow('SELECT `male_loc0`, `male_loc2`, `male_loc3`, `male_loc4`, `male_loc6`, `male_loc8` FROM ?# WHERE `id` = ?d', self::$dataTable, $id))
+        if ($n = DB::Aowow()->SelectRow('SELECT `male_loc0`, `male_loc2`, `male_loc3`, `male_loc4`, `male_loc6`, `male_loc8` FROM %n WHERE `id` = %i', self::$dataTable, $id))
             return new LocString($n, 'male', fn($x) => trim(str_replace('%s', '', $x)));
         return null;
     }

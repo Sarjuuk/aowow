@@ -74,12 +74,12 @@ class User
 
         # check IP bans #
 
-        if ($ipBan = DB::Aowow()->selectRow('SELECT `count`, IF(`unbanDate` > UNIX_TIMESTAMP(), 1, 0) AS "active" FROM ?_account_bannedips WHERE `ip` = ? AND `type` = ?d', self::$ip, IP_BAN_TYPE_LOGIN_ATTEMPT))
+        if ($ipBan = DB::Aowow()->selectRow('SELECT `count`, IF(`unbanDate` > UNIX_TIMESTAMP(), 1, 0) AS "active" FROM ::account_bannedips WHERE `ip` = %s AND `type` = %i', self::$ip, IP_BAN_TYPE_LOGIN_ATTEMPT))
         {
             if ($ipBan['count'] > Cfg::get('ACC_FAILED_AUTH_COUNT') && $ipBan['active'])
                 return false;
             else if (!$ipBan['active'])
-                DB::Aowow()->query('DELETE FROM ?_account_bannedips WHERE `ip` = ?', self::$ip);
+                DB::Aowow()->qry('DELETE FROM ::account_bannedips WHERE `ip` = %s', self::$ip);
         }
 
 
@@ -88,13 +88,13 @@ class User
         if (empty($_SESSION['user']))
             return false;
 
-        $session  = DB::Aowow()->selectRow('SELECT `userId`, `expires` FROM ?_account_sessions WHERE `status` = ?d AND `sessionId` = ?', SESSION_ACTIVE, session_id());
+        $session  = DB::Aowow()->selectRow('SELECT `userId`, `expires` FROM ::account_sessions WHERE `status` = %i AND `sessionId` = %s', SESSION_ACTIVE, session_id());
         $userData = DB::Aowow()->selectRow(
            'SELECT    a.`id`, a.`passHash`, a.`username`, a.`locale`, a.`userGroups`, a.`userPerms`, BIT_OR(ab.`typeMask`) AS "bans", IFNULL(SUM(r.`amount`), 0) AS "reputation", a.`dailyVotes`, a.`excludeGroups`, a.`status`, a.`statusTimer`, a.`email`, a.`debug`, a.`avatar`, a.`avatarborder`
-            FROM      ?_account a
-            LEFT JOIN ?_account_banned ab    ON a.`id` = ab.`userId` AND ab.`end` > UNIX_TIMESTAMP()
-            LEFT JOIN ?_account_reputation r ON a.`id` =  r.`userId`
-            WHERE     a.`id` = ?d
+            FROM      ::account a
+            LEFT JOIN ::account_banned ab    ON a.`id` = ab.`userId` AND ab.`end` > UNIX_TIMESTAMP()
+            LEFT JOIN ::account_reputation r ON a.`id` =  r.`userId`
+            WHERE     a.`id` = %i
             GROUP BY  a.`id`',
             $_SESSION['user']
         );
@@ -106,20 +106,20 @@ class User
         }
         else if ($session['expires'] && $session['expires'] < time())
         {
-            DB::Aowow()->query('UPDATE ?_account_sessions SET `touched` = ?d, `status` = ?d WHERE `sessionId` = ?', time(), SESSION_EXPIRED, session_id());
+            DB::Aowow()->qry('UPDATE ::account_sessions SET `touched` = %i, `status` = %i WHERE `sessionId` = %s', time(), SESSION_EXPIRED, session_id());
             self::destroy();
             return false;
         }
         else if ($session['userId'] != $userData['id'])        // what in the name of fuck..?
         {
             // Don't know why, don't know how .. doesn't matter, both parties are out.
-            DB::Aowow()->query('UPDATE ?_account_sessions SET `touched` = ?d, `status` = ?d WHERE `userId` IN (?a) AND `status` = ?d', time(), SESSION_FORCED_LOGOUT, [$userData['id'], $session['userId']], SESSION_ACTIVE);
+            DB::Aowow()->qry('UPDATE ::account_sessions SET `touched` = %i, `status` = %i WHERE `userId` IN %in AND `status` = %i', time(), SESSION_FORCED_LOGOUT, [$userData['id'], $session['userId']], SESSION_ACTIVE);
             trigger_error('User::init - tried to resume session "'.session_id().'" of user #'.$_SESSION['user'].' linked to session data for user #'.$session['userId'].' Kicked both!', E_USER_ERROR);
             self::destroy();
             return false;
         }
 
-        DB::Aowow()->query('UPDATE ?_account_sessions SET `touched` = ?d, `expires` = IF(`expires`, ?d, 0) WHERE `sessionId` = ?', time(), time() + Cfg::get('SESSION_TIMEOUT_DELAY'), session_id());
+        DB::Aowow()->qry('UPDATE ::account_sessions SET `touched` = %i, `expires` = IF(`expires`, %i, 0) WHERE `sessionId` = %s', time(), time() + Cfg::get('SESSION_TIMEOUT_DELAY'), session_id());
 
         if ($loc = Locale::tryFrom($userData['locale']))
             self::$preferedLoc = $loc;
@@ -127,7 +127,7 @@ class User
         // reset expired account statuses
         if ($userData['statusTimer'] && $userData['statusTimer'] < time() && $userData['status'] != ACC_STATUS_NEW)
         {
-            DB::Aowow()->query('UPDATE ?_account SET `status` = ?d, `statusTimer` = 0, `token` = "", `updateValue` = "" WHERE `id` = ?d', ACC_STATUS_NONE, User::$id);
+            DB::Aowow()->qry('UPDATE ::account SET `status` = %i, `statusTimer` = 0, `token` = "", `updateValue` = "" WHERE `id` = %i', ACC_STATUS_NONE, User::$id);
             $userData['status'] = ACC_STATUS_NONE;
         }
 
@@ -156,8 +156,8 @@ class User
         {
             if ($userData['avatar'] == 2)
             {
-                DB::Aowow()->query('UPDATE ?_account SET `avatar` = 1 WHERE `id` = ?d', self::$id);
-                DB::Aowow()->query('UPDATE ?_account_avatars SET `current` = 0 WHERE `userId` = ?d', self::$id);
+                DB::Aowow()->qry('UPDATE ::account SET `avatar` = 1 WHERE `id` = %i', self::$id);
+                DB::Aowow()->qry('UPDATE ::account_avatars SET `current` = 0 WHERE `userId` = %i', self::$id);
             }
 
             // avatar borders
@@ -169,17 +169,17 @@ class User
 
         if (!self::isBanned())
         {
-            $lastLogin = DB::Aowow()->selectCell('SELECT `curLogin` FROM ?_account WHERE `id` = ?d', self::$id);
+            $lastLogin = DB::Aowow()->selectCell('SELECT `curLogin` FROM ::account WHERE `id` = %i', self::$id);
             // either the day changed or the last visit was >24h ago
             if (date('j', $lastLogin) != date('j') || (time() - $lastLogin) > 1 * DAY)
             {
                 // - daily votes (we need to reset this one)
                 self::$dailyVotes = self::getMaxDailyVotes();
 
-                DB::Aowow()->query(
-                   'UPDATE  ?_account
-                    SET     `dailyVotes` = ?d, `prevLogin` = `curLogin`, `curLogin` = UNIX_TIMESTAMP(), `prevIP` = `curIP`, `curIP` = ?
-                    WHERE   `id` = ?d',
+                DB::Aowow()->qry(
+                   'UPDATE  ::account
+                    SET     `dailyVotes` = %i, `prevLogin` = `curLogin`, `curLogin` = UNIX_TIMESTAMP(), `prevIP` = `curIP`, `curIP` = ?
+                    WHERE   `id` = %i',
                     self::$dailyVotes,
                     self::$ip,
                     self::$id
@@ -191,9 +191,9 @@ class User
 
                 // - increment consecutive visits (next day or first of new month and not more than 48h)
                 if ((date('j', $lastLogin) + 1 == date('j') || (date('j') == 1 && date('n', $lastLogin) != date('n'))) && (time() - $lastLogin) < 2 * DAY)
-                    DB::Aowow()->query('UPDATE ?_account SET `consecutiveVisits` = `consecutiveVisits` + 1 WHERE `id` = ?d', self::$id);
+                    DB::Aowow()->qry('UPDATE ::account SET `consecutiveVisits` = `consecutiveVisits` + 1 WHERE `id` = %i', self::$id);
                 else
-                    DB::Aowow()->query('UPDATE ?_account SET `consecutiveVisits` = 0 WHERE `id` = ?d', self::$id);
+                    DB::Aowow()->qry('UPDATE ::account SET `consecutiveVisits` = 0 WHERE `id` = %i', self::$id);
             }
         }
 
@@ -207,7 +207,7 @@ class User
         // $_SESSION['dataKey'] does not depend on user login status and is set in User::init()
 
         if (self::isLoggedIn() && $toDB)
-            DB::Aowow()->query('UPDATE ?_account SET `locale` = ? WHERE `id` = ?', self::$preferedLoc->value, self::$id);
+            DB::Aowow()->qry('UPDATE ::account SET `locale` = %s WHERE `id` = %s', self::$preferedLoc->value, self::$id);
     }
 
     public static function destroy()
@@ -258,11 +258,11 @@ class User
             return AUTH_INTERNAL_ERR;
 
         // handle login try limitation
-        $ipBan = DB::Aowow()->selectRow('SELECT `ip`, `count`, IF(`unbanDate` > UNIX_TIMESTAMP(), 1, 0) AS "active" FROM ?_account_bannedips WHERE `type` = ?d AND `ip` = ?', IP_BAN_TYPE_LOGIN_ATTEMPT, self::$ip);
+        $ipBan = DB::Aowow()->selectRow('SELECT `ip`, `count`, IF(`unbanDate` > UNIX_TIMESTAMP(), 1, 0) AS "active" FROM ::account_bannedips WHERE `type` = %i AND `ip` = %s', IP_BAN_TYPE_LOGIN_ATTEMPT, self::$ip);
         if (!$ipBan || !$ipBan['active'])                   // no entry exists or time expired; set count to 1
-            DB::Aowow()->query('REPLACE INTO ?_account_bannedips (`ip`, `type`, `count`, `unbanDate`) VALUES (?, ?d, 1, UNIX_TIMESTAMP() + ?d)', self::$ip, IP_BAN_TYPE_LOGIN_ATTEMPT, Cfg::get('ACC_FAILED_AUTH_BLOCK'));
+            DB::Aowow()->qry('REPLACE INTO ::account_bannedips (`ip`, `type`, `count`, `unbanDate`) VALUES (%s, %i, 1, UNIX_TIMESTAMP() + %i)', self::$ip, IP_BAN_TYPE_LOGIN_ATTEMPT, Cfg::get('ACC_FAILED_AUTH_BLOCK'));
         else                                                // entry already exists; increment count
-            DB::Aowow()->query('UPDATE ?_account_bannedips SET `count` = `count` + 1, `unbanDate` = UNIX_TIMESTAMP() + ?d WHERE `ip` = ?', Cfg::get('ACC_FAILED_AUTH_BLOCK'), self::$ip);
+            DB::Aowow()->qry('UPDATE ::account_bannedips SET `count` = `count` + 1, `unbanDate` = UNIX_TIMESTAMP() + %i WHERE `ip` = %s', Cfg::get('ACC_FAILED_AUTH_BLOCK'), self::$ip);
 
         if ($ipBan && $ipBan['count'] >= Cfg::get('ACC_FAILED_AUTH_COUNT') && $ipBan['active'])
             return AUTH_IPBANNED;
@@ -271,12 +271,11 @@ class User
 
         $query = DB::Aowow()->SelectRow(
            'SELECT    a.`id`, a.`passHash`, BIT_OR(ab.`typeMask`) AS "bans", a.`status`
-            FROM      ?_account a
-            LEFT JOIN ?_account_banned ab ON a.`id` = ab.`userId` AND ab.`end` > UNIX_TIMESTAMP()
-            WHERE     { a.`email` = ? } { a.`login` = ? } AND `status` <> ?d
+            FROM      ::account a
+            LEFT JOIN ::account_banned ab ON a.`id` = ab.`userId` AND ab.`end` > UNIX_TIMESTAMP()
+            WHERE     %if', $email, 'a.`email` %else a.`login` %end = %s AND `status` <> %i
             GROUP BY  a.`id`',
-             $email ?: DBSIMPLE_SKIP,
-            !$email ? $nameOrEmail : DBSIMPLE_SKIP,
+            $nameOrEmail,
             ACC_STATUS_DELETED
         );
 
@@ -287,7 +286,7 @@ class User
             return AUTH_WRONGPASS;
 
         // successfull auth; clear bans for this IP
-        DB::Aowow()->query('DELETE FROM ?_account_bannedips WHERE `type` = ?d AND `ip` = ?', IP_BAN_TYPE_LOGIN_ATTEMPT, self::$ip);
+        DB::Aowow()->qry('DELETE FROM ::account_bannedips WHERE `type` = %i AND `ip` = %s', IP_BAN_TYPE_LOGIN_ATTEMPT, self::$ip);
 
         if ($query['bans'] & (ACC_BAN_PERM | ACC_BAN_TEMP))
             return AUTH_BANNED;
@@ -302,7 +301,7 @@ class User
         if (!DB::isConnectable(DB_AUTH))
             return AUTH_INTERNAL_ERR;
 
-        $wow = DB::Auth()->selectRow('SELECT a.id, a.salt, a.verifier, ab.active AS hasBan FROM account a LEFT JOIN account_banned ab ON ab.id = a.id AND active <> 0 WHERE username = ? LIMIT 1', $name);
+        $wow = DB::Auth()->selectRow('SELECT a.id, a.salt, a.verifier, ab.active AS hasBan FROM account a LEFT JOIN account_banned ab ON ab.id = a.id AND active <> 0 WHERE username = %s LIMIT 1', $name);
         if (!$wow)
             return AUTH_WRONGUSER;
 
@@ -358,14 +357,14 @@ class User
     // create a linked account for our settings if necessary
     private static function checkOrCreateInDB(int $extId, string $name, int $userGroup = -1) : int
     {
-        if ($_ = DB::Aowow()->selectCell('SELECT `id` FROM ?_account WHERE `extId` = ?d', $extId))
+        if ($_ = DB::Aowow()->selectCell('SELECT `id` FROM ::account WHERE `extId` = %i', $extId))
         {
             if ($userGroup >= U_GROUP_NONE)
-                DB::Aowow()->query('UPDATE ?_account SET `userGroups` = ?d WHERE `extId` = ?d', $userGroup, $extId);
+                DB::Aowow()->qry('UPDATE ::account SET `userGroups` = %i WHERE `extId` = %i', $userGroup, $extId);
             return $_;
         }
 
-        $newId = DB::Aowow()->query('INSERT IGNORE INTO ?_account (`extId`, `passHash`, `username`, `joinDate`, `prevIP`, `prevLogin`, `locale`, `status`, `userGroups`) VALUES (?d, "", ?, UNIX_TIMESTAMP(), ?, UNIX_TIMESTAMP(), ?d, ?d, ?d)',
+        $newId = DB::Aowow()->qry('INSERT IGNORE INTO ::account (`extId`, `passHash`, `username`, `joinDate`, `prevIP`, `prevLogin`, `locale`, `status`, `userGroups`) VALUES (%i, "", %s, UNIX_TIMESTAMP(), %s, UNIX_TIMESTAMP(), %i, %i, %i)',
             $extId,
             $name,
             $_SERVER["REMOTE_ADDR"] ?? '',
@@ -510,7 +509,7 @@ class User
             return;
 
         self::$dailyVotes--;
-        DB::Aowow()->query('UPDATE ?_account SET `dailyVotes` = ?d WHERE `id` = ?d', self::$dailyVotes, self::$id);
+        DB::Aowow()->qry('UPDATE ::account SET `dailyVotes` = %i WHERE `id` = %i', self::$dailyVotes, self::$id);
     }
 
     public static function getCurrentDailyVotes() : int
@@ -601,11 +600,11 @@ class User
         if (!self::isLoggedIn() || self::isBanned())
             return $result;
 
-        $res = DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, `name` FROM ?_account_weightscales WHERE `userId` = ?d', self::$id);
+        $res = DB::Aowow()->selectPairs('SELECT `id`, `name` FROM ::account_weightscales WHERE `userId` = %i', self::$id);
         if (!$res)
             return $result;
 
-        $weights = DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, `field` AS ARRAY_KEY2, `val` FROM ?_account_weightscale_data WHERE `id` IN (?a)', array_keys($res));
+        $weights = DB::Aowow()->selectAssoc('SELECT `id` AS ARRAY_KEY, `field` AS ARRAY_KEY2, `val` FROM ::account_weightscale_data WHERE `id` IN %in', array_keys($res));
         foreach ($weights as $id => $data)
             $result[] = array_merge(['name' => $res[$id], 'id' => $id], $data);
 
@@ -622,9 +621,8 @@ class User
         if (!Cfg::get('PROFILER_ENABLE'))
             return $result;
 
-        $modes  = [1 => 'excludes', 2 => 'includes'];
-        foreach ($modes as $mode => $field)
-            if ($ex = DB::Aowow()->selectCol('SELECT `type` AS ARRAY_KEY, `typeId` AS ARRAY_KEY2, `typeId` FROM ?_account_excludes WHERE `mode` = ?d AND `userId` = ?d', $mode, self::$id))
+        foreach ([Profiler::COMPLETION_EXCLUDE => 'excludes', Profiler::COMPLETION_INCLUDE => 'includes'] as $mode => $field)
+            if ($ex = DB::Aowow()->selectCol('SELECT `type` AS ARRAY_KEY, `typeId` AS ARRAY_KEY2, `typeId` FROM ::account_excludes WHERE `mode` = %i AND `userId` = %i', $mode, self::$id))
                 foreach ($ex as $type => $ids)
                     $result[$field][$type] = array_values($ids);
 
@@ -673,7 +671,7 @@ class User
         if (!self::isLoggedIn() || self::isBanned(ACC_BAN_GUIDE))
             return $result;
 
-        if ($guides = DB::Aowow()->select('SELECT `id`, `title`, `url` FROM ?_guides WHERE `userId` = ?d AND `status` <> ?d', self::$id, GuideMgr::STATUS_ARCHIVED))
+        if ($guides = DB::Aowow()->selectAssoc('SELECT `id`, `title`, `url` FROM ::guides WHERE `userId` = %i AND `status` <> %i', self::$id, GuideMgr::STATUS_ARCHIVED))
         {
             // fix url
             array_walk($guides, fn(&$x) => $x['url'] = '?guide='.($x['url'] ?: $x['id']));
@@ -688,7 +686,7 @@ class User
         if (!self::isLoggedIn())
             return [];
 
-        return DB::Aowow()->selectCol('SELECT `name` AS ARRAY_KEY, `data` FROM ?_account_cookies WHERE `userId` = ?d', self::$id);
+        return DB::Aowow()->selectPairs('SELECT `name`, `data` FROM ::account_cookies WHERE `userId` = %i', self::$id);
     }
 
     public static function getFavorites() : array
@@ -696,14 +694,14 @@ class User
         if (!self::isLoggedIn() || self::isBanned())
             return [];
 
-        $res = DB::Aowow()->selectCol('SELECT `type` AS ARRAY_KEY, `typeId` AS ARRAY_KEY2, `typeId` FROM ?_account_favorites WHERE `userId` = ?d', self::$id);
+        $res = DB::Aowow()->selectCol('SELECT `type` AS ARRAY_KEY, `typeId` AS ARRAY_KEY2, `typeId` FROM ::account_favorites WHERE `userId` = %i', self::$id);
         if (!$res)
             return [];
 
         $data = [];
         foreach ($res as $type => $ids)
         {
-            $tc = Type::newList($type, [['id', array_values($ids)]]);
+            $tc = Type::newList($type, [['id', $ids]]);
             if (!$tc || $tc->error)
                 continue;
 
@@ -733,23 +731,23 @@ class User
 
         $completion = [];
 
-        $x = DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, `questId` AS ARRAY_KEY2, `questId` FROM ?_profiler_completion_quests WHERE `id` IN (?a)', $ids);
+        $x = DB::Aowow()->selectAssoc('SELECT `id` AS ARRAY_KEY, `questId` AS ARRAY_KEY2, `questId` FROM ::profiler_completion_quests WHERE `id` IN %in', $ids);
         $completion[Type::QUEST] = $x ? array_map(array_values(...), $x) : [];
 
-        $x = DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, `achievementId` AS ARRAY_KEY2, `achievementId` FROM ?_profiler_completion_achievements WHERE `id` IN (?a)', $ids);
+        $x = DB::Aowow()->selectAssoc('SELECT `id` AS ARRAY_KEY, `achievementId` AS ARRAY_KEY2, `achievementId` FROM ::profiler_completion_achievements WHERE `id` IN %in', $ids);
         $completion[Type::ACHIEVEMENT] = $x ? array_map(array_values(...), $x) : [];
 
-        $x = DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, `titleId` AS ARRAY_KEY2, `titleId` FROM ?_profiler_completion_titles WHERE `id` IN (?a)', $ids);
+        $x = DB::Aowow()->selectAssoc('SELECT `id` AS ARRAY_KEY, `titleId` AS ARRAY_KEY2, `titleId` FROM ::profiler_completion_titles WHERE `id` IN %in', $ids);
         $completion[Type::TITLE] = $x ? array_map(array_values(...), $x) : [];
 
         $completion[Type::ITEM] = [];
 
-        $spells = DB::Aowow()->select(
+        $spells = DB::Aowow()->selectAssoc(
            'SELECT    pcs.`id` AS ARRAY_KEY, pcs.`spellId` AS ARRAY_KEY2, pcs.`spellId`, i.`id` AS "itemId"
-            FROM      ?_spell s
-            JOIN      ?_profiler_completion_spells pcs ON s.`id` = pcs.`spellId`
-            LEFT JOIN ?_items i ON i.`spellId1` IN (?a) AND i.`spellId2` = pcs.`spellId`
-            WHERE     s.`typeCat` IN (?a) AND pcs.`id` IN (?a)',
+            FROM      ::spell s
+            JOIN      ::profiler_completion_spells pcs ON s.`id` = pcs.`spellId`
+            LEFT JOIN ::items i ON i.`spellId1` IN %in AND i.`spellId2` = pcs.`spellId`
+            WHERE     s.`typeCat` IN %in AND pcs.`id` IN %in',
             LEARN_SPELLS, [-5, -6, 9, 11], $ids
         );
 
@@ -780,10 +778,10 @@ class User
 
         if (self::$profiles === null)
         {
-            $ap = DB::Aowow()->selectCol('SELECT `profileId` FROM ?_account_profiles WHERE `accountId` = ?d', self::$id);
+            $ap = DB::Aowow()->selectCol('SELECT `profileId` FROM ::account_profiles WHERE `accountId` = %i', self::$id);
 
-            // the old approach ['OR', ['user', self::$id], ['ap.accountId', self::$id]] caused keys to not get used
-            $conditions = $ap ? [['OR', ['user', self::$id], ['id', $ap]]] : [['user', self::$id]];
+            // the old approach [DB::OR, ['user', self::$id], ['ap.accountId', self::$id]] caused keys to not get used
+            $conditions = $ap ? [[DB::OR, ['user', self::$id], ['id', $ap]]] : [['user', self::$id]];
             if (!self::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
                 $conditions[] = ['deleted', 0];
 

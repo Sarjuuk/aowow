@@ -153,15 +153,15 @@ class ClassBaseResponse extends TemplateResponse implements ICache
             ['s.typeCat', [-13, -11, -2, 7]],
             [['s.cuFlags', (SPELL_CU_TRIGGERED | CUSTOM_EXCLUDE_FOR_LISTVIEW), '&'], 0],
             [
-                'OR',
+                DB::OR,
                 // Glyphs, Proficiencies
                 ['s.reqClassMask', $cl->toMask(), '&'],
                 // Abilities / Talents
                 ['s.skillLine1', $this->subject->getField('skills')],
-                ['AND', ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $this->subject->getField('skills')]]
+                [DB::AND, ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $this->subject->getField('skills')]]
             ],
             [                                               // last rank or unranked
-                'OR',
+                DB::OR,
                 ['s.cuFlags', SPELL_CU_LAST_RANK, '&'],
                 ['s.rankNo', 0]
             ]
@@ -268,13 +268,13 @@ class ClassBaseResponse extends TemplateResponse implements ICache
 
         // tab: criteria-of
         $conditions = array(
-            'AND',
+            DB::AND,
             ['ac.type', ACHIEVEMENT_CRITERIA_TYPE_HK_CLASS],
             ['ac.value1', $this->typeId]
         );
 
-        if ($extraCrt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` IN (?a) AND `value1` = ?d', [ACHIEVEMENT_CRITERIA_DATA_TYPE_S_PLAYER_CLASS_RACE, ACHIEVEMENT_CRITERIA_DATA_TYPE_T_PLAYER_CLASS_RACE], $this->typeId))
-            $conditions = ['OR', $conditions, ['ac.id', $extraCrt]];
+        if ($extraCrt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` IN %in AND `value1` = %i', [ACHIEVEMENT_CRITERIA_DATA_TYPE_S_PLAYER_CLASS_RACE, ACHIEVEMENT_CRITERIA_DATA_TYPE_T_PLAYER_CLASS_RACE], $this->typeId))
+            $conditions = [DB::OR, $conditions, ['ac.id', $extraCrt]];
 
         $crtOf = new AchievementList($conditions);
         if (!$crtOf->error)

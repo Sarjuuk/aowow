@@ -372,7 +372,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 return $m ? $m[1] : null;
             }, $missing);
 
-            DB::Aowow()->query('UPDATE ?_icons SET `cuFlags` = `cuFlags` | ?d WHERE `name` IN (?a)', CUSTOM_EXCLUDE_FOR_LISTVIEW, $iconNames);
+            DB::Aowow()->qry('UPDATE ::icons SET `cuFlags` = `cuFlags` | %i WHERE `name` IN %in', CUSTOM_EXCLUDE_FOR_LISTVIEW, $iconNames);
 
             CLI::write('[simpleimg] the following '.count($missing).' images where referenced by DBC but not in the mpqData directory. They may need to be converted by hand later on.', CLI::LOG_WARN);
             foreach ($missing as $m)

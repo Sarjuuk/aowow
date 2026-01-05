@@ -59,9 +59,9 @@ class LootByItem extends Loot
                   IF(lt1.`reference` = 0, lt1.`mincount`, 1)           AS "min",
                   IF(lt1.`reference` = 0, lt1.`maxcount`, 1)           AS "max",
                   IF(lt1.`reference` > 0, lt1.`maxcount`, 1)           AS "multiplier"
-        FROM      ?# lt1
-        LEFT JOIN ?# lt2 ON lt1.`entry` = lt2.`entry` AND lt1.`groupid` = lt2.`groupid`
-        WHERE     %s
+        FROM      %n lt1
+        LEFT JOIN %n lt2 ON lt1.`entry` = lt2.`entry` AND lt1.`groupid` = lt2.`groupid`
+        WHERE     %and
         GROUP BY  lt2.`entry`, lt2.`groupid`';
 
     /**
@@ -159,10 +159,10 @@ class LootByItem extends Loot
         /*
             get references containing the item
         */
-        $newRefs = DB::World()->select(
-            sprintf($this->queryTemplate, 'lt1.`item` = ?d AND lt1.`reference` = 0'),
+        $newRefs = DB::World()->selectAssoc(
+            $this->queryTemplate,
             Loot::REFERENCE, Loot::REFERENCE,
-            $this->entry
+            [['lt1.`item` = %i', $this->entry], ['lt1.`reference` = 0']]
         );
 
         /*
@@ -179,10 +179,10 @@ class LootByItem extends Loot
         while ($newRefs)
         {
             $curRefs = $newRefs;
-            $newRefs = DB::World()->select(
-                sprintf($this->queryTemplate, 'lt1.`reference` IN (?a)'),
+            $newRefs = DB::World()->selectAssoc(
+                $this->queryTemplate,
                 Loot::REFERENCE, Loot::REFERENCE,
-                array_keys($curRefs)
+                [['lt1.`reference` IN %in', array_keys($curRefs)]]
             );
 
             $refResults += $this->calcChance($curRefs, array_column($newRefs, 'item'));
@@ -199,11 +199,14 @@ class LootByItem extends Loot
             if ($lootTemplate == Loot::REFERENCE)
                 continue;
 
-            $result = $this->calcChance(DB::World()->select(
-                sprintf($this->queryTemplate, '{lt1.`reference` IN (?a) OR }(lt1.`reference` = 0 AND lt1.`item` = ?d)'),
+            $where = [[DB::OR, [[DB::AND, [['lt1.`reference` = 0'], ['lt1.`item` = %i', $this->entry]]]]]];
+            if ($refResults)
+                $where[0][1][] = ['lt1.`reference` IN %in', array_keys($refResults)];
+
+            $result = $this->calcChance(DB::World()->selectAssoc(
+                $this->queryTemplate,
                 $lootTemplate, $lootTemplate,
-                $refResults ? array_keys($refResults) : DBSIMPLE_SKIP,
-                $this->entry
+                $where
             ));
 
             // do not skip here if $result is empty. Additional loot for spells and quest is added separately
@@ -288,10 +291,10 @@ class LootByItem extends Loot
         if (!$ids)
             return false;
 
-        if ($baseIds = DB::Aowow()->selectCol(
-           'SELECT `difficultyEntry1` AS ARRAY_KEY, `id` FROM ?_creature WHERE `difficultyEntry1` IN (?a) UNION
-            SELECT `difficultyEntry2` AS ARRAY_KEY, `id` FROM ?_creature WHERE `difficultyEntry2` IN (?a) UNION
-            SELECT `difficultyEntry3` AS ARRAY_KEY, `id` FROM ?_creature WHERE `difficultyEntry3` IN (?a)',
+        if ($baseIds = DB::Aowow()->selectPairs(
+           'SELECT `difficultyEntry1` AS ARRAY_KEY, `id` FROM ::creature WHERE `difficultyEntry1` IN %in UNION
+            SELECT `difficultyEntry2` AS ARRAY_KEY, `id` FROM ::creature WHERE `difficultyEntry2` IN %in UNION
+            SELECT `difficultyEntry3` AS ARRAY_KEY, `id` FROM ::creature WHERE `difficultyEntry3` IN %in',
             $ids, $ids, $ids
         ))
         {
@@ -336,10 +339,10 @@ class LootByItem extends Loot
     private function handleSpellLoot(array $ids, array $result) : bool
     {
         $conditions = array(
-            'OR',
-            ['AND', ['effect1CreateItemId', $this->entry], ['OR', ['effect1Id', SpellList::EFFECTS_ITEM_CREATE], ['effect1AuraId', SpellList::AURAS_ITEM_CREATE]]],
-            ['AND', ['effect2CreateItemId', $this->entry], ['OR', ['effect2Id', SpellList::EFFECTS_ITEM_CREATE], ['effect2AuraId', SpellList::AURAS_ITEM_CREATE]]],
-            ['AND', ['effect3CreateItemId', $this->entry], ['OR', ['effect3Id', SpellList::EFFECTS_ITEM_CREATE], ['effect3AuraId', SpellList::AURAS_ITEM_CREATE]]]
+            DB::OR,
+            [DB::AND, ['effect1CreateItemId', $this->entry], [DB::OR, ['effect1Id', SpellList::EFFECTS_ITEM_CREATE], ['effect1AuraId', SpellList::AURAS_ITEM_CREATE]]],
+            [DB::AND, ['effect2CreateItemId', $this->entry], [DB::OR, ['effect2Id', SpellList::EFFECTS_ITEM_CREATE], ['effect2AuraId', SpellList::AURAS_ITEM_CREATE]]],
+            [DB::AND, ['effect3CreateItemId', $this->entry], [DB::OR, ['effect3Id', SpellList::EFFECTS_ITEM_CREATE], ['effect3AuraId', SpellList::AURAS_ITEM_CREATE]]]
         );
         if ($ids)
             $conditions[] = ['id', $ids];
@@ -366,7 +369,7 @@ class LootByItem extends Loot
     private function handleMailLoot(array $ids, array $result) : bool
     {
         // quest part
-        $conditions = array('OR',
+        $conditions = array(DB::OR,
             ['rewardChoiceItemId1', $this->entry], ['rewardChoiceItemId2', $this->entry], ['rewardChoiceItemId3', $this->entry], ['rewardChoiceItemId4', $this->entry], ['rewardChoiceItemId5', $this->entry],
             ['rewardChoiceItemId6', $this->entry], ['rewardItemId1',       $this->entry], ['rewardItemId2',       $this->entry], ['rewardItemId3',       $this->entry], ['rewardItemId4',       $this->entry]
         );
@@ -385,8 +388,8 @@ class LootByItem extends Loot
 
         // achievement part
         $conditions = array(['itemExtra', $this->entry]);
-        if ($ar = DB::World()->selectCol('SELECT `ID` FROM achievement_reward WHERE `ItemID` = ?d{ OR `MailTemplateID` IN (?a)}', $this->entry, $ids ?: DBSIMPLE_SKIP))
-            array_push($conditions, ['id', $ar], 'OR');
+        if ($ar = DB::World()->selectCol('SELECT `ID` FROM achievement_reward WHERE %if', $ids, '`MailTemplateID` IN %in OR %end', $ids, '`ItemID` = %i', $this->entry))
+            array_push($conditions, ['id', $ar], DB::OR);
 
         $achievements = new AchievementList($conditions);
         if (!$achievements->error)

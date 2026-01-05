@@ -146,9 +146,19 @@ class Report
 
     private function checkTargetContext(?string $url) : int
     {
-        // check already reported
-        $field = User::isLoggedIn() ? 'userId' : 'ip';
-        if (DB::Aowow()->selectCell('SELECT 1 FROM ?_reports WHERE `mode` = ?d AND `reason`= ?d AND `subject` = ?d{ AND `url` = ?} AND ?# = ?', $this->mode, $this->reason, $this->subject, $url ?: DBSIMPLE_SKIP, $field, User::$id ?: User::$ip))
+        $where = array(
+            ['`mode` = %i ', $this->mode],
+            ['`reason`= %i ', $this->reason],
+            ['`subject` = %i', $this->subject],
+        );
+        if (User::isLoggedIn())                             // check already reported
+            $where[] = ['`userId` = %i', User::$id];
+        else
+            $where[] = ['`ip` = %s', User::$ip];
+        if ($url)
+            $where[] = ['`url` = %s', $url];
+
+        if (DB::Aowow()->selectCell('SELECT 1 FROM ::reports WHERE %and', $where))
             return self::ERR_ALREADY_REPORTED;
 
         // check targeted post/postOwner staff status
@@ -157,9 +167,9 @@ class Report
         {
             $roles = User::$groups;
             if ($this->mode == self::MODE_COMMENT)
-                $roles = DB::Aowow()->selectCell('SELECT `roles` FROM ?_comments WHERE `id` = ?d', $this->subject);
+                $roles = DB::Aowow()->selectCell('SELECT `roles` FROM ::comments WHERE `id` = %i', $this->subject);
         //  else if if ($this->mode == self::MODE_FORUM_POST)
-        //      $roles = DB::Aowow()->selectCell('SELECT `roles` FROM ?_forum_posts WHERE `id` = ?d', $this->subject);
+        //      $roles = DB::Aowow()->selectCell('SELECT `roles` FROM ::forum_posts WHERE `id` = %i', $this->subject);
 
             return $roles & $ctxCheck ? self::ERR_NONE : self::ERR_MISCELLANEOUS;
         }
@@ -238,7 +248,7 @@ class Report
         if ($email)
             $update['email'] = $email;
 
-        return DB::Aowow()->query('INSERT INTO ?_reports (?#) VALUES (?a)', array_keys($update), array_values($update));
+        return DB::Aowow()->qry('INSERT INTO ::reports %v', $update);
     }
 
     public function getSimilar(int ...$status) : array
@@ -250,8 +260,8 @@ class Report
             if ($s < self::STATUS_OPEN || $s > self::STATUS_CLOSED_SOLVED)
                 unset($s);
 
-        return DB::Aowow()->select('SELECT `id` AS ARRAY_KEY, r.* FROM ?_reports r WHERE {`status` IN (?a) AND }`mode` = ?d AND `reason` = ?d AND `subject` = ?d',
-            $status ?: DBSIMPLE_SKIP, $this->mode, $this->reason, $this->subject);
+        return DB::Aowow()->selectAssoc('SELECT `id` AS ARRAY_KEY, r.* FROM ::reports r WHERE %if', $status, '`status` IN %in AND', $status, '%end `mode` = %i AND `reason` = %i AND `subject` = %i',
+            $this->mode, $this->reason, $this->subject);
     }
 
     public function close(int $closeStatus, bool $inclAssigned = false) : bool
@@ -266,10 +276,10 @@ class Report
         if ($inclAssigned)
             $fromStatus[] = self::STATUS_ASSIGNED;
 
-        if ($reports = DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, `userId` FROM ?_reports WHERE `status` IN (?a) AND `mode` = ?d AND `reason` = ?d AND `subject` = ?d',
+        if ($reports = DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, `userId` FROM ::reports WHERE `status` IN %in AND `mode` = %i AND `reason` = %i AND `subject` = %i',
             $fromStatus, $this->mode, $this->reason, $this->subject))
         {
-            DB::Aowow()->query('UPDATE ?_reports SET `status` = ?d, `assigned` = 0 WHERE `id` IN (?a)', $closeStatus, array_keys($reports));
+            DB::Aowow()->qry('UPDATE ::reports SET `status` = %i, `assigned` = 0 WHERE `id` IN %in', $closeStatus, array_keys($reports));
 
             foreach ($reports as $rId => $uId)
                 Util::gainSiteReputation($uId, $closeStatus == self::STATUS_CLOSED_SOLVED ? SITEREP_ACTION_GOOD_REPORT : SITEREP_ACTION_BAD_REPORT, ['id' => $rId]);

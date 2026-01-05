@@ -131,7 +131,7 @@ define('AUTH_IPBANNED',                     4);
 define('AUTH_ACC_INACTIVE',                 5);
 define('AUTH_INTERNAL_ERR',                 6);
 
-define('AUTH_MODE_SELF',                    0);             // uses ?_accounts
+define('AUTH_MODE_SELF',                    0);             // uses ::accounts
 define('AUTH_MODE_REALM',                   1);             // uses given realm-table
 define('AUTH_MODE_EXTERNAL',                2);             // uses external script
 
@@ -1073,7 +1073,7 @@ define('ENCHANTMENT_TYPE_PRISMATIC_SOCKET', 8);
 // define('ENCHANT_CONDITION_EQUAL_VALUE',        ?);
 define('ENCHANT_CONDITION_LESS_VALUE',            2);
 define('ENCHANT_CONDITION_MORE_COMPARE',          3);
-// define('ENCHANT_CONDITION_MORE_EQUAL_COMPARE', ?);
+// define('ENCHANT_CONDITION_MORE_EQUAL_COMPARE', %s);
 define('ENCHANT_CONDITION_MORE_VALUE',            5);
 // define('ENCHANT_CONDITION_NOT_EQUAL_COMPARE',  ?);
 // define('ENCHANT_CONDITION_NOT_EQUAL_VALUE',    ?);

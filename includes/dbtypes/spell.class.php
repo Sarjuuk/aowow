@@ -12,7 +12,7 @@ class SpellList extends DBTypeList
 
     public static  int      $type       = Type::SPELL;
     public static  string   $brickFile  = 'spell';
-    public static  string   $dataTable  = '?_spell';
+    public static  string   $dataTable  = '::spell';
     public         array    $ranks      = [];
     public        ?ItemList $relItems   = null;
     public static  array    $skillLines = array(
@@ -89,13 +89,13 @@ class SpellList extends DBTypeList
         10 => 4
     );
 
-    protected string $queryBase = 'SELECT s.*, s.`id` AS ARRAY_KEY FROM ?_spell s';
+    protected string $queryBase = 'SELECT s.*, s.`id` AS ARRAY_KEY FROM ::spell s';
     protected array  $queryOpts = array(
                         's'   => [['src', 'sr', 'ic', 'ica']],  //  6: Type::SPELL
-                        'ic'  => ['j' => ['?_icons ic  ON ic.`id`  = s.`iconId`',    true], 's' => ', ic.`name` AS "iconString"'],
-                        'ica' => ['j' => ['?_icons ica ON ica.`id` = s.`iconIdAlt`', true], 's' => ', ica.`name` AS "iconStringAlt"'],
-                        'sr'  => ['j' => ['?_spellrange sr ON sr.`id` = s.`rangeId`'], 's' => ', sr.`rangeMinHostile`, sr.`rangeMinFriend`, sr.`rangeMaxHostile`, sr.`rangeMaxFriend`, sr.`name_loc0` AS "rangeText_loc0", sr.`name_loc2` AS "rangeText_loc2", sr.`name_loc3` AS "rangeText_loc3", sr.`name_loc4` AS "rangeText_loc4", sr.`name_loc6` AS "rangeText_loc6", sr.`name_loc8` AS "rangeText_loc8"'],
-                        'src' => ['j' => ['?_source src ON `type` = 6 AND `typeId` = s.`id`', true], 's' => ', `moreType`, `moreTypeId`, `moreZoneId`, `moreMask`, `src1`, `src2`, `src3`, `src4`, `src5`, `src6`, `src7`, `src8`, `src9`, `src10`, `src11`, `src12`, `src13`, `src14`, `src15`, `src16`, `src17`, `src18`, `src19`, `src20`, `src21`, `src22`, `src23`, `src24`']
+                        'ic'  => ['j' => ['::icons ic  ON ic.`id`  = s.`iconId`',    true], 's' => ', ic.`name` AS "iconString"'],
+                        'ica' => ['j' => ['::icons ica ON ica.`id` = s.`iconIdAlt`', true], 's' => ', ica.`name` AS "iconStringAlt"'],
+                        'sr'  => ['j' => ['::spellrange sr ON sr.`id` = s.`rangeId`'], 's' => ', sr.`rangeMinHostile`, sr.`rangeMinFriend`, sr.`rangeMaxHostile`, sr.`rangeMaxFriend`, sr.`name_loc0` AS "rangeText_loc0", sr.`name_loc2` AS "rangeText_loc2", sr.`name_loc3` AS "rangeText_loc3", sr.`name_loc4` AS "rangeText_loc4", sr.`name_loc6` AS "rangeText_loc6", sr.`name_loc8` AS "rangeText_loc8"'],
+                        'src' => ['j' => ['::source src ON `type` = 6 AND `typeId` = s.`id`', true], 's' => ', `moreType`, `moreTypeId`, `moreZoneId`, `moreMask`, `src1`, `src2`, `src3`, `src4`, `src5`, `src6`, `src7`, `src8`, `src9`, `src10`, `src11`, `src12`, `src13`, `src14`, `src15`, `src16`, `src17`, `src18`, `src19`, `src20`, `src21`, `src22`, `src23`, `src24`']
                     );
 
     public function __construct(array $conditions = [], array $miscData = [])
@@ -112,7 +112,7 @@ class SpellList extends DBTypeList
             $this->charLevel = $miscData['charLevel'];
 
         // post processing
-        $foo = DB::World()->selectCol('SELECT `perfectItemType` FROM skill_perfect_item_template WHERE `spellId` IN (?a)', $this->getFoundIDs());
+        $foo = DB::World()->selectCol('SELECT `perfectItemType` FROM skill_perfect_item_template WHERE `spellId` IN %in', $this->getFoundIDs());
         foreach ($this->iterate() as &$_curTpl)
         {
             // required for globals
@@ -437,7 +437,7 @@ class SpellList extends DBTypeList
             // TotemCategory
             if ($_ = $this->curTpl['toolCategory'.$i])
             {
-                $tc = DB::Aowow()->selectRow('SELECT * FROM ?_totemcategory WHERE `id` = ?d', $_);
+                $tc = DB::Aowow()->selectRow('SELECT * FROM ::totemcategory WHERE `id` = %i', $_);
                 $tools[$i + 1] = array(
                     'id'   => $_,
                     'name' => Util::localizedString($tc, 'name'));
@@ -511,7 +511,7 @@ class SpellList extends DBTypeList
                         2289 => [2289, 29415, 29418, 29419, 29420, 29421]   // Bear - Tauren
                     );
 
-                    if ($st = DB::Aowow()->selectRow('SELECT *, `displayIdA` AS "model1", `displayIdH` AS "model2" FROM ?_shapeshiftforms WHERE `id` = ?d', $effMV))
+                    if ($st = DB::Aowow()->selectRow('SELECT *, `displayIdA` AS "model1", `displayIdH` AS "model2" FROM ::shapeshiftforms WHERE `id` = %i', $effMV))
                     {
                         foreach ([1, 2] as $j)
                             if (isset($subForms[$st['model'.$j]]))
@@ -1346,7 +1346,7 @@ class SpellList extends DBTypeList
         return [$return, $fSuffix, $fStat];
     }
 
-    // should probably used only once to create ?_spell. come to think of it, it yields the same results every time.. it absolutely has to!
+    // should probably used only once to create ::spell. come to think of it, it yields the same results every time.. it absolutely has to!
     // although it seems to be pretty fast, even on those pesky test-spells with extra complex tooltips (Ron Test Spell X))
     public function parseText(string $type = 'description', int $level = MAX_LEVEL) : array
     {
@@ -1358,7 +1358,7 @@ class SpellList extends DBTypeList
             documentation .. sort of
             bracket use
                 ${}.x - formulas; .x is optional; x:[0-9] .. max-precision of a floatpoint-result; default: 0
-                $[]   - conditionals ... like $?condition[true][false]; alternative $?!(cond1|cond2)[true]$?cond3[elseTrue][false]; ?a40120: has aura 40120; ?s40120: knows spell 40120(?)
+                $[]   - conditionals ... like $?condition[true][false]; alternative $?!(cond1|cond2)[true]$?cond3[elseTrue][false]; ?a40120: has aura 40120; ?s40120: knows spell 40120(%s)
                 $<>   - variables
                 ()    - regular use for function-like calls
 
@@ -1448,7 +1448,7 @@ class SpellList extends DBTypeList
         {
             if (empty($this->spellVars[$this->id]))
             {
-                $spellVars = DB::Aowow()->SelectCell('SELECT `vars` FROM ?_spellvariables WHERE `id` = ?d', $this->curTpl['spellDescriptionVariableId']);
+                $spellVars = DB::Aowow()->SelectCell('SELECT `vars` FROM ::spellvariables WHERE `id` = %i', $this->curTpl['spellDescriptionVariableId']);
                 $spellVars = explode("\n", $spellVars);
                 foreach ($spellVars as $sv)
                     if (preg_match('/\$(\w*\d*)=(.*)/i', trim($sv), $matches))
@@ -2583,7 +2583,7 @@ class SpellListFilter extends Filter
 
         // race
         if ($_v['ra'])
-            $parts[] = ['AND', [['reqRaceMask', ChrRace::MASK_ALL, '&'], ChrRace::MASK_ALL, '!'], ['reqRaceMask', $this->list2Mask([$_v['ra']]), '&']];
+            $parts[] = [DB::AND, [['reqRaceMask', ChrRace::MASK_ALL, '&'], ChrRace::MASK_ALL, '!'], ['reqRaceMask', $this->list2Mask([$_v['ra']]), '&']];
 
         // class [list]
         if ($_v['cl'])
@@ -2603,7 +2603,7 @@ class SpellListFilter extends Filter
 
         // mechanic
         if ($_v['me'])
-            $parts[] = ['OR', ['mechanic', $_v['me']], ['effect1Mechanic', $_v['me']], ['effect2Mechanic', $_v['me']], ['effect3Mechanic', $_v['me']]];
+            $parts[] = [DB::OR, ['mechanic', $_v['me']], ['effect1Mechanic', $_v['me']], ['effect2Mechanic', $_v['me']], ['effect3Mechanic', $_v['me']]];
 
         return $parts;
     }
@@ -2641,9 +2641,9 @@ class SpellListFilter extends Filter
         if (!Util::checkNumeric($crv, NUM_CAST_INT) || !$this->int2Op($crs))
             return null;
 
-        return ['OR',
-            ['AND', ['powerType', [POWER_RAGE, POWER_RUNIC_POWER]], ['powerCost', (10 * $crv), $crs]],
-            ['AND', ['powerType', [POWER_RAGE, POWER_RUNIC_POWER], '!'], ['powerCost', $crv, $crs]]
+        return [DB::OR,
+            [DB::AND, ['powerType', [POWER_RAGE, POWER_RUNIC_POWER]], ['powerCost', (10 * $crv), $crs]],
+            [DB::AND, ['powerType', [POWER_RAGE, POWER_RUNIC_POWER], '!'], ['powerCost', $crv, $crs]]
         ];
     }
 
@@ -2657,7 +2657,7 @@ class SpellListFilter extends Filter
             return ['src.src'.$_, null, '!'];
         else if ($_)                                        // any
         {
-            $foo = ['OR'];
+            $foo = [DB::OR];
             foreach (self::$enums[$cr] as $bar)
                 if (is_int($bar))
                     $foo[] = ['src.src'.$bar, null, '!'];
@@ -2676,9 +2676,9 @@ class SpellListFilter extends Filter
             return null;
 
         if ($crs)
-            return ['OR', ['reagent1', 0, '>'], ['reagent2', 0, '>'], ['reagent3', 0, '>'], ['reagent4', 0, '>'], ['reagent5', 0, '>'], ['reagent6', 0, '>'], ['reagent7', 0, '>'], ['reagent8', 0, '>']];
+            return [DB::OR, ['reagent1', 0, '>'], ['reagent2', 0, '>'], ['reagent3', 0, '>'], ['reagent4', 0, '>'], ['reagent5', 0, '>'], ['reagent6', 0, '>'], ['reagent7', 0, '>'], ['reagent8', 0, '>']];
         else
-            return ['AND', ['reagent1', 0], ['reagent2', 0], ['reagent3', 0], ['reagent4', 0], ['reagent5', 0], ['reagent6', 0], ['reagent7', 0], ['reagent8', 0]];
+            return [DB::AND, ['reagent1', 0], ['reagent2', 0], ['reagent3', 0], ['reagent4', 0], ['reagent5', 0], ['reagent6', 0], ['reagent7', 0], ['reagent8', 0]];
     }
 
     protected function cbAuraNames(int $cr, int $crs, string $crv) : ?array
@@ -2686,7 +2686,7 @@ class SpellListFilter extends Filter
         if (!$this->checkInput(parent::V_RANGE, [1, self::MAX_SPELL_AURA], $crs))
             return null;
 
-        return ['OR', ['effect1AuraId', $crs], ['effect2AuraId', $crs], ['effect3AuraId', $crs]];
+        return [DB::OR, ['effect1AuraId', $crs], ['effect2AuraId', $crs], ['effect3AuraId', $crs]];
     }
 
     protected function cbEffectNames(int $cr, int $crs, string $crv) : ?array
@@ -2694,7 +2694,7 @@ class SpellListFilter extends Filter
         if (!$this->checkInput(parent::V_RANGE, [1, self::MAX_SPELL_EFFECT], $crs))
             return null;
 
-        return ['OR', ['effect1Id', $crs], ['effect2Id', $crs], ['effect3Id', $crs]];
+        return [DB::OR, ['effect1Id', $crs], ['effect2Id', $crs], ['effect3Id', $crs]];
     }
 
     protected function cbInverseFlag(int $cr, int $crs, string $crv, string $field, int $flag) : ?array
@@ -2714,9 +2714,9 @@ class SpellListFilter extends Filter
             return null;
 
         if ($crs)
-            return ['AND', [[$field, $flag, '&'], 0], ['dispelType', SPELL_DAMAGE_CLASS_MAGIC]];
+            return [DB::AND, [[$field, $flag, '&'], 0], ['dispelType', SPELL_DAMAGE_CLASS_MAGIC]];
         else
-            return ['OR', [$field, $flag, '&'], ['dispelType', SPELL_DAMAGE_CLASS_MAGIC, '!']];
+            return [DB::OR, [$field, $flag, '&'], ['dispelType', SPELL_DAMAGE_CLASS_MAGIC, '!']];
     }
 
     protected function cbReqFaction(int $cr, int $crs, string $crv) : ?array
@@ -2726,11 +2726,11 @@ class SpellListFilter extends Filter
             // yes
             1 => ['reqRaceMask', 0, '!'],
             // alliance
-            2 => ['AND', [['reqRaceMask', ChrRace::MASK_HORDE, '&'], 0], ['reqRaceMask', ChrRace::MASK_ALLIANCE, '&']],
+            2 => [DB::AND, [['reqRaceMask', ChrRace::MASK_HORDE, '&'], 0], ['reqRaceMask', ChrRace::MASK_ALLIANCE, '&']],
             // horde
-            3 => ['AND', [['reqRaceMask', ChrRace::MASK_ALLIANCE, '&'], 0], ['reqRaceMask', ChrRace::MASK_HORDE, '&']],
+            3 => [DB::AND, [['reqRaceMask', ChrRace::MASK_ALLIANCE, '&'], 0], ['reqRaceMask', ChrRace::MASK_HORDE, '&']],
             // both
-            4 => ['AND', ['reqRaceMask', ChrRace::MASK_ALLIANCE, '&'], ['reqRaceMask', ChrRace::MASK_HORDE, '&']],
+            4 => [DB::AND, ['reqRaceMask', ChrRace::MASK_ALLIANCE, '&'], ['reqRaceMask', ChrRace::MASK_HORDE, '&']],
             // no
             5 => ['reqRaceMask', 0],
             default => null
@@ -2746,9 +2746,9 @@ class SpellListFilter extends Filter
         $field = $useInvType ? 'equippedItemInventoryTypeMask' : 'equippedItemSubClassMask';
 
         if ($crs)
-            return ['AND', ['equippedItemClass', ITEM_CLASS_WEAPON], [$field, $mask, '&']];
+            return [DB::AND, ['equippedItemClass', ITEM_CLASS_WEAPON], [$field, $mask, '&']];
         else
-            return ['OR', ['equippedItemClass', ITEM_CLASS_WEAPON, '!'], [[$field, $mask, '&'], 0]];
+            return [DB::OR, ['equippedItemClass', ITEM_CLASS_WEAPON, '!'], [[$field, $mask, '&'], 0]];
     }
 
     /* unused - for reference: attribute flag or cooldown time constraint */
@@ -2758,14 +2758,14 @@ class SpellListFilter extends Filter
             return null;
 
         if ($crs)
-            return  ['AND',
+            return  [DB::AND,
                         [['attributes4', SPELL_ATTR4_NOT_USABLE_IN_ARENA, '&'], 0],
-                        ['OR', ['recoveryTime', 10 * MINUTE * 1000, '<='], ['attributes4', SPELL_ATTR4_USABLE_IN_ARENA, '&']]
+                        [DB::OR, ['recoveryTime', 10 * MINUTE * 1000, '<='], ['attributes4', SPELL_ATTR4_USABLE_IN_ARENA, '&']]
                     ];
         else
-            return  ['OR',
+            return  [DB::OR,
                         ['attributes4', SPELL_ATTR4_NOT_USABLE_IN_ARENA, '&'],
-                        ['AND', ['recoveryTime', 10 * MINUTE * 1000, '>'], [['attributes4', SPELL_ATTR4_USABLE_IN_ARENA, '&'], 0]]
+                        [DB::AND, ['recoveryTime', 10 * MINUTE * 1000, '>'], [['attributes4', SPELL_ATTR4_USABLE_IN_ARENA, '&'], 0]]
                     ];
     }
 
@@ -2775,9 +2775,9 @@ class SpellListFilter extends Filter
             return null;
 
         if ($crs)                                           // match exact, not as flag
-            return ['AND', ['attributes1', SPELL_ATTR1_CHANNELED_1 | SPELL_ATTR1_CHANNELED_2 | SPELL_ATTR1_CHANNEL_TRACK_TARGET], ['effect1ImplicitTargetA', 21]];
+            return [DB::AND, ['attributes1', SPELL_ATTR1_CHANNELED_1 | SPELL_ATTR1_CHANNELED_2 | SPELL_ATTR1_CHANNEL_TRACK_TARGET], ['effect1ImplicitTargetA', 21]];
         else
-            return ['OR', ['attributes1', SPELL_ATTR1_CHANNELED_1 | SPELL_ATTR1_CHANNELED_2 | SPELL_ATTR1_CHANNEL_TRACK_TARGET, '!'], ['effect1ImplicitTargetA', 21, '!']];
+            return [DB::OR, ['attributes1', SPELL_ATTR1_CHANNELED_1 | SPELL_ATTR1_CHANNELED_2 | SPELL_ATTR1_CHANNEL_TRACK_TARGET, '!'], ['effect1ImplicitTargetA', 21, '!']];
     }
 
     protected function cbProficiency(int $cr, int $crs, string $crv) : ?array
@@ -2793,16 +2793,16 @@ class SpellListFilter extends Filter
             case 1:                                         // Weapons
                 foreach (Game::$skillLineMask[-3] as $bit => $_)
                     $skill2Mask |= (1 << $bit);
-                $skill1Ids = DB::Aowow()->selectCol('SELECT `id` FROM ?_skillline WHERE `typeCat` = 6');
+                $skill1Ids = DB::Aowow()->selectCol('SELECT `id` FROM ::skillline WHERE `typeCat` = 6');
                 break;
             case 2:                                         // Armor (Proficiencies + Specializations: so for us it's the same)
             case 3:                                         // Armor Proficiencies
-                $skill1Ids = DB::Aowow()->selectCol('SELECT `id` FROM ?_skillline WHERE `typeCat` = 8');
+                $skill1Ids = DB::Aowow()->selectCol('SELECT `id` FROM ::skillline WHERE `typeCat` = 8');
                 break;
             case 4:                                         // Armor Specializations
                 return [0];                                 // 4.x+ feature where using purely one type of armor increases your primary stat
             case 5:                                         // Languages
-                $skill1Ids = DB::Aowow()->selectCol('SELECT `id` FROM ?_skillline WHERE `typeCat` = 10');
+                $skill1Ids = DB::Aowow()->selectCol('SELECT `id` FROM ::skillline WHERE `typeCat` = 10');
                 break;
         }
 
@@ -2811,7 +2811,7 @@ class SpellListFilter extends Filter
 
         $cnd = ['skillLine1', $skill1Ids];
         if ($skill2Mask)
-            $cnd = ['OR', $cnd, ['AND', ['skillLine1', -3], ['skillLine2OrMask', $skill2Mask, '&']]];
+            $cnd = [DB::OR, $cnd, [DB::AND, ['skillLine1', -3], ['skillLine2OrMask', $skill2Mask, '&']]];
 
         return $cnd;
     }

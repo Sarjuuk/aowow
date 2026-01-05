@@ -10,9 +10,9 @@ class MailList extends DBTypeList
 {
     public static int    $type      = Type::MAIL;
     public static string $brickFile = 'mail';
-    public static string $dataTable = '?_mails';
+    public static string $dataTable = '::mails';
 
-    protected string $queryBase = 'SELECT m.*, m.`id` AS ARRAY_KEY FROM ?_mails m';
+    protected string $queryBase = 'SELECT m.*, m.`id` AS ARRAY_KEY FROM ::mails m';
     protected array  $queryOpts = [];
 
     public function __construct(array $conditions = [], array $miscData = [])
@@ -36,7 +36,7 @@ class MailList extends DBTypeList
 
     public static function getName(int $id) : ?LocString
     {
-        if ($n = DB::Aowow()->SelectRow('SELECT `subject_loc0`, `subject_loc2`, `subject_loc3`, `subject_loc4`, `subject_loc6`, `subject_loc8` FROM ?# WHERE `id` = ?d', self::$dataTable, $id))
+        if ($n = DB::Aowow()->SelectRow('SELECT `subject_loc0`, `subject_loc2`, `subject_loc3`, `subject_loc4`, `subject_loc6`, `subject_loc8` FROM %n WHERE `id` = %i', self::$dataTable, $id))
             return new LocString($n, 'subject');
         return null;
     }

@@ -172,7 +172,7 @@ class TemplateResponse extends BaseResponse
             array_push($this->scripts, [SC_CSS_FILE, 'css/staff.css'], [SC_JS_FILE,  'js/staff.js']);
 
         // get alt header logo
-        if ($ahl = DB::Aowow()->selectCell('SELECT `altHeaderLogo` FROM ?_home_featuredbox WHERE ?d BETWEEN `startDate` AND `endDate` ORDER BY `id` DESC', time()))
+        if ($ahl = DB::Aowow()->selectCell('SELECT `altHeaderLogo` FROM ::home_featuredbox WHERE %i BETWEEN `startDate` AND `endDate` ORDER BY `id` DESC', time()))
             $this->headerLogo = Util::defStatic($ahl);
 
         if ($this->pageName)
@@ -398,14 +398,12 @@ class TemplateResponse extends BaseResponse
         }
 
         // fetch announcements
-        $fromDB = DB::Aowow()->select(
+        $fromDB = DB::Aowow()->selectAssoc(
            'SELECT `id`, `mode`, `status`, `name`, `style`, `text_loc0`, `text_loc2`, `text_loc3`, `text_loc4`, `text_loc6`, `text_loc8`
-            FROM   ?_announcements
-            WHERE  (`status`    = ?d  { OR `status`    = ?d } ) AND
-                   (`page`      = "*" { OR `page`      = ?  } ) AND
-                   (`groupMask` = 0     OR `groupMask` & ?d)',
-            Announcement::STATUS_ENABLED, User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU) ? Announcement::STATUS_DISABLED : DBSIMPLE_SKIP,
-            $onlyGenerics || !$this->pageName ? DBSIMPLE_SKIP : $this->pageName,
+            FROM   ::announcements
+            WHERE  (`page` = "*" %if', !$onlyGenerics && $this->pageName, 'OR `page` = %s', $this->pageName, '%end) AND
+                   `status` IN (%i) AND (`groupMask` = 0 OR `groupMask` & %i)',
+            User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU) ? [Announcement::STATUS_ENABLED, Announcement::STATUS_DISABLED] : [Announcement::STATUS_ENABLED],
             User::$groups
         );
 
@@ -424,13 +422,13 @@ class TemplateResponse extends BaseResponse
 
         $article = [];
         if (isset($this->guideRevision))
-            $article = DB::Aowow()->selectRow('SELECT `article`, `locale`, `editAccess` FROM ?_articles WHERE `type` = ?d AND `typeId` = ?d AND `rev` = ?d',
+            $article = DB::Aowow()->selectRow('SELECT `article`, `locale`, `editAccess` FROM ::articles WHERE `type` = %i AND `typeId` = %i AND `rev` = %i',
                 Type::GUIDE, $this->typeId, $this->guideRevision);
         if (!$article && !empty($this->gPageInfo['articleUrl']))
-            $article = DB::Aowow()->selectRow('SELECT `article`, `locale`, `editAccess` FROM ?_articles WHERE `url` = ? AND `locale` IN (?a) ORDER BY `locale` DESC, `rev` DESC LIMIT 1',
+            $article = DB::Aowow()->selectRow('SELECT `article`, `locale`, `editAccess` FROM ::articles WHERE `url` = %s AND `locale` IN %in ORDER BY `locale` DESC, `rev` DESC LIMIT 1',
                 $this->gPageInfo['articleUrl'], [Lang::getLocale()->value, Locale::EN->value]);
         if (!$article && !empty($this->type) && isset($this->typeId))
-            $article = DB::Aowow()->selectRow('SELECT `article`, `locale`, `editAccess` FROM ?_articles WHERE `type` = ?d AND `typeId` = ?d AND `locale` IN (?a) ORDER BY `locale` DESC, `rev` DESC LIMIT 1',
+            $article = DB::Aowow()->selectRow('SELECT `article`, `locale`, `editAccess` FROM ::articles WHERE `type` = %i AND `typeId` = %i AND `locale` IN (%i) ORDER BY `locale` DESC, `rev` DESC LIMIT 1',
                 $this->type, $this->typeId, [Lang::getLocale()->value, Locale::EN->value]);
 
         if (!$article)

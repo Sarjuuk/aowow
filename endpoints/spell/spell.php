@@ -69,13 +69,13 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             $this->extendGlobalData($jsg, $extra);
 
         $this->modelInfo     = $this->subject->getModelInfo($this->typeId);
-        if ($spelldifficulty = DB::Aowow()->select(         // has difficulty versions of itself
+        if ($spelldifficulty = DB::Aowow()->selectAssoc(         // has difficulty versions of itself
             'SELECT `normal10` AS "0", `normal25` AS "1",
                     `heroic10` AS "2", `heroic25` AS "3",
                     `mapType`  AS ARRAY_KEY
-             FROM   ?_spelldifficulty
-             WHERE  `normal10` = ?d OR `normal25` = ?d OR
-                    `heroic10` = ?d OR `heroic25` = ?d',
+             FROM   ::spelldifficulty
+             WHERE  `normal10` = %i OR `normal25` = %i OR
+                    `heroic10` = %i OR `heroic25` = %i',
             $this->typeId, $this->typeId, $this->typeId, $this->typeId
         ))
         {
@@ -84,17 +84,17 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         }
 
         // returns self or firstRank
-        if ($fr = DB::World()->selectCell('SELECT `first_spell_id` FROM spell_ranks WHERE `spell_id` = ?d', $this->typeId))
+        if ($fr = DB::World()->selectCell('SELECT `first_spell_id` FROM spell_ranks WHERE `spell_id` = %i', $this->typeId))
             $this->firstRank = $fr;
         else
             $this->firstRank = DB::Aowow()->selectCell(
                'SELECT      IF(s1.`RankNo` <> 1 AND s2.`id`, s2.`id`, s1.`id`)
-                FROM        ?_spell s1
-                LEFT JOIN   ?_spell s2
+                FROM        ::spell s1
+                LEFT JOIN   ::spell s2
                     ON      s1.`SpellFamilyId`     = s2.`SpelLFamilyId`     AND s1.`SpellFamilyFlags1` = s2.`SpelLFamilyFlags1` AND
                             s1.`SpellFamilyFlags2` = s2.`SpellFamilyFlags2` AND s1.`SpellFamilyFlags3` = s2.`SpellFamilyFlags3` AND
                             s1.`name_loc0` = s2.`name_loc0`                 AND s2.`RankNo` = 1
-                WHERE       s1.`id` = ?d',
+                WHERE       s1.`id` = %i',
                 $this->typeId
             );
 
@@ -209,7 +209,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         /*************************/
 
         // factionchange-equivalent
-        if ($pendant = DB::World()->selectCell('SELECT IF(`horde_id` = ?d, `alliance_id`, -`horde_id`) FROM player_factionchange_spells WHERE `alliance_id` = ?d OR `horde_id` = ?d', $this->typeId, $this->typeId, $this->typeId))
+        if ($pendant = DB::World()->selectCell('SELECT IF(`horde_id` = %i, `alliance_id`, -`horde_id`) FROM player_factionchange_spells WHERE `alliance_id` = %i OR `horde_id` = %i', $this->typeId, $this->typeId, $this->typeId))
         {
             $altSpell = new SpellList(array(['id', abs($pendant)]));
             if (!$altSpell->error)
@@ -284,7 +284,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         $formSpells = [];
         for ($i = 1; $i < 4; $i++)
             if ($this->subject->getField('effect'.$i.'AuraId') == SPELL_AURA_MOD_SHAPESHIFT)
-                if ($_ = DB::Aowow()->selectRow('SELECT `spellId1`, `spellId2`, `spellId3`, `spellId4`, `spellId5`, `spellId6`, `spellId7`, `spellId8` FROM ?_shapeshiftforms WHERE `id` = ?d', $this->subject->getField('effect'.$i.'MiscValue')))
+                if ($_ = DB::Aowow()->selectRow('SELECT `spellId1`, `spellId2`, `spellId3`, `spellId4`, `spellId5`, `spellId6`, `spellId7`, `spellId8` FROM ::shapeshiftforms WHERE `id` = %i', $this->subject->getField('effect'.$i.'MiscValue')))
                     $formSpells = array_merge($formSpells, $_);
 
         if ($formSpells)
@@ -333,7 +333,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             $classSpells = $miscSpells = [];
             $this->effects[$i]['modifies'] = [&$classSpells, &$miscSpells];
 
-            $sub = ['OR', ['s.spellFamilyFlags1', $m1, '&'], ['s.spellFamilyFlags2', $m2, '&'], ['s.spellFamilyFlags3', $m3, '&']];
+            $sub = [DB::OR, ['s.spellFamilyFlags1', $m1, '&'], ['s.spellFamilyFlags2', $m2, '&'], ['s.spellFamilyFlags3', $m3, '&']];
 
             $modSpells = new SpellList($conditions);
             if (!$modSpells->error)
@@ -348,7 +348,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
                 if ($classSpells)
                 {
-                    foreach (DB::World()->select('SELECT `spell_id` AS ARRAY_KEY, `first_spell_id` AS "0", `rank` AS "1" FROM spell_ranks WHERE `spell_id` IN (?a)', array_keys($classSpells)) as $spellId => [$firstSpellId, $rank])
+                    foreach (DB::World()->selectAssoc('SELECT `spell_id` AS ARRAY_KEY, `first_spell_id` AS "0", `rank` AS "1" FROM spell_ranks WHERE `spell_id` IN %in', array_keys($classSpells)) as $spellId => [$firstSpellId, $rank])
                     {
                         $classSpells[$firstSpellId][1][0] = min($classSpells[$firstSpellId][1][0] ?? $rank, $rank);
                         $classSpells[$firstSpellId][1][1] = max($classSpells[$firstSpellId][1][1] ?? $rank, $rank);
@@ -392,7 +392,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: [$this is] modified by
-        $sub = ['OR'];
+        $sub = [DB::OR];
         $conditions = [
             ['s.typeCat', [-9], '!'],                       // GM (-9); also include uncategorized (0), NPC-Spell (-8)?; NPC includes totems, lightwell and others :/
             ['s.spellFamilyId', $this->subject->getField('spellFamilyId')],
@@ -409,10 +409,10 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 continue;
 
             $sub[] = array(
-                'AND',
+                DB::AND,
                 ['s.effect'.$i.'AuraId', self::MOD_AURAS],
                 [
-                    'OR',
+                    DB::OR,
                     ['s.effect'.$i.'SpellClassMaskA', $m1, '&'],
                     ['s.effect'.$i.'SpellClassMaskB', $m2, '&'],
                     ['s.effect'.$i.'SpellClassMaskC', $m3, '&']
@@ -452,7 +452,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         );
 
         if ($this->difficulties)
-            $conditions = ['OR', ['AND', ...$conditions], ['AND', ['s.id', $this->difficulties], ['s.id', $this->typeId, '!']]];
+            $conditions = [DB::OR, [DB::AND, ...$conditions], [DB::AND, ['s.id', $this->difficulties], ['s.id', $this->typeId, '!']]];
 
         $saSpells = new SpellList($conditions);
         if (!$saSpells->error)
@@ -521,7 +521,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: glyphs
-        if ($gpIds = DB::Aowow()->selectCol('SELECT `id` FROM ?_glyphproperties WHERE `spellId` = ?d', $this->typeId))
+        if ($gpIds = DB::Aowow()->selectCol('SELECT `id` FROM ?_glyphproperties WHERE `spellId` = %i', $this->typeId))
         {
             $conditions = array(
                 'OR',
@@ -544,13 +544,13 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: used by - spell
-        if ($so = DB::Aowow()->selectCell('SELECT `id` FROM ?_spelloverride WHERE `spellId1` = ?d OR `spellId2` = ?d OR `spellId3` = ?d OR `spellId4` = ?d OR `spellId5` = ?d', $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId))
+        if ($so = DB::Aowow()->selectCell('SELECT `id` FROM ::spelloverride WHERE `spellId1` = %i OR `spellId2` = %i OR `spellId3` = %i OR `spellId4` = %i OR `spellId5` = %i', $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId))
         {
             $conditions = array(
-                'OR',
-                ['AND', ['effect1AuraId', SPELL_AURA_OVERRIDE_SPELLS], ['effect1MiscValue', $so]],
-                ['AND', ['effect2AuraId', SPELL_AURA_OVERRIDE_SPELLS], ['effect2MiscValue', $so]],
-                ['AND', ['effect3AuraId', SPELL_AURA_OVERRIDE_SPELLS], ['effect3MiscValue', $so]]
+                DB::OR,
+                [DB::AND, ['effect1AuraId', SPELL_AURA_OVERRIDE_SPELLS], ['effect1MiscValue', $so]],
+                [DB::AND, ['effect2AuraId', SPELL_AURA_OVERRIDE_SPELLS], ['effect2MiscValue', $so]],
+                [DB::AND, ['effect3AuraId', SPELL_AURA_OVERRIDE_SPELLS], ['effect3MiscValue', $so]]
             );
             $ubSpells = new SpellList($conditions);
             if (!$ubSpells->error)
@@ -567,7 +567,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
         // tab: used by - itemset
         $conditions = array(
-            'OR',
+            DB::OR,
             ['spell1', $this->typeId], ['spell2', $this->typeId], ['spell3', $this->typeId], ['spell4', $this->typeId],
             ['spell5', $this->typeId], ['spell6', $this->typeId], ['spell7', $this->typeId], ['spell8', $this->typeId]
         );
@@ -586,12 +586,12 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
         // tab: used by - item
         $conditions = array(
-            'OR',
-            ['AND', ['spellTrigger1', SPELL_TRIGGER_LEARN, '!'], ['spellId1', $this->typeId]],
-            ['AND', ['spellTrigger2', SPELL_TRIGGER_LEARN, '!'], ['spellId2', $this->typeId]],
-            ['AND', ['spellTrigger3', SPELL_TRIGGER_LEARN, '!'], ['spellId3', $this->typeId]],
-            ['AND', ['spellTrigger4', SPELL_TRIGGER_LEARN, '!'], ['spellId4', $this->typeId]],
-            ['AND', ['spellTrigger5', SPELL_TRIGGER_LEARN, '!'], ['spellId5', $this->typeId]]
+            DB::OR,
+            [DB::AND, ['spellTrigger1', SPELL_TRIGGER_LEARN, '!'], ['spellId1', $this->typeId]],
+            [DB::AND, ['spellTrigger2', SPELL_TRIGGER_LEARN, '!'], ['spellId2', $this->typeId]],
+            [DB::AND, ['spellTrigger3', SPELL_TRIGGER_LEARN, '!'], ['spellId3', $this->typeId]],
+            [DB::AND, ['spellTrigger4', SPELL_TRIGGER_LEARN, '!'], ['spellId4', $this->typeId]],
+            [DB::AND, ['spellTrigger5', SPELL_TRIGGER_LEARN, '!'], ['spellId5', $this->typeId]]
         );
 
         $ubItems = new ItemList($conditions);
@@ -608,7 +608,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
         // tab: used by - object
         $conditions = array(
-            'OR',
+            DB::OR,
             ['onUseSpell', $this->typeId], ['onSuccessSpell', $this->typeId],
             ['auraSpell',  $this->typeId], ['triggeredSpell', $this->typeId]
         );
@@ -647,15 +647,15 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
         // tab: criteria of
         $conditions = array(
-            'AND',
+            DB::AND,
             ['ac.type', [ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL,
                          ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2,     ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL]
             ],
             ['ac.value1', $this->typeId]
         );
 
-        if ($extraCrt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` IN (?a) AND `value1` = ?d', [ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AURA, ACHIEVEMENT_CRITERIA_DATA_TYPE_T_AURA], $this->typeId))
-            $conditions = ['OR', $conditions, ['ac.id', $extraCrt]];
+        if ($extraCrt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` IN %in AND `value1` = %i', [ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AURA, ACHIEVEMENT_CRITERIA_DATA_TYPE_T_AURA], $this->typeId))
+            $conditions = [DB::OR, $conditions, ['ac.id', $extraCrt]];
 
         $coAchievemnts = new AchievementList($conditions);
         if (!$coAchievemnts->error)
@@ -690,7 +690,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: bonus loot
-        if ($extraItemData = DB::World()->select('SELECT `spellId` AS ARRAY_KEY, `additionalCreateChance` AS "0", `additionalMaxNum` AS "1" FROM skill_extra_item_template WHERE `requiredSpecialization` = ?d', $this->typeId))
+        if ($extraItemData = DB::World()->selectAssoc('SELECT `spellId` AS ARRAY_KEY, `additionalCreateChance` AS "0", `additionalMaxNum` AS "1" FROM skill_extra_item_template WHERE `requiredSpecialization` = %i', $this->typeId))
         {
             $extraSpells = new SpellList(array(['id', array_keys($extraItemData)]));
             if (!$extraSpells->error)
@@ -719,7 +719,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: exclusive with
-        if ($this->firstRank && DB::World()->selectCell('SELECT 1 FROM spell_group WHERE `spell_id` = ?d', $this->firstRank))
+        if ($this->firstRank && DB::World()->selectCell('SELECT 1 FROM spell_group WHERE `spell_id` = %i', $this->firstRank))
         {
             $groups = DB::World()->selectCol('SELECT `id` AS ARRAY_KEY, `spell_id` AS ARRAY_KEY2, `spell_id` FROM spell_group');
             // unpack recursion
@@ -741,12 +741,12 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             if ($filtered = array_filter($groups, fn($x) => in_array($this->firstRank, $x)))
             {
                 // get rule set
-                $rules = DB::World()->selectCol('SELECT `group_id` AS ARRAY_KEY, `stack_rule` FROM spell_group_stack_rules WHERE `group_id` IN (?a)', array_keys($filtered));
+                $rules = DB::World()->selectCol('SELECT `group_id` AS ARRAY_KEY, `stack_rule` FROM spell_group_stack_rules WHERE `group_id` IN %in', array_keys($filtered));
 
                 // only use groups that have rules set
                 if ($filtered = array_intersect_key($filtered, $rules))
                 {
-                    $cnd = ['OR'];
+                    $cnd = [DB::OR];
                     foreach ($filtered as $gr)
                         $cnd[] = ['s.id', $gr];
 
@@ -786,10 +786,10 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: linked with
-        $rows = DB::World()->select(
-           'SELECT  `spell_trigger` AS "trigger", `spell_effect` AS "effect", `type`, IF(ABS(`spell_effect`) = ?d, ABS(`spell_trigger`), ABS(`spell_effect`)) AS "related"
+        $rows = DB::World()->selectAssoc(
+           'SELECT  `spell_trigger` AS "trigger", `spell_effect` AS "effect", `type`, IF(ABS(`spell_effect`) = %i, ABS(`spell_trigger`), ABS(`spell_effect`)) AS "related"
             FROM    spell_linked_spell
-            WHERE   ABS(`spell_effect`) = ?d OR ABS(`spell_trigger`) = ?d',
+            WHERE   ABS(`spell_effect`) = %i OR ABS(`spell_trigger`) = %i',
             $this->typeId, $this->typeId, $this->typeId
         );
 
@@ -832,10 +832,10 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
         // tab: triggered by
         $conditions = array(
-            'OR',
-            ['AND', ['OR', ['effect1Id', SpellList::EFFECTS_TRIGGER], ['effect1AuraId', SpellList::AURAS_TRIGGER]], ['effect1TriggerSpell', $this->typeId]],
-            ['AND', ['OR', ['effect2Id', SpellList::EFFECTS_TRIGGER], ['effect2AuraId', SpellList::AURAS_TRIGGER]], ['effect2TriggerSpell', $this->typeId]],
-            ['AND', ['OR', ['effect3Id', SpellList::EFFECTS_TRIGGER], ['effect3AuraId', SpellList::AURAS_TRIGGER]], ['effect3TriggerSpell', $this->typeId]],
+            DB::OR,
+            [DB::AND, [DB::OR, ['effect1Id', SpellList::EFFECTS_TRIGGER], ['effect1AuraId', SpellList::AURAS_TRIGGER]], ['effect1TriggerSpell', $this->typeId]],
+            [DB::AND, [DB::OR, ['effect2Id', SpellList::EFFECTS_TRIGGER], ['effect2AuraId', SpellList::AURAS_TRIGGER]], ['effect2TriggerSpell', $this->typeId]],
+            [DB::AND, [DB::OR, ['effect3Id', SpellList::EFFECTS_TRIGGER], ['effect3AuraId', SpellList::AURAS_TRIGGER]], ['effect3TriggerSpell', $this->typeId]],
         );
 
         $trigger = new SpellList($conditions);
@@ -852,17 +852,17 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
         // tab: used by - creature
         $conditions = array(
-            'OR',
+            DB::OR,
             ['spell1', $this->typeId], ['spell2', $this->typeId], ['spell3', $this->typeId], ['spell4', $this->typeId],
             ['spell5', $this->typeId], ['spell6', $this->typeId], ['spell7', $this->typeId], ['spell8', $this->typeId]
         );
         if (!empty($ubSAI[Type::NPC]))
             $conditions[] = ['id', $ubSAI[Type::NPC]];
 
-        if ($auras = DB::World()->selectCol('SELECT `entry` FROM creature_template_addon WHERE `auras` REGEXP ?', '\\b'.$this->typeId.'\\b'))
+        if ($auras = DB::World()->selectCol('SELECT `entry` FROM creature_template_addon WHERE `auras` REGEXP %s', '\\b'.$this->typeId.'\\b'))
             $conditions[] = ['id', $auras];
 
-        if ($spellClick = DB::World()->selectCol('SELECT `npc_entry` FROM npc_spellclick_spells WHERE `spell_id` = ?d', $this->typeId))
+        if ($spellClick = DB::World()->selectCol('SELECT `npc_entry` FROM npc_spellclick_spells WHERE `spell_id` = %i', $this->typeId))
             $conditions[] = ['id', $spellClick];
 
         $ubCreature = new CreatureList($conditions);
@@ -879,7 +879,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: zone
-        if ($areaSpells = DB::World()->select('SELECT `area` AS ARRAY_KEY, `aura_spell` AS "0", `quest_start` AS "1", `quest_end` AS "2", `quest_start_status` AS "3", `quest_end_status` AS "4", `racemask` AS "5", `gender` AS "6" FROM spell_area WHERE `spell` = ?d', $this->typeId))
+        if ($areaSpells = DB::World()->selectAssoc('SELECT `area` AS ARRAY_KEY, `aura_spell` AS "0", `quest_start` AS "1", `quest_end` AS "2", `quest_start_status` AS "3", `quest_end_status` AS "4", `racemask` AS "5", `gender` AS "6" FROM spell_area WHERE `spell` = %i', $this->typeId))
         {
             $zones = new ZoneList(array(['id', array_keys($areaSpells)]));
             if (!$zones->error)
@@ -1019,11 +1019,11 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         // tab: taught by npc
         if ($this->subject->getRawSource(SRC_TRAINER))
         {
-            $trainers = DB::World()->select(
+            $trainers = DB::World()->selectAssoc(
                'SELECT  cdt.`CreatureId` AS ARRAY_KEY, ts.`ReqSkillLine` AS "reqSkillId", ts.`ReqSkillRank` AS "reqSkillValue", ts.`ReqLevel` AS "reqLevel", ts.`ReqAbility1` AS "reqSpellId1", ts.`reqAbility2` AS "reqSpellId2"
                 FROM    creature_default_trainer cdt
                 JOIN    trainer_spell ts ON ts.`TrainerId` = cdt.`TrainerId`
-                WHERE   ts.`SpellId` = ?d',
+                WHERE   ts.`SpellId` = %i',
                 $this->typeId
             );
 
@@ -1073,10 +1073,10 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
         // tab: taught by spell
         $conditions = array(
-            'OR',
-            ['AND', ['effect1Id', SpellList::EFFECTS_TEACH], ['effect1TriggerSpell', $this->typeId]],
-            ['AND', ['effect2Id', SpellList::EFFECTS_TEACH], ['effect2TriggerSpell', $this->typeId]],
-            ['AND', ['effect3Id', SpellList::EFFECTS_TEACH], ['effect3TriggerSpell', $this->typeId]],
+            DB::OR,
+            [DB::AND, ['effect1Id', SpellList::EFFECTS_TEACH], ['effect1TriggerSpell', $this->typeId]],
+            [DB::AND, ['effect2Id', SpellList::EFFECTS_TEACH], ['effect2TriggerSpell', $this->typeId]],
+            [DB::AND, ['effect3Id', SpellList::EFFECTS_TEACH], ['effect3TriggerSpell', $this->typeId]],
         );
 
         $tbSpell = new SpellList($conditions);
@@ -1095,7 +1095,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
         // tab: taught by quest
         $conditions = array(
-            'OR',
+            DB::OR,
             ['sourceSpellId',   $this->typeId],
             ['rewardSpell',     $this->typeId],
             ['rewardSpellCast', $this->typeId]
@@ -1117,12 +1117,12 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
         // tab: taught by item (i'd like to precheck $this->subject->sources, but there is no source:item only complicated crap like "drop" and "vendor")
         $conditions = array(
-            'OR',
-            ['AND', ['spellTrigger1', SPELL_TRIGGER_LEARN], ['spellId1', $this->typeId]],
-            ['AND', ['spellTrigger2', SPELL_TRIGGER_LEARN], ['spellId2', $this->typeId]],
-            ['AND', ['spellTrigger3', SPELL_TRIGGER_LEARN], ['spellId3', $this->typeId]],
-            ['AND', ['spellTrigger4', SPELL_TRIGGER_LEARN], ['spellId4', $this->typeId]],
-            ['AND', ['spellTrigger5', SPELL_TRIGGER_LEARN], ['spellId5', $this->typeId]],
+            DB::OR,
+            [DB::AND, ['spellTrigger1', SPELL_TRIGGER_LEARN], ['spellId1', $this->typeId]],
+            [DB::AND, ['spellTrigger2', SPELL_TRIGGER_LEARN], ['spellId2', $this->typeId]],
+            [DB::AND, ['spellTrigger3', SPELL_TRIGGER_LEARN], ['spellId3', $this->typeId]],
+            [DB::AND, ['spellTrigger4', SPELL_TRIGGER_LEARN], ['spellId4', $this->typeId]],
+            [DB::AND, ['spellTrigger5', SPELL_TRIGGER_LEARN], ['spellId5', $this->typeId]],
         );
 
         $tbItem = new ItemList($conditions);
@@ -1139,10 +1139,10 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
         // tab: enchantments
         $conditions = array(
-            'OR',
-            ['AND', ['type1', [ENCHANTMENT_TYPE_COMBAT_SPELL, ENCHANTMENT_TYPE_EQUIP_SPELL, ENCHANTMENT_TYPE_USE_SPELL]], ['object1', $this->typeId]],
-            ['AND', ['type2', [ENCHANTMENT_TYPE_COMBAT_SPELL, ENCHANTMENT_TYPE_EQUIP_SPELL, ENCHANTMENT_TYPE_USE_SPELL]], ['object2', $this->typeId]],
-            ['AND', ['type3', [ENCHANTMENT_TYPE_COMBAT_SPELL, ENCHANTMENT_TYPE_EQUIP_SPELL, ENCHANTMENT_TYPE_USE_SPELL]], ['object3', $this->typeId]]
+            DB::OR,
+            [DB::AND, ['type1', [ENCHANTMENT_TYPE_COMBAT_SPELL, ENCHANTMENT_TYPE_EQUIP_SPELL, ENCHANTMENT_TYPE_USE_SPELL]], ['object1', $this->typeId]],
+            [DB::AND, ['type2', [ENCHANTMENT_TYPE_COMBAT_SPELL, ENCHANTMENT_TYPE_EQUIP_SPELL, ENCHANTMENT_TYPE_USE_SPELL]], ['object2', $this->typeId]],
+            [DB::AND, ['type3', [ENCHANTMENT_TYPE_COMBAT_SPELL, ENCHANTMENT_TYPE_EQUIP_SPELL, ENCHANTMENT_TYPE_USE_SPELL]], ['object3', $this->typeId]]
         );
         $enchList = new EnchantmentList($conditions);
         if (!$enchList->error)
@@ -1160,9 +1160,9 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         $seSounds = [];
         for ($i = 1; $i < 4; $i++)                          // sounds from screen effect
             if ($this->subject->getField('effect'.$i.'AuraId') == SPELL_AURA_SCREEN_EFFECT)
-               $seSounds = DB::Aowow()->selectRow('SELECT `ambienceDay`, `ambienceNight`, `musicDay`, `musicNight` FROM ?_screeneffect_sounds WHERE `id` = ?d', $this->subject->getField('effect'.$i.'MiscValue'));
+               $seSounds = DB::Aowow()->selectRow('SELECT `ambienceDay`, `ambienceNight`, `musicDay`, `musicNight` FROM ::screeneffect_sounds WHERE `id` = %i', $this->subject->getField('effect'.$i.'MiscValue'));
 
-        $activitySounds = DB::Aowow()->selectRow('SELECT * FROM ?_spell_sounds WHERE `id` = ?d', $this->subject->getField('spellVisualId'));
+        $activitySounds = DB::Aowow()->selectRow('SELECT * FROM ::spell_sounds WHERE `id` = %i', $this->subject->getField('spellVisualId'));
         array_shift($activitySounds);                       // remove id-column
         if ($soundIDs = $activitySounds + $seSounds)
         {
@@ -1185,9 +1185,9 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
         // tab: unlocks (object or item)
         $lockIds = DB::Aowow()->selectCol(
-           'SELECT `id` FROM ?_lock WHERE            (`type1` = ?d AND `properties1` = ?d) OR
-            (`type2` = ?d AND `properties2` = ?d) OR (`type3` = ?d AND `properties3` = ?d) OR
-            (`type4` = ?d AND `properties4` = ?d) OR (`type5` = ?d AND `properties5` = ?d)',
+           'SELECT `id` FROM ::lock WHERE            (`type1` = %i AND `properties1` = %i) OR
+            (`type2` = %i AND `properties2` = %i) OR (`type3` = %i AND `properties3` = %i) OR
+            (`type4` = %i AND `properties4` = %i) OR (`type5` = %i AND `properties5` = %i)',
             LOCK_TYPE_SPELL, $this->typeId, LOCK_TYPE_SPELL, $this->typeId,
             LOCK_TYPE_SPELL, $this->typeId, LOCK_TYPE_SPELL, $this->typeId,
             LOCK_TYPE_SPELL, $this->typeId
@@ -1196,9 +1196,9 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         // we know this spell effect is only in use on index 1
         if ($this->subject->getField('effect1Id') == SPELL_EFFECT_OPEN_LOCK && ($lockId = $this->subject->getField('effect1MiscValue')))
             $lockIds += DB::Aowow()->selectCol(
-               'SELECT `id` FROM ?_lock WHERE            (`type1` = ?d AND `properties1` = ?d) OR
-                (`type2` = ?d AND `properties2` = ?d) OR (`type3` = ?d AND `properties3` = ?d) OR
-                (`type4` = ?d AND `properties4` = ?d) OR (`type5` = ?d AND `properties5` = ?d)',
+               'SELECT `id` FROM ::lock WHERE            (`type1` = %i AND `properties1` = %i) OR
+                (`type2` = %i AND `properties2` = %i) OR (`type3` = %i AND `properties3` = %i) OR
+                (`type4` = %i AND `properties4` = %i) OR (`type5` = %i AND `properties5` = %i)',
                 LOCK_TYPE_SKILL, $lockId, LOCK_TYPE_SKILL, $lockId,
                 LOCK_TYPE_SKILL, $lockId, LOCK_TYPE_SKILL, $lockId,
                 LOCK_TYPE_SKILL, $lockId
@@ -1296,9 +1296,9 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
         $item = DB::Aowow()->selectRow(
            'SELECT    `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8`, i.`id`, ic.`name` AS `iconString`, `quality`, `spellId1`, `spellCharges1`
-            FROM      ?_items i
-            LEFT JOIN ?_icons ic ON ic.`id` = i.`iconId`
-            WHERE     i.`id` = ?d',
+            FROM      ::items i
+            LEFT JOIN ::icons ic ON ic.`id` = i.`iconId`
+            WHERE     i.`id` = %i',
             $itemId
         );
 
@@ -1336,17 +1336,17 @@ class SpellBaseResponse extends TemplateResponse implements ICache
     {
         $level++;
         // assume that tradeSpells only use the first index to create items, so this runs somewhat efficiently >.<
-        $spells = DB::Aowow()->select(
+        $spells = DB::Aowow()->selectAssoc(
            'SELECT `reagent1`,      `reagent2`,      `reagent3`,      `reagent4`,      `reagent5`,      `reagent6`,      `reagent7`,      `reagent8`,
                    `reagentCount1`, `reagentCount2`, `reagentCount3`, `reagentCount4`, `reagentCount5`, `reagentCount6`, `reagentCount7`, `reagentCount8`,
                    `name_loc0`,     `name_loc2`,     `name_loc3`,     `name_loc4`,     `name_loc6`,     `name_loc8`,
                    `iconIdBak`,
                    s.`id` AS ARRAY_KEY, ic.`name` AS `iconString`
-            FROM   ?_spell s
-            JOIN   ?_icons ic ON s.`iconId` = ic.`id`
-            WHERE  (`effect1CreateItemId` = ?d AND `effect1Id` = ?d)',// OR
-                // (`effect2CreateItemId` = ?d AND `effect2Id` = ?d) OR
-                // (`effect3CreateItemId` = ?d AND `effect3Id` = ?d)',
+            FROM   ::spell s
+            JOIN   ::icons ic ON s.`iconId` = ic.`id`
+            WHERE  (`effect1CreateItemId` = %i AND `effect1Id` = %i)',// OR
+                // (`effect2CreateItemId` = %i AND `effect2Id` = %i) OR
+                // (`effect3CreateItemId` = %i AND `effect3Id` = %i)',
             $itemId, SPELL_EFFECT_CREATE_ITEM //, $itemId, SPELL_EFFECT_CREATE_ITEM, $itemId, SPELL_EFFECT_CREATE_ITEM
         );
 
@@ -1469,7 +1469,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             $allDoTs = false;
         }
 
-        if ($s = DB::World()->selectRow('SELECT `direct_bonus` AS "0", `dot_bonus` AS "1", `ap_bonus` AS "2", `ap_dot_bonus` AS "3" FROM spell_bonus_data WHERE `entry` = ?d', $this->firstRank))
+        if ($s = DB::World()->selectRow('SELECT `direct_bonus` AS "0", `dot_bonus` AS "1", `ap_bonus` AS "2", `ap_dot_bonus` AS "3" FROM spell_bonus_data WHERE `entry` = %i', $this->firstRank))
             $scaling = $s;
 
         if (!in_array($this->subject->getField('typeCat'), [-2, -3, -7, 7]) || $this->subject->getField('damageClass') == SPELL_DAMAGE_CLASS_NONE)
@@ -1590,7 +1590,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             'cooldown' => 0
         );
 
-        if ($sp = DB::World()->selectRow('SELECT IF(`ProcsPerMinute` > 0, -`ProcsPerMinute`, `Chance`) AS "chance", `Cooldown` AS "cooldown" FROM `spell_proc` WHERE ABS(`SpellId`) = ?d', $this->firstRank))
+        if ($sp = DB::World()->selectRow('SELECT IF(`ProcsPerMinute` > 0, -`ProcsPerMinute`, `Chance`) AS "chance", `Cooldown` AS "cooldown" FROM `spell_proc` WHERE ABS(`SpellId`) = %i', $this->firstRank))
         {
             $procData['chance']   = $sp['chance']   ?: $procData['chance'];
             $procData['cooldown'] = $sp['cooldown'] ?: $procData['cooldown'];
@@ -1599,7 +1599,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         $effects  = [];
         $spellIdx = array_unique(array_merge($this->subject->canTriggerSpell(), $this->subject->canTeachSpell()));
         $itemIdx  = $this->subject->canCreateItem();
-        $perfItem = DB::World()->selectRow('SELECT `perfectItemType` AS "itemId", `requiredSpecialization` AS "reqSpellId", `perfectCreateChance` AS "chance" FROM skill_perfect_item_template WHERE `spellId` = ?d', $this->typeId);
+        $perfItem = DB::World()->selectRow('SELECT `perfectItemType` AS "itemId", `requiredSpecialization` AS "reqSpellId", `perfectCreateChance` AS "chance" FROM skill_perfect_item_template WHERE `spellId` = %i', $this->typeId);
         $scaling  = $this->calculateEffectScaling();
 
         // Iterate through all effects:
@@ -1675,7 +1675,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                         );
                     }
                 }
-                else if ($extraItem = DB::World()->selectRow('SELECT * FROM skill_extra_item_template WHERE `spellid` = ?d', $this->typeId))
+                else if ($extraItem = DB::World()->selectRow('SELECT * FROM skill_extra_item_template WHERE `spellid` = %i', $this->typeId))
                 {
                     $cndSpell = new SpellList(array(['id', $extraItem['requiredSpecialization']]));
                     if (!$cndSpell->error)
@@ -1781,7 +1781,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                     $effMVB = 67;                           // TC uses hardcoded summon property 67
                     // DO NOT BREAK !
                 case SPELL_EFFECT_SUMMON:
-                    if (($sp = DB::Aowow()->selectRow('SELECT `control`, `slot` FROM ?_summonproperties WHERE `id` = ?d', $effMVB)))
+                    if (($sp = DB::Aowow()->selectRow('SELECT `control`, `slot` FROM ::summonproperties WHERE `id` = %i', $effMVB)))
                         $_nameMVB = $this->fmtStaffTip(Lang::spell('summonControl', $sp['control']).' &ndash; '.Lang::spell('summonSlot', $sp['slot']) , 'SummonProperty: '.$effMVB);
                     // DO NOT BREAK !
                 case SPELL_EFFECT_SUMMON_DEMON:
@@ -1830,7 +1830,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                         $_nameMV = $this->fmtStaffTip($_, 'MiscValue: '.$effMV);
                     break;
                 case SPELL_EFFECT_APPLY_GLYPH:
-                    if ($_ = DB::Aowow()->selectCell('SELECT `spellId` FROM ?_glyphproperties WHERE `id` = ?d', $effMV))
+                    if ($_ = DB::Aowow()->selectCell('SELECT `spellId` FROM ::glyphproperties WHERE `id` = %i', $effMV))
                     {
                         if ($a = SpellList::makeLink($_))
                             $_nameMV = $a;
@@ -1866,7 +1866,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                     break;
                 case SPELL_EFFECT_PLAY_SOUND:
                 case SPELL_EFFECT_PLAY_MUSIC:
-                    if (DB::Aowow()->selectCell('SELECT 1 FROM ?_sounds WHERE `id` = ?d', $effMV))
+                    if (DB::Aowow()->selectCell('SELECT 1 FROM ::sounds WHERE `id` = %i', $effMV))
                     {
                         $_markup = '[sound='.$effMV.']';
                         $effMV = 0;                         // prevent default display
@@ -1881,17 +1881,17 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                         $_nameMV = Util::ucFirst(Lang::game('faction')).' #'.$effMV;
 
                     // apply custom reward rated
-                    if ($cuRate = DB::World()->selectCell('SELECT `spell_rate` FROM reputation_reward_rate WHERE `spell_rate` <> 1 AND `faction` = ?d', $effMV))
+                    if ($cuRate = DB::World()->selectCell('SELECT `spell_rate` FROM reputation_reward_rate WHERE `spell_rate` <> 1 AND `faction` = %i', $effMV))
                         $_footer['value'][2] = sprintf(Util::$dfnString, Lang::faction('customRewRate'), ' ('.(($cuRate < 1 ? '-' : '+').intVal(($cuRate - 1) * $_footer['value'][0])).')');
                     break;
                 case SPELL_EFFECT_SEND_TAXI:
                     $_ = DB::Aowow()->selectRow(
-                       'SELECT tn1.`areaId` AS "startAreaId", tn1.`areaX` AS "startPosX", tn1.`areaY` AS "startPosY", tn1.`name_loc0` AS `start_loc0`, tn1.name_loc?d AS start_loc?d,
-                               tn2.`areaId` AS "endAreaId",   tn2.`areaX` AS "endPosX",   tn2.`areaY` AS "endPosY",   tn2.`name_loc0` AS `end_loc0`,   tn2.name_loc?d AS end_loc?d
-                        FROM   ?_taxipath tp
-                        JOIN   ?_taxinodes tn1 ON tp.`startNodeId` = tn1.`id`
-                        JOIN   ?_taxinodes tn2 ON tp.`endNodeId` = tn2.`id`
-                        WHERE  tp.`id` = ?d',
+                       'SELECT tn1.`areaId` AS "startAreaId", tn1.`areaX` AS "startPosX", tn1.`areaY` AS "startPosY", tn1.`name_loc0` AS "start_loc0", tn1.name_loc%i AS start_loc%i,
+                               tn2.`areaId` AS "endAreaId",   tn2.`areaX` AS "endPosX",   tn2.`areaY` AS "endPosY",   tn2.`name_loc0` AS "end_loc0",   tn2.name_loc%i AS end_loc%i
+                        FROM   ::taxipath tp
+                        JOIN   ::taxinodes tn1 ON tp.`startNodeId` = tn1.`id`
+                        JOIN   ::taxinodes tn2 ON tp.`endNodeId` = tn2.`id`
+                        WHERE  tp.`id` = %i',
                         Lang::getLocale()->value, Lang::getLocale()->value, Lang::getLocale()->value, Lang::getLocale()->value, $effMV
                     );
                     if ($_)
@@ -2154,7 +2154,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                                 $_nameMV = Util::ucFirst(Lang::game('faction')).' #'.$effMV;
                             break;                          // also breaks for SPELL_AURA_FORCE_REACTION
                         case SPELL_AURA_OVERRIDE_SPELLS:
-                            if ($so = DB::Aowow()->selectRow('SELECT `spellId1`, `spellId2`, `spellId3`, `spellId4`, `spellId5` FROM ?_spelloverride WHERE `id` = ?d', $effMV))
+                            if ($so = DB::Aowow()->selectRow('SELECT `spellId1`, `spellId2`, `spellId3`, `spellId4`, `spellId5` FROM ::spelloverride WHERE `id` = %i', $effMV))
                             {
                                 if ($so = array_filter($so))
                                 {
@@ -2181,7 +2181,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                                 trigger_error('unused case #'.$effMV.' found for aura #'.$effAura);
                             break;
                         case SPELL_AURA_SCREEN_EFFECT:
-                            if ($ses = DB::Aowow()->selectRow('SELECT `name`, `ambienceDay` AS "0", IF(`ambienceNight` <> `ambienceDay`, `ambienceNight`, 0) AS "1", `musicDay` AS "2", IF(`musicNight` <> `musicDay`, `musicNight`, 0) AS "3" FROM ?_screeneffect_sounds WHERE `id` = ?d', $effMV))
+                            if ($ses = DB::Aowow()->selectRow('SELECT `name`, `ambienceDay` AS "0", IF(`ambienceNight` <> `ambienceDay`, `ambienceNight`, 0) AS "1", `musicDay` AS "2", IF(`musicNight` <> `musicDay`, `musicNight`, 0) AS "3" FROM ::screeneffect_sounds WHERE `id` = %i', $effMV))
                             {
                                 $_nameMV = $this->fmtStaffTip($ses['name'], 'MiscValue: '.$effMV);
                                 for ($j = 0; $j < 4; $j++)
@@ -2422,12 +2422,12 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         // spell focus
         if ($_ = $this->subject->getField('spellFocusObject'))
         {
-            if ($sfObj = DB::Aowow()->selectRow('SELECT * FROM ?_spellfocusobject WHERE `id` = ?d', $_))
+            if ($sfObj = DB::Aowow()->selectRow('SELECT * FROM ::spellfocusobject WHERE `id` = %i', $_))
             {
                 $n = Util::localizedString($sfObj, 'name');
                 if (!is_null(GameObjectListFilter::getCriteriaIndex(50, $_)))
                     $n = '[url=?objects&filter=cr=50;crs='.$_.';crv=0]'.$n.'[/url]';
-                else if ($objId = DB::Aowow()->selectCell('SELECT `id` FROM ?_objects WHERE `spellFocusId` = ?d', $_))
+                else if ($objId = DB::Aowow()->selectCell('SELECT `id` FROM ?_objects WHERE `spellFocusId` = %i', $_))
                     $n = '[url=?object='.$objId.']'.$n.'[/url]';
 
                 $infobox[] =  Lang::game('requires2').' '.$n;
@@ -2484,8 +2484,8 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         // profiler relateed (note that this is part of the cache. I don't think this is important enough to calc for every view)
         if (Cfg::get('PROFILER_ENABLE') && $hasCompletion)
         {
-            $x = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ?_profiler_completion_spells WHERE `spellId` = ?d', $this->typeId);
-            $y = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ?_profiler_profiles WHERE `custom` = 0 AND `stub` = 0');
+            $x = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ::profiler_completion_spells WHERE `spellId` = %i', $this->typeId);
+            $y = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ::profiler_profiles WHERE `custom` = 0 AND `stub` = 0');
             $infobox[] = Lang::profiler('attainedBy', [round(($x ?: 0) * 100 / ($y ?: 1))]);
 
             // completion row added by InfoboxMarkup
@@ -2514,7 +2514,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
         // spell script
         if (User::isInGroup(U_GROUP_STAFF))
-            if ($_ = DB::World()->selectCell('SELECT `ScriptName` FROM spell_script_names WHERE ABS(`spell_id`) = ?d', $this->firstRank))
+            if ($_ = DB::World()->selectCell('SELECT `ScriptName` FROM spell_script_names WHERE ABS(`spell_id`) = %i', $this->firstRank))
                 $infobox[] = 'Script'.Lang::main('colon').$_;
 
 
@@ -2526,7 +2526,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             if ($this->subject->getField('effect'.$i.'Id') == SPELL_EFFECT_APPLY_GLYPH)
                 $glyphId = $this->subject->getField('effect'.$i.'MiscValue');
 
-        if ($_ = DB::Aowow()->selectCell('SELECT ic.`name` FROM ?_glyphproperties gp JOIN ?_icons ic ON gp.`iconId` = ic.`id` WHERE gp.`spellId` = ?d { OR gp.`id` = ?d }', $this->typeId, $glyphId ?: DBSIMPLE_SKIP))
+        if ($_ = DB::Aowow()->selectCell('SELECT ic.`name` FROM ::glyphproperties gp JOIN ::icons ic ON gp.`iconId` = ic.`id` WHERE %if', $glyphId, 'gp.`id` = %i OR', $glyphId, '%end gp.`spellId` = %i', $this->typeId))
             if (file_exists('static/images/wow/Interface/Spellbook/'.$_.'.png'))
                 $this->infobox->append('[img src='.Cfg::get('STATIC_URL').'/images/wow/Interface/Spellbook/'.$_.'.png border=0 float=center margin=15]');
     }

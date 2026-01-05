@@ -60,13 +60,13 @@ class VideoCompleteResponse extends TextResponse
         if (!VideoMgr::loadSuggestion($videoInfo, $this->destType, $this->destTypeId, $this->videoHash))
             $this->generate404();
 
-        $pos = DB::Aowow()->selectCell('SELECT MAX(`pos`) FROM ?_videos WHERE `type` = ?d AND `typeId` = ?d AND (`status` & ?d) = 0', $this->destType, $this->destTypeId, CC_FLAG_DELETED);
+        $pos = DB::Aowow()->selectCell('SELECT MAX(`pos`) FROM ::videos WHERE `type` = %i AND `typeId` = %i AND (`status` & %i) = 0', $this->destType, $this->destTypeId, CC_FLAG_DELETED);
         if (!is_int($pos))
             $pos = -1;
 
         // write to db
-        $newId = DB::Aowow()->query(
-           'INSERT INTO ?_videos (`type`, `typeId`, `userIdOwner`, `date`, `videoId`, `pos`, `url`, `width`, `height`, `name`, `caption`, `status`) VALUES (?d, ?d, ?d, UNIX_TIMESTAMP(), ?, ?d, ?, ?d, ?d, ?, ?, 0)',
+        $newId = DB::Aowow()->qry(
+           'INSERT INTO ::videos (`type`, `typeId`, `userIdOwner`, `date`, `videoId`, `pos`, `url`, `width`, `height`, `name`, `caption`, `status`) VALUES (%i, %i, %i, UNIX_TIMESTAMP(), %s, %i, %s, %i, %i, %s, %s, 0)',
             $this->destType, $this->destTypeId, User::$id,
             $videoInfo->id,
             $pos + 1,

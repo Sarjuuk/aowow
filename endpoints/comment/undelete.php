@@ -24,19 +24,20 @@ class CommentUndeleteResponse extends TextResponse
         }
 
         // in theory, there is a username passed alongside if executed from userpage...   lets just use the current user (see user.js)
-        $ok = DB::Aowow()->query('UPDATE ?_comments SET `flags` = `flags` & ~?d WHERE `id` IN (?a) { AND `userId` = `deleteUserId` AND `deleteUserId` = ?d }',
-            CC_FLAG_DELETED,
-            $this->_post['id'],
-            User::isInGroup(U_GROUP_MODERATOR) ? DBSIMPLE_SKIP : User::$id
-        );
+        $where = [['`id` IN %in', $this->_post['id']]];
+        if (!User::isInGroup(U_GROUP_MODERATOR))
+        {
+            $where[] = ['`deleteUserId` = `userId'];
+            $where[] = ['`deleteUserId` = %i', User::$id];
+        }
 
         // unflag subject: hasComment
-        if ($ok)
+        if (DB::Aowow()->qry('UPDATE ::comments SET `flags` = `flags` & ~%i WHERE %and', CC_FLAG_DELETED, $where))
         {
-            $coInfo = DB::Aowow()->select('SELECT `type` AS "0", `typeId` AS "1" FROM ?_comments WHERE `id` IN (?a) GROUP BY `type`, `typeId`', $this->_post['id']);
+            $coInfo = DB::Aowow()->selectAssoc('SELECT `type` AS "0", `typeId` AS "1" FROM ::comments WHERE `id` IN %in GROUP BY `type`, `typeId`', $this->_post['id']);
             foreach ($coInfo as [$type, $typeId])
                 if ($tbl = Type::getClassAttrib($type, 'dataTable'))
-                    DB::Aowow()->query('UPDATE ?# SET `cuFlags` = `cuFlags` | ?d WHERE `id` = ?d', $tbl, CUSTOM_HAS_COMMENT, $typeId);
+                    DB::Aowow()->qry('UPDATE %n SET `cuFlags` = `cuFlags` | %i WHERE `id` = %i', $tbl, CUSTOM_HAS_COMMENT, $typeId);
 
             return;
         }

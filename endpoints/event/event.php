@@ -114,7 +114,7 @@ class EventBaseResponse extends TemplateResponse implements ICache
         /* Main Content */
         /****************/
 
-        // no entry in ?_articles? use default HolidayDescription
+        // no entry in ::articles? use default HolidayDescription
         if ($_holidayId && empty($this->article))
             $this->article = new Markup($this->subject->getField('description', true), ['dbpage' => true]);
 
@@ -137,7 +137,7 @@ class EventBaseResponse extends TemplateResponse implements ICache
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
 
         // tab: npcs
-        if ($npcIds = DB::World()->selectCol('SELECT `id` AS ARRAY_KEY, IF(ec.`eventEntry` > 0, 1, 0) AS "added" FROM creature c, game_event_creature ec WHERE ec.`guid` = c.`guid` AND ABS(ec.`eventEntry`) = ?d', $this->typeId))
+        if ($npcIds = DB::World()->selectCol('SELECT `id` AS ARRAY_KEY, IF(ec.`eventEntry` > 0, 1, 0) AS "added" FROM creature c, game_event_creature ec WHERE ec.`guid` = c.`guid` AND ABS(ec.`eventEntry`) = %i', $this->typeId))
         {
             $creatures = new CreatureList(array(['id', array_keys($npcIds)]));
             if (!$creatures->error)
@@ -157,7 +157,7 @@ class EventBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: objects
-        if ($objectIds = DB::World()->selectCol('SELECT `id` AS ARRAY_KEY, IF(eg.`eventEntry` > 0, 1, 0) AS "added" FROM gameobject g, game_event_gameobject eg WHERE eg.`guid` = g.`guid` AND ABS(eg.`eventEntry`) = ?d', $this->typeId))
+        if ($objectIds = DB::World()->selectCol('SELECT `id` AS ARRAY_KEY, IF(eg.`eventEntry` > 0, 1, 0) AS "added" FROM gameobject g, game_event_gameobject eg WHERE eg.`guid` = g.`guid` AND ABS(eg.`eventEntry`) = %i', $this->typeId))
         {
             $objects = new GameObjectList(array(['id', array_keys($objectIds)]));
             if (!$objects->error)
@@ -205,7 +205,7 @@ class EventBaseResponse extends TemplateResponse implements ICache
         if ($_holidayId)
         {
             // tab: criteria-of
-            if ($extraCrt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` = ?d AND `value1` = ?d', ACHIEVEMENT_CRITERIA_DATA_TYPE_HOLIDAY, $_holidayId))
+            if ($extraCrt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` = %i AND `value1` = %i', ACHIEVEMENT_CRITERIA_DATA_TYPE_HOLIDAY, $_holidayId))
             {
                 $condition = array(['ac.id', $extraCrt]);
                 if ($exclAcvs)
@@ -260,9 +260,9 @@ class EventBaseResponse extends TemplateResponse implements ICache
             // vendor
             $cIds = $creatures->getFoundIDs();
             if ($sells = DB::World()->selectCol(
-               'SELECT     `item` FROM npc_vendor nv                                                               WHERE     `entry` IN (?a) UNION
-                SELECT nv1.`item` FROM npc_vendor nv1             JOIN npc_vendor nv2 ON -nv1.`entry` = nv2.`item` WHERE nv2.`entry` IN (?a) UNION
-                SELECT     `item` FROM game_event_npc_vendor genv JOIN creature   c   ON genv.`guid`  =   c.`guid` WHERE   c.`id`    IN (?a)',
+               'SELECT     `item` FROM npc_vendor nv                                                               WHERE     `entry` IN %in UNION
+                SELECT nv1.`item` FROM npc_vendor nv1             JOIN npc_vendor nv2 ON -nv1.`entry` = nv2.`item` WHERE nv2.`entry` IN %in UNION
+                SELECT     `item` FROM game_event_npc_vendor genv JOIN creature   c   ON genv.`guid`  =   c.`guid` WHERE   c.`id`    IN %in',
                 $cIds, $cIds, $cIds
             ))
                 $itemCnd[] = ['id', $sells];
@@ -272,7 +272,7 @@ class EventBaseResponse extends TemplateResponse implements ICache
         // not checking for loot ... cant distinguish between eventLoot and fillerCrapLoot
         if ($itemCnd)
         {
-            array_unshift($itemCnd, 'OR');
+            array_unshift($itemCnd, DB::OR);
             $eventItems = new ItemList($itemCnd);
             if (!$eventItems->error)
             {
@@ -288,7 +288,7 @@ class EventBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: see also (event conditions)
-        if ($rel = DB::World()->selectCol('SELECT IF(`eventEntry` = `prerequisite_event`, NULL, IF(`eventEntry` = ?d, `prerequisite_event`, -`eventEntry`)) FROM game_event_prerequisite WHERE `prerequisite_event` = ?d OR `eventEntry` = ?d', $this->typeId, $this->typeId, $this->typeId))
+        if ($rel = DB::World()->selectCol('SELECT IF(`eventEntry` = `prerequisite_event`, NULL, IF(`eventEntry` = %i, `prerequisite_event`, -`eventEntry`)) FROM game_event_prerequisite WHERE `prerequisite_event` = %i OR `eventEntry` = %i', $this->typeId, $this->typeId, $this->typeId))
         {
             if (array_filter($rel, fn($x) => $x === null))
                 trigger_error('game_event_prerequisite: this event has itself as prerequisite', E_USER_WARNING);

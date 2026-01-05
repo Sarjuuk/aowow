@@ -27,9 +27,9 @@ class AccountSignoutResponse extends TextResponse
     protected function generate() : void
     {
         if ($this->_get['global'])
-            DB::Aowow()->query('UPDATE ?_account_sessions SET `touched` = ?d, `status` = ?d WHERE `userId` = ?d', time(), SESSION_FORCED_LOGOUT, User::$id);
+            DB::Aowow()->qry('UPDATE ::account_sessions SET `touched` = %i, `status` = %i WHERE `userId` = %i', time(), SESSION_FORCED_LOGOUT, User::$id);
         else
-            DB::Aowow()->query('UPDATE ?_account_sessions SET `touched` = ?d, `status` = ?d WHERE `sessionId` = ?', time(), SESSION_LOGOUT, session_id());
+            DB::Aowow()->qry('UPDATE ::account_sessions SET `touched` = %i, `status` = %i WHERE `sessionId` = %s', time(), SESSION_LOGOUT, session_id());
 
         User::destroy();
 

@@ -23,7 +23,7 @@ class AdminVideosActionManageResponse extends TextResponse
         if ($this->_get['type'] && $this->_get['typeid'])
             $res = VideoMgr::getVideos($this->_get['type'], $this->_get['typeid']);
         else if ($this->_get['user'])
-            if ($uId = DB::Aowow()->selectCell('SELECT `id` FROM ?_account WHERE LOWER(`username`) = LOWER(?)', $this->_get['user']))
+            if ($uId = DB::Aowow()->selectCell('SELECT `id` FROM ::account WHERE LOWER(`username`) = LOWER(%s)', $this->_get['user']))
                 $res = VideoMgr::getVideos(userId: $uId);
 
         $this->result =  'vim_videoData = '.Util::toJSON($res);

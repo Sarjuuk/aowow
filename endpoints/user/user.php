@@ -38,7 +38,7 @@ class UserBaseResponse extends TemplateResponse
         if (!$rawParam)
             $this->forwardToSignIn('user');
 
-        if ($user = DB::Aowow()->selectRow('SELECT a.`id`, a.`username`, a.`consecutiveVisits`, a.`userGroups`, a.`avatar`, a.`avatarborder`, a.`wowicon`, a.`title`, a.`description`, a.`joinDate`, a.`prevLogin`, IFNULL(SUM(ar.`amount`), 0) AS "sumRep", a.`prevIP`, a.`email` FROM ?_account a LEFT JOIN ?_account_reputation ar ON a.`id` = ar.`userId` WHERE a.`id` <> 0 AND LOWER(a.`username`) = LOWER(?) GROUP BY a.`id`', $rawParam))
+        if ($user = DB::Aowow()->selectRow('SELECT a.`id`, a.`username`, a.`consecutiveVisits`, a.`userGroups`, a.`avatar`, a.`avatarborder`, a.`wowicon`, a.`title`, a.`description`, a.`joinDate`, a.`prevLogin`, IFNULL(SUM(ar.`amount`), 0) AS "sumRep", a.`prevIP`, a.`email` FROM ?_account a LEFT JOIN ?_account_reputation ar ON a.`id` = ar.`userId` WHERE a.`id` <> 0 AND LOWER(a.`username`) = LOWER(%s) GROUP BY a.`id`', $rawParam))
             $this->user = $user;
         else
             $this->generateNotFound(Lang::user('notFound', [Util::htmlEscape($rawParam)]));
@@ -113,7 +113,7 @@ class UserBaseResponse extends TemplateResponse
             $avatarMore = match ((int)$this->user['avatar'])
             {
                 1       => $this->user['wowicon'],
-                2       => DB::Aowow()->selectCell('SELECT `id` FROM ?_account_avatars WHERE `current` = 1 AND `userId` = ?d', $this->user['id']),
+                2       => DB::Aowow()->selectCell('SELECT `id` FROM ::account_avatars WHERE `current` = 1 AND `userId` = %i', $this->user['id']),
                 default => ''
             };
 
@@ -147,7 +147,7 @@ class UserBaseResponse extends TemplateResponse
 
         // Reputation changelog (params only for comment-events)
         if (User::$id == $this->user['id'] || User::isInGroup(U_GROUP_MODERATOR))
-            if ($repData = DB::Aowow()->select('SELECT `action`, `amount`, `date` AS "when", IF(`action` IN (3, 4, 5), `sourceA`, 0) AS "param" FROM ?_account_reputation WHERE `userId` = ?d', $this->user['id']))
+            if ($repData = DB::Aowow()->selectAssoc('SELECT `action`, `amount`, `date` AS "when", IF(`action` IN (3, 4, 5), `sourceA`, 0) AS "param" FROM ::account_reputation WHERE `userId` = %i', $this->user['id']))
             {
                 array_walk($repData, fn(&$x) => $x['when'] = date(Util::$dateFormatInternal, $x['when']));
                 $this->lvTabs->addListviewTab(new Listview(['data' => $repData], 'reputationhistory'));
@@ -287,7 +287,7 @@ class UserBaseResponse extends TemplateResponse
     private function getCommentStats() : ?string
     {
         $co = DB::Aowow()->selectRow(
-           'SELECT COUNT(DISTINCT c.`id`) AS "0", SUM(IFNULL(ur.`value`, 0)) AS "1" FROM ?_comments c LEFT JOIN ?_user_ratings ur ON ur.`entry` = c.`id` AND ur.`type` = ?d AND ur.`userId` <> 0 WHERE c.`replyTo` = 0 AND c.`userId` = ?d',
+           'SELECT COUNT(DISTINCT c.`id`) AS "0", SUM(IFNULL(ur.`value`, 0)) AS "1" FROM ::comments c LEFT JOIN ::user_ratings ur ON ur.`entry` = c.`id` AND ur.`type` = %i AND ur.`userId` <> 0 WHERE c.`replyTo` = 0 AND c.`userId` = %i',
             RATING_COMMENT, $this->user['id']
         );
 
@@ -305,7 +305,7 @@ class UserBaseResponse extends TemplateResponse
     private function getScreenshotStats() : ?string
     {
         $ss = DB::Aowow()->selectRow(
-           'SELECT COUNT(*) AS "0", SUM(IF(`status` & ?d, 1, 0)) AS "1", SUM(IF(`status` & ?d, 0, 1)) AS "2" FROM ?_screenshots WHERE `userIdOwner` = ?d AND (`status` & ?d) = 0',
+           'SELECT COUNT(*) AS "0", SUM(IF(`status` & %i, 1, 0)) AS "1", SUM(IF(`status` & %i, 0, 1)) AS "2" FROM ::screenshots WHERE `userIdOwner` = %i AND (`status` & %i) = 0',
             CC_FLAG_STICKY, CC_FLAG_APPROVED, $this->user['id'], CC_FLAG_DELETED
         );
 
@@ -336,7 +336,7 @@ class UserBaseResponse extends TemplateResponse
     private function getVideoStats() : ?string
     {
         $vi = DB::Aowow()->selectRow(
-           'SELECT COUNT(*) AS "0", SUM(IF(`status` & ?d, 1, 0)) AS "1", SUM(IF(`status` & ?d, 0, 1)) AS "2" FROM ?_videos WHERE `userIdOwner` = ?d AND (`status` & ?d) = 0',
+           'SELECT COUNT(*) AS "0", SUM(IF(`status` & %i, 1, 0)) AS "1", SUM(IF(`status` & %i, 0, 1)) AS "2" FROM ::videos WHERE `userIdOwner` = %i AND (`status` & %i) = 0',
             CC_FLAG_STICKY, CC_FLAG_APPROVED, $this->user['id'], CC_FLAG_DELETED
         );
 

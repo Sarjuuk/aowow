@@ -148,10 +148,10 @@ class ItemXmlResponse extends TextResponse implements ICache
 
         // reagents
         $cnd = array(
-            'OR',
-            ['AND', ['effect1CreateItemId', $this->typeId], ['OR', ['effect1Id', SpellList::EFFECTS_ITEM_CREATE], ['effect1AuraId', SpellList::AURAS_ITEM_CREATE]]],
-            ['AND', ['effect2CreateItemId', $this->typeId], ['OR', ['effect2Id', SpellList::EFFECTS_ITEM_CREATE], ['effect2AuraId', SpellList::AURAS_ITEM_CREATE]]],
-            ['AND', ['effect3CreateItemId', $this->typeId], ['OR', ['effect3Id', SpellList::EFFECTS_ITEM_CREATE], ['effect3AuraId', SpellList::AURAS_ITEM_CREATE]]],
+            DB::OR,
+            [DB::AND, ['effect1CreateItemId', $this->typeId], [DB::OR, ['effect1Id', SpellList::EFFECTS_ITEM_CREATE], ['effect1AuraId', SpellList::AURAS_ITEM_CREATE]]],
+            [DB::AND, ['effect2CreateItemId', $this->typeId], [DB::OR, ['effect2Id', SpellList::EFFECTS_ITEM_CREATE], ['effect2AuraId', SpellList::AURAS_ITEM_CREATE]]],
+            [DB::AND, ['effect3CreateItemId', $this->typeId], [DB::OR, ['effect3Id', SpellList::EFFECTS_ITEM_CREATE], ['effect3AuraId', SpellList::AURAS_ITEM_CREATE]]],
         );
 
         $spellSource = new SpellList($cnd);

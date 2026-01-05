@@ -44,12 +44,12 @@ class AccountConfirmpasswordResponse extends TemplateResponse
         if (!$this->assertGET('key'))
             return Lang::main('intError');
 
-        $acc = DB::Aowow()->selectRow('SELECT `updateValue`, `status`, `statusTimer` FROM ?_account WHERE `token` = ?', $this->_get['key']);
+        $acc = DB::Aowow()->selectRow('SELECT `updateValue`, `status`, `statusTimer` FROM ::account WHERE `token` = %s', $this->_get['key']);
         if (!$acc || $acc['status'] != ACC_STATUS_CHANGE_PASS || $acc['statusTimer'] < time())
             return Lang::account('inputbox', 'error', 'passTokenUsed');
 
         // 0 changes == error
-        if (!DB::Aowow()->query('UPDATE ?_account SET `passHash` = `updateValue`, `status` = ?d, `statusTimer` = 0, `token` = "", `updateValue` = "" WHERE `token` = ?', ACC_STATUS_NONE, $this->_get['key']))
+        if (!DB::Aowow()->qry('UPDATE ::account SET `passHash` = `updateValue`, `status` = %i, `statusTimer` = 0, `token` = "", `updateValue` = "" WHERE `token` = %s', ACC_STATUS_NONE, $this->_get['key']))
             return Lang::main('intError');
 
         $this->success = true;

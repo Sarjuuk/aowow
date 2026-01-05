@@ -68,22 +68,22 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         /* Determine Map Type */
         /**********************/
 
-        if ($objectdifficulty = DB::Aowow()->select(        // has difficulty versions of itself
+        if ($objectdifficulty = DB::Aowow()->selectAssoc(        // has difficulty versions of itself
            'SELECT `normal10` AS "0", `normal25` AS "1",
                    `heroic10` AS "2", `heroic25` AS "3",
                    `mapType`  AS ARRAY_KEY
-            FROM   ?_objectdifficulty
-            WHERE  `normal10` = ?d OR `normal25` = ?d OR
-                   `heroic10` = ?d OR `heroic25` = ?d',
+            FROM   ::objectdifficulty
+            WHERE  `normal10` = %i OR `normal25` = %i OR
+                   `heroic10` = %i OR `heroic25` = %i',
             $this->typeId, $this->typeId, $this->typeId, $this->typeId
         ))
         {
             $this->mapType      = key($objectdifficulty);
             $this->difficulties = array_pop($objectdifficulty);
         }
-        else if ($maps = DB::Aowow()->selectCell('SELECT IF(COUNT(DISTINCT `areaId`) > 1, 0, `areaId`) FROM ?_spawns WHERE `type` = ?d AND `typeId` = ?d', Type::OBJECT, $this->typeId))
+        else if ($maps = DB::Aowow()->selectCell('SELECT IF(COUNT(DISTINCT `areaId`) > 1, 0, `areaId`) FROM ::spawns WHERE `type` = %i AND `typeId` = %i', Type::OBJECT, $this->typeId))
         {
-            $this->mapType = match ((int)DB::Aowow()->selectCell('SELECT `type` FROM ?_zones WHERE `id` = ?d', $maps))
+            $this->mapType = match ((int)DB::Aowow()->selectCell('SELECT `type` FROM ::zones WHERE `id` = %i', $maps))
             {
                 // MAP_TYPE_DUNGEON,
                 MAP_TYPE_DUNGEON_HC    => 1,
@@ -102,7 +102,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
 
         // Event (ignore events, where the object only gets removed)
-        if ($_ = DB::World()->selectCol('SELECT DISTINCT ge.`eventEntry` FROM game_event ge, game_event_gameobject geg, gameobject g WHERE ge.`eventEntry` = geg.`eventEntry` AND g.`guid` = geg.`guid` AND g.`id` = ?d', $this->typeId))
+        if ($_ = DB::World()->selectCol('SELECT DISTINCT ge.`eventEntry` FROM game_event ge, game_event_gameobject geg, gameobject g WHERE ge.`eventEntry` = geg.`eventEntry` AND g.`guid` = geg.`guid` AND g.`id` = %i', $this->typeId))
         {
             $this->extendGlobalIds(Type::WORLDEVENT, ...$_);
             $ev = [];
@@ -113,7 +113,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         }
 
         // Faction
-        if ($_ = DB::Aowow()->selectCell('SELECT `factionId` FROM ?_factiontemplate WHERE `id` = ?d', $this->subject->getField('faction')))
+        if ($_ = DB::Aowow()->selectCell('SELECT `factionId` FROM ::factiontemplate WHERE `id` = %i', $this->subject->getField('faction')))
         {
             $this->extendGlobalIds(Type::FACTION, $_);
             $infobox[] = Util::ucFirst(Lang::game('faction')).Lang::main('colon').'[faction='.$_.']';
@@ -176,7 +176,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         // SpellFocus
         if ($_ = $this->subject->getField('spellFocusId'))
         {
-            if ($sfo = DB::Aowow()->selectRow('SELECT * FROM ?_spellfocusobject WHERE `id` = ?d', $_))
+            if ($sfo = DB::Aowow()->selectRow('SELECT * FROM ?_spellfocusobject WHERE `id` = %i', $_))
             {
                 $n = Util::localizedString($sfo, 'name');
                 if (!is_null(GameObjectListFilter::getCriteriaIndex(50, $_)))
@@ -242,7 +242,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
 
         if (User::isInGroup(U_GROUP_EMPLOYEE))
         {
-            $spawnData = DB::Aowow()->select('SELECT `guid` AS "0", `ScriptName` AS "1", `StringId` AS "2" FROM ?_spawns WHERE `type` = ?d AND `typeId` = ?d AND `ScriptName` IS NOT NULL ORDER BY `guid` ASC', Type::OBJECT, $this->typeId);
+            $spawnData = DB::Aowow()->selectAssoc('SELECT `guid` AS "0", `ScriptName` AS "1", `StringId` AS "2" FROM ::spawns WHERE `type` = %i AND `typeId` = %i AND `ScriptName` IS NOT NULL ORDER BY `guid` ASC', Type::OBJECT, $this->typeId);
 
             // AI
             $scripts = null;
@@ -311,16 +311,16 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         // todo (low): consider pooled spawns
 
 
-        if ($ll = DB::Aowow()->selectRow('SELECT * FROM ?_loot_link WHERE `objectId` = ?d ORDER BY `priority` DESC LIMIT 1', $this->typeId))
+        if ($ll = DB::Aowow()->selectRow('SELECT * FROM ::loot_link WHERE `objectId` = %i ORDER BY `priority` DESC LIMIT 1', $this->typeId))
         {
             // group encounter
             if ($ll['encounterId'])
                 $this->relBoss = [$ll['npcId'], Lang::profiler('encounterNames', $ll['encounterId'])];
             // difficulty dummy
-            else if ($c = DB::Aowow()->selectRow('SELECT `id`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8` FROM ?_creature WHERE `difficultyEntry1` = ?d OR `difficultyEntry2` = ?d OR `difficultyEntry3` = ?d', $ll['npcId'], $ll['npcId'], $ll['npcId']))
+            else if ($c = DB::Aowow()->selectRow('SELECT `id`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8` FROM ::creature WHERE `difficultyEntry1` = %i OR `difficultyEntry2` = %i OR `difficultyEntry3` = %i', $ll['npcId'], $ll['npcId'], $ll['npcId']))
                 $this->relBoss = [$c['id'], Util::localizedString($c, 'name')];
             // base creature
-            else if ($c = DB::Aowow()->selectRow('SELECT `id`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8` FROM ?_creature WHERE `id` = ?d', $ll['npcId']))
+            else if ($c = DB::Aowow()->selectRow('SELECT `id`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8` FROM ::creature WHERE `id` = %i', $ll['npcId']))
                 $this->relBoss = [$c['id'], Util::localizedString($c, 'name')];
         }
 
@@ -332,7 +332,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
             if (!$sai->prepare())                           // no smartAI found .. check per guid
             {
                 // at least one of many
-                $guids = DB::World()->selectCol('SELECT `guid` FROM gameobject WHERE `id` = ?d', $this->typeId);
+                $guids = DB::World()->selectCol('SELECT `guid` FROM gameobject WHERE `id` = %i', $this->typeId);
                 while ($_ = array_pop($guids))
                 {
                     $sai = new SmartAI(SmartAI::SRC_TYPE_OBJECT, -$_, ['title' => ' [small](for GUID: '.$_.')[/small]']);
@@ -373,10 +373,10 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
             SPELL_EFFECT_SUMMON_OBJECT_SLOT4
         );
         $conditions = array(
-            'OR',
-            ['AND', ['effect1Id', $summonEffects], ['effect1MiscValue', $this->typeId]],
-            ['AND', ['effect2Id', $summonEffects], ['effect2MiscValue', $this->typeId]],
-            ['AND', ['effect3Id', $summonEffects], ['effect3MiscValue', $this->typeId]]
+            DB::OR,
+            [DB::AND, ['effect1Id', $summonEffects], ['effect1MiscValue', $this->typeId]],
+            [DB::AND, ['effect2Id', $summonEffects], ['effect2MiscValue', $this->typeId]],
+            [DB::AND, ['effect3Id', $summonEffects], ['effect3MiscValue', $this->typeId]]
         );
 
         $summons = new SpellList($conditions);
@@ -478,15 +478,15 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         if ($_ = $this->subject->getField('lootId'))
         {
             // check if loot_link entry exists (only difficulty: 1)
-            if ($npcId = DB::Aowow()->selectCell('SELECT `npcId` FROM ?_loot_link WHERE `objectId` = ?d AND `difficulty` = 1', $this->typeId))
+            if ($npcId = DB::Aowow()->selectCell('SELECT `npcId` FROM ::loot_link WHERE `objectId` = %i AND `difficulty` = 1', $this->typeId))
             {
                 // get id set of npc
                 $lootEntries = DB::Aowow()->selectCol(
                    'SELECT    ll.`difficulty` AS ARRAY_KEY, o.`lootId`
-                    FROM      ?_creature c
-                    LEFT JOIN ?_loot_link ll ON ll.`npcId` IN (c.`id`, c.`difficultyEntry1`, c.`difficultyEntry2`, c.`difficultyEntry3`)
-                    LEFT JOIN ?_objects o    ON o.`id` = ll.`objectId`
-                    WHERE     c.`id` = ?d
+                    FROM      ::creature c
+                    LEFT JOIN ::loot_link ll ON ll.`npcId` IN (c.`id`, c.`difficultyEntry1`, c.`difficultyEntry2`, c.`difficultyEntry3`)
+                    LEFT JOIN ::objects o    ON o.`id` = ll.`objectId`
+                    WHERE     c.`id` = %i
                     ORDER BY  ll.`difficulty` ASC',
                     $npcId
                 );
@@ -579,7 +579,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         if ($this->difficulties)
         {
             $conditions = array(
-                'AND',
+                DB::AND,
                 ['id', $this->difficulties],
                 ['id', $this->typeId, '!']
             );

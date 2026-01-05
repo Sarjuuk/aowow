@@ -26,6 +26,6 @@ class AdminVideosActionEdittitleResponse extends TextResponse
 
         $caption = $this->handleCaption($this->_post['title']);
 
-        DB::Aowow()->query('UPDATE ?_videos SET `caption` = ? WHERE `id` = ?d', $caption, $this->_get['id'][0]);
+        DB::Aowow()->qry('UPDATE ::videos SET `caption` = %s WHERE `id` = %i', $caption, $this->_get['id'][0]);
     }
 }

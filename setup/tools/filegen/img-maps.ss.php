@@ -401,9 +401,9 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
     private function prepare() : bool
     {
-        $this->wmOverlays  = DB::Aowow()->select('SELECT *, `worldMapAreaId` AS ARRAY_KEY, `id` AS ARRAY_KEY2 FROM dbc_worldmapoverlay WHERE `textureString` <> ""');
-        $this->wmAreas     = DB::Aowow()->select('SELECT `id`, `mapId`, `areaId`, UPPER(`nameINT`) AS `nameINT`, IF(`areaId`, `areaId`, -`id`) AS ARRAY_KEY FROM dbc_worldmaparea');
-        $this->dmFloorData = DB::Aowow()->select('SELECT IF(`mapId` IN (?a), -`worldMapAreaId`, `mapId`) AS ARRAY_KEY, GROUP_CONCAT(DISTINCT `floor` SEPARATOR " ") AS "0", COUNT(DISTINCT `floor`) AS "1" FROM dbc_dungeonmap WHERE `worldMapAreaId` <> 0 GROUP BY ARRAY_KEY', self::CONTINENTS);
+        $this->wmOverlays  = DB::Aowow()->selectAssoc('SELECT *, `worldMapAreaId` AS ARRAY_KEY, `id` AS ARRAY_KEY2 FROM dbc_worldmapoverlay WHERE `textureString` <> ""');
+        $this->wmAreas     = DB::Aowow()->selectAssoc('SELECT `id`, `mapId`, `areaId`, UPPER(`nameINT`) AS `nameINT`, IF(`areaId`, `areaId`, -`id`) AS ARRAY_KEY FROM dbc_worldmaparea');
+        $this->dmFloorData = DB::Aowow()->selectAssoc('SELECT IF(`mapId` IN %in, -`worldMapAreaId`, `mapId`) AS ARRAY_KEY, GROUP_CONCAT(DISTINCT `floor` SEPARATOR " ") AS "0", COUNT(DISTINCT `floor`) AS "1" FROM dbc_dungeonmap WHERE `worldMapAreaId` <> 0 GROUP BY ARRAY_KEY', self::CONTINENTS);
         if (!$this->wmOverlays || !$this->wmAreas || !$this->dmFloorData)
         {
             CLI::write('[img-maps] - could not read required dbc files: WorldMapArea.dbc ['.count($this->wmAreas ?: []).' entries]; WorldMapOverlay.dbc ['.count($this->wmOverlays ?: []).'] entries; DungeonMap.dbc ['.count($this->dmFloorData ?: []).' entries]', CLI::LOG_ERROR);

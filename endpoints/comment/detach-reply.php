@@ -23,7 +23,7 @@ class CommentDetachreplyResponse extends TextResponse
             $this->generate404(User::isInGroup(U_GROUP_STAFF) ? 'request malformed' : '');
         }
 
-        DB::Aowow()->query('UPDATE ?_comments c1, ?_comments c2 SET c1.`replyTo` = 0, c1.`type` = c2.`type`, c1.`typeId` = c2.`typeId` WHERE c1.`replyTo` = c2.`id` AND c1.`id` = ?d', $this->_post['id']);
+        DB::Aowow()->qry('UPDATE ::comments c1, ::comments c2 SET c1.`replyTo` = 0, c1.`type` = c2.`type`, c1.`typeId` = c2.`typeId` WHERE c1.`replyTo` = c2.`id` AND c1.`id` = %i', $this->_post['id']);
     }
 }
 

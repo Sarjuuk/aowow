@@ -46,11 +46,11 @@ class AccountWeightscalesResponse extends TextResponse
         if (!$this->assertPOST('name', 'scale'))
             return;
 
-        $nScales = DB::Aowow()->selectCell('SELECT COUNT(`id`) FROM ?_account_weightscales WHERE `userId` = ?d', User::$id);
+        $nScales = DB::Aowow()->selectCell('SELECT COUNT(`id`) FROM ::account_weightscales WHERE `userId` = %i', User::$id);
         if ($nScales >= self::MAX_SCALES)
             return;
 
-        if ($id = DB::Aowow()->query('INSERT INTO ?_account_weightscales (`userId`, `name`) VALUES (?d, ?)', User::$id, $this->_post['name']))
+        if ($id = DB::Aowow()->qry('INSERT INTO ::account_weightscales (`userId`, `name`) VALUES (%i, %s)', User::$id, $this->_post['name']))
             if ($this->storeScaleData($id))
                 $this->result = $id;
     }
@@ -61,13 +61,13 @@ class AccountWeightscalesResponse extends TextResponse
             return;
 
         // not in DB or not owned by user
-        if (!DB::Aowow()->selectCell('SELECT 1 FROM ?_account_weightscales WHERE `userId` = ?d AND `id` = ?d', User::$id, $this->_post['id']))
+        if (!DB::Aowow()->selectCell('SELECT 1 FROM ::account_weightscales WHERE `userId` = %i AND `id` = %i', User::$id, $this->_post['id']))
         {
             trigger_error('AccountWeightscalesResponse::updateWeights - scale #'.$this->_post['id'].' not in db or not owned by user #'.User::$id, E_USER_ERROR);
             return;
         }
 
-        DB::Aowow()->query('UPDATE ?_account_weightscales SET `name` = ? WHERE `id` = ?d', $this->_post['name'], $this->_post['id']);
+        DB::Aowow()->qry('UPDATE ::account_weightscales SET `name` = %s WHERE `id` = %i', $this->_post['name'], $this->_post['id']);
         $this->storeScaleData($this->_post['id']);
 
         // return edited id on success
@@ -77,20 +77,24 @@ class AccountWeightscalesResponse extends TextResponse
     private function deleteWeights() : void
     {
         if ($this->assertPOST('id'))
-            DB::Aowow()->query('DELETE FROM ?_account_weightscales WHERE `id` = ?d AND `userId` = ?d', $this->_post['id'], User::$id);
+            DB::Aowow()->qry('DELETE FROM ::account_weightscales WHERE `id` = %i AND `userId` = %i', $this->_post['id'], User::$id);
 
         $this->result = '';
     }
 
     private function storeScaleData(int $scaleId) : bool
     {
-        if (!is_int(DB::Aowow()->query('DELETE FROM ?_account_weightscale_data WHERE `id` = ?d', $scaleId)))
+        if (!is_int(DB::Aowow()->qry('DELETE FROM ::account_weightscale_data WHERE `id` = %i', $scaleId)))
             return false;
 
-        foreach ($this->_post['scale'] as [$k, $v])
-            if (in_array($k, Util::$weightScales))          // $v is known to be a positive int due to regex check
-                if (!is_int(DB::Aowow()->query('INSERT INTO ?_account_weightscale_data VALUES (?d, ?, ?d)', $scaleId, $k, $v)))
-                    return false;
+        // $x['val'] is known to be a positive int due to regex check
+        $scaleData = array_filter($this->_post['scale'], fn($x) => in_array($x['field'], Util::$weightScales) && $x['val'] > 0);
+
+        array_walk($scaleData, fn($x) => $x['id'] = $scaleId);
+
+        foreach ($scaleData as $sd)
+            if (is_null(DB::Aowow()->qry('INSERT INTO ::account_weightscale_data %v', $sd)))
+                return false;
 
         return true;
     }
@@ -103,7 +107,7 @@ class AccountWeightscalesResponse extends TextResponse
     protected static function checkScale(string $val) : array
     {
         if (preg_match('/^((\w+:\d+)(,\w+:\d+)*)$/', $val))
-            return array_map(fn($x) => explode(':', $x), explode(',', $val));
+            return array_map(fn($x) => array_combine(['field', 'val'], explode(':', $x)), explode(',', $val));
 
         return [];
     }

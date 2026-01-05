@@ -56,7 +56,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
         $questorder = [];
         $questtotal = [];
         $condition  = [
-            'AND',
+            DB::AND,
             [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW | CUSTOM_UNAVAILABLE | CUSTOM_DISABLED, '&'], 0],
             [['flags', QUEST_FLAG_DAILY | QUEST_FLAG_WEEKLY | QUEST_FLAG_REPEATABLE | QUEST_FLAG_AUTO_REWARDED, '&'], 0],
             [['specialFlags', QUEST_FLAG_SPECIAL_REPEATABLE | QUEST_FLAG_SPECIAL_DUNGEON_FINDER | QUEST_FLAG_SPECIAL_MONTHLY, '&'], 0]
@@ -162,7 +162,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
         );
         $mountz = new SpellList($condition);
 
-        $conditionSet = DB::World()->selectCol('SELECT `SourceEntry` AS ARRAY_KEY, `ConditionValue1` FROM conditions WHERE `SourceTypeOrReferenceId` = ?d AND `ConditionTypeOrReference` = ?d AND `SourceEntry` IN (?a)', Conditions::SRC_SPELL, Conditions::SKILL, $mountz->getFoundIDs());
+        $conditionSet = DB::World()->selectCol('SELECT `SourceEntry` AS ARRAY_KEY, `ConditionValue1` FROM conditions WHERE `SourceTypeOrReferenceId` = %i AND `ConditionTypeOrReference` = %i AND `SourceEntry` IN %in', Conditions::SRC_SPELL, Conditions::SKILL, $mountz->getFoundIDs());
 
         // get mounts for exclusion
         foreach ($conditionSet as $mount => $skill)
@@ -208,7 +208,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             ['typeCat', -6]
         );
         $companionz = new SpellList($condition);
-        $legit      = DB::Aowow()->selectCol('SELECT `spellId2` FROM ?_items WHERE `class` = ?d AND `subClass` = ?d AND `spellId1` IN (?a) AND `spellId2` IN (?a)', ITEM_CLASS_MISC, 2, LEARN_SPELLS, $companionz->getFoundIDs());
+        $legit      = DB::Aowow()->selectCol('SELECT `spellId2` FROM ::items WHERE `class` = %i AND `subClass` = %i AND `spellId1` IN %in AND `spellId2` IN %in', ITEM_CLASS_MISC, 2, LEARN_SPELLS, $companionz->getFoundIDs());
 
         foreach ($companionz->iterate() as $id => $_)
             if (!$companionz->getSources())
@@ -273,7 +273,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             ['effect1Id', [SPELL_EFFECT_APPLY_AURA, SPELL_EFFECT_TRADE_SKILL, SPELL_EFFECT_PROSPECTING, SPELL_EFFECT_OPEN_LOCK, SPELL_EFFECT_MILLING, SPELL_EFFECT_DISENCHANT, SPELL_EFFECT_SUMMON, SPELL_EFFECT_SKINNING], '!'],
             // not the skill itself
             ['effect2Id', [SPELL_EFFECT_SKILL, SPELL_EFFECT_PROFICIENCY], '!'],
-            ['OR', ['typeCat', 9], ['typeCat', 11]]
+            [DB::OR, ['typeCat', 9], ['typeCat', 11]]
         );
 
         foreach ($skills as $s)
@@ -362,15 +362,15 @@ CLISetup::registerSetup("build", new class extends SetupScript
         set_time_limit(2);
 
         CLI::write('[profiler] applying '.count($this->exclusions).' baseline exclusions');
-        DB::Aowow()->query('DELETE FROM ?_profiler_excludes WHERE `comment` = ""');
+        DB::Aowow()->qry('DELETE FROM ::profiler_excludes WHERE `comment` = ""');
 
         foreach ($this->exclusions as $ex)
-            DB::Aowow()->query('REPLACE INTO ?_profiler_excludes (?#) VALUES (?a)', array_keys($ex), array_values($ex));
+            DB::Aowow()->qry('REPLACE INTO ::profiler_excludes %v', $ex);
 
         // excludes; type => [excludeGroupBit => [typeIds]]
         $excludes = [];
 
-        $exData = DB::Aowow()->selectCol('SELECT `type` AS ARRAY_KEY, `typeId` AS ARRAY_KEY2, `groups` FROM ?_profiler_excludes');
+        $exData = DB::Aowow()->selectCol('SELECT `type` AS ARRAY_KEY, `typeId` AS ARRAY_KEY2, `groups` FROM ::profiler_excludes');
         for ($i = 0; (1 << $i) < PR_EXCLUDE_GROUP_ANY; $i++)
             foreach ($exData as $type => $data)
                 if ($ids = array_keys(array_filter($data, fn($x) => $x & (1 << $i))))

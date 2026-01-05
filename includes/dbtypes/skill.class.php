@@ -10,12 +10,12 @@ class SkillList extends DBTypeList
 {
     public static int    $type      = Type::SKILL;
     public static string $brickFile = 'skill';
-    public static string $dataTable = '?_skillline';
+    public static string $dataTable = '::skillline';
 
-    protected string $queryBase = 'SELECT sl.*, sl.`id` AS ARRAY_KEY FROM ?_skillline sl';
+    protected string $queryBase = 'SELECT sl.*, sl.`id` AS ARRAY_KEY FROM ::skillline sl';
     protected array  $queryOpts = array(
                         'sl' => [['ic']],
-                        'ic' => ['j' => ['?_icons ic ON ic.`id` = sl.`iconId`', true], 's' => ', ic.`name` AS "iconString"'],
+                        'ic' => ['j' => ['::icons ic ON ic.`id` = sl.`iconId`', true], 's' => ', ic.`name` AS "iconString"'],
                     );
 
     public function __construct(array $conditions = [], array $miscData = [])

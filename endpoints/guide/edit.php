@@ -66,7 +66,7 @@ class GuideEditResponse extends TemplateResponse
             return;
 
         $this->typeId = $this->_get['id'];                  // just to display sensible not-found msg
-        $status = DB::Aowow()->selectCell('SELECT `status` FROM ?_guides WHERE `id` = ?d AND `status` <> ?d { AND `userId`  = ?d }', $this->typeId, GuideMgr::STATUS_ARCHIVED, User::isInGroup(U_GROUP_STAFF) ? DBSIMPLE_SKIP : User::$id);
+        $status = DB::Aowow()->selectCell('SELECT `status` FROM ::guides WHERE %if', !User::isInGroup(U_GROUP_STAFF), '`userId` = %i AND', User::$id, '%end `id` = %i AND `status` <> %i', $this->typeId, GuideMgr::STATUS_ARCHIVED);
         if (!$status && $this->typeId)
             $this->generateNotFound(Lang::game('guide'), Lang::guide('notFound'));
         else if (!$this->typeId)
@@ -75,7 +75,7 @@ class GuideEditResponse extends TemplateResponse
         // just so we don't have to access GuideMgr from template
         $this->isDraft    = $status == GuideMgr::STATUS_DRAFT;
         $this->editStatus = $status;
-        $this->editRev    = DB::Aowow()->selectCell('SELECT `rev` FROM ?_articles WHERE `type` = ?d AND `typeId` = ?d ORDER BY `rev` DESC', Type::GUIDE, $this->typeId);
+        $this->editRev    = DB::Aowow()->selectCell('SELECT `rev` FROM ::articles WHERE `type` = %i AND `typeId` = %i ORDER BY `rev` DESC', Type::GUIDE, $this->typeId);
     }
 
     protected function generate() : void
@@ -157,15 +157,15 @@ class GuideEditResponse extends TemplateResponse
         if ($this->_get['id'] === 0)
         {
             $guideData += ['userId' => User::$id];
-            if (!($this->typeId = (int)DB::Aowow()->query('INSERT INTO ?_guides (?#) VALUES (?a)', array_keys($guideData), array_values($guideData))))
+            if (!($this->typeId = (int)DB::Aowow()->qry('INSERT INTO ::guides %v', $guideData)))
             {
                 trigger_error('GuideEditResponse::saveGuide - failed to save guide to db', E_USER_ERROR);
                 return false;
             }
         }
         // existing guide > :shrug:
-        else if (DB::Aowow()->query('UPDATE ?_guides SET ?a WHERE `id` = ?d', $guideData, $this->typeId))
-            DB::Aowow()->query('INSERT INTO ?_guides_changelog (`id`, `rev`, `date`, `userId`, `msg`) VALUES (?d, ?d, ?d, ?d, ?)', $this->typeId, $this->editRev, time(), User::$id, $this->_post['changelog']);
+        else if (DB::Aowow()->qry('UPDATE ::guides SET %a WHERE `id` = %i', $guideData, $this->typeId))
+            DB::Aowow()->qry('INSERT INTO ::guides_changelog (`id`, `rev`, `date`, `userId`, `msg`) VALUES (%i, %i, %i, %i, %s)', $this->typeId, $this->editRev, time(), User::$id, $this->_post['changelog']);
         else
         {
             trigger_error('GuideEditResponse::saveGuide - failed to update guide in db', E_USER_ERROR);
@@ -173,8 +173,8 @@ class GuideEditResponse extends TemplateResponse
         }
 
         // insert Article
-        $articleId = DB::Aowow()->query(
-           'INSERT INTO ?_articles (`type`, `typeId`, `locale`, `rev`, `editAccess`, `article`) VALUES (?d, ?d, ?d, ?d, ?d, ?)',
+        $articleId = DB::Aowow()->qry(
+           'INSERT INTO ::articles (`type`, `typeId`, `locale`, `rev`, `editAccess`, `article`) VALUES (%i, %i, %i, %i, %i, %s)',
             Type::GUIDE,
             $this->typeId,
             $this->_post['locale']->value,
@@ -186,14 +186,14 @@ class GuideEditResponse extends TemplateResponse
         if (!is_int($articleId))
         {
             if ($this->_get['id'] === 0)
-                DB::Aowow()->query('DELETE FROM ?_guides WHERE `id` = ?d', $this->typeId);
+                DB::Aowow()->qry('DELETE FROM ::guides WHERE `id` = %i', $this->typeId);
 
             trigger_error('GuideEditResponse::saveGuide - failed to save article to db', E_USER_ERROR);
             return false;
         }
 
         if ($this->_post['submit'] && $this->editStatus != GuideMgr::STATUS_REVIEW)
-            DB::Aowow()->query('INSERT INTO ?_guides_changelog (`id`, `date`, `userId`, `status`) VALUES (?d, ?d, ?d, ?d)', $this->typeId, time(), User::$id, GuideMgr::STATUS_REVIEW);
+            DB::Aowow()->qry('INSERT INTO ::guides_changelog (`id`, `date`, `userId`, `status`) VALUES (%i, %i, %i, %i)', $this->typeId, time(), User::$id, GuideMgr::STATUS_REVIEW);
 
         $this->editStatus = $guideData['status'];
 

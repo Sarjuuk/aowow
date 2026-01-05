@@ -10,17 +10,17 @@ class QuestList extends DBTypeList
 {
     public static int    $type      = Type::QUEST;
     public static string $brickFile = 'quest';
-    public static string $dataTable = '?_quests';
+    public static string $dataTable = '::quests';
     public        array  $requires  = [];
     public        array  $rewards   = [];
     public        array  $choices   = [];
 
-    protected string $queryBase = 'SELECT q.*, q.`id` AS ARRAY_KEY FROM ?_quests q';
+    protected string $queryBase = 'SELECT q.*, q.`id` AS ARRAY_KEY FROM ::quests q';
     protected array  $queryOpts = array(
                         'q'   => [],
-                        'rsc' => ['j' => '?_spell rsc ON q.`rewardSpellCast` = rsc.`id`'], // limit rewardSpellCasts
-                        'qse' => ['j' => '?_quests_startend qse ON q.`id` = qse.`questId`', 's' => ', qse.`method`'], // groupConcat..?
-                        'e'   => ['j' => ['?_events e ON e.`id` = q.`eventId`', true], 's' => ', e.`holidayId`']
+                        'rsc' => ['j' => '::spell rsc ON q.`rewardSpellCast` = rsc.`id`'], // limit rewardSpellCasts
+                        'qse' => ['j' => '::quests_startend qse ON q.`id` = qse.`questId`', 's' => ', qse.`method`'], // groupConcat..?
+                        'e'   => ['j' => ['::events e ON e.`id` = q.`eventId`', true], 's' => ', e.`holidayId`']
                     );
 
     public function __construct(array $conditions = [], array $miscData = [])
@@ -28,7 +28,7 @@ class QuestList extends DBTypeList
         parent::__construct($conditions, $miscData);
 
         // i don't like this very much
-        $currencies = DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, `itemId` FROM ?_currencies');
+        $currencies = DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, `itemId` FROM ::currencies');
 
         // post processing
         foreach ($this->iterate() as $id => &$_curTpl)
@@ -172,7 +172,7 @@ class QuestList extends DBTypeList
                 continue;
 
             [$series, $first] = DB::Aowow()->SelectRow(
-               'SELECT IF(prev.`id` OR cur.`nextQuestIdChain`, 1, 0) AS "0", IF(prev.`id` IS NULL AND cur.`nextQuestIdChain`, 1, 0) AS "1" FROM ?_quests cur LEFT JOIN ?_quests prev ON prev.`nextQuestIdChain` = cur.`id` WHERE cur.`id` = ?d',
+               'SELECT IF(prev.`id` OR cur.`nextQuestIdChain`, 1, 0) AS "0", IF(prev.`id` IS NULL AND cur.`nextQuestIdChain`, 1, 0) AS "1" FROM ::quests cur LEFT JOIN ::quests prev ON prev.`nextQuestIdChain` = cur.`id` WHERE cur.`id` = %i',
                 $this->id
             );
 
@@ -539,15 +539,15 @@ class QuestListFilter extends Filter
         if ($_v['si'])
         {
             $excl = [['reqRaceMask', ChrRace::MASK_ALL, '&'], ChrRace::MASK_ALL, '!'];
-            $incl = ['OR', ['reqRaceMask', 0], [['reqRaceMask', ChrRace::MASK_ALL, '&'], ChrRace::MASK_ALL]];
+            $incl = [DB::OR, ['reqRaceMask', 0], [['reqRaceMask', ChrRace::MASK_ALL, '&'], ChrRace::MASK_ALL]];
 
             $parts[] = match ($_v['si'])
             {
                  SIDE_BOTH     => $incl,
-                 SIDE_HORDE    => ['OR',  $incl, ['reqRaceMask', ChrRace::MASK_HORDE, '&']],
-                -SIDE_HORDE    => ['AND', $excl, ['reqRaceMask', ChrRace::MASK_HORDE, '&']],
-                 SIDE_ALLIANCE => ['OR',  $incl, ['reqRaceMask', ChrRace::MASK_ALLIANCE, '&']],
-                -SIDE_ALLIANCE => ['AND', $excl, ['reqRaceMask', ChrRace::MASK_ALLIANCE, '&']]
+                 SIDE_HORDE    => [DB::OR,  $incl, ['reqRaceMask', ChrRace::MASK_HORDE, '&']],
+                -SIDE_HORDE    => [DB::AND, $excl, ['reqRaceMask', ChrRace::MASK_HORDE, '&']],
+                 SIDE_ALLIANCE => [DB::OR,  $incl, ['reqRaceMask', ChrRace::MASK_ALLIANCE, '&']],
+                -SIDE_ALLIANCE => [DB::AND, $excl, ['reqRaceMask', ChrRace::MASK_ALLIANCE, '&']]
             };
         }
 
@@ -566,16 +566,16 @@ class QuestListFilter extends Filter
         if (!in_array($crs, self::$enums[$cr]))
             return null;
 
-        if ($_ = DB::Aowow()->selectRow('SELECT * FROM ?_factions WHERE `id` = ?d', $crs))
+        if ($_ = DB::Aowow()->selectRow('SELECT * FROM ::factions WHERE `id` = %i', $crs))
             $this->fiReputationCols[] = [$crs, Util::localizedString($_, 'name')];
 
         return [
-            'OR',
-            ['AND', ['rewardFactionId1', $crs], ['rewardFactionValue1', 0, $sign]],
-            ['AND', ['rewardFactionId2', $crs], ['rewardFactionValue2', 0, $sign]],
-            ['AND', ['rewardFactionId3', $crs], ['rewardFactionValue3', 0, $sign]],
-            ['AND', ['rewardFactionId4', $crs], ['rewardFactionValue4', 0, $sign]],
-            ['AND', ['rewardFactionId5', $crs], ['rewardFactionValue5', 0, $sign]]
+            DB::OR,
+            [DB::AND, ['rewardFactionId1', $crs], ['rewardFactionValue1', 0, $sign]],
+            [DB::AND, ['rewardFactionId2', $crs], ['rewardFactionValue2', 0, $sign]],
+            [DB::AND, ['rewardFactionId3', $crs], ['rewardFactionValue3', 0, $sign]],
+            [DB::AND, ['rewardFactionId4', $crs], ['rewardFactionValue4', 0, $sign]],
+            [DB::AND, ['rewardFactionId5', $crs], ['rewardFactionValue5', 0, $sign]]
         ];
     }
 
@@ -585,7 +585,7 @@ class QuestListFilter extends Filter
         {
             Type::NPC,
             Type::OBJECT,
-            Type::ITEM   => ['AND', ['qse.type', $crs], ['qse.method', $flags, '&']],
+            Type::ITEM   => [DB::AND, ['qse.type', $crs], ['qse.method', $flags, '&']],
             default      => null
         };
     }
@@ -599,7 +599,7 @@ class QuestListFilter extends Filter
             return null;
 
         return [
-            'OR',
+            DB::OR,
             ['rewardItemId1', $crs], ['rewardItemId2', $crs], ['rewardItemId3', $crs], ['rewardItemId4', $crs],
             ['rewardChoiceItemId1', $crs], ['rewardChoiceItemId2', $crs], ['rewardChoiceItemId3', $crs], ['rewardChoiceItemId4', $crs], ['rewardChoiceItemId5', $crs], ['rewardChoiceItemId6', $crs]
         ];
@@ -622,9 +622,9 @@ class QuestListFilter extends Filter
             return null;
 
         if ($crs)
-            return ['OR', ['flags', QUEST_FLAG_REPEATABLE, '&'], ['specialFlags', QUEST_FLAG_SPECIAL_REPEATABLE, '&']];
+            return [DB::OR, ['flags', QUEST_FLAG_REPEATABLE, '&'], ['specialFlags', QUEST_FLAG_SPECIAL_REPEATABLE, '&']];
         else
-            return ['AND', [['flags', QUEST_FLAG_REPEATABLE, '&'], 0], [['specialFlags', QUEST_FLAG_SPECIAL_REPEATABLE, '&'], 0]];
+            return [DB::AND, [['flags', QUEST_FLAG_REPEATABLE, '&'], 0], [['specialFlags', QUEST_FLAG_SPECIAL_REPEATABLE, '&'], 0]];
     }
 
     protected function cbItemChoices(int $cr, int $crs, string $crv) : ?array
@@ -653,9 +653,9 @@ class QuestListFilter extends Filter
             return null;
 
         if ($crs)
-            return ['AND', ['questSortId', 0, '>'], [['flags', QUEST_FLAG_DAILY | QUEST_FLAG_WEEKLY | QUEST_FLAG_REPEATABLE, '&'], 0], [['specialFlags', QUEST_FLAG_SPECIAL_REPEATABLE | QUEST_FLAG_SPECIAL_MONTHLY, '&'], 0]];
+            return [DB::AND, ['questSortId', 0, '>'], [['flags', QUEST_FLAG_DAILY | QUEST_FLAG_WEEKLY | QUEST_FLAG_REPEATABLE, '&'], 0], [['specialFlags', QUEST_FLAG_SPECIAL_REPEATABLE | QUEST_FLAG_SPECIAL_MONTHLY, '&'], 0]];
         else
-            return ['OR', ['questSortId', 0, '<'], ['flags', QUEST_FLAG_DAILY | QUEST_FLAG_WEEKLY | QUEST_FLAG_REPEATABLE, '&'], ['specialFlags', QUEST_FLAG_SPECIAL_REPEATABLE | QUEST_FLAG_SPECIAL_MONTHLY, '&']];
+            return [DB::OR, ['questSortId', 0, '<'], ['flags', QUEST_FLAG_DAILY | QUEST_FLAG_WEEKLY | QUEST_FLAG_REPEATABLE, '&'], ['specialFlags', QUEST_FLAG_SPECIAL_REPEATABLE | QUEST_FLAG_SPECIAL_MONTHLY, '&']];
     }
 
     protected function cbSpellRewards(int $cr, int $crs, string $crv) : ?array
@@ -664,9 +664,9 @@ class QuestListFilter extends Filter
             return null;
 
         if ($crs)
-            return ['OR', ['sourceSpellId', 0, '>'], ['rewardSpell', 0, '>'], ['rsc.effect1Id', SpellList::EFFECTS_TEACH], ['rsc.effect2Id', SpellList::EFFECTS_TEACH], ['rsc.effect3Id', SpellList::EFFECTS_TEACH]];
+            return [DB::OR, ['sourceSpellId', 0, '>'], ['rewardSpell', 0, '>'], ['rsc.effect1Id', SpellList::EFFECTS_TEACH], ['rsc.effect2Id', SpellList::EFFECTS_TEACH], ['rsc.effect3Id', SpellList::EFFECTS_TEACH]];
         else
-            return ['AND', ['sourceSpellId', 0], ['rewardSpell', 0], ['rewardSpellCast', 0]];
+            return [DB::AND, ['sourceSpellId', 0], ['rewardSpell', 0], ['rewardSpellCast', 0]];
     }
 
     protected function cbEarnReputation(int $cr, int $crs, string $crv) : ?array
@@ -675,11 +675,11 @@ class QuestListFilter extends Filter
             return null;
 
         if ($crs == parent::ENUM_ANY)
-            return ['OR', ['reqFactionId1', 0, '>'], ['reqFactionId2', 0, '>']];
+            return [DB::OR, ['reqFactionId1', 0, '>'], ['reqFactionId2', 0, '>']];
         else if ($crs == parent::ENUM_NONE)
-            return ['AND', ['reqFactionId1', 0], ['reqFactionId2', 0]];
+            return [DB::AND, ['reqFactionId1', 0], ['reqFactionId2', 0]];
         else if (in_array($crs, self::$enums[$cr]))
-            return ['OR', ['reqFactionId1', $crs], ['reqFactionId2', $crs]];
+            return [DB::OR, ['reqFactionId1', $crs], ['reqFactionId2', $crs]];
 
         return null;
     }
@@ -691,11 +691,11 @@ class QuestListFilter extends Filter
 
         $_ = self::$enums[$cr][$crs];
         if ($_ === true)
-            return ['AND', ['reqClassMask', 0, '!'], [['reqClassMask', ChrClass::MASK_ALL, '&'], ChrClass::MASK_ALL, '!']];
+            return [DB::AND, ['reqClassMask', 0, '!'], [['reqClassMask', ChrClass::MASK_ALL, '&'], ChrClass::MASK_ALL, '!']];
         else if ($_ === false)
-            return ['OR', ['reqClassMask', 0], [['reqClassMask', ChrClass::MASK_ALL, '&'], ChrClass::MASK_ALL]];
+            return [DB::OR, ['reqClassMask', 0], [['reqClassMask', ChrClass::MASK_ALL, '&'], ChrClass::MASK_ALL]];
         else if (is_int($_))
-            return ['AND', ['reqClassMask', ChrClass::from($_)->toMask(), '&'], [['reqClassMask', ChrClass::MASK_ALL, '&'], ChrClass::MASK_ALL, '!']];
+            return [DB::AND, ['reqClassMask', ChrClass::from($_)->toMask(), '&'], [['reqClassMask', ChrClass::MASK_ALL, '&'], ChrClass::MASK_ALL, '!']];
 
         return null;
     }
@@ -707,11 +707,11 @@ class QuestListFilter extends Filter
 
         $_ = self::$enums[$cr][$crs];
         if ($_ === true)
-            return ['AND', ['reqRaceMask', 0, '!'], [['reqRaceMask', ChrRace::MASK_ALL, '&'], ChrRace::MASK_ALL, '!'], [['reqRaceMask', ChrRace::MASK_ALLIANCE, '&'], ChrRace::MASK_ALLIANCE, '!'], [['reqRaceMask', ChrRace::MASK_HORDE, '&'], ChrRace::MASK_HORDE, '!']];
+            return [DB::AND, ['reqRaceMask', 0, '!'], [['reqRaceMask', ChrRace::MASK_ALL, '&'], ChrRace::MASK_ALL, '!'], [['reqRaceMask', ChrRace::MASK_ALLIANCE, '&'], ChrRace::MASK_ALLIANCE, '!'], [['reqRaceMask', ChrRace::MASK_HORDE, '&'], ChrRace::MASK_HORDE, '!']];
         else if ($_ === false)
-            return ['OR', ['reqRaceMask', 0], ['reqRaceMask', ChrRace::MASK_ALL], ['reqRaceMask', ChrRace::MASK_ALLIANCE], ['reqRaceMask', ChrRace::MASK_HORDE]];
+            return [DB::OR, ['reqRaceMask', 0], ['reqRaceMask', ChrRace::MASK_ALL], ['reqRaceMask', ChrRace::MASK_ALLIANCE], ['reqRaceMask', ChrRace::MASK_HORDE]];
         else if (is_int($_))
-            return ['AND', ['reqRaceMask', ChrRace::from($_)->toMask(), '&'], [['reqRaceMask', ChrRace::MASK_ALLIANCE, '&'], ChrRace::MASK_ALLIANCE, '!'], [['reqRaceMask', ChrRace::MASK_HORDE, '&'], ChrRace::MASK_HORDE, '!']];
+            return [DB::AND, ['reqRaceMask', ChrRace::from($_)->toMask(), '&'], [['reqRaceMask', ChrRace::MASK_ALLIANCE, '&'], ChrRace::MASK_ALLIANCE, '!'], [['reqRaceMask', ChrRace::MASK_HORDE, '&'], ChrRace::MASK_HORDE, '!']];
 
         return null;
     }
@@ -721,7 +721,7 @@ class QuestListFilter extends Filter
         if (!$this->int2Bool($crs))
             return null;
 
-        $missing = DB::Aowow()->selectCol('SELECT `questId`, BIT_OR(`method`) AS "se" FROM ?_quests_startend GROUP BY `questId` HAVING "se" <> 3');
+        $missing = DB::Aowow()->selectCol('SELECT `questId`, BIT_OR(`method`) AS "se" FROM ::quests_startend GROUP BY `questId` HAVING "se" <> 3');
         if ($crs)
             return ['id', $missing];
         else

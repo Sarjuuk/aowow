@@ -201,7 +201,7 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
         // tab: created by (spell) [for items its handled in LootByItem]
         if ($this->typeId == CURRENCY_HONOR_POINTS)
         {
-            $createdBy = new SpellList(array(['effect1Id', SPELL_EFFECT_ADD_HONOR], ['effect2Id', SPELL_EFFECT_ADD_HONOR], ['effect3Id', SPELL_EFFECT_ADD_HONOR], 'OR'));
+            $createdBy = new SpellList(array(['effect1Id', SPELL_EFFECT_ADD_HONOR], ['effect2Id', SPELL_EFFECT_ADD_HONOR], ['effect3Id', SPELL_EFFECT_ADD_HONOR], DB::OR));
             if (!$createdBy->error)
             {
                 $this->extendGlobalData($createdBy->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
@@ -237,8 +237,8 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
         if (!$n && !is_null(ItemListFilter::getCriteriaIndex(158, $_relItemId)))
             $n = '?items&filter=cr=158;crs='.$_relItemId.';crv=0';
 
-        $xCosts   = DB::Aowow()->selectCol('SELECT `id` FROM ?_itemextendedcost WHERE '.$w);
-        $boughtBy = $xCosts ? DB::World()->selectCol('SELECT `item` FROM npc_vendor WHERE `extendedCost` IN (?a) UNION SELECT `item` FROM game_event_npc_vendor WHERE `extendedCost` IN (?a)', $xCosts, $xCosts) : [];
+        $xCosts   = DB::Aowow()->selectCol('SELECT `id` FROM ::itemextendedcost WHERE '.$w);
+        $boughtBy = $xCosts ? DB::World()->selectCol('SELECT `item` FROM npc_vendor WHERE `extendedCost` IN %in UNION SELECT `item` FROM game_event_npc_vendor WHERE `extendedCost` IN %in', $xCosts, $xCosts) : [];
         if ($boughtBy)
         {
             $boughtBy = new ItemList(array(['id', $boughtBy]));

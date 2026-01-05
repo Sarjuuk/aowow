@@ -289,7 +289,7 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
             case ItemListFilter::GROUP_BY_LEVEL:            // itemlevel: first, try to find 10 level steps within range (if given) as tabs
                 // ohkayy, maybe i need to rethink $this
                 $this->filterOpts = $this->filter->extraOpts;
-                $this->filterOpts['is']['o'] = [null];      // remove 'order by' from ?_item_stats
+                $this->filterOpts['is']['o'] = [null];      // remove 'order by' from ::item_stats
                 $extraOpts = array_merge($this->filterOpts, ['i'  => ['g' => ['itemlevel'], 'o' => ['itemlevel DESC']]]);
 
                 $levelRef = new ItemList(array_merge($conditions, [10]), ['extraOpts' => $extraOpts]);

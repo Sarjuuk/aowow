@@ -22,18 +22,18 @@ class AdminVideosActionApproveResponse extends TextResponse
             return;
         }
 
-        $viEntries = DB::Aowow()->select('SELECT `id` AS ARRAY_KEY, `userIdOwner`, `date`, `type`, `typeId` FROM ?_videos WHERE (`status` & ?d) = 0 AND `id` IN (?a)', CC_FLAG_APPROVED, $this->_get['id']);
+        $viEntries = DB::Aowow()->selectAssoc('SELECT `id` AS ARRAY_KEY, `userIdOwner`, `date`, `type`, `typeId` FROM ::videos WHERE (`status` & %i) = 0 AND `id` IN %in', CC_FLAG_APPROVED, $this->_get['id']);
         foreach ($viEntries as $id => $viData)
         {
             // set as approved in DB
-            DB::Aowow()->query('UPDATE ?_videos SET `status` = ?d, `userIdApprove` = ?d WHERE `id` = ?d', CC_FLAG_APPROVED, User::$id, $id);
+            DB::Aowow()->qry('UPDATE ::videos SET `status` = %i, `userIdApprove` = %i WHERE `id` = %i', CC_FLAG_APPROVED, User::$id, $id);
 
             // gain siterep
             Util::gainSiteReputation($viData['userIdOwner'], SITEREP_ACTION_SUGGEST_VIDEO, ['id' => $id, 'what' => 1, 'date' => $viData['date']]);
 
             // flag DB entry as having videos
             if ($tbl = Type::getClassAttrib($viData['type'], 'dataTable'))
-                DB::Aowow()->query('UPDATE ?# SET `cuFlags` = `cuFlags` | ?d WHERE `id` = ?d', $tbl, CUSTOM_HAS_VIDEO, $viData['typeId']);
+                DB::Aowow()->qry('UPDATE %n SET `cuFlags` = `cuFlags` | %i WHERE `id` = %i', $tbl, CUSTOM_HAS_VIDEO, $viData['typeId']);
 
             unset($viEntries[$id]);
         }

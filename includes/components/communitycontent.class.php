@@ -31,11 +31,7 @@ class CommunityContent
     private static array $jsGlobals = [];
     private static array $subjCache = [];
 
-    private static string $coCountQuery =
-       'SELECT    COUNT(1)
-        FROM      ?_comments c
-        WHERE     c.`replyTo` = ?d AND c.`type` = ?d AND c.`typeId` = ?d AND
-                  ((c.`flags` & ?d) = 0 OR c.`userId` = ?d OR ?d)';
+    private static string $coCountQuery = 'SELECT COUNT(1) FROM ::comments c WHERE %and';
 
     private static string $coQuery =
        'SELECT    c.*,
@@ -44,55 +40,54 @@ class CommunityContent
                   a3.`username` AS "deleteUser",
                   a4.`username` AS "responseUser",
                   IFNULL(SUM(ur.`value`), 0) AS "rating",
-                  SUM(IF(ur.`userId` > 0 AND ur.`userId` = ?d, ur.`value`, 0)) AS "userRating",
+                  SUM(IF(ur.`userId` > 0 AND ur.`userId` = %i, ur.`value`, 0)) AS "userRating",
                   IF(r.`id` IS NULL, 0, 1) AS "userReported"
-        FROM      ?_comments c
-        JOIN      ?_account a1 ON c.`userId` = a1.`id`
-        LEFT JOIN ?_account a2 ON c.`editUserId` = a2.`id`
-        LEFT JOIN ?_account a3 ON c.`deleteUserId` = a3.`id`
-        LEFT JOIN ?_account a4 ON c.`responseUserId` = a4.`id`
-        LEFT JOIN ?_user_ratings ur ON c.`id` = ur.`entry` AND ur.`type` = ?d
-        LEFT JOIN ?_reports r ON r.`subject` = c.`id` AND r.`mode` = ?d AND r.`userId` = ?d
-        WHERE     c.`replyTo` = ?d AND c.`type` = ?d AND c.`typeId` = ?d AND
-                  ((c.`flags` & ?d) = 0 OR c.`userId` = ?d OR ?d)
+        FROM      ::comments c
+        JOIN      ::account a1 ON c.`userId` = a1.`id`
+        LEFT JOIN ::account a2 ON c.`editUserId` = a2.`id`
+        LEFT JOIN ::account a3 ON c.`deleteUserId` = a3.`id`
+        LEFT JOIN ::account a4 ON c.`responseUserId` = a4.`id`
+        LEFT JOIN ::user_ratings ur ON c.`id` = ur.`entry` AND ur.`type` = %i
+        LEFT JOIN ::reports r ON r.`subject` = c.`id` AND r.`mode` = %i AND r.`userId` = %i
+        WHERE     %and
         GROUP BY  c.`id`
-        ORDER BY  c.`date` ASC';
+        ORDER BY  c.`date` ASC
+                  %lmt';
 
     private static string $ssQuery =
-       'SELECT    s.`id` AS ARRAY_KEY, s.`id`, a.`username` AS "user", s.`date`, s.`width`, s.`height`, s.`caption`, IF(s.`status` & ?d, 1, 0) AS "sticky", s.`type`, s.`typeId`
-        FROM      ?_screenshots s
-        LEFT JOIN ?_account a ON s.`userIdOwner` = a.`id`
-        WHERE   { s.`userIdOwner` = ?d AND }{ s.`type` = ? AND }{ s.`typeId` = ? AND } s.`status` & ?d AND (s.`status` & ?d) = 0
-      { ORDER BY  ?# DESC }
-      { LIMIT     ?d }';
+       'SELECT    s.`id` AS ARRAY_KEY, s.`id`, a.`username` AS "user", s.`date`, s.`width`, s.`height`, s.`caption`, IF(s.`status` & %i, 1, 0) AS "sticky", s.`type`, s.`typeId`
+        FROM      ::screenshots s
+        LEFT JOIN ::account a ON s.`userIdOwner` = a.`id`
+        WHERE     %and
+        ORDER BY  `date` DESC
+                  %lmt';
 
     private static string $viQuery =
-       'SELECT    v.`id` AS ARRAY_KEY, v.`id`, a.`username` AS "user", v.`date`, v.`videoId`, v.`caption`, IF(v.`status` & ?d, 1, 0) AS "sticky", v.`type`, v.`typeId`
-        FROM      ?_videos v
-        LEFT JOIN ?_account a ON v.`userIdOwner` = a.`id`
-        WHERE   { v.`userIdOwner` = ?d AND }{ v.`type` = ? AND }{ v.`typeId` = ? AND } v.`status` & ?d AND (v.`status` & ?d) = 0
-      { ORDER BY  ?# ASC }
-      { LIMIT     ?d }';
+       'SELECT    v.`id` AS ARRAY_KEY, v.`id`, a.`username` AS "user", v.`date`, v.`videoId`, v.`caption`, IF(v.`status` & %i, 1, 0) AS "sticky", v.`type`, v.`typeId`
+        FROM      ::videos v
+        LEFT JOIN ::account a ON v.`userIdOwner` = a.`id`
+        WHERE     %and
+        ORDER BY  %by
+                  %lmt';
 
     private static string $previewQuery =
        'SELECT    c.`id`,
                   c.`body` AS "preview",
                   c.`date`,
                   c.`replyTo` AS "commentid",
-                  IF(c.`flags` & ?d, 1, 0) AS "deleted",
+                  IF(c.`flags` & %i, 1, 0) AS "deleted",
                   IF(c.`type` <> 0, c.`type`, c2.`type`) AS "type",
                   IF(c.`typeId` <> 0, c.`typeId`, c2.`typeId`) AS "typeId",
                   IFNULL(SUM(ur.`value`), 0) AS "rating",
                   a.`username` AS "user"
-        FROM      ?_comments c
-        JOIN      ?_account a ON c.`userId` = a.`id`
-        LEFT JOIN ?_user_ratings ur ON ur.`entry` = c.`id` AND ur.`userId` <> 0 AND ur.`type` = 1
-        LEFT JOIN ?_comments c2 ON c.`replyTo` = c2.`id`
-        WHERE     %s
-                  ((c.`flags` & ?d) = 0 OR c.`userId` = ?d OR ?d)
+        FROM      ::comments c
+        JOIN      ::account a ON c.`userId` = a.`id`
+        LEFT JOIN ::user_ratings ur ON ur.`entry` = c.`id` AND ur.`userId` <> 0 AND ur.`type` = 1
+        LEFT JOIN ::comments c2 ON c.`replyTo` = c2.`id`
+        WHERE     %and
         GROUP BY  c.`id`
         ORDER BY  c.`date` DESC
-      { LIMIT     ?d }';
+                  %lmt';
 
     private static function addSubject(int $type, int $typeId) : void
     {
@@ -117,7 +112,7 @@ class CommunityContent
         }
     }
 
-    public static function getCommentPreviews(array $opt = [], ?int &$nFound = 0, bool $dateFmt = true, int $resultLimit = 0) : array
+    public static function getCommentPreviews(array $opt = [], ?int &$nFound = 0, bool $dateFmt = true, int $resultLimit = PHP_INT_MAX) : array
     {
         /*
             purged:0,           <- doesnt seem to be used anymore
@@ -127,41 +122,28 @@ class CommunityContent
         // add default values
         $opt += ['user' => 0, 'unrated' => 0, 'comments' => 0, 'replies' => 0, 'flags' => 0];
 
-        $w = [];
+        $where = [];
+        if (!User::isInGroup(U_GROUP_COMMENTS_MODERATOR))
+            $where[] = [DB::OR, ['(c.`flags` & %i) = 0', CC_FLAG_DELETED], ['c.`userId` = %i', User::$id]];
         if ($opt['user'])
-            $w[] = sprintf('c.`userId` = %d AND', $opt['user']);
+            $where[] = ['c.`userId` = %d', $opt['user']];
         if ($opt['unrated'])
-            $w[] = 'ur.`entry` IS NULL AND';
+            $where[] = ['ur.`entry` IS %sN', null];
         if ($opt['flags'])
-            $w[] = sprintf('(c.`flags` & %d) > 0 AND', $opt['flags']);
+            $where[] = ['(c.`flags` & %d) > 0', $opt['flags']];
         if ($opt['comments'] && !$opt['replies'])
-            $w[] = 'c.`replyTo` = 0 AND';
+            $where[] = ['c.`replyTo` = 0'];
         else if (!$opt['comments'] && $opt['replies'])
-            $w[] = 'c.`replyTo` <> 0 AND';
+            $where[] = ['c.`replyTo` <> 0'];
      // else
      //     pick both and no extra constraint needed for that
 
-        $query = sprintf(self::$previewQuery, implode(' ', $w));
-
-        $comments = DB::Aowow()->select(
-            $query,
-            CC_FLAG_DELETED,
-            CC_FLAG_DELETED,
-            User::$id,
-            User::isInGroup(U_GROUP_COMMENTS_MODERATOR),
-            $resultLimit ?: DBSIMPLE_SKIP
-        );
+        $comments = DB::Aowow()->selectAssoc(self::$previewQuery, CC_FLAG_DELETED, $where, $resultLimit);
 
         if (!$comments)
             return [];
 
-        $nFound = DB::Aowow()->selectCell(
-            substr_replace($query, 'SELECT COUNT(*) ', 0, strpos($query, 'FROM')),
-            CC_FLAG_DELETED,
-            User::$id,
-            User::isInGroup(U_GROUP_COMMENTS_MODERATOR),
-            DBSIMPLE_SKIP
-        );
+        $nFound = DB::Aowow()->selectCell(substr_replace(self::$previewQuery, 'SELECT COUNT(*) ', 0, strpos(self::$previewQuery, 'FROM')), $where, PHP_INT_MAX);
 
         foreach ($comments as $c)
             self::addSubject($c['type'], $c['typeId']);
@@ -196,15 +178,22 @@ class CommunityContent
         return array_values($comments);
     }
 
-    public static function getCommentReplies(int $commentId, int $limit = 0, ?int &$nFound = 0) : array
+    public static function getCommentReplies(int $commentId, int $resultLimit = PHP_INT_MAX, ?int &$nFound = 0) : array
     {
-        $replies = [];
-        $query = $limit > 0 ? self::$coQuery.' LIMIT '.$limit : self::$coQuery;
+        $where   = array(
+            ['c.`replyTo` = %i', $commentId],
+            ['c.`type` = %i', 0],
+            ['c.`typeId` = %i', 0]
+        );
+
+        if (!User::isInGroup(U_GROUP_COMMENTS_MODERATOR))
+            $where[] = [DB::OR, ['(c.`flags` & %i) = 0', CC_FLAG_DELETED], ['c.`userId` = %i', User::$id]];
 
         // get replies
-        if ($results = DB::Aowow()->select($query, User::$id, RATING_COMMENT, Report::MODE_COMMENT, User::$id, $commentId, 0, 0, CC_FLAG_DELETED, User::$id, User::isInGroup(U_GROUP_COMMENTS_MODERATOR)))
+        $replies = [];
+        if ($results = DB::Aowow()->selectAssoc(self::$coQuery, User::$id, RATING_COMMENT, Report::MODE_COMMENT, User::$id, $where, $resultLimit))
         {
-            $nFound = DB::Aowow()->selectCell(self::$coCountQuery, $commentId, 0, 0, CC_FLAG_DELETED, User::$id, User::isInGroup(U_GROUP_COMMENTS_MODERATOR));
+            $nFound = DB::Aowow()->selectCell(self::$coCountQuery, $where);
 
             foreach ($results as $r)
             {
@@ -239,7 +228,17 @@ class CommunityContent
     public static function getComments(int $type, int $typeId) : array
     {
 
-        $results  = DB::Aowow()->query(self::$coQuery, User::$id, RATING_COMMENT, Report::MODE_COMMENT, User::$id, 0, $type, $typeId, CC_FLAG_DELETED, User::$id, (int)User::isInGroup(U_GROUP_COMMENTS_MODERATOR));
+        $where   = array(
+            ['c.`replyTo` = %i', 0],
+            ['c.`type` = %i', $type],
+            ['c.`typeId` = %i', $typeId]
+        );
+
+        if (!User::isInGroup(U_GROUP_COMMENTS_MODERATOR))
+            $where[] = [DB::OR, [['(c.`flags` & %i) = 0', CC_FLAG_DELETED], ['c.`userId` = %i', User::$id]]];
+
+        // get replies
+        $results  = DB::Aowow()->selectAssoc(self::$coQuery, User::$id, RATING_COMMENT, Report::MODE_COMMENT, User::$id, $where, PHP_INT_MAX);
         $comments = [];
 
         // additional informations
@@ -295,32 +294,27 @@ class CommunityContent
         return $comments;
     }
 
-    public static function getVideos(int $typeOrUser = 0, int $typeId = 0, ?int &$nFound = 0, bool $dateFmt = true, int $resultLimit = 0) : array
+    public static function getVideos(int $typeOrUser = 0, int $typeId = 0, ?int &$nFound = 0, bool $dateFmt = true, int $resultLimit = PHP_INT_MAX) : array
     {
-        $videos = DB::Aowow()->select(self::$viQuery,
-            CC_FLAG_STICKY,
-            $typeOrUser < 0 ? -$typeOrUser : DBSIMPLE_SKIP,
-            $typeOrUser > 0 ?  $typeOrUser : DBSIMPLE_SKIP,
-            $typeOrUser > 0 ?  $typeId     : DBSIMPLE_SKIP,
-            CC_FLAG_APPROVED,
-            CC_FLAG_DELETED,
-            !$typeOrUser    ? 'date'       : 'pos',
-            $resultLimit ?: DBSIMPLE_SKIP
+        $where = array(
+            ['v.`status` & %i', CC_FLAG_APPROVED],
+            ['(v.`status` & %i) = 0', CC_FLAG_DELETED]
+
         );
+        if ($typeOrUser < 0)
+            $where[] = ['v.`userIdOwner` = %i', -$typeOrUser];
+        if ($typeOrUser > 0)
+        {
+            $where[] = ['v.`type` = %i', $typeOrUser];
+            $where[] = ['v.`typeId` = %i', $typeId];
+        }
+
+        $videos = DB::Aowow()->selectAssoc(self::$viQuery, CC_FLAG_STICKY, $where, $typeOrUser ? ['date' => false] : ['pos' => true], $resultLimit);
 
         if (!$videos)
             return [];
 
-        $nFound = DB::Aowow()->selectCell(
-            substr_replace(self::$viQuery, 'SELECT COUNT(*) ', 0, strpos(self::$viQuery, 'FROM')),
-            $typeOrUser < 0 ? -$typeOrUser : DBSIMPLE_SKIP,
-            $typeOrUser > 0 ?  $typeOrUser : DBSIMPLE_SKIP,
-            $typeOrUser > 0 ?  $typeId     : DBSIMPLE_SKIP,
-            CC_FLAG_APPROVED,
-            CC_FLAG_DELETED,
-            !$typeOrUser    ? 'date'       : 'pos',
-            DBSIMPLE_SKIP
-        );
+        $nFound = DB::Aowow()->selectCell(substr_replace(self::$viQuery, 'SELECT COUNT(*) ', 0, strpos(self::$viQuery, 'FROM')), $where, $typeOrUser ? ['date' => false] : ['pos' => true], PHP_INT_MAX);
 
         if ($typeOrUser <= 0)                               // not for search by type/typeId
         {
@@ -354,32 +348,31 @@ class CommunityContent
         return array_values($videos);
     }
 
-    public static function getScreenshots(int $typeOrUser = 0, int $typeId = 0, ?int &$nFound = 0, bool $dateFmt = true, int $resultLimit = 0) : array
+    public static function getScreenshots(int $typeOrUser = 0, int $typeId = 0, ?int &$nFound = 0, bool $dateFmt = true, int $resultLimit = PHP_INT_MAX) : array
     {
-        $screenshots = DB::Aowow()->select(self::$ssQuery,
+        $where = array(
+            ['s.`status` & %i', CC_FLAG_APPROVED],
+            ['(s.`status` & %i) = 0', CC_FLAG_DELETED]
+
+        );
+        if ($typeOrUser < 0)
+            $where[] = ['s.`userIdOwner` = %i', -$typeOrUser];
+        if ($typeOrUser > 0)
+        {
+            $where[] = ['s.`type` = %i', $typeOrUser];
+            $where[] = ['s.`typeId` = %i', $typeId];
+        }
+
+        $screenshots = DB::Aowow()->selectAssoc(self::$ssQuery,
             CC_FLAG_STICKY,
-            $typeOrUser < 0 ? -$typeOrUser : DBSIMPLE_SKIP,
-            $typeOrUser > 0 ?  $typeOrUser : DBSIMPLE_SKIP,
-            $typeOrUser > 0 ?  $typeId     : DBSIMPLE_SKIP,
-            CC_FLAG_APPROVED,
-            CC_FLAG_DELETED,
-            !$typeOrUser    ? 'date'       : DBSIMPLE_SKIP,
-            $resultLimit ?: DBSIMPLE_SKIP
+            $where,
+            $resultLimit
         );
 
         if (!$screenshots)
             return [];
 
-        $nFound = DB::Aowow()->selectCell(
-            substr_replace(self::$ssQuery, 'SELECT COUNT(*) ', 0, strpos(self::$ssQuery, 'FROM')),
-            $typeOrUser < 0 ? -$typeOrUser : DBSIMPLE_SKIP,
-            $typeOrUser > 0 ?  $typeOrUser : DBSIMPLE_SKIP,
-            $typeOrUser > 0 ?  $typeId     : DBSIMPLE_SKIP,
-            CC_FLAG_APPROVED,
-            CC_FLAG_DELETED,
-            !$typeOrUser    ? 'date'       : DBSIMPLE_SKIP,
-            DBSIMPLE_SKIP
-        );
+        $nFound = DB::Aowow()->selectCell(substr_replace(self::$ssQuery, 'SELECT COUNT(*) ', 0, strpos(self::$ssQuery, 'FROM')), $where, PHP_INT_MAX);
 
         if ($typeOrUser <= 0)                               // not for search by type/typeId
         {

@@ -33,13 +33,13 @@ class AdminCommentResponse extends TextResponse
         $ok = false;
         if ($this->_post['status'])                         // outdated, mark as deleted and clear other flags (sticky + outdated)
         {
-            if ($ok = DB::Aowow()->query('UPDATE ?_comments SET `flags` = ?d, `deleteUserId` = ?d, `deleteDate` = ?d WHERE `id` = ?d', CC_FLAG_DELETED, User::$id, time(), $this->_post['id']))
+            if ($ok = DB::Aowow()->qry('UPDATE ::comments SET `flags` = %i, `deleteUserId` = %i, `deleteDate` = %i WHERE `id` = %i', CC_FLAG_DELETED, User::$id, time(), $this->_post['id']))
                 if ($rep = new Report(Report::MODE_COMMENT, Report::CO_OUT_OF_DATE, $this->_post['id']))
                     $rep->close(Report::STATUS_CLOSED_SOLVED);
         }
         else                                                // up to date
         {
-            if ($ok = DB::Aowow()->query('UPDATE ?_comments SET `flags` = `flags` & ~?d WHERE `id` = ?d', CC_FLAG_OUTDATED, $this->_post['id']))
+            if ($ok = DB::Aowow()->qry('UPDATE ::comments SET `flags` = `flags` & ~%i WHERE `id` = %i', CC_FLAG_OUTDATED, $this->_post['id']))
                 if ($rep = new Report(Report::MODE_COMMENT, Report::CO_OUT_OF_DATE, $this->_post['id']))
                     $rep->close(Report::STATUS_CLOSED_WONTFIX);
         }

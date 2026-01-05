@@ -23,7 +23,7 @@ class CommentFlagreplyResponse extends TextResponse
             $this->generate404(User::isInGroup(U_GROUP_STAFF) ? 'request malformed' : '');
         }
 
-        $replyOwner = DB::Aowow()->selectCell('SELECT `userId` FROM ?_commments WHERE `id` = ?d', $this->_post['id']);
+        $replyOwner = DB::Aowow()->selectCell('SELECT `userId` FROM ::commments WHERE `id` = %i', $this->_post['id']);
         if (!$replyOwner)
         {
             trigger_error('CommentFlagreplyResponse - reply not found', E_USER_ERROR);
@@ -38,7 +38,7 @@ class CommentFlagreplyResponse extends TextResponse
         if (!$report->create('Report Reply Button Click'))
             $this->generate404('LANG.ct_resp_error'.$report->getError());
         else if (count($report->getSimilar()) >= CommunityContent::REPORT_THRESHOLD_AUTO_DELETE)
-            DB::Aowow()->query('UPDATE ?_comments SET `flags` = `flags` | ?d WHERE `id` = ?d', CC_FLAG_DELETED, $this->_post['id']);
+            DB::Aowow()->qry('UPDATE ::comments SET `flags` = `flags` | %i WHERE `id` = %i', CC_FLAG_DELETED, $this->_post['id']);
     }
 }
 

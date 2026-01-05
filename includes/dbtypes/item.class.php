@@ -12,7 +12,7 @@ class ItemList extends DBTypeList
 
     public static int    $type       = Type::ITEM;
     public static string $brickFile  = 'item';
-    public static string $dataTable  = '?_items';
+    public static string $dataTable  = '::items';
     public        array  $json       = [];
     public        array  $jsonStats  = [];
     public        array  $rndEnchIds = [];
@@ -25,14 +25,14 @@ class ItemList extends DBTypeList
     private array $enhanceR       = [];
     private array $relEnchant     = [];
 
-    protected string $queryBase  = 'SELECT i.*, i.`block` AS "tplBlock", i.`armor` AS tplArmor, i.`dmgMin1` AS "tplDmgMin1", i.`dmgMax1` AS "tplDmgMax1", i.`id` AS ARRAY_KEY, i.`id` AS "id" FROM ?_items i';
+    protected string $queryBase  = 'SELECT i.*, i.`block` AS "tplBlock", i.`armor` AS tplArmor, i.`dmgMin1` AS "tplDmgMin1", i.`dmgMax1` AS "tplDmgMax1", i.`id` AS ARRAY_KEY, i.`id` AS "id" FROM ::items i';
     protected array  $queryOpts  = array(                   // 3 => Type::ITEM
                         'i'   => [['is', 'src', 'ic'], 'o' => 'i.`quality` DESC, i.`itemLevel` DESC'],
-                        'ic'  => ['j' => ['?_icons      `ic`  ON `ic`.`id` = `i`.`iconId`', true], 's' => ', ic.`name` AS "iconString"'],
-                        'is'  => ['j' => ['?_item_stats `is`  ON `is`.`type` = 3 AND `is`.`typeId` = `i`.`id`', true], 's' => ', `is`.*'],
-                        's'   => ['j' => ['?_spell      `s`   ON `s`.`effect1CreateItemId` = `i`.`id`', true], 'g' => 'i.`id`'],
-                        'e'   => ['j' => ['?_events     `e`   ON `e`.`id` = `i`.`eventId`', true], 's' => ', e.`holidayId`'],
-                        'src' => ['j' => ['?_source     `src` ON `src`.`type` = 3 AND `src`.`typeId` = `i`.`id`', true], 's' => ', `moreType`, `moreTypeId`, `moreZoneId`, `moreMask`, `src1`, `src2`, `src3`, `src4`, `src5`, `src6`, `src7`, `src8`, `src9`, `src10`, `src11`, `src12`, `src13`, `src14`, `src15`, `src16`, `src17`, `src18`, `src19`, `src20`, `src21`, `src22`, `src23`, `src24`']
+                        'ic'  => ['j' => ['::icons      `ic`  ON `ic`.`id` = `i`.`iconId`', true], 's' => ', ic.`name` AS "iconString"'],
+                        'is'  => ['j' => ['::item_stats `is`  ON `is`.`type` = 3 AND `is`.`typeId` = `i`.`id`', true], 's' => ', `is`.*'],
+                        's'   => ['j' => ['::spell      `s`   ON `s`.`effect1CreateItemId` = `i`.`id`', true], 'g' => 'i.`id`'],
+                        'e'   => ['j' => ['::events     `e`   ON `e`.`id` = `i`.`eventId`', true], 's' => ', e.`holidayId`'],
+                        'src' => ['j' => ['::source     `src` ON `src`.`type` = 3 AND `src`.`typeId` = `i`.`id`', true], 's' => ', `moreType`, `moreTypeId`, `moreZoneId`, `moreMask`, `src1`, `src2`, `src3`, `src4`, `src5`, `src6`, `src7`, `src8`, `src9`, `src10`, `src11`, `src12`, `src13`, `src14`, `src15`, `src16`, `src17`, `src18`, `src19`, `src20`, `src21`, `src22`, `src23`, `src24`']
                     );
 
     public function __construct(array $conditions = [], array $miscData = [])
@@ -85,29 +85,28 @@ class ItemList extends DBTypeList
 
         if (empty($this->vendors))
         {
+            $itemIds = array_keys($this->templates);
+            if (!empty($filter[Type::NPC]) && is_array($filter[Type::NPC]))
+                $itemIds = array_intersect($itemIds, $filter[Type::NPC]);
+
             $itemz      = [];
             $xCostData  = [];
-            $rawEntries = DB::World()->select(
-               'SELECT   nv.`item`,        nv.`entry`,              0  AS "eventId",    nv.`maxcount`,   nv.`extendedCost`,   nv.`incrtime`
+            $rawEntries = DB::World()->selectAssoc(
+               'SELECT  nv.`item`,            nv.`entry`,              0  AS "eventId",    nv.`maxcount`,   nv.`extendedCost`,   nv.`incrtime`
                 FROM    npc_vendor nv
-                WHERE { nv.`entry` IN (?a) AND } nv.`item` IN (?a)
+                WHERE   nv.`item` IN %in
                   UNION
-                SELECT   nv2.`item`,      nv1.`entry`,              0  AS "eventId",   nv2.`maxcount`,  nv2.`extendedCost`,  nv2.`incrtime`
+                SELECT  nv2.`item`,          nv1.`entry`,              0  AS "eventId",   nv2.`maxcount`,  nv2.`extendedCost`,  nv2.`incrtime`
                 FROM    npc_vendor   nv1
-                JOIN    npc_vendor   nv2 ON -nv1.`item` = nv2.`entry` { AND nv1.`entry` IN (?a) }
-                WHERE   nv2.`item` IN (?a)
+                JOIN    npc_vendor   nv2 ON -nv1.`item` = nv2.`entry`
+                WHERE   nv2.`item` IN %in
                   UNION
-                SELECT genv.`item`, c.`id` AS "entry", ge.`eventEntry` AS "eventId",  genv.`maxcount`, genv.`extendedCost`, genv.`incrtime`
+                SELECT    genv.`item`, c.`id` AS "entry", ge.`eventEntry` AS "eventId",  genv.`maxcount`, genv.`extendedCost`, genv.`incrtime`
                 FROM      game_event_npc_vendor genv
                 LEFT JOIN game_event ge ON genv.`eventEntry` = ge.`eventEntry`
                 JOIN      creature c ON c.`guid` = genv.`guid`
-                WHERE   { c.`id` IN (?a) AND } genv.`item` IN (?a)',
-                empty($filter[Type::NPC]) || !is_array($filter[Type::NPC]) ? DBSIMPLE_SKIP : $filter[Type::NPC],
-                array_keys($this->templates),
-                empty($filter[Type::NPC]) || !is_array($filter[Type::NPC]) ? DBSIMPLE_SKIP : $filter[Type::NPC],
-                array_keys($this->templates),
-                empty($filter[Type::NPC]) || !is_array($filter[Type::NPC]) ? DBSIMPLE_SKIP : $filter[Type::NPC],
-                array_keys($this->templates)
+                WHERE     genv.`item` IN %in',
+                $itemIds, $itemIds, $itemIds
             );
 
             foreach ($rawEntries as $costEntry)
@@ -122,7 +121,7 @@ class ItemList extends DBTypeList
             }
 
             if ($xCostData)
-                $xCostData = DB::Aowow()->select('SELECT *, `id` AS ARRAY_KEY FROM ?_itemextendedcost WHERE `id` IN (?a)', $xCostData);
+                $xCostData = DB::Aowow()->selectAssoc('SELECT *, `id` AS ARRAY_KEY FROM ::itemextendedcost WHERE `id` IN %in', $xCostData);
 
             $cItems = [];
             foreach ($itemz as $k => $vendors)
@@ -540,7 +539,7 @@ class ItemList extends DBTypeList
                     if ($this->enhanceR['enchantId'.$i] <= 0)
                         continue;
 
-                    $enchant = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantment WHERE `id` = ?d', $this->enhanceR['enchantId'.$i]);
+                    $enchant = DB::Aowow()->selectRow('SELECT * FROM ::itemenchantment WHERE `id` = %i', $this->enhanceR['enchantId'.$i]);
                     if ($this->enhanceR['allocationPct'.$i] > 0)
                     {
                         $amount = intVal($this->enhanceR['allocationPct'.$i] * $this->generateEnchSuffixFactor());
@@ -574,17 +573,17 @@ class ItemList extends DBTypeList
         if (($_flags & ITEM_FLAG_HEROIC) && $_quality == ITEM_QUALITY_EPIC)
             $x .= '<br /><span class="q2">'.Lang::item('heroic').'</span>';
 
-        // requires map (todo: reparse ?_zones for non-conflicting data; generate Link to zone)
+        // requires map (todo: reparse :zones for non-conflicting data; generate Link to zone)
         if ($_ = $this->curTpl['map'])
         {
-            $map = DB::Aowow()->selectRow('SELECT * FROM ?_zones WHERE `mapId` = ?d LIMIT 1', $_);
+            $map = DB::Aowow()->selectRow('SELECT * FROM ::zones WHERE `mapId` = %i LIMIT 1', $_);
             $x .= '<br /><a href="?zone='.$_.'" class="q1">'.Util::localizedString($map, 'name').'</a>';
         }
 
         // requires area
         if ($this->curTpl['area'])
         {
-            $area = DB::Aowow()->selectRow('SELECT * FROM ?_zones WHERE `id` = ?d LIMIT 1', $this->curTpl['area']);
+            $area = DB::Aowow()->selectRow('SELECT * FROM ::zones WHERE `id` = %i LIMIT 1', $this->curTpl['area']);
             $x .= '<br />'.Util::localizedString($area, 'name');
         }
 
@@ -608,13 +607,13 @@ class ItemList extends DBTypeList
             $x .= '<br />'.Lang::item('uniqueEquipped', 0);
         else if ($this->curTpl['itemLimitCategory'])
         {
-            $limit = DB::Aowow()->selectRow("SELECT * FROM ?_itemlimitcategory WHERE `id` = ?", $this->curTpl['itemLimitCategory']);
+            $limit = DB::Aowow()->selectRow('SELECT * FROM ::itemlimitcategory WHERE `id` = %i', $this->curTpl['itemLimitCategory']);
             $x .= '<br />'.sprintf(Lang::item($limit['isGem'] ? 'uniqueEquipped' : 'unique', 2), Util::localizedString($limit, 'name'), $limit['count']);
         }
 
         // required holiday
         if ($eId = $this->curTpl['eventId'])
-            if ($hName = DB::Aowow()->selectRow('SELECT h.* FROM ?_holidays h JOIN ?_events e ON e.`holidayId` = h.`id` WHERE e.`id` = ?d', $eId))
+            if ($hName = DB::Aowow()->selectRow('SELECT h.* FROM ::holidays h JOIN ::events e ON e.`holidayId` = h.`id` WHERE e.`id` = %i', $eId))
                 $x .= '<br />'.sprintf(Lang::game('requires'), '<a href="?event='.$eId.'" class="q1">'.Util::localizedString($hName, 'name').'</a>');
 
         // item begins a quest
@@ -711,7 +710,7 @@ class ItemList extends DBTypeList
         // Item is a gem (don't mix with sockets)
         if ($geId = $this->curTpl['gemEnchantmentId'])
         {
-            $gemEnch = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantment WHERE `id` = ?d', $geId);
+            $gemEnch = DB::Aowow()->selectRow('SELECT * FROM ::itemenchantment WHERE `id` = %i', $geId);
             $x .= '<span class="q1"><a href="?enchantment='.$geId.'">'.Util::localizedString($gemEnch, 'name').'</a></span><br />';
 
             // activation conditions for meta gems
@@ -768,7 +767,7 @@ class ItemList extends DBTypeList
         // Enchantment
         if (isset($enhance['e']))
         {
-            if ($enchText = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantment WHERE `id` = ?', $enhance['e']))
+            if ($enchText = DB::Aowow()->selectRow('SELECT * FROM ::itemenchantment WHERE `id` = %s', $enhance['e']))
                 $x .= '<span class="q2"><!--e-->'.Util::localizedString($enchText, 'name').'</span><br />';
             else
             {
@@ -782,12 +781,12 @@ class ItemList extends DBTypeList
         // Sockets w/ Gems
         if (!empty($enhance['g']))
         {
-            $gems = DB::Aowow()->select(
+            $gems = DB::Aowow()->selectAssoc(
                'SELECT it.`id` AS ARRAY_KEY, ic.`name` AS "iconString", ae.*, it.`gemColorMask` AS "colorMask"
-                FROM   ?_items it
-                JOIN   ?_itemenchantment ae ON ae.`id` = it.`gemEnchantmentId`
-                JOIN   ?_icons ic ON ic.`id` = it.`iconId`
-                WHERE  it.`id` IN (?a)',
+                FROM   ::items it
+                JOIN   ::itemenchantment ae ON ae.`id` = it.`gemEnchantmentId`
+                JOIN   ::icons ic ON ic.`id` = it.`iconId`
+                WHERE  it.`id` IN %in',
                 $enhance['g']
             );
 
@@ -849,7 +848,7 @@ class ItemList extends DBTypeList
 
         if ($_ = $this->curTpl['socketBonus'])
         {
-            $sbonus = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantment WHERE `id` = ?d', $_);
+            $sbonus = DB::Aowow()->selectRow('SELECT * FROM ::itemenchantment WHERE `id` = %i', $_);
             $x .= '<span class="q'.($hasMatch ? '2' : '0').'">'.Lang::item('socketBonus', ['<a href="?enchantment='.$_.'">'.Util::localizedString($sbonus, 'name').'</a>']).'</span><br />';
         }
 
@@ -1033,10 +1032,10 @@ class ItemList extends DBTypeList
                     }
                 }
 
-                $pieces = DB::Aowow()->select(
+                $pieces = DB::Aowow()->selectAssoc(
                    'SELECT   b.`id` AS ARRAY_KEY, b.`name_loc0`, b.`name_loc2`, b.`name_loc3`, b.`name_loc4`, b.`name_loc6`, b.`name_loc8`, GROUP_CONCAT(a.`id` SEPARATOR ":") AS "equiv"
-                    FROM     ?_items a, ?_items b
-                    WHERE    a.`slotBak` = b.`slotBak` AND a.`itemset` = b.`itemset` AND b.`id` IN (?a)
+                    FROM     ::items a, ::items b
+                    WHERE    a.`slotBak` = b.`slotBak` AND a.`itemset` = b.`itemset` AND b.`id` IN %in
                     GROUP BY b.`id`',
                     array_keys($itemset->pieceToSet)
                 );
@@ -1212,8 +1211,8 @@ class ItemList extends DBTypeList
     {
         // is it available for this item? .. does it even exist?!
         if (empty($this->enhanceR))
-            if (DB::World()->selectCell('SELECT 1 FROM item_enchantment_template WHERE `entry` = ?d AND `ench` = ?d', abs($this->getField('randomEnchant')), abs($randId)))
-                if ($_ = DB::Aowow()->selectRow('SELECT * FROM ?_itemrandomenchant WHERE `id` = ?d', $randId))
+            if (DB::World()->selectCell('SELECT 1 FROM item_enchantment_template WHERE `entry` = %i AND `ench` = %i', abs($this->getField('randomEnchant')), abs($randId)))
+                if ($_ = DB::Aowow()->selectRow('SELECT * FROM ::itemrandomenchant WHERE `id` = %i', $randId))
                     $this->enhanceR = $_;
 
         return !empty($this->enhanceR);
@@ -1223,7 +1222,7 @@ class ItemList extends DBTypeList
     public function generateEnchSuffixFactor() : float
     {
         if (empty($this->randPropPoints[$this->curTpl['itemLevel']]))
-            $this->randPropPoints[$this->curTpl['itemLevel']] = DB::Aowow()->selectRow('SELECT * FROM ?_itemrandomproppoints WHERE `id` = ?', $this->curTpl['itemLevel']);
+            $this->randPropPoints[$this->curTpl['itemLevel']] = DB::Aowow()->selectRow('SELECT * FROM ::itemrandomproppoints WHERE `id` = %s', $this->curTpl['itemLevel']);
 
         $rpp = &$this->randPropPoints[$this->curTpl['itemLevel']];
 
@@ -1288,8 +1287,7 @@ class ItemList extends DBTypeList
 
         if ($enchantments)
         {
-            $eStats = DB::Aowow()->select('SELECT *, `typeId` AS ARRAY_KEY FROM ?_item_stats WHERE `type` = ?d AND `typeId` IN (?a)', Type::ENCHANTMENT, array_keys($enchantments));
-            Util::checkNumeric($eStats);
+            $eStats = DB::Aowow()->selectAssoc('SELECT *, `typeId` AS ARRAY_KEY FROM ::item_stats WHERE `type` = %i AND `typeId` IN %in', Type::ENCHANTMENT, array_keys($enchantments));
 
             // and merge enchantments back
             foreach ($enchantments as $eId => $items)
@@ -1333,8 +1331,8 @@ class ItemList extends DBTypeList
                'SELECT `effect1Id`, `effect1TriggerSpell`, `effect1AuraId`, `effect1MiscValue`, `effect1BasePoints`, `effect1DieSides`,
                        `effect2Id`, `effect2TriggerSpell`, `effect2AuraId`, `effect2MiscValue`, `effect2BasePoints`, `effect2DieSides`,
                        `effect3Id`, `effect3TriggerSpell`, `effect3AuraId`, `effect3MiscValue`, `effect3BasePoints`, `effect3DieSides`
-                FROM   ?_spell
-                WHERE  `id` = ?d',
+                FROM   ::spell
+                WHERE  `id` = %i',
                 $this->curTpl['spellId'.$h]
             ))
                 $onUseStats->fromSpell($spell);
@@ -1393,7 +1391,7 @@ class ItemList extends DBTypeList
             return 0.0;
 
         $subClasses = [ITEM_SUBCLASS_MISC_WEAPON];
-        $weaponTypeMask = DB::Aowow()->selectCell('SELECT `weaponTypeMask` FROM ?_classes WHERE `id` = ?d', ChrClass::DRUID->value);
+        $weaponTypeMask = DB::Aowow()->selectCell('SELECT `weaponTypeMask` FROM ::classes WHERE `id` = %i', ChrClass::DRUID->value);
         if ($weaponTypeMask)
             for ($i = 0; $i < 21; $i++)
                 if ($weaponTypeMask & (1 << $i))
@@ -1483,12 +1481,12 @@ class ItemList extends DBTypeList
             if ($mask & (1 << $i))
                 $field = Util::$ssdMaskFields[$i];
 
-        return $field ? DB::Aowow()->selectCell('SELECT ?# FROM ?_scalingstatvalues WHERE `id` = ?d', $field, $this->ssd[$this->id]['maxLevel']) : 0;
+        return $field ? DB::Aowow()->selectCell('SELECT %n FROM ::scalingstatvalues WHERE `id` = %i', $field, $this->ssd[$this->id]['maxLevel']) : 0;
     }
 
     private function initScalingStats() : void
     {
-        $this->ssd[$this->id] = DB::Aowow()->selectRow('SELECT * FROM ?_scalingstatdistribution WHERE `id` = ?d', $this->curTpl['scalingStatDistribution']);
+        $this->ssd[$this->id] = DB::Aowow()->selectRow('SELECT * FROM ::scalingstatdistribution WHERE `id` = %i', $this->curTpl['scalingStatDistribution']);
 
         if (!$this->ssd[$this->id])
             return;
@@ -1545,9 +1543,9 @@ class ItemList extends DBTypeList
             return;
 
         // remember: id < 0: randomSuffix; id > 0: randomProperty
-        $subItemTpls = DB::World()->select(
-           'SELECT CAST( `entry` AS SIGNED) AS ARRAY_KEY, CAST( `ench` AS SIGNED) AS ARRAY_KEY2, `chance` FROM item_enchantment_template WHERE `entry` IN (?a) UNION
-            SELECT CAST(-`entry` AS SIGNED) AS ARRAY_KEY, CAST(-`ench` AS SIGNED) AS ARRAY_KEY2, `chance` FROM item_enchantment_template WHERE `entry` IN (?a)',
+        $subItemTpls = DB::World()->selectAssoc(
+           'SELECT CAST( `entry` AS SIGNED) AS ARRAY_KEY, CAST( `ench` AS SIGNED) AS ARRAY_KEY2, `chance` FROM item_enchantment_template WHERE `entry` IN %in UNION
+            SELECT CAST(-`entry` AS SIGNED) AS ARRAY_KEY, CAST(-`ench` AS SIGNED) AS ARRAY_KEY2, `chance` FROM item_enchantment_template WHERE `entry` IN %in',
             array_keys(array_filter($subItemIds, fn($v) => $v > 0)) ?: [0],
             array_keys(array_filter($subItemIds, fn($v) => $v < 0)) ?: [0]
         );
@@ -1559,7 +1557,7 @@ class ItemList extends DBTypeList
         if (!$randIds)
             return;
 
-        $randEnchants = DB::Aowow()->select('SELECT *, `id` AS ARRAY_KEY FROM ?_itemrandomenchant WHERE `id` IN (?a)', $randIds);
+        $randEnchants = DB::Aowow()->selectAssoc('SELECT *, `id` AS ARRAY_KEY FROM ::itemrandomenchant WHERE `id` IN %in', $randIds);
         $enchIds = array_unique(array_merge(
             array_column($randEnchants, 'enchantId1'),
             array_column($randEnchants, 'enchantId2'),
@@ -1750,8 +1748,8 @@ class ItemListFilter extends Filter
     public const /* int */ GROUP_BY_SOURCE = 3;
 
     private array  $ubFilter     = [];                      // usable-by - limit weapon/armor selection per CharClass - itemClass => available itemsubclasses
-    private string $extCostQuery = 'SELECT `item` FROM npc_vendor            WHERE `extendedCost` IN (?a) UNION
-                                    SELECT `item` FROM game_event_npc_vendor WHERE `extendedCost` IN (?a)';
+    private string $extCostQuery = 'SELECT `item` FROM npc_vendor            WHERE `extendedCost` IN %in UNION
+                                    SELECT `item` FROM game_event_npc_vendor WHERE `extendedCost` IN %in';
 
     protected string $type  = 'items';
     protected static array $enums = array(
@@ -2030,7 +2028,7 @@ class ItemListFilter extends Filter
         }
 
         if (count($this->wtCnd) > 1)
-            array_unshift($this->wtCnd, 'OR');
+            array_unshift($this->wtCnd, DB::OR);
         else if (count($this->wtCnd) == 1)
             $this->wtCnd = $this->wtCnd[0];
 
@@ -2050,7 +2048,7 @@ class ItemListFilter extends Filter
     {
         if (!$this->ubFilter)
         {
-            $classes = DB::Aowow()->select('SELECT `id` AS ARRAY_KEY, `weaponTypeMask` AS "0", `armorTypeMask` AS "1" FROM ?_classes');
+            $classes = DB::Aowow()->selectAssoc('SELECT `id` AS ARRAY_KEY, `weaponTypeMask` AS "0", `armorTypeMask` AS "1" FROM ::classes');
             foreach ($classes as $cId => [$weaponTypeMask, $armorTypeMask])
             {
                 // preselect misc subclasses
@@ -2074,7 +2072,7 @@ class ItemListFilter extends Filter
         $parts = [];
         $_v    = $this->values;
 
-        // weights
+        // weights [list]
         if ($_v['wt'] && $_v['wtv'])
         {
             // gm - gem quality (qualityId)
@@ -2087,10 +2085,10 @@ class ItemListFilter extends Filter
                 $this->fiExtraCols[] = $_;
         }
 
-        // upgrade for [form only]
+        // upgrade for [list]
         if ($_v['upg'])
         {
-            if ($this->upgrades = DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, `slot` FROM ?_items WHERE `class` IN (?a) AND `id` IN (?a)', [ITEM_CLASS_WEAPON, ITEM_CLASS_GEM, ITEM_CLASS_ARMOR], $_v['upg']))
+            if ($this->upgrades = DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, `slot` FROM ::items WHERE `class` IN %in AND `id` IN %in', [ITEM_CLASS_WEAPON, ITEM_CLASS_GEM, ITEM_CLASS_ARMOR], $_v['upg']))
                 $parts[] = ['slot', $this->upgrades];
             else
                 $_v['upg'] = null;
@@ -2101,17 +2099,17 @@ class ItemListFilter extends Filter
             if ($_ = $this->buildMatchLookup(['name_loc'.Lang::getLocale()->value]))
                 $parts[] = $_;
 
-        // usable-by (not excluded by requiredClass && armor or weapons match mask from ?_classes)
+        // usable-by (not excluded by requiredClass && armor or weapons match mask from ::classes)
         if ($_v['ub'])
         {
             $parts[] = array(
-                'AND',
-                ['OR', ['requiredClass', 0], ['requiredClass', $this->list2Mask((array)$_v['ub']), '&']],
+                DB::AND,
+                [DB::OR, ['requiredClass', 0], ['requiredClass', $this->list2Mask((array)$_v['ub']), '&']],
                 [
-                    'OR',
+                    DB::OR,
                     ['class', [ITEM_CLASS_WEAPON, ITEM_CLASS_ARMOR], '!'],
-                    ['AND', ['class', ITEM_CLASS_WEAPON], ['subclassbak', $this->ubFilter[$_v['ub']][ITEM_CLASS_WEAPON]]],
-                    ['AND', ['class', ITEM_CLASS_ARMOR],  ['subclassbak', $this->ubFilter[$_v['ub']][ITEM_CLASS_ARMOR]]]
+                    [DB::AND, ['class', ITEM_CLASS_WEAPON], ['subclassbak', $this->ubFilter[$_v['ub']][ITEM_CLASS_WEAPON]]],
+                    [DB::AND, ['class', ITEM_CLASS_ARMOR],  ['subclassbak', $this->ubFilter[$_v['ub']][ITEM_CLASS_ARMOR]]]
                 ]
             );
         }
@@ -2133,12 +2131,11 @@ class ItemListFilter extends Filter
         {
             $parts[] = match ($_v['si'])
             {
-                // in theory an item could be requiring orc|nightelf etc. and would then be SIDE_BOTH without cleanly fitting the filters below, but in that case; WTF are you doing?!
-                SIDE_BOTH     => ['AND', [['flagsExtra', 0x3, '&'], [0, 3]], ['requiredRace', 0]],
-               -SIDE_HORDE    => ['OR',  [['flagsExtra', 0x3, '&'], 1],      ['requiredRace', ChrRace::MASK_HORDE, '&']],
-               -SIDE_ALLIANCE => ['OR',  [['flagsExtra', 0x3, '&'], 2],      ['requiredRace', ChrRace::MASK_ALLIANCE, '&']],
-                SIDE_HORDE    => ['AND', [['flagsExtra', 0x3, '&'], [0, 1]], ['OR',  ['requiredRace', 0], ['requiredRace', ChrRace::MASK_HORDE, '&']]],
-                SIDE_ALLIANCE => ['AND', [['flagsExtra', 0x3, '&'], [0, 2]], ['OR',  ['requiredRace', 0], ['requiredRace', ChrRace::MASK_ALLIANCE, '&']]],
+                SIDE_BOTH     => [DB::OR,  [['flagsExtra', 0x3, '&'], [0, 3]], ['requiredRace', 0]],
+               -SIDE_HORDE    => [DB::OR,  [['flagsExtra', 0x3, '&'], 1],      ['requiredRace', ChrRace::MASK_HORDE, '&']],
+               -SIDE_ALLIANCE => [DB::OR,  [['flagsExtra', 0x3, '&'], 2],      ['requiredRace', ChrRace::MASK_ALLIANCE, '&']],
+                SIDE_HORDE    => [DB::AND, [['flagsExtra', 0x3, '&'], [0, 1]], [DB::OR, ['requiredRace', 0], ['requiredRace', ChrRace::MASK_HORDE, '&']]],
+                SIDE_ALLIANCE => [DB::AND, [['flagsExtra', 0x3, '&'], [0, 2]], [DB::OR, ['requiredRace', 0], ['requiredRace', ChrRace::MASK_ALLIANCE, '&']]],
             };
         }
 
@@ -2187,7 +2184,7 @@ class ItemListFilter extends Filter
         return match ($crs)
         {
             // Meta, Red, Yellow, Blue
-            1, 2, 3, 4 => ['OR', ['socketColor1', 1 << ($crs - 1)], ['socketColor2', 1 << ($crs - 1)], ['socketColor3', 1 << ($crs - 1)]],
+            1, 2, 3, 4 => [DB::OR, ['socketColor1', 1 << ($crs - 1)], ['socketColor2', 1 << ($crs - 1)], ['socketColor3', 1 << ($crs - 1)]],
             5 => ['is.nsockets', 0, '!'],                   // Yes
             6 => ['is.nsockets', 0],                        // No
             default => null
@@ -2199,7 +2196,7 @@ class ItemListFilter extends Filter
         return match ($crs)
         {
             // Meta, Red, Yellow, Blue
-            1, 2, 3, 4 => ['AND', ['gemEnchantmentId', 0, '!'], ['gemColorMask', 1 << ($crs - 1), '&']],
+            1, 2, 3, 4 => [DB::AND, ['gemEnchantmentId', 0, '!'], ['gemColorMask', 1 << ($crs - 1), '&']],
             5 => ['gemEnchantmentId', 0, '!'],              // Yes
             6 => ['gemEnchantmentId', 0],                   // No
             default => null
@@ -2211,7 +2208,7 @@ class ItemListFilter extends Filter
         return match ($crs)
         {
             // major, minor
-            1, 2 => ['AND', ['class', ITEM_CLASS_GLYPH], ['subSubClass', $crs]],
+            1, 2 => [DB::AND, ['class', ITEM_CLASS_GLYPH], ['subSubClass', $crs]],
             default => null
         };
     }
@@ -2221,8 +2218,8 @@ class ItemListFilter extends Filter
         $n = preg_replace(parent::PATTERN_NAME, '', $crv);
         $n = $this->transformToken($n, false);
 
-        $randIds = DB::Aowow()->select('SELECT `id` AS ARRAY_KEY, ABS(`id`) AS `id`, name_loc?d, `name_loc0` FROM ?_itemrandomenchant WHERE name_loc?d LIKE ?', Lang::getLocale()->value, Lang::getLocale()->value, $n);
-        $tplIds  = $randIds ? DB::World()->select('SELECT `entry`, `ench` FROM item_enchantment_template WHERE `ench` IN (?a)', array_column($randIds, 'id')) : [];
+        $randIds = DB::Aowow()->selectAssoc('SELECT `id` AS ARRAY_KEY, ABS(`id`) AS `id`, name_loc%i, `name_loc0` FROM ::itemrandomenchant WHERE name_loc%i LIKE %~like~', Lang::getLocale()->value, Lang::getLocale()->value, $n);
+        $tplIds  = $randIds ? DB::World()->selectAssoc('SELECT `entry`, `ench` FROM item_enchantment_template WHERE `ench` IN %in', array_column($randIds, 'id')) : [];
         foreach ($tplIds as &$set)
         {
             $z = array_column($randIds, 'id');
@@ -2254,7 +2251,7 @@ class ItemListFilter extends Filter
         $this->fiExtraCols[] = $cr;
 
         $items = [0];
-        if ($costs = DB::Aowow()->selectCol('SELECT `id` FROM ?_itemextendedcost WHERE `reqPersonalrating` '.$crs.' '.$crv))
+        if ($costs = DB::Aowow()->selectCol('SELECT `id` FROM ::itemextendedcost WHERE `reqPersonalrating` '.$crs.' '.$crv))
             $items = DB::World()->selectCol($this->extCostQuery, $costs, $costs);
 
         return ['id', $items];
@@ -2279,7 +2276,7 @@ class ItemListFilter extends Filter
         if (!$this->checkInput(parent::V_RANGE, [SPELL_SCHOOL_NORMAL, SPELL_SCHOOL_ARCANE], $crs))
             return null;
 
-        return ['OR', ['dmgType1', $crs], ['dmgType2', $crs]];
+        return [DB::OR, ['dmgType1', $crs], ['dmgType2', $crs]];
     }
 
     protected function cbArmorBonus(int $cr, int $crs, string $crv) : ?array
@@ -2288,7 +2285,7 @@ class ItemListFilter extends Filter
             return null;
 
         $this->fiExtraCols[] = $cr;
-        return ['AND', ['armordamagemodifier', $crv, $crs], ['class', ITEM_CLASS_ARMOR]];
+        return [DB::AND, ['armordamagemodifier', $crv, $crs], ['class', ITEM_CLASS_ARMOR]];
     }
 
     protected function cbCraftedByProf(int $cr, int $crs, string $crv) : ?array
@@ -2308,7 +2305,7 @@ class ItemListFilter extends Filter
     protected function cbQuestRewardIn(int $cr, int $crs, string $crv) : ?array
     {
         if (in_array($crs, self::$enums[$cr]))
-            return ['AND', ['src.src4', null, '!'], ['src.moreZoneId', $crs]];
+            return [DB::AND, ['src.src4', null, '!'], ['src.moreZoneId', $crs]];
         else if ($crs == parent::ENUM_ANY)
             return ['src.src4', null, '!'];                 // well, this seems a bit redundant..
 
@@ -2318,7 +2315,7 @@ class ItemListFilter extends Filter
     protected function cbDropsInZone(int $cr, int $crs, string $crv) : ?array
     {
         if (in_array($crs, self::$enums[$cr]))
-            return ['AND', ['src.src2', null, '!'], ['src.moreZoneId', $crs]];
+            return [DB::AND, ['src.src2', null, '!'], ['src.moreZoneId', $crs]];
         else if ($crs == parent::ENUM_ANY)
             return ['src.src2', null, '!'];                 // well, this seems a bit redundant..
 
@@ -2328,9 +2325,9 @@ class ItemListFilter extends Filter
     protected function cbDropsInInstance(int $cr, int $crs, string $crv, int $moreFlag, int $modeBit) : ?array
     {
         if (in_array($crs, self::$enums[$cr]))
-            return ['AND', ['src.src2', $modeBit, '&'], ['src.moreMask', $moreFlag, '&'], ['src.moreZoneId', $crs]];
+            return [DB::AND, ['src.src2', $modeBit, '&'], ['src.moreMask', $moreFlag, '&'], ['src.moreZoneId', $crs]];
         else if ($crs == parent::ENUM_ANY)
-            return ['AND', ['src.src2', $modeBit, '&'], ['src.moreMask', $moreFlag, '&']];
+            return [DB::AND, ['src.src2', $modeBit, '&'], ['src.moreMask', $moreFlag, '&']];
 
         return null;
     }
@@ -2345,7 +2342,7 @@ class ItemListFilter extends Filter
             return null;
 
         $costs = DB::Aowow()->selectCol(
-           'SELECT `id` FROM ?_itemextendedcost WHERE `reqItemId1` IN (?a) OR `reqItemId2` IN (?a) OR `reqItemId3` IN (?a) OR `reqItemId4` IN (?a) OR `reqItemId5` IN (?a)',
+           'SELECT `id` FROM ::itemextendedcost WHERE `reqItemId1` IN %in OR `reqItemId2` IN %in OR `reqItemId3` IN %in OR `reqItemId4` IN %in OR `reqItemId5` IN %in',
             $_, $_, $_, $_, $_
         );
         if ($items = DB::World()->selectCol($this->extCostQuery, $costs, $costs))
@@ -2359,7 +2356,7 @@ class ItemListFilter extends Filter
         if (!Util::checkNumeric($crv, NUM_CAST_INT))
             return null;
 
-        if ($iIds = DB::World()->selectCol('SELECT `item` FROM npc_vendor WHERE `entry` = ?d UNION SELECT `item` FROM game_event_npc_vendor v JOIN creature c ON c.`guid` = v.`guid` WHERE c.`id` = ?d', $crv, $crv))
+        if ($iIds = DB::World()->selectCol('SELECT `item` FROM npc_vendor WHERE `entry` = %i UNION SELECT `item` FROM game_event_npc_vendor v JOIN creature c ON c.`guid` = v.`guid` WHERE c.`id` = %i', $crv, $crv))
             return ['i.id', $iIds];
         else
             return [0];
@@ -2374,7 +2371,7 @@ class ItemListFilter extends Filter
         {
             // todo: do something sensible..
             // // todo (med): get the avgbuyout into the listview
-            // if ($_ = DB::Characters()->select('SELECT ii.itemEntry AS ARRAY_KEY, AVG(ah.buyoutprice / ii.count) AS buyout FROM auctionhouse ah JOIN item_instance ii ON ah.itemguid = ii.guid GROUP BY ii.itemEntry HAVING buyout '.$crs.' ?f', $c[1]))
+            // if ($_ = DB::Characters()->selectAssoc('SELECT ii.itemEntry AS ARRAY_KEY, AVG(ah.buyoutprice / ii.count) AS buyout FROM auctionhouse ah JOIN item_instance ii ON ah.itemguid = ii.guid GROUP BY ii.itemEntry HAVING buyout '.$crs.' %f', $c[1]))
                 // return ['i.id', array_keys($_)];
             // else
                 // return [0];
@@ -2390,7 +2387,7 @@ class ItemListFilter extends Filter
             return null;
 
         $this->fiExtraCols[] = $cr;
-        return ['AND', ['flags', ITEM_FLAG_OPENABLE, '&'], ['((minMoneyLoot + maxMoneyLoot) / 2)', $crv, $crs]];
+        return [DB::AND, ['flags', ITEM_FLAG_OPENABLE, '&'], ['((minMoneyLoot + maxMoneyLoot) / 2)', $crv, $crs]];
     }
 
     protected function cbCooldown(int $cr, int $crs, string $crv) : ?array
@@ -2404,12 +2401,12 @@ class ItemListFilter extends Filter
         $this->extraOpts['is']['s'][] = ', GREATEST(`spellCooldown1`, `spellCooldown2`, `spellCooldown3`, `spellCooldown4`, `spellCooldown5`) AS "cooldown"';
 
         return [
-            'OR',
-            ['AND', ['spellTrigger1', SPELL_TRIGGER_USE], ['spellId1', 0, '!'], ['spellCooldown1', 0, '>'], ['spellCooldown1', $crv, $crs]],
-            ['AND', ['spellTrigger2', SPELL_TRIGGER_USE], ['spellId2', 0, '!'], ['spellCooldown2', 0, '>'], ['spellCooldown2', $crv, $crs]],
-            ['AND', ['spellTrigger3', SPELL_TRIGGER_USE], ['spellId3', 0, '!'], ['spellCooldown3', 0, '>'], ['spellCooldown3', $crv, $crs]],
-            ['AND', ['spellTrigger4', SPELL_TRIGGER_USE], ['spellId4', 0, '!'], ['spellCooldown4', 0, '>'], ['spellCooldown4', $crv, $crs]],
-            ['AND', ['spellTrigger5', SPELL_TRIGGER_USE], ['spellId5', 0, '!'], ['spellCooldown5', 0, '>'], ['spellCooldown5', $crv, $crs]],
+            DB::OR,
+            [DB::AND, ['spellTrigger1', SPELL_TRIGGER_USE], ['spellId1', 0, '!'], ['spellCooldown1', 0, '>'], ['spellCooldown1', $crv, $crs]],
+            [DB::AND, ['spellTrigger2', SPELL_TRIGGER_USE], ['spellId2', 0, '!'], ['spellCooldown2', 0, '>'], ['spellCooldown2', $crv, $crs]],
+            [DB::AND, ['spellTrigger3', SPELL_TRIGGER_USE], ['spellId3', 0, '!'], ['spellCooldown3', 0, '>'], ['spellCooldown3', $crv, $crs]],
+            [DB::AND, ['spellTrigger4', SPELL_TRIGGER_USE], ['spellId4', 0, '!'], ['spellCooldown4', 0, '>'], ['spellCooldown4', $crv, $crs]],
+            [DB::AND, ['spellTrigger5', SPELL_TRIGGER_USE], ['spellId5', 0, '!'], ['spellCooldown5', 0, '>'], ['spellCooldown5', $crv, $crs]],
         ];
     }
 
@@ -2420,11 +2417,11 @@ class ItemListFilter extends Filter
             // any
             1 => ['startQuest', 0, '>'],
             // exclude horde only
-            2 => ['AND', ['startQuest', 0, '>'], [['flagsExtra', 0x3, '&'], SIDE_HORDE]],
+            2 => [DB::AND, ['startQuest', 0, '>'], [['flagsExtra', 0x3, '&'], SIDE_HORDE]],
             // exclude alliance only
-            3 => ['AND', ['startQuest', 0, '>'], [['flagsExtra', 0x3, '&'], SIDE_ALLIANCE]],
+            3 => [DB::AND, ['startQuest', 0, '>'], [['flagsExtra', 0x3, '&'], SIDE_ALLIANCE]],
             // both
-            4 => ['AND', ['startQuest', 0, '>'], [['flagsExtra', 0x3, '&'], 0]],
+            4 => [DB::AND, ['startQuest', 0, '>'], [['flagsExtra', 0x3, '&'], 0]],
             // none
             5 => ['startQuest', 0],
             default => null
@@ -2452,7 +2449,7 @@ class ItemListFilter extends Filter
         if (!$this->int2Bool($crs))
             return null;
 
-        $costs = DB::Aowow()->selectCol('SELECT `id` FROM ?_itemextendedcost WHERE ?# > 0', $field);
+        $costs = DB::Aowow()->selectCol('SELECT `id` FROM ::itemextendedcost WHERE %n > 0', $field);
         if ($items = DB::World()->selectCol($this->extCostQuery, $costs, $costs))
             return ['id', $items, $crs ? null : '!'];
 
@@ -2468,35 +2465,42 @@ class ItemListFilter extends Filter
             return null;
 
         $refResults = [];
-        $newRefs = DB::World()->selectCol('SELECT `entry` FROM ?# WHERE `item` = ?d AND `reference` = 0', Loot::REFERENCE, $crs);
+        $newRefs = DB::World()->selectCol('SELECT `entry` FROM %n WHERE `item` = %i AND `reference` = 0', Loot::REFERENCE, $crs);
         while ($newRefs)
         {
             $refResults += $newRefs;
-            $newRefs     = DB::World()->selectCol('SELECT `entry` FROM ?# WHERE `reference` IN (?a)', Loot::REFERENCE, $newRefs);
+            $newRefs     = DB::World()->selectCol('SELECT `entry` FROM %n WHERE `reference` IN %in', Loot::REFERENCE, $newRefs);
         }
 
-        $lootIds = DB::World()->selectCol('SELECT `entry` FROM ?# WHERE {`reference` IN (?a) OR }(`reference` = 0 AND `item` = ?d)', Loot::DISENCHANT, $refResults ?: DBSIMPLE_SKIP, $crs);
+        $lootIds = DB::World()->selectCol('SELECT `entry` FROM %n', Loot::DISENCHANT, 'WHERE %if', $refResults, '`reference` IN %in OR', $refResults, '%end (`reference` = 0 AND `item` = %i)', $crs);
 
         return $lootIds ? ['disenchantId', $lootIds] : [0];
     }
 
     protected function cbObjectiveOfQuest(int $cr, int $crs, string $crv) : ?array
     {
-        $w = match ($crs)
+        $where = match ($crs)
         {
-            1, 5    => 1,                                                                                                                // Yes / No
-            2       =>  '`reqRaceMask` & '.ChrRace::MASK_ALLIANCE.' AND (`reqRaceMask` & '.ChrRace::MASK_HORDE.') = 0',                  // Alliance
-            3       =>  '`reqRaceMask` & '.ChrRace::MASK_HORDE.'    AND (`reqRaceMask` & '.ChrRace::MASK_ALLIANCE.') = 0',               // Horde
-            4       => '(`reqRaceMask` & '.ChrRace::MASK_ALLIANCE.' AND  `reqRaceMask` & '.ChrRace::MASK_HORDE.') OR `reqRaceMask` = 0', // Both
+            // Yes / No
+            1, 5    => [1],
+            // Alliance
+            2       => [['`reqRaceMask` & %i', ChrRace::MASK_ALLIANCE], ['(`reqRaceMask` & %i) = 0', ChrRace::MASK_HORDE]],
+            // Horde
+            3       => [['`reqRaceMask` & %i', ChrRace::MASK_HORDE],    ['(`reqRaceMask` & %i) = 0', ChrRace::MASK_ALLIANCE]],
+            // Both
+            4       => [[DB::OR,  [['`reqRaceMask` = 0'], [DB::AND, [['`reqRaceMask` & %i', ChrRace::MASK_ALLIANCE], ['`reqRaceMask` & %i', ChrRace::MASK_HORDE]]]]]],
             default => null
         };
 
-        $itemIds = DB::Aowow()->selectCol(sprintf(
-           'SELECT `reqItemId1` FROM ?_quests WHERE %1$s UNION SELECT `reqItemId2` FROM ?_quests WHERE %1$s UNION
-            SELECT `reqItemId3` FROM ?_quests WHERE %1$s UNION SELECT `reqItemId4` FROM ?_quests WHERE %1$s UNION
-            SELECT `reqItemId5` FROM ?_quests WHERE %1$s UNION SELECT `reqItemId6` FROM ?_quests WHERE %1$s',
-            $w
-        ));
+        if (!$where)
+            return [0];
+
+        $itemIds = DB::Aowow()->selectCol(
+           'SELECT `reqItemId1` FROM ::quests WHERE %and UNION SELECT `reqItemId2` FROM ::quests WHERE %and UNION
+            SELECT `reqItemId3` FROM ::quests WHERE %and UNION SELECT `reqItemId4` FROM ::quests WHERE %and UNION
+            SELECT `reqItemId5` FROM ::quests WHERE %and UNION SELECT `reqItemId6` FROM ::quests WHERE %and',
+            $where, $where, $where, $where, $where, $where
+        );
 
         if ($itemIds)
             return ['id', $itemIds, $crs == 5 ? '!' : null];
@@ -2514,11 +2518,11 @@ class ItemListFilter extends Filter
             return null;
 
         $ids    = [];
-        $spells = DB::Aowow()->select(                      // todo (med): hmm, selecting all using SpellList would exhaust 128MB of memory :x .. see, that we only select the fields that are really needed
+        $spells = DB::Aowow()->selectAssoc(                      // todo (med): hmm, selecting all using SpellList would exhaust 128MB of memory :x .. see, that we only select the fields that are really needed
            'SELECT `reagent1`,      `reagent2`,      `reagent3`,      `reagent4`,      `reagent5`,      `reagent6`,      `reagent7`,      `reagent8`,
                    `reagentCount1`, `reagentCount2`, `reagentCount3`, `reagentCount4`, `reagentCount5`, `reagentCount6`, `reagentCount7`, `reagentCount8`
-            FROM   ?_spell
-            WHERE  `skillLine1` IN (?a)',
+            FROM   ::spell
+            WHERE  `skillLine1` IN %in',
             is_bool($_) ? array_filter(self::$enums[99], "is_numeric") : $_
         );
         foreach ($spells as $spell)
@@ -2544,7 +2548,7 @@ class ItemListFilter extends Filter
             return ['src.src'.$_, null, '!'];
         else if ($_)                                        // any
         {
-            $foo = ['OR'];
+            $foo = [DB::OR];
             foreach (self::$enums[$cr] as $bar)
                 if (is_int($bar))
                     $foo[] = ['src.src'.$bar, null, '!'];

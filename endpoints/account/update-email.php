@@ -48,21 +48,21 @@ class AccountUpdateemailResponse extends TextResponse
         if (!$this->_post['newemail'])
             return Lang::account('emailInvalid');
 
-        if (DB::Aowow()->selectCell('SELECT 1 FROM ?_account WHERE `email` = ? AND `id` <> ?d', $this->_post['newemail'], User::$id))
+        if (DB::Aowow()->selectCell('SELECT 1 FROM ::account WHERE `email` = %s AND `id` <> %i', $this->_post['newemail'], User::$id))
             return Lang::account('mailInUse');
 
-        $status = DB::Aowow()->selectCell('SELECT `status` FROM ?_account WHERE `statusTimer` > UNIX_TIMESTAMP() AND `id` = ?d', User::$id);
+        $status = DB::Aowow()->selectCell('SELECT `status` FROM ::account WHERE `statusTimer` > UNIX_TIMESTAMP() AND `id` = %i', User::$id);
         if ($status != ACC_STATUS_NONE && $status != ACC_STATUS_CHANGE_EMAIL)
             return Lang::account('inputbox', 'error', 'isRecovering', [DateTime::formatTimeElapsedFloat(Cfg::get('ACC_RECOVERY_DECAY') * 1000)]);
 
-        $oldEmail = DB::Aowow()->selectCell('SELECT `email` FROM ?_account WHERE `id` = ?d', User::$id);
+        $oldEmail = DB::Aowow()->selectCell('SELECT `email` FROM ::account WHERE `id` = %i', User::$id);
         if ($this->_post['newemail'] == $oldEmail)
             return Lang::account('newMailDiff');
 
         $token = Util::createHash();
 
         // store new mail in updateValue field, exchange when confirmation mail gets confirmed
-        if (!DB::Aowow()->query('UPDATE ?_account SET `updateValue` = ?, `status` = ?d, `statusTimer` = UNIX_TIMESTAMP() + ?d, `token` = ? WHERE `id` = ?d',
+        if (!DB::Aowow()->qry('UPDATE ::account SET `updateValue` = %s, `status` = %i, `statusTimer` = UNIX_TIMESTAMP() + %i, `token` = %s WHERE `id` = %i',
             $this->_post['newemail'], ACC_STATUS_CHANGE_EMAIL, Cfg::get('ACC_RECOVERY_DECAY'), $token, User::$id))
             return Lang::main('intError');
 

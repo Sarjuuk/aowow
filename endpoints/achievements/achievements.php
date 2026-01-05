@@ -123,7 +123,7 @@ class AchievementsBaseResponse extends TemplateResponse implements ICache
             $conditions = [Listview::DEFAULT_SIZE];
             if ($fiCnd)
                 $conditions[] = $fiCnd;
-            if ($catList = DB::Aowow()->SelectCol('SELECT `id` FROM ?_achievementcategory WHERE `parentCat` IN (?a) OR `parentCat2` IN (?a) ', $this->category, $this->category))
+            if ($catList = DB::Aowow()->SelectCol('SELECT `id` FROM ::achievementcategory WHERE `parentCat` IN %in OR `parentCat2` IN %in ', $this->category, $this->category))
                 $conditions[] = ['category', $catList];
 
             $acvList = new AchievementList($conditions, ['calcTotal' => true]);

@@ -10,13 +10,13 @@ class WorldEventList extends DBTypeList
 {
     public static int    $type      = Type::WORLDEVENT;
     public static string $brickFile = 'event';
-    public static string $dataTable = '?_events';
+    public static string $dataTable = '::events';
 
-    protected string $queryBase = 'SELECT e.`holidayId`, e.`cuFlags`, e.`startTime`, e.`endTime`, e.`occurence`, e.`length`, e.`requires`, e.`description` AS "nameINT", e.`id` AS "eventId", e.`id` AS ARRAY_KEY FROM ?_events e';
+    protected string $queryBase = 'SELECT e.`holidayId`, e.`cuFlags`, e.`startTime`, e.`endTime`, e.`occurence`, e.`length`, e.`requires`, e.`description` AS "nameINT", e.`id` AS "eventId", e.`id` AS ARRAY_KEY FROM ::events e';
     protected array  $queryOpts = array(
                         'e'  => [['h', 'ic']],
-                        'h'  => ['j' => ['?_holidays h ON e.`holidayId` = h.`id`', true], 's' => ', h.*', 'o' => '-e.`id` ASC'],
-                        'ic' => ['j' => ['?_icons ic ON ic.`id` = h.`iconId`',     true], 's' => ', ic.`name` AS "iconString"']
+                        'h'  => ['j' => ['::holidays h ON e.`holidayId` = h.`id`', true], 's' => ', h.*', 'o' => '-e.`id` ASC'],
+                        'ic' => ['j' => ['::icons ic ON ic.`id` = h.`iconId`',     true], 's' => ', ic.`name` AS "iconString"']
                     );
 
     public function __construct(array $conditions = [], array $miscData = [])
@@ -71,9 +71,9 @@ class WorldEventList extends DBTypeList
     {
         $row = DB::Aowow()->SelectRow(
            'SELECT    IFNULL(h.`name_loc0`, e.`description`) AS "name_loc0", h.`name_loc2`, h.`name_loc3`, h.`name_loc4`, h.`name_loc6`, h.`name_loc8`
-            FROM      ?_events e
-            LEFT JOIN ?_holidays h ON e.`holidayId` = h.`id`
-            WHERE     e.`id` = ?d',
+            FROM      ::events e
+            LEFT JOIN ::holidays h ON e.`holidayId` = h.`id`
+            WHERE     e.`id` = %i',
             $id
         );
 

@@ -67,16 +67,16 @@ CLISetup::registerSetup("build", new class extends SetupScript
         $slotPointer   = [13, 17, 15, 15, 13, 17, 17, 13, 17, null, 17, null, null, 13, null, 13, null, null, null, null, 17];
 
         $castItems     = [];
-        $enchantSpells = DB::Aowow()->select(
+        $enchantSpells = DB::Aowow()->selectAssoc(
            'SELECT    s.`id` AS ARRAY_KEY,
                       `effect1MiscValue`,
                       `equippedItemClass`, `equippedItemInventoryTypeMask`, `equippedItemSubClassMask`,
                       `skillLine1`,
-                      IFNULL(i.`name`, ?) AS "iconString",
+                      IFNULL(i.`name`, %s) AS "iconString",
                       `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8`
-            FROM      ?_spell s
-            LEFT JOIN ?_icons i ON i.`id` = s.`iconId`
-            WHERE     `effect1Id` = ?d AND
+            FROM      ::spell s
+            LEFT JOIN ::icons i ON i.`id` = s.`iconId`
+            WHERE     `effect1Id` = %i AND
                       `name_loc0` NOT LIKE "QA%"',
             DEFAULT_ICON, SPELL_EFFECT_ENCHANT_ITEM
         );
@@ -86,7 +86,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
         $enchantments = new EnchantmentList(array(['id', $enchIds]));
         if ($enchantments->error)
         {
-            CLI::write('[enchants] Required table ?_itemenchantment seems to be empty!', CLI::LOG_ERROR);
+            CLI::write('[enchants] Required table ::itemenchantment seems to be empty!', CLI::LOG_ERROR);
             CLI::write();
             return false;
         }
@@ -94,7 +94,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
         $castItems = new ItemList(array(['spellId1', array_keys($enchantSpells)], ['src.typeId', null, '!']));
         if ($castItems->error)
         {
-            CLI::write('[enchants] Required table ?_items seems to be empty!', CLI::LOG_ERROR);
+            CLI::write('[enchants] Required table ::items seems to be empty!', CLI::LOG_ERROR);
             CLI::write();
             return false;
         }

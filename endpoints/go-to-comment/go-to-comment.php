@@ -23,7 +23,7 @@ class GotocommentBaseResponse extends TextResponse
 
         // the reputation-history listview only creates go-to-comment links. So either upvoting replies does not grant reputation, or.... bug.?
 
-        $comment = DB::Aowow()->selectRow('SELECT IFNULL(c2.`id`, c1.`id`) AS "id", IFNULL(c2.`type`, c1.`type`) AS "type", IFNULL(c2.`typeId`, c1.`typeId`) AS "typeId" FROM ?_comments c1 LEFT JOIN ?_comments c2 ON c1.`replyTo` = c2.`id` WHERE c1.`id` = ?d', $this->_get['id']);
+        $comment = DB::Aowow()->selectRow('SELECT IFNULL(c2.`id`, c1.`id`) AS "id", IFNULL(c2.`type`, c1.`type`) AS "type", IFNULL(c2.`typeId`, c1.`typeId`) AS "typeId" FROM ::comments c1 LEFT JOIN ::comments c2 ON c1.`replyTo` = c2.`id` WHERE c1.`id` = %i', $this->_get['id']);
         if (!$comment)
         {
             trigger_error('GotocommentBaseResponse - comment #'.$this->_get['id'].' not found', E_USER_ERROR);

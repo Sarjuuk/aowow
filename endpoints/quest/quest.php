@@ -200,7 +200,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         if ($_ = $this->subject->getField('timeLimit'))
             $infobox[] = Lang::quest('timer').DateTime::formatTimeElapsedFloat($_ * 1000);
 
-        $startEnd = DB::Aowow()->select('SELECT * FROM ?_quests_startend WHERE `questId` = ?d', $this->typeId);
+        $startEnd = DB::Aowow()->selectAssoc('SELECT * FROM ::quests_startend WHERE `questId` = %i', $this->typeId);
 
         // start
         $start = '[icon name=quest_start'.($this->subject->isRepeatable() ? '_daily' : '').']'.Lang::event('start').'[/icon]';
@@ -279,8 +279,8 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         // profiler relateed (note that this is part of the cache. I don't think this is important enough to calc for every view)
         if (Cfg::get('PROFILER_ENABLE') && $hasCompletion)
         {
-            $x = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ?_profiler_completion_quests WHERE `questId` = ?d', $this->typeId);
-            $y = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ?_profiler_profiles WHERE `custom` = 0 AND `stub` = 0');
+            $x = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ::profiler_completion_quests WHERE `questId` = %i', $this->typeId);
+            $y = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ::profiler_profiles WHERE `custom` = 0 AND `stub` = 0');
             $infobox[] = Lang::profiler('attainedBy', [round(($x ?: 0) * 100 / ($y ?: 1))]);
 
             // completion row added by InfoboxMarkup
@@ -384,7 +384,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         // .. creature kills
         if ($ids = array_keys($olNPCs))
         {
-            $olNPCData = new CreatureList(array('OR', ['id', $ids], ['killCredit1', $ids], ['killCredit2', $ids]));
+            $olNPCData = new CreatureList(array(DB::OR, ['id', $ids], ['killCredit1', $ids], ['killCredit2', $ids]));
             $this->extendGlobalData($olNPCData->getJSGlobals(GLOBALINFO_SELF));
 
             // create proxy-references
@@ -572,9 +572,9 @@ class QuestBaseResponse extends TemplateResponse implements ICache
             // dear god, if you are one of the types who puts queststarter-items in container-items, in conatiner-items, in container-items, in container-GOs .. you should kill yourself by killing yourself!
             // so yeah .. no recursion checking
             $vendors = DB::World()->selectCol(
-               'SELECT  nv.`entry` FROM npc_vendor nv                                                               WHERE   nv.`item` = ?d UNION
-                SELECT nv1.`entry` FROM npc_vendor nv1             JOIN npc_vendor nv2 ON -nv1.`item` = nv2.`entry` WHERE  nv2.`item` = ?d UNION
-                SELECT   c.`id`    FROM game_event_npc_vendor genv JOIN creature   c   ON c.`guid` = genv.`guid`    WHERE genv.`item` = ?d',
+               'SELECT  nv.`entry` FROM npc_vendor nv                                                               WHERE   nv.`item` = %i UNION
+                SELECT nv1.`entry` FROM npc_vendor nv1             JOIN npc_vendor nv2 ON -nv1.`item` = nv2.`entry` WHERE  nv2.`item` = %i UNION
+                SELECT   c.`id`    FROM game_event_npc_vendor genv JOIN creature   c   ON c.`guid` = genv.`guid`    WHERE genv.`item` = %i',
                 $itemId, $itemId, $itemId
             );
             foreach ($vendors as $v)
@@ -638,9 +638,9 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         if ($_specialFlags & QUEST_FLAG_SPECIAL_EXT_COMPLETE)
         {
             // areatrigger
-            if ($atir = DB::Aowow()->selectCol('SELECT `id` FROM ?_areatrigger WHERE `type` = ?d AND `quest` = ?d', AT_TYPE_OBJECTIVE, $this->typeId))
+            if ($atir = DB::Aowow()->selectCol('SELECT `id` FROM ::areatrigger WHERE `type` = %i AND `quest` = %i', AT_TYPE_OBJECTIVE, $this->typeId))
             {
-                if ($atSpawns = DB::AoWoW()->select('SELECT `typeId` AS ARRAY_KEY, `posX`, `posY`, `floor`, `areaId` FROM ?_spawns WHERE `type` = ?d AND `typeId` IN (?a)', Type::AREATRIGGER, $atir))
+                if ($atSpawns = DB::AoWoW()->selectAssoc('SELECT `typeId` AS ARRAY_KEY, `posX`, `posY`, `floor`, `areaId` FROM ::spawns WHERE `type` = %i AND `typeId` IN %in', Type::AREATRIGGER, $atir))
                 {
                     if (User::isInGroup(U_GROUP_STAFF))
                         $endTextWrapper = '<a href="?areatrigger='.$atir[0].'">%s</a>';
@@ -672,7 +672,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                 }
             }
             // complete-spell
-            else if ($endSpell = new SpellList(array('OR', ['AND', ['effect1Id', SPELL_EFFECT_QUEST_COMPLETE], ['effect1MiscValue', $this->typeId]], ['AND', ['effect2Id', SPELL_EFFECT_QUEST_COMPLETE], ['effect2MiscValue', $this->typeId]], ['AND', ['effect3Id', SPELL_EFFECT_QUEST_COMPLETE], ['effect3MiscValue', $this->typeId]])))
+            else if ($endSpell = new SpellList(array(DB::OR, [DB::AND, ['effect1Id', SPELL_EFFECT_QUEST_COMPLETE], ['effect1MiscValue', $this->typeId]], [DB::AND, ['effect2Id', SPELL_EFFECT_QUEST_COMPLETE], ['effect2MiscValue', $this->typeId]], [DB::AND, ['effect3Id', SPELL_EFFECT_QUEST_COMPLETE], ['effect3MiscValue', $this->typeId]])))
                 if (!$endSpell->error)
                     $endTextWrapper = '<a href="?spell='.$endSpell->id.'">%s</a>';
         }
@@ -916,7 +916,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
             $this->addScript([SC_CSS_FILE, 'css/Book.css']);
 
         // factionchange-equivalent
-        if ($pendant = DB::World()->selectCell('SELECT IF(`horde_id` = ?d, `alliance_id`, -`horde_id`) FROM player_factionchange_quests WHERE `alliance_id` = ?d OR `horde_id` = ?d', $this->typeId, $this->typeId, $this->typeId))
+        if ($pendant = DB::World()->selectCell('SELECT IF(`horde_id` = %i, `alliance_id`, -`horde_id`) FROM player_factionchange_quests WHERE `alliance_id` = %i OR `horde_id` = %i', $this->typeId, $this->typeId, $this->typeId))
         {
             $altQuest = new QuestList(array(['id', abs($pendant)]));
             if (!$altQuest->error)
@@ -962,9 +962,9 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: spawning pool (for the swarm)
-        if ($qp = DB::World()->selectCol('SELECT qpm2.`questId` FROM quest_pool_members qpm1 JOIN quest_pool_members qpm2 ON qpm1.`poolId` = qpm2.`poolId` WHERE qpm1.`questId` = ?d', $this->typeId))
+        if ($qp = DB::World()->selectCol('SELECT qpm2.`questId` FROM quest_pool_members qpm1 JOIN quest_pool_members qpm2 ON qpm1.`poolId` = qpm2.`poolId` WHERE qpm1.`questId` = %i', $this->typeId))
         {
-            $max = DB::World()->selectCell('SELECT `numActive` FROM quest_pool_template qpt JOIN quest_pool_members qpm ON qpm.`poolId` = qpt.`poolId` WHERE qpm.`questId` = ?d', $this->typeId);
+            $max = DB::World()->selectCell('SELECT `numActive` FROM quest_pool_template qpt JOIN quest_pool_members qpm ON qpm.`poolId` = qpt.`poolId` WHERE qpm.`questId` = %i', $this->typeId);
             $pooledQuests = new QuestList(array(['id', $qp]));
             if (!$pooledQuests->error)
             {
@@ -1169,7 +1169,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
             return false;
 
         $delay  = $this->subject->getField('rewardMailDelay');
-        $letter = DB::Aowow()->selectRow('SELECT * FROM ?_mails WHERE `id` = ?d', $rmtId);
+        $letter = DB::Aowow()->selectRow('SELECT * FROM ::mails WHERE `id` = %i', $rmtId);
 
         $this->mail = array(
             'attachments' => [],
@@ -1183,7 +1183,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         );
 
         $senderTypeId = 0;
-        if ($_= DB::World()->selectCell('SELECT `RewardMailSenderEntry` FROM quest_mail_sender WHERE `QuestId` = ?d', $this->typeId))
+        if ($_= DB::World()->selectCell('SELECT `RewardMailSenderEntry` FROM quest_mail_sender WHERE `QuestId` = %i', $this->typeId))
             $senderTypeId = $_;
         else
             foreach ($startEnd as $se)
@@ -1242,7 +1242,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                 'name' => FactionList::getName($fac)
             );
 
-            if ($cuRates = DB::World()->selectRow('SELECT * FROM reputation_reward_rate WHERE `faction` = ?d', $fac))
+            if ($cuRates = DB::World()->selectRow('SELECT * FROM reputation_reward_rate WHERE `faction` = %i', $fac))
             {
                 if ($this->subject->isRepeatable())
                     $rep['qty'][1] = $rep['qty'][0] * ($cuRates['quest_repeatable_rate'] - 1);
@@ -1290,14 +1290,14 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         // so we fast forward to the last quest and go backwards from there.
 
         $lastQuestId = $this->subject->getField('nextQuestIdChain');
-        while ($newLast = DB::Aowow()->selectCell('SELECT `nextQuestIdChain` FROM ?_quests WHERE `id` = ?d AND `id` <> `nextQuestIdChain`', $lastQuestId))
+        while ($newLast = DB::Aowow()->selectCell('SELECT `nextQuestIdChain` FROM ::quests WHERE `id` = %i AND `id` <> `nextQuestIdChain`', $lastQuestId))
             $lastQuestId = $newLast;
 
-        $end   = DB::Aowow()->selectRow('SELECT `id`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8`, `reqRaceMask` FROM ?_quests WHERE `id` = ?d', $lastQuestId ?: $this->typeId);
+        $end   = DB::Aowow()->selectRow('SELECT `id`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8`, `reqRaceMask` FROM ::quests WHERE `id` = %i', $lastQuestId ?: $this->typeId);
         $chain = array(array($makeSeriesItem($end)));       // series / step / quest
 
         $prevStepIds = [$lastQuestId ?: $this->typeId];
-        while ($prevQuests = DB::Aowow()->select('SELECT `id`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8`, `reqRaceMask` FROM ?_quests WHERE `nextQuestIdChain` IN (?a) AND `id` <> `nextQuestIdChain`', $prevStepIds))
+        while ($prevQuests = DB::Aowow()->selectAssoc('SELECT `id`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8`, `reqRaceMask` FROM ::quests WHERE `nextQuestIdChain` IN %in AND `id` <> `nextQuestIdChain`', $prevStepIds))
         {
             $step = [];
             foreach ($prevQuests as $pQuest)
@@ -1326,13 +1326,13 @@ class QuestBaseResponse extends TemplateResponse implements ICache
 
         $extraLists = array(
             // Requires all of these quests (Quests that you must follow to get this quest)
-            ['reqQ',       array('OR', ['AND', ['nextQuestId', $this->typeId], ['exclusiveGroup', 0, '<']], ['AND', ['id', $this->subject->getField('prevQuestId')], ['nextQuestIdChain', $this->typeId, '!']])],
+            ['reqQ',       array(DB::OR, [DB::AND, ['nextQuestId', $this->typeId], ['exclusiveGroup', 0, '<']], [DB::AND, ['id', $this->subject->getField('prevQuestId')], ['nextQuestIdChain', $this->typeId, '!']])],
 
             // Requires one of these quests (Requires one of the quests to choose from)
-            ['reqOneQ',    array('OR', ['AND', ['exclusiveGroup', 0, '>='], ['nextQuestId', $this->typeId]], ['breadCrumbForQuestId', $this->typeId])],
+            ['reqOneQ',    array(DB::OR, [DB::AND, ['exclusiveGroup', 0, '>='], ['nextQuestId', $this->typeId]], ['breadCrumbForQuestId', $this->typeId])],
 
             // Opens Quests (Quests that become available only after complete this quest (optionally only one))
-            ['opensQ',     array('OR', ['AND', ['prevQuestId', $this->typeId], ['id', $this->subject->getField('nextQuestIdChain'), '!']], ['id', $this->subject->getField('nextQuestId')], ['id', $this->subject->getField('breadcrumbForQuestId')])],
+            ['opensQ',     array(DB::OR, [DB::AND, ['prevQuestId', $this->typeId], ['id', $this->subject->getField('nextQuestIdChain'), '!']], ['id', $this->subject->getField('nextQuestId')], ['id', $this->subject->getField('breadcrumbForQuestId')])],
 
             // Closes Quests (Quests that become inaccessible after completing this quest)
             ['closesQ',    array(['exclusiveGroup', 0, '>'], ['exclusiveGroup', $this->subject->getField('exclusiveGroup')], ['id', $this->typeId, '!'])],

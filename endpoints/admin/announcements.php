@@ -44,13 +44,13 @@ class AdminAnnouncementsResponse extends TemplateResponse
             return;
         }
 
-        if (!DB::Aowow()->selectCell('SELECT 1 FROM ?_announcements WHERE `id` = ?d', $this->_get['id']))
+        if (!DB::Aowow()->selectCell('SELECT 1 FROM ::announcements WHERE `id` = %i', $this->_get['id']))
         {
             trigger_error('AdminAnnouncementsResponse::updateStatus - announcement does not exist');
             return;
         }
 
-        DB::Aowow()->query('UPDATE ?_announcements SET `status` = ?d WHERE `id` = ?d', $this->_get['status'], $this->_get['id']);
+        DB::Aowow()->qry('UPDATE ::announcements SET `status` = %i WHERE `id` = %i', $this->_get['status'], $this->_get['id']);
     }
 
     private function displayEditor() : void

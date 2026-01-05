@@ -416,7 +416,7 @@ class SmartAction
             case self::ACTION_SET_FACTION:                  // 2 -> any target
                 if ($this->param[0])
                 {
-                    $this->param[10] = DB::Aowow()->selectCell('SELECT `factionId` FROM ?_factiontemplate WHERE `id` = ?d', $this->param[0]);
+                    $this->param[10] = DB::Aowow()->selectCell('SELECT `factionId` FROM ::factiontemplate WHERE `id` = %i', $this->param[0]);
                     $this->jsGlobals[Type::FACTION][$this->param[10]] = $this->param[10];
                 }
                 break;
@@ -460,11 +460,11 @@ class SmartAction
                 break;
             case self::ACTION_ACTIVATE_TAXI:                // 52 -> invoker
                 $nodes = DB::Aowow()->selectRow(
-                   'SELECT tn1.`name_loc0` AS "start_loc0", tn1.name_loc?d AS start_loc?d, tn2.`name_loc0` AS "end_loc0", tn2.name_loc?d AS end_loc?d
-                    FROM   ?_taxipath tp
-                    JOIN   ?_taxinodes tn1 ON tp.`startNodeId` = tn1.`id`
-                    JOIN   ?_taxinodes tn2 ON tp.`endNodeId` = tn2.`id`
-                    WHERE  tp.`id` = ?d',
+                   'SELECT tn1.`name_loc0` AS "start_loc0", tn1.name_loc%i AS start_loc%i, tn2.`name_loc0` AS "end_loc0", tn2.name_loc%i AS end_loc%i
+                    FROM   ::taxipath tp
+                    JOIN   ::taxinodes tn1 ON tp.`startNodeId` = tn1.`id`
+                    JOIN   ::taxinodes tn2 ON tp.`endNodeId` = tn2.`id`
+                    WHERE  tp.`id` = %i',
                     Lang::getLocale()->value, Lang::getLocale()->value, Lang::getLocale()->value, Lang::getLocale()->value, $this->param[0]
                 );
                 $this->param[10] = Util::localizedString($nodes, 'start');
@@ -486,7 +486,7 @@ class SmartAction
                     $this->param[11] = str_pad($pos[0]['posX'] * 10, 3, '0', STR_PAD_LEFT).str_pad($pos[0]['posY'] * 10, 3, '0', STR_PAD_LEFT);
                 }
                 // maybe the mapId is an instane map
-                else if ($areaId = DB::Aowow()->selectCell('SELECT `id` FROM ?_zones WHERE `mapId` = ?d', $this->param[0]))
+                else if ($areaId = DB::Aowow()->selectCell('SELECT `id` FROM ::zones WHERE `mapId` = %i', $this->param[0]))
                     $this->param[10] = $areaId;
                 // ...whelp
                 else
@@ -507,7 +507,7 @@ class SmartAction
                 if ($this->param[0])
                 {
                     $slots = $this->param[1] ? Util::mask2bits($this->param[1], 1) : [1, 2, 3];
-                    $items = DB::World()->selectRow('SELECT `ItemID1`, `ItemID2`, `ItemID3` FROM creature_equip_template WHERE `CreatureID` = ?d AND `ID` = ?d', $this->smartAI->getEntry(), $this->param[0]);
+                    $items = DB::World()->selectRow('SELECT `ItemID1`, `ItemID2`, `ItemID3` FROM creature_equip_template WHERE `CreatureID` = %i AND `ID` = %i', $this->smartAI->getEntry(), $this->param[0]);
 
                     foreach ($slots as $s)
                         if ($_ = $items['ItemID'.$s])
@@ -536,7 +536,7 @@ class SmartAction
                 $buff = [];
                 if ($this->param[0])
                 {
-                    $items = DB::World()->selectRow('SELECT `ItemID1`, `ItemID2`, `ItemID3` FROM creature_equip_template WHERE `CreatureID` = ?d AND `ID` = ?d', $this->smartAI->getEntry(), $this->param[0]);
+                    $items = DB::World()->selectRow('SELECT `ItemID1`, `ItemID2`, `ItemID3` FROM creature_equip_template WHERE `CreatureID` = %i AND `ID` = %i', $this->smartAI->getEntry(), $this->param[0]);
                     foreach ($items as $i)
                     {
                         if (!$i)
@@ -626,7 +626,7 @@ class SmartAction
                 break;
             case self::ACTION_SUMMON_CREATURE_GROUP:        // 107 -> untargeted
                 if ($this->summons === null)
-                    $this->summons = DB::World()->selectCol('SELECT `groupId` AS ARRAY_KEY, `entry` AS ARRAY_KEY2, COUNT(*) AS "n" FROM creature_summon_groups WHERE `summonerId` = ?d GROUP BY `groupId`, `entry`', $this->smartAI->getEntry());
+                    $this->summons = DB::World()->selectCol('SELECT `groupId` AS ARRAY_KEY, `entry` AS ARRAY_KEY2, COUNT(*) AS "n" FROM creature_summon_groups WHERE `summonerId` = %i GROUP BY `groupId`, `entry`', $this->smartAI->getEntry());
 
                 $buff = [];
                 if (!empty($this->summons[$this->param[0]]))
@@ -669,8 +669,8 @@ class SmartAction
                 break;
             case self::ACTION_SPAWN_SPAWNGROUP:             // 131
             case self::ACTION_DESPAWN_SPAWNGROUP:           // 132
-                $this->param[10] = Util::jsEscape(DB::World()->selectCell('SELECT `GroupName` FROM spawn_group_template WHERE `groupId` = ?d', $this->param[0]));
-                $entities = DB::World()->select('SELECT `spawnType` AS "0", `spawnId` AS "1" FROM spawn_group WHERE `groupId` = ?d',  $this->param[0]);
+                $this->param[10] = Util::jsEscape(DB::World()->selectCell('SELECT `GroupName` FROM spawn_group_template WHERE `groupId` = %i', $this->param[0]));
+                $entities = DB::World()->selectAssoc('SELECT `spawnType` AS "0", `spawnId` AS "1" FROM spawn_group WHERE `groupId` = %i',  $this->param[0]);
 
                 $n = 5;
                 $buff = [];

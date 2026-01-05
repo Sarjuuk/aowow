@@ -12,18 +12,18 @@ class GuideList extends DBTypeList
 
     public static int    $type       = Type::GUIDE;
     public static string $brickFile  = 'guide';
-    public static string $dataTable  = '?_guides';
+    public static string $dataTable  = '::guides';
     public static int    $contribute = CONTRIBUTE_CO;
 
     private array $article   = [];
     private array $jsGlobals = [];
 
-    protected string $queryBase = 'SELECT g.*, g.`id` AS ARRAY_KEY FROM ?_guides g';
+    protected string $queryBase = 'SELECT g.*, g.`id` AS ARRAY_KEY FROM ::guides g';
     protected array  $queryOpts = array(
                         'g'  => [['a', 'c', 'ar'], 'g' => 'g.`id`'],
-                        'a'  => ['j' => ['?_account a ON a.`id` = g.`userId`', true], 's' => ', IFNULL(a.`username`, "") AS "author"'],
-                        'c'  => ['j' => ['?_comments c ON c.`type` = '.Type::GUIDE.' AND c.`typeId` = g.`id` AND (c.`flags` & '.CC_FLAG_DELETED.') = 0', true], 's' => ', COUNT(c.`id`) AS "comments"'],
-                        'ar' => ['j' => ['?_articles ar ON ar.`type` = 300 AND ar.`typeId` = g.`id`'], 's' => ', MAX(ar.`rev`) AS "latest"']
+                        'a'  => ['j' => ['::account a ON a.`id` = g.`userId`', true], 's' => ', IFNULL(a.`username`, "") AS "author"'],
+                        'c'  => ['j' => ['::comments c ON c.`type` = '.Type::GUIDE.' AND c.`typeId` = g.`id` AND (c.`flags` & '.CC_FLAG_DELETED.') = 0', true], 's' => ', COUNT(c.`id`) AS "comments"'],
+                        'ar' => ['j' => ['::articles ar ON ar.`type` = 300 AND ar.`typeId` = g.`id`'], 's' => ', MAX(ar.`rev`) AS "latest"']
                     );
 
     public function __construct(array $conditions = [], array $miscData = [])
@@ -42,7 +42,7 @@ class GuideList extends DBTypeList
 
     public static function getName(int $id) : ?LocString
     {
-        if ($n = DB::Aowow()->SelectRow('SELECT `title` AS "name_loc0" FROM ?# WHERE `id` = ?d', self::$dataTable, $id))
+        if ($n = DB::Aowow()->SelectRow('SELECT `title` AS "name_loc0" FROM %n WHERE `id` = %i', self::$dataTable, $id))
             return new LocString($n);
         return null;
     }
@@ -54,8 +54,15 @@ class GuideList extends DBTypeList
 
         if (empty($this->article[$rev]))
         {
-            $a = DB::Aowow()->selectRow('SELECT `article`, `rev` FROM ?_articles WHERE ((`type` = ?d AND `typeId` = ?d){ OR `url` = ?}){ AND `rev`= ?d} ORDER BY `rev` DESC LIMIT 1',
-                Type::GUIDE, $this->id, $this->getField('url') ?: DBSIMPLE_SKIP, $rev < 0 ? DBSIMPLE_SKIP : $rev);
+            $where = array(
+                [DB::OR, [DB::AND, ['`type` = %i', Type::GUIDE], ['`typeId` = %i', $this->id]]]
+            );
+            if ($url = $this->getField('url'))
+                $where[0][] = ['`url` = %s', $url];
+            if ($rev >= 0)
+                $where[] = ['`rev`= %i', $rev];
+
+            $a = DB::Aowow()->selectRow('SELECT `article`, `rev` FROM ::articles WHERE %and ORDER BY `rev` DESC LIMIT 1', $where);
 
             $this->article[$a['rev']] = $a['article'];
             if ($this->article[$a['rev']])

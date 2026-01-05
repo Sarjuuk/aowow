@@ -10,9 +10,9 @@ class EmoteList extends DBTypeList
 {
     public static int    $type      = Type::EMOTE;
     public static string $brickFile = 'emote';
-    public static string $dataTable = '?_emotes';
+    public static string $dataTable = '::emotes';
 
-    protected string $queryBase = 'SELECT e.*, e.`id` AS ARRAY_KEY FROM ?_emotes e';
+    protected string $queryBase = 'SELECT e.*, e.`id` AS ARRAY_KEY FROM ::emotes e';
 
     public function __construct(array $conditions = [], array $miscData = [])
     {
@@ -28,7 +28,7 @@ class EmoteList extends DBTypeList
 
     public static function getName(int $id) : ?LocString
     {
-        if ($n = DB::Aowow()->SelectRow('SELECT `cmd` AS "name_loc0" FROM ?# WHERE `id` = ?d', self::$dataTable, $id))
+        if ($n = DB::Aowow()->SelectRow('SELECT `cmd` AS "name_loc0" FROM %n WHERE `id` = %i', self::$dataTable, $id))
             return new LocString($n);
         return null;
     }

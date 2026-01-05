@@ -31,7 +31,7 @@ class AdminGuideResponse extends TextResponse
             return;
         }
 
-        $guide = DB::Aowow()->selectRow('SELECT `userId`, `status` FROM ?_guides WHERE `id` = ?d', $this->_post['id']);
+        $guide = DB::Aowow()->selectRow('SELECT `userId`, `status` FROM ::guides WHERE `id` = %i', $this->_post['id']);
         if (!$guide)
         {
             trigger_error('AdminGuideResponse - guide #'.$this->_post['id'].' not found', E_USER_ERROR);
@@ -63,16 +63,16 @@ class AdminGuideResponse extends TextResponse
     private function update(int $id, int $status, ?string $msg = null) : bool
     {
         if ($status == GuideMgr::STATUS_APPROVED)           // set display rev to latest
-            $ok = DB::Aowow()->query('UPDATE ?_guides SET `status` = ?d, `rev` = (SELECT `rev` FROM ?_articles WHERE `type` = ?d AND `typeId` = ?d ORDER BY `rev` DESC LIMIT 1), `approveUserId` = ?d, `approveDate` = ?d WHERE `id` = ?d', $status, Type::GUIDE, $id, User::$id, time(), $id);
+            $ok = DB::Aowow()->qry('UPDATE ::guides SET `status` = %i, `rev` = (SELECT `rev` FROM ::articles WHERE `type` = %i AND `typeId` = %i ORDER BY `rev` DESC LIMIT 1), `approveUserId` = %i, `approveDate` = %i WHERE `id` = %i', $status, Type::GUIDE, $id, User::$id, time(), $id);
         else
-            $ok = DB::Aowow()->query('UPDATE ?_guides SET `status` = ?d WHERE `id` = ?d', $status, $id);
+            $ok = DB::Aowow()->qry('UPDATE ::guides SET `status` = %i WHERE `id` = %i', $status, $id);
 
         if (!$ok)
             return false;
 
-        DB::Aowow()->query('INSERT INTO ?_guides_changelog (`id`, `date`, `userId`, `status`) VALUES (?d, ?d, ?d, ?d)', $id, time(), User::$id, $status);
+        DB::Aowow()->qry('INSERT INTO ::guides_changelog (`id`, `date`, `userId`, `status`) VALUES (%i, %i, %i, %i)', $id, time(), User::$id, $status);
         if ($msg)
-            DB::Aowow()->query('INSERT INTO ?_guides_changelog (`id`, `date`, `userId`, `msg`) VALUES (?d, ?d, ?d, ?)', $id, time(), User::$id, $msg);
+            DB::Aowow()->qry('INSERT INTO ::guides_changelog (`id`, `date`, `userId`, `msg`) VALUES (%i, %i, %i, %s)', $id, time(), User::$id, $msg);
 
         return true;
     }

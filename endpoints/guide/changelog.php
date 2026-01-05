@@ -81,7 +81,7 @@ class GuideChangelogResponse extends TemplateResponse
         $inp  = fn($rev) => User::isInGroup(U_GROUP_STAFF) && false ? ($rev !== null ? '<input name="a" value="'.$rev.'" type="radio"/><input name="b" value="'.$rev.'" type="radio"/><b>' : '<b style="margin-left:38px;">') : '';
         $now  = new DateTime();
 
-        $logEntries = DB::Aowow()->select('SELECT a.`username` AS `name`, gcl.`date`, gcl.`status`, gcl.`msg`, gcl.`rev` FROM ?_guides_changelog gcl JOIN ?_account a ON a.`id` = gcl.`userId` WHERE gcl.`id` = ?d ORDER BY gcl.`date` DESC', $this->_get['id']);
+        $logEntries = DB::Aowow()->selectAssoc('SELECT a.`username` AS `name`, gcl.`date`, gcl.`status`, gcl.`msg`, gcl.`rev` FROM ::guides_changelog gcl JOIN ::account a ON a.`id` = gcl.`userId` WHERE gcl.`id` = %i ORDER BY gcl.`date` DESC', $this->_get['id']);
         foreach ($logEntries as $log)
         {
             if ($log['status'] != GuideMgr::STATUS_NONE)

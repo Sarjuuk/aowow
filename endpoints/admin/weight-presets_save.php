@@ -30,8 +30,8 @@ class AdminWeightpresetsActionSaveResponse extends TextResponse
         }
 
         // save to db
-        DB::Aowow()->query('DELETE FROM ?_account_weightscale_data WHERE `id` = ?d', $this->_post['id']);
-        DB::Aowow()->query('UPDATE ?_account_weightscales SET `icon`= ? WHERE `id` = ?d', $this->_post['__icon'], $this->_post['id']);
+        DB::Aowow()->qry('DELETE FROM ::account_weightscale_data WHERE `id` = %i', $this->_post['id']);
+        DB::Aowow()->qry('UPDATE ::account_weightscales SET `icon`= %s WHERE `id` = %i', $this->_post['__icon'], $this->_post['id']);
 
         foreach (explode(',', $this->_post['scale']) as $s)
         {
@@ -40,7 +40,7 @@ class AdminWeightpresetsActionSaveResponse extends TextResponse
             if (!in_array($k, Util::$weightScales) || $v < 1)
                 continue;
 
-            if (DB::Aowow()->query('INSERT INTO ?_account_weightscale_data VALUES (?d, ?, ?d)', $this->_post['id'], $k, $v) === null)
+            if (DB::Aowow()->qry('INSERT INTO ::account_weightscale_data VALUES (%i, %s, %i)', $this->_post['id'], $k, $v) === null)
             {
                 trigger_error('AdminWeightpresetsActionSaveResponse - failed to write to database', E_USER_ERROR);
                 $this->result = self::ERR_WRITE_DB;

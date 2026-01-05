@@ -30,7 +30,7 @@ class AdminGuidesResponse extends TemplateResponse
         else
         {
             $data   = $pending->getListviewData();
-            $latest = DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, MAX(`rev`) FROM ?_articles WHERE `type` = ?d AND `typeId` IN (?a) GROUP BY `rev`', Type::GUIDE, $pending->getFoundIDs());
+            $latest = DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, MAX(`rev`) FROM ::articles WHERE `type` = %i AND `typeId` IN %in GROUP BY `rev`', Type::GUIDE, $pending->getFoundIDs());
             foreach ($latest as $id => $rev)
                 $data[$id]['rev'] = $rev;
         }

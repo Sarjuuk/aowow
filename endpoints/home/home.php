@@ -25,18 +25,18 @@ class HomeBaseResponse extends TemplateResponse
     protected function generate() : void
     {
         // set <title> element
-        if ($_ = DB::Aowow()->selectCell('SELECT `title` FROM ?_home_titles WHERE `active` = 1 AND `locale` = ?d ORDER BY RAND()', Lang::getLocale()->value))
+        if ($_ = DB::Aowow()->selectCell('SELECT `title` FROM ::home_titles WHERE `active` = 1 AND `locale` = %i ORDER BY RAND()', Lang::getLocale()->value))
             $this->homeTitle = Util::jsEscape(Cfg::get('NAME').Lang::main('colon').$_);
 
         // load oneliner
-        if ($_ = DB::Aowow()->selectRow('SELECT * FROM ?_home_oneliner WHERE `active` = 1 ORDER BY RAND() LIMIT 1'))
+        if ($_ = DB::Aowow()->selectRow('SELECT * FROM ::home_oneliner WHERE `active` = 1 ORDER BY RAND() LIMIT 1'))
             $this->oneliner = new Markup(new LocString($_, 'text'), [], 'home-oneliner');
 
         if ($_ = $this->oneliner?->getJsGlobals())
             $this->extendGlobalData($_);
 
         // load featuredBox (user web server time)
-        if ($box = DB::Aowow()->selectRow('SELECT * FROM ?_home_featuredbox WHERE ?d BETWEEN `startDate` AND `endDate` ORDER BY `id` DESC', time()))
+        if ($box = DB::Aowow()->selectRow('SELECT * FROM ::home_featuredbox WHERE %i BETWEEN `startDate` AND `endDate` ORDER BY `id` DESC', time()))
         {
             // define text constants for all fields (STATIC_URL, HOST_URL, etc.)
             $box = Util::defStatic($box);
@@ -55,9 +55,9 @@ class HomeBaseResponse extends TemplateResponse
                 $this->extendGlobalData($_);
 
             // load overlay links
-            foreach (DB::Aowow()->select('SELECT * FROM ?_home_featuredbox_overlay WHERE `featureId` = ?d', $box['id']) as $ovl)
+            foreach (DB::Aowow()->selectAssoc('SELECT * FROM ::home_featuredbox_overlay WHERE `featureId` = %i', $box['id']) as $ovl)
             {
-                $ovl = Util::defStatic($ovl);
+                $ovl = Util::defStatic((array)$ovl);
 
                 $this->featuredBox['overlays'][] = array(
                     'url'   => $ovl['url'],

@@ -51,7 +51,7 @@ class ProfilesBaseResponse extends TemplateResponse implements IProfilerList
             if ($this->realm && $r['name'] != $this->realm)
                 continue;
 
-            $this->sumSubjects += DB::Characters($idx)->selectCell('SELECT COUNT(*) FROM characters WHERE `deleteInfos_Name` IS NULL AND `level` <= ?d AND (`extra_flags` & ?) = 0', MAX_LEVEL, Profiler::CHAR_GMFLAGS);
+            $this->sumSubjects += DB::Characters($idx)->selectCell('SELECT COUNT(*) FROM characters WHERE `deleteInfos_Name` IS NULL AND `level` <= %i AND (`extra_flags` & ?) = 0', MAX_LEVEL, Profiler::CHAR_GMFLAGS);
             $realms[] = $idx;
         }
 

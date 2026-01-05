@@ -12,16 +12,16 @@ class ItemsetList extends DBTypeList
 
     public static int    $type       = Type::ITEMSET;
     public static string $brickFile  = 'itemset';
-    public static string $dataTable  = '?_itemset';
+    public static string $dataTable  = '::itemset';
     public        array  $pieceToSet = [];                  // used to build g_items and search
 
     private array $classes = [];                            // used to build g_classes
 
-    protected string $queryBase  = 'SELECT `set`.*, `set`.`id` AS ARRAY_KEY FROM ?_itemset `set`';
+    protected string $queryBase  = 'SELECT `set`.*, `set`.`id` AS ARRAY_KEY FROM ::itemset `set`';
     protected array  $queryOpts  = array(
                         'set' => ['o' => 'maxlevel DESC'],
-                        'e'   => ['j' => ['?_events e ON `e`.`id` = `set`.`eventId`', true], 's' => ', e.`holidayId`'],
-                        'src' => ['j' => ['?_source src ON `src`.`typeId` = `set`.`id` AND `src`.`type` = 4', true], 's' => ', `src1`, `src2`, `src3`, `src4`, `src5`, `src6`, `src7`, `src8`, `src9`, `src10`, `src11`, `src12`, `src13`, `src14`, `src15`, `src16`, `src17`, `src18`, `src19`, `src20`, `src21`, `src22`, `src23`, `src24`']
+                        'e'   => ['j' => ['::events e ON `e`.`id` = `set`.`eventId`', true], 's' => ', e.`holidayId`'],
+                        'src' => ['j' => ['::source src ON `src`.`typeId` = `set`.`id` AND `src`.`type` = 4', true], 's' => ', `src1`, `src2`, `src3`, `src4`, `src5`, `src6`, `src7`, `src8`, `src9`, `src10`, `src11`, `src12`, `src13`, `src14`, `src15`, `src16`, `src17`, `src18`, `src19`, `src20`, `src21`, `src22`, `src23`, `src24`']
                     );
 
     public function __construct(array $conditions = [], array $miscData = [])

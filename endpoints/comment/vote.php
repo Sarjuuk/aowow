@@ -32,7 +32,7 @@ class CommentVoteResponse extends TextResponse
         }
 
         $target = DB::Aowow()->selectRow(
-           'SELECT c.`userId` AS "owner", ur.`value`, IF(c.`flags` & ?d, 1, 0) AS "deleted" FROM ?_comments c LEFT JOIN ?_user_ratings ur ON ur.`type` = ?d AND ur.`entry` = c.id AND ur.`userId` = ?d WHERE c.id = ?d',
+           'SELECT c.`userId` AS "owner", ur.`value`, IF(c.`flags` & %i, 1, 0) AS "deleted" FROM ::comments c LEFT JOIN ::user_ratings ur ON ur.`type` = %i AND ur.`entry` = c.id AND ur.`userId` = %i WHERE c.id = %i',
             CC_FLAG_DELETED, RATING_COMMENT, User::$id, $this->_get['id']
         );
         if (!$target)
@@ -62,9 +62,9 @@ class CommentVoteResponse extends TextResponse
         $ok = false;
         // old and new have same sign; undo vote (user may have gained/lost access to superVote in the meantime)
         if ($target['value'] && ($target['value'] < 0) == ($val < 0))
-            $ok = DB::Aowow()->query('DELETE FROM ?_user_ratings WHERE `type` = ?d AND `entry` = ?d AND `userId` = ?d', RATING_COMMENT, $this->_get['id'], User::$id);
+            $ok = DB::Aowow()->qry('DELETE FROM ::user_ratings WHERE `type` = %i AND `entry` = %i AND `userId` = %i', RATING_COMMENT, $this->_get['id'], User::$id);
         else                                                // replace, because we may be overwriting an old, opposing vote
-            if ($ok = DB::Aowow()->query('REPLACE INTO ?_user_ratings (`type`, `entry`, `userId`, `value`) VALUES (?d, ?d, ?d, ?d)', RATING_COMMENT, $this->_get['id'], User::$id, $val))
+            if ($ok = DB::Aowow()->qry('REPLACE INTO ::user_ratings (`type`, `entry`, `userId`, `value`) VALUES (%i, %i, %i, %i)', RATING_COMMENT, $this->_get['id'], User::$id, $val))
                 User::decrementDailyVotes();                // do not refund retracted votes!
 
         if ($ok)

@@ -29,7 +29,7 @@ class CommentAddreplyResponse extends TextResponse
         if (!User::canReply())
             $this->generate404(Lang::main('cannotComment'));
 
-        if (!$this->_post['commentId'] || !DB::Aowow()->selectCell('SELECT 1 FROM ?_comments WHERE `id` = ?d', $this->_post['commentId']))
+        if (!$this->_post['commentId'] || !DB::Aowow()->selectCell('SELECT 1 FROM ::comments WHERE `id` = %i', $this->_post['commentId']))
         {
             trigger_error('CommentAddreplyResponse - parent comment #'.$this->_post['commentId'].' does not exist', E_USER_ERROR);
             $this->generate404(Lang::main('intError'));
@@ -38,7 +38,7 @@ class CommentAddreplyResponse extends TextResponse
         if (mb_strlen($this->_post['body']) < CommunityContent::REPLY_LENGTH_MIN || mb_strlen($this->_post['body']) > CommunityContent::REPLY_LENGTH_MAX)
             $this->generate404(Lang::main('textLength', [mb_strlen($this->_post['body']), CommunityContent::REPLY_LENGTH_MIN, CommunityContent::REPLY_LENGTH_MAX]));
 
-        if (!DB::Aowow()->query('INSERT INTO ?_comments (`userId`, `roles`, `body`, `date`, `replyTo`) VALUES (?d, ?d, ?, UNIX_TIMESTAMP(), ?d)', User::$id, User::$groups, $this->_post['body'], $this->_post['commentId']))
+        if (!DB::Aowow()->qry('INSERT INTO ::comments (`userId`, `roles`, `body`, `date`, `replyTo`) VALUES (%i, %i, %s, UNIX_TIMESTAMP(), %i)', User::$id, User::$groups, $this->_post['body'], $this->_post['commentId']))
         {
             trigger_error('CommentAddreplyResponse - write to db failed', E_USER_ERROR);
             $this->generate404(Lang::main('intError'));

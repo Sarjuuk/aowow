@@ -7,7 +7,7 @@ mb_substitute_character('none');                            // drop invalid char
 error_reporting(E_ALL);
 mysqli_report(MYSQLI_REPORT_ERROR);
 
-define('AOWOW_REVISION', 45);
+define('AOWOW_REVISION', 46);
 define('OS_WIN', substr(PHP_OS, 0, 3) == 'WIN');            // OS_WIN as per compile info of php
 define('CLI', PHP_SAPI === 'cli');
 define('CLI_HAS_E', CLI &&                                  // WIN10 and later usually support ANSI escape sequences
@@ -34,8 +34,8 @@ require_once 'includes/defines.php';
 require_once 'includes/locale.class.php';
 require_once 'localization/lang.class.php';
 require_once 'localization/datetime.class.php';
-require_once 'includes/libs/DbSimple/Generic.php';          // Libraray: http://en.dklab.ru/lib/DbSimple (using variant: https://github.com/ivan1986/DbSimple/tree/master)
-require_once 'includes/database.class.php';                 // wrap DBSimple
+require_once 'includes/libs/autoload.php';                  // Composer libraries
+require_once 'includes/database.php';                       // wrap dg/dibi (https://https://dibi.nette.org/)
 require_once 'includes/utilities.php';                      // helper functions
 require_once 'includes/type.class.php';                     // DB types storage and factory
 require_once 'includes/cfg.class.php';                      // Config holder
@@ -133,6 +133,10 @@ set_error_handler(function(int $errNo, string $errStr, string $errFile, int $err
     if (strstr($errStr, 'mysqli_connect') && $errNo == E_WARNING)
         return true;
 
+    // do not log XDebug shenanigans
+    if (strstr($errFile, 'xdebug://'))
+        return true;
+
     // we do not log deprecation notices
     if ($errNo & (E_DEPRECATED | E_USER_DEPRECATED))
         return true;
@@ -159,12 +163,12 @@ set_error_handler(function(int $errNo, string $errStr, string $errFile, int $err
         $_POST['c_password'] = '******';
 
     if (DB::isConnected(DB_AOWOW))
-        DB::Aowow()->query('INSERT INTO ?_errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `post`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), ?d, ?d, ?, ?d, ?, ?, ?d, ?) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
+        DB::Aowow()->qry('INSERT INTO ::errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `post`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), %i, %i, %s, %i, %s, %s, %i, %s) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
             AOWOW_REVISION, $errNo, $errFile, $errLine, CLI ? 'CLI' : substr($_SERVER['QUERY_STRING'] ?? '', 0, 250), empty($_POST) ? '' : http_build_query($_POST), User::$groups, $errStr
         );
 
     $logMsg = $errName.' - '.$errStr.' @ '.$errFile. ':'.$errLine;
-    if (CLI && class_exists('CLI'))
+    if (CLI && class_exists(__NAMESPACE__.'\CLI'))
         CLI::write($logMsg, $logLevel);
     else if (CLI)
         fwrite(STDERR, $logMsg);
@@ -183,7 +187,7 @@ set_exception_handler(function (\Throwable $e) : void
         $_POST['c_password'] = '******';
 
     if (DB::isConnected(DB_AOWOW))
-        DB::Aowow()->query('INSERT INTO ?_errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `post`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), ?d, ?d, ?, ?d, ?, ?, ?d, ?) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
+        DB::Aowow()->qry('INSERT INTO ::errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `post`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), %i, %i, %s, %i, %s, %s, %i, %s) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
             AOWOW_REVISION, $e->getCode(), $e->getFile(), $e->getLine(), CLI ? 'CLI' : substr($_SERVER['QUERY_STRING'] ?? '', 0, 250), empty($_POST) ? '' : http_build_query($_POST), User::$groups, $e->getMessage()
         );
 
@@ -211,7 +215,7 @@ register_shutdown_function(function() : void
             $_POST['c_password'] = '******';
 
         if (DB::isConnected(DB_AOWOW))
-            DB::Aowow()->query('INSERT INTO ?_errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `post`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), ?d, ?d, ?, ?d, ?, ?, ?d, ?) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
+            DB::Aowow()->qry('INSERT INTO ::errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `post`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), %i, %i, %s, %i, %s, %s, %i, %s) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
                 AOWOW_REVISION, $e['type'], $e['file'], $e['line'], CLI ? 'CLI' : substr($_SERVER['QUERY_STRING'] ?? '', 0, 250), empty($_POST) ? '' : http_build_query($_POST), User::$groups, $e['message']
             );
 
@@ -279,20 +283,6 @@ if (!CLI)
         Lang::load($loc);
     else
         Lang::load(User::$preferedLoc);
-
-    // set up some logging (some queries will execute before we init the user and load the config)
-    if (Cfg::get('DEBUG') >= LOG_LEVEL_INFO && User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN))
-    {
-        DB::Aowow()->setLogger(DB::profiler(...));
-        DB::World()->setLogger(DB::profiler(...));
-        if (DB::isConnected(DB_AUTH))
-            DB::Auth()->setLogger(DB::profiler(...));
-
-        if (!empty($AoWoWconf['characters']))
-            foreach ($AoWoWconf['characters'] as $idx => $__)
-                if (DB::isConnected(DB_CHARACTERS . $idx))
-                    DB::Characters($idx)->setLogger(DB::profiler(...));
-    }
 }
 
 ?>

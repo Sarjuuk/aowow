@@ -80,7 +80,7 @@ class Search
     private array $included    = [];
     private array $excluded    = [];
     private array $fulltext    = [];
-    private array $cndBase     = ['AND'];
+    private array $cndBase     = [DB::AND];
     private bool  $idSearch    = false;
 
     public array $invalid = [];
@@ -173,7 +173,7 @@ class Search
 
             // single cnd?
             if (count($sub) > 1)
-                array_unshift($sub, 'AND');
+                array_unshift($sub, DB::AND);
             else
                 $sub = $sub[0];
 
@@ -182,7 +182,7 @@ class Search
 
         // single cnd?
         if (count($qry) > 1)
-            array_unshift($qry, 'OR');
+            array_unshift($qry, DB::OR);
         else
             $qry = $qry[0];
 
@@ -210,7 +210,7 @@ class Search
 
         // single cnd?
         if (count($qry) > 1)
-            array_unshift($qry, 'OR');
+            array_unshift($qry, DB::OR);
         else
             $qry = $qry[0];
 
@@ -371,9 +371,9 @@ class Search
     {
         $cnd     = array_merge($this->cndBase, array(
             array(
-                'OR',
+                DB::OR,
                 $this->createLikeLookup(['h.name_loc'.Lang::getLocale()->value]),
-                ['AND', $this->createLikeLookup(['e.description']), ['e.holidayId', 0]]
+                [DB::AND, $this->createLikeLookup(['e.description']), ['e.holidayId', 0]]
             )
         ));
         $wEvents = new WorldEventList($cnd, ['calcTotal' => true]);
@@ -1481,7 +1481,7 @@ class Search
         $cnd  = array_merge($this->cndBase, array(
             ['s.typeCat', -8, '!'],
             [
-                'OR',
+                DB::OR,
                 ['s.typeCat', [0, -9]],
                 ['s.cuFlags', SPELL_CU_TRIGGERED, '&'],
                 ['s.attributes0', 0x80, '&']

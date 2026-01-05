@@ -37,7 +37,7 @@ class AccountUpdatecommunitysettingsResponse extends TextResponse
             return Lang::main('genericError');
 
         // description - 0 modified rows is still success
-        if (!is_int(DB::Aowow()->query('UPDATE ?_account SET `description` = ? WHERE `id` = ?d', $this->_post['desc'], User::$id)))
+        if (!is_int(DB::Aowow()->qry('UPDATE ::account SET `description` = %s WHERE `id` = %i', $this->_post['desc'], User::$id)))
             return Lang::main('genericError');
 
         $this->success = true;

@@ -29,18 +29,18 @@ class GuideVoteResponse extends TextResponse
 
         // by id, not own, published
         $points = $votes = 0;
-        if ($g = DB::Aowow()->selectRow('SELECT `userId`, `cuFlags` FROM ?_guides WHERE `id` = ?d AND (`status` = ?d OR `rev` > 0)', $this->_post['id'], GuideMgr::STATUS_APPROVED))
+        if ($g = DB::Aowow()->selectRow('SELECT `userId`, `cuFlags` FROM ::guides WHERE `id` = %i AND (`status` = %i OR `rev` > 0)', $this->_post['id'], GuideMgr::STATUS_APPROVED))
         {
             // apparently you are allowed to vote on your own guide
             if ($g['cuFlags'] & GUIDE_CU_NO_RATING)
                 $this->generate403();
 
             if (!$this->_post['rating'])
-                DB::Aowow()->query('DELETE FROM ?_user_ratings WHERE `type` = ?d AND `entry` = ?d AND `userId` = ?d', RATING_GUIDE, $this->_post['id'], User::$id);
+                DB::Aowow()->qry('DELETE FROM ::user_ratings WHERE `type` = %i AND `entry` = %i AND `userId` = %i', RATING_GUIDE, $this->_post['id'], User::$id);
             else
-                DB::Aowow()->query('REPLACE INTO ?_user_ratings (`type`, `entry`, `userId`, `value`) VALUES (?d, ?d, ?d, ?d)', RATING_GUIDE, $this->_post['id'], User::$id, $this->_post['rating']);
+                DB::Aowow()->qry('REPLACE INTO ::user_ratings (`type`, `entry`, `userId`, `value`) VALUES (%i, %i, %i, %i)', RATING_GUIDE, $this->_post['id'], User::$id, $this->_post['rating']);
 
-            [$points, $votes] = DB::Aowow()->selectRow('SELECT IFNULL(SUM(`value`), 0) AS "0", IFNULL(COUNT(*), 0) AS "1" FROM ?_user_ratings WHERE `type` = ?d AND `entry` = ?d', RATING_GUIDE, $this->_post['id']);
+            [$points, $votes] = DB::Aowow()->selectRow('SELECT IFNULL(SUM(`value`), 0) AS "0", IFNULL(COUNT(*), 0) AS "1" FROM ::user_ratings WHERE `type` = %i AND `entry` = %i', RATING_GUIDE, $this->_post['id']);
         }
 
         $this->result = Util::toJSON($votes ? ['rating' => $points / $votes, 'nvotes' => $votes] : ['rating' => 0, 'nvotes' => 0]);

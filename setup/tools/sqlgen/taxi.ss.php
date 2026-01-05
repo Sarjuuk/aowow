@@ -19,19 +19,19 @@ CLISetup::registerSetup("sql", new class extends SetupScript
     protected $worldDependency = ['creature', 'creature_template'];
     protected $setupAfter      = [['dungeonmap', 'worldmaparea'], []]; // accessed by WorldPosition::toZonePos
 
-    public function generate(array $ids = []) : bool
+    public function generate() : bool
     {
-        DB::Aowow()->query('TRUNCATE ?_taxipath');
-        DB::Aowow()->query('TRUNCATE ?_taxinodes');
+        DB::Aowow()->qry('TRUNCATE ::taxipath');
+        DB::Aowow()->qry('TRUNCATE ::taxinodes');
 
         /*********/
         /* paths */
         /*********/
 
-        DB::Aowow()->query('INSERT INTO ?_taxipath SELECT tp.id, tp.startNodeId, tp.endNodeId FROM dbc_taxipath tp WHERE tp.startNodeId > 0 AND tp.EndNodeId > 0');
+        DB::Aowow()->qry('INSERT INTO ::taxipath SELECT tp.id, tp.startNodeId, tp.endNodeId FROM dbc_taxipath tp WHERE tp.startNodeId > 0 AND tp.EndNodeId > 0');
 
         // paths are monodirectional and thus exist twice for regular flight travel (which is bidirectional)
-        $paths = DB::Aowow()->select('SELECT id AS ARRAY_KEY, tp.* FROM ?_taxipath tp');
+        $paths = DB::Aowow()->selectAssoc('SELECT id AS ARRAY_KEY, tp.* FROM ::taxipath tp');
         foreach ($paths as $i => $p)
         {
             foreach ($paths as $j => $_)
@@ -39,7 +39,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                 if ($_['startNodeId'] != $p['endNodeId'] || $_['endNodeId'] != $p['startNodeId'])
                     continue;
 
-                DB::Aowow()->query('DELETE FROM ?_taxipath WHERE id = ?d', $j);
+                DB::Aowow()->qry('DELETE FROM ::taxipath WHERE id = %i', $j);
                 unset($paths[$j]);
                 unset($paths[$i]);
                 break;
@@ -52,7 +52,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         /*********/
 
         // all sensible nodes
-        $fNodes  = DB::Aowow()->select(
+        $fNodes  = DB::Aowow()->selectAssoc(
            'SELECT tn.`id`,
                    tn.`mapId`,
                    100 - ROUND((tn.`posY` - wma.`right`)  * 100 / (wma.`left` - wma.`right`), 1) AS "mapX",
@@ -92,17 +92,18 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         );
 
         // all available flightmaster
-        $fMaster = DB::World()->select('SELECT ct.`entry`, ct.`faction`, c.`map`, c.`position_x` AS "posX", c.`position_y` AS "posY" FROM creature_template ct JOIN creature c ON c.`id` = ct.`entry` WHERE ct.`npcflag` & ?d OR c.`npcflag` & ?d',
+        $fMaster = DB::World()->selectAssoc(
+           'SELECT ct.`entry`, ct.`faction`, c.`map`, c.`position_x` AS "posX", c.`position_y` AS "posY" FROM creature_template ct JOIN creature c ON c.`id` = ct.`entry` WHERE ct.`npcflag` & %i OR c.`npcflag` & %i',
             NPC_FLAG_FLIGHT_MASTER, NPC_FLAG_FLIGHT_MASTER
         );
 
         // fetch reactions per faction
-        $factions = DB::Aowow()->query(
+        $factions = DB::Aowow()->selectAssoc(
            'SELECT `id` AS ARRAY_KEY,
                    IF(`enemyFactionId1` = 1 OR `enemyFactionId2` = 1 OR `enemyFactionId3` = 1 OR `enemyFactionId4` = 1 OR `hostileMask` & 0x3, -1, 1) AS "reactA",
                    IF(`enemyFactionId1` = 2 OR `enemyFactionId2` = 2 OR `enemyFactionId3` = 2 OR `enemyFactionId4` = 2 OR `hostileMask` & 0x5, -1, 1) AS "reactH"
             FROM   dbc_factiontemplate
-            WHERE  `id` IN (?a)',
+            WHERE  `id` IN %in',
         array_column($fMaster, 'faction'));
 
         foreach ($fNodes as $n)
@@ -125,8 +126,8 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                     {
                         $n['_dist']  = $dist;
                         $n['typeId'] = $c['entry'];
-                        $n['reactA'] = $factions[$c['faction']]['reactA'] ?? null;
-                        $n['reactH'] = $factions[$c['faction']]['reactH'] ?? null;
+                        $n['reactA'] = $factions[$c['faction']]['reactA'] ?? 0;
+                        $n['reactH'] = $factions[$c['faction']]['reactH'] ?? 0;
                     }
                 }
             }
@@ -141,7 +142,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
             unset($n['_mapId'], $n['_posX'], $n['_posY'], $n['_dist'], $n['_scripted']);
 
-            DB::Aowow()->query('INSERT INTO ?_taxinodes VALUES (?a)', array_values($n));
+            DB::Aowow()->qry('INSERT INTO ::taxinodes VALUES %l', $n);
         }
 
         return true;

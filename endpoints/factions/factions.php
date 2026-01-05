@@ -81,11 +81,11 @@ class FactionsBaseResponse extends TemplateResponse implements ICache
         else if (isset($this->category[0]))
         {
             if ($this->category[0])
-                $subs = DB::Aowow()->selectCol('SELECT `id` FROM ?_factions WHERE `parentFactionId` = ?d', $this->category[0]);
+                $subs = DB::Aowow()->selectCol('SELECT `id` FROM ::factions WHERE `parentFactionId` = %i', $this->category[0]);
             else
                 $subs = [0];
 
-            $conditions[] = ['OR', ['parentFactionId', $subs], ['id', $subs]];
+            $conditions[] = [DB::OR, ['parentFactionId', $subs], ['id', $subs]];
         }
 
         $data = [];

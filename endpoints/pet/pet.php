@@ -116,7 +116,7 @@ class PetBaseResponse extends TemplateResponse implements ICache
             ['ct.typeFlags', NPC_TYPEFLAG_TAMEABLE, '&'],
             ['ct.family', $this->typeId],                   // displayed petType
             [
-                'OR',                                       // at least neutral to at least one faction
+                DB::OR,                                       // at least neutral to at least one faction
                 ['ft.A', 1, '<'],
                 ['ft.H', 1, '<']
             ]
@@ -166,13 +166,13 @@ class PetBaseResponse extends TemplateResponse implements ICache
         $conditions = [
             ['s.typeCat', -3],                              // Pet-Ability
             [
-                'OR',
+                DB::OR,
                 // match: first skillLine
                 ['skillLine1', $this->subject->getField('skillLineId')],
                 // match: second skillLine (if not mask)
-                ['AND', ['skillLine1', 0, '>'], ['skillLine2OrMask', $this->subject->getField('skillLineId')]],
+                [DB::AND, ['skillLine1', 0, '>'], ['skillLine2OrMask', $this->subject->getField('skillLineId')]],
                 // match: skillLineMask (if mask)
-                ['AND', ['skillLine1', -1], ['skillLine2OrMask', $mask, '&']]
+                [DB::AND, ['skillLine1', -1], ['skillLine2OrMask', $mask, '&']]
             ]
         ];
 
@@ -190,7 +190,7 @@ class PetBaseResponse extends TemplateResponse implements ICache
         $conditions = array(
             ['s.typeCat', -7],
             [                                                   // last rank or unranked
-                'OR',
+                DB::OR,
                 ['s.cuFlags', SPELL_CU_LAST_RANK, '&'],
                 ['s.rankNo', 0]
             ]

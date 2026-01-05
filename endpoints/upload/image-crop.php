@@ -67,12 +67,12 @@ class UploadImagecropResponse extends TemplateResponse
         if (!AvatarMgr::loadUpload())
             return Lang::main('intError');
 
-        $n = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ?_account_avatars WHERE `userId` = ?d', User::$id);
+        $n = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ::account_avatars WHERE `userId` = %i', User::$id);
         if ($n && $n > Cfg::get('ACC_MAX_AVATAR_UPLOADS'))
             return Lang::main('intError');
 
         // why is ++(<IntExpression>); illegal syntax? WHO KNOWS!?
-        $this->nextId = (DB::Aowow()->selectCell('SELECT MAX(`id`) FROM ?_account_avatars') ?: 0) + 1;
+        $this->nextId = (DB::Aowow()->selectCell('SELECT MAX(`id`) FROM ::account_avatars') ?: 0) + 1;
 
         if (!AvatarMgr::tempSaveUpload(['avatar', $this->nextId], $this->imgHash))
             return Lang::main('intError');

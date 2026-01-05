@@ -27,8 +27,10 @@ CLISetup::registerSetup("sql", new class extends SetupScript
     protected $worldDependency = ['creature', 'creature_addon', 'creature_template_addon', 'gameobject', 'gameobject_template', 'vehicle_accessory', 'vehicle_accessory_template', 'waypoint_data', 'smart_scripts', 'areatrigger_teleport'];
     protected $setupAfter      = [['dungeonmap', 'worldmaparea', 'zones'], ['img-maps']];
 
-    private $transports         = [];
-    private $overrideData       = [];
+    private array $transports   = [];
+    private array $overrideData = [];
+    private array $mapToArea    = [];
+    private array $areaParents  = [];
 
     private $steps = array(
         0x01 => ['creature',     Type::NPC,         false, '`creature` spawns',                                ],
@@ -40,7 +42,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
     );
 
 
-    public function generate(array $ids = []) : bool
+    public function generate() : bool
     {
         /*****************************/
         /* find out what to generate */
@@ -74,30 +76,32 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         /*********************************/
 
         if (!$todoMask || ($todoMask & 0x1F) == 0x1F)
-            DB::Aowow()->query('TRUNCATE TABLE ?_spawns');
+            DB::Aowow()->qry('TRUNCATE TABLE ::spawns');
         else
             foreach ($this->steps as $idx => [, $type, $isWP, ])
                 if (($idx & $todoMask) && !$isWP)
-                    DB::Aowow()->query('DELETE FROM ?_spawns WHERE `type` = ?d', $type);
+                    DB::Aowow()->qry('DELETE FROM ::spawns WHERE `type` = %i', $type);
 
         if (!$todoMask || ($todoMask & 0x20))
-            DB::Aowow()->query('TRUNCATE TABLE ?_creature_waypoints');
+            DB::Aowow()->qry('TRUNCATE TABLE ::creature_waypoints');
 
 
         /**************************/
         /* offsets for transports */
         /**************************/
 
-        $this->transports = DB::World()->selectCol('SELECT `data0` AS `pathId`, `data6` AS ARRAY_KEY FROM gameobject_template WHERE `type` = ?d AND `data6` <> 0', OBJECT_MO_TRANSPORT);
+        $this->transports = DB::World()->selectCol('SELECT `data0` AS `pathId`, `data6` AS ARRAY_KEY FROM gameobject_template WHERE `type` = %i AND `data6` <> 0', OBJECT_MO_TRANSPORT);
         foreach ($this->transports as &$t)
-            $t = DB::Aowow()->selectRow('SELECT `posX`, `posY`, `mapId` FROM dbc_taxipathnode tpn WHERE tpn.`pathId` = ?d AND `nodeIdx` = 0', $t);
+            $t = DB::Aowow()->selectRow('SELECT `posX`, `posY`, `mapId` FROM dbc_taxipathnode tpn WHERE tpn.`pathId` = %i AND `nodeIdx` = 0', $t);
 
 
         /*********************/
         /* get override data */
         /*********************/
 
-        $this->overrideData = DB::Aowow()->select('SELECT `type` AS ARRAY_KEY, `typeGuid` AS ARRAY_KEY2, `areaId`, `floor` FROM ?_spawns_override');
+        $this->overrideData = DB::Aowow()->selectAssoc('SELECT `type` AS ARRAY_KEY, `typeGuid` AS ARRAY_KEY2, `areaId`, `floor` FROM ::spawns_override');
+        $this->mapToArea    = DB::Aowow()->selectCol('SELECT `mapId` AS ARRAY_KEY, `id` FROM ::zones WHERE `parentArea` = 0 AND (`cuFlags` & %i) = 0', CUSTOM_EXCLUDE_FOR_LISTVIEW);
+        $this->areaParents  = DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, IF(`parentArea`, `parentArea`, `id`) FROM ::zones');
 
 
         /**************/
@@ -109,6 +113,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             $time          = new Timer(500);
             $sum           = 0;
             $lastOverride  = 0;
+            $insertData    = [];
             $nSteps        = count($this->steps);
             $queryResult   = $this->$generator();
             $queryTotal    = count($queryResult);
@@ -139,16 +144,28 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                     continue;
                 }
 
-                $set = array_merge($spawn, $point);
-                if (!$isWP)                                 // REPLACE: because there is bogus data where one path may be assigned to multiple npcs
+                [
+                    $insertData['areaId'][],
+                    $insertData['posX'][],
+                    $insertData['posY'][],
+                    $insertData['floor'][]
+                ] = $point; // [areaId, posX, posY, floor]
+
+                unset($spawn['map'], $spawn['posX'], $spawn['posY'], $spawn['areaId']);
+                foreach ($spawn as $k => $v)
+                    $insertData[$k][] = $v;
+
+                if (!($sum % 1000) || $sum == $queryTotal)
                 {
-                    unset($set['map']);
-                    DB::Aowow()->query('REPLACE INTO ?_spawns (?#) VALUES (?a)', array_keys($set), array_values($set));
-                }
-                else
-                {
-                    unset($set['map'], $set['guid']);
-                    DB::Aowow()->query('REPLACE INTO ?_creature_waypoints (?#) VALUES (?a)', array_keys($set), array_values($set));
+                    if (!$isWP)                             // REPLACE: because there is bogus data where one path may be assigned to multiple npcs
+                        DB::Aowow()->qry('REPLACE INTO ::spawns %m', $insertData);
+                    else
+                    {
+                        unset($insertData['guid']);
+                        DB::Aowow()->qry('REPLACE INTO ::creature_waypoints %m', $insertData);
+                    }
+
+                    $insertData = [];
                 }
             }
         }
@@ -161,7 +178,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         if ($todoMask & 0x01)                               // only when creature is set
         {
             // get vehicle template accessories
-            $accessories = DB::World()->select(
+            $accessories = DB::World()->selectAssoc(
                'SELECT vta.`accessory_entry` AS `typeId`,  c.`guid`,  vta.`entry`, COUNT(1) AS `nSeats` FROM vehicle_template_accessory vta LEFT JOIN creature c ON c.`id` = vta.`entry` GROUP BY `accessory_entry`,  c.`guid` UNION
                 SELECT  va.`accessory_entry` AS `typeId`, va.`guid`, 0 AS `entry`, COUNT(1) AS `nSeats` FROM vehicle_accessory           va                                              GROUP BY `accessory_entry`, va.`guid`'
             );
@@ -178,16 +195,16 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                 {
                     $vehicles = [];
                     if ($data['guid'])                      // vehicle already spawned
-                        $vehicles = DB::Aowow()->select('SELECT s.`areaId`, s.`posX`, s.`posY`, s.`floor` FROM ?_spawns s WHERE s.`guid`   = ?d AND s.`type` = ?d', $data['guid'], Type::NPC);
+                        $vehicles = DB::Aowow()->selectAssoc('SELECT s.`areaId`, s.`posX`, s.`posY`, s.`floor` FROM ::spawns s WHERE s.`guid`   = %i AND s.`type` = %i', $data['guid'], Type::NPC);
                     else if ($data['entry'])                // vehicle on unspawned vehicle action
-                        $vehicles = DB::Aowow()->select('SELECT s.`areaId`, s.`posX`, s.`posY`, s.`floor` FROM ?_spawns s WHERE s.`typeId` = ?d AND s.`type` = ?d', $data['entry'], Type::NPC);
+                        $vehicles = DB::Aowow()->selectAssoc('SELECT s.`areaId`, s.`posX`, s.`posY`, s.`floor` FROM ::spawns s WHERE s.`typeId` = %i AND s.`type` = %i', $data['entry'], Type::NPC);
 
                     if ($vehicles)
                     {
                         $matches++;
                         foreach ($vehicles as $v)           // if there is more than one vehicle, its probably due to overlapping zones
                             for ($i = 0; $i < $data['nSeats']; $i++)
-                                DB::Aowow()->query('INSERT INTO ?_spawns (`guid`, `type`, `typeId`, `respawn`, `spawnMask`, `phaseMask`, `areaId`, `floor`, `posX`, `posY`, `pathId`) VALUES (?d, ?d, ?d, 0, 0, 1, ?d, ?d, ?f, ?f, 0)',
+                                DB::Aowow()->qry('INSERT INTO ::spawns (`guid`, `type`, `typeId`, `respawn`, `spawnMask`, `phaseMask`, `areaId`, `floor`, `posX`, `posY`, `pathId`) VALUES (%i, %i, %i, 0, 0, 1, %i, %i, %f, %f, 0)',
                                     --$vGuid, Type::NPC, $data['typeId'], $v['areaId'], $v['floor'], $v['posX'], $v['posY']);
 
                         unset($accessories[$idx]);
@@ -205,7 +222,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         /* restrict difficulty displays */
         /********************************/
 
-        DB::Aowow()->query('UPDATE ?_spawns s, dbc_worldmaparea wma, dbc_map m SET s.`spawnMask` = 0 WHERE s.`areaId` = wma.`areaId` AND wma.`mapId` = m.`id` AND m.`areaType` IN (0, 3, 4)');
+        DB::Aowow()->qry('UPDATE ::spawns s, dbc_worldmaparea wma, dbc_map m SET s.`spawnMask` = 0 WHERE s.`areaId` = wma.`areaId` AND wma.`mapId` = m.`id` AND m.`areaType` IN (0, 3, 4)');
 
         return true;
     }
@@ -213,8 +230,8 @@ CLISetup::registerSetup("sql", new class extends SetupScript
     private function creature() : array
     {
         // [guid, type, typeId, map, posX, posY [, respawn, spawnMask, phaseMask, areaId, floor, pathId, ScriptName, StringId]]
-        return DB::World()->select(
-           'SELECT    c.`guid`, ?d AS `type`, c.`id` AS `typeId`, c.`map`, c.`position_x` AS `posX`, c.`position_y` AS `posY`, c.`spawntimesecs` AS `respawn`, c.`spawnMask`, c.`phaseMask`, c.`zoneId` AS `areaId`, IFNULL(ca.`path_id`, IFNULL(cta.`path_id`, 0)) AS `pathId`, NULLIF(`ScriptName`, "") AS "ScriptName", NULLIF(`StringId`, "") AS "StringId"
+        return DB::World()->selectAssoc(
+           'SELECT    c.`guid`, %i AS `type`, c.`id` AS `typeId`, c.`map`, c.`position_x` AS `posX`, c.`position_y` AS `posY`, c.`spawntimesecs` AS `respawn`, c.`spawnMask`, c.`phaseMask`, c.`zoneId` AS `areaId`, IFNULL(ca.`path_id`, IFNULL(cta.`path_id`, 0)) AS `pathId`, NULLIF(`ScriptName`, "") AS "ScriptName", NULLIF(`StringId`, "") AS "StringId"
             FROM      creature c
             LEFT JOIN creature_addon ca           ON ca.guid   = c.guid
             LEFT JOIN creature_template_addon cta ON cta.entry = c.id',
@@ -225,8 +242,8 @@ CLISetup::registerSetup("sql", new class extends SetupScript
     private function gameobject() : array
     {
         // [guid, type, typeId, map, posX, posY [, respawn, spawnMask, phaseMask, areaId, floor, pathId, ScriptName, StringId]]
-        return DB::World()->select(
-           'SELECT `guid`, ?d AS `type`, `id` AS `typeId`, `map`, `position_x` AS `posX`, `position_y` AS `posY`, `spawntimesecs` AS `respawn`, `spawnMask`, `phaseMask`, `zoneId` AS `areaId`, NULLIF(`ScriptName`, "") AS "ScriptName", NULLIF(`StringId`, "") AS "StringId"
+        return DB::World()->selectAssoc(
+           'SELECT `guid`, %i AS `type`, `id` AS `typeId`, `map`, `position_x` AS `posX`, `position_y` AS `posY`, `spawntimesecs` AS `respawn`, `spawnMask`, `phaseMask`, `zoneId` AS `areaId`, NULLIF(`ScriptName`, "") AS "ScriptName", NULLIF(`StringId`, "") AS "StringId"
             FROM   gameobject',
             Type::OBJECT
         );
@@ -235,8 +252,8 @@ CLISetup::registerSetup("sql", new class extends SetupScript
     private function soundemitter() : array
     {
         // [guid, type, typeId, map, posX, posY [, respawn, spawnMask, phaseMask, areaId, floor, pathId, ScriptName, StringId]]
-        return DB::Aowow()->select(
-           'SELECT `id` AS `guid`, ?d AS `type`, `soundId` AS `typeId`, `mapId` AS `map`, `posX`, `posY`
+        return DB::Aowow()->selectAssoc(
+           'SELECT `id` AS `guid`, %i AS `type`, `soundId` AS `typeId`, `mapId` AS `map`, `posX`, `posY`
             FROM   dbc_soundemitters',
             Type::SOUND
         );
@@ -245,18 +262,18 @@ CLISetup::registerSetup("sql", new class extends SetupScript
     private function areatrigger() : array
     {
         // [guid, type, typeId, map, posX, posY [, respawn, spawnMask, phaseMask, areaId, floor, pathId, ScriptName, StringId]]
-        $base = DB::Aowow()->select(
-           'SELECT `id` AS `guid`, ?d AS `type`, `id` AS `typeId`, `mapId` AS `map`, `posX`, `posY`
+        $base = DB::Aowow()->selectAssoc(
+           'SELECT `id` AS `guid`, %i AS `type`, `id` AS `typeId`, `mapId` AS `map`, `posX`, `posY`
             FROM   dbc_areatrigger',
             Type::AREATRIGGER
         );
 
-        $addData = DB::World()->select(
-           'SELECT -`ID`          AS `guid`, ?d AS `type`, ID          AS `typeId`,    `target_map` AS `map`, `target_position_x` AS `posX`, `target_position_y` AS `posY`
+        $addData = DB::World()->selectAssoc(
+           'SELECT -`ID`          AS `guid`, %i AS `type`, ID          AS `typeId`,    `target_map` AS `map`, `target_position_x` AS `posX`, `target_position_y` AS `posY`
             FROM   areatrigger_teleport UNION
-            SELECT -`entryorguid` AS `guid`, ?d AS `type`, entryorguid AS `typeId`, `action_param1` AS `map`, `target_x`          AS `posX`, `target_y`          AS `posY`
+            SELECT -`entryorguid` AS `guid`, %i AS `type`, entryorguid AS `typeId`, `action_param1` AS `map`, `target_x`          AS `posX`, `target_y`          AS `posY`
             FROM   smart_scripts
-            WHERE `source_type` = ?d AND `action_type` = ?d',
+            WHERE `source_type` = %i AND `action_type` = %i',
             Type::AREATRIGGER, Type::AREATRIGGER, SmartAI::SRC_TYPE_AREATRIGGER, SmartAction::ACTION_TELEPORT
         );
 
@@ -266,10 +283,10 @@ CLISetup::registerSetup("sql", new class extends SetupScript
     private function instances() : array
     {
         // maps with set graveyard
-        return DB::Aowow()->select(
-           'SELECT -`id` AS `guid`, ?d AS `type`, `id` AS `typeId`, `parentMapId` AS `map`, `parentX` AS `posX`, `parentY` AS `posY`
-            FROM   ?_zones
-            WHERE `parentX` <> 0 AND `parentY` <> 0 AND `parentArea` = 0 AND (`cuFlags` & ?d) = 0',
+        return DB::Aowow()->selectAssoc(
+           'SELECT -`id` AS `guid`, %i AS `type`, `id` AS `typeId`, `parentMapId` AS `map`, `parentX` AS `posX`, `parentY` AS `posY`
+            FROM   ::zones
+            WHERE `parentX` <> 0 AND `parentY` <> 0 AND `parentArea` = 0 AND (`cuFlags` & %i) = 0',
             Type::ZONE, CUSTOM_EXCLUDE_FOR_LISTVIEW
         );
     }
@@ -280,7 +297,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         // in the future guid should be optional and additional parameters substituting guid should be passed down from NpcPage after SmartAI has been evaluated
 
         // assume that creature_template_addon data isn't stupid and only creatures with a single spawn are referenced here
-        return DB::World()->select(
+        return DB::World()->selectAssoc(
            'SELECT c.`guid`, -w.`id` AS `creatureOrPath`, w.`point`, c.`zoneId` AS `areaId`, c.`map`, w.`delay` AS `wait`, w.`position_x` AS `posX`, w.`position_y` AS `posY`
             FROM   creature c
             JOIN   creature_addon ca ON ca.`guid` = c.`guid`
@@ -294,7 +311,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         );
     }
 
-    private function transformPoint(array $point, int $type, ?string &$notice = '') : array
+    private function transformPoint(array $point, int $type, ?string &$notice = '') : ?array
     {
         // npc/object is on a transport -> apply offsets to path of transport
         // note, that transport DO spawn outside of displayable area maps .. another todo i guess..
@@ -318,22 +335,21 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         {
             // if areaId is set and we match it .. we're fine .. mostly
             if (count($points) == 1 && $area == $points[0]['areaId'])
-                return ['areaId' => $points[0]['areaId'], 'posX' => $points[0]['posX'], 'posY' => $points[0]['posY'], 'floor' => $points[0]['floor']];
+                return [$points[0]['areaId'], $points[0]['posX'], $points[0]['posY'], $points[0]['floor']];
 
             $point = WorldPosition::checkZonePos($points);  // try to determine best found point by alphamap
-            return ['areaId' => $point['areaId'], 'posX' => $point['posX'], 'posY' => $point['posY'], 'floor' => $point['floor']];
+            return [$point['areaId'], $point['posX'], $point['posY'], $point['floor']];
         }
 
         // cannot be placed on a map, try to reuse TC assigned areaId (note: area has been invalid in the past)
-        if ($area && ($selfOrParent = DB::Aowow()->selectCell('SELECT IF(`parentArea`, `parentArea`, `id`) FROM ?_zones WHERE `id` = ?d', $area)))
-            return ['areaId' => $selfOrParent, 'posX' => 0, 'posY' => 0, 'floor' => 0];
+        if ($area && isset($this->areaParents[$area]))
+            return [$this->areaParents[$area], 0, 0, 0];
 
         // we know the instanced map; try to assign a zone this way
-        if (!in_array($point['map'], [0, 1, 530, 571]))
-            if ($area = DB::Aowow()->selectCell('SELECT `id` FROM ?_zones WHERE `mapId` = ?d AND `parentArea` = 0 AND (`cuFlags` & ?d) = 0', $point['map'], CUSTOM_EXCLUDE_FOR_LISTVIEW))
-                return ['areaId' => $area, 'posX' => 0, 'posY' => 0, 'floor' => 0];
+        if (!in_array($point['map'], [0, 1, 530, 571]) && isset($this->mapToArea[$point['map']]))
+            return [$this->mapToArea[$point['map']], 0, 0, 0];
 
-        return [];
+        return null;
     }
 });
 

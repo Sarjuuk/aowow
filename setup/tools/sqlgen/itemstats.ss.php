@@ -11,7 +11,7 @@ if (!CLI)
 
 class ItemStatSetup extends ItemList
 {
-    public function __construct(int $start, int $limit, int $itemClass, array $ids, private bool $applyTriggered, private array $relEnchants, private array $relSpells)
+    public function __construct(int $start, int $limit, int $itemClass, private bool $applyTriggered, private array $relEnchants, private array $relSpells)
     {
         $this->queryOpts['i']['o'] = 'i.id ASC';
         unset($this->queryOpts['is']);                      // do not reference the stats table we are going to write to
@@ -21,9 +21,6 @@ class ItemStatSetup extends ItemList
             ['class', $itemClass],
             $limit
         );
-
-        if ($ids)
-            $conditions[] = ['id', $ids];
 
         parent::__construct($conditions);
     }
@@ -40,14 +37,14 @@ class ItemStatSetup extends ItemList
 
             if ($spellIds)                                  // array_merge kills the keys
             {
-                $newSpells = DB::Aowow()->select('SELECT *, id AS ARRAY_KEY FROM ?_spell WHERE id IN (?a)', $spellIds);
+                $newSpells = DB::Aowow()->selectAssoc('SELECT *, id AS ARRAY_KEY FROM ::spell WHERE id IN %in', $spellIds);
                 $this->relSpells = array_replace($this->relSpells, $newSpells);
 
                 // include triggered spell to calculate nutritional values
                 if ($this->applyTriggered)
                     if ($t = array_filter(array_merge(array_column($newSpells, 'effect1TriggerSpell'), array_column($newSpells, 'effect2TriggerSpell'), array_column($newSpells, 'effect3TriggerSpell'))))
                         if ($t = array_diff($t, array_keys($this->relSpells)))
-                            $this->relSpells = array_replace($this->relSpells, DB::Aowow()->select('SELECT *, id AS ARRAY_KEY FROM ?_spell WHERE id IN (?a)', $t));
+                            $this->relSpells = array_replace($this->relSpells, DB::Aowow()->selectAssoc('SELECT *, id AS ARRAY_KEY FROM ::spell WHERE id IN %in', $t));
             }
 
             // fromItem: itemMods, spell, enchants from template - fromJson: calculated stats (feralAP, dps, ...)
@@ -58,12 +55,9 @@ class ItemStatSetup extends ItemList
                 if ($this->getField('class') == ITEM_CLASS_WEAPON)
                     $stats += $shared + ($this->isRangedWeapon() ? ['rgddps' => 0, 'rgddmgmin' => 0, 'rgddmgmax' => 0, 'rgdspeed' => 0] : ['mledps' => 0, 'mledmgmin' => 0, 'mledmgmax' => 0, 'mlespeed' => 0]);
                 else if ($this->getField('class') == ITEM_CLASS_ARMOR)
-                    $stats += ['armorbonus' => 0];          //ArmorDamageModifier only valid on armor(?)
+                    $stats += ['armorbonus' => 0];          //ArmorDamageModifier only valid on armor(%s)
 
-                // apply PK
-                $stats += ['type' => Type::ITEM, 'typeId' => $this->id];
-
-                DB::Aowow()->query('INSERT INTO ?_item_stats (?#) VALUES (?a)', array_keys($stats), array_values($stats));
+                DB::Aowow()->qry('INSERT INTO ::item_stats %v', ['type' => Type::ITEM, 'typeId' => $this->id] + $stats);
             }
         }
     }
@@ -82,9 +76,9 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
     private function enchantment_stats(?int &$total = 0, ?int &$effective = 0) : array
     {
-        $enchants  = DB::Aowow()->select('SELECT *, `id` AS ARRAY_KEY FROM dbc_spellitemenchantment');
+        $enchants  = DB::Aowow()->selectAssoc('SELECT *, `id` AS ARRAY_KEY FROM dbc_spellitemenchantment');
         $spells    = [];
-        $result    = [];
+        $stats     = [];
         $effective = 0;
         $total     = count($enchants);
 
@@ -94,21 +88,21 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                     $spells[] = $e['object'.$i];
 
         if ($spells)
-            $this->relSpells = DB::Aowow()->select('SELECT *, id AS ARRAY_KEY FROM ?_spell WHERE id IN (?a)', $spells);
+            $this->relSpells = DB::Aowow()->selectAssoc('SELECT *, id AS ARRAY_KEY FROM ::spell WHERE id IN %in', $spells);
 
         foreach ($enchants as $eId => $e)
-            if ($result[$eId] = (new StatsContainer($this->relSpells))->fromEnchantment($e)->toJson(Stat::FLAG_ITEM | Stat::FLAG_SERVERSIDE))
+            if ($stats = (new StatsContainer($this->relSpells))->fromEnchantment($e)->toJson(Stat::FLAG_ITEM | Stat::FLAG_SERVERSIDE))
             {
-                DB::Aowow()->query('INSERT INTO ?_item_stats (?#) VALUES (?a)', array_merge(['type', 'typeId'], array_keys($result[$eId])), array_merge([Type::ENCHANTMENT, $eId], array_values($result[$eId])));
+                DB::Aowow()->qry('INSERT INTO ::item_stats %v', ['type' => Type::ENCHANTMENT, 'typeId' => $eId] + $stats);
                 $effective++;
             }
 
         return $enchants;
     }
 
-    public function generate(array $ids = []) : bool
+    public function generate() : bool
     {
-        DB::Aowow()->query('TRUNCATE ?_item_stats');
+        DB::Aowow()->qry('TRUNCATE ::item_stats');
 
         CLI::write('[stats] - applying stats for enchantments');
 
@@ -130,7 +124,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             $offset  = 0;
             while (true)
             {
-                $items = new ItemStatSetup($offset, CLISetup::SQL_BATCH, $itemClass, $ids, $applyTriggered, $enchStats, $this->relSpells);
+                $items = new ItemStatSetup($offset, CLISetup::SQL_BATCH, $itemClass, $applyTriggered, $enchStats, $this->relSpells);
                 if ($items->error)
                     break;
 

@@ -25,7 +25,7 @@ class AdminScreenshotsActionApproveResponse extends TextResponse
         ScreenshotMgr::init();
 
         // create resized and thumb version of screenshot
-        $ssEntries = DB::Aowow()->select('SELECT `id` AS ARRAY_KEY, `userIdOwner`, `date`, `type`, `typeId` FROM ?_screenshots WHERE (`status` & ?d) = 0 AND `id` IN (?a)', CC_FLAG_APPROVED, $this->_get['id']);
+        $ssEntries = DB::Aowow()->selectAssoc('SELECT `id` AS ARRAY_KEY, `userIdOwner`, `date`, `type`, `typeId` FROM ::screenshots WHERE (`status` & %i) = 0 AND `id` IN %in', CC_FLAG_APPROVED, $this->_get['id']);
         foreach ($ssEntries as $id => $ssData)
         {
             if (!ScreenshotMgr::loadFile(ScreenshotMgr::PATH_PENDING, $id))
@@ -42,14 +42,14 @@ class AdminScreenshotsActionApproveResponse extends TextResponse
                 continue;
 
             // set as approved in DB
-            DB::Aowow()->query('UPDATE ?_screenshots SET `status` = ?d, `userIdApprove` = ?d WHERE `id` = ?d', CC_FLAG_APPROVED, User::$id, $id);
+            DB::Aowow()->qry('UPDATE ::screenshots SET `status` = %i, `userIdApprove` = %i WHERE `id` = %i', CC_FLAG_APPROVED, User::$id, $id);
 
             // gain siterep
             Util::gainSiteReputation($ssData['userIdOwner'], SITEREP_ACTION_SUBMIT_SCREENSHOT, ['id' => $id, 'what' => 1, 'date' => $ssData['date']]);
 
             // flag DB entry as having screenshots
             if ($tbl = Type::getClassAttrib($ssData['type'], 'dataTable'))
-                DB::Aowow()->query('UPDATE ?# SET `cuFlags` = `cuFlags` | ?d WHERE `id` = ?d', $tbl, CUSTOM_HAS_SCREENSHOT, $ssData['typeId']);
+                DB::Aowow()->qry('UPDATE %n SET `cuFlags` = `cuFlags` | %i WHERE `id` = %i', $tbl, CUSTOM_HAS_SCREENSHOT, $ssData['typeId']);
 
             unset($ssEntries[$id]);
         }

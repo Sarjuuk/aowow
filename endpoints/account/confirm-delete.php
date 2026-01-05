@@ -54,14 +54,14 @@ class AccountConfirmdeleteResponse extends TemplateResponse
         $msg = Lang::account('inputbox', 'error', 'purgeTokenUsed');
 
         // display default confirm template
-        if ($this->assertGET('key') && DB::Aowow()->selectCell('SELECT 1 FROM ?_account WHERE `status` = ?d AND `statusTimer` > UNIX_TIMESTAMP() AND `token` = ?', ACC_STATUS_PURGING, $this->_get['key']))
+        if ($this->assertGET('key') && DB::Aowow()->selectCell('SELECT 1 FROM ::account WHERE `status` = %i AND `statusTimer` > UNIX_TIMESTAMP() AND `token` = %s', ACC_STATUS_PURGING, $this->_get['key']))
         {
             $this->key = $this->_get['key'];
             return;
         }
 
         // perform action and display status
-        if ($this->assertPOST('key') && ($userId = DB::Aowow()->selectCell('SELECT `id` FROM ?_account WHERE `status` = ?d AND `statusTimer` > UNIX_TIMESTAMP() AND `token` = ?', ACC_STATUS_PURGING, $this->_post['key'])))
+        if ($this->assertPOST('key') && ($userId = DB::Aowow()->selectCell('SELECT `id` FROM ::account WHERE `status` = %i AND `statusTimer` > UNIX_TIMESTAMP() AND `token` = %s', ACC_STATUS_PURGING, $this->_post['key'])))
         {
             if ($this->_post['cancel'])
                 $msg = $this->cancel($userId);
@@ -79,7 +79,7 @@ class AccountConfirmdeleteResponse extends TemplateResponse
 
     private function cancel(int $userId) : string
     {
-        if (DB::Aowow()->query('UPDATE ?_account SET `status` = ?d, `statusTimer` = 0, `token` = "" WHERE `id` = ?d', ACC_STATUS_NONE, $userId))
+        if (DB::Aowow()->qry('UPDATE ::account SET `status` = %i, `statusTimer` = 0, `token` = "" WHERE `id` = %i', ACC_STATUS_NONE, $userId))
         {
             $this->success = true;
             return Lang::account('inputbox', 'message', 'deleteCancel');
@@ -91,32 +91,32 @@ class AccountConfirmdeleteResponse extends TemplateResponse
     private function purge(int $userId) : string
     {
         // empty all user settings and cookies
-        DB::Aowow()->query('DELETE FROM ?_account_cookies WHERE `userId` = ?d', $userId);
-        DB::Aowow()->query('DELETE FROM ?_account_avatars WHERE `userId` = ?d', $userId);
-        DB::Aowow()->query('DELETE FROM ?_account_excludes WHERE `userId` = ?d', $userId);
-        DB::Aowow()->query('DELETE FROM ?_account_favorites WHERE `userId` = ?d', $userId);
-        DB::Aowow()->query('DELETE FROM ?_account_reputation WHERE `userId` = ?d', $userId);
-        DB::Aowow()->query('DELETE FROM ?_account_weightscales WHERE `userId` = ?d', $userId); // cascades to aowow_account_weightscale_data
+        DB::Aowow()->qry('DELETE FROM ::account_cookies WHERE `userId` = %i', $userId);
+        DB::Aowow()->qry('DELETE FROM ::account_avatars WHERE `userId` = %i', $userId);
+        DB::Aowow()->qry('DELETE FROM ::account_excludes WHERE `userId` = %i', $userId);
+        DB::Aowow()->qry('DELETE FROM ::account_favorites WHERE `userId` = %i', $userId);
+        DB::Aowow()->qry('DELETE FROM ::account_reputation WHERE `userId` = %i', $userId);
+        DB::Aowow()->qry('DELETE FROM ::account_weightscales WHERE `userId` = %i', $userId); // cascades to aowow_account_weightscale_data
 
         // delete profiles, unlink chars
-        DB::Aowow()->query('DELETE pp FROM ?_profiler_profiles pp JOIN ?_account_profiles ap ON ap.`profileId` = pp.`id` WHERE ap.`accountId` = ?d', $userId);
-     // DB::Aowow()->query('DELETE FROM ?_account_profiles WHERE `accountId` = ?d', $userId); // already deleted via FK?
+        DB::Aowow()->qry('DELETE pp FROM ::profiler_profiles pp JOIN ::account_profiles ap ON ap.`profileId` = pp.`id` WHERE ap.`accountId` = %i', $userId);
+     // DB::Aowow()->qry('DELETE FROM ::account_profiles WHERE `accountId` = %i', $userId); // already deleted via FK?
 
         // delete all sessions and bans
-        DB::Aowow()->query('DELETE FROM ?_account_banned WHERE `userId` = ?d', $userId);
-        DB::Aowow()->query('DELETE FROM ?_account_sessions WHERE `userId` = ?d', $userId);
+        DB::Aowow()->qry('DELETE FROM ::account_banned WHERE `userId` = %i', $userId);
+        DB::Aowow()->qry('DELETE FROM ::account_sessions WHERE `userId` = %i', $userId);
 
         // delete forum posts (msg: This post was from a user who has deleted their account. (no translations at src); comments/replies are unaffected)
         // ...
 
         // replace username with userId and empty fields
-        DB::Aowow()->query(
-           'UPDATE ?_account SET
+        DB::Aowow()->qry(
+           'UPDATE ::account SET
                 `login`       = "", `passHash`    = "", `username` = `id`, `email`       = NULL, `userGroups`     = 0,  `userPerms`   = 0,
                 `curIp`       = "", `prevIp`      = "", `curLogin` = 0,    `prevLogin`   = 0,
                 `locale`      = 0,  `debug`       = 0,  `avatar`   = 0,    `wowicon`     = "",   `title`          = "", `description` = "", `excludeGroups` = 0,
-                `status`      = ?d, `statusTimer` = 0,  `token`    = "",   `updateValue` = "",   `renameCooldown` = 0
-            WHERE `id` = ?d',
+                `status`      = %i, `statusTimer` = 0,  `token`    = "",   `updateValue` = "",   `renameCooldown` = 0
+            WHERE `id` = %i',
             ACC_STATUS_DELETED, $userId
         );
 
