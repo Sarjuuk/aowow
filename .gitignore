@@ -1,10 +1,5 @@
-# Git
-*.orig
-
 # cache
-/cache/template/*
-/cache/alphaMaps/*
-/cache/setup/*
+/cache/*
 
 # extract from MPQ
 /setup/mpqdata/*
@@ -17,10 +12,8 @@
 /static/widgets/searchbox.js
 /static/widgets/searchbox/searchbox.html
 /static/download/searchplugins/aowow.xml
-/config/config.php
+/config/*
 /datasets/*
-!/datasets/zones
-# /datasets/item-scaling
 
 # extracted sounds
 /static/wowsounds/*
@@ -30,7 +23,7 @@
 /static/images/wow/icons/medium/*
 /static/images/wow/icons/small/*
 /static/images/wow/icons/tiny/*
-!/static/images/wow/icons/tiny/quest_*
+!/static/images/wow/icons/tiny/quest_[end|start]
 /static/images/wow/hunterpettalents/*
 /static/images/wow/Interface/*
 /static/images/wow/loadingscreens/*
@@ -50,3 +43,7 @@
 /static/uploads/signatures/*
 /static/uploads/temp/*
 /static/uploads/guide/images/*
+
+# composer
+/includes/libs/*
+composer.phar

@@ -1,0 +1,30 @@
+{
+    "name": "aowow/aowow",
+    "description": "Server and client database visualization for World of Warcraft/TrinityCore v3.3.5a, including community tools.",
+    "version": "2.0",
+    "type": "project",
+    "keywords": ["World of Warcraft", "wow", "database", "db", "frontend", "Wrath of the Lich King", "wotlk",  "335a", "3.3.5a"],
+    "authors": [
+        {
+            "name": "Sarjuuk",
+            "role": "Developer"
+        }
+    ],
+    "config": {
+        "vendor-dir": "includes/libs"
+    },
+    "require": {
+        "php": "8.2 - 8.4",
+        "ext-mbstring": "*",
+        "ext-simplexml": "*",
+        "ext-gd": "*",
+        "ext-mysqli": "*",
+        "ext-fileinfo": "*",
+        "ext-intl": "*"
+    },
+    "require-dev": {
+        "dibi/dibi": "^5.1",
+        "jfcherng/php-diff": "6.16",
+        "triggerhappy/mpq": "dev-master"
+    }
+}

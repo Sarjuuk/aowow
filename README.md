@@ -27,6 +27,7 @@ Also, this project is not meant to be used for commercial purposes of any kind!
   + [Internationalization](https://www.php.net/manual/en/book.intl.php)
   + [GNU Multiple Precision](https://www.php.net/manual/en/book.gmp.php) (When using TrinityCore as auth source)
 + MySQL ≥ 5.7.0 OR MariaDB ≥ 10.6.4 OR similar
++ [Composer](https://getcomposer.org/download/)
 + [TDB 335.25101](https://github.com/TrinityCore/TrinityCore/releases/tag/TDB335.25101) including updates up to [TrinityCore/TrinityCore@f3b691d](https://github.com/TrinityCore/TrinityCore/commit/f3b691dcb085014ec3f0e2c60ab94fc9c00e8aa8) (no other other providers are supported at this time)
 + WIN: php.exe needs to be added to the `PATH` system variable, if it isn't already. 
 + Tools require cmake: Please refer to the individual repositories for detailed information
@@ -38,7 +39,7 @@ audio processing may require [lame](https://sourceforge.net/projects/lame/files/
 
 
 #### Highly Recommended
-+ setting the following configuration values on your TrinityCore server will greatly increase the accuracy of spawn points
++ setting the following configuration values on your TrinityCore server (and running it once) will greatly increase the accuracy of spawn points
   > Calculate.Creature.Zone.Area.Data = 1  
   > Calculate.Gameobject.Zone.Area.Data = 1
 
@@ -82,17 +83,17 @@ Extract the following directories from the client archives into `setup/mpqdata/`
    > \<localeCode>/Interface/FlavorImages  
    > \<localeCode>/Interface/Calendar/Holidays/  
    > \<localeCode>/Sound/  
-   
-   .. optionally (not used in AoWoW):
-   > \<localeCode>/Interface/Glues/Loadingscreens/  
-   > \<localeCode>/Interface/Glues/Credits/  
 
 #### 5. Reencode the audio files
 WAV-files need to be reencoded as `ogg/vorbis` and some MP3s may identify themselves as `application/octet-stream` instead of `audio/mpeg`.  
  * [example for WIN](https://gist.github.com/Sarjuuk/d77b203f7b71d191509afddabad5fc9f)  
  * [example for \*nix](https://gist.github.com/Sarjuuk/1f05ef2affe49a7e7ca0fad7b01c081d)
 
-#### 6. Run the initial setup from the CLI
+#### 6. Install dependencies with composer
+`php composer.phar install --no-dev` on a project level composer install, or  
+`composer install --no-dev` on a system level composer install
+
+#### 7. Run the initial setup from the CLI
 `php aowow --setup`.  
 This should guide you through with minimal input required from your end, but will take some time though, especially compiling the zone-images. Use it to familiarize yourself with the other functions this setup has. Yes, I'm dead serious: *Go read the code!* It will help you understand how to configure AoWoW and keep it in sync with your world database.  
 When you've created your admin account you are done.
@@ -104,7 +105,7 @@ Q: The Page appears white, without any styles.
 A: The static content is not being displayed. You are either using SSL and AoWoW is unable to detect it or STATIC_HOST is not defined properly. Either way this can be fixed via config `php aowow --siteconfig`
 
 Q: Fatal error: Can't inherit abstract function \<functionName> (previously declared abstract in \<className>) in \<path>  
-A: You are using cache optimization modules for php, that are in conflict with each other. (Zend OPcache, XCache, ..) Disable all but one.
+A: You are using multiple cache optimization modules for php that are in conflict with each other. (Zend OPcache, XCache, ..) Disable all but one.
 
 Q: Some generated images appear distorted or have alpha-channel issues.  
 A: Image compression is beyond my understanding, so i am unable to fix these issues within the blpReader.
@@ -118,7 +119,7 @@ Q: I'm getting random javascript errors!
 A: Some server configurations or external services (like Cloudflare) come with modules, that automatically minify js and css files. Sometimes they break in the process. Disable the module in this case.
 
 Q: Some search results within the profiler act rather strange. How does it work?  
-A: Whenever you try to view a new character, AoWoW needs to fetch it first. Since the data is structured for the needs of TrinityCore and not for easy viewing, AoWoW needs to save and restructure it locally. To this end, every char request is placed in a queue. While the queue is not empty, a single instance of `prQueue` is run in the background as not to overwhelm the characters database with requests. This also means, some more exotic search queries can't be run against the characters database and have to use the incomplete/outdated cached profiles of AoWoW.
+A: Whenever you try to view a new character, AoWoW needs to fetch it first. Since the data is structured for the needs of TrinityCore and not for easy viewing, AoWoW needs to save and restructure it locally. To this end, every char request is placed in a queue. While the queue is not empty, a single instance of `prQueue` is run in the background as not to overwhelm the characters database with requests. This also means complex search queries can't be run against the characters database and have to use the incomplete/outdated cached profiles of AoWoW.
 
 Q: Screenshot upload fails, because the file size is too large and/or the subdirectories are visible from the web!  
 A: That's a web server configuration issue. If you are using Apache you may need to [enable the use of .htaccess](http://httpd.apache.org/docs/2.4/de/mod/core.html#allowoverride). Other servers require individual configuration.  
