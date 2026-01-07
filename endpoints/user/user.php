@@ -276,7 +276,7 @@ class UserBaseResponse extends TemplateResponse
         }
 
         // My Guides
-        $guides = new GuideList(['status', [GuideMgr::STATUS_APPROVED, GuideMgr::STATUS_ARCHIVED]], ['userId', $this->user['id']]);
+        $guides = new GuideList(array(['status', [GuideMgr::STATUS_APPROVED, GuideMgr::STATUS_ARCHIVED]], ['userId', $this->user['id']]));
         if (!$guides->error)
         {
             $this->lvTabs->addListviewTab(new Listview(array(
