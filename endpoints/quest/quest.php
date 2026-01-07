@@ -335,11 +335,11 @@ class QuestBaseResponse extends TemplateResponse implements ICache
 
                 if (!$olItemData->getEntry($itemId))
                 {
-                    $this->objectiveList[] = [0, new IconElement(0, 0, Util::ucFirst(Lang::game('item')).' #'.$itemId, $qty > 1 ? $qty : '', size: IconElement::SIZE_SMALL, extraText: $provided ? Lang::quest('provided') : null)];
+                    $this->objectiveList[] = new IconElement(0, 0, Util::ucFirst(Lang::game('item')).' #'.$itemId, $qty > 1 ? $qty : '', size: IconElement::SIZE_SMALL, extraText: $provided ? Lang::quest('provided') : null);
                     continue;
                 }
 
-                $this->objectiveList[] = [0, new IconElement(
+                $this->objectiveList[] = new IconElement(
                     Type::ITEM,
                     $itemId,
                     Lang::unescapeUISequences($olItemData->json[$itemId]['name'], Lang::FMT_HTML),
@@ -348,7 +348,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                     size: IconElement::SIZE_SMALL,
                     element: 'iconlist-icon',
                     extraText: $provided ? Lang::quest('provided') : null
-                )];
+                );
             }
 
             // if providd item is not required by quest, list it below other requirements
@@ -414,17 +414,17 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                         array_slice($proxies, ceil(count($proxies) / 2), null, true)
                     );
 
-                    $this->objectiveList[] = [2, array(
+                    $this->objectiveList[] = array(
                         'id'    => $i,
                         'text'  => ($altText ?: Util::localizedString($olNPCData->getEntry($i), 'name')) . ((($_specialFlags & QUEST_FLAG_SPECIAL_SPELLCAST) || $altText) ? '' : ' '.Lang::achievement('slain')),
                         'qty'   => $qty > 1 ? $qty : 0,
                         'proxy' => array_filter($proxies)
-                    )];
+                    );
                 }
                 else if (!$olNPCData->getEntry($i))
-                    $this->objectiveList[] = [0, new IconElement(0, 0, Util::ucFirst(Lang::game('npc')).' #'.$i, $qty > 1 ? $qty : '')];
+                    $this->objectiveList[] = new IconElement(0, 0, Util::ucFirst(Lang::game('npc')).' #'.$i, $qty > 1 ? $qty : '');
                 else
-                    $this->objectiveList[] = [0, new IconElement(
+                    $this->objectiveList[] = new IconElement(
                         Type::NPC,
                         $i,
                         $altText ?: Util::localizedString($olNPCData->getEntry($i), 'name'),
@@ -432,7 +432,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                         size: IconElement::SIZE_SMALL,
                         element: 'iconlist-icon',
                         extraText: (($_specialFlags & QUEST_FLAG_SPECIAL_SPELLCAST) || $altText) ? '' : Lang::achievement('slain'),
-                    )];
+                    );
             }
         }
 
@@ -448,16 +448,16 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                     continue;
 
                 if (!$olGOData->getEntry($i))
-                    $this->objectiveList[] = [0, new IconElement(0, 0, Util::ucFirst(Lang::game('object')).' #'.$i, $qty > 1 ? $qty : '', size: IconElement::SIZE_SMALL)];
+                    $this->objectiveList[] = new IconElement(0, 0, Util::ucFirst(Lang::game('object')).' #'.$i, $qty > 1 ? $qty : '', size: IconElement::SIZE_SMALL);
                 else
-                    $this->objectiveList[] = [0, new IconElement(
+                    $this->objectiveList[] = new IconElement(
                         Type::OBJECT,
                         $i,
                         $altText ?: Lang::unescapeUISequences(Util::localizedString($olGOData->getEntry($i), 'name'), Lang::FMT_HTML),
                         $qty > 1 ? $qty : '',
                         size: IconElement::SIZE_SMALL,
                         element: 'iconlist-icon',
-                    )];
+                    );
             }
         }
 
@@ -482,14 +482,14 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                 if (!$i || !in_array($i, $olFactionsData->getFoundIDs()))
                     continue;
 
-                $this->objectiveList[] = [0, new IconElement(
+                $this->objectiveList[] = new IconElement(
                     Type::FACTION,
                     $i,
                     Util::localizedString($olFactionsData->getEntry($i), 'name'),
                     size: IconElement::SIZE_SMALL,
                     element: 'iconlist-icon',
                     extraText: sprintf(Util::$dfnString, $val.' '.Lang::achievement('points'), '('.Lang::getReputationLevelForPoints($val).')')
-                )];
+                );
             }
         }
 
@@ -497,16 +497,16 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         if ($_ = $this->subject->getField('sourceSpellId'))
         {
             $this->extendGlobalIds(Type::SPELL, $_);
-            $this->objectiveList[] = [0, new IconElement(Type::SPELL, $_, SpellList::getName($_), extraText: Lang::quest('provided'), element: 'iconlist-icon', size: IconElement::SIZE_SMALL)];
+            $this->objectiveList[] = new IconElement(Type::SPELL, $_, SpellList::getName($_), extraText: Lang::quest('provided'), element: 'iconlist-icon', size: IconElement::SIZE_SMALL);
         }
 
         // required money
         if ($this->subject->getField('rewardOrReqMoney') < 0)
-            $this->objectiveList[] = [1, Lang::quest('reqMoney', [Util::formatMoney(abs($this->subject->getField('rewardOrReqMoney')))])];
+            $this->objectiveList[] = Lang::quest('reqMoney', [Util::formatMoney(abs($this->subject->getField('rewardOrReqMoney')))]);
 
         // required pvp kills
         if ($_ = $this->subject->getField('reqPlayerKills'))
-            $this->objectiveList[] = [1, Lang::quest('playerSlain', [$_])];
+            $this->objectiveList[] = Lang::quest('playerSlain', [$_]);
 
 
         /**********/

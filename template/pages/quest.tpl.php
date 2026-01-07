@@ -43,26 +43,23 @@ if ($this->end || $this->objectiveList):
 ?>
                 <table class="iconlist">
 <?php
-    foreach ($this->objectiveList as [$type, $data]):
-        switch ($type):
-            case 1:                                         // just text line
-                echo '                    <tr><th><p style="height: 26px; width: 30px;">&nbsp;</p></th><td>'.$data."</td></tr>\n";
-                break;
-            case 2:                                         // proxy npc data
-                ['id' => $id, 'text' => $text, 'qty' => $qty, 'proxy' => $proxies] = $data;
-                echo '                    <tr><th><p style="height: 26px">&nbsp;</p></th><td><a href="javascript:;" onclick="g_disclose($WH.ge(\'npcgroup-'.$id.'\'), this)" class="disclosure-off">'.$text.'</a>'.($qty ? '&nbsp;('.$qty.')' : '').'<div id="npcgroup-'.$id."\" style=\"display: none\">\n";
-                foreach ($proxies as $block):
-                    echo "                        <div style=\"float: left\"><table class=\"iconlist\">\n";
-                    foreach ($block as $pId => $pName):
-                        echo '                            <tr><th><ul><li><var>&nbsp;</var></li></ul></th><td><a href="?npc='.$pId.'">'.$pName."</a></td></tr>\n";
-                    endforeach;
-                    echo "                        </table></div>\n";
+    foreach ($this->objectiveList as $objective):
+        if (is_string($objective)):                         // just text line
+            echo '                    <tr><th><p style="height: 26px; width: 30px;">&nbsp;</p></th><td>'.$objective."</td></tr>\n";
+        elseif (is_array($objective)):                      // proxy npc data
+            ['id' => $id, 'text' => $text, 'qty' => $qty, 'proxy' => $proxies] = $objective;
+            echo '                    <tr><th><p style="height: 26px">&nbsp;</p></th><td><a href="javascript:;" onclick="g_disclose($WH.ge(\'npcgroup-'.$id.'\'), this)" class="disclosure-off">'.$text.'</a>'.($qty ? '&nbsp;('.$qty.')' : '').'<div id="npcgroup-'.$id."\" style=\"display: none\">\n";
+            foreach ($proxies as $block):
+                echo "                        <div style=\"float: left\"><table class=\"iconlist\">\n";
+                foreach ($block as $pId => $pName):
+                    echo '                            <tr><th><ul><li><var>&nbsp;</var></li></ul></th><td><a href="?npc='.$pId.'">'.$pName."</a></td></tr>\n";
                 endforeach;
-                echo "                    </div></td></tr>\n";
-                break;
-            default:                                        // has icon set (spell / item / ...) or unordered linked list
-                echo $data->renderContainer(20, $iconOffset, true);
-        endswitch;
+                echo "                        </table></div>\n";
+            endforeach;
+            echo "                    </div></td></tr>\n";
+        elseif (is_object($objective)):                     // has icon set (spell / item / ...) or unordered linked list
+            echo $objective?->renderContainer(20, $iconOffset, true);
+        endif;
     endforeach;
 
     if ($this->end):
@@ -77,8 +74,8 @@ if ($this->end || $this->objectiveList):
 
                 <script type="text/javascript">//<![CDATA[
 <?php
-    foreach (array_filter($this->objectiveList, fn($x) => $x[0] === 0) as $k => [, $data]):
-        echo $data->renderJS();
+    foreach (array_filter($this->objectiveList, fn($x) => is_object($x)) as $k => $objective):
+        echo $objective?->renderJS();
     endforeach;
 ?>
                 //]]></script>
