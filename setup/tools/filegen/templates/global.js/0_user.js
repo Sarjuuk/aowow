@@ -3,6 +3,21 @@
 'abbr article aside audio canvas details figcaption figure footer header hgroup mark menu meter nav output progress section summary time video'.replace(/\w+/g,function(n){document.createElement(n)})
 
 
+// aowow - extend Date for holidaycal
+Date.prototype.getLocaleDay = function() {
+    const dayNo = this.getDay();
+    switch (Locale.getId())
+    {
+        case LOCALE_FRFR:
+        case LOCALE_DEDE:
+        case LOCALE_ESES:
+        case LOCALE_RURU:
+            return !dayNo ? 6 : dayNo - 1;
+        default:
+            return dayNo;
+    }
+};
+
 /*
 User-related functions
 TODO: Move global variables/functions into User class

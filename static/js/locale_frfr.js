@@ -2553,7 +2553,7 @@ var LANG = {
     date_simple: "$1-$2-$3",
     unknowndate_stc: "Date inconnue",
     date_months: ["janvier", "février", "mars", "Avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"],
-    date_days:   ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"],
+    date_days:   ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"],
 
     amount:                 "Montant",
     abilities:              "Techniques",

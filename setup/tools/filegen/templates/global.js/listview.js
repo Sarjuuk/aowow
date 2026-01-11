@@ -1098,7 +1098,7 @@ Listview.prototype = {
             $WH.ae(this.tbody, tr);
             tr = $WH.ce('tr');
 
-            for (var k = 0; k < this.dates[starti].date.getDay(); ++k)
+            for (var k = 0; k < this.dates[starti].date.getLocaleDay(); ++k)
             {
                 var foo = $WH.ce('td');
                 foo.className = 'empty-cell';
