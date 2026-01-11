@@ -106,8 +106,8 @@ class WorldEventList extends DBTypeList
         {
             WorldEventList::updateDates($row['_date'] ?? null, $start, $end, $rec);
 
-            $row['startDate'] = $start ? date(Util::$dateFormatInternal, $start) : null;
-            $row['endDate']   = $end   ? date(Util::$dateFormatInternal, $end)   : null;
+            $row['startDate'] = $start ? date(Util::$dateFormatInternal, $start)   : null;
+            $row['endDate']   = $end   ? date(Util::$dateFormatInternal, $end - 1) : null;
             $row['rec']       = $rec;
 
             unset($row['_date']);
