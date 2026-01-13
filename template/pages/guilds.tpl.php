@@ -46,7 +46,7 @@ $this->brick('redButtons');
                             <td style="width:50px;" class="padded">&nbsp;&nbsp;&nbsp;<?=Lang::profiler('realm').Lang::main('colon'); ?></td>
                             <td class="padded">&nbsp;<select name="sv"><option></option></select><input type="hidden" name="bg" value="<?=($f['bg'] ? $this->escHTML($f['bg']) : ''); ?>" /></td>
                         </tr><tr>
-                            <td class="padded"><?=Lang::main('side').Lang::main('colon'); ?></td>
+                            <td class="padded"><?=Lang::main('side'); ?></td>
                             <td class="padded" style="width:80px;">&nbsp;<select name="si">
                                 <option></option>
 <?=$this->makeOptionsList(Lang::game('si'), $f['si'], 32, fn($v, $k) => in_array($k, [SIDE_ALLIANCE, SIDE_HORDE])); ?>
