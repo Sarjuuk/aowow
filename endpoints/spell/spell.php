@@ -1864,7 +1864,8 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                     break;
                 case SPELL_EFFECT_SEND_TAXI:
                     $_ = DB::Aowow()->selectRow(
-                       'SELECT tn1.`name_loc0` AS `start_loc0`, tn1.name_loc?d AS start_loc?d, tn2.`name_loc0` AS `end_loc0`, tn2.name_loc?d AS end_loc?d
+                       'SELECT tn1.`areaId` AS "startAreaId", tn1.`areaX` AS "startPosX", tn1.`areaY` AS "startPosY", tn1.`name_loc0` AS `start_loc0`, tn1.name_loc?d AS start_loc?d,
+                               tn2.`areaId` AS "endAreaId",   tn2.`areaX` AS "endPosX",   tn2.`areaY` AS "endPosY",   tn2.`name_loc0` AS `end_loc0`,   tn2.name_loc?d AS end_loc?d
                         FROM   ?_taxipath tp
                         JOIN   ?_taxinodes tn1 ON tp.`startNodeId` = tn1.`id`
                         JOIN   ?_taxinodes tn2 ON tp.`endNodeId` = tn2.`id`
@@ -1872,7 +1873,16 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                         Lang::getLocale()->value, Lang::getLocale()->value, Lang::getLocale()->value, Lang::getLocale()->value, $effMV
                     );
                     if ($_)
-                        $_nameMV = $this->fmtStaffTip('<span class="breadcrumb-arrow">'.Util::localizedString($_, 'start').'</span>'.Util::localizedString($_, 'end'), 'MiscValue: '.$effMV);
+                    {
+                        $start = Util::localizedString($_, 'start');
+                        if ($_['startAreaId'])
+                            $start = sprintf('<a href="?maps=%d:%03d%03d">%s</a>', $_['startAreaId'], $_['startPosX'] * 10, $_['startPosY'] * 10, $start);
+                        $end = Util::localizedString($_, 'end');
+                        if ($_['endAreaId'])
+                            $end = sprintf('<a href="?maps=%d:%03d%03d">%s</a>', $_['endAreaId'], $_['endPosX'] * 10, $_['endPosY'] * 10, $end);
+
+                        $_nameMV = $this->fmtStaffTip('<span class="breadcrumb-arrow">'.$start.'</span>'.$end, 'MiscValue: '.$effMV);
+                    }
                     break;
                 case SPELL_EFFECT_TITAN_GRIP:
                     $effMV = 0;                             // effMV is trigger spell and was handled earlier

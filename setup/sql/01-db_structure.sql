@@ -2881,8 +2881,11 @@ DROP TABLE IF EXISTS `aowow_taxinodes`;
 CREATE TABLE `aowow_taxinodes` (
   `id` smallint(5) unsigned NOT NULL,
   `mapId` smallint(5) unsigned NOT NULL,
-  `posX` float unsigned NOT NULL,
-  `posY` float unsigned NOT NULL,
+  `mapX` float unsigned NOT NULL,
+  `mapY` float unsigned NOT NULL,
+  `areaId` smallint(5) unsigned NOT NULL,
+  `areaX` float unsigned NOT NULL,
+  `areaY` float unsigned NOT NULL,
   `type` enum('NPC','GOBJECT') NOT NULL,
   `typeId` mediumint(8) unsigned NOT NULL,
   `reactA` tinyint(4) NOT NULL,

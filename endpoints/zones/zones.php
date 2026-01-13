@@ -120,8 +120,8 @@ class ZonesBaseResponse extends TemplateResponse implements ICache
             $nodes   = DB::Aowow()->select('SELECT `id` AS ARRAY_KEY, tn.* FROM ?_taxinodes tn WHERE `mapId` = ?d AND `type` <> 0 AND `typeId` <> 0', $spawnMap);
             $paths   = DB::Aowow()->select(
                'SELECT IF(tn1.`reactA` = tn1.`reactH` AND tn2.`reactA` = tn2.`reactH`, 1, 0) AS "neutral",
-                       tp.`startNodeId` AS "startId", tn1.`posX` AS "startPosX", tn1.`posY` AS "startPosY",
-                       tp.`endNodeId`   AS "endId",   tn2.`posX` AS "endPosX",   tn2.`posY` AS "endPosY"
+                       tp.`startNodeId` AS "startId", tn1.`mapX` AS "startPosX", tn1.`mapY` AS "startPosY",
+                       tp.`endNodeId`   AS "endId",   tn2.`mapX` AS "endPosX",   tn2.`mapY` AS "endPosY"
                 FROM   ?_taxipath tp, ?_taxinodes tn1, ?_taxinodes tn2
                 WHERE  tn1.`Id` = tp.`endNodeId` AND tn2.`Id` = tp.`startNodeId` AND
                        tn1.`type` <> 0 AND tn2.`type` <> 0 AND
@@ -134,7 +134,7 @@ class ZonesBaseResponse extends TemplateResponse implements ICache
                 $neutral = $n['reactH'] == $n['reactA'];
 
                 $data = array(
-                    'coords'        => [[$n['posX'], $n['posY']]],
+                    'coords'        => [[$n['mapX'], $n['mapY']]],
                     'level'         => 0,                   // floor
                     'name'          => Util::localizedString($n, 'name'),
                     'type'          => $n['type'],
