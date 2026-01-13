@@ -2130,14 +2130,14 @@ class ItemListFilter extends Filter
         }
 
         // quality [list]
-        if ($_v['qu'] !== null)
+        if ($_v['qu'])
             $parts[] = ['quality', $_v['qu']];
 
-        // type
-        if ($_v['ty'] !== null)
+        // type [list]
+        if ($_v['ty'])
             $parts[] = ['subclass', $_v['ty']];
 
-        // slot
+        // slot [list]
         if ($_v['sl'])
             $parts[] = ['slot', $_v['sl']];
 

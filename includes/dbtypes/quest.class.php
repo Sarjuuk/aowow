@@ -549,7 +549,7 @@ class QuestListFilter extends Filter
         }
 
         // questInfoId [list]
-        if ($_v['ty'] !== null)
+        if ($_v['ty'])
             $parts[] = ['questInfoId', $_v['ty']];
 
         return $parts;

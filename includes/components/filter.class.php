@@ -229,13 +229,20 @@ abstract class Filter
             $this->cndSet = $this->createSQLForValues();
 
             // criteria
+            $filters = [];
             foreach ($this->criteriaIterator() as $_cr)
                 if ($cnd = $this->createSQLForCriterium(...$_cr))
-                    $this->cndSet[] = $cnd;
+                    $filters[] = $cnd;
 
-            if ($this->cndSet)                              // Note: TYPE_SOUND does not use 'match any'
-                array_unshift($this->cndSet, empty($this->values['ma']) ? 'AND' : 'OR');
+            if ($filters)                                   // if a filter uses criteria it must have a [ma]tch selector
+            {
+                $filters[] = empty($this->values['ma']) ? 'AND' : 'OR';
+                $this->cndSet[] = $filters;
+            }
         }
+
+        if ($this->cndSet)
+            array_unshift($this->cndSet, 'AND');
 
         return $this->cndSet;
     }
