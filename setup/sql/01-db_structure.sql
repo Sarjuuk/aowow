@@ -1702,7 +1702,9 @@ CREATE TABLE `aowow_profiler_arena_team` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `realm_realmGUID` (`realm`,`realmGUID`),
   KEY `name` (`name`),
-  KEY `idx_stub` (`stub`)
+  KEY `idx_stub` (`stub`),
+  KEY `idx_type` (`type`),
+  KEY `idx_rating` (`rating`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1795,6 +1797,7 @@ CREATE TABLE `aowow_profiler_completion_skills` (
   `max` smallint(5) unsigned DEFAULT NULL,
   KEY `id` (`id`),
   KEY `typeId` (`skillId`),
+  KEY `idx_value` (`value`),
   CONSTRAINT `FK_pr_completion_skills` FOREIGN KEY (`id`) REFERENCES `aowow_profiler_profiles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -2014,6 +2017,15 @@ CREATE TABLE `aowow_profiler_profiles` (
   KEY `idx_custom` (`custom`),
   KEY `idx_stub` (`stub`),
   KEY `idx_deleted` (`deleted`),
+  KEY `idx_race` (`race`),
+  KEY `idx_class` (`class`),
+  KEY `idx_level` (`level`),
+  KEY `idx_guildrank` (`guildrank`),
+  KEY `idx_gearscore` (`gearscore`),
+  KEY `idx_achievementpoints` (`achievementpoints`),
+  KEY `idx_talenttree1` (`talenttree1`),
+  KEY `idx_talenttree2` (`talenttree2`),
+  KEY `idx_talenttree3` (`talenttree3`),
   CONSTRAINT `FK_aowow_profiler_profiles_aowow_profiler_guild` FOREIGN KEY (`guild`) REFERENCES `aowow_profiler_guild` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
