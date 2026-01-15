@@ -46,7 +46,8 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                       BuyCount,               BuyPrice,               SellPrice,
                       0 AS repairPrice,
                       InventoryType AS slot,  InventoryType AS slotBak,
-                      AllowableClass,         AllowableRace,
+                      IF((`AllowableClass` & 1535) = 1535, 0, `AllowableClass` & 1535) AS "requiredClass",
+                      IF((`AllowableRace`  & 1791) = 1791, 0, `AllowableRace`  & 1791) AS "requiredRace",
                       ItemLevel,
                       RequiredLevel,
                       RequiredSkill,          RequiredSkillRank,
@@ -190,7 +191,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         DB::Aowow()->query('UPDATE ?_items i, dbc_spell s SET i.subClass = -3 WHERE s.effect1Id = 54 AND s.id = i.spellId1 AND i.class = 0 AND i.subClassBak = 8');
 
         // move armor tokens to own category
-        DB::Aowow()->query('UPDATE ?_items SET subClass = -2 WHERE quality = 4 AND class = 15 AND subClassBak = 0 AND requiredClass AND (requiredClass & 0x5FF) <> 0x5FF');
+        DB::Aowow()->query('UPDATE ?_items SET subClass = -2 WHERE quality = 4 AND class = 15 AND subClassBak = 0 AND requiredClass > 0');
 
         // move some junk to holiday if it requires one
         DB::Aowow()->query('UPDATE ?_items SET subClass = 3 WHERE classBak = 15 AND subClassBak = 0 AND eventId <> 0');

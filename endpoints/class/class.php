@@ -186,9 +186,7 @@ class ClassBaseResponse extends TemplateResponse implements ICache
 
         // tab: items (grouped)
         $conditions = array(
-            ['requiredClass', 0, '>'],
             ['requiredClass', $cl->toMask(), '&'],
-            [['requiredClass', ChrClass::MASK_ALL, '&'], ChrClass::MASK_ALL, '!'],
             ['itemset', 0]
         );
 

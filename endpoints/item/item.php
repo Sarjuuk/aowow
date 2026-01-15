@@ -920,7 +920,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                     ['itemLevel',     $_ilvl - 15, '>'],
                     ['itemLevel',     $_ilvl + 15, '<'],
                     ['quality',       $this->subject->getField('quality')],
-                    ['requiredClass', $this->subject->getField('requiredClass') ?: -1]  // todo: fix db data in setup and not on fetch
+                    ['requiredClass', $this->subject->getField('requiredClass')]
                 ]
             ]
         );

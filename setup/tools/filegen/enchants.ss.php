@@ -203,10 +203,10 @@ CLISetup::registerSetup("build", new class extends SetupScript
                     if ($cI->getField('quality') > $ench['quality'])
                         $ench['quality'] = $cI->getField('quality');
 
-                    if ($cI->getField('requiredClass') > 0)
+                    if ($rc = $cI->getField('requiredClass'))
                     {
-                        $ench['classes'] = $cI->getField('requiredClass');
-                        $ench['jsonequip']['classes'] = $cI->getField('requiredClass');
+                        $ench['classes'] = $rc;
+                        $ench['jsonequip']['classes'] = $rc;
                     }
 
                     if (!isset($ench['jsonequip']['reqlevel']))

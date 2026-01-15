@@ -63,19 +63,6 @@ class ItemList extends DBTypeList
                     $this->relEnchant = $miscData['extraOpts']['relEnchant'];
             }
 
-            // unify those pesky masks
-            $_  = &$_curTpl['requiredClass'];
-            $_ &= ChrClass::MASK_ALL;
-            if ($_ < 0 || $_ == ChrClass::MASK_ALL)
-                $_ = 0;
-            unset($_);
-
-            $_ = &$_curTpl['requiredRace'];
-            $_ &= ChrRace::MASK_ALL;
-            if ($_ < 0 || $_ == ChrRace::MASK_ALL)
-                $_ = 0;
-            unset($_);
-
             // sources
             for ($i = 1; $i < 25; $i++)
             {
@@ -439,7 +426,7 @@ class ItemList extends DBTypeList
                 $data[$this->id]['nslots'] = $x;
 
             $_ = $this->curTpl['requiredRace'];
-            if ($_ && $_ & ChrRace::MASK_ALLIANCE != ChrRace::MASK_ALLIANCE && $_ & ChrRace::MASK_HORDE != ChrRace::MASK_HORDE)
+            if (ChrRace::sideFromMask($_) != SIDE_BOTH)
                 $data[$this->id]['reqrace'] = $_;
 
             if ($_ = $this->curTpl['requiredClass'])
@@ -1972,8 +1959,8 @@ class ItemListFilter extends Filter
         149 => [parent::CR_CALLBACK,  'cbDropsInInstance',      SRC_FLAG_RAID_DROP,      4,                ], // dropsinheroic10 [heroicraid-any]
         150 => [parent::CR_CALLBACK,  'cbDropsInInstance',      SRC_FLAG_RAID_DROP,      8,                ], // dropsinheroic25 [heroicraid-any]
         151 => [parent::CR_NUMERIC,   'id',                     NUM_CAST_INT,            true              ], // id
-        152 => [parent::CR_CALLBACK,  'cbClassRaceSpec',        'requiredClass',         ChrClass::MASK_ALL], // classspecific [enum]
-        153 => [parent::CR_CALLBACK,  'cbClassRaceSpec',        'requiredRace',          ChrRace::MASK_ALL ], // racespecific [enum]
+        152 => [parent::CR_CALLBACK,  'cbClassRaceSpec',        'requiredClass'                            ], // classspecific [enum]
+        153 => [parent::CR_CALLBACK,  'cbClassRaceSpec',        'requiredRace'                             ], // racespecific [enum]
         154 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_REFUNDABLE                       ], // refundable
         155 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_USABLE_ARENA                     ], // usableinarenas
         156 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_USABLE_SHAPED                    ], // usablewhenshapeshifted
@@ -2144,17 +2131,14 @@ class ItemListFilter extends Filter
         // side
         if ($_v['si'])
         {
-            $excl = [['requiredRace', ChrRace::MASK_ALL, '&'], ChrRace::MASK_ALL, '!'];
-            $incl = ['OR', ['requiredRace', 0], [['requiredRace', ChrRace::MASK_ALL, '&'], ChrRace::MASK_ALL]];
-
-            // we sanitized v['si'] earlier .. right?
             $parts[] = match ($_v['si'])
             {
-                 SIDE_BOTH     => ['OR',  [['flagsExtra', 0x3, '&'], [0, 3]], ['requiredRace', ChrRace::MASK_ALL], ['requiredRace', 0]],
-                 SIDE_HORDE    => ['AND', [['flagsExtra', 0x3, '&'], [0, 1]], ['OR',  $incl, ['requiredRace', ChrRace::MASK_HORDE, '&']]],
-                -SIDE_HORDE    => ['OR',  [['flagsExtra', 0x3, '&'], 1],      ['AND', $excl, ['requiredRace', ChrRace::MASK_HORDE, '&']]],
-                 SIDE_ALLIANCE => ['AND', [['flagsExtra', 0x3, '&'], [0, 2]], ['OR',  $incl, ['requiredRace', ChrRace::MASK_ALLIANCE, '&']]],
-                -SIDE_ALLIANCE => ['OR',  [['flagsExtra', 0x3, '&'], 2],      ['AND', $excl, ['requiredRace', ChrRace::MASK_ALLIANCE, '&']]],
+                // in theory an item could be requiring orc|nightelf etc. and would then be SIDE_BOTH without cleanly fitting the filters below, but in that case; WTF are you doing?!
+                SIDE_BOTH     => ['AND', [['flagsExtra', 0x3, '&'], [0, 3]], ['requiredRace', 0]],
+               -SIDE_HORDE    => ['OR',  [['flagsExtra', 0x3, '&'], 1],      ['requiredRace', ChrRace::MASK_HORDE, '&']],
+               -SIDE_ALLIANCE => ['OR',  [['flagsExtra', 0x3, '&'], 2],      ['requiredRace', ChrRace::MASK_ALLIANCE, '&']],
+                SIDE_HORDE    => ['AND', [['flagsExtra', 0x3, '&'], [0, 1]], ['OR',  ['requiredRace', 0], ['requiredRace', ChrRace::MASK_HORDE, '&']]],
+                SIDE_ALLIANCE => ['AND', [['flagsExtra', 0x3, '&'], [0, 2]], ['OR',  ['requiredRace', 0], ['requiredRace', ChrRace::MASK_ALLIANCE, '&']]],
             };
         }
 
@@ -2276,16 +2260,16 @@ class ItemListFilter extends Filter
         return ['id', $items];
     }
 
-    protected function cbClassRaceSpec(int $cr, int $crs, string $crv, string $field, int $mask) : ?array
+    protected function cbClassRaceSpec(int $cr, int $crs, string $crv, string $field) : ?array
     {
         if (!isset(self::$enums[$cr][$crs]))
             return null;
 
         $_ = self::$enums[$cr][$crs];
         if (is_bool($_))
-            return $_ ? ['AND', [[$field, $mask, '&'], $mask, '!'], [$field, 0, '>']] : ['OR', [[$field, $mask, '&'], $mask], [$field, 0]];
+            return $_ ? [$field, 0, '>'] : [$field, 0];
         else if (is_int($_))
-            return ['AND', [[$field, $mask, '&'], $mask, '!'], [$field, 1 << ($_ - 1), '&']];
+            return [$field, 1 << ($_ - 1), '&'];
 
         return null;
     }
