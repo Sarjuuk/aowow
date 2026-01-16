@@ -35,6 +35,7 @@ abstract class DBTypeList
     *                      null  - operator defaults to: IS [NULL]
     *       operator:      modifies/overrides default
     *                      ! - negated default value (NOT LIKE; <>; NOT IN)
+    *                      MATCH - creates fulltext search ('value' must be array; column must have fulltext index)
     *   condition as str
     *       defines linking (AND || OR)
     *   condition as int
@@ -50,12 +51,13 @@ abstract class DBTypeList
     *               ['flags2', 0xF, '&'],
     *           ]
     *           [['mask', 0x3, '&'], 0],
+    *           ['nameField', ['+contains*', '-excludes'], 'MATCH],
     *           ['joinedTbl.field', NULL]                   // NULL must be explicitly specified "['joinedTbl.field']" would be skipped as erroneous definition (only really usefull when left-joining)
     *           'OR',
     *           5
     *       )
     *   results in
-    *       WHERE ((`id` = 45) OR (`name` NOT LIKE "test%") OR ((`flags` & 255) AND (`flags2` & 15)) OR ((`mask` & 3) = 0)) OR (`joinedTbl`.`field` IS NULL) LIMIT 5
+    *       WHERE ((`id` = 45) OR (`name` NOT LIKE "test%") OR ((`flags` & 255) AND (`flags2` & 15)) OR ((`mask` & 3) = 0)) OR (MATCH(`nameField`) AGAINST("+contains* -excludes" IN BOOLEAN MODE)) OR (`joinedTbl`.`field` IS NULL) LIMIT 5
     */
     public function __construct(array $conditions = [], array $miscData = [])
     {
@@ -167,6 +169,9 @@ abstract class DBTypeList
 
                 if (is_array($c[1]) && !empty($c[1]))
                 {
+                    if (($c[2] ?? '') === 'MATCH')
+                        return 'MATCH('.$field.') AGAINST(\''.implode(' ', $c[1]).'\' IN BOOLEAN MODE)';
+
                     array_walk($c[1], fn(&$x) => $x = Util::checkNumeric($x) ? $x : DB::Aowow()->escape($x));
 
                     $op  = (isset($c[2]) && $c[2] == '!') ? 'NOT IN' : 'IN';

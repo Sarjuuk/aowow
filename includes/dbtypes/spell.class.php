@@ -2551,14 +2551,17 @@ class SpellListFilter extends Filter
         //string (extended)
         if ($_v['na'])
         {
-            $_ = [];
             if ($_v['ex'] == 'on')
-                $_ = $this->tokenizeString(['name_loc'.Lang::getLocale()->value, 'buff_loc'.Lang::getLocale()->value, 'description_loc'.Lang::getLocale()->value]);
-            else
-                $_ = $this->tokenizeString(['name_loc'.Lang::getLocale()->value]);
+                if ($_ = $this->tokenizeString(['buff_loc'.Lang::getLocale()->value, 'description_loc'.Lang::getLocale()->value]))
+                    $parts[] = $_;
 
-            if ($_)
-                $parts[] = $_;
+            if ($_ = $this->buildMatchLookup(['name_loc'.Lang::getLocale()->value]))
+            {
+                if ($parts)
+                    $parts[0][] = $_;
+                else
+                    $parts[] = $_;
+            }
         }
 
         // spellLevel min                                   todo (low): talentSpells (typeCat -2) commonly have spellLevel 1 (and talentLevel >1) -> query is inaccurate

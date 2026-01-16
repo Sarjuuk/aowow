@@ -506,14 +506,17 @@ class QuestListFilter extends Filter
         // name
         if ($_v['na'])
         {
-            $_ = [];
             if ($_v['ex'] == 'on')
-                $_ = $this->tokenizeString(['name_loc'.Lang::getLocale()->value, 'objectives_loc'.Lang::getLocale()->value, 'details_loc'.Lang::getLocale()->value]);
-            else
-                $_ = $this->tokenizeString(['name_loc'.Lang::getLocale()->value]);
+                if ($_ = $this->tokenizeString(['objectives_loc'.Lang::getLocale()->value, 'details_loc'.Lang::getLocale()->value]))
+                    $parts[] = $_;
 
-            if ($_)
-                $parts[] = $_;
+            if ($_ = $this->buildMatchLookup(['name_loc'.Lang::getLocale()->value]))
+            {
+                if ($parts)
+                    $parts[0][] = $_;
+                else
+                    $parts[] = $_;
+            }
         }
 
         // level min

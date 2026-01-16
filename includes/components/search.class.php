@@ -131,7 +131,7 @@ class Search
         }
     }
 
-    private function createLookup(array $fields = []) : array
+    private function createLikeLookup(array $fields = []) : array
     {
         if ($this->idSearch && $this->included)
             return ['id', $this->included];
@@ -161,6 +161,36 @@ class Search
 
             $qry[] = $sub;
         }
+
+        // single cnd?
+        if (count($qry) > 1)
+            array_unshift($qry, 'OR');
+        else
+            $qry = $qry[0];
+
+        return $qry;
+    }
+
+    private function createMatchLookup(array $fields = []) : array
+    {
+        if ($this->idSearch && $this->included)
+            return ['id', $this->included];
+
+        if (!$this->included)
+            return [];
+
+        // default to name-field
+        if (!$fields)
+            $fields[] = 'name_loc'.Lang::getLocale()->value;
+
+        $match = array_merge(
+            array_map(fn($x) => '+'.preg_replace('/[^[:alpha:] \d_-]/iu', ' ', $x).'*', $this->included),
+            array_map(fn($x) => '-'.preg_replace('/[^[:alpha:] \d_-]/iu', ' ', $x).'*', $this->excluded)
+        );
+
+        $qry = [];
+        foreach ($fields as $f)
+            $qry[] = [$f, $match, 'MATCH'];
 
         // single cnd?
         if (count($qry) > 1)
@@ -206,7 +236,7 @@ class Search
 
     private function _searchCharClass() : ?array            // 0 Classes: $moduleMask & 0x00000001
     {
-        $cnd     = array_merge($this->cndBase, [$this->createLookup()]);
+        $cnd     = array_merge($this->cndBase, [$this->createLikeLookup()]);
         $classes = new CharClassList($cnd, ['calcTotal' => true]);
 
         $data = $classes->getListviewData();
@@ -245,7 +275,7 @@ class Search
 
     private function _searchCharRace() : ?array             // 1 Races: $moduleMask & 0x00000002
     {
-        $cnd   = array_merge($this->cndBase, [$this->createLookup()]);
+        $cnd   = array_merge($this->cndBase, [$this->createLikeLookup()]);
         $races = new CharRaceList($cnd, ['calcTotal' => true]);
 
         $data = $races->getListviewData();
@@ -284,7 +314,7 @@ class Search
 
     private function _searchTitle() : ?array                // 2 Titles: $moduleMask & 0x00000004
     {
-        $cnd    = array_merge($this->cndBase, [$this->createLookup(['male_loc'.Lang::getLocale()->value, 'female_loc'.Lang::getLocale()->value])]);
+        $cnd    = array_merge($this->cndBase, [$this->createLikeLookup(['male_loc'.Lang::getLocale()->value, 'female_loc'.Lang::getLocale()->value])]);
         $titles = new TitleList($cnd, ['calcTotal' => true]);
 
         $data = $titles->getListviewData();
@@ -326,8 +356,8 @@ class Search
         $cnd     = array_merge($this->cndBase, array(
             array(
                 'OR',
-                $this->createLookup(['h.name_loc'.Lang::getLocale()->value]),
-                ['AND', $this->createLookup(['e.description']), ['e.holidayId', 0]]
+                $this->createLikeLookup(['h.name_loc'.Lang::getLocale()->value]),
+                ['AND', $this->createLikeLookup(['e.description']), ['e.holidayId', 0]]
             )
         ));
         $wEvents = new WorldEventList($cnd, ['calcTotal' => true]);
@@ -368,7 +398,7 @@ class Search
 
     private function _searchCurrency() : ?array             // 4 Currencies $moduleMask & 0x0000010
     {
-        $cnd   = array_merge($this->cndBase, [$this->createLookup()]);
+        $cnd   = array_merge($this->cndBase, [$this->createLikeLookup()]);
         $money = new CurrencyList($cnd, ['calcTotal' => true]);
 
         $data = $money->getListviewData();
@@ -407,7 +437,7 @@ class Search
 
     private function _searchItemset(array &$shared) : ?array// 5 Itemsets $moduleMask & 0x0000020
     {
-        $cnd  = array_merge($this->cndBase, [$this->createLookup()]);
+        $cnd  = array_merge($this->cndBase, [$this->createLikeLookup()]);
         $sets = new ItemsetList($cnd, ['calcTotal' => true]);
 
         $data = $sets->getListviewData();
@@ -464,7 +494,7 @@ class Search
     private function _searchItem(array &$shared) : ?array   // 6 Items $moduleMask & 0x0000040
     {
         $miscData = ['calcTotal' => true];
-        $lookup   = $this->createLookup();
+        $lookup   = $this->createMatchLookup();
 
         if ($this->moduleMask & self::TYPE_JSON)
         {
@@ -544,11 +574,11 @@ class Search
 
     private function _searchAbility() : ?array              // 7 Abilities (Player + Pet) $moduleMask & 0x0000080
     {
-        $cnd       = array_merge($this->cndBase, array(           // hmm, inclued classMounts..?
+        $cnd       = array_merge($this->cndBase, array(     // hmm, inclued classMounts..?
             ['s.typeCat', [7, -2, -3, -4]],
             [['s.cuFlags', (SPELL_CU_TRIGGERED | SPELL_CU_TALENT), '&'], 0],
             [['s.attributes0', 0x80, '&'], 0],
-            $this->createLookup()
+            $this->createMatchLookup()
         ));
         $abilities = new SpellList($cnd, ['calcTotal' => true]);
 
@@ -610,7 +640,7 @@ class Search
     {
         $cnd     = array_merge($this->cndBase, array(
             ['s.typeCat', [-7, -2]],
-            $this->createLookup()
+            $this->createMatchLookup()
         ));
         $talents = new SpellList($cnd, ['calcTotal' => true]);
 
@@ -669,7 +699,7 @@ class Search
     {
         $cnd    = array_merge($this->cndBase, array(
             ['s.typeCat', -13],
-            $this->createLookup()
+            $this->createMatchLookup()
         ));
         $glyphs = new SpellList($cnd, ['calcTotal' => true]);
 
@@ -723,7 +753,7 @@ class Search
     {
         $cnd  = array_merge($this->cndBase, array(
             ['s.typeCat', -11],
-            $this->createLookup()
+            $this->createMatchLookup()
         ));
         $prof = new SpellList($cnd, ['calcTotal' => true]);
 
@@ -777,7 +807,7 @@ class Search
     {
         $cnd  = array_merge($this->cndBase, array(
             ['s.typeCat', [9, 11]],
-            $this->createLookup()
+            $this->createMatchLookup()
         ));
         $prof = new SpellList($cnd, ['calcTotal' => true]);
 
@@ -831,7 +861,7 @@ class Search
     {
         $cnd   = array_merge($this->cndBase, array(
             ['s.typeCat', -6],
-            $this->createLookup()
+            $this->createMatchLookup()
         ));
         $vPets = new SpellList($cnd, ['calcTotal' => true]);
 
@@ -885,7 +915,7 @@ class Search
     {
         $cnd    = array_merge($this->cndBase, array(
             ['s.typeCat', -5],
-            $this->createLookup()
+            $this->createMatchLookup()
         ));
         $mounts = new SpellList($cnd, ['calcTotal' => true]);
 
@@ -939,7 +969,7 @@ class Search
         $cnd  = array_merge($this->cndBase, array(
             [['flagsExtra', 0x80], 0],                      // exclude trigger creatures
             [['cuFlags', NPC_CU_DIFFICULTY_DUMMY, '&'], 0], // exclude difficulty entries
-            $this->createLookup()
+            $this->createMatchLookup()
         ));
         $npcs = new CreatureList($cnd, ['calcTotal' => true]);
 
@@ -991,7 +1021,7 @@ class Search
     {
         $cnd    = array_merge($this->cndBase, array(
             [['flags', CUSTOM_UNAVAILABLE | CUSTOM_DISABLED, '&'], 0],
-            $this->createLookup()
+            $this->createMatchLookup()
         ));
         $quests = new QuestList($cnd, ['calcTotal' => true]);
 
@@ -1040,7 +1070,7 @@ class Search
     {
         $cnd  = array_merge($this->cndBase, array(
             [['flags', ACHIEVEMENT_FLAG_COUNTER, '&'], 0],  // not a statistic
-            $this->createLookup()
+            $this->createLikeLookup()
         ));
         $acvs = new AchievementList($cnd, ['calcTotal' => true]);
 
@@ -1092,7 +1122,7 @@ class Search
     {
         $cnd   = array_merge($this->cndBase, array(
             ['flags', ACHIEVEMENT_FLAG_COUNTER, '&'],       // is a statistic
-            $this->createLookup()
+            $this->createLikeLookup()
         ));
         $stats = new AchievementList($cnd, ['calcTotal' => true]);
 
@@ -1145,7 +1175,7 @@ class Search
 
     private function _searchZone() : ?array                 // 18 Zones $moduleMask & 0x0040000
     {
-        $cnd    = array_merge($this->cndBase, [$this->createLookup()]);
+        $cnd    = array_merge($this->cndBase, [$this->createLikeLookup()]);
         $zones  = new ZoneList($cnd, ['calcTotal' => true]);
 
         $data = $zones->getListviewData();
@@ -1188,7 +1218,7 @@ class Search
 
     private function _searchObject() : ?array               // 19 Objects $moduleMask & 0x0080000
     {
-        $cnd     = array_merge($this->cndBase, [$this->createLookup()]);
+        $cnd     = array_merge($this->cndBase, [$this->createMatchLookup()]);
         $objects = new GameObjectList($cnd, ['calcTotal' => true]);
 
         $data = $objects->getListviewData();
@@ -1231,7 +1261,7 @@ class Search
 
     private function _searchFaction() : ?array              // 20 Factions $moduleMask & 0x0100000
     {
-        $cnd      = array_merge($this->cndBase, [$this->createLookup()]);
+        $cnd      = array_merge($this->cndBase, [$this->createLikeLookup()]);
         $factions = new FactionList($cnd, ['calcTotal' => true]);
 
         $data = $factions->getListviewData();
@@ -1267,7 +1297,7 @@ class Search
 
     private function _searchSkill() : ?array                // 21 Skills $moduleMask & 0x0200000
     {
-        $cnd    = array_merge($this->cndBase, [$this->createLookup()]);
+        $cnd    = array_merge($this->cndBase, [$this->createLikeLookup()]);
         $skills = new SkillList($cnd, ['calcTotal' => true]);
 
         $data = $skills->getListviewData();
@@ -1306,7 +1336,7 @@ class Search
 
     private function _searchPet() : ?array                  // 22 Pets $moduleMask & 0x0400000
     {
-        $cnd  = array_merge($this->cndBase, [$this->createLookup()]);
+        $cnd  = array_merge($this->cndBase, [$this->createLikeLookup()]);
         $pets = new PetList($cnd, ['calcTotal' => true]);
 
         $data = $pets->getListviewData();
@@ -1350,7 +1380,7 @@ class Search
     {
         $cnd          = array_merge($this->cndBase, array(
             ['s.typeCat', -8],
-            $this->createLookup()
+            $this->createMatchLookup()
         ));
         $npcAbilities = new SpellList($cnd, ['calcTotal' => true]);
 
@@ -1411,7 +1441,7 @@ class Search
                 ['s.cuFlags', SPELL_CU_TRIGGERED, '&'],
                 ['s.attributes0', 0x80, '&']
             ],
-            $this->createLookup()
+            $this->createMatchLookup()
         ));
         $misc = new SpellList($cnd, ['calcTotal' => true]);
 
@@ -1463,7 +1493,7 @@ class Search
 
     private function _searchEmote() : ?array                // 25 Emotes $moduleMask & 0x2000000
     {
-        $cnd   = array_merge($this->cndBase, [$this->createLookup(['cmd', 'meToExt_loc'.Lang::getLocale()->value, 'meToNone_loc'.Lang::getLocale()->value, 'extToMe_loc'.Lang::getLocale()->value, 'extToExt_loc'.Lang::getLocale()->value, 'extToNone_loc'.Lang::getLocale()->value])]);
+        $cnd   = array_merge($this->cndBase, [$this->createLikeLookup(['cmd', 'meToExt_loc'.Lang::getLocale()->value, 'meToNone_loc'.Lang::getLocale()->value, 'extToMe_loc'.Lang::getLocale()->value, 'extToExt_loc'.Lang::getLocale()->value, 'extToNone_loc'.Lang::getLocale()->value])]);
         $emote = new EmoteList($cnd, ['calcTotal' => true]);
 
         $data = $emote->getListviewData();
@@ -1504,7 +1534,7 @@ class Search
 
     private function _searchEnchantment() : ?array          // 26 Enchantments $moduleMask & 0x4000000
     {
-        $cnd         = array_merge($this->cndBase, [$this->createLookup(['name_loc'.Lang::getLocale()->value])]);
+        $cnd         = array_merge($this->cndBase, [$this->createLikeLookup(['name_loc'.Lang::getLocale()->value])]);
         $enchantment = new EnchantmentList($cnd, ['calcTotal' => true]);
 
         $data = $enchantment->getListviewData();
@@ -1551,7 +1581,7 @@ class Search
 
     private function _searchSound() : ?array                // 27 Sounds $moduleMask & 0x8000000
     {
-        $cnd    = array_merge($this->cndBase, [$this->createLookup(['name'])]);
+        $cnd    = array_merge($this->cndBase, [$this->createLikeLookup(['name'])]);
         $sounds = new SoundList($cnd, ['calcTotal' => true]);
 
         $data = $sounds->getListviewData();

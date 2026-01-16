@@ -60,10 +60,12 @@ class DBC
         'S' => 'V',                                         // S - string block index, 4 bytes - localized; autofill
         'f' => 'f',                                         // f - float, 4 bytes (rounded to 4 digits after comma)
         'i' => 'l',                                         // i - signed int, 4 bytes
+        'I' => 'l',                                         // I - signed int, 4 bytes, sql index
         'u' => 'V',                                         // u - unsigned int, 4 bytes
+        'U' => 'V',                                         // U - unsigned int, 4 bytes, sql index
         'b' => 'C',                                         // b - unsigned char, 1 byte
         'd' => 'x4',                                        // d - ordered by this field, not included in array
-        'n' => 'V'                                          // n - int, 4 bytes, ordered by this field
+        'n' => 'V'                                          // n - unsigned int, 4 bytes, sql primary key
     );
 
     public  const DEFAULT_WOW_BUILD = '12340';
@@ -284,8 +286,9 @@ class DBC
         if ($this->error)
             return;
 
-        $pKey  = '';
-        $query = 'CREATE '.($this->tempTable ? 'TEMPORARY' : '').' TABLE `'.$this->tableName.'` (';
+        $pKey    = '';
+        $query   = 'CREATE '.($this->tempTable ? 'TEMPORARY' : '').' TABLE `'.$this->tableName.'` (';
+        $indizes = [];
 
         if ($this->isGameTable)
         {
@@ -312,10 +315,14 @@ class DBC
                 case 'b':
                     $query .= '`'.$name.'` TINYINT UNSIGNED NOT NULL, ';
                     break;
+                case 'I':
+                    $indizes[] = $name;
                 case 'i':
                 case 'n':
                     $query .= '`'.$name.'` INT SIGNED NOT NULL, ';
                     break;
+                case 'U':
+                    $indizes[] = $name;
                 case 'u':
                     $query .= '`'.$name.'` INT UNSIGNED NOT NULL, ';
                     break;
@@ -326,6 +333,9 @@ class DBC
             if ($type == 'n')
                 $pKey = $name;
         }
+
+        foreach ($indizes as $i)
+            $query .= 'KEY `idx_'.$i.'` (`'.$i.'`), ';
 
         if ($pKey)
             $query .= 'PRIMARY KEY (`'.$pKey.'`) ';

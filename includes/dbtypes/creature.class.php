@@ -364,14 +364,17 @@ class CreatureListFilter extends Filter
         // name [str]
         if ($_v['na'])
         {
-            $_ = [];
             if ($_v['ex'] == 'on')
-                $_ = $this->tokenizeString(['name_loc'.Lang::getLocale()->value, 'subname_loc'.Lang::getLocale()->value]);
-            else
-                $_ = $this->tokenizeString(['name_loc'.Lang::getLocale()->value]);
+                if ($_ = $this->tokenizeString(['subname_loc'.Lang::getLocale()->value]))
+                    $parts[] = $_;
 
-            if ($_)
-                $parts[] = $_;
+            if ($_ = $this->buildMatchLookup(['name_loc'.Lang::getLocale()->value]))
+            {
+                if ($parts)
+                    $parts = ['OR', $_, ...$parts];
+                else
+                    $parts[] = $_;
+            }
         }
 
         // pet family [list]

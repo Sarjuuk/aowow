@@ -178,7 +178,7 @@ class GameObjectListFilter extends Filter
 
         // name
         if ($_v['na'])
-            if ($_ = $this->tokenizeString(['name_loc'.Lang::getLocale()->value]))
+            if ($_ = $this->buildMatchLookup(['name_loc'.Lang::getLocale()->value]))
                 $parts[] = $_;
 
         return $parts;
