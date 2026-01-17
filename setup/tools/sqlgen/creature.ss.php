@@ -102,8 +102,10 @@ CLISetup::registerSetup("sql", new class extends SetupScript
            { WHERE     ct.entry IN (?a) }
             LIMIT     ?d, ?d';
 
-        $i = 0;
         DB::Aowow()->query('TRUNCATE ?_creature');
+        DB::Aowow()->query('SET SESSION innodb_ft_enable_stopword = OFF');
+
+        $i = 0;
         while ($npcs = DB::World()->select($baseQuery, NPC_CU_INSTANCE_BOSS, $ids ?: DBSIMPLE_SKIP, CLISetup::SQL_BATCH * $i, CLISetup::SQL_BATCH))
         {
             CLI::write(' * batch #' . ++$i . ' (' . count($npcs) . ')', CLI::LOG_BLANK, true, true);

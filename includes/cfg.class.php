@@ -473,6 +473,27 @@ class Cfg
 
         return true;
     }
+
+    private static function logographic_ft_search(int|string $value, ?string &$msg = '') : bool
+    {
+        if (!$value)
+            return true;
+
+        $ok = true;
+        foreach (['?_spell', '?_items', '?_objects', '?_creature', '?_quests'] as $tbl)
+        {
+            if (DB::Aowow()->selectRow('SHOW INDEX FROM ?# WHERE `column_name` = ? AND `index_type` = "FULLTEXT"', $tbl, 'name_loc4'))
+                continue;
+
+            $ok = false;
+            $msg .= "\nNo fulltext index found on col: 'name_loc4'; tbl: '".$tbl."'.";
+        }
+
+        if (!$ok)
+            $msg .= "\nCannot enable option.\n";
+
+        return $ok;
+    }
 }
 
 ?>

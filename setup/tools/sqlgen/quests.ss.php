@@ -116,8 +116,10 @@ CLISetup::registerSetup("sql", new class extends SetupScript
           { WHERE     q.Id IN (?a) }
             LIMIT     ?d, ?d';
 
-        $i = 0;
         DB::Aowow()->query('TRUNCATE ?_quests');
+        DB::Aowow()->query('SET SESSION innodb_ft_enable_stopword = OFF');
+
+        $i = 0;
         while ($quests = DB::World()->select($baseQuery, $ids ?: DBSIMPLE_SKIP, CLISetup::SQL_BATCH * $i, CLISetup::SQL_BATCH))
         {
             CLI::write(' * batch #' . ++$i . ' (' . count($quests) . ')', CLI::LOG_BLANK, true, true);

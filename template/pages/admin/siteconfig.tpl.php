@@ -18,7 +18,7 @@
             var a = $WH.ce('a');
             a.style.opacity = 0;
             a.className = errTxt ? 'icon-report' : 'icon-tick';
-            g_addTooltip(a, errTxt || 'success', 'q');
+            g_addTooltip(a, errTxt ? '<pre>' + errTxt + '</pre>' : 'success', 'q');
             a.onclick = fadeout.bind(a);
             setTimeout(function () { $(a).animate({ opacity: '1.0' }, 250); }, 50);
             setTimeout(fadeout.bind(a), 10000);

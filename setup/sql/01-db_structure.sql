@@ -581,7 +581,6 @@ CREATE TABLE `aowow_creature` (
   FULLTEXT `idx_name0` (`name_loc0`),
   FULLTEXT `idx_name2` (`name_loc2`),
   FULLTEXT `idx_name3` (`name_loc3`),
-  FULLTEXT `idx_name4` (`name_loc4`),
   FULLTEXT `idx_name6` (`name_loc6`),
   FULLTEXT `idx_name8` (`name_loc8`),
   KEY `idx_spell1` (`spell1`),
@@ -1473,7 +1472,6 @@ CREATE TABLE `aowow_items` (
   FULLTEXT `idx_name0` (`name_loc0`),
   FULLTEXT `idx_name2` (`name_loc2`),
   FULLTEXT `idx_name3` (`name_loc3`),
-  FULLTEXT `idx_name4` (`name_loc4`),
   FULLTEXT `idx_name6` (`name_loc6`),
   FULLTEXT `idx_name8` (`name_loc8`),
   KEY `idx_itemset` (`itemset`)
@@ -1668,7 +1666,6 @@ CREATE TABLE `aowow_objects` (
   FULLTEXT `idx_name0` (`name_loc0`),
   FULLTEXT `idx_name2` (`name_loc2`),
   FULLTEXT `idx_name3` (`name_loc3`),
-  FULLTEXT `idx_name4` (`name_loc4`),
   FULLTEXT `idx_name6` (`name_loc6`),
   FULLTEXT `idx_name8` (`name_loc8`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -2272,7 +2269,6 @@ CREATE TABLE `aowow_quests` (
   FULLTEXT `idx_name0` (`name_loc0`),
   FULLTEXT `idx_name2` (`name_loc2`),
   FULLTEXT `idx_name3` (`name_loc3`),
-  FULLTEXT `idx_name4` (`name_loc4`),
   FULLTEXT `idx_name6` (`name_loc6`),
   FULLTEXT `idx_name8` (`name_loc8`),
   KEY `idx_sourcespell` (`sourceSpellId`),
@@ -2881,7 +2877,6 @@ CREATE TABLE `aowow_spell` (
   FULLTEXT `idx_name0` (`name_loc0`),
   FULLTEXT `idx_name2` (`name_loc2`),
   FULLTEXT `idx_name3` (`name_loc3`),
-  FULLTEXT `idx_name4` (`name_loc4`),
   FULLTEXT `idx_name6` (`name_loc6`),
   FULLTEXT `idx_name8` (`name_loc8`),
   KEY `idx_spellfamily` (`spellFamilyId`),

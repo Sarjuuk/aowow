@@ -79,6 +79,7 @@ class Search
     private array $resultStore = [];
     private array $included    = [];
     private array $excluded    = [];
+    private array $fulltext    = [];
     private array $cndBase     = ['AND'];
     private bool  $idSearch    = false;
 
@@ -109,25 +110,32 @@ class Search
 
         foreach (explode(' ', $this->query) as $raw)
         {
+            // ivalid chars for both LIKE and MATCH
             $clean = str_replace(['\\', '%'], '', $raw);
 
             if ($clean === '')
                 continue;
 
-            if ($clean[0] == '-')
+            $ex = ($clean[0] == '-');
+            if ($ex)
             {
-                if (mb_strlen($clean) < 4 && !Lang::getLocale()->isLogographic())
-                    $this->invalid[] = mb_substr($raw, 1);
-                else
-                    $this->excluded[] = mb_substr(str_replace('_', '\\_', $clean), 1);
+                $clean = mb_substr($clean, 1);
+                $raw   = mb_substr($raw, 1);
             }
-            else
+
+            if (mb_strlen($clean) < 3 && !Lang::getLocale()->isLogographic())
             {
-                if (mb_strlen($clean) < 3 && !Lang::getLocale()->isLogographic())
-                    $this->invalid[] = $raw;
-                else
-                    $this->included[] = str_replace('_', '\\_', $clean);
+                $this->invalid[] = $raw;
+                continue;
             }
+
+            $this->{$ex ? 'excluded' : 'included'}[] = str_replace('_', '\\_', $clean);
+
+            // note: a fulltext search purely with exclude tokens will return no result
+            if (($tokens = trim(preg_replace(Filter::PATTERN_FT, ' ', $clean))) !== '')
+                foreach (array_filter(explode(' ', $tokens)) as $t)
+                    if (mb_strlen($t) > 2)
+                        $this->fulltext[] = ($ex ? '-' : '+') . $t . '*';
         }
     }
 
@@ -176,21 +184,19 @@ class Search
         if ($this->idSearch && $this->included)
             return ['id', $this->included];
 
-        if (!$this->included)
+        if (Lang::getLocale()->isLogographic() && !Cfg::get('LOGOGRAPHIC_FT_SEARCH'))
+            return $this->createLikeLookup($fields);
+
+        if (!$this->fulltext)
             return [];
 
         // default to name-field
         if (!$fields)
             $fields[] = 'name_loc'.Lang::getLocale()->value;
 
-        $match = array_merge(
-            array_map(fn($x) => '+'.preg_replace('/[^[:alpha:] \d_-]/iu', ' ', $x).'*', $this->included),
-            array_map(fn($x) => '-'.preg_replace('/[^[:alpha:] \d_-]/iu', ' ', $x).'*', $this->excluded)
-        );
-
         $qry = [];
         foreach ($fields as $f)
-            $qry[] = [$f, $match, 'MATCH'];
+            $qry[] = [$f, $this->fulltext, 'MATCH'];
 
         // single cnd?
         if (count($qry) > 1)
@@ -495,6 +501,8 @@ class Search
     {
         $miscData = ['calcTotal' => true];
         $lookup   = $this->createMatchLookup();
+        if (!$lookup)
+            return null;
 
         if ($this->moduleMask & self::TYPE_JSON)
         {
@@ -574,11 +582,15 @@ class Search
 
     private function _searchAbility() : ?array              // 7 Abilities (Player + Pet) $moduleMask & 0x0000080
     {
+        $lookup = $this->createMatchLookup();
+        if (!$lookup)
+            return null;
+
         $cnd       = array_merge($this->cndBase, array(     // hmm, inclued classMounts..?
             ['s.typeCat', [7, -2, -3, -4]],
             [['s.cuFlags', (SPELL_CU_TRIGGERED | SPELL_CU_TALENT), '&'], 0],
             [['s.attributes0', 0x80, '&'], 0],
-            $this->createMatchLookup()
+            $lookup
         ));
         $abilities = new SpellList($cnd, ['calcTotal' => true]);
 
@@ -638,10 +650,11 @@ class Search
 
     private function _searchTalent() : ?array               // 8 Talents (Player + Pet) $moduleMask & 0x0000100
     {
-        $cnd     = array_merge($this->cndBase, array(
-            ['s.typeCat', [-7, -2]],
-            $this->createMatchLookup()
-        ));
+        $lookup = $this->createMatchLookup();
+        if (!$lookup)
+            return null;
+
+        $cnd     = array_merge($this->cndBase, [['s.typeCat', [-7, -2]], $lookup]);
         $talents = new SpellList($cnd, ['calcTotal' => true]);
 
         $data = $talents->getListviewData();
@@ -697,10 +710,11 @@ class Search
 
     private function _searchGlyph() : ?array                // 9 Glyphs $moduleMask & 0x0000200
     {
-        $cnd    = array_merge($this->cndBase, array(
-            ['s.typeCat', -13],
-            $this->createMatchLookup()
-        ));
+        $lookup = $this->createMatchLookup();
+        if (!$lookup)
+            return null;
+
+        $cnd    = array_merge($this->cndBase, [['s.typeCat', -13], $lookup]);
         $glyphs = new SpellList($cnd, ['calcTotal' => true]);
 
         $data = $glyphs->getListviewData();
@@ -751,10 +765,11 @@ class Search
 
     private function _searchProficiency() : ?array          // 10 Proficiencies $moduleMask & 0x0000400
     {
-        $cnd  = array_merge($this->cndBase, array(
-            ['s.typeCat', -11],
-            $this->createMatchLookup()
-        ));
+        $lookup = $this->createMatchLookup();
+        if (!$lookup)
+            return null;
+
+        $cnd  = array_merge($this->cndBase, [['s.typeCat', -11], $lookup]);
         $prof = new SpellList($cnd, ['calcTotal' => true]);
 
         $data = $prof->getListviewData();
@@ -805,10 +820,11 @@ class Search
 
     private function _searchProfession() : ?array           // 11 Professions (Primary + Secondary) $moduleMask & 0x0000800
     {
-        $cnd  = array_merge($this->cndBase, array(
-            ['s.typeCat', [9, 11]],
-            $this->createMatchLookup()
-        ));
+        $lookup = $this->createMatchLookup();
+        if (!$lookup)
+            return null;
+
+        $cnd  = array_merge($this->cndBase, [['s.typeCat', [9, 11]], $lookup]);
         $prof = new SpellList($cnd, ['calcTotal' => true]);
 
         $data = $prof->getListviewData();
@@ -859,10 +875,11 @@ class Search
 
     private function _searchCompanion() : ?array            // 12 Companions $moduleMask & 0x0001000
     {
-        $cnd   = array_merge($this->cndBase, array(
-            ['s.typeCat', -6],
-            $this->createMatchLookup()
-        ));
+        $lookup = $this->createMatchLookup();
+        if (!$lookup)
+            return null;
+
+        $cnd   = array_merge($this->cndBase, [['s.typeCat', -6], $lookup]);
         $vPets = new SpellList($cnd, ['calcTotal' => true]);
 
         $data = $vPets->getListviewData();
@@ -913,10 +930,11 @@ class Search
 
     private function _searchMount() : ?array                // 13 Mounts $moduleMask & 0x0002000
     {
-        $cnd    = array_merge($this->cndBase, array(
-            ['s.typeCat', -5],
-            $this->createMatchLookup()
-        ));
+        $lookup = $this->createMatchLookup();
+        if (!$lookup)
+            return null;
+
+        $cnd    = array_merge($this->cndBase, [['s.typeCat', -5], $lookup]);
         $mounts = new SpellList($cnd, ['calcTotal' => true]);
 
         $data = $mounts->getListviewData();
@@ -966,10 +984,14 @@ class Search
 
     private function _searchCreature() : ?array             // 14 NPCs $moduleMask & 0x0004000
     {
+        $lookup = $this->createMatchLookup();
+        if (!$lookup)
+            return null;
+
         $cnd  = array_merge($this->cndBase, array(
             [['flagsExtra', 0x80], 0],                      // exclude trigger creatures
             [['cuFlags', NPC_CU_DIFFICULTY_DUMMY, '&'], 0], // exclude difficulty entries
-            $this->createMatchLookup()
+            $lookup
         ));
         $npcs = new CreatureList($cnd, ['calcTotal' => true]);
 
@@ -1019,9 +1041,13 @@ class Search
 
     private function _searchQuest() : ?array                // 15 Quests $moduleMask & 0x0008000
     {
+        $lookup = $this->createMatchLookup();
+        if (!$lookup)
+            return null;
+
         $cnd    = array_merge($this->cndBase, array(
             [['flags', CUSTOM_UNAVAILABLE | CUSTOM_DISABLED, '&'], 0],
-            $this->createMatchLookup()
+            $lookup
         ));
         $quests = new QuestList($cnd, ['calcTotal' => true]);
 
@@ -1218,7 +1244,11 @@ class Search
 
     private function _searchObject() : ?array               // 19 Objects $moduleMask & 0x0080000
     {
-        $cnd     = array_merge($this->cndBase, [$this->createMatchLookup()]);
+        $lookup = $this->createMatchLookup();
+        if (!$lookup)
+            return null;
+
+        $cnd     = array_merge($this->cndBase, [$lookup]);
         $objects = new GameObjectList($cnd, ['calcTotal' => true]);
 
         $data = $objects->getListviewData();
@@ -1378,10 +1408,11 @@ class Search
 
     private function _searchCreatureAbility() : ?array      // 23 NPCAbilities $moduleMask & 0x0800000
     {
-        $cnd          = array_merge($this->cndBase, array(
-            ['s.typeCat', -8],
-            $this->createMatchLookup()
-        ));
+        $lookup = $this->createMatchLookup();
+        if (!$lookup)
+            return null;
+
+        $cnd          = array_merge($this->cndBase, [['s.typeCat', -8], $lookup]);
         $npcAbilities = new SpellList($cnd, ['calcTotal' => true]);
 
         $data = $npcAbilities->getListviewData();
@@ -1433,6 +1464,10 @@ class Search
 
     private function _searchSpell() : ?array                // 24 Spells (Misc + GM + triggered abilities) $moduleMask & 0x1000000
     {
+        $lookup = $this->createMatchLookup();
+        if (!$lookup)
+            return null;
+
         $cnd  = array_merge($this->cndBase, array(
             ['s.typeCat', -8, '!'],
             [
@@ -1441,7 +1476,7 @@ class Search
                 ['s.cuFlags', SPELL_CU_TRIGGERED, '&'],
                 ['s.attributes0', 0x80, '&']
             ],
-            $this->createMatchLookup()
+            $lookup
         ));
         $misc = new SpellList($cnd, ['calcTotal' => true]);
 
