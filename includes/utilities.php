@@ -185,7 +185,7 @@ abstract class Util
 
         $from = array(
             '/\$g\s*([^:;]*)\s*:\s*([^:;]*)\s*(:?[^:;]*);/ui',// directed gender-reference                      $g<male>:<female>:<refVariable>
-            '/\$t([^;]+);/ui',                              // nonsense, that the client apparently ignores
+            '/\$t([^;]+);/ui',                              // HK rank. $t<male>:<female>; (maybe male/female if pvp unranked? Gets replaced with current HK rank.)
             '/<([^\"=\/>]+\s[^\"=\/>]+)>/ui',               // emotes (workaround: at least one whitespace and never " or = between brackets)
             '/\$(\d+)w/ui',                                 // worldState(?)-ref found on some pageTexts        $1234w
             '/\$c/i',                                       // class-ref
@@ -196,7 +196,7 @@ abstract class Util
 
         $toMD = array(
             '<\1/\2>',
-            '',
+            '<'.implode('/', Lang::game('pvpRank', 1)).'>',
             '<\1>',
             '[span class=q0>WorldState #\1[/span]',
             '<'.Lang::game('class').'>',
@@ -207,7 +207,7 @@ abstract class Util
 
         $toHTML = array(
             '&lt;\1/\2&gt;',
-            '',
+            '&lt;'.implode('/', Lang::game('pvpRank', 1)).'&gt;',
             '&lt;\1&gt;',
             '<span class="q0">WorldState #\1</span>',
             '&lt;'.Lang::game('class').'&gt;',
