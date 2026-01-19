@@ -467,19 +467,19 @@ class PageTemplate
     // refresh vars that shouldn't be cached
     private function update() : void
     {
-        // analytics + consent
-        // not set or declined
-        if (empty($_COOKIE['consent']))
-            $this->hasAnalytics = false;
-
-        // not set
-        if (!isset($_COOKIE['consent']))
+        // not set, but should be
+        if (!isset($_COOKIE['consent']) && $this->hasAnalytics)
         {
             $this->addScript(SC_CSS_FILE, 'css/consent.css', SC_FLAG_NOCACHE);
             $this->addScript(SC_JS_FILE,  'js/consent.js', SC_FLAG_NOCACHE);
 
             $this->consentFooter = true;
         }
+
+        // analytics + consent
+        // not set or declined
+        if (empty($_COOKIE['consent']))
+            $this->hasAnalytics = false;
 
         // js + css
         $this->prepareScripts();
