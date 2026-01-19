@@ -108,6 +108,8 @@ class Search
             return;
         }
 
+        $allowShort = Lang::getLocale()->isLogographic();
+
         foreach (explode(' ', $this->query) as $raw)
         {
             // ivalid chars for both LIKE and MATCH
@@ -123,7 +125,7 @@ class Search
                 $raw   = mb_substr($raw, 1);
             }
 
-            if (mb_strlen($clean) < 3 && !Lang::getLocale()->isLogographic())
+            if (mb_strlen($clean) < 3 && !$allowShort)
             {
                 $this->invalid[] = $raw;
                 continue;
@@ -138,13 +140,9 @@ class Search
                 {
                     // cant have trailing/leading dashes. FT confuses them for additional modifiers and dies with a syntax error
                     // would be an issue for all modifiers, but Filter::PATTERN_FT only allows for - at this point
-                    while (($t[0] ?? '') === '-')
-                        $t = mb_substr($t, 1);
+                    $t = preg_replace('/^-+|-+$/', '', $t);
 
-                    while (($t[-1] ?? '') === '-')
-                        $t = mb_substr($t, 0, -1);
-
-                    if (mb_strlen($t) > 2)
+                    if ($allowShort || mb_strlen($t) > 2)
                         $this->fulltext[] = ($ex ? '-' : '+') . $t . '*';
                 }
             }

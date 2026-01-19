@@ -567,14 +567,14 @@ abstract class Filter
         return sprintf($exact ? '%s' : '%%%s%%', $string);
     }
 
-    protected function tokenizeString(array $fields, string $string = '', bool $exact = false, bool $shortStr = false) : array
+    protected function tokenizeString(array $fields, string $string = '', bool $exact = false, bool $allowShort = false) : array
     {
         if (!$string && $this->values['na'])
             $string = $this->values['na'];
 
         // always allow sub 3 chars for logographic locales
         if (Lang::getLocale()->isLogographic())
-            $shortStr = true;
+            $allowShort = true;
 
         $qry = [];
         foreach ($fields as $f)
@@ -583,9 +583,9 @@ abstract class Filter
             $tokens = $exact ? [$string] : array_filter(explode(' ', $string));
             foreach ($tokens as $t)
             {
-                if ($t[0] == '-' && (mb_strlen($t) > 3 || $shortStr))
+                if ($t[0] == '-' && (mb_strlen($t) > 3 || $allowShort))
                     $sub[] = [$f, $this->transformToken(mb_substr($t, 1), $exact), '!'];
-                else if ($t[0] != '-' && (mb_strlen($t) > 2 || $shortStr))
+                else if ($t[0] != '-' && (mb_strlen($t) > 2 || $allowShort))
                     $sub[] = [$f, $this->transformToken($t, $exact)];
             }
 
@@ -614,13 +614,13 @@ abstract class Filter
         return $qry;
     }
 
-    protected function buildMatchLookup(array $fields, string $string = '', bool $exact = false, bool $shortStr = false) : array
+    protected function buildMatchLookup(array $fields, string $string = '', bool $exact = false, bool $allowShort = false) : array
     {
         if (!$string && $this->values['na'])
             $string = $this->values['na'];
 
         if (Lang::getLocale()->isLogographic() && !Cfg::get('LOGOGRAPHIC_FT_SEARCH'))
-            return $this->tokenizeString($fields, $string, $exact, $shortStr);
+            return $this->tokenizeString($fields, $string, $exact, $allowShort);
 
         $string = trim(preg_replace(self::PATTERN_FT, ' ', $string));
         if (!$string)
@@ -628,7 +628,7 @@ abstract class Filter
 
         // always allow sub 3 chars for logographic locales
         if (Lang::getLocale()->isLogographic())
-            $shortStr = true;
+            $allowShort = true;
 
         $sub    = [];
         $tokens = $exact ? [$string] : array_filter(explode(' ', $string));
@@ -640,16 +640,10 @@ abstract class Filter
 
             // cant have trailing/leading dashes. FT confuses them for additional modifiers and dies with a syntax error
             // would be an issue for all modifiers, but Filter::PATTERN_FT only allows for - at this point
-            while (($t[0] ?? '') === '-')
-                $t = mb_substr($t, 1);
+            $t = preg_replace('/^-+|-+$/', '', $t);
 
-            while (($t[-1] ?? '') === '-')
-                $t = mb_substr($t, 0, -1);
-
-            if (!$shortStr && mb_strlen($t) < 3)
-                continue;
-
-            $sub[] = ($ex ? '-' : '+') . $t . '*';
+            if ($allowShort || mb_strlen($t) > 2)
+                $sub[] = ($ex ? '-' : '+') . $t . '*';
         }
 
         $qry = [];
