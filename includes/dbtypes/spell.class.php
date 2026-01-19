@@ -2453,6 +2453,7 @@ class SpellListFilter extends Filter
         40  => [parent::CR_ENUM,      'damageClass'                                                                               ], // damagetype [damagetype]
         41  => [parent::CR_FLAG,      'stanceMask',       (1 << (22 - 1))                                                         ], // requiresmetamorphosis [yn]
         42  => [parent::CR_FLAG,      'attributes5',      SPELL_ATTR5_USABLE_WHILE_STUNNED                                        ], // usablewhenstunned [yn]
+        43  => [parent::CR_FLAG,      'attributes3',      SPELL_ATTR3_BATTLEGROUND                                                ], // usableinbgs [yn]
         44  => [parent::CR_FLAG,      'attributes4',      SPELL_ATTR4_USABLE_IN_ARENA                                             ], // usableinarenas [yn]
         45  => [parent::CR_ENUM,      'powerType'                                                                                 ], // resourcetype [resourcetype]
         46  => [parent::CR_FLAG,      'attributes0',      SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY                               ], // disregardimmunity [yn]
