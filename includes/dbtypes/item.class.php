@@ -1330,9 +1330,9 @@ class ItemList extends DBTypeList
                 continue;
 
             if ($spell = DB::Aowow()->selectRow(
-               'SELECT `effect1AuraId`, `effect1MiscValue`, `effect1BasePoints`, `effect1DieSides`,
-                       `effect2AuraId`, `effect2MiscValue`, `effect2BasePoints`, `effect2DieSides`,
-                       `effect3AuraId`, `effect3MiscValue`, `effect3BasePoints`, `effect3DieSides`
+               'SELECT `effect1Id`, `effect1TriggerSpell`, `effect1AuraId`, `effect1MiscValue`, `effect1BasePoints`, `effect1DieSides`,
+                       `effect2Id`, `effect2TriggerSpell`, `effect2AuraId`, `effect2MiscValue`, `effect2BasePoints`, `effect2DieSides`,
+                       `effect3Id`, `effect3TriggerSpell`, `effect3AuraId`, `effect3MiscValue`, `effect3BasePoints`, `effect3DieSides`
                 FROM   ?_spell
                 WHERE  `id` = ?d',
                 $this->curTpl['spellId'.$h]
