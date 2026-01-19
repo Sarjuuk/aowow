@@ -30,30 +30,24 @@ if (!CLI)
 
 class DBC
 {
-    private $isGameTable = false;
-    private $localized   = false;
-    private $tempTable   = true;
-    private $tableName   = '';
+    private const /* string */ INI_FILE_PATH   = 'setup/tools/dbc/%s.ini';
+    private const /* int    */ MAX_INSERT_ROWS = 500;
 
-    private $dataBuffer  = [];
-    private $bufferSize  = 500;
+    public  const /* string */ DEFAULT_WOW_BUILD = '12340';
 
-    private static $structs = [];
-
-    private $fileRefs    = [];
-    private $curFile     = '';
-
-    public $error  = true;
-    public $fields = [];
-    public $format = [];
-    public $file   = '';
-
-    private $macro = array(
+    private bool   $isGameTable = false;
+    private bool   $isLocalized = false;
+    private bool   $isTempTable = true;
+    private string $tableName   = '';
+    private array  $dataBuffer  = [];
+    private array  $fileRefs    = [];
+    private array  $format      = [];
+    private string $recordFmt   = '';
+    private array  $macro       = array(
         'LOC'   => 'sxsssxsxsxxxxxxxx',                     // pre 4.x locale block (in use)
         'X_LOC' => 'xxxxxxxxxxxxxxxxx'                      // pre 4.x locale block (unused)
     );
-
-    private $unpackFmt = array(                             // Supported format characters:
+    private array  $unpackFmt   = array(                    // Supported format characters:
         'x' => 'x/x/x/x',                                   // x - not used/unknown, 4 bytes
         'X' => 'x',                                         // X - not used/unknown, 1 byte
         's' => 'V',                                         // s - string block index, 4 bytes
@@ -68,50 +62,64 @@ class DBC
         'n' => 'V'                                          // n - unsigned int, 4 bytes, sql primary key
     );
 
-    public  const DEFAULT_WOW_BUILD = '12340';
-    private const INI_FILE_PATH     = 'setup/tools/dbc/%s.ini';
+    private static array $structs = [];
 
-    public function __construct($file, $opts = [], string $wowBuild = self::DEFAULT_WOW_BUILD)
+    public bool $error = true;
+
+    public function __construct(public string $file, array $opts = [], string $wowBuild = self::DEFAULT_WOW_BUILD)
     {
         self::loadStructs($wowBuild);
 
-        $file = strtolower($file);
-        if (empty(self::$structs[$file]))
+        $this->file = strtolower($this->file);
+        if (empty(self::$structs[$this->file]))
         {
-            CLI::write('no structure known for '.$file.'.dbc, build '.$wowBuild, CLI::LOG_ERROR);
+            CLI::write('no structure known for '.$this->file.'.dbc, build '.$wowBuild, CLI::LOG_ERROR);
             return;
         }
 
-        foreach (self::$structs[$file] as $name => $type)
+        foreach (self::$structs[$this->file] as $name => $type)
         {
             // resolove locale macro
             if (isset($this->macro[$type]))
             {
-                $this->localized = true;
+                $this->isLocalized = true;
                 for ($i = 0; $i < strlen($this->macro[$type]); $i++)
+                {
                     $this->format[$name.'_loc'.$i] = $this->macro[$type][$i];
+                    $this->recordFmt .= '/'.$this->unpackFmt[$this->macro[$type][$i]].$name.'_loc'.$i;
+                }
+            }
+            else if (!isset($this->unpackFmt[$type]))
+            {
+                CLI::write('unknown format parameter '.CLI::bold($type).' at for field '.CLI::bold($name).' in format string', CLI::LOG_ERROR);
+                return;
             }
             else
             {
                 $this->format[$name] = $type;
-                if ($type == 'S')
-                    $this->localized = true;
+                $this->recordFmt .= '/'.$this->unpackFmt[$type];
+                if ($type !== 'x' && $type !== 'X')
+                    $this->recordFmt .= $name;
+
+                if ($type === 'S')
+                    $this->isLocalized = true;
             }
         }
 
-        $this->file = $file;
+        // Optimizing unpack string: 'x/x/x/x/x/x' => 'x6'
+        $this->recordFmt = preg_replace_callback('/x(\/x)+/i', fn($m) => 'x'.((strlen($m[0]) + 1) / 2), substr($this->recordFmt, 1));
 
         if (is_bool($opts['temporary']))
-            $this->tempTable = $opts['temporary'];
+            $this->isTempTable = $opts['temporary'];
 
         if (!empty($opts['tableName']))
             $this->tableName = $opts['tableName'];
         else
-            $this->tableName = 'dbc_'.$file;
+            $this->tableName = 'dbc_'.$this->file;
 
         // gameTable-DBCs don't have an index and are accessed through value order
         // allas, you cannot do this with mysql, so we add a 'virtual' index
-        $this->isGameTable = array_values($this->format) == ['f'] && substr($file, 0, 2) == 'gt';
+        $this->isGameTable = array_values($this->format) == ['f'] && substr($this->file, 0, 2) == 'gt';
 
         $foundMask = 0x0;
         foreach (Locale::cases() as $loc)
@@ -128,40 +136,58 @@ class DBC
                 if (!CLISetup::fileExists($fullPath))
                     continue;
 
-                $this->curFile = $fullPath;
-                if ($this->validateFile($loc))
+                $dbcFile = new DBCFile($fullPath);
+                if ($dbcFile->error)
                 {
-                    $foundMask |= (1 << $loc->value);
-                    break;
+                    CLI::write($dbcFile->error, CLI::LOG_ERROR);
+                    unset($dbcFile);
+                    continue;
                 }
+
+                if ($dbcFile->nCols != count($this->format))
+                {
+                    CLI::write('incorrect format specified for file '.$this->file.' - expected fields: '.count($this->format).' read fields: '.$dbcFile->nCols, CLI::LOG_ERROR);
+                    unset($dbcFile);
+                    continue;
+                }
+
+                $recSize = 0;
+                foreach ($this->format as $ch)
+                    $recSize += ($ch == 'X' || $ch == 'b') ? 1 : 4;
+
+                if ($recSize != $dbcFile->recordSize)
+                {
+                    CLI::write('format string size ('.$recSize.') for file '.$this->file.' does not match actual size ('.$dbcFile->recordSize.')', CLI::LOG_ERROR);
+                    unset($dbcFile);
+                    continue;
+                }
+
+                $this->fileRefs[$loc->value] = $dbcFile;
+                $foundMask |= (1 << $loc->value);
             }
         }
 
         if (!$this->fileRefs)
         {
-            CLI::write('no suitable files found for '.$file.'.dbc, aborting.', CLI::LOG_ERROR);
+            CLI::write('no suitable files found for '.$this->file.'.dbc, aborting.', CLI::LOG_ERROR);
             return;
         }
 
         // check if DBCs are identical
-        $headers = array_column($this->fileRefs, 2);
-        $x = array_unique(array_column($headers, 'recordCount'));
-        if (count($x) != 1)
+
+        $tests = ['nRows' => null, 'nCols' => null, 'recordSize' => null];
+        foreach ($this->fileRefs as $fileRef)
         {
-            CLI::write('some DBCs have different record counts ('.implode(', ', $x).' respectively). cannot merge!', CLI::LOG_ERROR);
-            return;
-        }
-        $x = array_unique(array_column($headers, 'fieldCount'));
-        if (count($x) != 1)
-        {
-            CLI::write('some DBCs have differenct field counts ('.implode(', ', $x).' respectively). cannot merge!', CLI::LOG_ERROR);
-            return;
-        }
-        $x = array_unique(array_column($headers, 'recordSize'));
-        if (count($x) != 1)
-        {
-            CLI::write('some DBCs have differenct record sizes ('.implode(', ', $x).' respectively). cannot merge!', CLI::LOG_ERROR);
-            return;
+            foreach ($tests as $field => $val)
+            {
+                if ($val === null)
+                    $tests[$field] = $fileRef->{$field};
+                else if ($val != $fileRef->{$field})
+                {
+                    CLI::write('some DBCs have different '.$field.': '.CLI::bold($val).' <> '.CLI::bold($fileRef->{$field}).' respectively. cannot merge!', CLI::LOG_ERROR);
+                    return;
+                }
+            }
         }
 
         $this->error = false;
@@ -174,7 +200,7 @@ class DBC
 
         $this->createTable();
 
-        if ($this->localized)
+        if ($this->isLocalized)
             CLI::write(' - DBC: reading and merging '.$this->file.'.dbc for locales '.Lang::concat(array_keys($this->fileRefs), callback: fn($x) => CLI::bold(Locale::from($x)->name)));
         else
             CLI::write(' - DBC: reading '.$this->file.'.dbc');
@@ -216,69 +242,7 @@ class DBC
 
     private function endClean()
     {
-        foreach ($this->fileRefs as &$ref)
-            fclose($ref[0]);
-
-        $this->dataBuffer = null;
-    }
-
-    private function readHeader(&$handle = null) : array
-    {
-        if (!is_resource($handle))
-            $handle = fopen($this->curFile, 'rb');
-
-        if (!$handle)
-            return [];
-
-        if (fread($handle, 4) != 'WDBC')
-        {
-            CLI::write('file '.$this->curFile.' has incorrect magic bytes', CLI::LOG_ERROR);
-            fclose($handle);
-            return [];
-        }
-
-        return unpack('VrecordCount/VfieldCount/VrecordSize/VstringSize', fread($handle, 16));
-    }
-
-    private function validateFile(Locale $loc) : bool
-    {
-        $filesize = filesize($this->curFile);
-        if ($filesize < 20)
-        {
-            CLI::write('file '.$this->curFile.' is too small for a DBC file', CLI::LOG_ERROR);
-            return false;
-        }
-
-        $header = $this->readHeader($handle);
-        if (!$header)
-        {
-            CLI::write('cannot open file '.$this->curFile, CLI::LOG_ERROR);
-            return false;
-        }
-
-        // Different debug checks to be sure, that file was opened correctly
-        $debugStr = '(recordCount='.$header['recordCount'].
-                    ' fieldCount=' .$header['fieldCount'] .
-                    ' recordSize=' .$header['recordSize'] .
-                    ' stringSize=' .$header['stringSize'] .')';
-
-        if ($header['recordCount'] * $header['recordSize'] + $header['stringSize'] + 20 != $filesize)
-        {
-            CLI::write('file '.$this->curFile.' has incorrect size '.$filesize.': '.$debugStr, CLI::LOG_ERROR);
-            fclose($handle);
-            return false;
-        }
-
-        if ($header['fieldCount'] != count($this->format))
-        {
-            CLI::write('incorrect format ('.implode('', $this->format).') specified for file '.$this->curFile.' fieldCount='.$header['fieldCount'], CLI::LOG_ERROR);
-            fclose($handle);
-            return false;
-        }
-
-        $this->fileRefs[$loc->value] = [$handle, $this->curFile, $header];
-
-        return true;
+        unset($this->fileRefs, $this->dataBuffer);
     }
 
     private function createTable()
@@ -287,7 +251,7 @@ class DBC
             return;
 
         $pKey    = '';
-        $query   = 'CREATE '.($this->tempTable ? 'TEMPORARY' : '').' TABLE `'.$this->tableName.'` (';
+        $query   = 'CREATE '.($this->isTempTable ? 'TEMPORARY' : '').' TABLE `'.$this->tableName.'` (';
         $indizes = [];
 
         if ($this->isGameTable)
@@ -298,38 +262,28 @@ class DBC
 
         foreach ($this->format as $name => $type)
         {
-            switch ($type)
+            $query .= match($type)
             {
-                case 'f':
-                    $query .= '`'.$name.'` FLOAT NOT NULL, ';
-                    break;
-                case 'S':
-                    for ($l = 0; $l < strlen($this->macro['LOC']); $l++)
-                        if ($this->macro['LOC'][$l] == 's')
-                            $query .= '`'.$name.'_loc'.$l.'` TEXT NULL, ';
+                'f'           => '`'.$name.'` FLOAT NOT NULL, ',
+                's'           => '`'.$name.'` TEXT NULL, ',
+                'b'           => '`'.$name.'` TINYINT UNSIGNED NOT NULL, ',
+                'i', 'I', 'n' => '`'.$name.'` INT SIGNED NOT NULL, ',
+                'u', 'U'      => '`'.$name.'` INT SIGNED NOT NULL, ',
+                'S'           => (function ($n) {
+                                     $buf = '';
+                                     for ($l = 0; $l < strlen($this->macro['LOC']); $l++)
+                                         if ($this->macro['LOC'][$l] == 's')
+                                             $buf .= '`'.$n.'_loc'.$l.'` TEXT NULL, ';
+                                     return $buf;
+                                 })($name),
+                default       => ''                         // 'x', 'X', 'd'
+            };
 
-                    break;
-                case 's':
-                    $query .= '`'.$name.'` TEXT NULL, ';
-                    break;
-                case 'b':
-                    $query .= '`'.$name.'` TINYINT UNSIGNED NOT NULL, ';
-                    break;
-                case 'I':
-                    $indizes[] = $name;
-                case 'i':
-                case 'n':
-                    $query .= '`'.$name.'` INT SIGNED NOT NULL, ';
-                    break;
-                case 'U':
-                    $indizes[] = $name;
-                case 'u':
-                    $query .= '`'.$name.'` INT UNSIGNED NOT NULL, ';
-                    break;
-                default:                                    // 'x', 'X', 'd'
-                    continue 2;
-            }
+            if ($this->isGameTable)
+                continue;
 
+            if ($type == 'I' || $type == 'U')
+                $indizes[] = $name;
             if ($type == 'n')
                 $pKey = $name;
         }
@@ -353,151 +307,54 @@ class DBC
         if (!$this->dataBuffer || $this->error)
             return;
 
-        $cols = [];
-        foreach ($this->format as $n => $type)
-        {
-            switch ($type)
-            {
-                case 'x':
-                case 'X':
-                case 'd':
-                    continue 2;
-                case 'S':
-                    for ($l = 0; $l < strlen($this->macro['LOC']); $l++)
-                        if ($this->macro['LOC'][$l] == 's')
-                         $cols[] = $n.'_loc'.$l;
-                    break;
-                default:
-                    $cols[] = $n;
-            }
-        }
-
-        if ($this->isGameTable)
-            array_unshift($cols, 'idx');
-
-        foreach ($this->dataBuffer as $row)
-            DB::Aowow()->qry('INSERT INTO %n %v', $this->tableName, array_combine($cols, $row));
+        DB::Aowow()->qry('INSERT INTO %n %m', $this->tableName, $this->dataBuffer);
 
         $this->dataBuffer = [];
     }
 
     private function read()
     {
-        // Check that record size also matches
-        $itr       = 0;
-        $recSize   = 0;
-        $unpackStr = '';
-        foreach ($this->format as $ch)
+        $nRows = 1;                                         // set to actual value once we have a file handle
+        for ($i = 0; $i < $nRows; $i++)
         {
-            if ($ch == 'X' || $ch == 'b')
-                $recSize += 1;
-            else
-                $recSize += 4;
-
-            if (!isset($this->unpackFmt[$ch]))
-            {
-                CLI::write('unknown format parameter \''.$ch.'\' in format string', CLI::LOG_ERROR);
-                return false;
-            }
-
-            $unpackStr .= '/'.$this->unpackFmt[$ch];
-
-            if ($ch != 'X' && $ch != 'x')
-                $unpackStr .= 'f'.$itr;                     // output can't have numeric key as it gets interpreted as repeat factor here
-
-            $itr++;
-        }
-
-        $unpackStr = substr($unpackStr, 1);
-
-        // Optimizing unpack string: 'x/x/x/x/x/x' => 'x6'
-        while (preg_match('/(x\/)+x/', $unpackStr, $r))
-            $unpackStr = substr_replace($unpackStr, 'x'.((strlen($r[0]) + 1) / 2), strpos($unpackStr, $r[0]), strlen($r[0]));
-
-        // we asserted all DBCs to be identical in structure. pick first header for checks
-        $header = reset($this->fileRefs)[2];
-
-        if ($recSize != $header['recordSize'])
-        {
-            CLI::write('format string size ('.$recSize.') for file '.$this->file.' does not match actual size ('.$header['recordSize'].')', CLI::LOG_ERROR);
-            return false;
-        }
-
-        // And, finally, extract the records
-        $strBlock = 4 + 16 + $header['recordSize'] * $header['recordCount'];
-
-        for ($i = 0; $i < $header['recordCount']; $i++)
-        {
-            $row = [];
-            $idx = $i;
-
             // add 'virtual' enumerator for gt*-dbcs
             if ($this->isGameTable)
-                $row[-1] = $i;
+                $this->dataBuffer['idx'][$i] = $i;
 
-            foreach ($this->fileRefs as $locId => [$handle, $fullPath, $header])
+            foreach ($this->fileRefs as $locId => $dbcFile)
             {
-                $rec = unpack($unpackStr, fread($handle, $header['recordSize']));
+                $nRows = $dbcFile->nRows;
 
-                $offset = 0;
-                foreach (array_values($this->format) as $j => $type)
+                // note that the file pointer is already on the first record as the DBCFile reads its own header
+                $row = $dbcFile->readRecord($this->recordFmt);
+
+                foreach ($row as $name => $value)
                 {
-                    if (!isset($rec['f'.$j]))
-                        continue;
+                    $type = $this->format[$name];
 
-                    $outIdx = $j + $offset;
-
-                    if (!empty($row[$outIdx]) && $type != 'S')
-                        continue;
-
-                    switch ($type)
+                    // handle locale fields for post 3.3.5a DBCs
+                    if ($type === 'S')
                     {
-                        case 'S':                           // localized String - autofill
-                            $offset = substr_count($this->macro['LOC'], 's');
+                        for ($k = 0; $k < strlen($this->macro['LOC']); $k++)
+                            if ($this->macro['LOC'][$k] === 's')
+                                $this->dataBuffer[$name.'_loc'.$k][$i] ??= null;
 
-                            for ($k = 0; $k < strlen($this->macro['LOC']); $k++)
-                            {
-                                if ($this->macro['LOC'][$k] != 's')
-                                    continue;
-
-                                if (!isset($row[$j + $k]))  // prep locale fields
-                                    $row[$j + $k] = null;
-                            }
-
-                            // provide outIdx for passthrough
-                            $outIdx = $j + $locId;
-                        case 's':
-                            $curPos = ftell($handle);
-                            fseek($handle, $strBlock + $rec['f'.$j]);
-
-                            $str = $chr = '';
-                            do
-                            {
-                                $str .= $chr;
-                                $chr = fread($handle, 1);
-                            }
-                            while ($chr != "\000");
-
-                            fseek($handle, $curPos);
-                            $row[$outIdx] = $str;
-                            break;
-                        case 'f':
-                            $row[$outIdx] = round($rec['f'.$j], 8);
-                            break;
-                        case 'n':                               // DO NOT BREAK!
-                            $idx = $rec['f'.$j];
-                        default:                                // nothing special .. 'i', 'u' and the likes
-                            $row[$outIdx] = $rec['f'.$j];
+                        $this->dataBuffer[$name.'_loc'.$locId][$i] ??= $dbcFile->getStringFromOffset($value);
+                    }
+                    if (empty($this->dataBuffer[$name][$i]))
+                    {
+                        if ($type == 's')
+                            $this->dataBuffer[$name][$i] ??= $dbcFile->getStringFromOffset($value);
+                        else
+                            $this->dataBuffer[$name][$i] = $value;
                     }
                 }
 
-                if (!$this->localized)                          // one match is enough
+                if (!$this->isLocalized)                    // one match is enough
                     break;
             }
 
-            $this->dataBuffer[$idx] = array_values($row);
-
-            if (count($this->dataBuffer) >= $this->bufferSize)
+            if (count(current($this->dataBuffer)) >= self::MAX_INSERT_ROWS)
                 $this->writeToDB();
         }
 
