@@ -133,9 +133,21 @@ class Search
 
             // note: a fulltext search purely with exclude tokens will return no result
             if (($tokens = trim(preg_replace(Filter::PATTERN_FT, ' ', $clean))) !== '')
+            {
                 foreach (array_filter(explode(' ', $tokens)) as $t)
+                {
+                    // cant have trailing/leading dashes. FT confuses them for additional modifiers and dies with a syntax error
+                    // would be an issue for all modifiers, but Filter::PATTERN_FT only allows for - at this point
+                    while (($t[0] ?? '') === '-')
+                        $t = mb_substr($t, 1);
+
+                    while (($t[-1] ?? '') === '-')
+                        $t = mb_substr($t, 0, -1);
+
                     if (mb_strlen($t) > 2)
                         $this->fulltext[] = ($ex ? '-' : '+') . $t . '*';
+                }
+            }
         }
     }
 
