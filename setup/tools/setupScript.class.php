@@ -30,7 +30,7 @@ trait TrDBCcopy
 
         CLI::write('[sql] copying '.$this->dbcSourceFiles[0].'.dbc into aowow_'.$this->command);
 
-        $dbc = new DBC($this->dbcSourceFiles[0], ['temporary' => false, 'tableName' => 'aowow_'.$this->command]);
+        $dbc = new DBCReader($this->dbcSourceFiles[0], ['temporary' => false, 'tableName' => 'aowow_'.$this->command]);
         if ($dbc->error)
             return false;
 

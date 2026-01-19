@@ -62,10 +62,10 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         // .mp3 => audio/mpeg
 
         $query =
-           'SELECT `id` AS `id`, `type` AS `cat`, `name`, 0 AS `cuFlags`,
-                   `file1` AS `soundFile1`, `file2` AS `soundFile2`, `file3` AS `soundFile3`, `file4` AS `soundFile4`, `file5`  AS `soundFile5`,
-                   `file6` AS `soundFile6`, `file7` AS `soundFile7`, `file8` AS `soundFile8`, `file9` AS `soundFile9`, `file10` AS `soundFile10`,
-                   `path`, `flags`
+           'SELECT `id` AS "id", `type` AS "cat", `name`, 0 AS "cuFlags",
+                   `file1` AS "soundFile1", `file2` AS "soundFile2", `file3` AS "soundFile3", `file4` AS "soundFile4", `file5`  AS "soundFile5",
+                   `file6` AS "soundFile6", `file7` AS "soundFile7", `file8` AS "soundFile8", `file9` AS "soundFile9", `file10` AS "soundFile10",
+                   IFNULL(`path`, "") AS "path", `flags`
             FROM   dbc_soundentries
             LIMIT  %i, %i';
 
@@ -95,6 +95,9 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                 $hasDupes = false;
                 for ($i = 1; $i < 11; $i++)
                 {
+                    if (!$s['soundFile'.$i])
+                        continue;
+
                     $nicePath = CLI::nicePath($s['soundFile'.$i], $s['path']);
                     if ($s['soundFile'.$i] && array_key_exists($nicePath, $soundIndex))
                     {
@@ -134,9 +137,6 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                         CLI::write('[sound] Group '.str_pad('['.$s['id'].']', 7).' '.CLI::bold($s['name']).' has invalid sound file '.CLI::bold($s['soundFile'.$i]).' on index '.$i.'! Skipping...', CLI::LOG_WARN);
                         $s['soundFile'.$i] = null;
                     }
-                    // empty case
-                    else
-                        $s['soundFile'.$i] = null;
                 }
 
                 if (!$fileSets && !$hasDupes)

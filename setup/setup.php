@@ -12,7 +12,7 @@ if (!CLI)
 require_once 'setup/tools/setupScript.class.php';
 require_once 'setup/tools/utilityScript.class.php';
 require_once 'setup/tools/CLISetup.class.php';
-require_once 'setup/tools/dbc.class.php';
+require_once 'setup/tools/dbcreader.class.php';
 require_once 'setup/tools/imagecreatefromblp.func.php';
 
 CLISetup::init();

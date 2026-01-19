@@ -40,7 +40,7 @@ CLISetup::registerUtility(new class extends UtilityScript
             if ($args[0])
                 $opts['tableName'] = $args[0];
 
-            $dbc = new DBC(strtolower($n), $opts, $args[1] ?: DBC::DEFAULT_WOW_BUILD);
+            $dbc = new DBCReader(strtolower($n), $opts, $args[1] ?: DBCReader::DEFAULT_WOW_BUILD);
             if ($dbc->error)
             {
                 CLI::write('[dbc] required DBC '.CLI::bold($n).'.dbc not found!', CLI::LOG_ERROR);
@@ -84,7 +84,7 @@ CLISetup::registerUtility(new class extends UtilityScript
         CLI::write();
         CLI::write('  Known DBC files:', -1, false);
 
-        $defs   = DBC::getDefinitions();
+        $defs   = DBCReader::getDefinitions();
         $letter = '';
         $buff   = [];
 
