@@ -890,9 +890,9 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         /* Main Content */
         /****************/
 
-        $this->series        = $this->createSeries($_side);
-        $this->gains         = $this->createGains();
-        $this->rewards       = $this->createRewards($_side);
+        $this->series        = $this->createSeries();
+        $this->gains         = $this->createGains($_side);
+        $this->rewards       = $this->createRewards();
         $this->objectives    = $this->subject->parseText('objectives', false);
         $this->details       = $this->subject->parseText('details', false);
         $this->offerReward   = $this->subject->parseText('offerReward', false);
@@ -999,7 +999,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         parent::generate();
     }
 
-    private function createRewards(int $side) : ?array
+    private function createRewards() : ?array
     {
         $rewards = [[], [], [], ''];                        // [spells, items, choice, money]
 
@@ -1056,9 +1056,9 @@ class QuestBaseResponse extends TemplateResponse implements ICache
             }
         }
 
-        if (!empty($this->subject->rewards[$this->typeId][Type::CURRENCY]))
+        if ($currency = array_filter($this->subject->rewards[$this->typeId][Type::CURRENCY] ?? [],
+            fn($x) => $x != CURRENCY_ARENA_POINTS && $x != CURRENCY_HONOR_POINTS, ARRAY_FILTER_USE_KEY))
         {
-            $currency = $this->subject->rewards[$this->typeId][Type::CURRENCY];
             $rewCurr  = new CurrencyList(array(['id', array_keys($currency)]));
             if (!$rewCurr->error)
             {
@@ -1069,7 +1069,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                         $id,
                         $rewCurr->getField('name', true),
                         quality: ITEM_QUALITY_NORMAL,
-                        num: $currency[$id] * ($side == SIDE_HORDE ? -1 : 1), // toggles the icon
+                        num: $currency[$id]
                     );
             }
         }
@@ -1187,12 +1187,18 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         return true;
     }
 
-    private function createGains() : ?array
+    private function createGains(int $side) : ?array
     {
         $gains = [];
 
         // xp
         $gains[0] = $this->subject->getField('rewardXP');
+
+        // arena points
+        $gains[5] = $this->subject->getField('rewardArenaPoints');
+
+        // honor points
+        $gains[4] = [$this->subject->getField('rewardHonorPoints'), $side];
 
         // talent points
         $gains[3] = $this->subject->getField('rewardTalents');

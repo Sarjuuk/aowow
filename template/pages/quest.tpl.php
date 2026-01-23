@@ -147,7 +147,7 @@ if ([$spells, $items, $choice, $money] = $this->rewards):
 
 endif;
 
-if ([$xp, $rep, $title, $tp] = $this->gains):
+if ([$xp, $rep, $title, $tp, $honor, $arena] = $this->gains):
 ?>
                     <h3><?=Lang::main('gains'); ?></h3>
                     <?=Lang::quest('gainsDesc').Lang::main('colon'); ?>
@@ -169,6 +169,19 @@ if ([$xp, $rep, $title, $tp] = $this->gains):
 
     if ($tp):
         echo '                        <li><div>'.Lang::quest('bonusTalents', [$tp])."</div></li>\n";
+    endif;
+
+    if ($arena || $honor[0]):
+        echo '                        <li><div>';
+        if ($honor[0]):
+            $a = '<a href="?currency=104">'.$honor[0].'</a>';
+            $a = $honor[1] == SIDE_BOTH ? '<span class="moneyalliance">'.$a.'</span>' : $a;
+            echo '<span class="money'.($honor[1] == SIDE_ALLIANCE ? 'alliance' : 'horde').' tip q1" onmouseover="Listview.funcBox.moneyHonorOver(event)" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">'.$a.'</span>';
+        endif;
+        if ($arena):
+            echo ' <span class="moneyarena tip q1" onmouseover="Listview.funcBox.moneyArenaOver(event)" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()"><a href="?currency=103">'.$arena.'</a></span>';
+        endif;
+        echo                         "</div></li>\n";
     endif;
 
     echo "                    </ul>\n";
