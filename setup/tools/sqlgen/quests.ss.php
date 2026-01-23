@@ -60,7 +60,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                       RewardMoney,
                       RewardBonusMoney,
                       RewardDisplaySpell,                 RewardSpell,
-                      RewardHonor * 124 * RewardKillHonor,            -- alt calculation in QuestDef.cpp -> Quest::CalculateHonorGain(playerLevel)
+                      RewardHonor + (124 * RewardKillHonor),          -- 124 = 1HK @ L80 (real value per level in TeamContributionPoints.dbc)
                       IFNULL(qa.RewardMailTemplateId, 0), IFNULL(qa.RewardMailDelay, 0),
                       RewardTitle,
                       RewardTalents,
