@@ -984,11 +984,29 @@ class QuestBaseResponse extends TemplateResponse implements ICache
             ->getByCondition(Type::QUEST, $this->typeId)
             ->prepare();
 
-        if ($_ = $this->subject->getField('reqMinRepFaction'))
-            $cnd->addExternalCondition(Conditions::SRC_QUEST_AVAILABLE, '0:'.$this->typeId, [Conditions::REPUTATION_RANK, $_, 1 << Game::getReputationLevelForPoints($this->subject->getField('reqMinRepValue'))]);
 
-        if ($_ = $this->subject->getField('reqMaxRepFaction'))
-            $cnd->addExternalCondition(Conditions::SRC_QUEST_AVAILABLE, '0:'.$this->typeId, [-Conditions::REPUTATION_RANK, $_, 1 << Game::getReputationLevelForPoints($this->subject->getField('reqMaxRepValue'))]);
+        $minRepFac = $this->subject->getField('reqMinRepFaction');
+        $maxRepFac = $this->subject->getField('reqMaxRepFaction');
+        // add +/- 2 to contain edgecases. ie a reqMaxRepValue of 1 should not include the whole of REP_NEUTRAL
+        $minRepRank = $minRepFac ? Game::getReputationLevelForPoints($this->subject->getField('reqMinRepValue') + 2) : REP_HATED;
+        $maxRepRank = $maxRepFac ? Game::getReputationLevelForPoints($this->subject->getField('reqMaxRepValue') - 2) : REP_EXALTED;
+
+        $convertRankBits = function (int $minRank, int $maxRank) : int
+        {
+            $bits = 0;
+            for ($i = $minRank; $i <= $maxRank; $i++)
+                $bits |= (1 << $i);
+
+            return $bits;
+        };
+
+        if ($minRepFac && $maxRepFac && $minRepFac <> $maxRepFac)
+        {
+            $cnd->addExternalCondition(Conditions::SRC_QUEST_AVAILABLE, '0:'.$this->typeId, [Conditions::REPUTATION_RANK, $minRepFac, $convertRankBits($minRepRank, REP_EXALTED)]);
+            $cnd->addExternalCondition(Conditions::SRC_QUEST_AVAILABLE, '0:'.$this->typeId, [Conditions::REPUTATION_RANK, $maxRepFac, $convertRankBits(REP_HATED, $maxRepRank)]);
+        }
+        else if (($_ = $minRepFac) || ($_ = $maxRepFac))
+            $cnd->addExternalCondition(Conditions::SRC_QUEST_AVAILABLE, '0:'.$this->typeId, [Conditions::REPUTATION_RANK, $_, $convertRankBits($minRepRank, $maxRepRank)]);
 
         if ($tab = $cnd->toListviewTab())
         {

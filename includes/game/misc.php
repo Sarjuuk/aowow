@@ -135,22 +135,16 @@ class Game
 
     public static function getReputationLevelForPoints(int $pts) : int
     {
-        if ($pts >= 41999)
-            return REP_EXALTED;
-        if ($pts >= 20999)
-            return REP_REVERED;
-        if ($pts >= 8999)
-            return REP_HONORED;
-        if ($pts >= 2999)
-            return REP_FRIENDLY;
-        if ($pts >= 0)
-            return REP_NEUTRAL;
-        if ($pts >= -3000)
-            return REP_UNFRIENDLY;
-        if ($pts >= -6000)
-            return REP_HOSTILE;
-
-        return REP_HATED;
+        return match (true) {
+            $pts >=  42000 => REP_EXALTED,
+            $pts >=  21000 => REP_REVERED,
+            $pts >=  9000  => REP_HONORED,
+            $pts >=  3000  => REP_FRIENDLY,
+            $pts >=  0     => REP_NEUTRAL,
+            $pts >= -3000  => REP_UNFRIENDLY,
+            $pts >= -6000  => REP_HOSTILE,
+            default        => REP_HATED,
+        };
     }
 
     public static function getTaughtSpells(mixed &$spell) : array
