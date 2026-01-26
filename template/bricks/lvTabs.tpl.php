@@ -30,10 +30,10 @@ if (($this->lvTabs && count($this->lvTabs)) || $this->charactersLvData || $this-
     echo $this->lvTabs;
 
     if ($this->charactersLvData):
-        echo '                us_addCharactersTab('.$this->json('charactersLvData').');'.PHP_EOL;
+        echo '                us_addCharactersTab('.$this->json('charactersLvData', varRef: true).');'.PHP_EOL;
     endif;
     if ($this->profilesLvData):
-        echo '                us_addProfilesTab('.$this->json('profilesLvData').');'.PHP_EOL;
+        echo '                us_addProfilesTab('.$this->json('profilesLvData', varRef: true).');'.PHP_EOL;
     endif;
     if ($this->contribute & CONTRIBUTE_CO):
         echo "                new Listview({template: 'comment', id: 'comments', name: LANG.tab_comments".($this->lvTabs ? ", tabs: ".$this->lvTabs->__tabVar : '').", parent: 'lv-generic', data: lv_comments});".PHP_EOL;

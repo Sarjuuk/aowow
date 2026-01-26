@@ -24,7 +24,7 @@
 ?>
                 <div id="h1-icon-generic" class="h1-icon"></div>
                 <script type="text/javascript">
-                    $WH.ge('h1-icon-generic').appendChild(Icon.createUser(<?=substr($this->json('userIcon'), 1, -1); ?>));
+                    $WH.ge('h1-icon-generic').appendChild(Icon.createUser(<?=substr($this->json('userIcon', varRef: true), 1, -1); ?>));
                 </script>
                 <h1 class="h1-icon"><?=$this->h1; ?></h1>
 <?php else: ?>

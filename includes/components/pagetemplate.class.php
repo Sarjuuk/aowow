@@ -207,27 +207,27 @@ class PageTemplate
         return Cfg::get($name);
     }
 
-    private function json(mixed $var, int $jsonFlags = 0x0) : string
+    private function json(mixed $var, int $jsonFlags = 0x0, bool $varRef = false) : string
     {
-        if (is_string($var) && $this->$var)
-            $var = $this->$var;
+        if (!is_string($var))
+            return preg_replace('/script\s*\>/i', 'scr"+"ipt>', Util::toJSON($var, $jsonFlags) ?: "{}");
 
-        return preg_replace('/script\s*\>/i', 'scr"+"ipt>', Util::toJSON($var, $jsonFlags) ?: "{}");
+        return preg_replace('/script\s*\>/i', 'scr"+"ipt>', Util::toJSON($varRef ? $this->$var : $var, $jsonFlags) ?: "{}");
     }
 
-    private function escHTML(string $var) : string|array
+    private function escHTML(string $var, bool $varRef = false) : string|array
     {
-        return Util::htmlEscape($this->$var ?? $var);
+        return Util::htmlEscape($varRef ? $this->$var : $var);
     }
 
-    private function escJS(string $var) : string|array
+    private function escJS(string $var, bool $varRef = false) : string|array
     {
-        return Util::jsEscape($this->$var ?? $var);
+        return Util::jsEscape($varRef ? $this->$var : $var);
     }
 
-    private function ucFirst(string $var) : string
+    private function ucFirst(string $var, bool $varRef = false) : string
     {
-        return Util::ucFirst($this->$var ?? $var);
+        return Util::ucFirst($varRef ? $this->$var : $var);
     }
 
 

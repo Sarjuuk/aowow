@@ -239,8 +239,11 @@ abstract class Util
         return 'b'.$_;
     }
 
-    public static function htmlEscape($data)
+    public static function htmlEscape(string|array|null $data) : string|array
     {
+        if (empty($data))                                   // null, '', [] and not "0"
+            return '';
+
         if (is_array($data))
         {
             foreach ($data as &$v)
@@ -252,8 +255,11 @@ abstract class Util
         return htmlspecialchars($data, ENT_QUOTES | ENT_DISALLOWED | ENT_HTML5, 'utf-8');
     }
 
-    public static function jsEscape($data)
+    public static function jsEscape(string|array|null $data) : string|array
     {
+        if (empty($data))                                   // null, '', [] and not "0"
+            return '';
+
         if (is_array($data))
         {
             foreach ($data as &$v)

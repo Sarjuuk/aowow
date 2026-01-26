@@ -15,7 +15,7 @@ if ($this->contribute & CONTRIBUTE_VI):
 endif;
 
 if ($this->gPageInfo):
-    echo "                var g_pageInfo = ".$this->json('gPageInfo').";\n";
+    echo "                var g_pageInfo = ".$this->json('gPageInfo', varRef: true).";\n";
 
     // set by ItemBaseEndpoint
     if ($this->user::isLoggedIn() && !empty($this->redButtons[BUTTON_EQUIP])):
@@ -27,7 +27,7 @@ if ($this->pageTemplate):
     if ($this->locale->value && $this->pageTemplate['pageName'] != 'home'):
         echo "                Locale.set(".$this->locale->value.");\n";
     endif;
-    echo "                PageTemplate.set(".$this->json('pageTemplate').");\n";
+    echo "                PageTemplate.set(".$this->json('pageTemplate', varRef: true).");\n";
 endif;
     echo "                PageTemplate.init();\n";
 
