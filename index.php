@@ -64,7 +64,7 @@ try {
     $responder = new \StdClass;
 
     // 1. try specialized response
-    if (file_exists('endpoints/'.$pageCall.'/'.$file.'.php'))
+    if (file_exists('endpoints/'.$pageCall.'/'.$file.'.php') && $pageCall != $file)
     {
         require_once 'endpoints/'.$pageCall.'/'.$file.'.php';
 
