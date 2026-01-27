@@ -38,14 +38,10 @@ class UserBaseResponse extends TemplateResponse
         if (!$rawParam)
             $this->forwardToSignIn('user');
 
-        if ($user = DB::Aowow()->selectRow('SELECT a.`id`, a.`username`, a.`consecutiveVisits`, a.`userGroups`, a.`avatar`, a.`avatarborder`, a.`wowicon`, a.`title`, a.`description`, a.`joinDate`, a.`prevLogin`, IFNULL(SUM(ar.`amount`), 0) AS "sumRep", a.`prevIP`, a.`email` FROM ?_account a LEFT JOIN ?_account_reputation ar ON a.`id` = ar.`userId` WHERE LOWER(a.`username`) = LOWER(?) GROUP BY a.`id`', $rawParam))
+        if ($user = DB::Aowow()->selectRow('SELECT a.`id`, a.`username`, a.`consecutiveVisits`, a.`userGroups`, a.`avatar`, a.`avatarborder`, a.`wowicon`, a.`title`, a.`description`, a.`joinDate`, a.`prevLogin`, IFNULL(SUM(ar.`amount`), 0) AS "sumRep", a.`prevIP`, a.`email` FROM ?_account a LEFT JOIN ?_account_reputation ar ON a.`id` = ar.`userId` WHERE a.`id` <> 0 AND LOWER(a.`username`) = LOWER(?) GROUP BY a.`id`', $rawParam))
             $this->user = $user;
         else
-            $this->generateNotFound(Lang::user('notFound', [$rawParam]));
-
-        // do not display system account
-        if (!$this->user['id'])
-            $this->generateNotFound(Lang::user('notFound', [$rawParam]));
+            $this->generateNotFound(Lang::user('notFound', [Util::htmlEscape($rawParam)]));
     }
 
     protected function generate() : void
