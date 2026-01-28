@@ -43,11 +43,11 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         );
 
         // set derived icons
-        DB::Aowow()->query('UPDATE ?_holidays h, ?_icons i SET h.`iconId` = i.`id` WHERE i.`name` LIKE CONCAT(LOWER(h.`textureString`), "%") AND h.`textureString` <> ""');
+        DB::Aowow()->query('UPDATE ?_holidays h, ?_icons i SET h.`iconId` = i.`id` WHERE i.`name_source` LIKE CONCAT(LOWER(h.`textureString`), "%") AND h.`textureString` <> ""');
 
         // set custom icons
         foreach (self::CUSTOM_ICONS as $hId => $iconString)
-            DB::Aowow()->query('UPDATE ?_holidays h SET h.`iconId` = (SELECT i.`id` FROM ?_icons i WHERE `name` = ?) WHERE `id` = ?d', $iconString, $hId);
+            DB::Aowow()->query('UPDATE ?_holidays h SET h.`iconId` = (SELECT i.`id` FROM ?_icons i WHERE `name_source` = ?) WHERE `id` = ?d', $iconString, $hId);
 
         return true;
     }

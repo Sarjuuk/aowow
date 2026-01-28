@@ -499,14 +499,14 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         $itemInfo = DB::World()->select('SELECT entry AS ARRAY_KEY, displayId AS d, Quality AS q FROM item_template WHERE entry IN (?a)', $itemSpells);
         foreach ($itemSpells as $sId => $itemId)
             if (isset($itemInfo[$itemId]))
-                DB::Aowow()->query('UPDATE ?_spell s, ?_icons ic, dbc_itemdisplayinfo idi SET s.iconIdAlt = ic.id, s.cuFlags = s.cuFlags | ?d WHERE ic.name = LOWER(idi.inventoryIcon1) AND idi.id = ?d AND s.id = ?d', ((7 - $itemInfo[$itemId]['q']) << 8), $itemInfo[$itemId]['d'], $sId);
+                DB::Aowow()->query('UPDATE ?_spell s, ?_icons ic, dbc_itemdisplayinfo idi SET s.iconIdAlt = ic.id, s.cuFlags = s.cuFlags | ?d WHERE ic.name_source = LOWER(idi.inventoryIcon1) AND idi.id = ?d AND s.id = ?d', ((7 - $itemInfo[$itemId]['q']) << 8), $itemInfo[$itemId]['d'], $sId);
 
         $itemReqs = DB::World()->selectCol('SELECT entry AS ARRAY_KEY, requiredSpell FROM item_template WHERE requiredSpell NOT IN (?a)', [0, 34090, 34091]); // not riding
         foreach ($itemReqs AS $itemId => $req)
             DB::Aowow()->query('UPDATE ?_spell SET reqSpellId = ?d WHERE skillLine1 IN (?a) AND effect1CreateItemId = ?d', $req, [SKILL_BLACKSMITHING, SKILL_LEATHERWORKING, SKILL_TAILORING, SKILL_ENGINEERING], $itemId);
 
         // setting icons
-        DB::Aowow()->query('UPDATE ?_spell s, ?_icons ic, dbc_spellicon si SET s.iconId = ic.id WHERE s.iconIdBak = si.id AND ic.name = LOWER(SUBSTRING_INDEX(si.iconPath, "\\\\", -1))');
+        DB::Aowow()->query('UPDATE ?_spell s, ?_icons ic, dbc_spellicon si SET s.iconId = ic.id WHERE s.iconIdBak = si.id AND ic.name_source = LOWER(SUBSTRING_INDEX(si.iconPath, "\\\\", -1))');
 
         // hide internal stuff from listviews
         // QA*; *DND*; square brackets anything; *(NYI)*; *(TEST)*
@@ -661,7 +661,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
            'SELECT    s.id, s.name_loc0, s.skillLine1 as skill, ic.id as icon, s.typeCat * s.typeCat AS prio
             FROM      ?_spell s
             LEFT JOIN dbc_spellicon si ON s.iconIdBak = si.id
-            LEFT JOIN ?_icons ic ON ic.name = LOWER(SUBSTRING_INDEX(si.iconPath, "\\\\", -1))
+            LEFT JOIN ?_icons ic ON ic.name_source = LOWER(SUBSTRING_INDEX(si.iconPath, "\\\\", -1))
             WHERE     [WHERE] AND (s.cuFlags & ?d) = 0 AND s.typeCat IN (0, 7, -2)  -- not triggered; class spells first, talents second, unk last
             ORDER BY  prio DESC';
 

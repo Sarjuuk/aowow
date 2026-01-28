@@ -149,7 +149,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         DB::Aowow()->query('UPDATE ?_items i, dbc_itemdisplayinfo idi SET i.model = IF(idi.leftModelName = "", idi.rightModelName, idi.leftModelName) WHERE i.displayId = idi.id');
 
         // get iconId
-        DB::Aowow()->query('UPDATE ?_items i, dbc_itemdisplayinfo idi, ?_icons ic SET i.iconId = ic.id WHERE i.displayId = idi.id AND LOWER(idi.inventoryIcon1) = ic.name');
+        DB::Aowow()->query('UPDATE ?_items i, dbc_itemdisplayinfo idi, ?_icons ic SET i.iconId = ic.id WHERE i.displayId = idi.id AND LOWER(idi.inventoryIcon1) = ic.name_source');
 
         // unify slots:  Robes => Chest; Ranged (right) => Ranged
         DB::Aowow()->query('UPDATE ?_items SET slot = ?d WHERE slotbak = ?d', INVTYPE_RANGED, INVTYPE_RANGEDRIGHT);

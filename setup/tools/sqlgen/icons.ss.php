@@ -42,18 +42,13 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         DB::Aowow()->query('TRUNCATE ?_icons');
         DB::Aowow()->query('ALTER TABLE ?_icons AUTO_INCREMENT = 1');
         DB::Aowow()->query(
-           'INSERT INTO ?_icons (`name`, `name_source`) SELECT x, x FROM
+           'INSERT INTO ?_icons (`name`, `name_source`) SELECT REGEXP_REPLACE(x, "\\\\W", "-"), x FROM
             (
                 (SELECT LOWER(SUBSTRING_INDEX(`iconPath`, "\\\\", -1))   AS x FROM dbc_spellicon       WHERE `iconPath` LIKE "%icons%") UNION
                 (SELECT LOWER(`inventoryIcon1`)                          AS x FROM dbc_itemdisplayinfo WHERE `inventoryIcon1` <> "")    UNION
                 (SELECT LOWER(SUBSTRING_INDEX(`iconString`, "\\\\", -1)) AS x FROM dbc_creaturefamily  WHERE `iconString` LIKE "%icons%")
             ) y GROUP BY x'
         );
-
-        // fix icons with fucked up names
-        if ($errChars = DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, `name` FROM ?_icons WHERE `name` REGEXP "[^a-z0-9_-]"'))
-            foreach (preg_replace('/[^a-z0-9_-]/', '-', $errChars) as $id => $fixedName)
-                DB::Aowow()->query('UPDATE ?_icons SET `name` = ? WHERE `id` = ?d', $fixedName, $id);
 
         // invent class icons
         foreach (ChrClass::cases() as $cl)

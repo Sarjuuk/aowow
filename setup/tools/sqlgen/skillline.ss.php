@@ -48,7 +48,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                    dbc_spellicon si
             SET    sl.iconId = ic.id
             WHERE  (s.effect1Id IN (25, 26, 40) OR s.effect2Id = 60) AND
-                   ic.name = LOWER(SUBSTRING_INDEX(si.iconPath, "\\\\", -1)) AND
+                   ic.name_source = LOWER(SUBSTRING_INDEX(si.iconPath, "\\\\", -1)) AND
                    s.iconId = si.id AND
                    sla.spellId = s.id AND
                    sl.id = sla.skillLineId'

@@ -23,7 +23,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         DB::Aowow()->query('TRUNCATE ?_glyphproperties');
         DB::Aowow()->query('INSERT INTO ?_glyphproperties SELECT id, spellId, typeFlags, 0, iconId FROM dbc_glyphproperties');
 
-        DB::Aowow()->query('UPDATE ?_glyphproperties gp, ?_icons ic, dbc_spellicon si SET gp.iconId = ic.id WHERE gp.iconIdBak = si.id AND ic.name = LOWER(SUBSTRING_INDEX(si.iconPath, "\\\\", -1))');
+        DB::Aowow()->query('UPDATE ?_glyphproperties gp, ?_icons ic, dbc_spellicon si SET gp.iconId = ic.id WHERE gp.iconIdBak = si.id AND ic.name_source = LOWER(SUBSTRING_INDEX(si.iconPath, "\\\\", -1))');
 
         return true;
     }

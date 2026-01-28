@@ -30,7 +30,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         );
 
         // collect iconIds
-        DB::Aowow()->query('UPDATE ?_races r, ?_icons i0, ?_icons i1 SET r.iconId0 = i0.id, r.iconId1 = i1.id WHERE i0.name = CONCAT("race_", LOWER(r.fileString), "_male") AND i1.name = CONCAT("race_", LOWER(r.fileString), "_female")');
+        DB::Aowow()->query('UPDATE ?_races r, ?_icons i0, ?_icons i1 SET r.`iconId0` = i0.`id`, r.`iconId1` = i1.`id` WHERE i0.`name_source` = CONCAT("race_", LOWER(r.`fileString`), "_male") AND i1.`name_source` = CONCAT("race_", LOWER(r.`fileString`), "_female")');
 
         // add classMask
         DB::Aowow()->query('UPDATE ?_races r JOIN (SELECT BIT_OR(1 << (`classId` - 1)) AS "classMask", `raceId` FROM dbc_charbaseinfo GROUP BY `raceId`) cbi ON cbi.`raceId` = r.id SET r.`classMask` = cbi.`classMask`');

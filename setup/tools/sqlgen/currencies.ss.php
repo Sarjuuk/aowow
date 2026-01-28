@@ -62,7 +62,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             DB::Aowow()->query(
                'UPDATE ?_currencies c, ?_icons i, dbc_itemdisplayinfo idi
                 SET    c.`iconId` = i.`id`
-                WHERE  i.`name` = LOWER(idi.`inventoryIcon1`) AND idi.`id` = ?d AND c.`itemId` = ?d',
+                WHERE  i.`name_source` = LOWER(idi.`inventoryIcon1`) AND idi.`id` = ?d AND c.`itemId` = ?d',
                 $iconId, $itemId
             );
 

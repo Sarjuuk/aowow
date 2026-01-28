@@ -64,7 +64,7 @@ CLISetup::registerSetup('sql', new class extends SetupScript
             FROM        dbc_achievement a
             LEFT JOIN   dbc_achievement_category ac ON ac.id = a.category
             LEFT JOIN   dbc_spellicon si ON si.id = a.iconId
-            LEFT JOIN   ?_icons i ON LOWER(SUBSTRING_INDEX(si.iconPath, "\\\\", -1)) = i.name
+            LEFT JOIN   ?_icons i ON LOWER(SUBSTRING_INDEX(si.iconPath, "\\\\", -1)) = i.name_source
             { WHERE a.id IN (?a) }',
             $ids ?: DBSIMPLE_SKIP
         );

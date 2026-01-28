@@ -43,7 +43,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                         0, 0, 0, 0,                         -- spell[1-4]
                         0, 0, 0                             -- armor, damage, health
             FROM        dbc_creaturefamily f
-            LEFT JOIN   ?_icons ic ON ic.`name` = LOWER(SUBSTRING_INDEX(f.`iconString`, "\\\\", -1))
+            LEFT JOIN   ?_icons ic ON ic.`name_source` = LOWER(SUBSTRING_INDEX(f.`iconString`, "\\\\", -1))
             WHERE       `petTalentType` <> -1'
         );
 
