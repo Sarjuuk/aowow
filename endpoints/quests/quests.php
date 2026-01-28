@@ -52,7 +52,14 @@ class QuestsBaseResponse extends TemplateResponse implements ICache
         parent::__construct($rawParam);
 
         if ($this->category)
+        {
+            // basically: everywhere except for page structure quests require cat AND cat2 to be set
+            // causing links to be generated for /?quests=-2.0, which only exist as /?quests=-2
+            if ($this->category[0] == -2 && isset($this->category[1]))
+                $this->forward('?' . $this->pageName . '=-2');
+
             $this->subCat = '='.implode('.', $this->category);
+        }
 
         $this->filter = new QuestListFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
         if ($this->filter->shouldReload)

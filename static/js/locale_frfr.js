@@ -1531,6 +1531,7 @@ var g_quest_sorts = {
      "-374": 'Jardin des nobles',
      "-375": 'Bienfaits du pèlerin',
      "-376": 'De l\'amour dans l\'air',
+          0: 'Non classés',
           1: 'Dun Morogh',
           3: 'Terres ingrates',
           4: 'Terres foudroyées',

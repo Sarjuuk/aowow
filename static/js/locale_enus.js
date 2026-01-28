@@ -1578,6 +1578,7 @@ var g_quest_sorts = {
      "-374": 'Noblegarden',
      "-375": 'Pilgrim\'s Bounty',
      "-376": 'Love is in the Air',
+          0: 'Uncategorized',
           1: 'Dun Morogh',
           3: 'Badlands',
           4: 'Blasted Lands',

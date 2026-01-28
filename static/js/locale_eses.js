@@ -1531,6 +1531,7 @@ var g_quest_sorts = {
      "-374": 'Jardín Noble',
      "-375": 'Generosidad del Peregrino',
      "-376": 'Amor en el aire',
+          0: 'Sin categoría',
           1: 'Dun Morogh',
           3: 'Tierras Inhóspitas',
           4: 'Las Tierras Devastadas',

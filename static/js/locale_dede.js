@@ -1531,6 +1531,7 @@ var g_quest_sorts = {
      "-374": 'Nobelgarten',
      "-375": 'Pilgerfreuden',
      "-376": 'Liebe liegt in der Luft',
+          0: 'Nicht kategorisiert',
           1: 'Dun Morogh',
           3: 'Ödland',
           4: 'Verwüstete Lande',
