@@ -29,6 +29,7 @@ class HelpBaseResponse extends TemplateResponse
             $this->generateError();
 
         $this->catg = $rawParam;
+        $this->articleUrl = $this->pageName.'='.$rawParam;
     }
 
     protected function generate() : void
