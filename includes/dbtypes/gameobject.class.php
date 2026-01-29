@@ -37,7 +37,9 @@ class GameObjectList extends DBTypeList
                 $curTpl['name_loc0'] = 'Unnamed Object #' . $_id;
 
             // unpack miscInfo
-            $curTpl['lootStack'] = [];
+            $curTpl['mStone']    =
+            $curTpl['capture']   =
+            $curTpl['lootStack'] = null;
             $curTpl['spells']    = [];
 
             if (in_array($curTpl['type'], [OBJECT_GOOBER, OBJECT_RITUAL, OBJECT_SPELLCASTER, OBJECT_FLAGSTAND, OBJECT_FLAGDROP, OBJECT_AURA_GENERATOR, OBJECT_TRAP]))

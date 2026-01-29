@@ -179,20 +179,17 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                 $infobox[] = '[tooltip name=focus]'.Lang::gameObject('focusDesc').'[/tooltip][span class=tip tooltip=focus]'.Lang::gameObject('focus').Lang::main('colon').Util::localizedString($sfo, 'name').'[/span]';
 
         // lootinfo: [min, max, restock]
-        if ($this->subject->getField('lootStack'))
+        if (([$min, $max, $restock] = $this->subject->getField('lootStack')) && $min)
         {
-            [$min, $max, $restock] = $this->subject->getField('lootStack');
             $buff = Lang::spell('spellModOp', 4).Lang::main('colon').Util::createNumRange($min, $max);
 
-            // since Veins don't have charges anymore, the timer is questionable
+            // ore veins don't have charges in 335a, but the functionality is still there
             $infobox[] = $restock > 1 ? '[tooltip name=restock]'.Lang::gameObject('restock', [DateTime::formatTimeElapsed($restock * 1000)]).'[/tooltip][span class=tip tooltip=restock]'.$buff.'[/span]' : $buff;
         }
 
-        // meeting stone [minLevel, maxLevel, zone]
-        if ($this->subject->getField('type') == OBJECT_MEETINGSTONE && $this->subject->getField('mStone'))
+        // meeting stone (only on type: OBJECT_MEETINGSTONE)
+        if ([$minLevel, $maxLevel, $zone] = $this->subject->getField('mStone'))
         {
-            [$minLevel, $maxLevel, $zone] = $this->subject->getField('mStone');
-
             $this->extendGlobalIds(Type::ZONE, $zone);
             $m = Lang::game('meetingStone').'[zone='.$zone.']';
             $l = Util::createNumRange($minLevel, min($maxLevel, MAX_LEVEL));
@@ -200,11 +197,9 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
             $infobox[] = $l ? '[tooltip name=meetingstone]'.Lang::game('reqLevel', [$l]).'[/tooltip][span class=tip tooltip=meetingstone]'.$m.'[/span]' : $m;
         }
 
-        // capture area
-        if ($this->subject->getField('type') == OBJECT_CAPTURE_POINT && $this->subject->getField('capture'))
+        // capture area (only on type: OBJECT_CAPTURE_POINT)
+        if ([$minPlayer, $maxPlayer, $minTime, $maxTime, $radius] = $this->subject->getField('capture'))
         {
-            [$minPlayer, $maxPlayer, $minTime, $maxTime, $radius] = $this->subject->getField('capture');
-
             $buff = Lang::gameObject('capturePoint');
 
             if ($minTime > 1 || $minPlayer || $radius)
