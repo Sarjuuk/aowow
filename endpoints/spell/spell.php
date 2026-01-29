@@ -520,6 +520,29 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             }
         }
 
+        // tab: glyphs
+        if ($gpIds = DB::Aowow()->selectCol('SELECT `id` FROM ?_glyphproperties WHERE `spellId` = ?d', $this->typeId))
+        {
+            $conditions = array(
+                'OR',
+                ['AND', ['effect1Id', SPELL_EFFECT_APPLY_GLYPH], ['effect1MiscValue', $gpIds]],
+                ['AND', ['effect2Id', SPELL_EFFECT_APPLY_GLYPH], ['effect2MiscValue', $gpIds]],
+                ['AND', ['effect3Id', SPELL_EFFECT_APPLY_GLYPH], ['effect3MiscValue', $gpIds]]
+            );
+            $glyphSpells = new SpellList($conditions);
+            if (!$glyphSpells->error)
+            {
+                $this->lvTabs->addListviewTab(new Listview(array(
+                    'data'        => $glyphSpells->getListviewData(),
+                    'visibleCols' => ['singleclass', 'glyphtype'],
+                    'id'          => 'glyphs',
+                    'name'        => '$LANG.tab_glyphs'
+                ), SpellList::$brickFile));
+
+                $this->extendGlobalData($glyphSpells->getJSGlobals(GLOBALINFO_SELF));
+            }
+        }
+
         // tab: used by - spell
         if ($so = DB::Aowow()->selectCell('SELECT `id` FROM ?_spelloverride WHERE `spellId1` = ?d OR `spellId2` = ?d OR `spellId3` = ?d OR `spellId4` = ?d OR `spellId5` = ?d', $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId))
         {
@@ -541,7 +564,6 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 $this->extendGlobalData($ubSpells->getJSGlobals(GLOBALINFO_SELF));
             }
         }
-
 
         // tab: used by - itemset
         $conditions = array(
