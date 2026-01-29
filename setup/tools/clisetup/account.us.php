@@ -74,7 +74,7 @@ CLISetup::registerUtility(new class extends UtilityScript
                 $name = $uiAccount['name'];
 
             if (!$passw && !Util::validatePassword($uiAccount['pass1'], $e))
-                CLI::write(Lang::account($e == 1 ? 'errPassLength' : 'errPassChars'), CLI::LOG_ERROR);
+                CLI::write($e == 1 ? Lang::account('errPassLength') : Lang::main('intError'), CLI::LOG_ERROR);
             else if (!$passw && $uiAccount['pass1'] != $uiAccount['pass2'])
                 CLI::write(Lang::account('passMismatch'), CLI::LOG_ERROR);
             else if (!$passw)

@@ -99,7 +99,7 @@ class AccountSignupResponse extends TemplateResponse
 
         // check password
         if (!Util::validatePassword($this->_post['password'], $e))
-            return Lang::account($e == 1 ? 'errPassLength' : 'errPassChars');
+            return $e == 1 ? Lang::account('errPassLength') : Lang::main('intError');
 
         if ($this->_post['password'] !== $this->_post['c_password'])
             return Lang::account('passMismatch');

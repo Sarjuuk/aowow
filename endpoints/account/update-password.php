@@ -48,7 +48,7 @@ class AccountUpdatepasswordResponse extends TextResponse
             return Lang::main('intError');
 
         if (!Util::validatePassword($this->_post['newPassword'], $e))
-            return Lang::account($e == 1 ? 'errPassLength' : 'errPassChars');
+            return $e == 1 ? Lang::account('errPassLength') : Lang::main('intError');
 
         if ($this->_post['newPassword'] !== $this->_post['confirmPassword'])
             return Lang::account('passMismatch');
