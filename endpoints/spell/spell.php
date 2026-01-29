@@ -2403,7 +2403,9 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             if ($sfObj = DB::Aowow()->selectRow('SELECT * FROM ?_spellfocusobject WHERE `id` = ?d', $_))
             {
                 $n = Util::localizedString($sfObj, 'name');
-                if ($objId = DB::Aowow()->selectCell('SELECT `id` FROM ?_objects WHERE `spellFocusId` = ?d', $_))
+                if (!is_null(GameObjectListFilter::getCriteriaIndex(50, $_)))
+                    $n = '[url=?objects&filter=cr=50;crs='.$_.';crv=0]'.$n.'[/url]';
+                else if ($objId = DB::Aowow()->selectCell('SELECT `id` FROM ?_objects WHERE `spellFocusId` = ?d', $_))
                     $n = '[url=?object='.$objId.']'.$n.'[/url]';
 
                 $infobox[] =  Lang::game('requires2').' '.$n;
