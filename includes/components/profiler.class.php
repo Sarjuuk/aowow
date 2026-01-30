@@ -503,8 +503,12 @@ class Profiler
         // char is flagged for rename
         if ($char['at_login'] & 0x1)
         {
-            $ri = DB::Aowow()->selectCell('SELECT MAX(`renameItr`) FROM ?_profiler_profiles WHERE `realm` = ?d AND `custom` = 0 AND `name` = ?', $realmId, $char['name']);
-            $data['renameItr'] = $ri ? ++$ri : 1;
+            if ($ri = DB::Aowow()->selectCell('SELECT MAX(`renameItr`) FROM ?_profiler_profiles WHERE `realm` = ?d AND `realmGUID` = ?d', $realmId, $charGuid))
+                $data['renameItr'] = $ri;
+            else if ($ri = DB::Aowow()->selectCell('SELECT MAX(`renameItr`) FROM ?_profiler_profiles WHERE `realm` = ?d AND `custom` = 0 AND `name` = ?', $realmId, $char['name']))
+                $data['renameItr'] = ++$ri;
+            else
+                $data['renameItr'] = 1;
         }
 
 
