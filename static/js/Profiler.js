@@ -6362,7 +6362,7 @@ function ProfilerInventory(_parent) {
                     if (ls != null) {
                         buff += '; ' + ls.text;
 
-                        if (sm.dd) {
+                        if (sm.dd && sm.dd != 99) {
                             if (sm.dd < 0) { // Dungeon
                                 buff += ' ' + (sm.dd < -1 ? LANG.pr_print_heroic : LANG.pr_print_normal);
                             }
@@ -8715,7 +8715,7 @@ Listview.templates.inventory = {
                             $WH.ae(td, $WH.ct(Listview.funcBox.getUpperSource(item.source[0], sm)));
                         }
 
-                        if (sm.dd) {
+                        if (sm.dd && sm.dd != 99) {
                             if (sm.dd < 0) { // Dungeon
                                 $WH.ae(td, $WH.ct($WH.sprintf(LANG.lvitem_dd, '', (sm.dd < -1 ? LANG.lvitem_heroic : LANG.lvitem_normal))));
                             }
@@ -8963,7 +8963,7 @@ Listview.templates.gallery = {
                     $WH.ae(s, $WH.ct(Listview.funcBox.getUpperSource(item.source[0], sm)));
                 }
 
-                if (sm.dd) {
+                if (sm.dd && sm.dd != 99) {
                     if (sm.dd < 0) { // Dungeon
                         $WH.ae(s, $WH.ct($WH.sprintf(LANG.lvitem_dd, '', (sm.dd < -1 ? LANG.lvitem_heroic : LANG.lvitem_normal))));
                     }
@@ -9011,7 +9011,7 @@ Listview.templates.gallery = {
 
                 buff += ' ' + Listview.funcBox.getUpperSource(item.source[0], sm);
 
-                if (sm.dd) {
+                if (sm.dd && sm.dd != 99) {
                     buff += ' ' + (sm.dd < -1 || sm.dd > 2 ? LANG.pr_print_heroic : LANG.pr_print_normal);
                 }
             }
