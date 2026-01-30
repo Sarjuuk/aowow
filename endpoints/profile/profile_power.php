@@ -72,8 +72,11 @@ class ProfilePowerResponse extends TextResponse implements ICache
             );
         }
 
+        if ($_ = $profile->getField('renameItr'))
+            $ri = '-'.$_;
+
         if ($this->subjectName)
-            $id = implode('.', [$this->region, Profiler::urlize($this->realm, true), urlencode($this->subjectName)]);
+            $id = implode('.', [$this->region, Profiler::urlize($this->realm, true), urlencode($this->subjectName) . ($ri ?? '')]);
         else
             $id = $this->typeId;
 
