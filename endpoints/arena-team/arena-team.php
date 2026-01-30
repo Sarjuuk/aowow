@@ -58,7 +58,7 @@ class ArenateamBaseResponse extends TemplateResponse
 
         // 2) not yet synced but exists on realm (wont work if we get passed an urlized name, but there is nothing we can do about it)
         $subjects = DB::Characters($this->realmId)->select('SELECT at.`arenaTeamId` AS "realmGUID", at.`name`, at.`type` FROM arena_team at WHERE at.`name` = ?', $this->subjectName);
-        if ($subject = array_filter($subjects, fn($x) => Util::lower($x['name']) === Util::lower($this->subjectName)))
+        if ($subject = array_filter($subjects ?: [], fn($x) => Util::lower($x['name']) === Util::lower($this->subjectName)))
         {
             $subject = array_pop($subject);
             $subject['realm']   = $this->realmId;
