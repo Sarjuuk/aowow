@@ -475,6 +475,8 @@ class PageTemplate
 
             $this->consentFooter = true;
         }
+        else
+            $this->consentFooter = false;
 
         // analytics + consent
         // not set or declined
