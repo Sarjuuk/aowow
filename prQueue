@@ -29,7 +29,7 @@ CLI::write('profiler queue started', CLI::LOG_OK);
 set_time_limit(0);
 $tCycle = microtime(true);
 
-$error = function (int $type, int $realmGUID, int $realmId) : void
+$error = function (int $type, int $realmGUID, int $realmId, int $fetchResult) : void
 {
     $what = match ($type)
     {
@@ -38,8 +38,17 @@ $error = function (int $type, int $realmGUID, int $realmId) : void
         Type::ARENA_TEAM => 'arena team'
     };
 
+    $msg = match ($fetchResult)
+    {
+        Profiler::FETCH_RESULT_ERR_NAME_EMPTY  => 'Subject has an empty name and was skipped.',
+        Profiler::FETCH_RESULT_ERR_NOT_FOUND   => 'Subject was not found. Truncating local placeholder.',
+        Profiler::FETCH_RESULT_ERR_NO_MEMBERS  => 'Subject has no members. Truncating local placeholder.',
+        Profiler::FETCH_RESULT_ERR_INTERNAL    => 'Internal Error - Data stub is missing.'
+    };
+
+    trigger_error('prQueue - [realm: '.$realmId.' '.$what.' guid: '.$realmGUID.'] '.$msg, E_USER_WARNING);
+
     DB::Aowow()->query('UPDATE ?_profiler_sync SET `status` = ?d, `errorCode` = ?d WHERE `realm` = ?d AND `realmGUID` = ?d AND `type` = ?d', PR_QUEUE_STATUS_ERROR, PR_QUEUE_ERROR_CHAR, $realmId, $realmGUID, $type);
-    trigger_error('prQueue - '.$what.' #'.$realmGUID.' on realm #'.$realmId.' not found. Truncating local placeholder.', E_USER_WARNING);
 };
 
 
@@ -68,7 +77,7 @@ while (Cfg::get('PROFILER_ENABLE', true))
     if (empty(Profiler::getRealms()[$row['realm']]))
     {
         DB::Aowow()->query('UPDATE ?_profiler_sync SET `status` = ?d, `errorCode` = ?d WHERE `realm` = ?d AND `type` = ?d AND `typeId` = ?d', PR_QUEUE_STATUS_ERROR, PR_QUEUE_ERROR_ARMORY, $row['realm'], $row['type'], $row['typeId']);
-        CLI::write('realm #'.$row['realm'].' for subject guid '.$row['realmGUID'].' is undefined', CLI::LOG_WARN);
+        CLI::write('realm #'.$row['realm'].' for subject guid '.$row['realmGUID'].' is missing/inaccessible.', CLI::LOG_WARN);
         continue;
     }
     else
@@ -77,32 +86,45 @@ while (Cfg::get('PROFILER_ENABLE', true))
     switch ($row['type'])
     {
         case Type::PROFILE:
-            if (!Profiler::getCharFromRealm($row['realm'], $row['realmGUID']))
+            switch ($result = Profiler::getCharFromRealm($row['realm'], $row['realmGUID']))
             {
-                $error(Type::PROFILE, $row['realmGUID'], $row['realm']);
-                DB::Aowow()->query('DELETE FROM ?_profiler_profiles WHERE `realm` = ?d AND `realmGUID` = ?d', $row['realm'], $row['realmGUID']);
-                continue 2;
+                case Profiler::FETCH_RESULT_OK_UNCHANGED:
+                    CLI::write('char #'.$row['realmGUID'].' on realm #'.$row['realm'].' did not log in since last update. skipping...');
+                case Profiler::FETCH_RESULT_OK:
+                    break 2;
+                case Profiler::FETCH_RESULT_ERR_NAME_EMPTY:
+                case Profiler::FETCH_RESULT_ERR_NOT_FOUND:
+                    DB::Aowow()->query('DELETE FROM ?_profiler_profiles WHERE `realm` = ?d AND `realmGUID` = ?d', $row['realm'], $row['realmGUID']);
+                default:
+                    $error(Type::PROFILE, $row['realmGUID'], $row['realm'], $result);
+                    continue 3;
             }
-
-            break;
         case Type::GUILD:
-            if (!Profiler::getGuildFromRealm($row['realm'], $row['realmGUID']))
+            switch ($result = Profiler::getGuildFromRealm($row['realm'], $row['realmGUID']))
             {
-                $error(Type::GUILD, $row['realmGUID'], $row['realm']);
-                DB::Aowow()->query('DELETE FROM ?_profiler_guild WHERE `realm` = ?d AND `realmGUID` = ?d', $row['realm'], $row['realmGUID']);
-                continue 2;
+                case Profiler::FETCH_RESULT_OK:
+                    break 2;
+                case Profiler::FETCH_RESULT_ERR_NAME_EMPTY:
+                case Profiler::FETCH_RESULT_ERR_NOT_FOUND:
+                case Profiler::FETCH_RESULT_ERR_NO_MEMBERS:
+                    DB::Aowow()->query('DELETE FROM ?_profiler_guild WHERE `realm` = ?d AND `realmGUID` = ?d', $row['realm'], $row['realmGUID']);
+                default:
+                    $error(Type::GUILD, $row['realmGUID'], $row['realm'], $result);
+                    continue 3;
             }
-
-            break;
         case Type::ARENA_TEAM:
-            if (!Profiler::getArenaTeamFromRealm($row['realm'], $row['realmGUID']))
+            switch ($result = Profiler::getArenaTeamFromRealm($row['realm'], $row['realmGUID']))
             {
-                $error(Type::ARENA_TEAM, $row['realmGUID'], $row['realm']);
-                DB::Aowow()->query('DELETE FROM ?_profiler_arena_team WHERE `realm` = ?d AND `realmGUID` = ?d', $row['realm'], $row['realmGUID']);
-                continue 2;
+                case Profiler::FETCH_RESULT_OK:
+                    break 2;
+                case Profiler::FETCH_RESULT_ERR_NAME_EMPTY:
+                case Profiler::FETCH_RESULT_ERR_NOT_FOUND:
+                case Profiler::FETCH_RESULT_ERR_NO_MEMBERS:
+                    DB::Aowow()->query('DELETE FROM ?_profiler_arena_team WHERE `realm` = ?d AND `realmGUID` = ?d', $row['realm'], $row['realmGUID']);
+                default:
+                    $error(Type::ARENA_TEAM, $row['realmGUID'], $row['realm'], $result);
+                    continue 3;
             }
-
-            break;
         default:
             DB::Aowow()->query('DELETE FROM ?_profiler_sync WHERE realm = ?d AND type = ?d AND typeId = ?d', $row['realm'], $row['type'], $row['typeId']);
             trigger_error('prQueue - unknown type #'.$row['type'].' to sync into profiler. Removing from queue...', E_USER_ERROR);

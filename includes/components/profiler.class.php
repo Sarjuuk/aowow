@@ -11,6 +11,13 @@ class Profiler
     public const /* string */ PID_FILE     = 'config/pr-queue-pid';
     public const /* int    */ CHAR_GMFLAGS = 0x1 | 0x8 | 0x10 | 0x20; // PLAYER_EXTRA_ :: GM_ON | TAXICHEAT | GM_INVISIBLE | GM_CHAT
 
+    public const /* int    */ FETCH_RESULT_OK             = 1;
+    public const /* int    */ FETCH_RESULT_OK_UNCHANGED   = 2;
+    public const /* int    */ FETCH_RESULT_ERR_NOT_FOUND  = 3;
+    public const /* int    */ FETCH_RESULT_ERR_NAME_EMPTY = 4;
+    public const /* int    */ FETCH_RESULT_ERR_NO_MEMBERS = 5;
+    public const /* int    */ FETCH_RESULT_ERR_INTERNAL   = 6;
+
     public const /* array  */ REGIONS      = array(         // see cfg_categories.dbc
         'us' => [2, 3, 4, 5],                               // US (us, oceanic, latin america, americas - tournament)
         'kr' => [6, 7],                                     // KR (kr, tournament)
@@ -359,22 +366,19 @@ class Profiler
         return Util::toJSON($response);
     }
 
-    public static function getCharFromRealm(int $realmId, int $charGuid) : bool
+    public static function getCharFromRealm(int $realmId, int $charGuid) : int
     {
         $char = DB::Characters($realmId)->selectRow('SELECT c.* FROM characters c WHERE c.`guid` = ?d', $charGuid);
         if (!$char)
-            return false;
+            return self::FETCH_RESULT_ERR_NOT_FOUND;
 
         if (!$char['name'])
-        {
-            trigger_error('char #'.$charGuid.' on realm #'.$realmId.' has empty name. skipping...', E_USER_WARNING);
-            return false;
-        }
+            return self::FETCH_RESULT_ERR_NAME_EMPTY;
 
         // reminder: this query should not fail: a placeholder entry is created as soon as a char listview is created or profile detail page is called
         $profile = DB::Aowow()->selectRow('SELECT `id`, `lastupdated` FROM ?_profiler_profiles WHERE `realm` = ?d AND `realmGUID` = ?d', $realmId, $char['guid']);
         if (!$profile)
-            return false;                                   // well ... it failed
+            return self::FETCH_RESULT_ERR_INTERNAL;         // well ... it failed
 
         $profileId = $profile['id'];
 
@@ -383,8 +387,7 @@ class Profiler
         if (!$char['online'] && $char['logout_time'] <= $profile['lastupdated'])
         {
             DB::Aowow()->query('UPDATE ?_profiler_profiles SET `lastupdated` = ?d WHERE `id` = ?d', time(), $profileId);
-            CLI::write('char did not log in since last update. skipping...');
-            return true;
+            return self::FETCH_RESULT_OK_UNCHANGED;
         }
 
         CLI::write('writing...');
@@ -888,20 +891,17 @@ class Profiler
         if (DB::Aowow()->query('UPDATE ?_profiler_profiles SET ?a WHERE `realm` = ?d AND `realmGUID` = ?d', $data, $realmId, $charGuid) !== null)
             DB::Aowow()->query('UPDATE ?_profiler_profiles SET `stub` = 0 WHERE `id` = ?d', $profileId);
 
-        return true;
+        return self::FETCH_RESULT_OK;
     }
 
-    public static function getGuildFromRealm(int $realmId, int $guildGuid) : bool
+    public static function getGuildFromRealm(int $realmId, int $guildGuid) : int
     {
         $guild = DB::Characters($realmId)->selectRow('SELECT `guildId`, `name`, `createDate`, `info`, `backgroundColor`, `emblemStyle`, `emblemColor`, `borderStyle`, `borderColor` FROM guild WHERE `guildId` = ?d', $guildGuid);
         if (!$guild)
-            return false;
+            return self::FETCH_RESULT_ERR_NOT_FOUND;
 
         if (!$guild['name'])
-        {
-            trigger_error('guild #'.$guildGuid.' on realm #'.$realmId.' has empty name. skipping...', E_USER_WARNING);
-            return false;
-        }
+            return self::FETCH_RESULT_ERR_NAME_EMPTY;
 
         // reminder: this query should not fail: a placeholder entry is created as soon as a team listview is created or team detail page is called
         $guildId = DB::Aowow()->selectCell('SELECT `id` FROM ?_profiler_guild WHERE `realm` = ?d AND `realmGUID` = ?d', $realmId, $guild['guildId']);
@@ -941,10 +941,10 @@ class Profiler
 
         // this here should all happen within ProfileList
         $members = new RemoteProfileList($conditions, ['sv' => $realmId]);
-        if (!$members->error)
-            $members->initializeLocalEntries();
-        else
-            return false;
+        if ($members->error)
+            return self::FETCH_RESULT_ERR_NO_MEMBERS;
+
+        $members->initializeLocalEntries();
 
         CLI::write(' ..guild members');
 
@@ -955,20 +955,17 @@ class Profiler
 
         DB::Aowow()->query('UPDATE ?_profiler_guild SET `stub` = 0 WHERE `id` = ?d', $guildId);
 
-        return true;
+        return self::FETCH_RESULT_OK;
     }
 
-    public static function getArenaTeamFromRealm(int $realmId, int $teamGuid) : bool
+    public static function getArenaTeamFromRealm(int $realmId, int $teamGuid) : int
     {
         $team = DB::Characters($realmId)->selectRow('SELECT `arenaTeamId`, `name`, `type`, `captainGuid`, `rating`, `seasonGames`, `seasonWins`, `weekGames`, `weekWins`, `rank`, `backgroundColor`, `emblemStyle`, `emblemColor`, `borderStyle`, `borderColor` FROM arena_team WHERE `arenaTeamId` = ?d', $teamGuid);
         if (!$team)
-            return false;
+            return self::FETCH_RESULT_ERR_NOT_FOUND;
 
         if (!$team['name'])
-        {
-            trigger_error('arena team #'.$teamGuid.' on realm #'.$realmId.' has empty name. skipping...', E_USER_WARNING);
-            return false;
-        }
+            return self::FETCH_RESULT_ERR_NAME_EMPTY;
 
         // reminder: this query should not fail: a placeholder entry is created as soon as a team listview is created or team detail page is called
         $teamId = DB::Aowow()->selectCell('SELECT `id` FROM ?_profiler_arena_team WHERE `realm` = ?d AND `realmGUID` = ?d', $realmId, $team['arenaTeamId']);
@@ -1017,7 +1014,7 @@ class Profiler
 
         $mProfiles = new RemoteProfileList($conditions, ['sv' => $realmId]);
         if ($mProfiles->error)
-            return false;
+            return self::FETCH_RESULT_ERR_NO_MEMBERS;
 
         $mProfiles->initializeLocalEntries();
         foreach ($mProfiles->iterate() as $__)
@@ -1055,7 +1052,7 @@ class Profiler
 
         DB::Aowow()->query('UPDATE ?_profiler_arena_team SET `stub` = 0 WHERE `id` = ?d', $teamId);
 
-        return true;
+        return self::FETCH_RESULT_OK;
     }
 }
 
