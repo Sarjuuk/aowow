@@ -19,7 +19,7 @@ class ProfilePowerResponse extends TextResponse implements ICache
         'domain' => ['filter' => FILTER_CALLBACK, 'options' => [Locale::class, 'tryFromDomain']]
     );
 
-    public function __construct(string $rawParam)
+    public function __construct(private string $rawParam)
     {
         parent::__construct($rawParam);
 
@@ -75,8 +75,9 @@ class ProfilePowerResponse extends TextResponse implements ICache
         if ($_ = $profile->getField('renameItr'))
             $ri = '-'.$_;
 
+        // the 'id' must be exactly as the js requested it or the tooltip won't register
         if ($this->subjectName)
-            $id = implode('.', [$this->region, Profiler::urlize($this->realm, true), urlencode($this->subjectName) . ($ri ?? '')]);
+            $id = urlencode($this->rawParam) . ($ri ?? '');
         else
             $id = $this->typeId;
 
