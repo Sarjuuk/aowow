@@ -4126,6 +4126,14 @@ div.captcha-center {
     font-size: 11px;
 }
 
+audio {
+    background: rgba(0, 0, 0, 0.21);
+    border-radius: 99px;
+    margin-bottom: 0 !important;
+    margin-top: 0 !important;
+    max-height: 32px;
+}
+
 .audio-controls td {
     text-align:center
 }
