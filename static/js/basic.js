@@ -473,12 +473,16 @@ $WH.sp = function(z) {
 // Set cookie
 $WH.sc = function(z, y, x, w, v) {
     var a = new Date();
-    var b = z + "=" + escape(x) + "; ";
+    var b = z + "=" + encodeURI(x) + "; ";
 
     a.setDate(a.getDate() + y);
     b += "expires=" + a.toUTCString() + "; ";
 
-    b += "SameSite=strict;";
+    b += "samesite=lax; ";
+
+    if (location.protocol === 'https:') {
+        b += "secure; ";
+    }
 
     if (w) {
         b += "path=" + w + "; ";
@@ -502,7 +506,7 @@ $WH.dc = function(z) {
 // Get all cookies (return value is cached)
 $WH.gc = function(z) {
     if ($WH.gc.I == null) { // Initialize cookie table
-        var words = unescape(document.cookie).split("; ");
+        var words = decodeURI(document.cookie).split("; ");
 
         $WH.gc.C = {};
         for (var i = 0, len = words.length; i < len; ++i) {
