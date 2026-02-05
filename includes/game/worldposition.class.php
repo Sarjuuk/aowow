@@ -8,6 +8,7 @@ if (!defined('AOWOW_REVISION'))
 
 abstract class WorldPosition
 {
+    private static array $zoneMapCache  = [];
     private static array $alphaMapCache = [];
     private static array $capitalCities = array(        // capitals take precedence over their surrounding area
         1497, 1637, 1638, 3487,                         // Undercity,      Ogrimmar,  Thunder Bluff, Silvermoon City
@@ -67,7 +68,7 @@ abstract class WorldPosition
         // spawn does not really match on a map, but we need at least one result
         if (!$result)
         {
-            usort($points, function ($a, $b) { return ($a['dist'] < $b['dist']) ? -1 : 1; });
+            usort($points, fn ($a, $b) => $a['dist'] <=> $b['dist']);
             $result = [1.0, $points[0]];
         }
 
@@ -118,17 +119,62 @@ abstract class WorldPosition
         if (!$mapId < 0)
             return [];
 
-        $query =
+        if (!isset(self::$zoneMapCache[$mapId]))
+            self::initZoneMaps($mapId);
+
+        $points = [];
+        for ($i = 0; $i < 2; $i++)
+        {
+            foreach (self::$zoneMapCache[$mapId] as $area)
+            {
+                if (!$i && $preferedAreaId != 0 && $area['areaId'] != $preferedAreaId)
+                    continue;
+
+                if (!$i && $preferedFloor >= 0 && $area['floor'] != $preferedFloor)
+                    continue;
+
+                if ($mapX < $area['minX'] || $mapX > $area['maxX'] ||
+                    $mapY < $area['minY'] || $mapY > $area['maxY'])
+                    continue;
+
+                // dist BETWEEN 0 (center) AND 70.7 (corner)
+                $posX = round(($area['maxY'] - $mapY) * 100 / ($area['maxY'] - $area['minY']), 1);
+                $posY = round(($area['maxX'] - $mapX) * 100 / ($area['maxX'] - $area['minX']), 1);
+                $dist = sqrt(pow(abs($posX - 50), 2) + pow(abs($posY - 50), 2));
+
+                $points[] = array(
+                    'id'         => $area['id'],
+                    'areaId'     => $area['areaId'],
+                    'floor'      => $area['floor'],
+                    'multifloor' => $area['multifloor'],
+                    'srcPrio'    => $area['srcPrio'],
+                    'posX'       => $posX,
+                    'posY'       => $posY,
+                    'dist'       => $dist
+                );
+            }
+
+            // retry: pre-instance subareas belong to the instance-maps but are displayed on the outside. There also cases where the zone reaches outside it's own map.
+            if ($points)
+                break;
+        }
+
+        // sort by srcPrio DESC (primary), dist ASC (secondary)
+        usort($points, fn ($a, $b) => ($b['srcPrio'] <=> $a['srcPrio']) ?: ($a['dist'] <=> $b['dist']));
+
+        return $points;
+    }
+
+    private static function initZoneMaps(int $mapId) : void
+    {
+        self::$zoneMapCache[$mapId] = DB::Aowow()->select(
            'SELECT
                 x.`id`,
                 x.`areaId`,
+                x.`minX`, x.`maxX`, x.`minY`, x.`maxY`,
                 IF(x.`defaultDungeonMapId` < 0, x.`floor` + 1, x.`floor`) AS `floor`,
                 IF(useDM.`id`   IS NOT NULL OR x.`defaultDungeonMapId` < 0, 1, 0) AS `srcPrio`,
-                IF(multiDM.`id` IS NOT NULL OR x.`defaultDungeonMapId` < 0, 1, 0) AS `multifloor`,
-                ROUND((x.`maxY` - ?d) * 100 / (x.`maxY` - x.`minY`), 1) AS `posX`,
-                ROUND((x.`maxX` - ?d) * 100 / (x.`maxX` - x.`minX`), 1) AS `posY`,
-                SQRT(POWER(ABS((x.`maxY` - ?d) * 100 / (x.`maxY` - x.`minY`) - 50), 2) +
-                     POWER(ABS((x.`maxX` - ?d) * 100 / (x.`maxX` - x.`minX`) - 50), 2)) AS `dist`
+                IF(multiDM.`id` IS NOT NULL OR x.`defaultDungeonMapId` < 0, 1, 0) AS `multifloor`
             FROM
                 (SELECT 0 AS `id`, `areaId`,     `mapId`, `right` AS `minY`, `left` AS `maxY`, `top` AS `maxX`, `bottom` AS `minX`, 0 AS `floor`, 0 AS `worldMapAreaId`, `defaultDungeonMapId` FROM ?_worldmaparea wma UNION
                  SELECT   dm.`id`, `areaId`, wma.`mapId`,            `minY`,           `maxY`,          `maxX`,             `minX`,      `floor`,      `worldMapAreaId`, `defaultDungeonMapId` FROM ?_worldmaparea wma
@@ -138,25 +184,12 @@ abstract class WorldPosition
             LEFT JOIN
                 ?_dungeonmap multiDM ON multiDM.`mapId` = x.`mapId` AND multiDM.`worldMapAreaId` = x.`worldMapAreaId` AND multiDM.`floor` <> x.`floor` AND multiDM.`worldMapAreaId` > 0
             WHERE
-                x.`mapId` = ?d AND IF(?d, x.`areaId` = ?d, x.`areaId` <> 0){ AND x.`floor` = ?d - IF(x.`defaultDungeonMapId` < 0, 1, 0)}
+                x.`mapId` = ?d AND x.`areaId` <> 0 AND
+                x.`minX` <> 0 AND x.`maxX` <> 0 AND x.`minY` <> 0 AND x.`maxY`
             GROUP BY
-                x.`id`, x.`areaId`
-            HAVING
-                (`posX` BETWEEN 0.1 AND 99.9 AND `posY` BETWEEN 0.1 AND 99.9)
-            ORDER BY
-                `srcPrio` DESC, `dist` ASC';
-
-        // dist BETWEEN 0 (center) AND 70.7 (corner)
-        $points = DB::Aowow()->select($query, $mapY, $mapX, $mapY, $mapX, $mapId, $preferedAreaId, $preferedAreaId, $preferedFloor < 0 ? DBSIMPLE_SKIP : $preferedFloor);
-        if (!$points)                                       // retry: pre-instance subareas belong to the instance-maps but are displayed on the outside. There also cases where the zone reaches outside it's own map.
-            $points = DB::Aowow()->select($query, $mapY, $mapX, $mapY, $mapX, $mapId, 0, 0, DBSIMPLE_SKIP);
-        if (!is_array($points))
-        {
-            trigger_error('WorldPosition::toZonePos - query failed', E_USER_ERROR);
-            return [];
-        }
-
-        return $points;
+                x.`id`, x.`areaId`',
+            $mapId
+        ) ?: [];
     }
 }
 
