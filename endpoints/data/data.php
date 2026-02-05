@@ -31,7 +31,7 @@ class DataBaseResponse extends TextResponse
         foreach ($this->params as $set)
         {
             // requires valid token to hinder automated access
-            if ($set != 'item-scaling' && (!$this->_get['t'] || empty($_SESSION['dataKey']) || $this->_get['t'] != $_SESSION['dataKey']))
+            if ($set != 'item-scaling' && $set != 'spell-scaling' && (!$this->_get['t'] || empty($_SESSION['dataKey']) || $this->_get['t'] != $_SESSION['dataKey']))
             {
                 trigger_error('DataBaseResponse::generate - session data key empty or expired', E_USER_ERROR);
                 continue;
@@ -54,6 +54,7 @@ class DataBaseResponse extends TextResponse
                 'quick-excludes',
                 'weight-presets',
                 'item-scaling',
+                'spell-scaling',
                 'realms',
                 'statistics' => $this->loadAgnosticFile($set),
                 // localized

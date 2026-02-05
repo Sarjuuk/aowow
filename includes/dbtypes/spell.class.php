@@ -29,6 +29,11 @@ class SpellList extends DBTypeList
     public const EFFECTS_SCALING_DAMAGE   = array( // as per Unit::SpellDamageBonusDone() calls in TC
         SPELL_EFFECT_SCHOOL_DAMAGE,         SPELL_EFFECT_HEALTH_LEECH,                      SPELL_EFFECT_POWER_BURN
     );
+    public const EFFECTS_LDC_SCALING      = array(
+        SPELL_EFFECT_SCHOOL_DAMAGE,         SPELL_EFFECT_DUMMY,                             SPELL_EFFECT_POWER_DRAIN,                       SPELL_EFFECT_HEALTH_LEECH,                      SPELL_EFFECT_HEAL,
+        SPELL_EFFECT_WEAPON_DAMAGE,         SPELL_EFFECT_POWER_BURN,                        SPELL_EFFECT_SCRIPT_EFFECT,                     SPELL_EFFECT_NORMALIZED_WEAPON_DMG,             SPELL_EFFECT_FORCE_CAST_WITH_VALUE,
+        SPELL_EFFECT_TRIGGER_SPELL_WITH_VALUE,                                              SPELL_EFFECT_TRIGGER_MISSILE_SPELL_WITH_VALUE
+    );
     public const EFFECTS_ITEM_CREATE      = array(
         SPELL_EFFECT_CREATE_ITEM,           SPELL_EFFECT_SUMMON_CHANGE_ITEM,                SPELL_EFFECT_CREATE_RANDOM_ITEM,                SPELL_EFFECT_CREATE_MANA_GEM,                   SPELL_EFFECT_CREATE_ITEM_2
     );
@@ -60,6 +65,10 @@ class SpellList extends DBTypeList
     );
     public const AURAS_SCALING_DAMAGE     = array( // as per Unit::SpellDamageBonusDone() calls in TC
         SPELL_AURA_PERIODIC_DAMAGE,         SPELL_AURA_PERIODIC_LEECH,                      SPELL_AURA_DAMAGE_SHIELD,                       SPELL_AURA_PROC_TRIGGER_DAMAGE
+    );
+    public const AURAS_LDC_SCALING      = array(
+        SPELL_AURA_PERIODIC_DAMAGE,         SPELL_AURA_DUMMY,                               SPELL_AURA_PERIODIC_HEAL,                       SPELL_AURA_DAMAGE_SHIELD,                       SPELL_AURA_PROC_TRIGGER_DAMAGE,
+        SPELL_AURA_PERIODIC_LEECH,          SPELL_AURA_PERIODIC_MANA_LEECH,                 SPELL_AURA_SCHOOL_ABSORB,                       SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE
     );
     public const AURAS_ITEM_CREATE        = array(
         SPELL_AURA_CHANNEL_DEATH_ITEM
@@ -648,6 +657,9 @@ class SpellList extends DBTypeList
             $str .= $pcp."% ".Lang::spell('pctCostOf', [mb_strtolower(Lang::spell('powerTypes', $pt))]);
         else if ($pc > 0 || $pps > 0 || $pcpl > 0)
         {
+            if ($this->curTpl['attributes0'] & SPELL_ATTR0_LEVEL_DAMAGE_CALCULATION)
+                $str .= '<!--pts'.$this->curTpl['baseLevel'].':'.$pc.'-->';
+
             if (Lang::exist('spell', 'powerCost', $pt))
                 $str .= Lang::spell('powerCost', $pt,   intVal($pps > 0), [$pc, $pps]);
             else
@@ -690,13 +702,17 @@ class SpellList extends DBTypeList
     // formulae base from TC
     private function calculateAmountForCurrent(int $effIdx, int $nTicks = 1) : array
     {
-        $level   = $this->charLevel;
-        $maxBase = 0;
-        $rppl    = $this->getField('effect'.$effIdx.'RealPointsPerLevel');
-        $base    = $this->getField('effect'.$effIdx.'BasePoints');
-        $add     = $this->getField('effect'.$effIdx.'DieSides');
-        $maxLvl  = $this->getField('maxLevel');
-        $baseLvl = $this->getField('baseLevel');
+        $level    = $this->charLevel;
+        $maxBase  = 0;
+        $rppl     = $this->getField('effect'.$effIdx.'RealPointsPerLevel');
+        $base     = $this->getField('effect'.$effIdx.'BasePoints');
+        $add      = $this->getField('effect'.$effIdx.'DieSides');
+        $maxLvl   = $this->getField('maxLevel');
+        $baseLvl  = $this->getField('baseLevel');
+        $spellLvl = $this->getField('spellLevel');
+        $LDSEffs  = $this->canLevelDamageScale();
+        $modMin   =
+        $modMax   = null;
 
         if ($rppl)
         {
@@ -705,22 +721,29 @@ class SpellList extends DBTypeList
             else if ($level < $baseLvl)
                 $level = $baseLvl;
 
-            if (!$this->getField('atributes0') & SPELL_ATTR0_PASSIVE)
-                $level -= $this->getField('spellLevel');
+            if (!$this->getField('attributes0') & SPELL_ATTR0_PASSIVE)
+                $level -= $spellLvl;
 
             $maxBase += (int)(($level - $baseLvl) * $rppl);
             $maxBase *= $nTicks;
+
         }
 
         $min = $nTicks * ($add ? $base + 1 : $base);
         $max = $nTicks * ($add + $base);
 
-        return [
-            $min + $maxBase,
-            $max + $maxBase,
-            $rppl ? '<!--ppl'.$baseLvl.':'.($maxLvl ?: $level).':'.$min.':'.($rppl * 100 * $nTicks).'-->' : null,
-            $rppl ? '<!--ppl'.$baseLvl.':'.($maxLvl ?: $level).':'.$max.':'.($rppl * 100 * $nTicks).'-->' : null
-        ];
+        if ($rppl)
+        {
+            $modMin = '<!--ppl'.$baseLvl.':'.($maxLvl ?: $level).':'.$min.':'.($rppl * 100 * $nTicks).'-->';
+            $modMax = '<!--ppl'.$baseLvl.':'.($maxLvl ?: $level).':'.$max.':'.($rppl * 100 * $nTicks).'-->';
+        }
+        else if ($this->getField('attributes0') & SPELL_ATTR0_LEVEL_DAMAGE_CALCULATION && in_array($effIdx, $LDSEffs) && $spellLvl)
+        {
+            $modMin = '<!--pts'.$spellLvl.':'.abs($min).'-->';
+            $modMax = '<!--pts'.$spellLvl.':'.abs($max).'-->';
+        }
+
+        return [$min + $maxBase, $max + $maxBase, $modMin, $modMax];
     }
 
     public function canCreateItem() : array
@@ -761,6 +784,16 @@ class SpellList extends DBTypeList
         $idx = [];
         for ($i = 1; $i < 4; $i++)
             if (in_array($this->curTpl['effect'.$i.'Id'], SpellList::EFFECTS_ENCHANTMENT))
+                $idx[] = $i;
+
+        return $idx;
+    }
+
+    public function canLevelDamageScale() : array
+    {
+        $idx = [];
+        for ($i = 1; $i < 4; $i++)
+            if (in_array($this->curTpl['effect'.$i.'Id'], SpellList::EFFECTS_LDC_SCALING) || in_array($this->curTpl['effect'.$i.'AuraId'], SpellList::AURAS_LDC_SCALING))
                 $idx[] = $i;
 
         return $idx;
@@ -1970,10 +2003,23 @@ class SpellList extends DBTypeList
         if ($xTmp)
             $x .= '<table><tr><td>'.implode('<br />', $xTmp).'</td></tr></table>';
 
-        $min = $this->scaling[$this->id] ? ($this->getField('baseLevel') ?: 1) : 1;
-        $max = $this->scaling[$this->id] ? ($this->getField('maxLevel') ?: MAX_LEVEL) : 1;
-        // scaling information - spellId:min:max:curr
-        $x .= '<!--?'.$this->id.':'.$min.':'.$max.':'.min($this->charLevel, $max).'-->';
+        // scaling information - spellId:min:max:curr[:scalingDistribution:ScalingFlags]
+        $scalingInfo = array(
+            $this->id,
+            $this->scaling[$this->id] ? ($this->getField('baseLevel') ?: 1) : 1,
+            $this->scaling[$this->id] ? ($this->getField('maxLevel') ?: MAX_LEVEL) : 1
+        );
+
+        if ($this->getField('attributes0') & SPELL_ATTR0_LEVEL_DAMAGE_CALCULATION)
+        {
+            $scalingInfo[] = $this->getField('spellLevel') ?: 1;
+            $scalingInfo[] = 1;                             // in 4.x+ proper scaling information; for us just to flag a npc spell as level damage scaling
+            $scalingInfo[] = 1;
+        }
+        else
+            $scalingInfo[] = min($this->charLevel, $scalingInfo[2]);
+
+        $x .= '<!--?'.implode(':', $scalingInfo).'-->';
 
         return $x;
     }

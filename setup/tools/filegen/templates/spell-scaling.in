@@ -1,0 +1,5 @@
+$WH.g_convertScalingSpell.SV = /*setup:spellScalingSV*/;
+
+if ($WH.isset('$WowheadPower')) {
+    $WowheadPower.loadScales(6);
+}

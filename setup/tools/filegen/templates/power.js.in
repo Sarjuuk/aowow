@@ -90,7 +90,7 @@ if (typeof $WowheadPower == "undefined") {
             },
             SCALES = {
                 3: { url: "?data=item-scaling" },
-                6: { url: "?data=item-scaling" }
+                6: { url: "?data=spell-scaling" }
             },
             LOCALES = {
                 0: "enus",

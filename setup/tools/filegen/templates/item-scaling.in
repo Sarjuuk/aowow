@@ -6,5 +6,4 @@ $WH.g_convertScalingFactor.SD = /*setup:itemScalingSD*/;
 
 if ($WH.isset('$WowheadPower')) {
     $WowheadPower.loadScales(3);
-    $WowheadPower.loadScales(6);
 }

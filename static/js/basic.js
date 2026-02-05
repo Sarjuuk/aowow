@@ -1224,6 +1224,24 @@ if (!$WH.wowheadRemote) {
     $WH.g_ajaxIshRequest('?data=item-scaling');
 }
 
+// aowow - custom..ish
+$WH.g_convertScalingSpell = function(base, spellLevel, level) {
+    let scaler = $WH.g_convertScalingSpell.SV;
+
+    if (!scaler[level] || !scaler[spellLevel]) {
+        if (g_user.roles & U_GROUP_ADMIN) {
+            alert('There are no spell scaling values for level ' + level);
+        }
+
+        return base;
+    }
+
+    return base *= scaler[level] / scaler[spellLevel];
+}
+
+if(!$WH.wowheadRemote)
+    $WH.g_ajaxIshRequest('?data=spell-scaling');
+
 $WH.g_getDataSource = function() {
     if ($WH.isset('g_pageInfo')) {
         switch (g_pageInfo.type) {
@@ -1330,6 +1348,14 @@ $WH.g_setJsonItemLevel = function (json, level) {
     }
 };
 
+$WH.g_setJsonSpellLevel = function(json, level)
+{
+    if (!json.scadist)
+        return;
+
+    $WH.cO(json, $WH.g_convertScalingSpell(level, json.scadist));
+}
+
 $WH.g_setTooltipLevel = function(tooltip, level) {
     var _ = typeof tooltip;
 
@@ -1359,7 +1385,8 @@ $WH.g_setTooltipLevel = function(tooltip, level) {
 
     // Update the tooltip
     if (scaDist) {
-        if (!tooltip.match(/<!--pts[0-9](:[0-9])?-->/g)) { // Not a spell
+     // if (!tooltip.match(/<!--pts[0-9](:[0-9])?-->/g)) { // Not a spell
+        if (!tooltip.match(/<!--pts[0-9]+(:[0-9]+)?-->/g)) { // aowow - appropriated for 335a
             var
                 scaFlags = parseInt(_[5]) || 0,
                 speed = tooltip.match(/<!--spd-->(\d\.\d+)/);
@@ -1456,6 +1483,23 @@ $WH.g_setTooltipLevel = function(tooltip, level) {
                 }
 
                 return '<span class="q2"' + style + '>' + prefix + '<!--rtg' + ratingId + '-->' + value + suffix + '</span>' + br;
+            });
+        }
+        else
+        {
+            var json = {
+                scadist: scaDist
+            };
+
+            // $WH.g_setJsonSpellLevel(json, level);
+
+            // Cast time
+            // tooltip = tooltip.replace(/<!--cast-->\d+\.\d+/, '<!--cast-->' + json.cast);
+
+            // Spell effects
+            // aowow - custom: spell level damage calculation
+            tooltip = tooltip.replace(/<!--pts(\d+):(\d+)-->\s*\d+/gi, function(_all, spellLvl, base) {
+                return '<!--pts' + spellLvl + ':' + base + '-->' + Math.round($WH.g_convertScalingSpell(base, parseInt(spellLvl), parseInt(level)));
             });
         }
     }
