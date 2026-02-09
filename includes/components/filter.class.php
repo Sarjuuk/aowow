@@ -622,8 +622,8 @@ abstract class Filter
         if (Lang::getLocale()->isLogographic() && !Cfg::get('LOGOGRAPHIC_FT_SEARCH'))
             return $this->tokenizeString($fields, $string, $exact, $allowShort);
 
-        $string = trim(preg_replace(self::PATTERN_FT, ' ', $string));
-        if (!$string)
+        $ftString = trim(preg_replace(self::PATTERN_FT, ' ', $string));
+        if (!$ftString)
             return [];
 
         // always allow sub 3 chars for logographic locales
@@ -631,7 +631,7 @@ abstract class Filter
             $allowShort = true;
 
         $sub    = [];
-        $tokens = $exact ? [$string] : array_filter(explode(' ', $string));
+        $tokens = $exact ? [$ftString] : array_filter(explode(' ', $ftString));
         foreach ($tokens as $t)
         {
             $ex = $t[0] === '-';
@@ -646,17 +646,22 @@ abstract class Filter
                 $sub[] = ($ex ? '-' : '+') . $t . '*';
         }
 
-        $qry = [];
-        foreach ($fields as $f)
-            $qry[] = [$f, $sub, 'MATCH'];
-
-        // single cnd?
-        if (!$qry)
+        if (!$sub)
         {
-            trigger_error('Filter::buildMatchLookup - could build MATCH AGAINST from: '.$string, E_USER_NOTICE);
+            trigger_error('Filter::buildMatchLookup - could not build MATCH AGAINST from: "'.$ftString.'"', E_USER_NOTICE);
             $this->error = true;
         }
-        else if (count($qry) > 1)
+
+        $qry = [];
+        foreach ($fields as $f)
+        {
+            $qry[] = [$f, trim($string)];
+            if ($sub)
+                $qry[] = [$f, $sub, 'MATCH'];
+        }
+
+        // single cnd?
+        if (count($qry) > 1)
             array_unshift($qry, 'OR');
         else
             $qry = $qry[0];

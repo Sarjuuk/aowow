@@ -112,7 +112,7 @@ class Search
 
         foreach (explode(' ', $this->query) as $raw)
         {
-            // ivalid chars for both LIKE and MATCH
+            // invalid chars for both LIKE and MATCH
             $clean = str_replace(['\\', '%'], '', $raw);
 
             if ($clean === '')
@@ -197,16 +197,17 @@ class Search
         if (Lang::getLocale()->isLogographic() && !Cfg::get('LOGOGRAPHIC_FT_SEARCH'))
             return $this->createLikeLookup($fields);
 
-        if (!$this->fulltext)
-            return [];
-
         // default to name-field
         if (!$fields)
             $fields[] = 'name_loc'.Lang::getLocale()->value;
 
         $qry = [];
         foreach ($fields as $f)
-            $qry[] = [$f, $this->fulltext, 'MATCH'];
+        {
+            $qry[] = [$f, $this->query];
+            if ($this->fulltext)
+                $qry[] = [$f, $this->fulltext, 'MATCH'];
+        }
 
         // single cnd?
         if (count($qry) > 1)
