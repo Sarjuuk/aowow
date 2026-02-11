@@ -56,6 +56,7 @@ abstract class Filter
     public const V_LIST       = 10;
     public const V_CALLBACK   = 11;
     public const V_REGEX      = 12;
+    public const V_NAME       = 13;
 
     protected const ENUM_ANY     = -2323;
     protected const ENUM_NONE    = -2324;
@@ -102,7 +103,13 @@ abstract class Filter
     private array $cndSet  = [];                            // db type query storage
     private array $rawData = [];
 
-    /* genericFilter: [FILTER_TYPE, colOrFnName, param1, param2]
+    protected string $type          = '';                   // set by child
+    protected array  $parentCats    = [];                   // used to validate ty-filter
+    protected array  $inTokens      = [];                   // text search includes
+    protected array  $exTokens      = [];                   // text search excludes
+    protected array  $ftTokens      = [];                   // fulltext search
+
+    /* $genericFilter: [FILTER_TYPE, colOrFnName, param1, param2]
         [self::CR_BOOLEAN,   <string:colName>, <bool:isString>, null]
         [self::CR_FLAG,      <string:colName>, <int:testBit>,   <bool:matchAny>]       # default param2: matchExact
         [self::CR_NUMERIC,   <string:colName>, <int:NUM_FLAGS>, <bool:addExtraCol>]
@@ -111,12 +118,17 @@ abstract class Filter
         [self::CR_STAFFFLAG, <string:colName>, null,            null]
         [self::CR_CALLBACK,  <string:fnName>,  <mixed:param1>,  <mixed:param2>]
         [self::CR_NYI_PH,    null,             <int:returnVal>, param2]                # mostly 1: to ignore this criterium; 0: to fail the whole query
-    */
-    protected string $type          = '';                   // set by child
-    protected array  $parentCats    = [];                   // used to validate ty-filter
 
+       $inputFields: fieldName => [VALUE_TYPE, checkInfo, fieldIsArray]
+        [self::V_EQUAL,    <mixed:exactValue>, <bool:isArray>]
+        [self::V_RANGE,    <array:minMaxInt>,  <bool:isArray>]
+        [self::V_LIST,     <array:validInts>,  <bool:isArray>]
+        [self::V_CALLBACK, <string:fnName>,    <bool:isArray>]
+        [self::V_REGEX,    <string:regexp>,    <bool:isArray>]
+        [self::V_NAME,     <bool:matchExact>,  <bool:isArray>]
+    */
     protected static array $genericFilter = [];
-    protected static array $inputFields   = [];             // list of input fields defined per page - fieldName => [checkType, checkValue[, fieldIsArray]]
+    protected static array $inputFields   = [];             // list of input fields defined per page
     protected static array $enums         = [];             // validation for opt lists per page - criteriumID => [validOptionList]
 
     // express Filters in template
@@ -441,6 +453,12 @@ abstract class Filter
                         continue 2;
                     break;
                 case self::CR_STRING:
+                    if ($param1 & STR_LOCALIZED)
+                        $colOrFn .= '_loc'.Lang::getLocale()->value;
+
+                    if ($this->tokenizeString($colOrFn, $_crv[$i], $param1 & STR_MATCH_EXACT, $param1 & STR_ALLOW_SHORT))
+                        continue 2;
+                    break;
                 case self::CR_CALLBACK:
                 case self::CR_NYI_PH:
                     continue 2;
@@ -497,19 +515,19 @@ abstract class Filter
         $this->fiSetWeights = [$_wt, $_wtv];
     }
 
-    protected function checkInput(int $type, mixed $valid, mixed &$val, bool $recursive = false) : bool
+    protected function checkInput(int $type, mixed $checkInfo, mixed &$val, bool $recursive = false) : bool
     {
         switch ($type)
         {
             case self::V_EQUAL:
-                if (gettype($valid) == 'integer')
+                if (gettype($checkInfo) == 'integer')
                     $val = intval($val);
-                else if (gettype($valid) == 'double')
+                else if (gettype($checkInfo) == 'double')
                     $val = floatval($val);
-                else /* if (gettype($valid) == 'string') */
+                else /* if (gettype($checkInfo) == 'string') */
                     $val = strval($val);
 
-                if ($valid == $val)
+                if ($checkInfo == $val)
                     return true;
 
                 break;
@@ -517,10 +535,10 @@ abstract class Filter
                 if (!Util::checkNumeric($val, NUM_CAST_INT))
                     return false;
 
-                if (in_array($val, $valid))
+                if (in_array($val, $checkInfo))
                     return true;
 
-                foreach ($valid as $v)
+                foreach ($checkInfo as $v)
                 {
                     if (gettype($v) != 'array')
                         continue;
@@ -531,142 +549,144 @@ abstract class Filter
 
                 break;
             case self::V_RANGE:
-                if (Util::checkNumeric($val, NUM_CAST_INT) && $val >= $valid[0] && $val <= $valid[1])
+                if (Util::checkNumeric($val, NUM_CAST_INT) && $val >= $checkInfo[0] && $val <= $checkInfo[1])
                     return true;
 
                 break;
             case self::V_CALLBACK:
-                if ($this->$valid($val))
+                if ($this->$checkInfo($val))
                     return true;
 
                 break;
             case self::V_REGEX:
-                if (!preg_match($valid, $val))
+                if (!preg_match($checkInfo, $val))
                     return true;
 
                 break;
+            case self::V_NAME:
+                if (preg_match(self::PATTERN_NAME, $val))
+                    break;
+
+                if (!$this->tokenizeString('na', $val, $checkInfo && $this->values['ex']))
+                    return false;                           // quit without logging more errors
+
+                return true;
         }
 
         if (!$recursive)
         {
-            trigger_error('Filter::checkInput - check failed [type: '.$type.' valid: '.Util::toString($valid).' val: '.((string)$val).']', E_USER_NOTICE);
+            trigger_error('Filter::checkInput - check failed [type: '.$type.' valid: '.Util::toString($checkInfo).' val: '.((string)$val).']', E_USER_NOTICE);
             $this->error = true;
         }
 
         return false;
     }
 
-    protected function transformToken(string $string, bool $exact) : string
+    public static function transformToken(string &$string, bool $allowShort = false) : ?array
     {
+        $lenTest = fn($x) => $x !== '' && (mb_strlen($x) > 2 || $allowShort || Lang::getLocale()->isLogographic());
+        $string  = trim($string);
+
+        if ($string === '')
+            return null;
+
+        // invalid chars for both LIKE and MATCH
+        $str = str_replace(['\\', '%'], '', $string);
+
+        if ($neg = ($str[0] === '-'))
+            $str = mb_substr($str, 1);
+
+        if (!$lenTest($str))
+            return null;
+
+        // if the fulltext token contains invalid chars, should it be sub-tokenized (current behavior) or should the chars just be stripped
+        $ft = array_filter(explode(' ', preg_replace(self::PATTERN_FT, ' ', $str)), $lenTest);
+
         // escape manually entered _; entering % should be prohibited
-        $string = str_replace('_', '\\_', $string);
+        // then replace search wildcards with sql wildcards
+        $lk = strtr(str_replace('_', '\\_', $str), self::$wCards);
 
-        // now replace search wildcards with sql wildcards
-        $string = strtr($string, self::$wCards);
-
-        return sprintf($exact ? '%s' : '%%%s%%', $string);
+        return [$lk, $ft, $neg];
     }
 
-    protected function tokenizeString(array $fields, string $string = '', bool $exact = false, bool $allowShort = false) : array
+    protected function tokenizeString(string $field, string $string, bool $exact = false, bool $allowShort = false) : bool
     {
-        if (!$string && $this->values['na'])
-            $string = $this->values['na'];
-
         // always allow sub 3 chars for logographic locales
         if (Lang::getLocale()->isLogographic())
             $allowShort = true;
 
-        $qry = [];
-        foreach ($fields as $f)
-        {
-            $sub    = [];
-            $tokens = $exact ? [$string] : array_filter(explode(' ', $string));
-            foreach ($tokens as $t)
-            {
-                if ($t[0] == '-' && (mb_strlen($t) > 3 || $allowShort))
-                    $sub[] = [$f, $this->transformToken(mb_substr($t, 1), $exact), '!'];
-                else if ($t[0] != '-' && (mb_strlen($t) > 2 || $allowShort))
-                    $sub[] = [$f, $this->transformToken($t, $exact)];
-            }
-
-            // single cnd?
-            if (!$sub)
-                continue;
-            else if (count($sub) > 1)
-                array_unshift($sub, 'AND');
-            else
-                $sub = $sub[0];
-
-            $qry[] = $sub;
-        }
-
-        // single cnd?
-        if (!$qry)
-        {
-            trigger_error('Filter::tokenizeString - could not tokenize string: '.$string, E_USER_NOTICE);
-            $this->error = true;
-        }
-        else if (count($qry) > 1)
-            array_unshift($qry, 'OR');
-        else
-            $qry = $qry[0];
-
-        return $qry;
-    }
-
-    protected function buildMatchLookup(array $fields, string $string = '', bool $exact = false, bool $allowShort = false) : array
-    {
-        if (!$string && $this->values['na'])
-            $string = $this->values['na'];
-
-        if (Lang::getLocale()->isLogographic() && !Cfg::get('LOGOGRAPHIC_FT_SEARCH'))
-            return $this->tokenizeString($fields, $string, $exact, $allowShort);
-
-        $ftString = trim(preg_replace(self::PATTERN_FT, ' ', $string));
-        if (!$ftString)
-            return [];
-
-        // always allow sub 3 chars for logographic locales
-        if (Lang::getLocale()->isLogographic())
-            $allowShort = true;
-
-        $sub    = [];
-        $tokens = $exact ? [$ftString] : array_filter(explode(' ', $ftString));
+        $tokens = $exact ? [$string] : explode(' ', $string);
         foreach ($tokens as $t)
         {
-            $ex = $t[0] === '-';
-            if ($ex)
-                $t = mb_substr($t, 1);
+            if ([$like, $fulltext, $ex] = self::transformToken($t, $allowShort))
+            {
+                if ($like)
+                    $this->{$ex ? 'exTokens' : 'inTokens'}[$field][] = $like;
 
-            // cant have trailing/leading dashes. FT confuses them for additional modifiers and dies with a syntax error
-            // would be an issue for all modifiers, but Filter::PATTERN_FT only allows for - at this point
-            $t = preg_replace('/^-+|-+$/', '', $t);
+                // don't bother with fulltext search if exact is specified
+                if ($exact)
+                    continue;
 
-            if ($allowShort || mb_strlen($t) > 2)
-                $sub[] = ($ex ? '-' : '+') . $t . '*';
+                // note: a fulltext search purely from exclude tokens will return no result
+                foreach ($fulltext as $ft)
+                {
+                    // cant have trailing/leading dashes. FT confuses them for additional modifiers and dies with a syntax error
+                    // would be an issue for all modifiers, but Filter::PATTERN_FT only allows for - at this point
+                    $this->ftTokens[$field][] = ($ex ? '-' : '+') . preg_replace('/^-+|-+$/', '', $ft) . '*';
+                }
+            }
         }
 
-        if (!$sub)
+        if (empty($this->inTokens[$field]))
         {
-            trigger_error('Filter::buildMatchLookup - could not build MATCH AGAINST from: "'.$ftString.'"', E_USER_NOTICE);
+            trigger_error('Filter::tokenizeString - could not tokenize string: "'.$string.'" for input: '.$field, E_USER_NOTICE);
             $this->error = true;
+            return false;
         }
+
+        return true;
+    }
+
+    protected function buildLikeLookup(array $fields, bool $exact = false) : array
+    {
+        $qry = [];
+        foreach ($fields as $field => $col)
+        {
+            $sub = [];
+            if (!empty($this->inTokens[$field]))
+                $sub = array_merge($sub, array_map(fn($x) => [$col, $x, $exact ? null : 'LIKE'], $this->inTokens[$field]));
+            if (!empty($this->exTokens[$field]))
+                $sub = array_merge($sub, array_map(fn($x) => [$col, $x, $exact ? null : 'NOT LIKE'], $this->exTokens[$field]));
+
+            if (count($sub) > 1)
+                array_unshift($sub, 'AND');
+            else if ($sub)
+                $sub = $sub[0];
+
+            if ($sub)
+                $qry[] = $sub;
+        }
+
+        return $qry ? ['OR', ...$qry] : [];
+    }
+
+    protected function buildMatchLookup(array $fields, bool $exact = false) : array
+    {
+        if (Lang::getLocale()->isLogographic() && !Cfg::get('LOGOGRAPHIC_FT_SEARCH'))
+            return $this->buildLikeLookup($fields, $exact);
 
         $qry = [];
-        foreach ($fields as $f)
+        foreach ($fields as $field => $col)
         {
-            $qry[] = [$f, trim($string)];
-            if ($sub)
-                $qry[] = [$f, $sub, 'MATCH'];
+            if (!empty($this->ftTokens[$field]))
+                $qry[] = [$col, $this->ftTokens[$field], 'MATCH'];
+
+            $tok = $this->values[$field];
+            if (self::transformToken($tok))
+                $qry[] = [$col, $tok];
         }
 
-        // single cnd?
-        if (count($qry) > 1)
-            array_unshift($qry, 'OR');
-        else
-            $qry = $qry[0];
-
-        return $qry;
+        return $qry ? ['OR', ...$qry] : [];
     }
 
     protected function int2Op(mixed &$op) : bool
@@ -738,14 +758,14 @@ abstract class Filter
             return [[$field, $value, '&'], $value];
     }
 
-    private function genericString(string $field, string $value, ?int $strFlags) : ?array
+    private function genericString(string $field, ?int $strFlags) : ?array
     {
         $strFlags ??= 0x0;
 
         if ($strFlags & STR_LOCALIZED)
             $field .= '_loc'.Lang::getLocale()->value;
 
-        return $this->tokenizeString([$field], $value, $strFlags & STR_MATCH_EXACT, $strFlags & STR_ALLOW_SHORT);
+        return $this->buildLikeLookup([$field => $field]);
     }
 
     private function genericNumeric(string $field, int|float $value, int $op, int $typeCast) : ?array
@@ -821,7 +841,7 @@ abstract class Filter
             self::CR_FLAG      => $this->genericBooleanFlags($colOrFn, $param1, $crs, $param2),
             self::CR_STAFFFLAG => $this->genericBooleanFlags($colOrFn, (1 << ($crs - 1)), true),
             self::CR_BOOLEAN   => $this->genericBoolean($colOrFn, $crs, !empty($param1)),
-            self::CR_STRING    => $this->genericString($colOrFn, $crv, $param1),
+            self::CR_STRING    => $this->genericString($colOrFn, $param1),
             self::CR_CALLBACK  => $this->{$colOrFn}($cr, $crs, $crv, $param1, $param2),
             self::CR_ENUM      => $handleEnum($cr, $crs, $colOrFn, $param1, $param2),
             self::CR_NYI_PH    => $handleNYIPH($crs, $crv, $param1),

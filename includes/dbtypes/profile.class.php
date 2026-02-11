@@ -244,9 +244,9 @@ class ProfileListFilter extends Filter
         'cr'    => [parent::V_RANGE,    [1, 36],                                          true ], // criteria ids
         'crs'   => [parent::V_LIST,     [parent::ENUM_NONE, parent::ENUM_ANY, [0, 5000]], true ], // criteria operators
         'crv'   => [parent::V_REGEX,    parent::PATTERN_CRV,                              true ], // criteria values
-        'na'    => [parent::V_REGEX,    parent::PATTERN_NAME,                             false], // name - only printable chars, no delimiter
+        'ex'    => [parent::V_EQUAL,    'on',                                             false], // only match exact - must be defined before 'na' as it's test relies on 'ex's value
+        'na'    => [parent::V_NAME,     true,                                             false], // name - only printable chars, no delimiter
         'ma'    => [parent::V_EQUAL,    1,                                                false], // match any / all filter
-        'ex'    => [parent::V_EQUAL,    'on',                                             false], // only match exact
         'si'    => [parent::V_LIST,     [SIDE_ALLIANCE, SIDE_HORDE],                      false], // side
         'ra'    => [parent::V_LIST,     [[1, 8], 10, 11],                                 true ], // race
         'cl'    => [parent::V_LIST,     [[1, 9], 11],                                     true ], // class
@@ -284,13 +284,20 @@ class ProfileListFilter extends Filter
         // table key differs between remote and local :<
         $k = $this->useLocalList ? 'p' : 'c';
 
-        // name [str] - the table is case sensitive. Since i don't want to destroy indizes, lets alter the search terms
+        // name [str]
         if ($_v['na'])
         {
-            $lower  = $this->tokenizeString([$k.'.name'], Util::lower($_v['na']),   $_v['ex'] == 'on', true);
-            $proper = $this->tokenizeString([$k.'.name'], Util::ucWords($_v['na']), $_v['ex'] == 'on', true);
+            // issue: the table is case sensitive. so we need to alter the tokens for multiple cases
+            foreach (['inTokens', 'exTokens'] as $prop)
+            {
+                if (empty($this->{$prop}['na']))
+                    continue;
 
-            $parts[] = ['OR', $lower, $proper];
+                $this->{$prop}['na']  = array_map(Util::lower(...), $this->{$prop}['na']);
+                $this->{$prop}['_na'] = array_map(Util::ucWords(...), $this->{$prop}['na']);
+            };
+
+            $parts[] = $this->buildLikeLookup(['na' => $k.'.name', '_na' => $k.'.name'], $_v['ex'] == 'on');
         }
 
         // side [list]
@@ -406,8 +413,10 @@ class ProfileListFilter extends Filter
 
     protected function cbTeamName(int $cr, int $crs, string $crv, $size) : ?array
     {
-        if ($_ = $this->tokenizeString(['at.name'], $crv))
-            return ['AND', ['at.type', $size], $_];
+        $n = preg_replace(parent::PATTERN_NAME, '', $crv);
+        if ($this->tokenizeString($cr, $n))
+            if ($_ = $this->buildLikeLookup([$cr => 'at.name']))
+                return ['AND', ['at.type', $size], $_];
 
         return null;
     }

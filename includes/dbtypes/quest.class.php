@@ -485,7 +485,7 @@ class QuestListFilter extends Filter
         'cr'    => [parent::V_RANGE, [1, 45],                                                             true ], // criteria ids
         'crs'   => [parent::V_LIST,  [parent::ENUM_NONE, parent::ENUM_ANY, [0, 99999]],                   true ], // criteria operators
         'crv'   => [parent::V_REGEX, parent::PATTERN_INT,                                                 true ], // criteria values - only numerals
-        'na'    => [parent::V_REGEX, parent::PATTERN_NAME,                                                false], // name / text - only printable chars, no delimiter
+        'na'    => [parent::V_NAME,  false,                                                               false], // name / text - only printable chars, no delimiter
         'ex'    => [parent::V_EQUAL, 'on',                                                                false], // also match subname
         'ma'    => [parent::V_EQUAL, 1,                                                                   false], // match any / all filter
         'minle' => [parent::V_RANGE, [0, 99],                                                             false], // min quest level
@@ -507,10 +507,10 @@ class QuestListFilter extends Filter
         if ($_v['na'])
         {
             if ($_v['ex'] == 'on')
-                if ($_ = $this->tokenizeString(['objectives_loc'.Lang::getLocale()->value, 'details_loc'.Lang::getLocale()->value]))
+                if ($_ = $this->buildLikeLookup(['na' => 'objectives_loc'.Lang::getLocale()->value, 'na' => 'details_loc'.Lang::getLocale()->value]))
                     $parts[] = $_;
 
-            if ($_ = $this->buildMatchLookup(['name_loc'.Lang::getLocale()->value]))
+            if ($_ = $this->buildMatchLookup(['na' => 'name_loc'.Lang::getLocale()->value]))
             {
                 if ($parts)
                     $parts[0][] = $_;

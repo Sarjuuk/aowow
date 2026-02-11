@@ -938,7 +938,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
 
         // tab: see also
-        $seeAlso = new QuestList(array(['name_loc'.Lang::getLocale()->value, '%'.Util::htmlEscape($this->subject->getField('name', true)).'%'], ['id', $this->typeId, '!']));
+        $seeAlso = new QuestList(array(['name_loc'.Lang::getLocale()->value, Util::htmlEscape($this->subject->getField('name', true))], ['id', $this->typeId, '!']));
         if (!$seeAlso->error)
         {
             $this->extendGlobalData($seeAlso->getJSGlobals());

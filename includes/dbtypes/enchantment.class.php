@@ -237,7 +237,7 @@ class EnchantmentListFilter extends Filter
         'cr'  => [parent::V_RANGE, [2, 123],             true ], // criteria ids
         'crs' => [parent::V_RANGE, [1, 15],              true ], // criteria operators
         'crv' => [parent::V_REGEX, parent::PATTERN_INT,  true ], // criteria values - only numerals
-        'na'  => [parent::V_REGEX, parent::PATTERN_NAME, false], // name - only printable chars, no delimiter
+        'na'  => [parent::V_NAME,  false,                false], // name - only printable chars, no delimiter
         'ma'  => [parent::V_EQUAL, 1,                    false], // match any / all filter
         'ty'  => [parent::V_RANGE, [1, 8],               true ]  // types
     );
@@ -249,7 +249,7 @@ class EnchantmentListFilter extends Filter
 
         //string
         if ($_v['na'])
-            if ($_ = $this->tokenizeString(['name_loc'.Lang::getLocale()->value]))
+            if ($_ = $this->buildLikeLookup(['na' => 'name_loc'.Lang::getLocale()->value]))
                 $parts[] = $_;
 
         // type

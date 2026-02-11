@@ -343,7 +343,7 @@ class CreatureListFilter extends Filter
         'cr'    => [parent::V_LIST,     [[1, 3],[5, 12], 15, 16, [18, 25], [27, 29], [31, 35], 37, 38, [40, 44]], true ], // criteria ids
         'crs'   => [parent::V_LIST,     [parent::ENUM_NONE, parent::ENUM_ANY, [0, 9999]],                         true ], // criteria operators
         'crv'   => [parent::V_REGEX,    parent::PATTERN_CRV,                                                      true ], // criteria values - only printable chars, no delimiter
-        'na'    => [parent::V_REGEX,    parent::PATTERN_NAME,                                                     false], // name / subname - only printable chars, no delimiter
+        'na'    => [parent::V_NAME,     false,                                                                    false], // name / subname - only printable chars, no delimiter
         'ex'    => [parent::V_EQUAL,    'on',                                                                     false], // also match subname
         'ma'    => [parent::V_EQUAL,    1,                                                                        false], // match any / all filter
         'fa'    => [parent::V_CALLBACK, 'cbPetFamily',                                                            true ], // pet family [list]  -  cat[0] == 1
@@ -365,10 +365,10 @@ class CreatureListFilter extends Filter
         if ($_v['na'])
         {
             if ($_v['ex'] == 'on')
-                if ($_ = $this->tokenizeString(['subname_loc'.Lang::getLocale()->value]))
+                if ($_ = $this->buildLikeLookup(['na' => 'subname_loc'.Lang::getLocale()->value]))
                     $parts[] = $_;
 
-            if ($_ = $this->buildMatchLookup(['name_loc'.Lang::getLocale()->value]))
+            if ($_ = $this->buildMatchLookup(['na' => 'name_loc'.Lang::getLocale()->value]))
             {
                 if ($parts)
                     $parts = ['OR', $_, ...$parts];

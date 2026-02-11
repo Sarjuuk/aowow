@@ -29,13 +29,14 @@ abstract class DBTypeList
     *       expression:    str   - must match fieldname;
     *                      int   - 1: select everything; 0: select nothing
     *                      array - another condition array
-    *       value:         str   - operator defaults to: LIKE <val>
-    *                      int   - operator defaults to: = <val>
+    *       value:         str   - operator defaults to: = <val>
+    *                      num   - operator defaults to: = <val>
     *                      array - operator defaults to: IN (<val>)
     *                      null  - operator defaults to: IS [NULL]
     *       operator:      modifies/overrides default
     *                      ! - negated default value (NOT LIKE; <>; NOT IN)
     *                      MATCH - creates fulltext search ('value' must be array; column must have fulltext index)
+    *                      LIKE / NOT LIKE - partial string matching ('value' must be string (*d'uh*))
     *   condition as str
     *       defines linking (AND || OR)
     *   condition as int
@@ -167,36 +168,49 @@ abstract class DBTypeList
                 else
                     return null;
 
+                $c[2] ??= '';
+
                 if (is_array($c[1]) && !empty($c[1]))
                 {
-                    if (($c[2] ?? '') === 'MATCH')
+                    if ($c[2] === 'MATCH')
                         return 'MATCH('.$field.') AGAINST(\''.implode(' ', $c[1]).'\' IN BOOLEAN MODE)';
 
                     array_walk($c[1], fn(&$x) => $x = Util::checkNumeric($x) ? $x : DB::Aowow()->escape($x));
 
-                    $op  = (isset($c[2]) && $c[2] == '!') ? 'NOT IN' : 'IN';
+                    $op  = $c[2] == '!' ? 'NOT IN' : 'IN';
                     $val = '('.implode(', ', $c[1]).')';
                 }
                 else if (Util::checkNumeric($c[1]))         // Note: should this be a NUM_REQ_* check?
                 {
-                    $op  = (isset($c[2]) && $c[2] == '!') ? '<>' : '=';
                     $val = $c[1];
+                    $op  = $c[2] == '!' ? '<>' : ($c[2] ?: '=');
                 }
                 else if (is_string($c[1]))
                 {
-                    $op  = (isset($c[2]) && $c[2] == '!') ? 'NOT LIKE' : 'LIKE';
-                    $val = DB::Aowow()->escape($c[1]);
+                    $val = mysqli_real_escape_string(DB::Aowow()->link, $c[1]);
+                    if ($c[2] == 'LIKE')
+                    {
+                        $op  = 'LIKE';
+                        $val = '"%'.$val.'%"';
+                    }
+                    else if ($c[2] == 'NOT LIKE')
+                    {
+                        $op  = 'NOT LIKE';
+                        $val = '"%'.$val.'%"';
+                    }
+                    else
+                    {
+                        $op  = $c[2] == '!' ? '<>' : '=';
+                        $val = '"'.$val.'"';
+                    }
                 }
                 else if (count($c) > 1 && $c[1] === null)   // specifficly check for NULL
                 {
-                    $op  = (isset($c[2]) && $c[2] == '!') ? 'IS NOT' : 'IS';
+                    $op  = $c[2] == '!' ? 'IS NOT' : 'IS';
                     $val = 'NULL';
                 }
                 else                                        // null for example
                     return null;
-
-                if (isset($c[2]) && $c[2] != '!')
-                    $op = $c[2];
 
                 return '('.$field.' '.$op.' '.$val.')';
             }

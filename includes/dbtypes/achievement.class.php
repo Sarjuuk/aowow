@@ -310,7 +310,7 @@ class AchievementListFilter extends Filter
         'cr'    => [parent::V_RANGE, [2, 18],                                                             true ], // criteria ids
         'crs'   => [parent::V_LIST,  [parent::ENUM_NONE, parent::ENUM_ANY, [0, 99999]],                   true ], // criteria operators
         'crv'   => [parent::V_REGEX, parent::PATTERN_CRV,                                                 true ], // criteria values - only printable chars, no delimiters
-        'na'    => [parent::V_REGEX, parent::PATTERN_NAME,                                                false], // name / description - only printable chars, no delimiter
+        'na'    => [parent::V_NAME,  false,                                                               false], // name / description - only printable chars, no delimiter
         'ex'    => [parent::V_EQUAL, 'on',                                                                false], // extended name search
         'ma'    => [parent::V_EQUAL, 1,                                                                   false], // match any / all filter
         'si'    => [parent::V_LIST,  [SIDE_ALLIANCE, SIDE_HORDE, SIDE_BOTH, -SIDE_ALLIANCE, -SIDE_HORDE], false], // side
@@ -328,9 +328,9 @@ class AchievementListFilter extends Filter
         {
             $_ = [];
             if ($_v['ex'] == 'on')
-                $_ = $this->tokenizeString(['name_loc'.Lang::getLocale()->value, 'reward_loc'.Lang::getLocale()->value, 'description_loc'.Lang::getLocale()->value]);
+                $_ = $this->buildLikeLookup(['na' => 'name_loc'.Lang::getLocale()->value, 'na' => 'reward_loc'.Lang::getLocale()->value, 'na' => 'description_loc'.Lang::getLocale()->value]);
             else
-                $_ = $this->tokenizeString(['name_loc'.Lang::getLocale()->value]);
+                $_ = $this->buildLikeLookup(['na' => 'name_loc'.Lang::getLocale()->value]);
 
             if ($_)
                 $parts[] = $_;

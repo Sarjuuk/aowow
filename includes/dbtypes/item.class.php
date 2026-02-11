@@ -1991,7 +1991,7 @@ class ItemListFilter extends Filter
         'crv'   => [parent::V_REGEX,    parent::PATTERN_CRV,                                                 true ], // criteria values - only printable chars, no delimiters
         'upg'   => [parent::V_REGEX,    '/[^\d:]/ui',                                                        true ], // upgrade item ids
         'gb'    => [parent::V_LIST,     [0, 1, 2, 3],                                                        false], // search result grouping
-        'na'    => [parent::V_REGEX,    parent::PATTERN_NAME,                                                false], // name - only printable chars, no delimiter
+        'na'    => [parent::V_NAME,     false,                                                               false], // name - only printable chars, no delimiter
         'ma'    => [parent::V_EQUAL,    1,                                                                   false], // match any / all filter
         'ub'    => [parent::V_LIST,     [[1, 9], 11],                                                        false], // usable by classId
         'qu'    => [parent::V_RANGE,    [0, 7],                                                              true ], // quality ids
@@ -2097,7 +2097,7 @@ class ItemListFilter extends Filter
 
         // name
         if ($_v['na'])
-            if ($_ = $this->buildMatchLookup(['name_loc'.Lang::getLocale()->value]))
+            if ($_ = $this->buildMatchLookup(['na' => 'name_loc'.Lang::getLocale()->value]))
                 $parts[] = $_;
 
         // usable-by (not excluded by requiredClass && armor or weapons match mask from ?_classes)
@@ -2218,9 +2218,16 @@ class ItemListFilter extends Filter
     protected function cbHasRandEnchant(int $cr, int $crs, string $crv) : ?array
     {
         $n = preg_replace(parent::PATTERN_NAME, '', $crv);
-        $n = $this->transformToken($n, false);
+        if (!$this->tokenizeString($cr, $n))
+            return null;
 
-        $randIds = DB::Aowow()->select('SELECT `id` AS ARRAY_KEY, ABS(`id`) AS `id`, name_loc?d, `name_loc0` FROM ?_itemrandomenchant WHERE name_loc?d LIKE ?', Lang::getLocale()->value, Lang::getLocale()->value, $n);
+        $parts = [];
+        foreach ($this->inTokens[$cr] ?? [] as $tok)
+            $parts[] = sprintf('name_loc%d LIKE "%%%s%%"', Lang::getLocale()->value, mysqli_real_escape_string(DB::Aowow()->link, $tok));
+        foreach ($this->exTokens[$cr] ?? [] as $tok)
+            $parts[] = sprintf('name_loc%d NOT LIKE "%%%s%%"', Lang::getLocale()->value, mysqli_real_escape_string(DB::Aowow()->link, $tok));
+
+        $randIds = DB::Aowow()->select('SELECT `id` AS ARRAY_KEY, ABS(`id`) AS `id`, name_loc?d, `name_loc0` FROM ?_itemrandomenchant WHERE '.implode(' AND ', $parts), Lang::getLocale()->value);
         $tplIds  = $randIds ? DB::World()->select('SELECT `entry`, `ench` FROM item_enchantment_template WHERE `ench` IN (?a)', array_column($randIds, 'id')) : [];
         foreach ($tplIds as &$set)
         {

@@ -104,7 +104,7 @@ class SoundListFilter extends Filter
 {
     protected string $type        = 'sounds';
     protected static array $inputFields = array(
-        'na' => [parent::V_REGEX, parent::PATTERN_NAME,                                         false], // name - only printable chars, no delimiter
+        'na' => [parent::V_NAME,  false,                                                        false], // name - only printable chars, no delimiter
         'ty' => [parent::V_LIST,  [[1, 4], 6, 9, 10, 12, 13, 14, 16, 17, [19, 31], 50, 52, 53], true ]  // type
     );
 
@@ -115,7 +115,7 @@ class SoundListFilter extends Filter
 
         // name [str]
         if ($_v['na'])
-            if ($_ = $this->tokenizeString(['name']))
+            if ($_ = $this->buildLikeLookup(['na' => 'name']))
                 $parts[] = $_;
 
         // type [list]

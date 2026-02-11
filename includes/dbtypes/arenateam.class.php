@@ -52,9 +52,9 @@ class ArenaTeamListFilter extends Filter
     protected string $type          = 'arenateams';
     protected static array $genericFilter = [];
     protected static array $inputFields   = array(
-        'na' => [parent::V_REGEX,    parent::PATTERN_NAME, false], // name - only printable chars, no delimiter
+        'ex' => [parent::V_EQUAL,    'on',                 false], // only match exact - must be defined before 'na' as it's test relies on 'ex's value
+        'na' => [parent::V_NAME,     true,                 false], // name - only printable chars, no delimiter
         'ma' => [parent::V_EQUAL,    1,                    false], // match any / all filter
-        'ex' => [parent::V_EQUAL,    'on',                 false], // only match exact
         'si' => [parent::V_LIST,     [1, 2],               false], // side
         'sz' => [parent::V_LIST,     [2, 3, 5],            false], // tema size
         'rg' => [parent::V_CALLBACK, 'cbRegionCheck',      false], // region
@@ -73,7 +73,7 @@ class ArenaTeamListFilter extends Filter
 
         // name [str]
         if ($_v['na'])
-            if ($_ = $this->tokenizeString(['at.name'], $_v['na'], $_v['ex'] == 'on'))
+            if ($_ = $this->buildLikeLookup(['na' => 'at.name'], $_v['ex'] == 'on'))
                 $parts[] = $_;
 
         // side [list]

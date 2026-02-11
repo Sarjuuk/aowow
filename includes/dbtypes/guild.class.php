@@ -94,9 +94,9 @@ class GuildListFilter extends Filter
     protected string $type          = 'guilds';
     protected static array $genericFilter = [];
     protected static array $inputFields   = array(
-        'na' => [parent::V_REGEX,    parent::PATTERN_NAME,        false], // name - only printable chars, no delimiter
+        'ex' => [parent::V_EQUAL,    'on',                        false], // only match exact - must be defined before 'na' as it's test relies on 'ex's value
+        'na' => [parent::V_NAME,     true,                        false], // name - only printable chars, no delimiter
         'ma' => [parent::V_EQUAL,    1,                           false], // match any / all filter
-        'ex' => [parent::V_EQUAL,    'on',                        false], // only match exact
         'si' => [parent::V_LIST,     [SIDE_ALLIANCE, SIDE_HORDE], false], // side
         'rg' => [parent::V_CALLBACK, 'cbRegionCheck',             false], // region
         'bg' => [parent::V_EQUAL,    null,                        false], // battlegroup - unsued here, but var expected by template
@@ -114,7 +114,7 @@ class GuildListFilter extends Filter
 
         // name [str]
         if ($_v['na'])
-            if ($_ = $this->tokenizeString(['g.name'], $_v['na'], $_v['ex'] == 'on'))
+            if ($_ = $this->buildLikeLookup(['na' => 'g.name'], $_v['ex'] == 'on'))
                 $parts[] = $_;
 
         // side [list]

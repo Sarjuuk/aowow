@@ -180,7 +180,7 @@ class ItemsetListFilter extends Filter
         'cr'    => [parent::V_RANGE, [2, 12],                                         true ], // criteria ids
         'crs'   => [parent::V_LIST,  [parent::ENUM_NONE, parent::ENUM_ANY, [0, 424]], true ], // criteria operators
         'crv'   => [parent::V_REGEX, parent::PATTERN_CRV,                             true ], // criteria values - only printable chars, no delimiters
-        'na'    => [parent::V_REGEX, parent::PATTERN_NAME,                            false], // name / description - only printable chars, no delimiter
+        'na'    => [parent::V_NAME,  false,                                           false], // name / description - only printable chars, no delimiter
         'ma'    => [parent::V_EQUAL, 1,                                               false], // match any / all filter
         'qu'    => [parent::V_RANGE, [0, 7],                                          true ], // quality
         'ty'    => [parent::V_RANGE, [1, 12],                                         true ], // set type
@@ -199,7 +199,7 @@ class ItemsetListFilter extends Filter
 
         // name [str]
         if ($_v['na'])
-            if ($_ = $this->tokenizeString(['name_loc'.Lang::getLocale()->value]))
+            if ($_ = $this->buildLikeLookup(['na' => 'name_loc'.Lang::getLocale()->value]))
                 $parts[] = $_;
 
         // quality [enum]

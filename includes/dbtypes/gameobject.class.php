@@ -167,7 +167,7 @@ class GameObjectListFilter extends Filter
         'cr'  => [parent::V_LIST,  [[1, 5], 7, 11, 13, 15, 16, 18, 50],              true ], // criteria ids
         'crs' => [parent::V_LIST,  [parent::ENUM_NONE, parent::ENUM_ANY, [0, 5000]], true ], // criteria operators
         'crv' => [parent::V_REGEX, parent::PATTERN_INT,                              true ], // criteria values - only numeric input values expected
-        'na'  => [parent::V_REGEX, parent::PATTERN_NAME,                             false], // name - only printable chars, no delimiter
+        'na'  => [parent::V_NAME,  false,                                            false], // name - only printable chars, no delimiter
         'ma'  => [parent::V_EQUAL, 1,                                                false]  // match any / all filter
     );
 
@@ -180,7 +180,7 @@ class GameObjectListFilter extends Filter
 
         // name
         if ($_v['na'])
-            if ($_ = $this->buildMatchLookup(['name_loc'.Lang::getLocale()->value]))
+            if ($_ = $this->buildMatchLookup(['na' => 'name_loc'.Lang::getLocale()->value]))
                 $parts[] = $_;
 
         return $parts;

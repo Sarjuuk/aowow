@@ -73,7 +73,7 @@ class AreaTriggerListFilter extends Filter
         'cr'  => [parent::V_LIST,  [2],                  true ], // criteria ids
         'crs' => [parent::V_RANGE, [1, 6],               true ], // criteria operators
         'crv' => [parent::V_REGEX, parent::PATTERN_INT,  true ], // criteria values - all criteria are numeric here
-        'na'  => [parent::V_REGEX, parent::PATTERN_NAME, false], // name - only printable chars, no delimiter
+        'na'  => [parent::V_NAME,  false,                false], // name - only printable chars, no delimiter
         'ma'  => [parent::V_EQUAL, 1,                    false], // match any / all filter
         'ty'  => [parent::V_RANGE, [0, 5],               true ]  // types
     );
@@ -85,7 +85,7 @@ class AreaTriggerListFilter extends Filter
 
         // name [str]
         if ($_v['na'])
-            if ($_ = $this->tokenizeString(['name']))
+            if ($_ = $this->buildLikeLookup(['na' => 'name']))
                 $parts[] = $_;
 
         // type [list]

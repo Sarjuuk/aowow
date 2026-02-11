@@ -2575,7 +2575,7 @@ class SpellListFilter extends Filter
         'cr'    => [parent::V_RANGE,    [1, 116],                                          true ], // criteria ids
         'crs'   => [parent::V_LIST,     [parent::ENUM_NONE, parent::ENUM_ANY, [0, 99999]], true ], // criteria operators
         'crv'   => [parent::V_REGEX,    parent::PATTERN_CRV,                               true ], // criteria values - only printable chars, no delimiters
-        'na'    => [parent::V_REGEX,    parent::PATTERN_NAME,                              false], // name / text - only printable chars, no delimiter
+        'na'    => [parent::V_NAME,     false,                                             false], // name / text - only printable chars, no delimiter
         'ex'    => [parent::V_EQUAL,    'on',                                              false], // extended name search
         'ma'    => [parent::V_EQUAL,    1,                                                 false], // match any / all filter
         'minle' => [parent::V_RANGE,    [0, 99],                                           false], // spell level min
@@ -2599,10 +2599,10 @@ class SpellListFilter extends Filter
         if ($_v['na'])
         {
             if ($_v['ex'] == 'on')
-                if ($_ = $this->tokenizeString(['buff_loc'.Lang::getLocale()->value, 'description_loc'.Lang::getLocale()->value]))
+                if ($_ = $this->buildLikeLookup(['na' => 'buff_loc'.Lang::getLocale()->value, 'na' => 'description_loc'.Lang::getLocale()->value]))
                     $parts[] = $_;
 
-            if ($_ = $this->buildMatchLookup(['name_loc'.Lang::getLocale()->value]))
+            if ($_ = $this->buildMatchLookup(['na' => 'name_loc'.Lang::getLocale()->value]))
             {
                 if ($parts)
                     $parts[0][] = $_;
