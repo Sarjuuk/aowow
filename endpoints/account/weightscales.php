@@ -88,7 +88,7 @@ class AccountWeightscalesResponse extends TextResponse
             return false;
 
         foreach ($this->_post['scale'] as [$k, $v])
-            if (in_array($k, Util::$weightScales))          // $v is known to be a positive int due to regex check
+            if (Stat::getWeightJson($k))                    // $v is known to be a positive int due to regex check
                 if (!is_int(DB::Aowow()->query('INSERT INTO ?_account_weightscale_data VALUES (?d, ?, ?d)', $scaleId, $k, $v)))
                     return false;
 

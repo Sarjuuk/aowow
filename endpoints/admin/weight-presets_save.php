@@ -37,7 +37,7 @@ class AdminWeightpresetsActionSaveResponse extends TextResponse
         {
             [$k, $v] = explode(':', $s);
 
-            if (!in_array($k, Util::$weightScales) || $v < 1)
+            if (!Stat::getWeightJson($k) || $v < 1)
                 continue;
 
             if (DB::Aowow()->query('INSERT INTO ?_account_weightscale_data VALUES (?d, ?, ?d)', $this->_post['id'], $k, $v) === null)

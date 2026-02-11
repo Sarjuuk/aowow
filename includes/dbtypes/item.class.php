@@ -2018,9 +2018,8 @@ class ItemListFilter extends Filter
 
         foreach ($this->values['wt'] as $k => $v)
         {
-            if ($idx = Stat::getIndexFrom(Stat::IDX_FILTER_CR_ID, $v))
+            if ($str = Stat::getWeightJson($v))
             {
-                $str = Stat::getJsonString($idx);
                 $qty = intVal($this->values['wtv'][$k]);
 
                 $select[]      = '(IFNULL(`is`.`'.$str.'`, 0) * '.$qty.')';
