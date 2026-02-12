@@ -4167,6 +4167,7 @@ var LANG = {
         id:                      "ID",
         classspecific:           "Classe-spécifique",
         racespecific:            "Spécifique à la race",
+        setspvpflag:             "Vous garde en mode JvJ",
 
         sepgainsrewards:         "Gains/récompenses",
         experiencegained:        "Expérience gagnée",

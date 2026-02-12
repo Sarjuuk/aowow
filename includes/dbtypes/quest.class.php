@@ -112,7 +112,7 @@ class QuestList extends DBTypeList
 
     public function isRepeatable() : bool
     {
-        return $this->curTpl['flags'] & QUEST_FLAG_REPEATABLE || $this->curTpl['specialFlags'] & QUEST_FLAG_SPECIAL_REPEATABLE;
+        return $this->curTpl['specialFlags'] & QUEST_FLAG_SPECIAL_REPEATABLE;
     }
 
     public function isDaily() : int
@@ -129,10 +129,9 @@ class QuestList extends DBTypeList
         return 0;
     }
 
-    // using reqPlayerKills and rewardHonor as a crutch .. has TC this even implemented..?
-    public function isPvPEnabled() : bool
+    public function isAutoAccept() : bool
     {
-        return $this->curTpl['reqPlayerKills'] || $this->curTpl['rewardHonorPoints'] || $this->curTpl['rewardArenaPoints'];
+        return $this->curTpl['flags'] & QUEST_FLAG_AUTO_ACCEPT || $this->curTpl['specialFlags'] & QUEST_FLAG_SPECIAL_AUTO_ACCEPT;
     }
 
     // by TC definition
@@ -263,14 +262,14 @@ class QuestList extends DBTypeList
             if ($this->isSeasonal())
                 $data[$this->id]['wflags'] |= QUEST_CU_SEASONAL;
 
-            if ($this->curTpl['flags'] & QUEST_FLAG_AUTO_REWARDED)  // not shown in log
+            if ($this->curTpl['flags'] & QUEST_FLAG_TRACKING)       // not shown in log
                 $data[$this->id]['wflags'] |= QUEST_CU_SKIP_LOG;
 
-            if ($this->curTpl['flags'] & QUEST_FLAG_AUTO_ACCEPT)    // self-explanatory
+            if ($this->isAutoAccept())
                 $data[$this->id]['wflags'] |= QUEST_CU_AUTO_ACCEPT;
 
-            if ($this->isPvPEnabled())                              // not sure why this flag also requires auto-accept to be set
-                $data[$this->id]['wflags'] |= (QUEST_CU_AUTO_ACCEPT | QUEST_CU_PVP_ENABLED);
+            if ($this->curTpl['flags'] & QUEST_FLAG_FLAGS_PVP)      // this flag is only displayed if auto-accept is also set. not sure why.
+                $data[$this->id]['wflags'] |= QUEST_CU_PVP_ENABLED;
 
             $data[$this->id]['reprewards'] = [];
             for ($i = 1; $i < 6; $i++)
@@ -447,42 +446,43 @@ class QuestListFilter extends Filter
     );
 
     protected static array $genericFilter = array(
-         1 => [parent::CR_CALLBACK,  'cbReputation',     '>',                  null], // increasesrepwith
-         2 => [parent::CR_NUMERIC,   'rewardXP',         NUM_CAST_INT              ], // experiencegained
-         3 => [parent::CR_NUMERIC,   'rewardOrReqMoney', NUM_CAST_INT              ], // moneyrewarded
-         4 => [parent::CR_CALLBACK,  'cbSpellRewards',   null,                 null], // spellrewarded [yn]
-         5 => [parent::CR_FLAG,      'flags',            QUEST_FLAG_SHARABLE       ], // sharable
-         6 => [parent::CR_NUMERIC,   'timeLimit',        NUM_CAST_INT              ], // timer
-         7 => [parent::CR_FLAG,      'cuFlags',          QUEST_CU_FIRST_SERIES     ], // firstquestseries
-         9 => [parent::CR_CALLBACK,  'cbEarnReputation', null,                 null], // objectiveearnrepwith [enum]
-        10 => [parent::CR_CALLBACK,  'cbReputation',     '<',                  null], // decreasesrepwith
-        11 => [parent::CR_NUMERIC,   'suggestedPlayers', NUM_CAST_INT              ], // suggestedplayers
-        15 => [parent::CR_FLAG,      'cuFlags',          QUEST_CU_LAST_SERIES      ], // lastquestseries
-        16 => [parent::CR_FLAG,      'cuFlags',          QUEST_CU_PART_OF_SERIES   ], // partseries
-        18 => [parent::CR_FLAG,      'cuFlags',          CUSTOM_HAS_SCREENSHOT     ], // hasscreenshots
-        19 => [parent::CR_CALLBACK,  'cbQuestRelation',  0x1,                  null], // startsfrom [enum]
-        21 => [parent::CR_CALLBACK,  'cbQuestRelation',  0x2,                  null], // endsat [enum]
-        22 => [parent::CR_CALLBACK,  'cbItemRewards',    null,                 null], // itemrewards [op] [int]
-        23 => [parent::CR_CALLBACK,  'cbItemChoices',    null,                 null], // itemchoices [op] [int]
-        24 => [parent::CR_CALLBACK,  'cbLacksStartEnd',  null,                 null], // lacksstartend [yn]
-        25 => [parent::CR_FLAG,      'cuFlags',          CUSTOM_HAS_COMMENT        ], // hascomments
-        27 => [parent::CR_FLAG,      'flags',            QUEST_FLAG_DAILY          ], // daily
-        28 => [parent::CR_FLAG,      'flags',            QUEST_FLAG_WEEKLY         ], // weekly
-        29 => [parent::CR_CALLBACK,  'cbRepeatable',     null                      ], // repeatable
-        30 => [parent::CR_NUMERIC,   'id',               NUM_CAST_INT,         true], // id
-        33 => [parent::CR_ENUM,      'e.holidayId',      true,                 true], // relatedevent
-        34 => [parent::CR_CALLBACK,  'cbAvailable',      null,                 null], // availabletoplayers [yn]
-        36 => [parent::CR_FLAG,      'cuFlags',          CUSTOM_HAS_VIDEO          ], // hasvideos
-        37 => [parent::CR_CALLBACK,  'cbClassSpec',      null,                 null], // classspecific [enum]
-        38 => [parent::CR_CALLBACK,  'cbRaceSpec',       null,                 null], // racespecific [enum]
-        42 => [parent::CR_STAFFFLAG, 'flags'                                       ], // flags
-        43 => [parent::CR_CALLBACK,  'cbCurrencyReward', null,                 null], // currencyrewarded [enum]
-        44 => [parent::CR_CALLBACK,  'cbLoremaster',     null,                 null], // countsforloremaster_stc [yn]
-        45 => [parent::CR_BOOLEAN,   'rewardTitleId'                               ]  // titlerewarded
+         1 => [parent::CR_CALLBACK,  'cbReputation',     '>',                     null], // increasesrepwith
+         2 => [parent::CR_NUMERIC,   'rewardXP',         NUM_CAST_INT                 ], // experiencegained
+         3 => [parent::CR_NUMERIC,   'rewardOrReqMoney', NUM_CAST_INT                 ], // moneyrewarded
+         4 => [parent::CR_CALLBACK,  'cbSpellRewards',   null,                    null], // spellrewarded [yn]
+         5 => [parent::CR_FLAG,      'flags',            QUEST_FLAG_SHARABLE          ], // sharable
+         6 => [parent::CR_NUMERIC,   'timeLimit',        NUM_CAST_INT                 ], // timer
+         7 => [parent::CR_FLAG,      'cuFlags',          QUEST_CU_FIRST_SERIES        ], // firstquestseries
+         9 => [parent::CR_CALLBACK,  'cbEarnReputation', null,                    null], // objectiveearnrepwith [enum]
+        10 => [parent::CR_CALLBACK,  'cbReputation',     '<',                     null], // decreasesrepwith
+        11 => [parent::CR_NUMERIC,   'suggestedPlayers', NUM_CAST_INT                 ], // suggestedplayers
+        15 => [parent::CR_FLAG,      'cuFlags',          QUEST_CU_LAST_SERIES         ], // lastquestseries
+        16 => [parent::CR_FLAG,      'cuFlags',          QUEST_CU_PART_OF_SERIES      ], // partseries
+        18 => [parent::CR_FLAG,      'cuFlags',          CUSTOM_HAS_SCREENSHOT        ], // hasscreenshots
+        19 => [parent::CR_CALLBACK,  'cbQuestRelation',  0x1,                     null], // startsfrom [enum]
+        21 => [parent::CR_CALLBACK,  'cbQuestRelation',  0x2,                     null], // endsat [enum]
+        22 => [parent::CR_CALLBACK,  'cbItemRewards',    null,                    null], // itemrewards [op] [int]
+        23 => [parent::CR_CALLBACK,  'cbItemChoices',    null,                    null], // itemchoices [op] [int]
+        24 => [parent::CR_CALLBACK,  'cbLacksStartEnd',  null,                    null], // lacksstartend [yn]
+        25 => [parent::CR_FLAG,      'cuFlags',          CUSTOM_HAS_COMMENT           ], // hascomments
+        27 => [parent::CR_FLAG,      'flags',            QUEST_FLAG_DAILY             ], // daily
+        28 => [parent::CR_FLAG,      'flags',            QUEST_FLAG_WEEKLY            ], // weekly
+        29 => [parent::CR_FLAG,      'specialFlags',     QUEST_FLAG_SPECIAL_REPEATABLE], // repeatable
+        30 => [parent::CR_NUMERIC,   'id',               NUM_CAST_INT,            true], // id
+        33 => [parent::CR_ENUM,      'e.holidayId',      true,                    true], // relatedevent
+        34 => [parent::CR_CALLBACK,  'cbAvailable',      null,                    null], // availabletoplayers [yn]
+        36 => [parent::CR_FLAG,      'cuFlags',          CUSTOM_HAS_VIDEO             ], // hasvideos
+        37 => [parent::CR_CALLBACK,  'cbClassSpec',      null,                    null], // classspecific [enum]
+        38 => [parent::CR_CALLBACK,  'cbRaceSpec',       null,                    null], // racespecific [enum]
+        42 => [parent::CR_STAFFFLAG, 'flags'                                          ], // flags
+        43 => [parent::CR_CALLBACK,  'cbCurrencyReward', null,                    null], // currencyrewarded [enum]
+        44 => [parent::CR_CALLBACK,  'cbLoremaster',     null,                    null], // countsforloremaster_stc [yn]
+        45 => [parent::CR_BOOLEAN,   'rewardTitleId'                                  ], // titlerewarded
+        47 => [parent::CR_FLAG,      'flags',            QUEST_FLAG_FLAGS_PVP         ]  // setspvpflag
     );
 
     protected static array $inputFields = array(
-        'cr'    => [parent::V_RANGE, [1, 45],                                                             true ], // criteria ids
+        'cr'    => [parent::V_RANGE, [1, 47],                                                             true ], // criteria ids
         'crs'   => [parent::V_LIST,  [parent::ENUM_NONE, parent::ENUM_ANY, [0, 99999]],                   true ], // criteria operators
         'crv'   => [parent::V_REGEX, parent::PATTERN_INT,                                                 true ], // criteria values - only numerals
         'na'    => [parent::V_NAME,  false,                                                               false], // name / text - only printable chars, no delimiter
@@ -616,17 +616,6 @@ class QuestListFilter extends Filter
             return ['cuFlags', CUSTOM_UNAVAILABLE | CUSTOM_DISABLED, '&'];
     }
 
-    protected function cbRepeatable(int $cr, int $crs, string $crv) : ?array
-    {
-        if (!$this->int2Bool($crs))
-            return null;
-
-        if ($crs)
-            return ['OR', ['flags', QUEST_FLAG_REPEATABLE, '&'], ['specialFlags', QUEST_FLAG_SPECIAL_REPEATABLE, '&']];
-        else
-            return ['AND', [['flags', QUEST_FLAG_REPEATABLE, '&'], 0], [['specialFlags', QUEST_FLAG_SPECIAL_REPEATABLE, '&'], 0]];
-    }
-
     protected function cbItemChoices(int $cr, int $crs, string $crv) : ?array
     {
         if (!Util::checkNumeric($crv, NUM_CAST_INT) || !$this->int2Op($crs))
@@ -653,9 +642,9 @@ class QuestListFilter extends Filter
             return null;
 
         if ($crs)
-            return ['AND', ['questSortId', 0, '>'], [['flags', QUEST_FLAG_DAILY | QUEST_FLAG_WEEKLY | QUEST_FLAG_REPEATABLE, '&'], 0], [['specialFlags', QUEST_FLAG_SPECIAL_REPEATABLE | QUEST_FLAG_SPECIAL_MONTHLY, '&'], 0]];
+            return ['AND', ['questSortId', 0, '>'], [['flags', QUEST_FLAG_DAILY | QUEST_FLAG_WEEKLY, '&'], 0], [['specialFlags', QUEST_FLAG_SPECIAL_REPEATABLE | QUEST_FLAG_SPECIAL_MONTHLY, '&'], 0]];
         else
-            return ['OR', ['questSortId', 0, '<'], ['flags', QUEST_FLAG_DAILY | QUEST_FLAG_WEEKLY | QUEST_FLAG_REPEATABLE, '&'], ['specialFlags', QUEST_FLAG_SPECIAL_REPEATABLE | QUEST_FLAG_SPECIAL_MONTHLY, '&']];
+            return ['OR', ['questSortId', 0, '<'], ['flags', QUEST_FLAG_DAILY | QUEST_FLAG_WEEKLY, '&'], ['specialFlags', QUEST_FLAG_SPECIAL_REPEATABLE | QUEST_FLAG_SPECIAL_MONTHLY, '&']];
     }
 
     protected function cbSpellRewards(int $cr, int $crs, string $crv) : ?array

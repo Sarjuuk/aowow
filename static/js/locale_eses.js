@@ -4167,6 +4167,7 @@ var LANG = {
         id:                      "ID",
         classspecific:           "Específico de clase",
         racespecific:            "Específico de raza",
+        setspvpflag:             "Mantiene el JcJ activado",
 
         sepgainsrewards:         "Ganancias/recompensas",
         experiencegained:        "Experiencia ganada",

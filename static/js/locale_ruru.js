@@ -4166,6 +4166,7 @@ var LANG = {
         id:                      "Номер",
         classspecific:           "Только для класса",
         racespecific:            "Расовый",
+        setspvpflag:             "Включает доступность PvP",
 
         sepgainsrewards:         "Награда за выполнение",
         experiencegained:        "Получаемый опыт",

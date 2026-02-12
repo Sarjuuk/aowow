@@ -4211,6 +4211,7 @@ var LANG = {
         id:                      "ID",
         classspecific:           "Class-specific",
         racespecific:            "Race-specific",
+        setspvpflag:             "Keeps you PvP flagged",
 
         sepgainsrewards:         "Gains/rewards",
         experiencegained:        "Experience gained",

@@ -233,7 +233,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
             $infobox[] = implode('[br]', $e);
 
         // auto accept
-        if ($_flags & QUEST_FLAG_AUTO_ACCEPT)
+        if ($this->subject->isAutoAccept())
             $infobox[] = Lang::quest('autoaccept');
 
         // Repeatable
@@ -244,7 +244,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         $infobox[] = $_flags & QUEST_FLAG_SHARABLE ? Lang::quest('sharable') : Lang::quest('notSharable');
 
         // Keeps you PvP flagged
-        if ($this->subject->isPvPEnabled())
+        if ($_flags & QUEST_FLAG_FLAGS_PVP)
             $infobox[] = Lang::quest('keepsPvpFlag');
 
         // difficulty (todo (low): formula unclear. seems to be [minLevel,] -4, -2, (level), +3, +(9 to 15))

@@ -280,6 +280,7 @@ var fi_filters = {
         { id: 29,  name: 'repeatable',              type: 'yn' },
         { id: 30,  name: 'id',                      type: 'num', before: 'name' },
         { id: 44,  name: 'countsforloremaster_stc', type: 'yn' },
+        { id: 47,  name: 'setspvpflag',             type: 'yn' },
         { id: 9,   name: 'objectiveearnrepwith',    type: 'faction-any+none' },
         { id: 33,  name: 'relatedevent',            type: 'event-any+none' },
         { id: 5,   name: 'sharable',                type: 'yn' },

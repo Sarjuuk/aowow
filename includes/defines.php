@@ -801,24 +801,33 @@ define('PET_TALENT_TYPE_TENACITY', 1);
 define('PET_TALENT_TYPE_CUNNING',  2);
 
 // quest
-define('QUEST_FLAG_STAY_ALIVE',             0x00001);
-define('QUEST_FLAG_PARTY_ACCEPT',           0x00002);
-define('QUEST_FLAG_EXPLORATION',            0x00004);
-define('QUEST_FLAG_SHARABLE',               0x00008);
-define('QUEST_FLAG_AUTO_REWARDED',          0x00400);
-define('QUEST_FLAG_DAILY',                  0x01000);
-define('QUEST_FLAG_REPEATABLE',             0x02000);
-define('QUEST_FLAG_UNAVAILABLE',            0x04000);
-define('QUEST_FLAG_WEEKLY',                 0x08000);
-define('QUEST_FLAG_AUTO_COMPLETE',          0x10000);
-define('QUEST_FLAG_AUTO_ACCEPT',            0x80000);
+define('QUEST_FLAG_STAY_ALIVE',              0x00001);
+define('QUEST_FLAG_PARTY_ACCEPT',            0x00002);
+define('QUEST_FLAG_EXPLORATION',             0x00004);
+define('QUEST_FLAG_SHARABLE',                0x00008);
+define('QUEST_FLAG_HAS_CONDITION',           0x00010); // TC: Not used currently
+define('QUEST_FLAG_HIDE_REWARD_POI',         0x00020); // TC: Not used currently: Unsure of content
+define('QUEST_FLAG_RAID',                    0x00040);
+define('QUEST_FLAG_TBC',                     0x00080);
+define('QUEST_FLAG_NO_MONEY_FROM_XP',        0x00100);
+define('QUEST_FLAG_HIDDEN_REWARDS',          0x00200);
+define('QUEST_FLAG_TRACKING',                0x00400); // TC: These quests are automatically rewarded on quest complete and they will never appear in quest log client side.
+define('QUEST_FLAG_DEPRECATE_REPUTATION',    0x00800); // TC: Not used currently
+define('QUEST_FLAG_DAILY',                   0x01000);
+define('QUEST_FLAG_FLAGS_PVP',               0x02000);
+define('QUEST_FLAG_UNAVAILABLE',             0x04000);
+define('QUEST_FLAG_WEEKLY',                  0x08000);
+define('QUEST_FLAG_AUTO_COMPLETE',           0x10000);
+define('QUEST_FLAG_DISPLAY_ITEM_IN_TRACKER', 0x20000); // TC: Displays usable item in quest tracker
+define('QUEST_FLAG_OBJ_TEXT',                0x40000); // TC: use Objective text as Complete text
+define('QUEST_FLAG_AUTO_ACCEPT',             0x80000);
 
-define('QUEST_FLAG_SPECIAL_REPEATABLE',     0x01);
-define('QUEST_FLAG_SPECIAL_EXT_COMPLETE',   0x02);
-define('QUEST_FLAG_SPECIAL_AUTO_ACCEPT',    0x04);
-define('QUEST_FLAG_SPECIAL_DUNGEON_FINDER', 0x08);
-define('QUEST_FLAG_SPECIAL_MONTHLY',        0x10);
-define('QUEST_FLAG_SPECIAL_SPELLCAST',      0x20);          // not documented in wiki! :[
+define('QUEST_FLAG_SPECIAL_REPEATABLE',      0x01);
+define('QUEST_FLAG_SPECIAL_EXT_COMPLETE',    0x02);
+define('QUEST_FLAG_SPECIAL_AUTO_ACCEPT',     0x04);
+define('QUEST_FLAG_SPECIAL_DUNGEON_FINDER',  0x08);
+define('QUEST_FLAG_SPECIAL_MONTHLY',         0x10);
+define('QUEST_FLAG_SPECIAL_SPELLCAST',       0x20);    // not documented in wiki! :[
 
 // GameObject
 define('OBJECT_DOOR',                       0);

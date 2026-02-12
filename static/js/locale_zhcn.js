@@ -4208,6 +4208,7 @@ var LANG = {
         id:                      "ID",
         classspecific:           "职业专属",
         racespecific:            "种族特定",
+        setspvpflag:             "保持PvP旗帜标记",
 
         sepgainsrewards:         "收获/奖励",
         experiencegained:        "获得的经验",
