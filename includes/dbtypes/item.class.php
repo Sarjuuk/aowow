@@ -1922,7 +1922,7 @@ class ItemListFilter extends Filter
         104 => [parent::CR_STRING,    'description',            STR_LOCALIZED                              ], // flavortext
         105 => [parent::CR_CALLBACK,  'cbDropsInInstance',      SRC_FLAG_DUNGEON_DROP,   1                 ], // dropsinnormal [heroicdungeon-any]
         106 => [parent::CR_CALLBACK,  'cbDropsInInstance',      SRC_FLAG_DUNGEON_DROP,   2                 ], // dropsinheroic [heroicdungeon-any]
-        107 => [parent::CR_NYI_PH,    null,                     1,                                         ], // effecttext [str]                 not yet parsed              ['effectsParsed_loc'.Lang::getLocale()->value, $crv]
+        107 => [parent::CR_STRING,    'effects',                STR_LOCALIZED                              ], // effecttext [str]
         109 => [parent::CR_CALLBACK,  'cbArmorBonus',           null,                    null              ], // armorbonus [op] [int]
         111 => [parent::CR_NUMERIC,   'requiredSkillRank',      NUM_CAST_INT,            true              ], // reqskillrank
         113 => [parent::CR_FLAG,      'cuFlags',                CUSTOM_HAS_SCREENSHOT                      ], // hasscreenshots

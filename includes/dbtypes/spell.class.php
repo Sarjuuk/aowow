@@ -10,6 +10,10 @@ class SpellList extends DBTypeList
 {
     use listviewHelper, sourceHelper;
 
+    public const /* int */ INTERACTIVE_NONE     = 0;
+    public const /* int */ INTERACTIVE_EMBEDDED = 1;        // parse combat ratings to %
+    public const /* int */ INTERACTIVE_FULL     = 2;        // additionaly allow links and hover tooltips
+
     public static  int      $type       = Type::SPELL;
     public static  string   $brickFile  = 'spell';
     public static  string   $dataTable  = '?_spell';
@@ -88,7 +92,7 @@ class SpellList extends DBTypeList
     private        array $spellVars   = [];
     private        array $refSpells   = [];
     private        array $tools       = [];
-    private        bool  $interactive = false;
+    private        int   $interactive = self::INTERACTIVE_EMBEDDED;
     private        int   $charLevel   = MAX_LEVEL;
     private        array $scaling     = [];
     private        array $parsedText  = [];
@@ -833,28 +837,36 @@ class SpellList extends DBTypeList
         return $effMask;
     }
 
+    private function dfnText(string $tooltip, string $text) : string
+    {
+        if ($this->interactive < self::INTERACTIVE_FULL)
+            return $text;
+
+        return sprintf(Util::$dfnString, $tooltip, $text);
+    }
+
     // description-, buff-parsing component
     private function resolveEvaluation(string $formula) : string
     {
         // see Traits in javascript locales
 
         $PlayerName     = Lang::main('name');
-        $pl    = $PL    = /* playerLevel set manually ? $this->charLevel : */ $this->interactive ? sprintf(Util::$dfnString, 'LANG.level', Lang::game('level')) : Lang::game('level');
-        $ap    = $AP    = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.atkpwr[0]',    Lang::spell('traitShort', 'atkpwr'))    : Lang::spell('traitShort', 'atkpwr');
-        $rap   = $RAP   = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.rgdatkpwr[0]', Lang::spell('traitShort', 'rgdatkpwr')) : Lang::spell('traitShort', 'rgdatkpwr');
-        $sp    = $SP    = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.splpwr[0]',    Lang::spell('traitShort', 'splpwr'))    : Lang::spell('traitShort', 'splpwr');
-        $spa   = $SPA   = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.arcsplpwr[0]', Lang::spell('traitShort', 'arcsplpwr')) : Lang::spell('traitShort', 'arcsplpwr');
-        $spfi  = $SPFI  = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.firsplpwr[0]', Lang::spell('traitShort', 'firsplpwr')) : Lang::spell('traitShort', 'firsplpwr');
-        $spfr  = $SPFR  = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.frosplpwr[0]', Lang::spell('traitShort', 'frosplpwr')) : Lang::spell('traitShort', 'frosplpwr');
-        $sph   = $SPH   = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.holsplpwr[0]', Lang::spell('traitShort', 'holsplpwr')) : Lang::spell('traitShort', 'holsplpwr');
-        $spn   = $SPN   = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.natsplpwr[0]', Lang::spell('traitShort', 'natsplpwr')) : Lang::spell('traitShort', 'natsplpwr');
-        $sps   = $SPS   = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.shasplpwr[0]', Lang::spell('traitShort', 'shasplpwr')) : Lang::spell('traitShort', 'shasplpwr');
-        $bh    = $BH    = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.splheal[0]',   Lang::spell('traitShort', 'splheal'))   : Lang::spell('traitShort', 'splheal');
-        $spi   = $SPI   = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.spi[0]',       Lang::spell('traitShort', 'spi'))       : Lang::spell('traitShort', 'spi');
-        $sta   = $STA   = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.sta[0]',       Lang::spell('traitShort', 'sta'))       : Lang::spell('traitShort', 'sta');
-        $str   = $STR   = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.str[0]',       Lang::spell('traitShort', 'str'))       : Lang::spell('traitShort', 'str');
-        $agi   = $AGI   = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.agi[0]',       Lang::spell('traitShort', 'agi'))       : Lang::spell('traitShort', 'agi');
-        $int   = $INT   = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.int[0]',       Lang::spell('traitShort', 'int'))       : Lang::spell('traitShort', 'int');
+        $pl    = $PL    = /* playerLevel set manually ? $this->charLevel : */ $this->dfnText('LANG.level', Lang::game('level'));
+        $ap    = $AP    = $this->dfnText('LANG.traits.atkpwr[0]',    Lang::spell('traitShort', 'atkpwr'));
+        $rap   = $RAP   = $this->dfnText('LANG.traits.rgdatkpwr[0]', Lang::spell('traitShort', 'rgdatkpwr'));
+        $sp    = $SP    = $this->dfnText('LANG.traits.splpwr[0]',    Lang::spell('traitShort', 'splpwr'));
+        $spa   = $SPA   = $this->dfnText('LANG.traits.arcsplpwr[0]', Lang::spell('traitShort', 'arcsplpwr'));
+        $spfi  = $SPFI  = $this->dfnText('LANG.traits.firsplpwr[0]', Lang::spell('traitShort', 'firsplpwr'));
+        $spfr  = $SPFR  = $this->dfnText('LANG.traits.frosplpwr[0]', Lang::spell('traitShort', 'frosplpwr'));
+        $sph   = $SPH   = $this->dfnText('LANG.traits.holsplpwr[0]', Lang::spell('traitShort', 'holsplpwr'));
+        $spn   = $SPN   = $this->dfnText('LANG.traits.natsplpwr[0]', Lang::spell('traitShort', 'natsplpwr'));
+        $sps   = $SPS   = $this->dfnText('LANG.traits.shasplpwr[0]', Lang::spell('traitShort', 'shasplpwr'));
+        $bh    = $BH    = $this->dfnText('LANG.traits.splheal[0]',   Lang::spell('traitShort', 'splheal'));
+        $spi   = $SPI   = $this->dfnText('LANG.traits.spi[0]',       Lang::spell('traitShort', 'spi'));
+        $sta   = $STA   = $this->dfnText('LANG.traits.sta[0]',       Lang::spell('traitShort', 'sta'));
+        $str   = $STR   = $this->dfnText('LANG.traits.str[0]',       Lang::spell('traitShort', 'str'));
+        $agi   = $AGI   = $this->dfnText('LANG.traits.agi[0]',       Lang::spell('traitShort', 'agi'));
+        $int   = $INT   = $this->dfnText('LANG.traits.int[0]',       Lang::spell('traitShort', 'int'));
 
         // only 'ron test spell', guess its %-dmg mod; no idea what bc2 might be
         $pa    = '<$PctArcane>';                            // %arcane
@@ -867,14 +879,14 @@ class SpellList extends DBTypeList
         $pbhd  = '<$PctHealDone>';                          // %heal done
         $bc2   = '<$bc2>';                                  // bc2
 
-        $HND   = $hnd   = $this->interactive ? sprintf(Util::$dfnString, '[Hands required by weapon]', 'HND') : 'HND';    // todo (med): localize this one
-        $MWS   = $mws   = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.mlespeed[0]',    'MWS') : 'MWS';
-        $mw             = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.dmgmin1[0]',     'mw')  : 'mw';
-        $MW             = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.dmgmax1[0]',     'MW')  : 'MW';
-        $mwb            = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.mledmgmin[0]',   'mwb') : 'mwb';
-        $MWB            = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.mledmgmax[0]',   'MWB') : 'MWB';
-        $rwb            = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.rgddmgmin[0]',   'rwb') : 'rwb';
-        $RWB            = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.rgddmgmax[0]',   'RWB') : 'RWB';
+        $HND   = $hnd   = $this->dfnText('[Hands required by weapon]', 'HND'); // todo (med): localize this one
+        $MWS   = $mws   = $this->dfnText('LANG.traits.mlespeed[0]',    'MWS');
+        $mw             = $this->dfnText('LANG.traits.dmgmin1[0]',     'mw');
+        $MW             = $this->dfnText('LANG.traits.dmgmax1[0]',     'MW');
+        $mwb            = $this->dfnText('LANG.traits.mledmgmin[0]',   'mwb');
+        $MWB            = $this->dfnText('LANG.traits.mledmgmax[0]',   'MWB');
+        $rwb            = $this->dfnText('LANG.traits.rgddmgmin[0]',   'rwb');
+        $RWB            = $this->dfnText('LANG.traits.rgddmgmax[0]',   'RWB');
 
         $cond  = $COND  = fn($a, $b, $c) => $a ? $b : $c;
         $eq    = $EQ    = fn($a, $b)     => $a == $b;
@@ -911,14 +923,14 @@ class SpellList extends DBTypeList
             if (!$evalable)
             {
                 // can't eval constructs because of strings present. replace constructs with strings
-                $cond  = $COND  = !$this->interactive ? 'COND'  : sprintf(Util::$dfnString, 'COND(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>, <span class=\'q1\'>c</span>)<br /> <span class=\'q1\'>a</span> ? <span class=\'q1\'>b</span> : <span class=\'q1\'>c</span>', 'COND');
-                $eq    = $EQ    = !$this->interactive ? 'EQ'    : sprintf(Util::$dfnString, 'EQ(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)<br /> <span class=\'q1\'>a</span> == <span class=\'q1\'>b</span>', 'EQ');
-                $gt    = $GT    = !$this->interactive ? 'GT'    : sprintf(Util::$dfnString, 'GT(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)<br /> <span class=\'q1\'>a</span> > <span class=\'q1\'>b</span>', 'GT');
-                $gte   = $GTE   = !$this->interactive ? 'GTE'   : sprintf(Util::$dfnString, 'GTE(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)<br /> <span class=\'q1\'>a</span> >= <span class=\'q1\'>b</span>', 'GTE');
-                $floor = $FLOOR = !$this->interactive ? 'FLOOR' : sprintf(Util::$dfnString, 'FLOOR(<span class=\'q1\'>a</span>)', 'FLOOR');
-                $min   = $MIN   = !$this->interactive ? 'MIN'   : sprintf(Util::$dfnString, 'MIN(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)', 'MIN');
-                $max   = $MAX   = !$this->interactive ? 'MAX'   : sprintf(Util::$dfnString, 'MAX(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)', 'MAX');
-                $pl    = $PL    = !$this->interactive ? 'PL'    : sprintf(Util::$dfnString, 'LANG.level', 'PL');
+                $cond  = $COND  = $this->dfnText('COND(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>, <span class=\'q1\'>c</span>)<br /> <span class=\'q1\'>a</span> ? <span class=\'q1\'>b</span> : <span class=\'q1\'>c</span>', 'COND');
+                $eq    = $EQ    = $this->dfnText('EQ(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)<br /> <span class=\'q1\'>a</span> == <span class=\'q1\'>b</span>', 'EQ');
+                $gt    = $GT    = $this->dfnText('GT(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)<br /> <span class=\'q1\'>a</span> > <span class=\'q1\'>b</span>', 'GT');
+                $gte   = $GTE   = $this->dfnText('GTE(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)<br /> <span class=\'q1\'>a</span> >= <span class=\'q1\'>b</span>', 'GTE');
+                $floor = $FLOOR = $this->dfnText('FLOOR(<span class=\'q1\'>a</span>)', 'FLOOR');
+                $min   = $MIN   = $this->dfnText('MIN(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)', 'MIN');
+                $max   = $MAX   = $this->dfnText('MAX(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)', 'MAX');
+                $pl    = $PL    = $this->dfnText('LANG.level', 'PL');
 
                 // space out operators for better readability
                 $formula = preg_replace('/(\+|-|\*|\/)/', ' \1 ', $formula);
@@ -1116,14 +1128,14 @@ class SpellList extends DBTypeList
                         $this->scaling[$this->id] = true;
                 // Aura end
 
-                if ($stats)
+                if ($stats && $this->interactive >= self::INTERACTIVE_EMBEDDED)
                 {
                     $fmtStringMin = '<!--rtg%s-->%s&nbsp;<small>(%s)</small>';
                     $statId = $stats[0];                    // could be multiple ratings in theory, but not expected to be
                 }
                 /*
                     todo: export to and solve formulas in javascript e.g.: spell 10187 - ${$42213m1*8*$<mult>} with $mult = ${${$?s31678[${1.05}][${${$?s31677[${1.04}][${${$?s31676[${1.03}][${${$?s31675[${1.02}][${${$?s31674[${1.01}][${1}]}}]}}]}}]}}]}*${$?s12953[${1.06}][${${$?s12952[${1.04}][${${$?s11151[${1.02}][${1}]}}]}}]}}
-                    else if ($this->interactive && ($modStrMin || $modStrMax))
+                    else if ($this->interactive == self::INTERACTIVE_FULL && ($modStrMin || $modStrMax))
                     {
                         $this->scaling[$this->id] = true;
                         $fmtStringMin = $modStrMin.'%s';
@@ -1163,7 +1175,7 @@ class SpellList extends DBTypeList
                     eval("\$max = $max $op $oparg;");
                 }
 
-                if ($this->interactive && ($modStrMin || $modStrMax))
+                if ($this->interactive >= self::INTERACTIVE_EMBEDDED && ($modStrMin || $modStrMax))
                 {
                     $this->scaling[$this->id] = true;
 
@@ -1210,12 +1222,12 @@ class SpellList extends DBTypeList
                         $this->scaling[$this->id] = true;
                 // Aura end
 
-                if ($stats)
+                if ($stats && $this->interactive >= self::INTERACTIVE_EMBEDDED)
                 {
                     $fmtStringMin = '<!--rtg%s-->%s&nbsp;<small>(%s)</small>';
                     $statId = $stats[0];                    // could be multiple ratings in theory, but not expected to be
                 }
-                else if (($modStrMin || $modStrMax) && $this->interactive)
+                else if (($modStrMin || $modStrMax) && $this->interactive == self::INTERACTIVE_FULL)
                 {
                     $this->scaling[$this->id] = true;
                     $fmtStringMin = $modStrMin.'%s';
@@ -1468,8 +1480,8 @@ class SpellList extends DBTypeList
         $this->charLevel   = $level;
 
         // step -1: already handled?
-        if (isset($this->parsedText[$this->id][$type][Lang::getLocale()->value][$this->charLevel][(int)$this->interactive]))
-            return $this->parsedText[$this->id][$type][Lang::getLocale()->value][$this->charLevel][(int)$this->interactive];
+        if (isset($this->parsedText[$this->id][$type][Lang::getLocale()->value][$this->charLevel][$this->interactive]))
+            return $this->parsedText[$this->id][$type][Lang::getLocale()->value][$this->charLevel][$this->interactive];
 
         // step 0: get text
         $data = $this->getField($type, true);
@@ -1575,7 +1587,7 @@ class SpellList extends DBTypeList
         $data = strtr($data, ["\r" => '', "\n" => '<br />']);
 
         // cache result
-        $this->parsedText[$this->id][$type][Lang::getLocale()->value][$this->charLevel][(int)$this->interactive] = [$data, $relSpells, $this->scaling[$this->id]];
+        $this->parsedText[$this->id][$type][Lang::getLocale()->value][$this->charLevel][$this->interactive] = [$data, $relSpells, $this->scaling[$this->id]];
 
         return [$data, $relSpells, $this->scaling[$this->id]];
     }
@@ -1621,10 +1633,8 @@ class SpellList extends DBTypeList
             }
             [$formOutVal, $formOutStr, $statId] = $this->resolveFormulaString($formOutStr, $formPrecision ?: ($topLevel ? 0 : 10));
 
-            if ($statId && Util::checkNumeric($formOutVal) && $this->interactive)
-                $resolved = sprintf($formOutStr, $statId, abs($formOutVal), sprintf(Util::$setRatingLevelString, $this->charLevel, $statId, abs($formOutVal), Util::setRatingLevel($this->charLevel, $statId, abs($formOutVal))));
-            else if ($statId && Util::checkNumeric($formOutVal))
-                $resolved = sprintf($formOutStr, $statId, abs($formOutVal), Util::setRatingLevel($this->charLevel, $statId, abs($formOutVal)));
+            if ($statId && Util::checkNumeric($formOutVal))
+                $resolved = sprintf($formOutStr, $statId, abs($formOutVal), Util::setRatingLevel($this->charLevel, $statId, abs($formOutVal), $this->interactive == self::INTERACTIVE_FULL));
             else
                 $resolved = sprintf($formOutStr, Util::checkNumeric($formOutVal) ? abs($formOutVal) : $formOutVal);
 
@@ -1661,10 +1671,8 @@ class SpellList extends DBTypeList
             $resolved = is_numeric($minPoints) ? abs($minPoints) : $minPoints;
             if (isset($fmtStringMin))
             {
-                if (isset($statId) && $this->interactive)
-                    $resolved = sprintf($fmtStringMin, $statId, abs($minPoints), sprintf(Util::$setRatingLevelString, $this->charLevel, $statId, abs($minPoints), Util::setRatingLevel($this->charLevel, $statId, abs($minPoints))));
-                else if (isset($statId))
-                    $resolved = sprintf($fmtStringMin, $statId, abs($minPoints), Util::setRatingLevel($this->charLevel, $statId, abs($minPoints)));
+                if (isset($statId))
+                    $resolved = sprintf($fmtStringMin, $statId, abs($minPoints), Util::setRatingLevel($this->charLevel, $statId, abs($minPoints), $this->interactive == self::INTERACTIVE_FULL));
                 else
                     $resolved = sprintf($fmtStringMin, $resolved);
             }
@@ -1799,7 +1807,7 @@ class SpellList extends DBTypeList
         return $data;
     }
 
-    public function renderBuff($level = MAX_LEVEL, $interactive = false, ?array &$buffSpells = []) : ?string
+    public function renderBuff(int $level = MAX_LEVEL, int $interactive = self::INTERACTIVE_EMBEDDED, ?array &$buffSpells = []) : ?string
     {
         $buffSpells = [];
 
@@ -1848,7 +1856,7 @@ class SpellList extends DBTypeList
         return $x;
     }
 
-    public function renderTooltip(?int $level = MAX_LEVEL, ?bool $interactive = false, ?array &$ttSpells = []) : ?string
+    public function renderTooltip(int $level = MAX_LEVEL, int $interactive = self::INTERACTIVE_EMBEDDED, ?array &$ttSpells = []) : ?string
     {
         $ttSpells = [];
 

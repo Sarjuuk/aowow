@@ -1713,7 +1713,7 @@ $lang = array(
         ),
         'duration'      => array(
             "jusqu’à annulation",
-            "%.2G sec.",
+            "%.2G sec",
             "%.2G min",
             "%.2G h",
             "%.2G |4jour:jours;"

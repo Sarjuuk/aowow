@@ -19,9 +19,9 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
     protected $dbcSourceFiles     = ['gemproperties', 'itemdisplayinfo', 'spell', 'glyphproperties', 'durabilityquality', 'durabilitycosts'];
     protected $worldDependency    = ['item_template', 'item_template_locale', 'spell_group', 'game_event'];
-    protected $setupAfter         = [['icons'], []];
+    protected $setupAfter         = [['icons', 'spell', 'spellvariables', 'spellrange'], []];
 
-    private $skill2cat = array(
+    private const /* array */ SKILL_CATG = array(
         SKILL_INSCRIPTION  => 11,
         SKILL_FISHING      =>  9,
         SKILL_MINING       => 12,
@@ -118,7 +118,8 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                       0 AS dropDownSoundId,
                       0 AS sheatheSoundId,
                       0 AS unsheatheSoundId,
-                      flagsCustom
+                      flagsCustom,
+                      null AS effects_loc0, null AS effects_loc2, null AS effects_loc3, null AS effects_loc4, null AS effects_loc6, null AS effects_loc8
             FROM      item_template it
             LEFT JOIN item_template_locale itl2 ON it.entry = itl2.ID AND itl2.locale = "frFR"
             LEFT JOIN item_template_locale itl3 ON it.entry = itl3.ID AND itl3.locale = "deDE"
@@ -136,11 +137,13 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         $i = 0;
         while ($items = DB::World()->select($baseQuery, $ids ?: DBSIMPLE_SKIP, CLISetup::SQL_BATCH * $i, CLISetup::SQL_BATCH))
         {
-            CLI::write(' * batch #' . ++$i . ' (' . count($items) . ')', CLI::LOG_BLANK, true, true);
+            CLI::write(' * batch #' . ++$i . ' (' . count($items) . ')', tmpRow: true);
 
             foreach ($items as $item)
                 DB::Aowow()->query('INSERT INTO ?_items VALUES (?a)', array_values($item));
         }
+
+        CLI::write('[items] - applying misc data & fixes');
 
         // merge with gemProperties
         DB::Aowow()->query('UPDATE ?_items i, dbc_gemproperties gp SET i.gemEnchantmentId = gp.enchantmentId, i.gemColorMask = gp.colorMask WHERE i.gemColorMask = gp.id');
@@ -205,7 +208,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         DB::Aowow()->query('UPDATE ?_items i, dbc_spell s SET i.class = 0, i.subClass = 6 WHERE s.id = i.spellId1 AND s.effect1Id = 53 AND i.classBak = 12');
 
         // move some generic recipes into appropriate sub-categories
-        foreach ($this->skill2cat as $skill => $cat)
+        foreach (self::SKILL_CATG as $skill => $cat)
             DB::Aowow()->query('UPDATE ?_items SET subClass = ?d WHERE classBak = 9 AND subClassBak = 0 AND requiredSkill = ?d', $cat, $skill);
 
         // assign slot from onUse spell to item (todo (med): handle multi slot enchantments (like armor kits))
@@ -261,6 +264,58 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         );
         foreach ($checks as [$slots, $subclasses])
             DB::Aowow()->query('UPDATE ?_items SET `cuFlags` = `cuFlags` | ?d WHERE `class`= ?d AND `slotBak` IN (?a) AND `subClass` NOT IN (?a)', CUSTOM_EXCLUDE_FOR_LISTVIEW, ITEM_CLASS_WEAPON, $slots, $subclasses);
+
+
+        CLI::write('[items] - collecting spell descriptions');
+        CLI::write(' * fetching', tmpRow: true);
+
+        $itemSpellData = DB::Aowow()->select(
+           'SELECT `id` AS "0", `spellId1` AS "1" FROM ?_items WHERE `spellId1` > 0 UNION
+            SELECT `id` AS "0", `spellId2` AS "1" FROM ?_items WHERE `spellId2` > 0 UNION
+            SELECT `id` AS "0", `spellId3` AS "1" FROM ?_items WHERE `spellId3` > 0 UNION
+            SELECT `id` AS "0", `spellId4` AS "1" FROM ?_items WHERE `spellId4` > 0 UNION
+            SELECT `id` AS "0", `spellId5` AS "1" FROM ?_items WHERE `spellId5` > 0'
+        );
+
+        $itemSpells = new SpellList(array(['id', array_column($itemSpellData, 1)]), ['interactive' => SpellList::INTERACTIVE_NONE]);
+        $items = DB::Aowow()->select('SELECT `id` AS ARRAY_KEY, `spellId1`, `spellId2`, `spellId3`, `spellId4`, `spellId5` FROM ?_items WHERE `id` IN (?a)', array_column($itemSpellData, 0));
+        if (!$itemSpells->error)
+        {
+            $i      = 0;
+            $total  = count($items) * count(CLISetup::$locales);
+            $update = [];
+            foreach (CLISetup::$locales as $locId => $loc)
+            {
+                Lang::load($loc);
+
+                foreach ($items as $itemId => $spells)
+                {
+                    CLI::write(' * applying ' . str_pad(++$i, strlen($total), pad_type: STR_PAD_LEFT) . ' / ' . $total . str_pad('('.number_format(100 * $i / $total, 1).'%)', 8, pad_type: STR_PAD_LEFT), tmpRow: true);
+
+                    foreach ($spells as $spellId)
+                    {
+                        if (!$itemSpells->getEntry($spellId))
+                            continue;
+
+                        if ($_ = $itemSpells->parseText('description'))
+                        {
+                            if (!isset($update[$itemId]['effects_loc'.$locId]))
+                                $update[$itemId]['effects_loc'.$locId] = '';
+
+                            $update[$itemId]['effects_loc'.$locId] .= $_[0]."\n";
+                        }
+                    }
+                }
+            }
+
+            $i     = 0;
+            $total = count($update);
+            foreach ($update as $itemId => $upd)
+            {
+                CLI::write(' * writing ' . str_pad(++$i, strlen($total), pad_type: STR_PAD_LEFT) . ' / ' . $total . str_pad('('.number_format(100 * $i / $total, 1).'%)', 8, pad_type: STR_PAD_LEFT), tmpRow: true);
+                DB::Aowow()->query('UPDATE ?_items SET ?a WHERE `id` = ?d', $upd, $itemId);
+            }
+        }
 
         $this->reapplyCCFlags('items', Type::ITEM);
 

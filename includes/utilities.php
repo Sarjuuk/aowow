@@ -315,7 +315,7 @@ abstract class Util
     }
 
     // for item and spells
-    public static function setRatingLevel(int $level, int $statId, int $val) : string
+    public static function setRatingLevel(int $level, int $statId, int $val, bool $interactive = false) : string
     {
         if (in_array($statId, [Stat::DEFENSE_RTG, Stat::DODGE_RTG, Stat::PARRY_RTG, Stat::BLOCK_RTG, Stat::RESILIENCE_RTG]) && $level < 34)
             $level = 34;
@@ -341,7 +341,9 @@ abstract class Util
         if (!in_array($statId, [Stat::DEFENSE_RTG, Stat::EXPERTISE_RTG]))
             $result .= '%';
 
-        return Lang::item('ratingString', [$statId, $result, $level]);
+        $result = Lang::item('ratingString', [$statId, $result, $level]);
+
+        return $interactive ? sprintf(self::$setRatingLevelString, $level, $statId, $val, $result) : $result;
     }
 
     // default ucFirst doesn't convert UTF-8 chars (php 8.4 finally implemented this .. see ya in 2027)
