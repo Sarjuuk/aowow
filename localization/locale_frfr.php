@@ -502,7 +502,7 @@ $lang = array(
             UNIT_FLAG_IMMUNE_TO_NPC         => 'Immune to creatures',
             UNIT_FLAG_LOOTING               => 'Loot animation',
             UNIT_FLAG_PET_IN_COMBAT         => 'Pet in combat',
-            UNIT_FLAG_PVP                   => 'PvP',
+            UNIT_FLAG_PVP_ENABLING          => 'PvP',
             UNIT_FLAG_SILENCED              => 'Silenced',
             UNIT_FLAG_CANNOT_SWIM           => 'Cannot swim',
             UNIT_FLAG_UNK_15                => 'UNK-15 (can only swim)',
@@ -575,11 +575,11 @@ $lang = array(
                 UNIT_VIS_FLAGS_UNK5        => 'UNK-5'
             ),
 /*idx:3*/   array(
-                UNIT_BYTE1_ANIM_TIER_GROUND    => 'ground animations',
-                UNIT_BYTE1_ANIM_TIER_SWIM      => 'swimming animations',
-                UNIT_BYTE1_ANIM_TIER_HOVER     => 'hovering animations',
-                UNIT_BYTE1_ANIM_TIER_FLY       => 'flying animations',
-                UNIT_BYTE1_ANIM_TIER_SUMBERGED => 'submerged animations'
+                UNIT_ANIM_TIER_GROUND    => 'ground animations',
+                UNIT_ANIM_TIER_SWIM      => 'swimming animations',
+                UNIT_ANIM_TIER_HOVER     => 'hovering animations',
+                UNIT_ANIM_TIER_FLY       => 'flying animations',
+                UNIT_ANIM_TIER_SUMBERGED => 'submerged animations'
             ),
             'bytesIdx' => ['StandState', null, 'VisFlags', 'AnimTier'],
             'valueUNK' => '[span class=q10]unhandled value [b class=q1]%d[/b] provided for UnitFieldBytes1 on offset [b class=q1]%d[/b][/span]',

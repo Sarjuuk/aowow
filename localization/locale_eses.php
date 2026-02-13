@@ -502,7 +502,7 @@ $lang = array(
             UNIT_FLAG_IMMUNE_TO_NPC         => 'Inmune a criaturas',
             UNIT_FLAG_LOOTING               => 'Animación de botín',
             UNIT_FLAG_PET_IN_COMBAT         => 'Mascota en combate',
-            UNIT_FLAG_PVP                   => 'JcJ',
+            UNIT_FLAG_PVP_ENABLING          => 'JcJ',
             UNIT_FLAG_SILENCED              => 'Silenciado',
             UNIT_FLAG_CANNOT_SWIM           => 'No puede nadar',
             UNIT_FLAG_UNK_15                => 'UNK-15 (solo puede nadar)',
@@ -575,11 +575,11 @@ $lang = array(
                 UNIT_VIS_FLAGS_UNK5        => 'UNK-5'
             ),
 /*idx:3*/   array(
-                UNIT_BYTE1_ANIM_TIER_GROUND    => 'animaciones en tierra',
-                UNIT_BYTE1_ANIM_TIER_SWIM      => 'animaciones de nado',
-                UNIT_BYTE1_ANIM_TIER_HOVER     => 'animaciones de flotar',
-                UNIT_BYTE1_ANIM_TIER_FLY       => 'animaciones de vuelo',
-                UNIT_BYTE1_ANIM_TIER_SUMBERGED => 'animaciones sumergidas'
+                UNIT_ANIM_TIER_GROUND    => 'animaciones en tierra',
+                UNIT_ANIM_TIER_SWIM      => 'animaciones de nado',
+                UNIT_ANIM_TIER_HOVER     => 'animaciones de flotar',
+                UNIT_ANIM_TIER_FLY       => 'animaciones de vuelo',
+                UNIT_ANIM_TIER_SUMBERGED => 'animaciones sumergidas'
             ),
             'bytesIdx' => ['StandState', null, 'VisFlags', 'AnimTier'],
             'valueUNK' => '[span class=q10]valor no manejado [b class=q1]%d[/b] proporcionado para UnitFieldBytes1 en el desplazamiento [b class=q1]%d[/b][/span]',

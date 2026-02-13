@@ -718,7 +718,7 @@ define('UNIT_FLAG_IMMUNE_TO_PC',            0x00000100);    // disables combat/a
 define('UNIT_FLAG_IMMUNE_TO_NPC',           0x00000200);    // disables combat/assistance with NonPlayerCharacters (NPC)
 define('UNIT_FLAG_LOOTING',                 0x00000400);    // Loot animation
 define('UNIT_FLAG_PET_IN_COMBAT',           0x00000800);    // In combat? 2.0.8
-define('UNIT_FLAG_PVP',                     0x00001000);    // Changed in 3.0.3
+define('UNIT_FLAG_PVP_ENABLING',            0x00001000);    // Changed in 3.0.3
 define('UNIT_FLAG_SILENCED',                0x00002000);    // Can't cast spells
 define('UNIT_FLAG_CANNOT_SWIM',             0x00004000);    // 2.0.8
 define('UNIT_FLAG_UNK_15',                  0x00008000);    // Only Swim ('OnlySwim' from UnitFlags.cs in WPP)
@@ -780,11 +780,16 @@ define('UNIT_VIS_FLAGS_UNK4',             0x08);
 define('UNIT_VIS_FLAGS_UNK5',             0x10);
 
 // UNIT_FIELD_BYTES_1 - idx 3 (UnitAnimTier)
-define('UNIT_BYTE1_ANIM_TIER_GROUND',    0);
-define('UNIT_BYTE1_ANIM_TIER_SWIM',      1);
-define('UNIT_BYTE1_ANIM_TIER_HOVER',     2);
-define('UNIT_BYTE1_ANIM_TIER_FLY',       3);
-define('UNIT_BYTE1_ANIM_TIER_SUMBERGED', 4);
+define('UNIT_ANIM_TIER_GROUND',    0);
+define('UNIT_ANIM_TIER_SWIM',      1);
+define('UNIT_ANIM_TIER_HOVER',     2);
+define('UNIT_ANIM_TIER_FLY',       3);
+define('UNIT_ANIM_TIER_SUMBERGED', 4);
+
+// UNIT_FIELD_BYTES_2 - idx 1 (UnitPvPStateFlags)
+define('UNIT_PVPSTATE_FLAG_PVP',       0x01);
+define('UNIT_PVPSTATE_FLAG_FFA_PVP',   0x04);               // not expected to be on NPCs, buuuut...
+define('UNIT_PVPSTATE_FLAG_SANCTUARY', 0x08);
 
 define('UNIT_DYNFLAG_LOOTABLE',                  0x01);     //
 define('UNIT_DYNFLAG_TRACK_UNIT',                0x02);     // Creature's location will be seen as a small dot in the minimap
