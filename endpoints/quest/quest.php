@@ -1297,7 +1297,8 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         $chain = array(array($makeSeriesItem($end)));       // series / step / quest
 
         $prevStepIds = [$lastQuestId ?: $this->typeId];
-        while ($prevQuests = DB::Aowow()->select('SELECT `id`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8`, `reqRaceMask` FROM ?_quests WHERE `nextQuestIdChain` IN (?a) AND `id` <> `nextQuestIdChain`', $prevStepIds))
+        while ($prevQuests = DB::Aowow()->select('SELECT `id`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8`, `reqRaceMask` FROM ?_quests WHERE `nextQuestIdChain` IN (?a) AND `id` <> `nextQuestIdChain`{ AND (`cuFlags` & ?d) = 0}',
+            $prevStepIds, User::isInGroup(U_GROUP_STAFF) ? CUSTOM_EXCLUDE_FOR_LISTVIEW : DBSIMPLE_SKIP))
         {
             $step = [];
             foreach ($prevQuests as $pQuest)
