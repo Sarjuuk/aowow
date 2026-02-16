@@ -6,6 +6,21 @@ if (PHP_SAPI !== 'cli')
 if (PHP_SAPI === 'cli' && getcwd().DIRECTORY_SEPARATOR.'aowow' != __FILE__)
     die("this script must be run from the aowow root directory\n");
 
+// file definitions for setup
+spl_autoload_register(function (string $class) : void
+{
+    if ($i = strrpos($class, '\\'))
+        $class = substr($class, $i + 1);
+
+    if (preg_match('/[^\w]/i', $class))
+        return;
+
+    if (file_exists('includes/setup/files/'.strtolower($class).'.class.php'))
+        require_once 'includes/setup/files/'.strtolower($class).'.class.php';
+    else if (file_exists('includes/setup/modelviewer/datatypes/'.strtolower($class).'.class.php'))
+        require_once 'includes/setup/modelviewer/datatypes/'.strtolower($class).'.class.php';
+});
+
 require_once 'includes/kernel.php';
 require_once 'includes/setup/cli.class.php';
 require_once 'includes/setup/timer.class.php';
