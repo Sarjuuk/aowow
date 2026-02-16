@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-abstract class Primitive
+abstract class Primitive implements IDataType
 {
     public const int    SIZE     = 1;
     public const string PACK_FMT = 'x';
