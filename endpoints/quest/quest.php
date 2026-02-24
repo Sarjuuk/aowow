@@ -160,7 +160,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
             $infobox[] = Lang::game('type').implode(' ', $_);
 
         // side
-        $infobox[] = Lang::main('side') . match ($this->subject->getField('faction'))
+        $infobox[] = Lang::main('side') . match ($_side)
         {
             SIDE_ALLIANCE => '[span class=icon-alliance]'.Lang::game('si', SIDE_ALLIANCE).'[/span]',
             SIDE_HORDE    => '[span class=icon-horde]'.Lang::game('si', SIDE_HORDE).'[/span]',
@@ -169,7 +169,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
 
         // races
         $jsg = [];
-        if ($_ = Lang::getRaceString($this->subject->getField('reqRaceMask'), $jsg, Lang::FMT_MARKUP))
+        if (($_ = Lang::getRaceString($this->subject->getField('reqRaceMask'), $jsg, Lang::FMT_MARKUP)) && $jsg)
         {
             $this->extendGlobalIds(Type::CHR_RACE, ...$jsg);
             $t = count($jsg) == 1 ? Lang::game('race') : Lang::game('races');
