@@ -723,7 +723,7 @@ abstract class Util
     /* file handling */
     /*****************/
 
-    public static function writeFile($file, $content)
+    public static function writeFile(string $file, string $content) : bool
     {
         $success = false;
 
