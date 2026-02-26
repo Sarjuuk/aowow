@@ -432,7 +432,7 @@ class CreatureListFilter extends Filter
         {
             if ($eventIds = DB::Aowow()->selectCol('SELECT `id` FROM ::events WHERE `holidayId` <> 0'))
                 if ($cGuids   = DB::World()->selectCol('SELECT DISTINCT `guid` FROM game_event_creature WHERE `eventEntry` IN %in', $eventIds))
-                    return ['s.guid', $cGuids, '!'];
+                    return [DB::OR, ['s.guid', $cGuids, '!'], ['s.guid', null]];
 
             return [0];
         }

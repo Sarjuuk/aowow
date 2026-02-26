@@ -228,7 +228,7 @@ class GameObjectListFilter extends Filter
         {
             if ($eventIds = DB::Aowow()->selectCol('SELECT `id` FROM ::events WHERE `holidayId` <> 0'))
                 if ($goGuids  = DB::World()->selectCol('SELECT DISTINCT `guid` FROM game_event_gameobject WHERE `eventEntry` IN %in', $eventIds))
-                    return ['s.guid', $goGuids, '!'];
+                    return [DB::OR, ['s.guid', $goGuids, '!'], ['s.guid', null]];
 
             return [0];
         }
