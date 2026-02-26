@@ -473,7 +473,7 @@ $WH.sp = function(z) {
 // Set cookie
 $WH.sc = function(z, y, x, w, v) {
     var a = new Date();
-    var b = z + "=" + encodeURI(x) + "; ";
+    var b = z + "=" + encodeURIComponent(x) + "; ";
 
     a.setDate(a.getDate() + y);
     b += "expires=" + a.toUTCString() + "; ";
@@ -506,7 +506,7 @@ $WH.dc = function(z) {
 // Get all cookies (return value is cached)
 $WH.gc = function(z) {
     if ($WH.gc.I == null) { // Initialize cookie table
-        var words = decodeURI(document.cookie).split("; ");
+        var words = decodeURIComponent(document.cookie).split("; ");
 
         $WH.gc.C = {};
         for (var i = 0, len = words.length; i < len; ++i) {
