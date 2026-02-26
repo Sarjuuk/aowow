@@ -34,7 +34,7 @@ class AccountExcludeResponse extends TextResponse
         else if ($this->_post['reset'] == 1)                // defaults to unavailable
             $this->resetExcludes();
 
-        else if ($this->_post['groups'])                    // exclude by group mask
+        else if ($this->_post['groups'] !== null)           // exclude by group mask
             $this->updateGroups();
     }
 
