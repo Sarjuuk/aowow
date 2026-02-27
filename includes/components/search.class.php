@@ -118,11 +118,7 @@ class Search
 
                 // note: a fulltext search purely from exclude tokens will return no result
                 foreach ($fulltext as $ft)
-                {
-                    // cant have trailing/leading dashes. FT confuses them for additional modifiers and dies with a syntax error
-                    // would be an issue for all modifiers, but Filter::PATTERN_FT only allows for - at this point
-                    $this->fulltext[] = ($ex ? '-' : '+') . preg_replace('/^-+|-+$/', '', $ft) . '*';
-                }
+                    $this->fulltext[] = ($ex ? '-' : '+') . $ft . '*';
             }
             else
                 $this->invalid[] = $raw;
@@ -181,10 +177,9 @@ class Search
         $qry = [];
         if ($this->fulltext)
             $qry = array_map(fn($x) => [$x, $this->fulltext, 'MATCH'], $fields);
-
-        $strBak = trim($this->query);
-        if (mb_strlen($strBak) > 2 || Lang::getLocale()->isLogographic())
-            $qry = array_merge($qry, array_map(fn($x) => [$x, $strBak], $fields));
+        else if ($strBak = trim($this->query))
+            if (mb_strlen($strBak) > 2 || Lang::getLocale()->isLogographic())
+                $qry = array_map(fn($x) => [$x, $strBak], $fields);
 
         // single cnd?
         if (count($qry) > 1)

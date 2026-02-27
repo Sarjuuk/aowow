@@ -65,7 +65,7 @@ abstract class Filter
     protected const PATTERN_CRV   = '/[\p{C};:%\\\\]/ui';
     protected const PATTERN_INT   = '/\D/';
     public    const PATTERN_PARAM = '/^[\p{L}\p{Sm} \d\p{P}]+$/ui';
-    public    const PATTERN_FT    = '/[^[:alpha:] \d_-]/iu'; // +-*<>@()~" have special meaning; ' seems to fuck up the search; other irregular cases?
+    public    const PATTERN_FT    = '/[^[:alpha:] \d_]/iu'; // +-*<>@()~" have special meaning; ' seems to fuck up the search; other irregular cases?
 
     protected const ENUM_FACTION       = array(  469,  1037,  1106,   529,  1012,    87,    21,   910,   609,   942,   909,   530,    69,   577,   930,  1068,  1104,   729,   369,    92,
                                                   54,   946,    67,  1052,   749,    47,   989,  1090,  1098,   978,  1011,    93,  1015,  1038,    76,   470,   349,  1031,  1077,   809,
@@ -629,11 +629,7 @@ abstract class Filter
 
                 // note: a fulltext search purely from exclude tokens will return no result
                 foreach ($fulltext as $ft)
-                {
-                    // cant have trailing/leading dashes. FT confuses them for additional modifiers and dies with a syntax error
-                    // would be an issue for all modifiers, but Filter::PATTERN_FT only allows for - at this point
-                    $this->ftTokens[$field][] = ($ex ? '-' : '+') . preg_replace('/^-+|-+$/', '', $ft) . '*';
-                }
+                    $this->ftTokens[$field][] = ($ex ? '-' : '+') . $ft . '*';
             }
         }
 
