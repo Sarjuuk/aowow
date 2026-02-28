@@ -12,8 +12,8 @@
 <body class="home<?=($this->user::isPremium() ? ' premium-logo' : ''); ?>">
     <div id="layers"></div>
 <?php
-if ($this->homeTitle):
-    echo "    <script>document.title = '".$this->homeTitle."';</script>\n";
+if (!empty($this->homeTitle) && is_string($this->homeTitle)):
+    echo "    <script>document.title = " . json_encode($this->homeTitle) . ";</script>\n";
 endif;
 
 if ($this->altHomeLogo):
