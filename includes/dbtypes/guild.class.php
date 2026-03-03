@@ -114,7 +114,7 @@ class GuildListFilter extends Filter
 
         // name [str]
         if ($_v['na'])
-            if ($_ = $this->buildLikeLookup(['na' => 'g.name'], $_v['ex'] == 'on'))
+            if ($_ = $this->buildLikeLookup([['na', 'g.name']], $_v['ex'] == 'on'))
                 $parts[] = $_;
 
         // side [list]

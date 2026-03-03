@@ -102,7 +102,6 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             LIMIT     %i, %i';
 
         DB::Aowow()->qry('TRUNCATE ::creature');
-        DB::Aowow()->qry('SET SESSION innodb_ft_enable_stopword = OFF');
 
         $i = 0;
         while ($npcs = DB::World()->selectAssoc($baseQuery, NPC_CU_INSTANCE_BOSS, CLISetup::SQL_BATCH * $i, CLISetup::SQL_BATCH))

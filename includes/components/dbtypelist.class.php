@@ -144,6 +144,9 @@ abstract class DBTypeList
         if ($h = array_filter(array_column($this->queryOpts, 'h')))
             $this->queryBase .= ' HAVING '.implode(' AND ', $h);
 
+        // fill in locale
+        $this->queryBase = str_replace(['DB_LOC_I', 'DB_LOC_S'], [Lang::getLocale()->value, '"'.Lang::getLocale()->json().'"'], $this->queryBase);
+
         // without applied LIMIT and ORDER
         if ($calcTotal)
             $totalQuery = $this->queryBase;
@@ -227,12 +230,12 @@ abstract class DBTypeList
 
         $literal = false;
 
-        if (is_array($expOrField))
+        if (is_array($expOrField) && $op != 'MATCH')
             $field = $this->resolveCondition($expOrField, $supLink);
         else
         {
             // basic formulas ex: [((minGold + maxGold) / 2), 0, '>']
-            if (preg_match('/^\([\s\+\-\*\/\w\(\)\.]+\)$/i', strtr($expOrField, ['`' => '', '´' => '', '--' => ''])))
+            if (is_string($expOrField) && preg_match('/^\([\s\+\-\*\/\w\(\)\.]+\)$/i', strtr($expOrField, ['`' => '', '´' => '', '--' => ''])))
             {
                 $field   = preg_replace_callback('/[\w\]*\.?[\w]+/i', $this->setColPrefix(...), $expOrField);
                 $literal = true;
@@ -258,21 +261,20 @@ abstract class DBTypeList
         if (!$expr)
             return null;
 
-        // [[flags, 0x4, '&'], 0] -> (`flags` & 4) = 0
-        if (is_array($field))                               // $field is expression
-            return [...$field, $expr, $value];
         if ($op == 'MATCH' && gettype($value) == 'array')
             return ['MATCH(%n)', $field, 'AGAINST(%s IN BOOLEAN MODE)', DB::Aowow()->translate($value)];
         if (($op == 'LIKE' || $op == 'NOT LIKE') && gettype($value) == 'string')
             return ['%n', $field, $op, '%~like~', $value];
+        if (is_array($field))                               // $field is expression: [[flags, 0x4, '&'], 0] -> (`flags` & 4) = 0
+            return [...$field, $expr, $value];
 
         return [$literal ? '%SQL' : '%n', $field, $expr, $value];
     }
 
-    private function setColPrefix(mixed $colName) : ?string
+    private function setColPrefix(mixed $colName) : null|string|array
     {
         if (is_array($colName))
-            $colName = $colName[0];
+            return array_filter(array_map([$this, 'setColPrefix'], $colName)) ?: null;
 
         // numeric allows for formulas e.g. (1 < 3)
         if (Util::checkNumeric($colName))

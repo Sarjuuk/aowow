@@ -199,7 +199,6 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
 
         DB::Aowow()->qry('TRUNCATE ::spell');
-        DB::Aowow()->qry('SET SESSION innodb_ft_enable_stopword = OFF');
 
         // merge serverside spells into aowow_spell
         $lastMax = 0;

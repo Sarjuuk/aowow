@@ -105,6 +105,7 @@ class SpellList extends DBTypeList
     protected string $queryBase = 'SELECT s.*, s.`id` AS ARRAY_KEY FROM ::spell s';
     protected array  $queryOpts = array(
                         's'   => [['src', 'sr', 'ic', 'ica']],  //  6: Type::SPELL
+                        'nml' => ['j' => ['::spell_search nml ON nml.`id` = s.`id` AND nml.`locale` = DB_LOC_I']],
                         'ic'  => ['j' => ['::icons ic  ON ic.`id`  = s.`iconId`',    true], 's' => ', ic.`name` AS "iconString"'],
                         'ica' => ['j' => ['::icons ica ON ica.`id` = s.`iconIdAlt`', true], 's' => ', ica.`name` AS "iconStringAlt"'],
                         'sr'  => ['j' => ['::spellrange sr ON sr.`id` = s.`rangeId`'], 's' => ', sr.`rangeMinHostile`, sr.`rangeMinFriend`, sr.`rangeMaxHostile`, sr.`rangeMaxFriend`, sr.`name_loc0` AS "rangeText_loc0", sr.`name_loc2` AS "rangeText_loc2", sr.`name_loc3` AS "rangeText_loc3", sr.`name_loc4` AS "rangeText_loc4", sr.`name_loc6` AS "rangeText_loc6", sr.`name_loc8` AS "rangeText_loc8"'],
@@ -2603,18 +2604,22 @@ class SpellListFilter extends Filter
         $parts = [];
         $_v    = &$this->values;
 
-        //string (extended)
+        // string (extended)
         if ($_v['na'])
         {
-            if ($_v['ex'] == 'on')
-                if ($_ = $this->buildLikeLookup(['na' => 'buff_loc'.Lang::getLocale()->value, 'na' => 'description_loc'.Lang::getLocale()->value]))
-                    $parts[] = $_;
+            $f = [['na', ['nml.nName', 'nml.nBuff', 'nml.nDescription']]];
+            if ($_v['ex'] != 'on')
+                $f = [['na', 'nml.nName']];
 
-            if ($_ = $this->buildMatchLookup(['na' => 'name_loc'.Lang::getLocale()->value]))
+            if ($_ = $this->buildMatchLookup($f))
+                $parts[] = $_;
+            else
             {
-                if ($parts)
-                    $parts[0][] = $_;
-                else
+                $f = [['na', 'name_loc'.Lang::getLocale()->value], ['na', 'buff_loc'.Lang::getLocale()->value], ['na', 'description_loc'.Lang::getLocale()->value]];
+                if ($_v['ex'] != 'on')
+                    $f = [$f[0]];
+
+                if ($_ = $this->buildLikeLookup($f))
                     $parts[] = $_;
             }
         }

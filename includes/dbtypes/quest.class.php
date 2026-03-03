@@ -18,6 +18,7 @@ class QuestList extends DBTypeList
     protected string $queryBase = 'SELECT q.*, q.`id` AS ARRAY_KEY FROM ::quests q';
     protected array  $queryOpts = array(
                         'q'   => [],
+                        'nml' => ['j' => '::quests_search nml ON nml.`id` = q.`id` AND nml.`locale` = DB_LOC_I'],
                         'rsc' => ['j' => '::spell rsc ON q.`rewardSpellCast` = rsc.`id`'], // limit rewardSpellCasts
                         'qse' => ['j' => '::quests_startend qse ON q.`id` = qse.`questId`', 's' => ', qse.`method`'], // groupConcat..?
                         'e'   => ['j' => ['::events e ON e.`id` = q.`eventId`', true], 's' => ', e.`holidayId`']
@@ -506,15 +507,19 @@ class QuestListFilter extends Filter
         // name
         if ($_v['na'])
         {
-            if ($_v['ex'] == 'on')
-                if ($_ = $this->buildLikeLookup(['na' => 'objectives_loc'.Lang::getLocale()->value, 'na' => 'details_loc'.Lang::getLocale()->value]))
-                    $parts[] = $_;
+            $f = [['na', ['nml.nName', 'nml.nObjectives', 'nml.nDetails']]];
+            if ($_v['ex'] != 'on')
+                $f = [['na', 'nml.nName']];
 
-            if ($_ = $this->buildMatchLookup(['na' => 'name_loc'.Lang::getLocale()->value]))
+            if ($_ = $this->buildMatchLookup($f))
+                $parts[] = $_;
+            else
             {
-                if ($parts)
-                    $parts[0][] = $_;
-                else
+                $f = [['na', 'name_loc'.Lang::getLocale()->value], ['na', 'objectives_loc'.Lang::getLocale()->value], ['na', 'details_loc'.Lang::getLocale()->value]];
+                if ($_v['ex'] != 'on')
+                    $f = [$f[0]];
+
+                if ($_ = $this->buildLikeLookup($f))
                     $parts[] = $_;
             }
         }

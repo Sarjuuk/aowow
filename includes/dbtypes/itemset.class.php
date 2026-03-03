@@ -199,7 +199,7 @@ class ItemsetListFilter extends Filter
 
         // name [str]
         if ($_v['na'])
-            if ($_ = $this->buildLikeLookup(['na' => 'name_loc'.Lang::getLocale()->value]))
+            if ($_ = $this->buildLikeLookup([['na', 'name_loc'.Lang::getLocale()->value]]))
                 $parts[] = $_;
 
         // quality [enum]

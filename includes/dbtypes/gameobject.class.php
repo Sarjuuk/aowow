@@ -17,6 +17,7 @@ class GameObjectList extends DBTypeList
     protected string $queryBase = 'SELECT o.*, o.`id` AS ARRAY_KEY FROM ::objects o';
     protected array  $queryOpts = array(
                         'o'   => [['ft', 'qse']],
+                        'nml' => ['j' => ['::objects_search nml ON nml.`id` = o.`id` AND nml.`locale` = DB_LOC_I']],
                         'ft'  => ['j' => ['::factiontemplate ft ON ft.`id` = o.`faction`', true], 's' => ', ft.`factionId`, IFNULL(ft.`A`, 0) AS "A", IFNULL(ft.`H`, 0) AS "H"'],
                         'qse' => ['j' => ['::quests_startend qse ON qse.`type` = 2 AND qse.`typeId` = o.id', true], 's' => ', IF(MIN(qse.`method`) = 1 OR MAX(qse.`method`) = 3, 1, 0) AS "startsQuests", IF(MIN(qse.`method`) = 2 OR MAX(qse.`method`) = 3, 1, 0) AS "endsQuests"', 'g' => 'o.`id`'],
                         'qt'  => ['j' => '::quests qt ON qse.`questId` = qt.`id`'],
@@ -180,8 +181,12 @@ class GameObjectListFilter extends Filter
 
         // name
         if ($_v['na'])
-            if ($_ = $this->buildMatchLookup(['na' => 'name_loc'.Lang::getLocale()->value]))
+        {
+            if ($_ = $this->buildMatchLookup([['na', 'nml.nName']]))
                 $parts[] = $_;
+            else if ($_ = $this->buildLikeLookup([['na', 'name_loc'.Lang::getLocale()->value]]))
+                $parts[] = $_;
+        }
 
         return $parts;
     }

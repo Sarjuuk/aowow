@@ -67,7 +67,6 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             LIMIT     %i, %i';
 
         DB::Aowow()->qry('TRUNCATE ::objects');
-        DB::Aowow()->qry('SET SESSION innodb_ft_enable_stopword = OFF');
 
         $i = 0;
         while ($objects = DB::World()->selectAssoc($baseQuery, CLISetup::SQL_BATCH * $i, CLISetup::SQL_BATCH))

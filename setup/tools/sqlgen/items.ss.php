@@ -118,8 +118,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                       0 AS dropDownSoundId,
                       0 AS sheatheSoundId,
                       0 AS unsheatheSoundId,
-                      flagsCustom,
-                      null AS effects_loc0, null AS effects_loc2, null AS effects_loc3, null AS effects_loc4, null AS effects_loc6, null AS effects_loc8
+                      flagsCustom
             FROM      item_template it
             LEFT JOIN item_template_locale itl2 ON it.entry = itl2.ID AND itl2.locale = "frFR"
             LEFT JOIN item_template_locale itl3 ON it.entry = itl3.ID AND itl3.locale = "deDE"
@@ -131,7 +130,6 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             LIMIT     %i, %i';
 
         DB::Aowow()->qry('TRUNCATE ::items');
-        DB::Aowow()->qry('SET SESSION innodb_ft_enable_stopword = OFF');
 
         $i = 0;
         while ($items = DB::World()->selectAssoc($baseQuery, CLISetup::SQL_BATCH * $i, CLISetup::SQL_BATCH))
@@ -264,57 +262,6 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         foreach ($checks as [$slots, $subclasses])
             DB::Aowow()->qry('UPDATE ::items SET `cuFlags` = `cuFlags` | %i WHERE `class`= %i AND `slotBak` IN %in AND `subClass` NOT IN %in', CUSTOM_EXCLUDE_FOR_LISTVIEW, ITEM_CLASS_WEAPON, $slots, $subclasses);
 
-
-        CLI::write('[items] - collecting spell descriptions');
-        CLI::write(' * fetching', tmpRow: true);
-
-        $itemSpellData = DB::Aowow()->selectAssoc(
-           'SELECT `id` AS "0", `spellId1` AS "1" FROM ::items WHERE `spellId1` > 0 UNION
-            SELECT `id` AS "0", `spellId2` AS "1" FROM ::items WHERE `spellId2` > 0 UNION
-            SELECT `id` AS "0", `spellId3` AS "1" FROM ::items WHERE `spellId3` > 0 UNION
-            SELECT `id` AS "0", `spellId4` AS "1" FROM ::items WHERE `spellId4` > 0 UNION
-            SELECT `id` AS "0", `spellId5` AS "1" FROM ::items WHERE `spellId5` > 0'
-        );
-
-        $itemSpells = new SpellList(array(['id', array_column($itemSpellData, 1)]), ['interactive' => SpellList::INTERACTIVE_NONE]);
-        $items = DB::Aowow()->selectAssoc('SELECT `id` AS ARRAY_KEY, `spellId1`, `spellId2`, `spellId3`, `spellId4`, `spellId5` FROM ::items WHERE `id` IN %in', array_column($itemSpellData, 0));
-        if (!$itemSpells->error)
-        {
-            $i      = 0;
-            $total  = count($items) * count(CLISetup::$locales);
-            $update = [];
-            foreach (CLISetup::$locales as $locId => $loc)
-            {
-                Lang::load($loc);
-
-                foreach ($items as $itemId => $spells)
-                {
-                    CLI::write(' * applying ' . str_pad(++$i, strlen($total), pad_type: STR_PAD_LEFT) . ' / ' . $total . str_pad('('.number_format(100 * $i / $total, 1).'%)', 8, pad_type: STR_PAD_LEFT), tmpRow: true);
-
-                    foreach ($spells as $spellId)
-                    {
-                        if (!$itemSpells->getEntry($spellId))
-                            continue;
-
-                        if ($_ = $itemSpells->parseText('description'))
-                        {
-                            if (!isset($update[$itemId]['effects_loc'.$locId]))
-                                $update[$itemId]['effects_loc'.$locId] = '';
-
-                            $update[$itemId]['effects_loc'.$locId] .= $_[0]."\n";
-                        }
-                    }
-                }
-            }
-
-            $i     = 0;
-            $total = count($update);
-            foreach ($update as $itemId => $upd)
-            {
-                CLI::write(' * writing ' . str_pad(++$i, strlen($total), pad_type: STR_PAD_LEFT) . ' / ' . $total . str_pad('('.number_format(100 * $i / $total, 1).'%)', 8, pad_type: STR_PAD_LEFT), tmpRow: true);
-                DB::Aowow()->qry('UPDATE ::items SET %a WHERE `id` = %i', $upd, $itemId);
-            }
-        }
 
         $this->reapplyCCFlags('items', Type::ITEM);
 

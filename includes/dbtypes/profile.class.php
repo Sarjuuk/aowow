@@ -297,7 +297,7 @@ class ProfileListFilter extends Filter
                 $this->{$prop}['_na'] = array_map(Util::ucWords(...), $this->{$prop}['na']);
             };
 
-            $parts[] = $this->buildLikeLookup(['na' => $k.'.name', '_na' => $k.'.name'], $_v['ex'] == 'on');
+            $parts[] = $this->buildLikeLookup([['na', $k.'.name'], ['_na', $k.'.name']], $_v['ex'] == 'on');
         }
 
         // side [list]
@@ -415,7 +415,7 @@ class ProfileListFilter extends Filter
     {
         $n = preg_replace(parent::PATTERN_NAME, '', $crv);
         if ($this->tokenizeString($cr, $n))
-            if ($_ = $this->buildLikeLookup([$cr => 'at.name']))
+            if ($_ = $this->buildLikeLookup([[$cr, 'at.name']]))
                 return [DB::AND, ['at.type', $size], $_];
 
         return null;

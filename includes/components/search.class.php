@@ -162,32 +162,21 @@ class Search
         return $qry;
     }
 
-    private function createMatchLookup(array $fields = []) : array
+    private function createMatchLookup() : array
     {
         if ($this->idSearch && $this->included)
             return ['id', $this->included];
 
         if (Lang::getLocale()->isLogographic() && !Cfg::get('LOGOGRAPHIC_FT_SEARCH'))
-            return $this->createLikeLookup($fields);
+            return $this->createLikeLookup();
 
-        // default to name-field
-        if (!$fields)
-            $fields[] = 'name_loc'.Lang::getLocale()->value;
-
-        $qry = [];
         if ($this->fulltext)
-            $qry = array_map(fn($x) => [$x, $this->fulltext, 'MATCH'], $fields);
+            return ['nml.nName', $this->fulltext, 'MATCH'];
         else if ($strBak = trim($this->query))
             if (mb_strlen($strBak) > 2 || Lang::getLocale()->isLogographic())
-                $qry = array_map(fn($x) => [$x, $strBak], $fields);
+                return ['name_loc'.Lang::getLocale()->value, $strBak];
 
-        // single cnd?
-        if (count($qry) > 1)
-            array_unshift($qry, DB::OR);
-        else if (count($qry) == 1)
-            $qry = $qry[0];
-
-        return $qry;
+        return [];
     }
 
     public function canPerform() : bool

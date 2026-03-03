@@ -85,7 +85,7 @@ class AreaTriggerListFilter extends Filter
 
         // name [str]
         if ($_v['na'])
-            if ($_ = $this->buildLikeLookup(['na' => 'name']))
+            if ($_ = $this->buildLikeLookup([['na', 'name']]))
                 $parts[] = $_;
 
         // type [list]

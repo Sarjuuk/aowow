@@ -28,6 +28,7 @@ class ItemList extends DBTypeList
     protected string $queryBase  = 'SELECT i.*, i.`block` AS "tplBlock", i.`armor` AS tplArmor, i.`dmgMin1` AS "tplDmgMin1", i.`dmgMax1` AS "tplDmgMax1", i.`id` AS ARRAY_KEY, i.`id` AS "id" FROM ::items i';
     protected array  $queryOpts  = array(                   // 3 => Type::ITEM
                         'i'   => [['is', 'src', 'ic'], 'o' => 'i.`quality` DESC, i.`itemLevel` DESC'],
+                        'nml' => ['j' => ['::items_search nml ON nml.`id` = i.`id` AND nml.`locale` = DB_LOC_I']],
                         'ic'  => ['j' => ['::icons      `ic`  ON `ic`.`id` = `i`.`iconId`', true], 's' => ', ic.`name` AS "iconString"'],
                         'is'  => ['j' => ['::item_stats `is`  ON `is`.`type` = 3 AND `is`.`typeId` = `i`.`id`', true], 's' => ', `is`.*'],
                         's'   => ['j' => ['::spell      `s`   ON `s`.`effect1CreateItemId` = `i`.`id`', true], 'g' => 'i.`id`'],
@@ -1917,10 +1918,10 @@ class ItemListFilter extends Filter
         101 => [parent::CR_NUMERIC,   'is.rgdhastertng',        NUM_CAST_INT,            true              ], // rgdhastertng
         102 => [parent::CR_NUMERIC,   'is.splhastertng',        NUM_CAST_INT,            true              ], // splhastertng
         103 => [parent::CR_NUMERIC,   'is.hastertng',           NUM_CAST_INT,            true              ], // hastertng
-        104 => [parent::CR_STRING,    'description',            STR_LOCALIZED                              ], // flavortext
+        104 => [parent::CR_STRING,    'description',            STR_LOCALIZED,           'nml.nDescription'], // flavortext
         105 => [parent::CR_CALLBACK,  'cbDropsInInstance',      SRC_FLAG_DUNGEON_DROP,   1                 ], // dropsinnormal [heroicdungeon-any]
         106 => [parent::CR_CALLBACK,  'cbDropsInInstance',      SRC_FLAG_DUNGEON_DROP,   2                 ], // dropsinheroic [heroicdungeon-any]
-        107 => [parent::CR_STRING,    'effects',                STR_LOCALIZED                              ], // effecttext [str]
+        107 => [parent::CR_STRING,    '',                       STR_LOCALIZED,           'nml.nEffects'    ], // effecttext [str]
         109 => [parent::CR_CALLBACK,  'cbArmorBonus',           null,                    null              ], // armorbonus [op] [int]
         111 => [parent::CR_NUMERIC,   'requiredSkillRank',      NUM_CAST_INT,            true              ], // reqskillrank
         113 => [parent::CR_FLAG,      'cuFlags',                CUSTOM_HAS_SCREENSHOT                      ], // hasscreenshots
@@ -2095,8 +2096,12 @@ class ItemListFilter extends Filter
 
         // name
         if ($_v['na'])
-            if ($_ = $this->buildMatchLookup(['na' => 'name_loc'.Lang::getLocale()->value]))
+        {
+            if ($_ = $this->buildMatchLookup([['na', 'nml.nName']]))
                 $parts[] = $_;
+            else if ($_ = $this->buildLikeLookup([['na', 'name_loc'.Lang::getLocale()->value]]))
+                $parts[] = $_;
+        }
 
         // usable-by (not excluded by requiredClass && armor or weapons match mask from ::classes)
         if ($_v['ub'])

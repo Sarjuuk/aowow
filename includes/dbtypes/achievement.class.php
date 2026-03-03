@@ -328,9 +328,9 @@ class AchievementListFilter extends Filter
         {
             $_ = [];
             if ($_v['ex'] == 'on')
-                $_ = $this->buildLikeLookup(['na' => 'name_loc'.Lang::getLocale()->value, 'na' => 'reward_loc'.Lang::getLocale()->value, 'na' => 'description_loc'.Lang::getLocale()->value]);
+                $_ = $this->buildLikeLookup([['na', 'name_loc'.Lang::getLocale()->value], ['na', 'reward_loc'.Lang::getLocale()->value], ['na', 'description_loc'.Lang::getLocale()->value]]);
             else
-                $_ = $this->buildLikeLookup(['na' => 'name_loc'.Lang::getLocale()->value]);
+                $_ = $this->buildLikeLookup([['na', 'name_loc'.Lang::getLocale()->value]]);
 
             if ($_)
                 $parts[] = $_;

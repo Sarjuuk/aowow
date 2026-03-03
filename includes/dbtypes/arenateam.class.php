@@ -73,7 +73,7 @@ class ArenaTeamListFilter extends Filter
 
         // name [str]
         if ($_v['na'])
-            if ($_ = $this->buildLikeLookup(['na' => 'at.name'], $_v['ex'] == 'on'))
+            if ($_ = $this->buildLikeLookup([['na', 'at.name']], $_v['ex'] == 'on'))
                 $parts[] = $_;
 
         // side [list]

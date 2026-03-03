@@ -113,7 +113,7 @@ abstract class Filter
         [self::CR_BOOLEAN,   <string:colName>, <bool:isString>, null]
         [self::CR_FLAG,      <string:colName>, <int:testBit>,   <bool:matchAny>]       # default param2: matchExact
         [self::CR_NUMERIC,   <string:colName>, <int:NUM_FLAGS>, <bool:addExtraCol>]
-        [self::CR_STRING,    <string:colName>, <int:STR_FLAGS>, null]
+        [self::CR_STRING,    <string:colName>, <int:STR_FLAGS>, <string:fulltextColName]
         [self::CR_ENUM,      <string:colName>, <bool:ANY_NONE>, <bool:isEnumVal>]      # param3 ? crv is val in enum : key in enum
         [self::CR_STAFFFLAG, <string:colName>, null,            null]
         [self::CR_CALLBACK,  <string:fnName>,  <mixed:param1>,  <mixed:param2>]
@@ -600,7 +600,13 @@ abstract class Filter
             return null;
 
         // if the fulltext token contains invalid chars, should it be sub-tokenized (current behavior) or should the chars just be stripped
-        $ft = array_filter(explode(' ', preg_replace(self::PATTERN_FT, ' ', $str)), $lenTest);
+        if ($tok = explode(' ', preg_replace(self::PATTERN_FT, ' ', $str)))
+        {
+            $ft = array_filter($tok, $lenTest);
+
+            if (count($tok) > 1)
+                $ft[] = implode('', $tok);
+        }
 
         // escape manually entered _; entering % should be prohibited
         // then replace search wildcards with sql wildcards
@@ -646,7 +652,7 @@ abstract class Filter
     protected function buildLikeLookup(array $fields, bool $exact = false) : array
     {
         $qry = [];
-        foreach ($fields as $field => $col)
+        foreach ($fields as [$field, $col])
         {
             $sub = [];
             if (!empty($this->inTokens[$field]))
@@ -669,17 +675,25 @@ abstract class Filter
     protected function buildMatchLookup(array $fields, bool $exact = false) : array
     {
         if (Lang::getLocale()->isLogographic() && !Cfg::get('LOGOGRAPHIC_FT_SEARCH'))
-            return $this->buildLikeLookup($fields, $exact);
+            return [];
 
         $qry = [];
-        foreach ($fields as $field => $col)
+        foreach ($fields as [$field, $col])
         {
             if (!empty($this->ftTokens[$field]))
-                $qry[] = [$col, $this->ftTokens[$field], 'MATCH'];
-
-            $tok = $this->values[$field];
-            if (self::transformToken($tok))
-                $qry[] = [$col, $tok];
+                $qry[] = [$col, array_unique($this->ftTokens[$field]), 'MATCH'];
+            else
+            {
+                $tok = $this->values[$field];
+                if (self::transformToken($tok))
+                {
+                    if (!is_array($col))
+                        $qry[] = [$col, $tok];
+                    else
+                        foreach ($col as $c)
+                            $qry[] = [$c, $tok];
+                }
+            }
         }
 
         return $qry ? [DB::OR, ...$qry] : [];
@@ -754,14 +768,19 @@ abstract class Filter
             return [[$field, $value, '&'], $value];
     }
 
-    private function genericString(string $field, ?int $strFlags) : ?array
+    private function genericString(string $field, ?int $strFlags, ?string $fulltextCol = null) : ?array
     {
         $strFlags ??= 0x0;
 
+        $lkCol = $field;
         if ($strFlags & STR_LOCALIZED)
-            $field .= '_loc'.Lang::getLocale()->value;
+            $lkCol .= '_loc'.Lang::getLocale()->value;
 
-        return $this->buildLikeLookup([$field => $field]);
+        $lookup = null;
+        if ($fulltextCol)
+            $lookup = $this->buildMatchLookup([[$lkCol, $fulltextCol]]);
+
+        return $lookup ?: ($field ? $this->buildLikeLookup([[$lkCol, $lkCol]]) : null);
     }
 
     private function genericNumeric(string $field, int|float $value, int $op, int $typeCast) : ?array
@@ -837,7 +856,7 @@ abstract class Filter
             self::CR_FLAG      => $this->genericBooleanFlags($colOrFn, $param1, $crs, $param2),
             self::CR_STAFFFLAG => $this->genericBooleanFlags($colOrFn, (1 << ($crs - 1)), true),
             self::CR_BOOLEAN   => $this->genericBoolean($colOrFn, $crs, !empty($param1)),
-            self::CR_STRING    => $this->genericString($colOrFn, $param1),
+            self::CR_STRING    => $this->genericString($colOrFn, $param1, $param2),
             self::CR_CALLBACK  => $this->{$colOrFn}($cr, $crs, $crv, $param1, $param2),
             self::CR_ENUM      => $handleEnum($cr, $crs, $colOrFn, $param1, $param2),
             self::CR_NYI_PH    => $handleNYIPH($crs, $crv, $param1),

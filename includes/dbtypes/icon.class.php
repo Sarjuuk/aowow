@@ -145,7 +145,7 @@ class IconListFilter extends Filter
 
         //string
         if ($_v['na'])
-            if ($_ = $this->buildLikeLookup(['na' => 'name']))
+            if ($_ = $this->buildLikeLookup([['na', 'name']]))
                 $parts[] = $_;
 
         return $parts;

@@ -578,11 +578,6 @@ CREATE TABLE `aowow_creature` (
   KEY `idx_skinloot` (`skinLootId`),
   KEY `idx_trainer` (`trainerType`),
   KEY `idx_trainerrequirement` (`trainerRequirement`),
-  FULLTEXT `idx_ft_name0` (`name_loc0`),
-  FULLTEXT `idx_ft_name2` (`name_loc2`),
-  FULLTEXT `idx_ft_name3` (`name_loc3`),
-  FULLTEXT `idx_ft_name6` (`name_loc6`),
-  FULLTEXT `idx_ft_name8` (`name_loc8`),
   KEY `idx_name0` (`name_loc0`),
   KEY `idx_name2` (`name_loc2`),
   KEY `idx_name3` (`name_loc3`),
@@ -597,6 +592,24 @@ CREATE TABLE `aowow_creature` (
   KEY `idx_spell6` (`spell6`),
   KEY `idx_spell7` (`spell7`),
   KEY `idx_spell8` (`spell8`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `aowow_creature_search`
+--
+
+DROP TABLE IF EXISTS `aowow_creature_search`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `aowow_creature_search` (
+  `id` mediumint(8) unsigned NOT NULL,
+  `locale` tinyint(3) unsigned NOT NULL,
+  `nName` varchar(100) DEFAULT NULL,
+  `nSubname` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`,`locale`),
+  FULLTEXT KEY `idx_ft_na` (`nName`),
+  FULLTEXT KEY `idx_ft_na_ex` (`nName`,`nSubname`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1460,12 +1473,6 @@ CREATE TABLE `aowow_items` (
   `sheatheSoundId` smallint(5) unsigned NOT NULL DEFAULT 0,
   `unsheatheSoundId` smallint(5) unsigned NOT NULL DEFAULT 0,
   `flagsCustom` int(10) unsigned NOT NULL DEFAULT 0,
-  `effects_loc0` text DEFAULT NULL,
-  `effects_loc2` text DEFAULT NULL,
-  `effects_loc3` text DEFAULT NULL,
-  `effects_loc4` text DEFAULT NULL,
-  `effects_loc6` text DEFAULT NULL,
-  `effects_loc8` text DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `items_index` (`class`),
   KEY `idx_model` (`displayId`),
@@ -1482,11 +1489,6 @@ CREATE TABLE `aowow_items` (
   KEY `idx_trigger4` (`spellTrigger4`),
   KEY `idx_trigger5` (`spellTrigger5`),
   KEY `idx_reqskill` (`requiredSkill`),
-  FULLTEXT `idx_ft_name0` (`name_loc0`),
-  FULLTEXT `idx_ft_name2` (`name_loc2`),
-  FULLTEXT `idx_ft_name3` (`name_loc3`),
-  FULLTEXT `idx_ft_name6` (`name_loc6`),
-  FULLTEXT `idx_ft_name8` (`name_loc8`),
   KEY `idx_name0` (`name_loc0`),
   KEY `idx_name2` (`name_loc2`),
   KEY `idx_name3` (`name_loc3`),
@@ -1494,6 +1496,26 @@ CREATE TABLE `aowow_items` (
   KEY `idx_name6` (`name_loc6`),
   KEY `idx_name8` (`name_loc8`),
   KEY `idx_itemset` (`itemset`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `aowow_items_search`
+--
+
+DROP TABLE IF EXISTS `aowow_items_search`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `aowow_items_search` (
+  `id` mediumint(8) unsigned NOT NULL,
+  `locale` tinyint(3) unsigned NOT NULL,
+  `nName` varchar(127) DEFAULT NULL,
+  `nDescription` varchar(255) DEFAULT NULL,
+  `nEffects` text DEFAULT NULL,
+  PRIMARY KEY (`id`,`locale`),
+  FULLTEXT KEY `idx_ft_na` (`nName`),
+  FULLTEXT KEY `idx_ft_description` (`nDescription`),
+  FULLTEXT KEY `idx_ft_effects` (`nEffects`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1682,17 +1704,28 @@ CREATE TABLE `aowow_objects` (
   KEY `idx_onsuccessspell` (`onSuccessSpell`),
   KEY `idx_auraspell` (`auraSpell`),
   KEY `idx_triggeredspell` (`triggeredSpell`),
-  FULLTEXT `idx_ft_name0` (`name_loc0`),
-  FULLTEXT `idx_ft_name2` (`name_loc2`),
-  FULLTEXT `idx_ft_name3` (`name_loc3`),
-  FULLTEXT `idx_ft_name6` (`name_loc6`),
-  FULLTEXT `idx_ft_name8` (`name_loc8`),
   KEY `idx_name0` (`name_loc0`),
   KEY `idx_name2` (`name_loc2`),
   KEY `idx_name3` (`name_loc3`),
   KEY `idx_name4` (`name_loc4`),
   KEY `idx_name6` (`name_loc6`),
   KEY `idx_name8` (`name_loc8`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `aowow_objects_search`
+--
+
+DROP TABLE IF EXISTS `aowow_objects_search`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `aowow_objects_search` (
+  `id` mediumint(8) unsigned NOT NULL,
+  `locale` tinyint(3) unsigned NOT NULL,
+  `nName` varchar(127) DEFAULT NULL,
+  PRIMARY KEY (`id`,`locale`),
+  FULLTEXT KEY `idx_ft_na` (`nName`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -2291,11 +2324,6 @@ CREATE TABLE `aowow_quests` (
   `objectiveText4_loc8` text DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `nextQuestIdChain` (`nextQuestIdChain`),
-  FULLTEXT `idx_ft_name0` (`name_loc0`),
-  FULLTEXT `idx_ft_name2` (`name_loc2`),
-  FULLTEXT `idx_ft_name3` (`name_loc3`),
-  FULLTEXT `idx_ft_name6` (`name_loc6`),
-  FULLTEXT `idx_ft_name8` (`name_loc8`),
   KEY `idx_name0` (`name_loc0`),
   KEY `idx_name2` (`name_loc2`),
   KEY `idx_name3` (`name_loc3`),
@@ -2328,6 +2356,25 @@ CREATE TABLE `aowow_quests` (
   KEY `idx_requirement3` (`reqNpcOrGo3`),
   KEY `idx_requirement4` (`reqNpcOrGo4`),
   KEY `idx_event` (`eventId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `aowow_quests_search`
+--
+
+DROP TABLE IF EXISTS `aowow_quests_search`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `aowow_quests_search` (
+  `id` mediumint(8) unsigned NOT NULL,
+  `locale` tinyint(3) unsigned NOT NULL,
+  `nName` varchar(100) DEFAULT NULL,
+  `nObjectives` text DEFAULT NULL,
+  `nDetails` text DEFAULT NULL,
+  PRIMARY KEY (`id`,`locale`),
+  FULLTEXT KEY `idx_ft_na` (`nName`),
+  FULLTEXT KEY `idx_ft_na_ex` (`nName`,`nObjectives`,`nDetails`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -2905,11 +2952,6 @@ CREATE TABLE `aowow_spell` (
   KEY `effect3AuraId` (`effect3AuraId`),
   KEY `idx_skill1` (`skillLine1`),
   KEY `idx_skill2` (`skillLine2OrMask`),
-  FULLTEXT `idx_ft_name0` (`name_loc0`),
-  FULLTEXT `idx_ft_name2` (`name_loc2`),
-  FULLTEXT `idx_ft_name3` (`name_loc3`),
-  FULLTEXT `idx_ft_name6` (`name_loc6`),
-  FULLTEXT `idx_ft_name8` (`name_loc8`),
   KEY `idx_name0` (`name_loc0`),
   KEY `idx_name2` (`name_loc2`),
   KEY `idx_name3` (`name_loc3`),
@@ -2923,6 +2965,25 @@ CREATE TABLE `aowow_spell` (
   KEY `idx_triggerspell1` (`effect1TriggerSpell`),
   KEY `idx_triggerspell2` (`effect2TriggerSpell`),
   KEY `idx_triggerspell3` (`effect3TriggerSpell`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `aowow_spell_search`
+--
+
+DROP TABLE IF EXISTS `aowow_spell_search`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `aowow_spell_search` (
+  `id` mediumint(8) unsigned NOT NULL,
+  `locale` tinyint(3) unsigned NOT NULL,
+  `nName` varchar(185) DEFAULT NULL,
+  `nDescription` text DEFAULT NULL,
+  `nBuff` text DEFAULT NULL,
+  PRIMARY KEY (`id`,`locale`),
+  FULLTEXT KEY `idx_ft_na` (`nName`),
+  FULLTEXT KEY `idx_ft_na_ex` (`nName`,`nDescription`,`nBuff`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
