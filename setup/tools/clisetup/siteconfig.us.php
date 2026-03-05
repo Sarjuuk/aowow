@@ -406,7 +406,7 @@ CLISetup::registerUtility(new class extends UtilityScript
 
         $prot  = Cfg::get('FORCE_SSL') ? 'https://' : 'http://';
         $cases = array(
-            'site_host'   => [$prot, Cfg::get('SITE_HOST'),   '/robots.txt'],
+            'site_host'   => [$prot, Cfg::get('SITE_HOST'),   '/index.php'],
             'static_host' => [$prot, Cfg::get('STATIC_HOST'), '/css/aowow.css']
         );
 

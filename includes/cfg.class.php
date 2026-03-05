@@ -55,7 +55,7 @@ class Cfg
         'profiler_enable'          => ['realms', 'realmMenu'],
         'battlegroup'              => ['realms', 'realmMenu'],
         'name_short'               => ['searchplugin', 'searchboxBody', 'searchboxScript', 'demo'],
-        'site_host'                => ['searchplugin', 'searchboxBody', 'searchboxScript', 'demo', 'power'],
+        'site_host'                => ['searchplugin', 'searchboxBody', 'searchboxScript', 'demo', 'power', 'robots'],
         'static_host'              => ['searchplugin', 'searchboxBody', 'searchboxScript', 'power'],
         'contact_email'            => ['globaljs'],
         'locales'                  => ['globaljs']
