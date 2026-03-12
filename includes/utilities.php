@@ -115,26 +115,21 @@ abstract class Util
 
     public static function formatMoney(int $qty) : string
     {
-        $money = '';
+        if ($qty <= 0)
+            return '';
 
-        if ($qty >= 10000)
-        {
-            $g = floor($qty / 10000);
-            $money .= '<span class="moneygold">'.$g.'</span> ';
-            $qty -= $g * 10000;
-        }
+        $parts = [];
 
-        if ($qty >= 100)
-        {
-            $s = floor($qty / 100);
-            $money .= '<span class="moneysilver">'.$s.'</span> ';
-            $qty -= $s * 100;
-        }
+        if ($g = intdiv($qty, 10000))
+            $parts[] = '<span class="moneygold">'.$g.'</span>';
 
-        if ($qty > 0)
-            $money .= '<span class="moneycopper">'.$qty.'</span>';
+        if ($s = intdiv($qty % 10000, 100))
+            $parts[] = '<span class="moneysilver">'.$s.'</span>';
 
-        return $money;
+        if ($c = ($qty % 100))
+            $parts[] = '<span class="moneycopper">'.$c.'</span>';
+
+        return implode(' ', $parts);
     }
 
     // pageTexts, questTexts and mails
