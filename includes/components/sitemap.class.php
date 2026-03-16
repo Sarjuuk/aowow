@@ -43,7 +43,7 @@ class Sitemap
         'skill'       => [Type::SKILL,       '::skillline',       'IF(x.`cuFlags` & 0x40000000, 0.1, IF(x.`typeCat` IN(11, 9), 0.5, IF(x.`typeCat` IN (8, 6), 0.4, 0.3)))'],
         'currency'    => [Type::CURRENCY,    '::currencies',      'IF(x.`cuFlags` & 0x40000000, 0.1, IF(x.`category` = 3, 0.2, IF(x.`description_loc0`, 0.4, 0.3)))'],
         'sound'       => [Type::SOUND,       '::sounds',          'IF(x.`cuFlags` & 0x40000000, 0.1, 0.3)'],
-        'icons'       => [Type::ICON,        '::icons',           'IF(x.`cuFlags` & 0x40000000, 0.1, 0.3)'],
+        'icon'        => [Type::ICON,        '::icons',           'IF(x.`cuFlags` & 0x40000000, 0.1, 0.3)'],
         'emote'       => [Type::EMOTE,       '::emotes',          'IF(x.`cuFlags` & 0x40000000, 0.1, 0.3)'],
         'enchantment' => [Type::ENCHANTMENT, '::itemenchantment', 'IF(x.`cuFlags` & 0x40000000, 0.1, IF(x.`type1` IN (1, 7) OR x.`type2` IN (1, 7) OR x.`type3` IN (1, 7), 0.4, 0.3))'],
         'areatrigger' => [Type::AREATRIGGER, '::areatrigger',     'IF(x.`cuFlags` & 0x40000000, 0.1, 0.3)'],
