@@ -171,7 +171,7 @@ if ([$xp, $rep, $title, $tp, $honor, $arena] = $this->gains):
         echo '                        <li><div>'.Lang::quest('bonusTalents', [$tp])."</div></li>\n";
     endif;
 
-    if ($arena || $honor[0]):
+    if ($arena || $honor):
         echo '                        <li><div>';
         if ($honor[0]):
             $a = '<a href="?currency=104">'.$honor[0].'</a>';

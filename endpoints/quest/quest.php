@@ -1216,7 +1216,10 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         $gains[5] = $this->subject->getField('rewardArenaPoints');
 
         // honor points
-        $gains[4] = [$this->subject->getField('rewardHonorPoints'), $side];
+        if ($_ = $this->subject->getField('rewardHonorPoints'))
+            $gains[4] = [$_, $side];
+        else
+            $gains[4] = null;
 
         // talent points
         $gains[3] = $this->subject->getField('rewardTalents');
