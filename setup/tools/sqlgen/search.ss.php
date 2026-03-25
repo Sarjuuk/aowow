@@ -133,13 +133,18 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
         $rows = array_filter($rows, fn($x) => $x['name'] !== null);
 
-        CLI::write('   * inserting', tmpRow: true);
-
-        DB::Aowow()->qry('INSERT INTO ::objects_search %m', array(
+        $result = array(
             'id'     => array_column($rows, 'id'),
             'locale' => array_column($rows, 'locale'),
             'nName'  => array_column($rows, 'name')
-        ));
+        );
+
+        $n = ceil(count(current($result)) / CLISetup::SQL_BATCH);
+        for ($i = 0; $i < $n; $i++)
+        {
+            CLI::write('   * inserting batch '.($i + 1).' / '.$n, tmpRow: true);
+            DB::Aowow()->qry('INSERT INTO ::objects_search %m', array_map(fn($x) => array_slice($x, $i * CLISetup::SQL_BATCH, CLISetup::SQL_BATCH), $result));
+        }
     }
 
     private function normalizeCreatures() : void
@@ -162,16 +167,21 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
         array_walk($rows, self::normalizeRow(...), ['name', 'subname']);
 
-        $rows = array_filter($rows, fn($x) => $x['name'] !== null && $x['subname'] !== null);
+        $rows = array_filter($rows, fn($x) => $x['name'] !== null || $x['subname'] !== null);
 
-        CLI::write('   * inserting', tmpRow: true);
-
-        DB::Aowow()->qry('INSERT INTO ::creature_search %m', array(
+        $result = array(
             'id'       => array_column($rows, 'id'),
             'locale'   => array_column($rows, 'locale'),
             'nName'    => array_column($rows, 'name'),
             'nSubname' => array_column($rows, 'subname')
-        ));
+        );
+
+        $n = ceil(count(current($result)) / CLISetup::SQL_BATCH);
+        for ($i = 0; $i < $n; $i++)
+        {
+            CLI::write('   * inserting batch '.($i + 1).' / '.$n, tmpRow: true);
+            DB::Aowow()->qry('INSERT INTO ::creature_search %m', array_map(fn($x) => array_slice($x, $i * CLISetup::SQL_BATCH, CLISetup::SQL_BATCH), $result));
+        }
     }
 
     private function normalizeItems() : void
