@@ -634,7 +634,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         // PSA: 'redundant' data is on purpose (e.g. creature required for kill, also dropps item required to collect)
 
         // external events
-        $endTextWrapper = '%s';
+        $endText = $this->subject->parseText('end', false);
         if ($_specialFlags & QUEST_FLAG_SPECIAL_EXT_COMPLETE)
         {
             // areatrigger
@@ -643,7 +643,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                 if ($atSpawns = DB::AoWoW()->selectAssoc('SELECT `typeId` AS ARRAY_KEY, `posX`, `posY`, `floor`, `areaId` FROM ::spawns WHERE `type` = %i AND `typeId` IN %in', Type::AREATRIGGER, $atir))
                 {
                     if (User::isInGroup(U_GROUP_STAFF))
-                        $endTextWrapper = '<a href="?areatrigger='.$atir[0].'">%s</a>';
+                        $endText = '<a href="?areatrigger='.$atir[0].'">'.($endText ?: Lang::areatrigger('unnamed', [$atir[0]])).'</a>';
 
                     foreach ($atSpawns as $atId => $atsp)
                     {
@@ -651,7 +651,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                                 'type'      => User::isInGroup(U_GROUP_STAFF) ? Type::AREATRIGGER : -1,
                                 'id'        => $atId,
                                 'point'     => 'requirement',
-                                'name'      => $this->subject->parseText('end', false),
+                                'name'      => $this->subject->parseText('end', false) ?: Lang::areatrigger('unnamed', [$atir[0]]),
                                 'coord'     => [$atsp['posX'], $atsp['posY']],
                                 'coords'    => [[$atsp['posX'], $atsp['posY']]],
                                 'objective' => $objectiveIdx++
@@ -674,7 +674,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
             // complete-spell
             else if ($endSpell = new SpellList(array(DB::OR, [DB::AND, ['effect1Id', SPELL_EFFECT_QUEST_COMPLETE], ['effect1MiscValue', $this->typeId]], [DB::AND, ['effect2Id', SPELL_EFFECT_QUEST_COMPLETE], ['effect2MiscValue', $this->typeId]], [DB::AND, ['effect3Id', SPELL_EFFECT_QUEST_COMPLETE], ['effect3MiscValue', $this->typeId]])))
                 if (!$endSpell->error)
-                    $endTextWrapper = '<a href="?spell='.$endSpell->id.'">%s</a>';
+                    $endText = '<a href="?spell='.$endSpell->id.'">'.($endText ?: $endSpell->getField('name', true)).'</a>';
         }
 
         // ..adding creature kill requirements
@@ -898,7 +898,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         $this->offerReward   = $this->subject->parseText('offerReward', false);
         $this->requestItems  = $this->subject->parseText('requestItems', false);
         $this->completed     = $this->subject->parseText('completed', false);
-        $this->end           = sprintf($endTextWrapper, $this->subject->parseText('end', false));
+        $this->end           = $endText;
         $this->suggestedPl   = $this->subject->getField('suggestedPlayers');
         $this->unavailable   = $_flags & QUEST_FLAG_UNAVAILABLE || $this->subject->getField('cuFlags') & CUSTOM_EXCLUDE_FOR_LISTVIEW;
         $this->redButtons    = array(

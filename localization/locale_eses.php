@@ -1143,11 +1143,13 @@ $lang = array(
     'areatrigger' => array(
         'notFound'      => "Este activador de área no existe.",
         'foundIn'       => "Este activador de área se puede encontrar en",
+        'unnamed'       => "[Unnamed areatrigger] #%d",
         'types'         => ['Sin usar', 'Taberna', 'Teletransportador', 'Objetivo de misión', 'Activador inteligente', 'Script']
     ),
     'gameObject' => array(
         'id'            => "ID de Entidad: ",
         'notFound'      => "Esta entidad no existe.",
+        'unnamed'       => "[Unnamed object] #%d",
         'cat'           => [0 => "Otros", 3 => "Contenedores", 6 => "Trampas", 9 => "Libros", 25 => "Bancos de peces", -5 => "Cofres", -3 => "Hierbas", -4 => "Venas de minerales", -2 => "Misiones", -6 => "Herramientas"],
         'type'          => [              3 => "Contenedore",  6 => "",        9 => "Libro",  25 => "",                -5 => "Cofre",  -3 => "Hierba",  -4 => "Filóne de mineral",  -2 => "Misión",   -6 => ""],
         'unkPosition'   => "No se conoce la ubicación de esta entidad.",

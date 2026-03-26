@@ -1143,11 +1143,13 @@ $lang = array(
     'areatrigger' => array(
         'notFound'      => "This areatrigger doesn't exist.",
         'foundIn'       => "This areatrigger can be found in",
+        'unnamed'       => "[Unnamed areatrigger] #%d",
         'types'         => ['Unused', 'Tavern', 'Teleporter', 'Quest Objective', 'Smart Trigger', 'Script']
     ),
     'gameObject' => array(
         'id'            => "Объект ID: ",
         'notFound'      => "Такой объект не существует.",
+        'unnamed'       => "[Unnamed object] #%d",
         'cat'           => [0 => "Другое", 3 => "Контейнеры", 6 => "Ловушки", 9 => "Книги", 25 => "Рыболовные лунки", -5 => "Сундуки", -3 => "Травы",    -4 => "Полезные ископаемые", -2 => "Задания", -6 => "Инструменты"],
         'type'          => [               3 => "Контейнер",  6 => "",        9 => "Книга", 25 => "",                 -5 => "Сундук",  -3 => "Растение", -4 => "Полезное ископаемое", -2 => "Задание", -6 => ""],
         'unkPosition'   => "Местонахождение этого объекта неизвестно.",

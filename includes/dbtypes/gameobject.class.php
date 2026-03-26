@@ -34,8 +34,8 @@ class GameObjectList extends DBTypeList
         // post processing
         foreach ($this->iterate() as $_id => &$curTpl)
         {
-            if (!$curTpl['name_loc0'])
-                $curTpl['name_loc0'] = 'Unnamed Object #' . $_id;
+            if (!$curTpl['name_loc'.Lang::getLocale()->value])
+                $curTpl['name_loc'.Lang::getLocale()->value] = Lang::gameObject('unnamed', [$_id]);
 
             // unpack miscInfo
             $curTpl['mStone']    =

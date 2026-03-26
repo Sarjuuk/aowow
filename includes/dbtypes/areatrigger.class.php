@@ -27,13 +27,13 @@ class AreaTriggerList extends DBTypeList
 
         foreach ($this->iterate() as $id => &$_curTpl)
             if (!$_curTpl['name'])
-                $_curTpl['name'] = 'Unnamed Areatrigger #' . $id;
+                $_curTpl['name'] = Lang::areatrigger('unnamed', [$id]);
     }
 
     public static function getName(int $id) : ?LocString
     {
-        if ($n = DB::Aowow()->SelectRow('SELECT IF(`name`, `name`, CONCAT("Unnamed Areatrigger #", `id`) AS "name_loc0" FROM %n WHERE `id` = %i', self::$dataTable, $id))
-            return new LocString($n);
+        if ($n = DB::Aowow()->SelectRow('SELECT `name` AS "name_loc0" FROM %n WHERE `id` = %i', self::$dataTable, $id))
+            return new LocString($n, callback: fn($x) => $x ?: Lang::areatrigger('unnamed', [$id]));
         return null;
     }
 

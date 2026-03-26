@@ -1143,11 +1143,13 @@ $lang = array(
     'areatrigger' => array(
         'notFound'      => "This areatrigger doesn't exist.",
         'foundIn'       => "This areatrigger can be found in",
+        'unnamed'       => "[Unnamed areatrigger] #%d",
         'types'         => ['Unused', 'Tavern', 'Teleporter', 'Quest Objective', 'Smart Trigger', 'Script']
     ),
     'gameObject' => array(
         'id'            => "ID Entité: ",
         'notFound'      => "Cette entité n'existe pas.",
+        'unnamed'       => "[Unnamed object] #%d",
         'cat'           => [0 => "Autre", 3 => "Conteneurs", 6 => "Pièges", 9 => "Livres", 25 => "Bancs de poissons", -5 => "Coffres", -3 => "Herbes", -4 => "Filons de minerai", -2 => "Quêtes", -6 => "Outils"],
         'type'          => [              3 => "Conteneur",  6 => "",       9 => "Livre",  25 => "",                  -5 => "Coffre",  -3 => "Herbe",  -4 => "Filon de minerai",  -2 => "Quête",  -6 => ""],
         'unkPosition'   => "L'emplacement de cette entité est inconnu.",
