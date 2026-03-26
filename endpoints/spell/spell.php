@@ -1344,10 +1344,11 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                    s.`id` AS ARRAY_KEY, ic.`name` AS `iconString`
             FROM   ::spell s
             JOIN   ::icons ic ON s.`iconId` = ic.`id`
-            WHERE  (`effect1CreateItemId` = %i AND `effect1Id` = %i)',// OR
+            WHERE  (s.`cuFlags` & %i) = 0 AND
+                   (`effect1CreateItemId` = %i AND `effect1Id` = %i)',// OR
                 // (`effect2CreateItemId` = %i AND `effect2Id` = %i) OR
                 // (`effect3CreateItemId` = %i AND `effect3Id` = %i)',
-            $itemId, SPELL_EFFECT_CREATE_ITEM //, $itemId, SPELL_EFFECT_CREATE_ITEM, $itemId, SPELL_EFFECT_CREATE_ITEM
+            CUSTOM_UNAVAILABLE, $itemId, SPELL_EFFECT_CREATE_ITEM //, $itemId, SPELL_EFFECT_CREATE_ITEM, $itemId, SPELL_EFFECT_CREATE_ITEM
         );
 
         if (!$spells)
