@@ -118,7 +118,7 @@ class Search
 
                 // note: a fulltext search purely from exclude tokens will return no result
                 foreach ($fulltext as $ft)
-                    $this->fulltext[] = ($ex ? '-' : '+') . $ft . '*';
+                    $this->fulltext[] = ($ex ? '-' : '+') . '(' . $ft . '* ' . Util::strrev($ft) . '*)';
             }
             else
                 $this->invalid[] = $raw;

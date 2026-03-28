@@ -289,9 +289,9 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                         $buff = self::normalize(str_replace('<br />', ' ', $_));
                 }
 
-                if ($_ = $desc ?: Util::localizedString($spell, 'description', true))
+                if (!$desc && ($_ =  Util::localizedString($spell, 'description', true)))
                     $desc = self::normalize($_);
-                if ($_ = $buff ?: Util::localizedString($spell, 'buff', true))
+                if (!$buff && ($_ = Util::localizedString($spell, 'buff', true)))
                     $buff = self::normalize($_);
                 if ($_ = Util::localizedString($spell, 'name', true))
                     $name = self::normalize($_);
@@ -321,7 +321,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             $row[$key] = self::normalize($row[$key] ?? '');
     }
 
-    // e.g. "Zul'Aman O'Reilly" => "Zul Aman ZulAman OReilly Reilly"
+    // e.g. "Zul'Aman O'Reilly" => "Zul Aman ZulAman OReilly Reilly luZ namA luZnamA yllieRO yllieR"
     private static function normalize(?string $words) : ?string
     {
         if (!$words)
@@ -351,7 +351,13 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             $result[] = $word;
         }
 
-        return $result ? implode(' ', array_unique($result)) : null;
+        if (!$result)
+            return null;
+
+        $result   = array_unique($result);
+        $reversed = array_map(Util::strrev(...), $result);
+
+        return implode(' ', array_merge($result, $reversed));
     }
 });
 

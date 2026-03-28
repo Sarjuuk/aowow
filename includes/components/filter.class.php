@@ -635,7 +635,7 @@ abstract class Filter
 
                 // note: a fulltext search purely from exclude tokens will return no result
                 foreach ($fulltext as $ft)
-                    $this->ftTokens[$field][] = ($ex ? '-' : '+') . $ft . '*';
+                    $this->ftTokens[$field][] = ($ex ? '-' : '+') . '(' . $ft . '* ' . Util::strrev($ft) . '*)';
             }
         }
 

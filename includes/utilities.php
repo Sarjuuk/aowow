@@ -360,6 +360,15 @@ abstract class Util
         return mb_strtolower($str);
     }
 
+    public static function strrev(string $str) : string
+    {
+        $out = '';
+        for ($i = 1, $len = mb_strlen($str); $i <= $len; $i++)
+            $out .= mb_substr($str, -$i, 1);
+
+        return $out;
+    }
+
     // doesn't handle scientific notation .. why would you input 3e3 for 3000..?
     public static function checkNumeric(mixed &$data, int $typeCast = NUM_ANY) : bool
     {
