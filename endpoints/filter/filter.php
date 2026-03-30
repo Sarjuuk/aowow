@@ -19,14 +19,28 @@ class FilterBaseResponse extends TextResponse
 
         parent::__construct($rawParam);
 
-        $catg = null;
+        $catg = $page = null;
         if (strstr($rawParam, '='))
-            [$this->page, $catg] = explode('=', $rawParam);
+            [$page, $catg] = explode('=', $rawParam);
         else
-            $this->page = $rawParam;
+            $page = $rawParam;
+
+        if (!$page || preg_match('/[^a-z\-]/i', $page))
+            return;
+
+        $this->page = strtolower($page);
 
         if ($catg !== null)
-            $this->catg = explode('.', $catg);
+        {
+            // category is a string for profiler (region.realm) but not passed through here
+            foreach (explode('.', $catg) as $c)
+            {
+                if (preg_match('/\D/', $c))
+                    break;
+
+                $this->catg[] = intval($c);
+            }
+        }
 
         $opts = ['parentCats' => $this->catg];
 
@@ -38,14 +52,22 @@ class FilterBaseResponse extends TextResponse
         };
 
         // yes, the whole _POST! .. should the input fields be exposed and static so they can be evaluated via BaseResponse::initRequestData() ?
-        $this->filter = Type::newFilter($fileStr, $_POST, $opts);
+        if (!$this->filter = Type::newFilter($fileStr, $_POST, $opts))
+            trigger_error('Filter::__construct - tried to init filter from bogus GET data', E_USER_WARNING);
     }
 
     protected function generate() : void
     {
+        // could not build filter from $this->page > go to front page
+        if (!$this->filter)
+        {
+            $this->redirectTo = '.';
+            return;
+        }
+
         $url = '?'.$this->page;
 
-        $this->filter?->mergeCat($this->catg);
+        $this->filter->mergeCat($this->catg);
 
         if ($this->catg)
             $url .= '='.implode('.', $this->catg);
@@ -53,7 +75,7 @@ class FilterBaseResponse extends TextResponse
         if ($x = $this->filter?->buildGETParam())
             $url .= '&filter='.$x;
 
-        if ($this->filter?->error)
+        if ($this->filter->error)
             $_SESSION['error']['fi'] = $this->filter::class;
 
         // do get request
