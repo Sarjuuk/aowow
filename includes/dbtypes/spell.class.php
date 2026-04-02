@@ -14,7 +14,7 @@ class SpellList extends DBTypeList
     public const /* int */ INTERACTIVE_EMBEDDED = 1;        // parse combat ratings to %
     public const /* int */ INTERACTIVE_FULL     = 2;        // additionaly allow links and hover tooltips
 
-    public static  int      $type       = Type::SPELL;
+    public static  int      $dbType     = Type::SPELL;
     public static  string   $brickFile  = 'spell';
     public static  string   $dataTable  = '::spell';
     public         array    $ranks      = [];

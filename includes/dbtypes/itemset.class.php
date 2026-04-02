@@ -10,7 +10,7 @@ class ItemsetList extends DBTypeList
 {
     use ListviewHelper;
 
-    public static int    $type       = Type::ITEMSET;
+    public static int    $dbType     = Type::ITEMSET;
     public static string $brickFile  = 'itemset';
     public static string $dataTable  = '::itemset';
     public        array  $pieceToSet = [];                  // used to build g_items and search

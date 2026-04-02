@@ -10,7 +10,7 @@ class GuideList extends DBTypeList
 {
     use ListviewHelper;
 
-    public static int    $type       = Type::GUIDE;
+    public static int    $dbType     = Type::GUIDE;
     public static string $brickFile  = 'guide';
     public static string $dataTable  = '::guides';
     public static int    $contribute = CONTRIBUTE_CO;

@@ -21,7 +21,7 @@ class AreatriggerBaseResponse extends TemplateResponse implements ICache
     public int $type   = Type::AREATRIGGER;
     public int $typeId = 0;
 
-    private AreaTriggerList $subject;
+    private AreaTrigger $subject;
 
     public function __construct(string $id)
     {
@@ -33,11 +33,11 @@ class AreatriggerBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new AreaTriggerList(array(['id', $this->typeId]));
+        $this->subject = new AreaTrigger($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('areatrigger'), Lang::areatrigger('notFound'));
 
-        $this->h1 = $this->subject->getField('name') ?: 'Areatrigger #'.$this->typeId;
+        $this->h1 = $this->subject->name;
 
         $this->gPageInfo += array(
             'type'   => $this->type,
@@ -45,12 +45,14 @@ class AreatriggerBaseResponse extends TemplateResponse implements ICache
             'name'   => $this->h1
         );
 
+        $_type = $this->subject->type;
+
 
         /*************/
         /* Menu Path */
         /*************/
 
-        $this->breadcrumb[] = $this->subject->getField('type');
+        $this->breadcrumb[] = $_type;
 
 
         /**************/
@@ -63,8 +65,6 @@ class AreatriggerBaseResponse extends TemplateResponse implements ICache
         /****************/
         /* Main Content */
         /****************/
-
-        $_type = $this->subject->getField('type');
 
         // get spawns
         if ($spawns = $this->subject->getSpawns(SPAWNINFO_FULL))
@@ -83,7 +83,7 @@ class AreatriggerBaseResponse extends TemplateResponse implements ICache
         // Smart AI
         if ($_type == AT_TYPE_SMART)
         {
-            $sai = new SmartAI(SmartAI::SRC_TYPE_AREATRIGGER, $this->typeId, ['teleportTargetArea' => $this->subject->getField('areaId')]);
+            $sai = new SmartAI(SmartAI::SRC_TYPE_AREATRIGGER, $this->typeId, ['teleportTargetArea' => $this->subject->location]);
             if ($sai->prepare())
             {
                 $this->extendGlobalData($sai->getJSGlobals());
@@ -114,7 +114,7 @@ class AreatriggerBaseResponse extends TemplateResponse implements ICache
 
         if ($_type == AT_TYPE_OBJECTIVE)
         {
-            $relQuest = new QuestList(array(['id', $this->subject->getField('quest')]));
+            $relQuest = new QuestList(array(['id', $this->subject->quest]));
             if (!$relQuest->error)
             {
                 $this->extendGlobalData($relQuest->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_REWARDS));
@@ -123,15 +123,15 @@ class AreatriggerBaseResponse extends TemplateResponse implements ICache
         }
         else if ($_type == AT_TYPE_TELEPORT)
         {
-            $relZone = new ZoneList(array(['id', $this->subject->getField('areaId')]));
+            $relZone = new ZoneList(array(['id', $this->subject->location]));
             if (!$relZone->error)
                 $this->lvTabs->addListviewTab(new Listview(['data' => $relZone->getListviewData()], ZoneList::$brickFile));
         }
         else if ($_type == AT_TYPE_SCRIPT)
         {
-            $relTrigger = new AreaTriggerList(array(['id', $this->typeId, '!'], ['name', $this->subject->getField('name')]));
+            $relTrigger = new AreaTriggerSet(array(['id', $this->typeId, '!'], ['name', $this->subject->name]));
             if (!$relTrigger->error)
-                $this->lvTabs->addListviewTab(new Listview(['data' => $relTrigger->getListviewData(), 'name' => Util::ucFirst(Lang::game('areatrigger'))]), AreaTriggerList::$brickFile, 'areatrigger');
+                $this->lvTabs->addListviewTab(new Listview(['data' => $relTrigger->getListviewData(), 'name' => Util::ucFirst(Lang::game('areatrigger'))], AreaTrigger::$brickFile, 'areatrigger'));
         }
 
         parent::generate();

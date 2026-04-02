@@ -10,7 +10,7 @@ class EnchantmentList extends DBTypeList
 {
     use listviewHelper;
 
-    public static int    $type      = Type::ENCHANTMENT;
+    public static int    $dbType    = Type::ENCHANTMENT;
     public static string $brickFile = 'enchantment';
     public static string $dataTable = '::itemenchantment';
 

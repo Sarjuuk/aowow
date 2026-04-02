@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 
 class MailList extends DBTypeList
 {
-    public static int    $type      = Type::MAIL;
+    public static int    $dbType    = Type::MAIL;
     public static string $brickFile = 'mail';
     public static string $dataTable = '::mails';
 

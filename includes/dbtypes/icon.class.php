@@ -10,7 +10,7 @@ class IconList extends DBTypeList
 {
     use listviewHelper;
 
-    public static int    $type       = Type::ICON;
+    public static int    $dbType     = Type::ICON;
     public static string $brickFile  = 'icongallery';
     public static string $dataTable  = '::icons';
     public static int    $contribute = CONTRIBUTE_CO;

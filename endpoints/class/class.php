@@ -23,7 +23,7 @@ class ClassBaseResponse extends TemplateResponse implements ICache
     public  int     $typeId    = 0;
     public ?string  $expansion = null;
 
-    private CharClassList $subject;
+    private CharClass $subject;
 
     public function __construct(string $id)
     {
@@ -35,11 +35,11 @@ class ClassBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new CharClassList(array(['id', $this->typeId]));
+        $this->subject = new CharClass($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('class'), Lang::chrClass('notFound'));
 
-        $this->h1 = $this->subject->getField('name', true);
+        $this->h1 = $this->subject->name;
 
         $this->gPageInfo += array(
             'type'   => $this->type,
@@ -68,10 +68,10 @@ class ClassBaseResponse extends TemplateResponse implements ICache
 
         $cl = ChrClass::from($this->typeId);
 
-        $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
+        $infobox = Lang::getInfoBoxForFlags($this->subject->cuFlags);
 
         // hero class
-        if ($this->subject->getField('flags') & 0x40)
+        if ($this->subject->isHeroClass())
             $infobox[] = '[tooltip=tooltip_heroclass]'.Lang::game('heroClass').'[/tooltip]';
 
         // resource
@@ -81,14 +81,14 @@ class ClassBaseResponse extends TemplateResponse implements ICache
             '[tooltip name=powertype2]'.Lang::game('st', 5).', '.Lang::game('st', 8).'[/tooltip][span class=tip tooltip=powertype2]'.Util::ucFirst(Lang::spell('powerTypes', POWER_RAGE)).'[/span], '.
             '[tooltip name=powertype8]'.Lang::game('st', 1).'[/tooltip][span class=tip tooltip=powertype8]'.Util::ucFirst(Lang::spell('powerTypes', POWER_ENERGY)).'[/span]';
         else if ($cl == ChrClass::DEATHKNIGHT)              // special DK case
-            $infobox[] = Lang::game('resources').'[span]'.Util::ucFirst(Lang::spell('powerTypes', POWER_RUNE)).', '.Util::ucFirst(Lang::spell('powerTypes', $this->subject->getField('powerType'))).'[/span]';
+            $infobox[] = Lang::game('resources').'[span]'.Util::ucFirst(Lang::spell('powerTypes', POWER_RUNE)).', '.Util::ucFirst(Lang::spell('powerTypes', $this->subject->powerType)).'[/span]';
         else                                                // regular case
-            $infobox[] = Lang::game('resource').'[span]'.Util::ucFirst(Lang::spell('powerTypes', $this->subject->getField('powerType'))).'[/span]';
+            $infobox[] = Lang::game('resource').'[span]'.Util::ucFirst(Lang::spell('powerTypes', $this->subject->powerType)).'[/span]';
 
         // roles
         $roles = [];
         for ($i = 0; $i < 4; $i++)
-            if ($this->subject->getField('roles') & (1 << $i))
+            if ($this->subject->roles & (1 << $i))
                 $roles[] = (count($roles) == 2 ? "[br]" : '').Lang::game('_roles', $i);
 
         if ($roles)
@@ -96,7 +96,7 @@ class ClassBaseResponse extends TemplateResponse implements ICache
 
         // specs
         $specList = [];
-        $skills = new SkillList(array(['id', $this->subject->getField('skills')]));
+        $skills = new SkillList(array(['id', $this->subject->skills]));
         foreach ($skills->iterate() as $k => $__)
             $specList[$k] = '[icon name='.$skills->getField('iconString').'][url=?spells=7.'.$this->typeId.'.'.$k.']'.$skills->getField('name', true).'[/url][/icon]';
 
@@ -107,7 +107,7 @@ class ClassBaseResponse extends TemplateResponse implements ICache
         $infobox[] = Lang::chrClass('id') . $this->typeId;
 
         // icon
-        if ($_ = $this->subject->getField('iconId'))
+        if ($_ = $this->subject->iconId)
         {
             $infobox[] = Util::ucFirst(Lang::game('icon')).Lang::main('colon').'[icondb='.$_.' name=true]';
             $this->extendGlobalIds(Type::ICON, $_);
@@ -115,7 +115,7 @@ class ClassBaseResponse extends TemplateResponse implements ICache
 
         // original name
         if (Lang::getLocale() != Locale::EN)
-            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.$this->subject->getField('name_loc0').'[/copy][/li]';
+            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.($this->subject->name)(Locale::EN).'[/copy][/li]';
 
         if ($infobox)
             $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0');
@@ -125,7 +125,7 @@ class ClassBaseResponse extends TemplateResponse implements ICache
         /* Main Content */
         /****************/
 
-        $this->expansion  = Util::$expansionString[$this->subject->getField('expansion')];
+        $this->expansion  = Util::$expansionString[$this->subject->expansion];
         $this->redButtons = array(
             BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId],
             BUTTON_WOWHEAD => true,
@@ -133,7 +133,7 @@ class ClassBaseResponse extends TemplateResponse implements ICache
             BUTTON_FORUM   => false                         // todo (low): Cfg::get('BOARD_URL') + X
         );
 
-        if ($_ = $this->subject->getField('iconString'))
+        if ($_ = $this->subject->icon)
             $this->headIcons[] = $_;
 
 
@@ -157,8 +157,8 @@ class ClassBaseResponse extends TemplateResponse implements ICache
                 // Glyphs, Proficiencies
                 ['s.reqClassMask', $cl->toMask(), '&'],
                 // Abilities / Talents
-                ['s.skillLine1', $this->subject->getField('skills')],
-                [DB::AND, ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $this->subject->getField('skills')]]
+                ['s.skillLine1', $this->subject->skills],
+                [DB::AND, ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $this->subject->skills]]
             ],
             [                                               // last rank or unranked
                 DB::OR,
@@ -191,9 +191,9 @@ class ClassBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: races
-        $races = new CharRaceList(array(['classMask', $cl->toMask(), '&']));
+        $races = new CharRaceSet(array(['classMask', $cl->toMask(), '&']));
         if (!$races->error)
-            $this->lvTabs->addListviewTab(new Listview(['data' => $races->getListviewData()], CharRaceList::$brickFile));
+            $this->lvTabs->addListviewTab(new Listview(['data' => $races->getListviewData()], CharRace::$brickFile));
 
         // tab: skills
         if ($skillIds)
@@ -292,7 +292,7 @@ class ClassBaseResponse extends TemplateResponse implements ICache
         if ($extraCrt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` IN %in AND `value1` = %i', [ACHIEVEMENT_CRITERIA_DATA_TYPE_S_PLAYER_CLASS_RACE, ACHIEVEMENT_CRITERIA_DATA_TYPE_T_PLAYER_CLASS_RACE], $this->typeId))
             $conditions = [DB::OR, $conditions, ['ac.id', $extraCrt]];
 
-        $crtOf = new AchievementList($conditions);
+        $crtOf = new AchievementSet($conditions);
         if (!$crtOf->error)
         {
             $this->extendGlobalData($crtOf->getJSGlobals());
@@ -301,7 +301,7 @@ class ClassBaseResponse extends TemplateResponse implements ICache
                 'data' => $crtOf->getListviewData(),
                 'name' => '$LANG.tab_criteriaof',
                 'id'   => 'criteria-of'
-            ), AchievementList::$brickFile));
+            ), Achievement::$brickFile));
         }
 
         // tab: condition-for

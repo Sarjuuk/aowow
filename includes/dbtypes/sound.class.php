@@ -10,7 +10,7 @@ class SoundList extends DBTypeList
 {
     use spawnHelper;
 
-    public static int    $type       = Type::SOUND;
+    public static int    $dbType     = Type::SOUND;
     public static string $brickFile  = 'sound';
     public static string $dataTable  = '::sounds';
     public static int    $contribute = CONTRIBUTE_CO;
@@ -88,7 +88,7 @@ class SoundList extends DBTypeList
         $data = [];
 
         foreach ($this->iterate() as $__)
-            $data[self::$type][$this->id] = array(
+            $data[self::$dbType][$this->id] = array(
                 'name'  => $this->getField('name', true),
                 'type'  => $this->getField('cat'),
                 'files' => array_values(array_filter($this->getField('files')))

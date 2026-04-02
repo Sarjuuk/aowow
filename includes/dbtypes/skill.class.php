@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 
 class SkillList extends DBTypeList
 {
-    public static int    $type      = Type::SKILL;
+    public static int    $dbType    = Type::SKILL;
     public static string $brickFile = 'skill';
     public static string $dataTable = '::skillline';
 
@@ -62,7 +62,7 @@ class SkillList extends DBTypeList
         $data = [];
 
         foreach ($this->iterate() as $__)
-            $data[self::$type][$this->id] = ['name' => $this->getField('name', true), 'icon' => $this->curTpl['iconString']];
+            $data[self::$dbType][$this->id] = ['name' => $this->getField('name', true), 'icon' => $this->curTpl['iconString']];
 
         return $data;
     }

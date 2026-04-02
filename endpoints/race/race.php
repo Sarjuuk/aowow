@@ -27,7 +27,7 @@ class RaceBaseResponse extends TemplateResponse implements ICache
     public int     $typeId    = 0;
     public ?string $expansion = null;
 
-    private CharRaceList $subject;
+    private CharRace $subject;
 
     public function __construct(string $id)
     {
@@ -39,11 +39,11 @@ class RaceBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new CharRaceList(array(['id', $this->typeId]));
+        $this->subject = new CharRace($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('race'), Lang::race('notFound'));
 
-        $this->h1 = $this->subject->getField('name', true);
+        $this->h1 = $this->subject->name;
 
         $this->gPageInfo += array(
             'type'   => $this->type,
@@ -72,28 +72,28 @@ class RaceBaseResponse extends TemplateResponse implements ICache
 
         $ra = ChrRace::from($this->typeId);
 
-        $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
+        $infobox = Lang::getInfoBoxForFlags($this->subject->cuFlags);
 
         // side
-        if ($_ = $this->subject->getField('side'))
+        if ($_ = $this->subject->side)
             $infobox[] = Lang::main('side').'[span class=icon-'.($_ == SIDE_HORDE ? 'horde' : 'alliance').']'.Lang::game('si', $_).'[/span]';
 
         // faction
-        if ($_ = $this->subject->getField('factionId'))
+        if ($_ = $this->subject->factionId)
         {
             $this->extendGlobalIds(Type::FACTION, $_);
             $infobox[] = Util::ucFirst(Lang::game('faction')).Lang::main('colon').'[faction='.$_.']';
         }
 
         // leader
-        if ($_ = $this->subject->getField('leader'))
+        if ($_ = $this->subject->leader)
         {
             $this->extendGlobalIds(Type::NPC, $_);
             $infobox[] = Lang::race('racialLeader').'[npc='.$_.']';
         }
 
         // start area
-        if ($_ = $this->subject->getField('startAreaId'))
+        if ($_ = $this->subject->startAreaId)
         {
             $this->extendGlobalIds(Type::ZONE, $_);
             $infobox[] = Lang::race('startZone').Lang::main('colon').'[zone='.$_.']';
@@ -103,8 +103,8 @@ class RaceBaseResponse extends TemplateResponse implements ICache
         $infobox[] = Lang::race('id') . $this->typeId;
 
         // icon
-        $mIcon = $this->subject->getField('iconId0');
-        $fIcon = $this->subject->getField('iconId1');
+        $mIcon = $this->subject->iconId[0];
+        $fIcon = $this->subject->iconId[1];
         if ($mIcon || $fIcon)
         {
             $buff = '';
@@ -124,7 +124,7 @@ class RaceBaseResponse extends TemplateResponse implements ICache
 
         // original name
         if (Lang::getLocale() != Locale::EN)
-            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.$this->subject->getField('name_loc0').'[/copy][/li]';
+            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.($this->subject->name)(Locale::EN).'[/copy][/li]';
 
         if ($infobox)
             $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0');
@@ -134,15 +134,15 @@ class RaceBaseResponse extends TemplateResponse implements ICache
         /* Main Content */
         /****************/
 
-        $this->expansion  = Util::$expansionString[$this->subject->getField('expansion')];
+        $this->expansion  = Util::$expansionString[$this->subject->expansion];
         $this->redButtons = array(
             BUTTON_WOWHEAD => true,
             BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId]
         );
 
-        if ($_ = $this->subject->getField('iconStringMale'))
+        if ($_ = $this->subject->icon[0])
             $this->headIcons[] = $_;
-        if ($_ = $this->subject->getField('iconStringFemale'))
+        if ($_ = $this->subject->icon[1])
             $this->headIcons[] = $_;
 
 
@@ -153,11 +153,11 @@ class RaceBaseResponse extends TemplateResponse implements ICache
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
 
         // tab: classes
-        $classes = new CharClassList(array(['racemask', $ra->toMask(), '&']));
+        $classes = new CharClassSet(array(['racemask', $ra->toMask(), '&']));
         if (!$classes->error)
         {
             $this->extendGlobalData($classes->getJSGlobals());
-            $this->lvTabs->addListviewTab(new Listview(['data' => $classes->getListviewData()], CharClassList::$brickFile));
+            $this->lvTabs->addListviewTab(new Listview(['data' => $classes->getListviewData()], CharClass::$brickFile));
         }
 
         // tab: languages
@@ -268,7 +268,7 @@ class RaceBaseResponse extends TemplateResponse implements ICache
         if ($extraCrt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` IN %in AND `value2` = %i', [ACHIEVEMENT_CRITERIA_DATA_TYPE_S_PLAYER_CLASS_RACE, ACHIEVEMENT_CRITERIA_DATA_TYPE_T_PLAYER_CLASS_RACE], $this->typeId))
             $conditions = [DB::OR, $conditions, ['ac.id', $extraCrt]];
 
-        $crtOf = new AchievementList($conditions);
+        $crtOf = new AchievementSet($conditions);
         if (!$crtOf->error)
         {
             $this->extendGlobalData($crtOf->getJSGlobals());
@@ -277,7 +277,7 @@ class RaceBaseResponse extends TemplateResponse implements ICache
                 'data' => $crtOf->getListviewData(),
                 'name' => '$LANG.tab_criteriaof',
                 'id'   => 'criteria-of'
-            ), AchievementList::$brickFile));
+            ), Achievement::$brickFile));
         }
 
         // tab: condition-for

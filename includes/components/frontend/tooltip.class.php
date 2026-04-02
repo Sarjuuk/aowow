@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 
 class Tooltip implements \JsonSerializable
 {
-    private ?string    $name       = null;
+    private ?string    $name       = null;                  // should be LocString but some names are edited to hell and back (enchanted items, profiles with title)
     private ?string    $tooltip    = null;
     private ?string    $tooltip2   = null;
     private ?\StdClass $map        = null;                  // secondary tooltip

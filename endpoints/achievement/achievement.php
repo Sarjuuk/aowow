@@ -36,7 +36,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
     public  array  $criteria    = [];
     public ?array  $rewards     = null;
 
-    private AchievementList $subject;
+    private Achievement $subject;
 
     public function __construct(string $id)
     {
@@ -48,13 +48,13 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new AchievementList(array(['id', $this->typeId]));
+        $this->subject = new Achievement($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('achievement'), Lang::achievement('notFound'));
 
-        $this->extendGlobalData($this->subject->getJSGlobals(GLOBALINFO_REWARDS));
+        $this->extendGlobalData($this->subject->getJSGlobal(GLOBALINFO_REWARDS));
 
-        $this->h1 = $this->subject->getField('name', true);
+        $this->h1 = $this->subject->name;
 
         $this->gPageInfo += array(
             'type'   => $this->type,
@@ -68,7 +68,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
         /*************/
 
         // create page title and path
-        $curCat  = $this->subject->getField('category');
+        $curCat  = $this->subject->category;
         $catPath = [];
         while ($curCat > 0)
         {
@@ -83,24 +83,24 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
         /* Page Title */
         /**************/
 
-        array_unshift($this->title, $this->subject->getField('name', true), Util::ucFirst(Lang::game('achievement')));
+        array_unshift($this->title, $this->subject->name, Util::ucFirst(Lang::game('achievement')));
 
 
         /***********/
         /* Infobox */
         /***********/
 
-        $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
+        $infobox = Lang::getInfoBoxForFlags($this->subject->cuFlags);
 
         // points
-        if ($_ = $this->subject->getField('points'))
+        if (!$this->subject->isStatistic() && ($_ = $this->subject->points))
             $infobox[] = Lang::achievement('points').Lang::main('colon').'[achievementpoints='.$_.']';
 
         // location
             // todo (low)
 
         // faction
-        $infobox[] = Lang::main('side') . match ($this->subject->getField('faction'))
+        $infobox[] = Lang::main('side') . match ($this->subject->faction)
         {
             SIDE_ALLIANCE => '[span class=icon-alliance]'.Lang::game('si', SIDE_ALLIANCE).'[/span]',
             SIDE_HORDE    => '[span class=icon-horde]'.Lang::game('si', SIDE_HORDE).'[/span]',
@@ -111,14 +111,14 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
         $infobox[] = Lang::achievement('id') . $this->typeId;
 
         // icon
-        if ($_ = $this->subject->getField('iconId'))
+        if ($_ = $this->subject->iconId)
         {
             $infobox[] = Util::ucFirst(Lang::game('icon')).Lang::main('colon').'[icondb='.$_.' name=true]';
             $this->extendGlobalIds(Type::ICON, $_);
         }
 
         // profiler relateed (note that this is part of the cache. I don't think this is important enough to calc for every view)
-        if (Cfg::get('PROFILER_ENABLE') && !($this->subject->getField('flags') & ACHIEVEMENT_FLAG_COUNTER))
+        if (Cfg::get('PROFILER_ENABLE') && !($this->subject->isStatistic()))
         {
             $x = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ::profiler_completion_achievements WHERE `achievementId` = %i', $this->typeId);
             $y = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ::profiler_profiles WHERE `custom` = 0 AND `stub` = 0');
@@ -129,10 +129,10 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
 
         // original name
         if (Lang::getLocale() != Locale::EN)
-            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.$this->subject->getField('name_loc0').'[/copy][/li]';
+            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.($this->subject->name)(Locale::EN).'[/copy][/li]';
 
         if ($infobox)
-            $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0', !($this->subject->getField('flags') & ACHIEVEMENT_FLAG_COUNTER));
+            $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0', !($this->subject->isStatistic()));
 
 
         /**********/
@@ -140,21 +140,20 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
         /**********/
 
         $series = [];
-        if ($c = $this->subject->getField('chainId'))
+        if ($c = $this->subject->chainId)
         {
-            $chainAcv = new AchievementList(array(['chainId', $c]));
+            $chainAcv = new AchievementSet(array(['chainId', $c]));
 
-            foreach ($chainAcv->iterate() as $aId => $__)
+            foreach ($chainAcv->iterate() as $aId => $acv)
             {
-                $pos = $chainAcv->getField('chainPos');
-                if (!isset($series[$pos]))
-                    $series[$pos] = [];
+                if (!isset($series[$acv->chainPos]))
+                    $series[$acv->chainPos] = [];
 
-                $series[$pos][] = array(
-                    'side'    => (int)$chainAcv->getField('faction'),
+                $series[$acv->chainPos][] = array(
+                    'side'    => $acv->faction,
                     'typeStr' => Type::getFileString(Type::ACHIEVEMENT),
                     'typeId'  => $aId,
-                    'name'    => $chainAcv->getField('name', true)
+                    'name'    => $acv->name
                 );
             }
         }
@@ -167,10 +166,10 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
         /* Main Content */
         /****************/
 
-        $this->headIcons   = [$this->subject->getField('iconString')];
-        $this->description = $this->subject->getField('description', true);
+        $this->headIcons   = [$this->subject->icon];
+        $this->description = $this->subject->description;
         $this->redButtons  = array(
-            BUTTON_WOWHEAD => !($this->subject->getField('cuFlags') & CUSTOM_SERVERSIDE),
+            BUTTON_WOWHEAD => !($this->subject->cuFlags & CUSTOM_SERVERSIDE),
             BUTTON_LINKS   => array(
                 'linkColor' => 'ffffff00',
                 'linkId'    => Type::getFileString(Type::ACHIEVEMENT).':'.$this->typeId.':&quot;..UnitGUID(&quot;player&quot;)..&quot;:0:0:0:0:0:0:0:0',
@@ -179,14 +178,14 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
                 'typeId'    => $this->typeId
             )
         );
-        $this->reqCrtQty  = $this->subject->getField('reqCriteriaCount');
+        $this->reqCrtQty  = $this->subject->reqCriteriaCount;
 
         if ($this->createMail())
             $this->addScript([SC_CSS_FILE, 'css/Book.css']);
 
         // create rewards
         $rewItems = $rewTitles = [];
-        if ($foo = $this->subject->getField('rewards'))
+        if ($foo = $this->subject->getRewards())
         {
             if ($itemRewards = array_filter($foo, fn($x) => $x[0] == Type::ITEM))
             {
@@ -203,20 +202,20 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
             }
         }
 
-        if (($text = $this->subject->getField('reward', true)) || $rewItems || $rewTitles)
+        if (($text = $this->subject->rewardText) || $rewItems || $rewTitles)
             $this->rewards = [$rewItems, $rewTitles, $text];
 
         // factionchange-equivalent
         if ($pendant = DB::World()->selectCell('SELECT IF(`horde_id` = %i, `alliance_id`, -`horde_id`) FROM player_factionchange_achievement WHERE `alliance_id` = %i OR `horde_id` = %i', $this->typeId, $this->typeId, $this->typeId))
         {
-            $altAcv = new AchievementList(array(['id', abs($pendant)]));
+            $altAcv = new Achievement(abs($pendant));
             if (!$altAcv->error)
             {
                 $this->transfer = Lang::achievement('_transfer', array(
                     $altAcv->id,
                     ITEM_QUALITY_NORMAL,
-                    $altAcv->getField('iconString'),
-                    $altAcv->getField('name', true),
+                    $altAcv->icon,
+                    $altAcv->name,
                     $pendant > 0 ? 'alliance' : 'horde',
                     $pendant > 0 ? Lang::game('si', SIDE_ALLIANCE) : Lang::game('si', SIDE_HORDE)
                 ));
@@ -279,15 +278,15 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
                     break;
                 // link to class
                 case ACHIEVEMENT_CRITERIA_TYPE_HK_CLASS:
-                    $crtIcon = new IconElement(Type::CHR_CLASS, $obj, $crtName ?: CharClassList::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
+                    $crtIcon = new IconElement(Type::CHR_CLASS, $obj, $crtName ?: CharClass::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
                     break;
                 // link to race
                 case ACHIEVEMENT_CRITERIA_TYPE_HK_RACE:
-                    $crtIcon = new IconElement(Type::CHR_RACE, $obj, $crtName ?: CharRaceList::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
+                    $crtIcon = new IconElement(Type::CHR_RACE, $obj, $crtName ?: CharRace::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
                     break;
                 // link to achivement
                 case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ACHIEVEMENT:
-                    $crtIcon = new IconElement(Type::ACHIEVEMENT, $obj, $crtName ?: AchievementList::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
+                    $crtIcon = new IconElement(Type::ACHIEVEMENT, $obj, $crtName ?: Achievement::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
                     $this->extendGlobalIds(Type::ACHIEVEMENT, $obj);
                     break;
                 // link to quest
@@ -348,10 +347,10 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
                     case ACHIEVEMENT_CRITERIA_DATA_TYPE_T_PLAYER_CLASS_RACE:
                     case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_PLAYER_CLASS_RACE:
                         if ($xData['value1'])
-                            $extraData[] = CharClassList::makeLink($xData['value1']);
+                            $extraData[] = CharClass::makeLink($xData['value1']);
 
                         if ($xData['value2'])
-                            $extraData[] = CharRaceList::makeLink($xData['value2']);
+                            $extraData[] = CharRace::makeLink($xData['value2']);
 
                         break;
                     case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AURA:
@@ -406,10 +405,10 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
 
         // tab: see also
         $conditions = array(
-            ['name_loc'.Lang::getLocale()->value, $this->subject->getField('name', true)],
+            ['name_loc'.Lang::getLocale()->value, (string)$this->subject->name],
             ['id', $this->typeId, '!']
         );
-        $saList = new AchievementList($conditions);
+        $saList = new AchievementSet($conditions);
         if (!$saList->error)
         {
             $this->extendGlobalData($saList->getJSGlobals());
@@ -419,7 +418,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
                 'id'          => 'see-also',
                 'name'        => '$LANG.tab_seealso',
                 'visibleCols' => ['category']
-            ), AchievementList::$brickFile));
+            ), Achievement::$brickFile));
         }
 
         // tab: criteria of
@@ -430,7 +429,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
 
         if (!empty($refs))
         {
-            $coList = new AchievementList(array(['id', $refs]));
+            $coList = new AchievementSet(array(['id', $refs]));
             if (!$coList->error)
             {
                 $this->extendGlobalData($coList->getJSGlobals());
@@ -440,7 +439,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
                     'id'          => 'criteria-of',
                     'name'        => '$LANG.tab_criteriaof',
                     'visibleCols' => ['category']
-                ), AchievementList::$brickFile));
+                ), Achievement::$brickFile));
             }
         }
 
@@ -455,34 +454,39 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
 
         parent::generate();
 
-        if ($this->subject->getField('flags') & ACHIEVEMENT_FLAG_REALM_FIRST)
+        if ($this->subject->isRealmFirst())
             $this->result->registerDisplayHook('infobox', [self::class, 'infoboxHook']);
     }
 
     private function createMail() : bool
     {
-        $acvEntry = $this->subject->getEntry($this->typeId);
-        $mtId     = $this->subject->getField('mailTemplate');
+        $rewardMailData = DB::World()->selectRow(
+           'SELECT    ar.`Sender`, ar.`MailTemplateID`,
+                      ar.`Subject` AS "subject_loc0", IFNULL(arl2.`Subject`, "") AS "subject_loc2", IFNULL(arl3.`Subject`, "") AS "subject_loc3", IFNULL(arl4.`Subject`, "") AS "subject_loc4", IFNULL(arl6.`Subject`, "") AS "subject_loc6", IFNULL(arl8.`Subject`, "") AS "subject_loc8",
+                      ar.`Body`    AS "text_loc0",    IFNULL(arl2.`Body`,    "") AS "text_loc2",    IFNULL(arl3.`Body`,    "") AS "text_loc3",    IFNULL(arl4.`Body`,    "") AS "text_loc4",    IFNULL(arl6.`Body`,    "") AS "text_loc6",    IFNULL(arl8.`Body`,    "") AS "text_loc8"
+            FROM      achievement_reward ar
+            LEFT JOIN achievement_reward_locale arl2 ON arl2.`ID` = ar.`ID` AND arl2.`Locale` = "frFR"
+            LEFT JOIN achievement_reward_locale arl3 ON arl3.`ID` = ar.`ID` AND arl3.`Locale` = "deDE"
+            LEFT JOIN achievement_reward_locale arl4 ON arl4.`ID` = ar.`ID` AND arl4.`Locale` = "zhCN"
+            LEFT JOIN achievement_reward_locale arl6 ON arl6.`ID` = ar.`ID` AND arl6.`Locale` = "esES"
+            LEFT JOIN achievement_reward_locale arl8 ON arl8.`ID` = ar.`ID` AND arl8.`Locale` = "ruRU"
+            WHERE     ar.`ID` = %i',
+            $this->typeId
+        );
 
-        // try mail template before letter from world.achievement_reward
-        if ($mtId && ($_ = DB::Aowow()->selectRow('SELECT * FROM ::mails WHERE `id` = %i', $mtId)))
-            $letter = $_;
-        else if ($this->subject->getField('sender'))
-            $letter = $acvEntry;
-        else
+        if (!$rewardMailData || !$rewardMailData['Sender'])
             return false;
 
-        $subject = new LocString($letter, 'subject', UIText::formatHtml(...));
-        $text    = new LocString($letter, 'text',    UIText::formatHtml(...));
-
-        if ($text->isEmpty())
-            return false;
+        $letter = $rewardMailData;
+        if ($rewardMailData['MailTemplateID'])
+            if (!($letter = DB::Aowow()->selectRow('SELECT * FROM ::mails WHERE `id` = %i', $rewardMailData['MailTemplateID'])))
+                return false;
 
         $this->mail = new Mail(
-            $mtId ?: -$this->typeId,
-            $subject,
-            $text,
-            $this->subject->getField('sender') ?: null
+            $rewardMailData['MailTemplateID'] ?: -$this->typeId,
+            new LocString($letter, 'subject', UIText::formatHtml(...)),
+            new LocString($letter, 'text',    UIText::formatHtml(...)),
+            $rewardMailData['Sender']
         );
 
         /*

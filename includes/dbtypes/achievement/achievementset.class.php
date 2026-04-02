@@ -1,0 +1,48 @@
+<?php
+
+namespace Aowow;
+
+if (!defined('AOWOW_REVISION'))
+    die('illegal access');
+
+
+class AchievementSet extends DBTypeSet implements IListview, ISource
+{
+    use TrSource;
+
+    public static int $dbType = Type::ACHIEVEMENT;
+
+    public function __construct(array $conditions = [], array $miscData = [])
+    {
+        parent::__construct($conditions, $miscData);
+
+        $rewards = Achievement::fetchRewards(...$this->getFoundIds());
+
+        /** @var Achievement $entry */
+        foreach ($this->iterate() as $id => $entry)
+            $entry->setRewards($rewards[$id] ?? []);
+    }
+
+    /**
+     * iterate over fetched sets
+     *
+     * @return \Generator<int, Achievement> id => achievement template
+     */
+    public function iterate() : \Generator
+    {
+        yield from parent::iterate();
+    }
+
+    public function getSourceData(int $_id = 0) : array
+    {
+        $data = [];
+
+        foreach ($this->iterate() as $id => $entry)
+            if (!$_id || $id == $_id)
+                $data[$id] = $entry->getSourceData();
+
+        return $data;
+    }
+}
+
+?>

@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 
 class EmoteList extends DBTypeList
 {
-    public static int    $type      = Type::EMOTE;
+    public static int    $dbType    = Type::EMOTE;
     public static string $brickFile = 'emote';
     public static string $dataTable = '::emotes';
 
