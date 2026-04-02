@@ -1258,7 +1258,7 @@ $lang = array(
         'unnamed'       => "Unbenannter Areatrigger #%d",
         'types'         => ['Unbenutzt', 'Gasthaus', 'Teleporter', 'Questziel', 'Smarter Trigger', 'Script']
     ),
-    'gameObject' => array(
+    'gameobject' => array(
         'id'            => "Objekt-ID: ",
         'notFound'      => "Dieses Objekt existiert nicht.",
         'unnamed'       => "Unbenanntes Objekt #%d",

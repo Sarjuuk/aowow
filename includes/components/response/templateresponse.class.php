@@ -26,14 +26,236 @@ trait TrDetailPage
             ''                                              // misc (here unused)
         );
     }
+
+    /**
+     * for display on map on detail page
+     * (for historic reasons )
+     * @param DBTypeEntry|DBTypeContainer $set limited to:
+     * * `CreatureEntry` `CreatureContainer`
+     * * `GameobjectEntry` `GameobjectContainer`
+     * * `SoundEntry` `SoundContainer`
+     * * `AreatriggerEntry` `AreatriggerContainer`
+     * @param bool $skipWPs do not display waypoints
+     * @param bool $skipAdmin neither display admin info nor attach spawnposfix menu
+     * @param bool $hasLabel use entities name as tooltip if it would otherwise be empty
+     * @param bool $hasLink attach link to entity to pip
+     * @return array [zoneId => [floor => ['coords' => [[x, y, opts], ...], count => n]]]
+     */
+    private static function createFullSpawns(DBTypeEntry|DBTypeContainer $set, bool $skipWPs = false, bool $skipAdmin = false, bool $hasLabel = false, bool $hasLink = false) : array
+    {
+        // works for both Sets and Entities
+        if (!($tbl = WorldPosition::getStorageByType($set::$dbType)))
+            return [];
+
+        if ($set instanceof DBTypeEntry)
+        {
+            $tmp = $set;
+            ($set = Type::newContainer($set::$dbType, null))->import($tmp);
+            unset($tmp);
+        }
+
+        $result   = [];
+        $wpSum    = [];                                     // subtract from pip total later to get spawn count
+        $wpIdx    = 0;                                      // map pip color
+        $worldPos = [];
+        $spawns   = DB::Aowow()->selectAssoc(
+           'SELECT CASE WHEN z.`type` = %i THEN 1
+                        WHEN z.`type` = %i THEN 2
+                        WHEN z.`type` = %i THEN 2
+                        ELSE 0
+                   END AS "mapType",
+                   IF (s.`pathId`, -s.`pathId`, s.`typeId`) AS "creatureOrPath",
+                   s.*
+            FROM   %n s
+            JOIN   ::zones z ON s.areaId = z.id
+            WHERE  s.`typeId` IN %in AND s.`areaX` > 0 AND s.`areaY` > 0',
+            MAP_TYPE_DUNGEON_HC, MAP_TYPE_MMODE_RAID, MAP_TYPE_MMODE_RAID_HC,
+            $tbl, $set->getFoundIDs()
+        ) ?: [];
+
+        // vehicle accessories and transport passengers are moved with their parent
+        if (!$skipAdmin && User::isInGroup(U_GROUP_MODERATOR))
+            if ($guids = array_column(array_filter($spawns, fn($x) => !($x['flags'] & (0xFFF00 | SPAWNTYPE_VEHICLE_ACCESSORY))), 'guid'))
+                $worldPos = WorldPosition::getForGUID($set::$dbType, ...$guids);
+
+        // check, if we can attach waypoints to creature
+        // we will get a nice clusterfuck of dots if we do this for more GUIDs, than we have colors though
+        $wPoints = [];
+        $wpSum   = [];
+        if (!$skipWPs && $spawns && count($spawns) < 6 && $paths = array_column($spawns, 'pathId'))
+            $wPoints = match($set::$dbType)
+            {
+                Type::NPC    => DB::Aowow()->selectAssoc('SELECT CONCAT(w.`pathId`, "-", w.`floor`) AS ARRAY_KEY, w.`point` AS ARRAY_KEY2, w.* FROM ::creature_waypoints w WHERE w.`pathId` IN %in AND w.`floor` IN %in', $paths, array_column($spawns, 'floor')),
+                Type::OBJECT => DB::Aowow()->selectAssoc('SELECT CONCAT(w.`pathId`, "-", w.`floor`) AS ARRAY_KEY, w.`point` AS ARRAY_KEY2, w.* FROM ::objects_waypoints  w WHERE w.`pathId` IN %in AND w.`floor` IN %in', $paths, array_column($spawns, 'floor')),
+                default      => []
+            };
+
+        foreach ($spawns as $s)
+        {
+            $typeId     = $s['typeId'];
+            $flags      = $s['flags'];
+            $areaId     = $s['areaId'];
+            $floor      = $s['floor'];
+            $posX       = $s['areaX'];
+            $posY       = $s['areaY'];
+            $mapType    = $s['mapType'];
+            $guid       = $s['guid']       ?? $typeId;
+            $respawn    = $s['respawn']    ?? 0;
+            $spawnMask  = $s['spawnMask']  ?? 0;
+            $phaseMask  = $s['phaseMask']  ?? 0;
+            $pathId     = $s['pathId']     ?? 0;
+            $scriptName = $s['ScriptName'] ?? null;
+            $stringId   = $s['StringId']   ?? null;
+
+            // waypoint_data.point may inconsistently start with 0 or 1 .. insert_rageface_here FFFFUUUUUUU!!!!!!!!!
+            $wpForFloor = array_values($wPoints[$pathId.'-'.$floor] ?? []);
+            foreach ($wpForFloor as $i => $p)
+            {
+                $label = [Lang::npc('waypoint').Lang::main('colon').$p['point']];
+
+                if ($p['wait'])
+                    $label[] = Lang::npc('wait').Lang::main('colon').DateTime::formatTimeElapsedFloat($p['wait']);
+                if (!empty($p['arrivalEventId']))           // gameobjects
+                    $label[] = 'on arrival: emit event #'.$p['arrivalEventId'];
+                if (!empty($p['departureEventId']))         // gameobjects
+                    $label[] = 'on departure: emit event #'.$p['departureEventId'];
+                if (!empty($p['action']))                   // creatures
+                    $label[] = lang::main('parensFmt', ['emit event #'.$p['action'], $p['actionChance']]);
+
+                $opts = array(                              // \0 doesn't get printed and tricks Util::toJSON() into handling this as a string .. i feel slightly dirty now
+                    'label' => "\0$<br /><span class=\"q0\">".implode('<br />', $label).'</span>',
+                    'type'  => $wpIdx
+                );
+
+                // connective line
+                if ($i > 0 && $wpForFloor[$i - 1]['areaId'] == $p['areaId'])
+                    $opts['lines'] = [[$wpForFloor[$i - 1]['areaX'], $wpForFloor[$i - 1]['areaY']]];
+
+                $data[$p['areaId']][$p['floor']]['coords'][] = [$p['areaX'], $p['areaY'], $opts];
+                $wpSum[$p['areaId']][$p['floor']] = ($wpSum[$p['areaId']][$p['floor']] ?? 0) + 1;
+            }
+
+            if ($wpForFloor)
+                $wpIdx++;
+
+            $opts   = $menu = $tt = $info = [];
+            $footer = '';
+
+            if ($respawn > 0)
+                $info[1] = '<span class="q0">'.Lang::npc('respawnIn', [Lang::formatTime($respawn * 1000, 'game', 'timeAbbrev', true)]).'</span>';
+            else if ($respawn < 0)
+            {
+                $info[0] = '<span class="q0">'.Lang::npc('scriptedSpawn').'</span>';
+                $info[1] = '<span class="q0">'.Lang::npc('despawnAfter', [Lang::formatTime(-$respawn * 1000, 'game', 'timeAbbrev', true)]).'</span>';
+            }
+
+            if (!$skipAdmin && User::isInGroup(U_GROUP_STAFF))
+            {
+                $vSpawn = match ($flags & 0xFF)
+                {
+                    SPAWNTYPE_VEHICLE_ACCESSORY => '* Vehicle Accessory',
+                    SPAWNTYPE_SUMMON_GROUPS     => '* Creature Summon Group',
+                    SPAWNTYPE_SMART_SCRIPTS     => '* Smart AI summon',
+                    SPAWNTYPE_TELEPORTER_DEST   => '* Teleporter Destination',
+                    SPAWNTYPE_MO_TRANSPORT      => '* Transport',
+                    default                     => $info[0] ?? null
+                };
+
+                if ($vSpawn)
+                {
+                    $info[0] = $vSpawn;
+                    $opts['type'] = 4;                      // make pip purple
+                }
+                else if ($set::$dbType == Type::NPC || $set::$dbType == Type::OBJECT)
+                    $info[0] = 'GUID'.Lang::main('colon').$guid;
+
+                if ($_ = (($flags >> 8) & 0xFFF))
+                    $info[] = Lang::game('transports', $_) ?? 'UNK transport #'.$_;
+
+                if (!empty($phaseMask) && ($phaseMask & 0xFFFF) != 0xFFFF)
+                    $info[] = Lang::game('phases').Lang::main('colon').Util::asHex($phaseMask);
+
+                if ($spawnMask == 0xF)
+                    $info[] = Lang::game('mode').Lang::game('modes', 0, -1);
+                else if ($spawnMask)
+                    if ($_ = array_intersect_key(Lang::game('modes', $mapType), Util::mask2bits($spawnMask)))
+                        $info[] = Lang::game('mode').implode(', ', $_);
+
+                if ($scriptName)
+                    $info[] = 'ScriptName'.Lang::main('colon').$scriptName;
+                if ($stringId)
+                    $info[] = 'StringId'.Lang::main('colon').$stringId;
+
+                if (!($flags & SPAWNTYPE_TELEPORTER_DEST) && $set instanceof AreatriggerContainer && $at = $set->getEntry($typeId))
+                {
+                    [$deg, $dir] = Util::O2Deg($at->orientation);
+                    $info[] = 'Orientation'.Lang::main('colon').$deg.'° ('.$dir.')';
+                }
+
+                if (isset($worldPos[$guid]))
+                    $menu = Util::buildPosFixMenu($worldPos[$guid]['mapId'], $worldPos[$guid]['mapX'], $worldPos[$guid]['mapY'], $set::$dbType, $guid, $areaId, $floor);
+
+                if ($menu)
+                    $footer = '<br /><span class="q2">Click to move pin</span>';
+            }
+
+            /* recognized opts
+             * url:     string - makes pin clickable
+             * tooltip: array  - title => [info: <arr>lines, footer: <string>line]
+             * label:   string - single line tooltip (skipped if 'tooltip' is set)
+             * menu:    array  - menu definiton (conflicts with url)
+             * type:    int    - colors the pip [default, green, red, blue, purple]
+             * lines:   array  - [[destX, destY]] - draws line from point to dest
+             */
+
+            if ($info)
+                $tt['info'] = $info;
+
+            if ($footer)
+                $tt['footer'] = $footer;
+
+            /** @var CreatureEntry|GameobjectEntry|SoundEntry|AreatriggerEntry $entry */
+            if ($entry = $set->getEntry($typeId))
+            {
+                if ($tt)
+                    $opts['tooltip'] = [(string)$entry->name => $tt];
+                else if ($hasLabel)
+                    $opts['label'] = sprintf('<span class="q">%1$s</span> ($)', $entry->name);
+            }
+
+            if ($hasLink)
+                $opts['url'] = '?' . Type::getFileString($set::$dbType) . '=' . $typeId;
+
+            if ($menu)
+                $opts['menu'] = $menu;
+
+            $result[$areaId] [$floor] ['coords'] [] = [$posX, $posY, $opts];
+        }
+
+        foreach ($result as $a => &$areas)
+            foreach ($areas as $f => &$floor)
+                $floor['count'] = count($floor['coords']) - ($wpSum[$a][$f] ?? 0);
+
+        uasort($result, self::sortBySpawnCount(...));
+
+        return $result;
+    }
+
+    private static function sortBySpawnCount(array $a, array $b) : int
+    {
+        $aCount = current($a)['count'];
+        $bCount = current($b)['count'];
+
+        return $bCount <=> $aCount;                         // sort descending
+    }
 }
 
 
 trait TrListPage
 {
-    public  string $subCat          = '';
-    public ?Filter $filter          = null;
-    public ?string $fiMenuExtension = null;
+    public  string       $subCat          = '';
+    public ?DBTypeFilter $filter          = null;
+    public ?string       $fiMenuExtension = null;
 
     public function getCacheKeyComponents() : array
     {
@@ -322,12 +544,12 @@ class TemplateResponse extends BaseResponse
 
         if ($extra)
         {
+            [$type, $typeId, $extraData] = $extra;
             $namedExtra = [];
-            foreach ($extra as $typeId => $extraData)
-                foreach ($extraData as $k => $v)
-                    $namedExtra[$typeId][$k.'_'.Lang::getLocale()->json()] = $v;
+            foreach ($extraData as $k => $v)
+                $namedExtra[$k.'_'.Lang::getLocale()->json()] = $v;
 
-            $this->jsGlobals[$type][2] = $namedExtra;
+            $this->jsGlobals[$type][2] = [$typeId => $namedExtra];
         }
     }
 
@@ -357,11 +579,11 @@ class TemplateResponse extends BaseResponse
 
             $this->initJSGlobal($type);
 
-            $obj = Type::newList($type, [['id', array_unique($ids, SORT_NUMERIC)]]);
+            $obj = Type::newContainer($type, [['id', array_unique($ids, SORT_NUMERIC)]]);
             if (!$obj)
                 continue;
 
-            $this->extendGlobalData($obj->getJSGlobals(GLOBALINFO_SELF));
+            $this->extendGlobalData($obj->getJSGlobals());
 
             // delete processed ids
             $this->jsgBuffer[$type] = [];

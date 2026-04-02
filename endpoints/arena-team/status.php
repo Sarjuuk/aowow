@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class ArenaTeamStatusResponse extends TextResponse
+class ArenateamStatusResponse extends TextResponse
 {
     protected array $expectedGET = array(
         'id' => ['filter' => FILTER_CALLBACK, 'options' => [self::class, 'checkIdList']]

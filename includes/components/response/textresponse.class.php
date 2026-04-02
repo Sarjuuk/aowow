@@ -24,6 +24,38 @@ trait TrTooltip
 
         return $key;
     }
+
+    /**
+     * tooltip2 for spawnable entities
+     * enabled by <a rel="map" ...> or anchor #map
+     * (one area, one floor, one creature, no survivors)
+     *
+     * @param DBTypeEntry $entity limited to:
+     * * `CreatureEntry`
+     * * `GameobjectEntry`
+     * * `SoundEntry`
+     * * `AreatriggerEntry`
+     * @return \StdClass [zoneId, floor, [[x1, y1], [x2, y2], ..]]
+     */
+    public static function createShortSpawns(DBTypeEntry $entity) : \StdClass
+    {
+        // first - get zone/floor with the most spawns
+        // second - get relevant spawn points
+        $result = new \StdClass;
+
+        if (!($tbl = WorldPosition::getStorageByType($entity::$dbType)))
+            return $result;
+
+        if ($res = DB::Aowow()->selectRow('SELECT `areaId`, `floor` FROM %n WHERE `typeId` = %i AND `areaX` > 0 AND `areaY` > 0 GROUP BY `areaId`, `floor` ORDER BY COUNT(1) DESC LIMIT 1', $tbl, $entity->id))
+        {
+            $result->zone   = $res['areaId'];
+            $result->coords = array(
+                $res['floor'] => DB::Aowow()->selectAssoc('SELECT `areaX` AS "0", `areaY` AS "1" FROM %n WHERE `typeId` = %i AND `areaId` = %i AND `floor` = %i AND `areaX` > 0 AND `areaY` > 0', $tbl, $entity->id, $res['areaId'], $res['floor']) ?: []
+            );
+        }
+
+        return $result;
+    }
 }
 
 

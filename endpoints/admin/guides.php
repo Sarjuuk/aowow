@@ -24,7 +24,7 @@ class AdminGuidesResponse extends TemplateResponse
 
         parent::generate();
 
-        $pending = new GuideList([['status', GuideMgr::STATUS_REVIEW]]);
+        $pending = new GuideContainer([['status', GuideMgr::STATUS_REVIEW]]);
         if ($pending->error)
             $data = [];
         else
@@ -39,7 +39,7 @@ class AdminGuidesResponse extends TemplateResponse
             'data'       => array_values($data),
             'hiddenCols' => ['patch', 'comments', 'views', 'rating'],
             'extraCols'  => '$_'
-        ), GuideList::$brickFile, 'guideAdminCol'));
+        ), GuideEntry::$brickFile, 'guideAdminCol'));
     }
 }
 

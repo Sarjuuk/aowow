@@ -54,7 +54,7 @@ class GuildsBaseResponse extends TemplateResponse implements IProfilerList
         if ($this->category)
             $this->subCat = '='.implode('.', $this->category);
 
-        $this->filter = new GuildListFilter($this->_get['filter'] ?? '', ['realms' => $realms]);
+        $this->filter = new GuildFilter($this->_get['filter'] ?? '', ['realms' => $realms]);
         if ($this->filter->shouldReload)
         {
             $_SESSION['error']['fi'] = $this->filter::class;
@@ -73,7 +73,8 @@ class GuildsBaseResponse extends TemplateResponse implements IProfilerList
         /* Menu Path */
         /*************/
 
-        $this->followBreadcrumbPath();
+        if ($path = $this->followBreadcrumbPath())
+            array_push($this->breadcrumb, ...$path);
 
 
         /**************/
@@ -124,7 +125,7 @@ class GuildsBaseResponse extends TemplateResponse implements IProfilerList
         if ($this->region)
             $miscParams['rg'] = $this->region;
 
-        $guilds = new RemoteGuildList($conditions, $miscParams);
+        $guilds = new RemoteGuildContainer($conditions, $miscParams);
         if (!$guilds->error)
         {
             $guilds->initializeLocalEntries();
@@ -143,14 +144,14 @@ class GuildsBaseResponse extends TemplateResponse implements IProfilerList
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated');
 
-        $this->lvTabs->addListviewTab(new Listview($tabData, GuildList::$brickFile, 'membersCol'));
+        $this->lvTabs->addListviewTab(new Listview($tabData, GuildEntry::$brickFile, 'membersCol'));
 
         parent::generate();
 
         $this->result->registerDisplayHook('filter', [self::class, 'filterFormHook']);
     }
 
-    public static function filterFormHook(Template\PageTemplate &$pt, GuildListFilter $filter) : void
+    public static function filterFormHook(Template\PageTemplate &$pt, GuildFilter $filter) : void
     {
         // sort for dropdown-menus
         Lang::sort('game', 'cl');
