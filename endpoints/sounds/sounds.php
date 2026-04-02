@@ -35,7 +35,7 @@ class SoundsBaseResponse extends TemplateResponse implements ICache
         if ($this->category)
             $this->subCat = '='.implode('.', $this->category);
 
-        $this->filter = new SoundListFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
+        $this->filter = new SoundFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
         if ($this->filter->shouldReload)
         {
             $_SESSION['error']['fi'] = $this->filter::class;
@@ -89,7 +89,7 @@ class SoundsBaseResponse extends TemplateResponse implements ICache
          // note: do not propagate filter to menu. Its just for categories
 
         $tabData = [];
-        $sounds  = new SoundList($conditions, ['calcTotal' => true]);
+        $sounds  = new SoundContainer($conditions, ['calcTotal' => true]);
         if (!$sounds->error)
         {
             $tabData['data'] = $sounds->getListviewData();
@@ -104,7 +104,7 @@ class SoundsBaseResponse extends TemplateResponse implements ICache
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
 
-        $this->lvTabs->addListviewTab(new Listview($tabData, SoundList::$brickFile));
+        $this->lvTabs->addListviewTab(new Listview($tabData, SoundEntry::$brickFile));
 
         parent::generate();
 

@@ -86,40 +86,40 @@ abstract class Type
     public const int FLAG_DB_TYPE           = 0x4;
     public const int FLAG_HAS_ICON          = 0x8;
 
-    public const int IDX_LIST_OBJ = 0;
+    public const int IDX_OBJECT   = 0;
     public const int IDX_FILE_STR = 1;
     public const int IDX_JSG_TPL  = 2;
     public const int IDX_FLAGS    = 3;
 
     private static array $data = array(
-        self::NPC         => [CreatureList::class,    'npc',         'g_npcs',               self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
-        self::OBJECT      => [GameObjectList::class,  'object',      'g_objects',            self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
-        self::ITEM        => [ItemList::class,        'item',        'g_items',              self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
-        self::ITEMSET     => [ItemsetList::class,     'itemset',     'g_itemsets',           self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
-        self::QUEST       => [QuestList::class,       'quest',       'g_quests',             self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
-        self::SPELL       => [SpellList::class,       'spell',       'g_spells',             self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
-        self::ZONE        => [ZoneList::class,        'zone',        'g_gatheredzones',      self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE],
-        self::FACTION     => [FactionList::class,     'faction',     'g_factions',           self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE],
-        self::PET         => [PetList::class,         'pet',         'g_pets',               self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
-        self::ACHIEVEMENT => [AchievementList::class, 'achievement', 'g_achievements',       self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
-        self::TITLE       => [TitleList::class,       'title',       'g_titles',             self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE],
-        self::WORLDEVENT  => [WorldEventList::class,  'event',       'g_holidays',           self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
-        self::CHR_CLASS   => [CharClassList::class,   'class',       'g_classes',            self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE],
-        self::CHR_RACE    => [CharRaceList::class,    'race',        'g_races',              self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE],
-        self::SKILL       => [SkillList::class,       'skill',       'g_skills',             self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
-        self::STATISTIC   => [AchievementList::class, 'achievement', 'g_achievements',       self::FLAG_NONE], // alias for achievements; exists only for Markup
-        self::CURRENCY    => [CurrencyList::class,    'currency',    'g_gatheredcurrencies', self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
-        self::SOUND       => [SoundList::class,       'sound',       'g_sounds',             self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
-        self::ICON        => [IconList::class,        'icon',        'g_icons',              self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
-        self::GUIDE       => [GuideList::class,       'guide',       '',                     self::FLAG_DB_TYPE],
-        self::PROFILE     => [ProfileList::class,     'profile',     '',                     self::FLAG_FILTRABLE], // x - not known in javascript
-        self::GUILD       => [GuildList::class,       'guild',       '',                     self::FLAG_FILTRABLE], // x
-        self::ARENA_TEAM  => [ArenaTeamList::class,   'arena-team',  '',                     self::FLAG_FILTRABLE], // x
-        self::USER        => [UserList::class,        'user',        'g_users',              self::FLAG_NONE],      // x
-        self::EMOTE       => [EmoteList::class,       'emote',       'g_emotes',             self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE],
-        self::ENCHANTMENT => [EnchantmentList::class, 'enchantment', 'g_enchantments',       self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
-        self::AREATRIGGER => [AreatriggerList::class, 'areatrigger', '',                     self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
-        self::MAIL        => [MailList::class,        'mail',        '',                     self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE]
+        self::NPC         => [CreatureEntry::class,    'npc',         'g_npcs',               self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
+        self::OBJECT      => [GameobjectEntry::class,  'object',      'g_objects',            self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
+        self::ITEM        => [ItemEntry::class,        'item',        'g_items',              self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
+        self::ITEMSET     => [ItemsetEntry::class,     'itemset',     'g_itemsets',           self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
+        self::QUEST       => [QuestEntry::class,       'quest',       'g_quests',             self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
+        self::SPELL       => [SpellEntry::class,       'spell',       'g_spells',             self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
+        self::ZONE        => [ZoneEntry::class,        'zone',        'g_gatheredzones',      self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE],
+        self::FACTION     => [FactionEntry::class,     'faction',     'g_factions',           self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE],
+        self::PET         => [PetEntry::class,         'pet',         'g_pets',               self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
+        self::ACHIEVEMENT => [AchievementEntry::class, 'achievement', 'g_achievements',       self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
+        self::TITLE       => [TitleEntry::class,       'title',       'g_titles',             self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE],
+        self::WORLDEVENT  => [WorldeventEntry::class,  'event',       'g_holidays',           self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
+        self::CHR_CLASS   => [CharClassEntry::class,   'class',       'g_classes',            self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE],
+        self::CHR_RACE    => [CharRaceEntry::class,    'race',        'g_races',              self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE],
+        self::SKILL       => [SkillEntry::class,       'skill',       'g_skills',             self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
+        self::STATISTIC   => [AchievementEntry::class, 'achievement', 'g_achievements',       self::FLAG_NONE], // alias for achievements; exists only for Markup
+        self::CURRENCY    => [CurrencyEntry::class,    'currency',    'g_gatheredcurrencies', self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
+        self::SOUND       => [SoundEntry::class,       'sound',       'g_sounds',             self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
+        self::ICON        => [IconEntry::class,        'icon',        'g_icons',              self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
+        self::GUIDE       => [GuideEntry::class,       'guide',       '',                     self::FLAG_DB_TYPE],
+        self::PROFILE     => [ProfileEntry::class,     'profile',     '',                     self::FLAG_FILTRABLE], // x - not known in javascript
+        self::GUILD       => [GuildEntry::class,       'guild',       '',                     self::FLAG_FILTRABLE], // x
+        self::ARENA_TEAM  => [ArenateamEntry::class,   'arena-team',  '',                     self::FLAG_FILTRABLE], // x
+        self::USER        => [UserEntry::class,        'user',        'g_users',              self::FLAG_NONE],      // x
+        self::EMOTE       => [EmoteEntry::class,       'emote',       'g_emotes',             self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE],
+        self::ENCHANTMENT => [EnchantmentEntry::class, 'enchantment', 'g_enchantments',       self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
+        self::AREATRIGGER => [AreatriggerEntry::class, 'areatrigger', '',                     self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
+        self::MAIL        => [MailEntry::class,        'mail',        '',                     self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE]
     );
 
 
@@ -127,19 +127,27 @@ abstract class Type
     /* Field Operations */
     /********************/
 
-    public static function newList(int $type, array $conditions = []) : ?DBTypeList
+    public static function newEntry(int $type, int|array $initData, array $opts = []) : ?DBTypeEntry
     {
         if (!self::exists($type))
             return null;
 
-        return new (self::$data[$type][self::IDX_LIST_OBJ])($conditions);
+        return new (self::$data[$type][self::IDX_OBJECT])($initData, $opts);
     }
 
-    public static function newFilter(string $fileStr, array|string $data, array $opts = []) : ?Filter
+    public static function newContainer(int $type, ?array $conditions = [], array $opts = []) : ?DBTypeContainer
+    {
+        if (!self::exists($type))
+            return null;
+
+        return new (strtr(self::$data[$type][self::IDX_OBJECT], ['Entry' => 'Container']))($conditions, $opts);
+    }
+
+    public static function newFilter(string $fileStr, array|string $data, array $opts = []) : ?DBTypeFilter
     {
         $x = self::getFileStringsFor(self::FLAG_FILTRABLE);
         if ($type = array_search($fileStr, $x))
-            return new (self::$data[$type][self::IDX_LIST_OBJ].'Filter')($data, $opts);
+            return new (strtr(self::$data[$type][self::IDX_OBJECT], ['Entry' => 'DBTypeFilter']))($data, $opts);
 
         return null;
     }
@@ -152,7 +160,7 @@ abstract class Type
         if (!(self::$data[$type][self::IDX_FLAGS] & self::FLAG_DB_TYPE))
             return [];
 
-        return DB::Aowow()->selectCol('SELECT `id` FROM %n WHERE `id` IN %in', self::$data[$type][self::IDX_LIST_OBJ]::$dataTable, (array)$ids);
+        return DB::Aowow()->selectCol('SELECT `id` FROM %n WHERE `id` IN %in', self::$data[$type][self::IDX_OBJECT]::$dataTable, (array)$ids);
     }
 
     public static function hasIcon(int $type) : bool
@@ -181,6 +189,14 @@ abstract class Type
         return self::$data[$type][self::IDX_JSG_TPL];
     }
 
+    public static function getClassName(int $type) : string
+    {
+        if (!self::exists($type))
+            return '';
+
+        return self::$data[$type][self::IDX_OBJECT];
+    }
+
     public static function getJSGlobalTemplate(int $type) : array
     {
         if (!self::exists($type) || !self::$data[$type][self::IDX_JSG_TPL])
@@ -195,7 +211,7 @@ abstract class Type
         if (!self::exists($type))
             return false;
 
-        return isset((self::$data[$type][self::IDX_LIST_OBJ])::$$attr) && ($attrVal === null || ((self::$data[$type][self::IDX_LIST_OBJ])::$$attr & $attrVal));
+        return isset((self::$data[$type][self::IDX_OBJECT])::$$attr) && ($attrVal === null || ((self::$data[$type][self::IDX_OBJECT])::$$attr & $attrVal));
     }
 
     public static function getClassAttrib(int $type, string $attr) : mixed
@@ -203,7 +219,17 @@ abstract class Type
         if (!self::exists($type))
             return null;
 
-        return (self::$data[$type][self::IDX_LIST_OBJ])::$$attr ?? null;
+        return (self::$data[$type][self::IDX_OBJECT])::$$attr ?? null;
+    }
+
+    // obsolete in php8.3 and beyond
+    public static function getClassConst(int $type, string $const) : mixed
+    {
+        if (!self::exists($type))
+            return null;
+
+        $c = self::$data[$type][self::IDX_OBJECT] . '::' . $const;
+        return defined($c) ? constant($c) : null;
     }
 
     public static function exists(int $type) : ?int

@@ -37,9 +37,9 @@ CLISetup::registerSetup("build", new class extends SetupScript
     protected array $requiredDirs   = ['datasets/'];
     protected bool  $localized      = true;
 
-    private  array     $petFamIcons = [];
-    private ?SpellList $tSpells     = null;
-    private  array     $spellMods   = [];
+    private  array          $petFamIcons = [];
+    private ?SpellContainer $tSpells     = null;
+    private  array          $spellMods   = [];
 
     public function generate() : bool
     {
@@ -49,12 +49,12 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
         // my neighbour is noisy as fuck and my head hurts, so ..
         $this->petFamIcons = ['Ability_Druid_KingoftheJungle', 'Ability_Druid_DemoralizingRoar', 'Ability_EyeOfTheOwl']; // .. i've no idea where to fetch these from
-        $this->spellMods   = (new SpellList(array(['typeCat', -2])))->getProfilerMods();
+        $this->spellMods   = (new SpellContainer(array(['typeCat', -2])))->getProfilerMods();
 
-        $petIcons  = Util::toJSON(DB::Aowow()->SelectCol('SELECT `id` AS ARRAY_KEY, LOWER(SUBSTRING_INDEX(`iconString`, "\\", -1)) AS "iconString" FROM dbc_creaturefamily WHERE `petTalentType` IN (0, 1, 2)'));
+        $petIcons  = Util::toJSON(DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, LOWER(SUBSTRING_INDEX(`iconString`, "\\", -1)) FROM dbc_creaturefamily WHERE `petTalentType` IN (0, 1, 2)'));
 
         $tSpellIds = DB::Aowow()->selectCol('SELECT `rank1` FROM dbc_talent UNION SELECT `rank2` FROM dbc_talent UNION SELECT `rank3` FROM dbc_talent UNION SELECT `rank4` FROM dbc_talent UNION SELECT `rank5` FROM dbc_talent');
-        $this->tSpells = new SpellList(array(['s.id', $tSpellIds]));
+        $this->tSpells = new SpellContainer(array(['id', $tSpellIds]));
 
         foreach (CLISetup::$locales as $loc)
         {
@@ -97,7 +97,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             $talents = DB::Aowow()->selectAssoc(
                 'SELECT  t.id AS "tId", t.*, IF(t.rank5, 5, IF(t.rank4, 4, IF(t.rank3, 3, IF(t.rank2, 2, 1)))) AS "maxRank",
                          s.`name_loc0`, s.`name_loc2`, s.`name_loc3`, s.`name_loc4`, s.`name_loc6`, s.`name_loc8`,
-                         LOWER(SUBSTRING_INDEX(si.`iconPath`, "\\", -1)) AS "iconString"
+                         LOWER(SUBSTRING_INDEX(si.`iconPath`, "\\", -1)) AS "icon"
                 FROM     dbc_talent t, dbc_spell s, dbc_spellicon si
                 WHERE    si.`id` = s.`iconId` AND t.`tabId`= %i AND s.`id` = t.`rank1`
                 ORDER BY t.`row`, t.`column`, t.`id` ASC',
@@ -140,15 +140,15 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 );
 
                 if ($classMask)
-                    $talent['iconname'] = $talents[$talentIdx]['iconString'];
+                    $talent['iconname'] = $talents[$talentIdx]['icon'];
 
                 for ($itr = 0; $itr <= ($talent['m'] - 1); $itr++)
                 {
                     $spell = $talents[$talentIdx]['rank'.($itr + 1)];
-                    if (!$this->tSpells->getEntry($spell))
+                    if (!($tEntry = $this->tSpells->getEntry($spell)))
                         continue;
 
-                    $talent['d'][] = $this->tSpells->parseText()[0];
+                    $talent['d'][] = $tEntry->renderText()[0];
                     $talent['s'][] = $talents[$talentIdx]['rank'.($itr + 1)];
 
                     if ($classMask && isset($this->spellMods[$spell]))
@@ -156,7 +156,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                             $talent['j'][] = $mod;
 
                     if ($talents[$talentIdx]['talentSpell'])
-                        $talent['t'][] = $this->tSpells->getTalentHeadForCurrent();
+                        $talent['t'][] = $tEntry->getTalentHead();
                 }
 
                 foreach ($petCategories as $k => $v)

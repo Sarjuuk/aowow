@@ -208,7 +208,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             array_column($sets, 'spellId7'), array_column($sets, 'spellId8'), array_column($sets, 'spellId9')
         );
 
-        $bonusSpells = new SpellList(array(['s.id', array_unique($spells)]), ['interactive' => SpellList::INTERACTIVE_NONE]);
+        $bonusSpells = new SpellContainer(array(['id', array_unique($spells)]), ['interactive' => SpellEntry::INTERACTIVE_NONE]);
 
         $pieces = DB::World()->selectAssoc('SELECT `itemset` AS ARRAY_KEY, `entry` AS ARRAY_KEY2, `entry`, `name`, `class`, `subclass`, `Quality`, `AllowableClass`, `ItemLevel`, `RequiredLevel`, `itemset`, IF (`Flags` & %i, 1, 0) AS "heroic", IF(`InventoryType` = 15, 26, IF(`InventoryType` = 5, 20, `InventoryType`)) AS "slot" FROM item_template WHERE `itemset` > 0', ITEM_FLAG_HEROIC);
 
@@ -251,13 +251,13 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
                 for ($i = 1; $i < 9; $i++)
                 {
-                    if (!$setData['spellId'.$i] || !$bonusSpells->getEntry($setData['spellId'.$i]))
+                    if (!$setData['spellId'.$i] || !($bonusEntry = $bonusSpells->getEntry($setData['spellId'.$i])))
                         continue;
 
                     if (!isset($descText[$locId]))
                         $descText[$locId] = '';
 
-                    $descText[$locId] .= $bonusSpells->parseText()[0]."\n";
+                    $descText[$locId] .= $bonusEntry->renderText()[0].PHP_EOL;
                 }
 
                 $row['bonusText_loc'.$locId] = $descText[$locId];

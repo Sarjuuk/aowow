@@ -8,10 +8,6 @@ if (!defined('AOWOW_REVISION'))
 
 class Game
 {
-    public static array $resistanceFields         = array(
-        null,           'resHoly',      'resFire',      'resNature',    'resFrost',     'resShadow',    'resArcane'
-    );
-
     public static array $rarityColorStings        = array(  // zero-indexed
         '9d9d9d',       'ffffff',       '1eff00',       '0070dd',       'a335ee',       'ff8000',       'e5cc80',       'e6cc80'
     );
@@ -147,42 +143,13 @@ class Game
         };
     }
 
-    public static function getTaughtSpells(mixed &$spell) : array
+    public static function getTaughtSpells(int ...$spellIds) : array
     {
-        $extraIds = [-1];                                    // init with -1 to prevent empty-array errors
-        $lookup   = [-1];
-        switch (gettype($spell))
-        {
-            case 'object':
-                if (get_class($spell) != SpellList::class)
-                    return [];
-
-                $lookup[] = $spell->id;
-                foreach ($spell->canTeachSpell() as $idx)
-                    $extraIds[] = $spell->getField('effect'.$idx.'TriggerSpell');
-
-                break;
-            case 'integer':
-                $lookup[] = $spell;
-                break;
-            case 'array':
-                $lookup = $spell;
-                break;
-            default:
-                return [];
-        }
-
         // note: omits required spell and chance in skill_discovery_template
-        $data = array_merge(
-            DB::World()->selectCol('SELECT spellId FROM spell_learn_spell WHERE entry IN %in', $lookup),
-            DB::World()->selectCol('SELECT spellId FROM skill_discovery_template WHERE reqSpell IN %in', $lookup),
-            $extraIds
+        return array_merge(
+            DB::World()->selectCol('SELECT `spellId` FROM spell_learn_spell WHERE `entry` IN %in', $spellIds),
+            DB::World()->selectCol('SELECT `spellId` FROM skill_discovery_template WHERE `reqSpell` IN %in', $spellIds)
         );
-
-        // return list of integers, not strings
-        $data = array_map('intVal', $data);
-
-        return $data;
     }
 
     public static function getBook(int $ptId, ?int $startPage = null) : ?Book

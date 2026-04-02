@@ -32,7 +32,7 @@ class RandomBaseResponse extends TextResponse
      // array_unshift($this->title, $this->h1);
 
         $type    = array_rand(Type::getClassesFor(Type::FLAG_RANDOM_SEARCHABLE));
-        $typeId  = (Type::newList($type))?->getRandomId();
+        $typeId  = (Type::newContainer($type))?->getRandomId();
 
         $this->redirectTo = '?'.Type::getFileString($type).'='.$typeId;
 

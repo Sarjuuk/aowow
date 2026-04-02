@@ -20,7 +20,7 @@ class Mail
                 ?int       $delaySeconds = null
     )
     {
-        if ($senderNpcID && ($_ = CreatureList::getName($senderNpcID)))
+        if ($senderNpcID && ($_ = CreatureEntry::getName($senderNpcID)))
             $this->sender = Lang::mail('mailBy', [$senderNpcID, $_]);
 
         if ($delaySeconds)

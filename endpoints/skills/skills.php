@@ -51,13 +51,13 @@ class SkillsBaseResponse extends TemplateResponse implements ICache
             $conditions[] = ['typeCat', $this->category[0]];
 
         $tabData = ['data' => []];
-        $skills  = new SkillList($conditions);
+        $skills  = new SkillContainer($conditions);
         if (!$skills->error)
             $tabData['data'] = $skills->getListviewData();
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
 
-        $this->lvTabs->addListviewTab(new Listview($tabData, SkillList::$brickFile));
+        $this->lvTabs->addListviewTab(new Listview($tabData, SkillEntry::$brickFile));
 
         parent::generate();
     }
