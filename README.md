@@ -2,7 +2,7 @@
 
 
 ## Build Status
-![fuck it ship it](http://forthebadge.com/images/badges/fuck-it-ship-it.svg)
+![fuck it ship it](https://forthebadge.com/badges/fuck-it-ship-it.svg)
 
 
 ## Introduction
