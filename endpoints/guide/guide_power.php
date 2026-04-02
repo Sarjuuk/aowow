@@ -43,9 +43,9 @@ class GuidePowerResponse extends TextResponse implements ICache
     {
         $opts = [];
         if ($this->typeId)
-            if (!($guide = new GuideList(array(['id', $this->typeId])))->error)
+            if (!($guide = new GuideEntry($this->typeId))->error)
                 $opts = array(
-                    'name'    => $guide->getField('name', true),
+                    'name'    => $guide->name,
                     'tooltip' => $guide->renderTooltip()
                 );
 

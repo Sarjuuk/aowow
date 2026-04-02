@@ -1,0 +1,49 @@
+<?php
+
+namespace Aowow;
+
+if (!defined('AOWOW_REVISION'))
+    die('illegal access');
+
+
+class GameobjectContainer extends DBTypeContainer
+{
+    public static int $dbType = Type::OBJECT;
+
+    public function __construct(?array $conditions = [], array $miscData = [])
+    {
+        parent::__construct($conditions, $miscData);
+    }
+
+    /**
+     * iterate over fetched sets
+     *
+     * @return \Generator<int, GameobjectEntry> id => go template
+     */
+    public function iterate() : \Generator
+    {
+        yield from parent::iterate();
+    }
+
+    /**
+     * @return ?GameobjectEntry
+     */
+    public function getEntry(null|string|int $key = null) : ?GameobjectEntry
+    {
+        return parent::getEntry($key);
+    }
+
+    /** returns data portion of a listview js object */
+    public function getListviewData(int $addInfoMask = 0x0) : array
+    {
+        $data = [];
+        $location = Util::createZoneSpawns(set: $this);
+
+        foreach ($this->iterate() as $id => $entry)
+            $data[$id] = $entry->getListviewRow($addInfoMask, $location[$id] ?? null);
+
+        return $data;
+    }
+}
+
+?>

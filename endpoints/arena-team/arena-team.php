@@ -24,7 +24,7 @@ class ArenateamBaseResponse extends TemplateResponse
 
     public int $type = Type::ARENA_TEAM;
 
-    private ?LocalArenaTeamList $subject = null;
+    private ?LocalArenateamEntry $subject = null;
 
     public function __construct(string $idOrProfile)
     {
@@ -85,7 +85,7 @@ class ArenateamBaseResponse extends TemplateResponse
             return;
         }
 
-        $this->subject = new LocalArenaTeamList(array(['at.id', $this->typeId]));
+        $this->subject = new LocalArenateamEntry($this->typeId);
         if ($this->subject->error)
             $this->notFound();
 
@@ -93,14 +93,15 @@ class ArenateamBaseResponse extends TemplateResponse
         if (!$this->subjectName)
             $this->forward($this->subject->getProfileUrl());
 
-        $this->h1 = Lang::profiler('arenaRoster', [$this->subject->getField('name')]);
+        $this->h1 = Lang::profiler('arenaRoster', [$this->subject->name]);
 
 
         /*************/
         /* Menu Path */
         /*************/
 
-        $this->followBreadcrumbPath();
+        if ($path = $this->followBreadcrumbPath())
+            array_push($this->breadcrumb, ...$path);
 
 
         /**************/
@@ -109,7 +110,7 @@ class ArenateamBaseResponse extends TemplateResponse
 
         array_unshift(
             $this->title,
-            $this->subject->getField('name').' ('.$this->realm.' - '.Lang::profiler('regions', $this->region).')',
+            $this->subject->name.' ('.$this->realm.' - '.Lang::profiler('regions', $this->region).')',
             Util::ucFirst(Lang::profiler('profiler'))
         );
 
@@ -132,13 +133,13 @@ class ArenateamBaseResponse extends TemplateResponse
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated');
 
         // tab: members
-        $member = new LocalProfileList(array(['atm.arenaTeamId', $this->typeId]));
+        $member = new LocalProfileContainer(array(['atm.arenaTeamId', $this->typeId]));
         $this->lvTabs->addListviewTab(new Listview(array(
             'data'        => $member->getListviewData(LISTVIEWINFO_CHARACTER | LISTVIEWINFO_ARENA),
             'sort'        => [-15],
             'visibleCols' => ['race', 'classs', 'level', 'talents', 'gearscore', 'rating', 'wins', 'losses'],
             'hiddenCols'  => ['guild', 'location']
-        ), ProfileList::$brickFile));
+        ), ProfileEntry::$brickFile));
     }
 
     private function notFound() : never
@@ -154,9 +155,9 @@ class ArenateamBaseResponse extends TemplateResponse
             return;
         }
 
-        $name  = $this->subject->getField('name');
-        $realm = $this->subject->getField('realmName');
-        $size  = $this->subject->getField('type');
+        $name  = $this->subject->name;
+        $realm = $this->subject->realmName;
+        $size  = $this->subject->type;
 
         $this->metaTags[] = ['property' => 'og:title', 'content' => Lang::game('arenateam') . Lang::main('colon') . $name];
         $this->metaTags[] = ['property' => 'og:type',  'content' => 'article'];

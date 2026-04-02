@@ -58,7 +58,7 @@ class ProfilesBaseResponse extends TemplateResponse implements IProfilerList
         if ($this->category)
             $this->subCat = '='.implode('.', $this->category);
 
-        $this->filter = new ProfileListFilter($this->_get['filter'] ?? '', ['realms' => $realms]);
+        $this->filter = new ProfileFilter($this->_get['filter'] ?? '', ['realms' => $realms]);
         if ($this->filter->shouldReload)
         {
             $_SESSION['error']['fi'] = $this->filter::class;
@@ -129,13 +129,13 @@ class ProfilesBaseResponse extends TemplateResponse implements IProfilerList
             $miscParams['sv'] = $this->realm;
         if ($this->region)
             $miscParams['rg'] = $this->region;
-        if ($_ = $this->filter->extraOpts)
-            $miscParams['extraOpts'] = $_;
+        if ($_ = $this->filter->queryOpts)
+            $miscParams['queryOpts'] = $_;
 
         if ($this->filter->useLocalList)
-            $profiles = new LocalProfileList($conditions, $miscParams);
+            $profiles = new LocalProfileContainer($conditions, $miscParams);
         else
-            $profiles = new RemoteProfileList($conditions, $miscParams);
+            $profiles = new RemoteProfileContainer($conditions, $miscParams);
 
         if (!$profiles->error)
         {
@@ -159,19 +159,19 @@ class ProfilesBaseResponse extends TemplateResponse implements IProfilerList
             }
 
             // init roster-listview
-            if ($roster == 1 && !$profiles->hasDiffFields('guild') && $profiles->getField('guild'))
+            if ($roster == 1 && !$profiles->hasDiffFields('guild') && $profiles->getEntry()->guild)
             {
                 $lvVisibleCols[] = 'guildrank';
                 $lvHiddenCols[]  = 'guild';
 
-                $this->roster = Lang::profiler('guildRoster', [$profiles->getField('guildname')]);
+                $this->roster = Lang::profiler('guildRoster', [$profiles->getEntry()->guildname]);
             }
-            else if ($roster && !$profiles->hasDiffFields('arenateam') && $profiles->getField('arenateam'))
+            else if ($roster && !$profiles->hasDiffFields('arenateam') && $profiles->getEntry()->arenateam)
             {
                 $lvVisibleCols[] = 'rating';
 
                 $addInfoMask |= LISTVIEWINFO_ARENA;
-                $this->roster = Lang::profiler('arenaRoster', [$profiles->getField('arenateam')]);
+                $this->roster = Lang::profiler('arenaRoster', [$profiles->getEntry()->arenateam]);
             }
 
             $lvData = $profiles->getListviewData($addInfoMask, $fiExtraCols);
@@ -209,14 +209,14 @@ class ProfilesBaseResponse extends TemplateResponse implements IProfilerList
             'hiddenCols'     => $lvHiddenCols  ?: null,
             'note'           => $lvNote        ?: null,
             '_truncated'     => $lv_truncated  ?: null
-        ), ProfileList::$brickFile));
+        ), ProfileEntry::$brickFile));
 
         parent::generate();
 
         $this->result->registerDisplayHook('filter', [self::class, 'filterFormHook']);
     }
 
-    public static function filterFormHook(Template\PageTemplate &$pt, ProfileListFilter $filter) : void
+    public static function filterFormHook(Template\PageTemplate &$pt, ProfileFilter $filter) : void
     {
         // sort for dropdown-menus
         Lang::sort('game', 'ra');

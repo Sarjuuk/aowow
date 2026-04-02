@@ -26,8 +26,16 @@ if ($ext = array_filter($badExt, fn($x) => extension_loaded($x)))
 if (version_compare(PHP_VERSION, '8.4.0') < 0)
     $error .= 'PHP Version <b>8.4</b> or higher required! Your version is <b>'.PHP_VERSION.'</b>.'.PHP_EOL.'Core functions are unavailable!';
 
-if ($error)
-    die(CLI ? strip_tags($error).PHP_EOL.PHP_EOL : $error);
+if (PHP_INT_SIZE != 8)                                      // required for packing character guids and realmIds
+    $error .= 'PHP must be compiled for x64 systems!';
+
+if ($error && CLI)
+{
+    fwrite(STDERR, (CLI_HAS_E ? "[\e[31mERR\e[0m] " : '').strip_tags($error).PHP_EOL.PHP_EOL);
+    die(78);                                                // configuration error
+}
+else if ($error)
+    die($error);
 
 
 require_once 'includes/defines.php';
@@ -42,6 +50,10 @@ require_once 'includes/cfg.class.php';                      // Config holder
 require_once 'includes/user.class.php';                     // Session handling (could be skipped for CLI context except for username and password validation used in account creation)
 require_once 'includes/game/misc.php';                      // Misc game related data & functions
 
+
+// hmm .. should every autoloader be differentiated by namespace?
+
+
 // game client data interfaces
 spl_autoload_register(function (string $class) : void
 {
@@ -51,12 +63,14 @@ spl_autoload_register(function (string $class) : void
     if (preg_match('/[^\w]/i', $class))
         return;
 
-    if ($class == 'Stat' || $class == 'StatsContainer')     // entity statistics conversion
+    $class = strtolower($class);
+
+    if ($class == 'stat' || $class == 'statscontainer')     // entity statistics conversion
         require_once 'includes/game/chrstatistics.php';
-    else if (file_exists('includes/game/'.strtolower($class).'.class.php'))
-        require_once 'includes/game/'.strtolower($class).'.class.php';
-    else if (file_exists('includes/game/loot/'.strtolower($class).'.class.php'))
-        require_once 'includes/game/loot/'.strtolower($class).'.class.php';
+    else if (file_exists('includes/game/'.$class.'.class.php'))
+        require_once 'includes/game/'.$class.'.class.php';
+    else if (file_exists('includes/game/loot/'.$class.'.class.php'))
+        require_once 'includes/game/loot/'.$class.'.class.php';
 });
 
 // our site components
@@ -68,12 +82,14 @@ spl_autoload_register(function (string $class) : void
     if (preg_match('/[^\w]/i', $class))
         return;
 
-    if (file_exists('includes/components/'.strtolower($class).'.class.php'))
-        require_once 'includes/components/'.strtolower($class).'.class.php';
-    else if (file_exists('includes/components/frontend/'.strtolower($class).'.class.php'))
-        require_once 'includes/components/frontend/'.strtolower($class).'.class.php';
-    else if (file_exists('includes/components/response/'.strtolower($class).'.class.php'))
-        require_once 'includes/components/response/'.strtolower($class).'.class.php';
+    $class = strtolower($class);
+
+    if (file_exists('includes/components/'.$class.'.class.php'))
+        require_once 'includes/components/'.$class.'.class.php';
+    else if (file_exists('includes/components/frontend/'.$class.'.class.php'))
+        require_once 'includes/components/frontend/'.$class.'.class.php';
+    else if (file_exists('includes/components/response/'.$class.'.class.php'))
+        require_once 'includes/components/response/'.$class.'.class.php';
 });
 
 // TC systems in components
@@ -96,7 +112,7 @@ spl_autoload_register(function (string $class) : void
     }
 });
 
-// autoload List-classes, associated filters
+// dbtype autloader
 spl_autoload_register(function (string $class) : void
 {
     if ($i = strrpos($class, '\\'))
@@ -105,26 +121,24 @@ spl_autoload_register(function (string $class) : void
     if (preg_match('/[^\w]/i', $class))
         return;
 
-    if (!stripos($class, 'list'))
-        return;
+    $class = strtolower($class);
 
-    $class = strtolower(str_replace('ListFilter', 'List', $class));
+    // profiler...
+    $class = strtr($class, ['remote' => '', 'local' => '']);
 
-    $cl = match ($class)
+    $dir = strtr($class, ['entry' => '', 'container' => '', 'filter' => '']);
+
+    if (file_exists('includes/dbtypes/'.$dir.'/'.$class.'.class.php'))
     {
-        'localprofilelist',
-        'remoteprofilelist'   => 'profile',
-        'localarenateamlist',
-        'remotearenateamlist' => 'arenateam',
-        'localguildlist',
-        'remoteguildlist'     => 'guild',
-        default               => strtr($class, ['list' => ''])
-    };
+        require_once 'includes/dbtypes/dbquery.class.php';
+        require_once 'includes/dbtypes/dbtypeentry.class.php';
+        require_once 'includes/dbtypes/dbtypecontainer.class.php';
 
-    if (file_exists('includes/dbtypes/'.$cl.'.class.php'))
-        require_once 'includes/dbtypes/'.$cl.'.class.php';
-    else
-        throw new \Exception('could not register type class: '.$cl);
+        if ($class == $dir.'filter')
+            require_once 'includes/dbtypes/dbtypefilter.class.php';
+
+        require_once 'includes/dbtypes/'.$dir.'/'.$class.'.class.php';
+    }
 });
 
 set_error_handler(function(int $errNo, string $errStr, string $errFile, int $errLine) : bool

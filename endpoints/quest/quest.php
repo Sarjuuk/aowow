@@ -35,7 +35,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
     public  int         $suggestedPl   = 1;
     public  bool        $unavailable   = false;
 
-    private QuestList $subject;
+    private QuestEntry $subject;
 
     public function __construct(string $id)
     {
@@ -47,32 +47,32 @@ class QuestBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new QuestList(array(['id', $this->typeId]));
+        $this->subject = new QuestEntry($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('quest'), Lang::quest('notFound'));
 
-        $this->h1 = UIText::unescapeUISequences(Util::htmlEscape($this->subject->getField('name', true)), Lang::FMT_HTML);
+        $this->h1 = UIText::unescapeUISequences(Util::htmlEscape($this->subject->name), Lang::FMT_HTML);
 
         $this->gPageInfo += array(
             'type'   => $this->type,
             'typeId' => $this->typeId,
-            'name'   => UIText::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_HTML)
+            'name'   => UIText::unescapeUISequences($this->subject->name, Lang::FMT_HTML)
         );
 
-        $_level        = $this->subject->getField('level');
-        $_minLevel     = $this->subject->getField('minLevel');
-        $_flags        = $this->subject->getField('flags');
-        $_specialFlags = $this->subject->getField('specialFlags');
-        $_side         = ChrRace::sideFromMask($this->subject->getField('reqRaceMask'));
-        $hasCompletion = !($_flags & QUEST_FLAG_UNAVAILABLE || $this->subject->getField('cuFlags') & CUSTOM_EXCLUDE_FOR_LISTVIEW);
+        $_level        = $this->subject->level;
+        $_minLevel     = $this->subject->minLevel;
+        $_flags        = $this->subject->flags;
+        $_specialFlags = $this->subject->specialFlags;
+        $_side         = ChrRace::sideFromMask($this->subject->reqRaceMask);
+        $hasCompletion = !($_flags & QUEST_FLAG_UNAVAILABLE || $this->subject->cuFlags & CUSTOM_EXCLUDE_FOR_LISTVIEW);
 
 
         /*************/
         /* Menu Path */
         /*************/
 
-        $this->breadcrumb[] = $this->subject->getField('cat2');
-        if ($cat = $this->subject->getField('cat1'))
+        $this->breadcrumb[] = $this->subject->category2;
+        if ($cat = $this->subject->category1)
         {
             foreach (Game::$questSubCats as $parent => $children)
                 if (in_array($cat, $children))
@@ -86,17 +86,17 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         /* Page Title */
         /**************/
 
-        array_unshift($this->title, UIText::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_RAW), Util::ucFirst(Lang::game('quest')));
+        array_unshift($this->title, UIText::unescapeUISequences($this->subject->name, Lang::FMT_RAW), Util::ucFirst(Lang::game('quest')));
 
 
         /***********/
         /* Infobox */
         /***********/
 
-        $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
+        $infobox = Lang::getInfoBoxForFlags($this->subject->cuFlags);
 
         // event (todo: assign eventData)
-        if ($_ = $this->subject->getField('eventId'))
+        if ($_ = $this->subject->eventId)
         {
             $this->extendGlobalIds(Type::WORLDEVENT, $_);
             $infobox[] = Lang::game('eventShort', ['[event='.$_.']']);
@@ -110,22 +110,22 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         if ($_minLevel)
         {
             $lvl = $_minLevel;
-            if ($_ = $this->subject->getField('maxLevel'))
+            if ($_ = $this->subject->maxLevel)
                 $lvl .= ' - '.$_;
 
             $infobox[] = Lang::game('reqLevel', [$lvl]);
         }
 
         // loremaster (i dearly hope those flags cover every case...)
-        if ($this->subject->getField('questSortIdBak') > 0 && !$this->subject->isRepeatable())
+        if ($this->subject->questSortIdBak > 0 && !$this->subject->isRepeatable())
         {
             $conditions = array(
                 ['ac.type', ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUESTS_IN_ZONE],
-                ['ac.value1', $this->subject->getField('questSortIdBak')],
+                ['ac.value1', $this->subject->questSortIdBak],
                 ['a.faction', $_side, '&']
             );
-            $loremaster = new AchievementList($conditions);
-            $this->extendGlobalData($loremaster->getJSGlobals(GLOBALINFO_SELF));
+            $loremaster = new AchievementContainer($conditions);
+            $this->extendGlobalData($loremaster->getJSGlobals());
 
             switch (count($loremaster->getFoundIds()))
             {
@@ -153,7 +153,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         else if ($_specialFlags & QUEST_FLAG_SPECIAL_MONTHLY)
             $_[] = Lang::quest('monthly');
 
-        if ($t = $this->subject->getField('questInfoId'))
+        if ($t = $this->subject->questInfoId)
             $_[] = Lang::quest('questInfo', $t);
 
         if ($_)
@@ -169,7 +169,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
 
         // races
         $jsg = [];
-        if (($_ = Lang::getRaceString($this->subject->getField('reqRaceMask'), $jsg, Lang::FMT_MARKUP)) && $jsg)
+        if (($_ = Lang::getRaceString($this->subject->reqRaceMask, $jsg, Lang::FMT_MARKUP)) && $jsg)
         {
             $this->extendGlobalIds(Type::CHR_RACE, ...$jsg);
             $t = count($jsg) == 1 ? Lang::game('race') : Lang::game('races');
@@ -178,7 +178,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
 
         // classes
         $jsg = [];
-        if ($_ = Lang::getClassString($this->subject->getField('reqClassMask'), $jsg, Lang::FMT_MARKUP))
+        if ($_ = Lang::getClassString($this->subject->reqClassMask, $jsg, Lang::FMT_MARKUP))
         {
             $this->extendGlobalIds(Type::CHR_CLASS, ...$jsg);
             $t = count($jsg) == 1 ? Lang::game('class') : Lang::game('classes');
@@ -186,18 +186,18 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         }
 
         // profession / skill
-        if ($_ = $this->subject->getField('reqSkillId'))
+        if ($_ = $this->subject->reqSkillId)
         {
             $this->extendGlobalIds(Type::SKILL, $_);
             $sk = '[skill='.$_.']';
-            if ($_ = $this->subject->getField('reqSkillPoints'))
+            if ($_ = $this->subject->reqSkillPoints)
                 $sk = Lang::main('parensFmt', [$sk, $_]);
 
             $infobox[] = Lang::quest('profession').$sk;
         }
 
         // timer
-        if ($_ = $this->subject->getField('timeLimit'))
+        if ($_ = $this->subject->timeLimit)
             $infobox[] = Lang::quest('timer').DateTime::formatTimeElapsedFloat($_ * 1000);
 
         $startEnd = DB::Aowow()->selectAssoc('SELECT * FROM ::quests_startend WHERE `questId` = %i', $this->typeId);
@@ -288,7 +288,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
 
         // original name
         if (Lang::getLocale() != Locale::EN)
-            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.$this->subject->getField('name_loc0').'[/copy][/li]';
+            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.($this->subject->name)(Locale::EN).'[/copy][/li]';
 
         if ($infobox)
             $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0', $hasCompletion);
@@ -304,25 +304,19 @@ class QuestBaseResponse extends TemplateResponse implements ICache
 
         // items
         $olItems[0] = array(                                // srcItem on idx:0
-            $this->subject->getField('sourceItemId'),
-            $this->subject->getField('sourceItemCount'),
+            $this->subject->sourceItemId,
+            $this->subject->sourceItemCount,
             false
         );
 
-        for ($i = 1; $i < 7; $i++)                          // reqItem in idx:1-6
-        {
-            $id  = $this->subject->getField('reqItemId'.$i);
-            $qty = $this->subject->getField('reqItemCount'.$i);
-            if (!$id || !$qty)
-                continue;
-
-            $olItems[$i] = [$id, $qty, $id == $olItems[0][0]];
-        }
+        // reqItem in idx:1-6
+        foreach ($this->subject->getRequiredItems() as $id => $qty)
+            $olItems[] = [$id, $qty, $id == $olItems[0][0]];
 
         if ($ids = array_filter(array_column($olItems, 0)))
         {
-            $olItemData = new ItemList(array(['id', $ids]));
-            $this->extendGlobalData($olItemData->getJSGlobals(GLOBALINFO_SELF));
+            $olItemData = new ItemContainer(array(['id', $ids]));
+            $this->extendGlobalData($olItemData->getJSGlobals());
 
             $providedRequired = false;
             foreach ($olItems as $i => [$itemId, $qty, $provided])
@@ -333,48 +327,49 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                 if ($provided)
                     $providedRequired = true;
 
-                if (!$olItemData->getEntry($itemId))
+                if ($entry = $olItemData->getEntry($itemId))
                 {
-                    $this->objectiveList[] = new IconElement(0, 0, Util::ucFirst(Lang::game('item')).' #'.$itemId, $qty > 1 ? $qty : '', size: IconElement::SIZE_SMALL, extraText: $provided ? Lang::quest('provided') : null);
-                    continue;
+                    $this->objectiveList[] = new IconElement(
+                        Type::ITEM,
+                        $itemId,
+                        UIText::unescapeUISequences($entry->name, Lang::FMT_HTML),
+                        num: $qty > 1 ? $qty : '',
+                        quality: $entry->quality,
+                        size: IconElement::SIZE_SMALL,
+                        element: 'iconlist-icon',
+                        extraText: $provided ? Lang::quest('provided') : null
+                    );
                 }
-
-                $this->objectiveList[] = new IconElement(
-                    Type::ITEM,
-                    $itemId,
-                    UIText::unescapeUISequences($olItemData->json[$itemId]['name'], Lang::FMT_HTML),
-                    num: $qty > 1 ? $qty : '',
-                    quality: 7 - $olItemData->json[$itemId]['quality'],
-                    size: IconElement::SIZE_SMALL,
-                    element: 'iconlist-icon',
-                    extraText: $provided ? Lang::quest('provided') : null
-                );
+                else
+                    $this->objectiveList[] = new IconElement(0, 0, Util::ucFirst(Lang::game('item')).' #'.$itemId, $qty > 1 ? $qty : '', size: IconElement::SIZE_SMALL, extraText: $provided ? Lang::quest('provided') : null);
             }
 
             // if providd item is not required by quest, list it below other requirements
             if (!$providedRequired && $olItems[0][0])
             {
-                if (!$olItemData->getEntry($olItems[0][0]))
-                    $this->providedItem = new IconElement(0, 0, Util::ucFirst(Lang::game('item')).' #'.$itemId, $olItems[0][1] > 1 ? $olItems[0][1] : '');
-                else
+                if ($entry = $olItemData->getEntry($olItems[0][0]))
+                {
                     $this->providedItem = new IconElement(
                         Type::ITEM,
                         $olItems[0][0],
-                        UIText::unescapeUISequences($olItemData->json[$olItems[0][0]]['name'], Lang::FMT_HTML),
+                        UIText::unescapeUISequences($entry->name, Lang::FMT_HTML),
                         num: $olItems[0][1] > 1 ? $olItems[0][1] : '',
-                        quality: 7 - $olItemData->json[$olItems[0][0]]['quality'],
+                        quality: $entry->quality,
                         size: IconElement::SIZE_SMALL,
                         element: 'iconlist-icon'
                     );
+                }
+                else
+                    $this->providedItem = new IconElement(0, 0, Util::ucFirst(Lang::game('item')).' #'.$itemId, $olItems[0][1] > 1 ? $olItems[0][1] : '');
             }
         }
 
         // creature or GO...
-        for ($i = 1; $i < 5; $i++)
+        for ($i = 0; $i < 4; $i++)
         {
-            $id     = $this->subject->getField('reqNpcOrGo'.$i);
-            $qty    = $this->subject->getField('reqNpcOrGoCount'.$i);
-            $altTxt = $this->subject->getField('objectiveText'.$i, true);
+            $id     = $this->subject->reqNpcOrGo[$i];
+            $qty    = $this->subject->reqNpcOrGoCount[$i];
+            $altTxt = $this->subject->objectiveText[$i];
             if ($id > 0 && $qty)
                 $olNPCs[$id] = [$qty, $altTxt, []];
             else if ($id < 0 && $qty)
@@ -384,29 +379,22 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         // .. creature kills
         if ($ids = array_keys($olNPCs))
         {
-            $olNPCData = new CreatureList(array(DB::OR, ['id', $ids], ['killCredit1', $ids], ['killCredit2', $ids]));
-            $this->extendGlobalData($olNPCData->getJSGlobals(GLOBALINFO_SELF));
+            $olNPCData = new CreatureContainer(array(DB::OR, ['id', $ids], ['killCredit1', $ids], ['killCredit2', $ids]));
+            $this->extendGlobalData($olNPCData->getJSGlobals());
 
             // create proxy-references
-            foreach ($olNPCData->iterate() as $id => $__)
-            {
-                if ($p = $olNPCData->getField('KillCredit1'))
-                    if (isset($olNPCs[$p]))
-                        $olNPCs[$p][2][$id] = $olNPCData->getField('name', true);
-
-                if ($p = $olNPCData->getField('KillCredit2'))
-                    if (isset($olNPCs[$p]))
-                        $olNPCs[$p][2][$id] = $olNPCData->getField('name', true);
-            }
+            foreach ($olNPCData->iterate() as $id => $entry)
+                foreach ($entry->killCredit as $kc)
+                    if (isset($olNPCs[$kc]))
+                        $olNPCs[$kc][2][$id] = $entry->name;
 
             foreach ($olNPCs as $i => [$qty, $altText, $proxies])
             {
-                if (!$i)
-                    continue;
+                $entry = $olNPCData->getEntry($i);
 
                 if ($proxies)                               // has proxies assigned, add yourself as another proxy
                 {
-                    $proxies[$i] = Util::localizedString($olNPCData->getEntry($i), 'name');
+                    $proxies[$i] = $entry->name;
 
                     // split in two blocks for display
                     $proxies = array(
@@ -416,76 +404,67 @@ class QuestBaseResponse extends TemplateResponse implements ICache
 
                     $this->objectiveList[] = array(
                         'id'    => $i,
-                        'text'  => ($altText ?: Util::localizedString($olNPCData->getEntry($i), 'name')) . ((($_specialFlags & QUEST_FLAG_SPECIAL_SPELLCAST) || $altText) ? '' : ' '.Lang::achievement('slain')),
+                        'text'  => ($altText ?: $entry->name) . ((($_specialFlags & QUEST_FLAG_SPECIAL_SPELLCAST) || $altText) ? '' : ' '.Lang::achievement('slain')),
                         'qty'   => $qty > 1 ? $qty : 0,
                         'proxy' => array_filter($proxies)
                     );
                 }
-                else if (!$olNPCData->getEntry($i))
-                    $this->objectiveList[] = new IconElement(0, 0, Util::ucFirst(Lang::game('npc')).' #'.$i, $qty > 1 ? $qty : '');
-                else
+                else if ($entry = $olNPCData->getEntry($i))
+                {
                     $this->objectiveList[] = new IconElement(
                         Type::NPC,
                         $i,
-                        $altText ?: Util::localizedString($olNPCData->getEntry($i), 'name'),
+                        $altText ?: $entry->name,
                         $qty > 1 ? $qty : '',
                         size: IconElement::SIZE_SMALL,
                         element: 'iconlist-icon',
                         extraText: (($_specialFlags & QUEST_FLAG_SPECIAL_SPELLCAST) || $altText) ? '' : Lang::achievement('slain'),
                     );
+                }
+                else
+                    $this->objectiveList[] = new IconElement(0, 0, Util::ucFirst(Lang::game('npc')).' #'.$i, $qty > 1 ? $qty : '');
             }
         }
 
         // .. GO interactions
         if ($ids = array_keys($olGOs))
         {
-            $olGOData = new GameObjectList(array(['id', $ids]));
-            $this->extendGlobalData($olGOData->getJSGlobals(GLOBALINFO_SELF));
+            $olGOData = new GameobjectContainer(array(['id', $ids]));
+            $this->extendGlobalData($olGOData->getJSGlobals());
 
             foreach ($olGOs as $i => [$qty, $altText])
             {
-                if (!$i)
-                    continue;
-
-                if (!$olGOData->getEntry($i))
-                    $this->objectiveList[] = new IconElement(0, 0, Util::ucFirst(Lang::game('object')).' #'.$i, $qty > 1 ? $qty : '', size: IconElement::SIZE_SMALL);
-                else
+                if ($entry = $olGOData->getEntry($i))
+                {
                     $this->objectiveList[] = new IconElement(
                         Type::OBJECT,
                         $i,
-                        $altText ?: UIText::unescapeUISequences(Util::localizedString($olGOData->getEntry($i), 'name'), Lang::FMT_HTML),
+                        $altText ?: UIText::unescapeUISequences($entry->name, Lang::FMT_HTML),
                         $qty > 1 ? $qty : '',
                         size: IconElement::SIZE_SMALL,
                         element: 'iconlist-icon',
                     );
+                }
+                else
+                    $this->objectiveList[] = new IconElement(0, 0, Util::ucFirst(Lang::game('object')).' #'.$i, $qty > 1 ? $qty : '', size: IconElement::SIZE_SMALL);
             }
         }
 
         // reputation required
-        for ($i = 1; $i < 3; $i++)
+        if ($olFactions = $this->subject->getRequiredReputation())
         {
-            $id  = $this->subject->getField('reqFactionId'.$i);
-            $val = $this->subject->getField('reqFactionValue'.$i);
-            if (!$id)
-                continue;
+            $olFactionsData = new FactionContainer(array(['id', array_keys($olFactions)]));
+            $this->extendGlobalData($olFactionsData->getJSGlobals());
 
-            $olFactions[$id] = $val;
-        }
-
-        if ($ids = array_keys($olFactions))
-        {
-            $olFactionsData = new FactionList(array(['id', $ids]));
-            $this->extendGlobalData($olFactionsData->getJSGlobals(GLOBALINFO_SELF));
-
-            foreach ($olFactions as $i => $val)
+            foreach ($olFactions as $fId => $val)
             {
-                if (!$i || !in_array($i, $olFactionsData->getFoundIDs()))
+                if (!($entry = $olFactionsData->getEntry($fId)))
                     continue;
 
                 $this->objectiveList[] = new IconElement(
                     Type::FACTION,
                     $i,
-                    Util::localizedString($olFactionsData->getEntry($i), 'name'),
+                    $entry->name,
                     size: IconElement::SIZE_SMALL,
                     element: 'iconlist-icon',
                     extraText: sprintf(Util::$dfnString, $val.' '.Lang::achievement('points'), '('.Lang::getReputationLevelForPoints($val).')')
@@ -494,18 +473,18 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         }
 
         // granted spell
-        if ($_ = $this->subject->getField('sourceSpellId'))
+        if ($_ = $this->subject->sourceSpellId)
         {
             $this->extendGlobalIds(Type::SPELL, $_);
-            $this->objectiveList[] = new IconElement(Type::SPELL, $_, SpellList::getName($_), extraText: Lang::quest('provided'), element: 'iconlist-icon', size: IconElement::SIZE_SMALL);
+            $this->objectiveList[] = new IconElement(Type::SPELL, $_, Spellentry::getName($_), extraText: Lang::quest('provided'), element: 'iconlist-icon', size: IconElement::SIZE_SMALL);
         }
 
         // required money
-        if ($this->subject->getField('rewardOrReqMoney') < 0)
-            $this->objectiveList[] = Lang::quest('reqMoney', [Util::formatMoney(abs($this->subject->getField('rewardOrReqMoney')))]);
+        if ($this->subject->rewardOrReqMoney < 0)
+            $this->objectiveList[] = Lang::quest('reqMoney', [Util::formatMoney(abs($this->subject->rewardOrReqMoney))]);
 
         // required pvp kills
-        if ($_ = $this->subject->getField('reqPlayerKills'))
+        if ($_ = $this->subject->reqPlayerKills)
             $this->objectiveList[] = Lang::quest('playerSlain', [$_]);
 
 
@@ -634,7 +613,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         // PSA: 'redundant' data is on purpose (e.g. creature required for kill, also dropps item required to collect)
 
         // external events
-        $endText = $this->subject->parseText('end', false);
+        $endText = $this->subject->renderText('end', false);
         if ($_specialFlags & QUEST_FLAG_SPECIAL_EXT_COMPLETE)
         {
             // areatrigger
@@ -651,7 +630,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                                 'type'      => User::isInGroup(U_GROUP_STAFF) ? Type::AREATRIGGER : -1,
                                 'id'        => $atId,
                                 'point'     => 'requirement',
-                                'name'      => $this->subject->parseText('end', false) ?: Lang::areatrigger('unnamed', [$atir[0]]),
+                                'name'      => $this->subject->renderText('end', false) ?: Lang::areatrigger('unnamed', [$atir[0]]),
                                 'coord'     => [$atsp['posX'], $atsp['posY']],
                                 'coords'    => [[$atsp['posX'], $atsp['posY']]],
                                 'objective' => $objectiveIdx++
@@ -672,21 +651,26 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                 }
             }
             // complete-spell
-            else if ($endSpell = new SpellList(array(DB::OR, [DB::AND, ['effect1Id', SPELL_EFFECT_QUEST_COMPLETE], ['effect1MiscValue', $this->typeId]], [DB::AND, ['effect2Id', SPELL_EFFECT_QUEST_COMPLETE], ['effect2MiscValue', $this->typeId]], [DB::AND, ['effect3Id', SPELL_EFFECT_QUEST_COMPLETE], ['effect3MiscValue', $this->typeId]])))
-                if (!$endSpell->error)
-                    $endText = '<a href="?spell='.$endSpell->id.'">'.($endText ?: $endSpell->getField('name', true)).'</a>';
+            else if ($endSpell = new SpellContainer(array(DB::OR, [DB::AND, ['effect1Id', SPELL_EFFECT_QUEST_COMPLETE], ['effect1MiscValue', $this->typeId]], [DB::AND, ['effect2Id', SPELL_EFFECT_QUEST_COMPLETE], ['effect2MiscValue', $this->typeId]], [DB::AND, ['effect3Id', SPELL_EFFECT_QUEST_COMPLETE], ['effect3MiscValue', $this->typeId]])))
+            {
+                foreach ($endSpell->iterate() as $entry)
+                {
+                    $endText = '<a href="?spell='.$entry->id.'">'.($endText ?: $entry->name).'</a>';
+                    break;                                  // should only ever match one single spell, but who knows..
+                }
+            }
         }
 
         // ..adding creature kill requirements
         if ($olNPCData && !$olNPCData->error)
         {
-            $spawns = $olNPCData->getSpawns(SPAWNINFO_QUEST);
+            $spawns = self::createQuestSpawns($olNPCData);
             $addObjectiveSpawns($spawns, function ($npcId, $npcData) use ($olNPCs, &$objectiveIdx)
             {
                 $npcData['point'] = 'requirement';          // always requirement
                 foreach ($olNPCs as $proxyNpcId => $npc)
                 {
-                    if ($npc[1] && $npcId == $proxyNpcId)  // overwrite creature name with quest specific text, if set.
+                    if ($npc[1] && $npcId == $proxyNpcId)   // overwrite creature name with quest specific text, if set.
                         $npcData['name'] = $npc[1];
 
                     if (!empty($npc[2][$npcId]))
@@ -703,7 +687,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         // ..adding object interaction requirements
         if ($olGOData && !$olGOData->error)
         {
-            $spawns = $olGOData->getSpawns(SPAWNINFO_QUEST);
+            $spawns = self::createQuestSpawns($olGOData);
             $addObjectiveSpawns($spawns, function ($goId, $goData) use ($olGOs, &$objectiveIdx)
             {
                 foreach ($olGOs as $_goId => $go)
@@ -724,11 +708,11 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         // .. adding npc from: droping queststart item; dropping item needed to collect; starting quest; ending quest
         if ($mapNPCs)
         {
-            $npcs = new CreatureList(array(['id', array_column($mapNPCs, 0)]));
+            $npcs = new CreatureContainer(array(['id', array_column($mapNPCs, 0)]));
             if (!$npcs->error)
             {
                 $startEndDupe = [];                         // if quest starter/ender is the same creature, we need to add it twice
-                $spawns       = $npcs->getSpawns(SPAWNINFO_QUEST);
+                $spawns       = self::createQuestSpawns($npcs);
                 $addObjectiveSpawns($spawns, function ($npcId, $npcData) use ($mapNPCs, &$startEndDupe, $itemObjectives)
                 {
                     foreach ($mapNPCs as $mn)
@@ -737,7 +721,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                             continue;
 
                         if ($mn[2])                         // source for itemId
-                            $npcData['item'] = ItemList::getName($mn[2]);
+                            $npcData['item'] = ItemEntry::getName($mn[2]);
 
                         switch ($mn[1])                     // method
                         {
@@ -777,11 +761,11 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         // .. adding go from: containing queststart item; containing item needed to collect; starting quest; ending quest
         if ($mapGOs)
         {
-            $gos = new GameObjectList(array(['id', array_column($mapGOs, 0)]));
+            $gos = new GameobjectContainer(array(['id', array_column($mapGOs, 0)]));
             if (!$gos->error)
             {
                 $startEndDupe = [];                         // if quest starter/ender is the same object, we need to add it twice
-                $spawns       = $gos->getSpawns(SPAWNINFO_QUEST);
+                $spawns       = self::createQuestSpawns($gos);
                 $addObjectiveSpawns($spawns, function ($goId, $goData) use ($mapGOs, &$startEndDupe, $itemObjectives)
                 {
                     foreach ($mapGOs as $mgo)
@@ -790,7 +774,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                             continue;
 
                         if ($mgo[2])                        // source for itemId
-                            $goData['item'] = ItemList::getName($mgo[2]);
+                            $goData['item'] = ItemEntry::getName($mgo[2]);
 
                         switch ($mgo[1])                    // method
                         {
@@ -838,14 +822,14 @@ class QuestBaseResponse extends TemplateResponse implements ICache
             arsort($zoneOrder);
             $zoneOrder = array_flip(array_keys($zoneOrder));
 
-            $areas = new ZoneList(array(['id', array_keys($mObjectives)]));
+            $areas = new ZoneContainer(array(['id', array_keys($mObjectives)]));
             if (!$areas->error)
             {
-                foreach ($areas->iterate() as $id => $__)
+                foreach ($areas->iterate() as $id => $areaEntry)
                 {
                     // [zoneId, selectionPriority] - determines which map link is preselected. (highest index)
                     $mZones[$zoneOrder[$id]]  = [$id, count($zoneOrder) - $zoneOrder[$id]];
-                    $mObjectives[$id]['zone'] = $areas->getField('name', true);
+                    $mObjectives[$id]['zone'] = $areaEntry->name;
                 }
             }
 
@@ -893,20 +877,20 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         $this->series        = $this->createSeries();
         $this->gains         = $this->createGains($_side);
         $this->rewards       = $this->createRewards();
-        $this->objectives    = $this->subject->parseText('objectives', false);
-        $this->details       = $this->subject->parseText('details', false);
-        $this->offerReward   = $this->subject->parseText('offerReward', false);
-        $this->requestItems  = $this->subject->parseText('requestItems', false);
-        $this->completed     = $this->subject->parseText('completed', false);
+        $this->objectives    = $this->subject->renderText('objectives', false);
+        $this->details       = $this->subject->renderText('details', false);
+        $this->offerReward   = $this->subject->renderText('offerReward', false);
+        $this->requestItems  = $this->subject->renderText('requestItems', false);
+        $this->completed     = $this->subject->renderText('completed', false);
         $this->end           = $endText;
-        $this->suggestedPl   = $this->subject->getField('suggestedPlayers');
-        $this->unavailable   = $_flags & QUEST_FLAG_UNAVAILABLE || $this->subject->getField('cuFlags') & CUSTOM_EXCLUDE_FOR_LISTVIEW;
+        $this->suggestedPl   = $this->subject->suggestedPlayers;
+        $this->unavailable   = $_flags & QUEST_FLAG_UNAVAILABLE || $this->subject->cuFlags & CUSTOM_EXCLUDE_FOR_LISTVIEW;
         $this->redButtons    = array(
             BUTTON_WOWHEAD => true,
             BUTTON_LINKS   => array(
                 'linkColor' => 'ffffff00',
                 'linkId'    => 'quest:'.$this->typeId.':'.$_level,
-                'linkName'  => Util::jsEscape($this->subject->getField('name', true)),
+                'linkName'  => Util::jsEscape($this->subject->name),
                 'type'      => $this->type,
                 'typeId'    => $this->typeId
             )
@@ -918,12 +902,12 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         // factionchange-equivalent
         if ($pendant = DB::World()->selectCell('SELECT IF(`horde_id` = %i, `alliance_id`, -`horde_id`) FROM player_factionchange_quests WHERE `alliance_id` = %i OR `horde_id` = %i', $this->typeId, $this->typeId, $this->typeId))
         {
-            $altQuest = new QuestList(array(['id', abs($pendant)]));
+            $altQuest = new QuestEntry(abs($pendant));
             if (!$altQuest->error)
             {
                 $this->transfer = Lang::quest('_transfer', array(
                     $altQuest->id,
-                    $altQuest->getField('name', true),
+                    $altQuest->name,
                     $pendant > 0 ? 'alliance' : 'horde',
                     $pendant > 0 ? Lang::game('si', SIDE_ALLIANCE) : Lang::game('si', SIDE_HORDE)
                 ));
@@ -938,7 +922,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
 
         // tab: see also
-        $seeAlso = new QuestList(array(['name_loc'.Lang::getLocale()->value, Util::htmlEscape($this->subject->getField('name', true))], ['id', $this->typeId, '!']));
+        $seeAlso = new QuestContainer(array(['name_loc'.Lang::getLocale()->value, Util::htmlEscape($this->subject->name)], ['id', $this->typeId, '!']));
         if (!$seeAlso->error)
         {
             $this->extendGlobalData($seeAlso->getJSGlobals());
@@ -946,26 +930,26 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                 'data' => $seeAlso->getListviewData(),
                 'name' => '$LANG.tab_seealso',
                 'id'   => 'see-also'
-            ), QuestList::$brickFile));
+            ), QuestEntry::$brickFile));
         }
 
         // tab: criteria of
-        $criteriaOf = new AchievementList(array(['ac.type', ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST], ['ac.value1', $this->typeId]));
+        $criteriaOf = new AchievementContainer(array(['ac.type', ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST], ['ac.value1', $this->typeId]));
         if (!$criteriaOf->error)
         {
-            $this->extendGlobalData($criteriaOf->getJSGlobals());
+            $this->extendGlobalData($criteriaOf->getJSGlobals(GLOBALINFO_REWARDS));
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $criteriaOf->getListviewData(),
                 'name' => '$LANG.tab_criteriaof',
                 'id'   => 'criteria-of'
-            ), AchievementList::$brickFile));
+            ), AchievementEntry::$brickFile));
         }
 
         // tab: spawning pool (for the swarm)
         if ($qp = DB::World()->selectCol('SELECT qpm2.`questId` FROM quest_pool_members qpm1 JOIN quest_pool_members qpm2 ON qpm1.`poolId` = qpm2.`poolId` WHERE qpm1.`questId` = %i', $this->typeId))
         {
             $max = DB::World()->selectCell('SELECT `numActive` FROM quest_pool_template qpt JOIN quest_pool_members qpm ON qpm.`poolId` = qpt.`poolId` WHERE qpm.`questId` = %i', $this->typeId);
-            $pooledQuests = new QuestList(array(['id', $qp]));
+            $pooledQuests = new QuestContainer(array(['id', $qp]));
             if (!$pooledQuests->error)
             {
                 $this->extendGlobalData($pooledQuests->getJSGlobals());
@@ -974,7 +958,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                     'name' => 'Quest Pool',
                     'id'   => 'quest-pool',
                     'note' => Lang::quest('questPoolDesc', [$max])
-                ), QuestList::$brickFile));
+                ), QuestEntry::$brickFile));
             }
         }
 
@@ -985,11 +969,11 @@ class QuestBaseResponse extends TemplateResponse implements ICache
             ->prepare();
 
 
-        $minRepFac = $this->subject->getField('reqMinRepFaction');
-        $maxRepFac = $this->subject->getField('reqMaxRepFaction');
+        $minRepFac = $this->subject->reqMinRepFaction;
+        $maxRepFac = $this->subject->reqMaxRepFaction;
         // add +/- 2 to contain edgecases. ie a reqMaxRepValue of 1 should not include the whole of REP_NEUTRAL
-        $minRepRank = $minRepFac ? Game::getReputationLevelForPoints($this->subject->getField('reqMinRepValue') + 2) : REP_HATED;
-        $maxRepRank = $maxRepFac ? Game::getReputationLevelForPoints($this->subject->getField('reqMaxRepValue') - 2) : REP_EXALTED;
+        $minRepRank = $minRepFac ? Game::getReputationLevelForPoints($this->subject->reqMinRepValue + 2) : REP_HATED;
+        $maxRepRank = $maxRepFac ? Game::getReputationLevelForPoints($this->subject->reqMaxRepValue - 2) : REP_EXALTED;
 
         $convertRankBits = function (int $minRank, int $maxRank) : int
         {
@@ -1022,8 +1006,8 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         $rewards = [[], [], [], ''];                        // [spells, items, choice, money]
 
         // moneyReward / maxLevelCompensation
-        $comp       = $this->subject->getField('rewardMoneyMaxLevel');
-        $questMoney = $this->subject->getField('rewardOrReqMoney');
+        $comp       = $this->subject->rewardMoneyMaxLevel;
+        $questMoney = $this->subject->rewardOrReqMoney;
         $realComp   = max($comp, $questMoney);
         if ($questMoney > 0)
         {
@@ -1035,57 +1019,54 @@ class QuestBaseResponse extends TemplateResponse implements ICache
             $rewards[3] = Lang::quest('expConvert2', [Util::formatMoney($realComp), MAX_LEVEL]);
 
         // itemChoices
-        if (!empty($this->subject->choices[$this->typeId][Type::ITEM]))
+        if ($choices = $this->subject->getRewardChoiceItems())
         {
-            $choices     = $this->subject->choices[$this->typeId][Type::ITEM];
-            $choiceItems = new ItemList(array(['id', array_keys($choices)]));
+            $choiceItems = new ItemContainer(array(['id', array_keys($choices)]));
             if (!$choiceItems->error)
             {
                 $this->extendGlobalData($choiceItems->getJSGlobals());
                 foreach ($choices as $id => $num)           // itr over $choices to preserve display order
-                    if ($choiceItems->getEntry($id))
+                    if ($entry = $choiceItems->getEntry($id))
                         $rewards[2][] = new IconElement(
                             Type::ITEM,
                             $id,
-                            UIText::unescapeUISequences($choiceItems->getField('name', true), Lang::FMT_HTML),
-                            quality: $choiceItems->getField('quality'),
+                            UIText::unescapeUISequences($entry->name, Lang::FMT_HTML),
+                            quality: $entry->quality,
                             num: $num
                         );
             }
         }
 
         // itemRewards
-        if (!empty($this->subject->rewards[$this->typeId][Type::ITEM]))
+        if ($reward = $this->subject->getRewardItems())
         {
-            $reward   = $this->subject->rewards[$this->typeId][Type::ITEM];
-            $rewItems = new ItemList(array(['id', array_keys($reward)]));
+            $rewItems = new ItemContainer(array(['id', array_keys($reward)]));
             if (!$rewItems->error)
             {
                 $this->extendGlobalData($rewItems->getJSGlobals());
                 foreach ($reward as $id => $num)            // itr over $reward to preserve display order
-                    if ($rewItems->getEntry($id))
+                    if ($entry = $rewItems->getEntry($id))
                         $rewards[1][] = new IconElement(
                             Type::ITEM,
                             $id,
-                            UIText::unescapeUISequences($rewItems->getField('name', true), Lang::FMT_HTML),
-                            quality: $rewItems->getField('quality'),
+                            UIText::unescapeUISequences($entry->name, Lang::FMT_HTML),
+                            quality: $entry->quality,
                             num: $num
                         );
             }
         }
 
-        if ($currency = array_filter($this->subject->rewards[$this->typeId][Type::CURRENCY] ?? [],
-            fn($x) => $x != CURRENCY_ARENA_POINTS && $x != CURRENCY_HONOR_POINTS, ARRAY_FILTER_USE_KEY))
+        if ($currency = array_filter($this->subject->getRewardCurrencies(), fn($x) => $x != CURRENCY_ARENA_POINTS && $x != CURRENCY_HONOR_POINTS, ARRAY_FILTER_USE_KEY))
         {
-            $rewCurr  = new CurrencyList(array(['id', array_keys($currency)]));
+            $rewCurr  = new CurrencyContainer(array(['id', array_keys($currency)]));
             if (!$rewCurr->error)
             {
                 $this->extendGlobalData($rewCurr->getJSGlobals());
-                foreach ($rewCurr->iterate() as $id => $__)
+                foreach ($rewCurr->iterate() as $id => $entry)
                     $rewards[1][] = new IconElement(
                         Type::CURRENCY,
                         $id,
-                        $rewCurr->getField('name', true),
+                        $entry->name,
                         quality: ITEM_QUALITY_NORMAL,
                         num: $currency[$id]
                     );
@@ -1093,8 +1074,8 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         }
 
         // spellRewards
-        $displ = $this->subject->getField('rewardSpell');
-        $cast  = $this->subject->getField('rewardSpellCast');
+        $displ = $this->subject->rewardSpell;
+        $cast  = $this->subject->rewardSpellCast;
         if ($cast <= 0 && $displ > 0)
         {
             $cast  = $displ;
@@ -1103,68 +1084,65 @@ class QuestBaseResponse extends TemplateResponse implements ICache
 
         if ($cast > 0 || $displ > 0)
         {
-            $rewSpells = new SpellList(array(['id', [$displ, $cast]]));
+            $rewSpells = new SpellContainer(array(['id', [$displ, $cast]]));
             $this->extendGlobalData($rewSpells->getJSGlobals());
 
             if (User::isInGroup(U_GROUP_EMPLOYEE))          // accurately display, what spell is what
             {
                 $extra = null;
-                if ($_ = $rewSpells->getEntry($displ))
-                    $extra = Lang::quest('spellDisplayed', [$displ, Util::localizedString($_, 'name')]);
+                if ($entry = $rewSpells->getEntry($displ))
+                    $extra = Lang::quest('spellDisplayed', [$displ, $entry->name]);
 
-                if ($_ = $rewSpells->getEntry($cast))
+                if ($entry = $rewSpells->getEntry($cast))
                     $rewards[0] = array(
                         'title' => Lang::quest('rewardAura'),
-                        'cast'  => [new IconElement(Type::SPELL, $cast, Util::localizedString($_, 'name'))],
+                        'cast'  => [new IconElement(Type::SPELL, $cast, $entry->name)],
                         'extra' => $extra
                     );
             }
             else                                            // if it has effect:learnSpell display the taught spell instead
             {
                 $teach = [];
-                foreach ($rewSpells->iterate() as $id => $__)
-                    if ($_ = $rewSpells->canTeachSpell())
-                        foreach ($_ as $idx)
-                            $teach[$rewSpells->getField('effect'.$idx.'TriggerSpell')] = $id;
+                foreach ($rewSpells->iterate() as $id => $entry)
+                    foreach ($entry->canTeachSpell() as $idx)
+                        $teach[$entry->effectTriggerSpell[$idx]] = $id;
 
                 if ($teach)
                 {
-                    $taught = new SpellList(array(['id', array_keys($teach)]));
+                    $taught = new SpellContainer(array(['id', array_keys($teach)]));
                     if (!$taught->error)
                     {
                         $this->extendGlobalData($taught->getJSGlobals());
                         $rewards[0] = ['cast' => [], 'extra' => null];
 
                         $isTradeSkill = 0;
-                        foreach ($taught->iterate() as $id => $__)
+                        foreach ($taught->iterate() as $id => $entry)
                         {
-                            $isTradeSkill |= array_intersect($taught->getField('skillLines'), array_merge(SKILLS_TRADE_PRIMARY, SKILLS_TRADE_SECONDARY)) ? 1 : 0;
-                            $rewards[0]['cast'][] = new IconElement(Type::SPELL, $id, $taught->getField('name', true));
+                            $isTradeSkill |= array_intersect($entry->skillLines, array_merge(SKILLS_TRADE_PRIMARY, SKILLS_TRADE_SECONDARY)) ? 1 : 0;
+                            $rewards[0]['cast'][] = new IconElement(Type::SPELL, $id, $entry->name);
                         }
 
                         $rewards[0]['title'] = $isTradeSkill ? Lang::quest('rewardTradeSkill') : Lang::quest('rewardSpell');
                     }
                 }
-                else if (($_ = $rewSpells->getEntry($displ)) || ($_ = $rewSpells->getEntry($cast)))
+                else if (($entry = $rewSpells->getEntry($displ)) || ($entry = $rewSpells->getEntry($cast)))
                 {
                     $rewards[0] = array(
                         'title' => Lang::quest('rewardAura'),
-                        'cast'  => [new IconElement(Type::SPELL, $cast, Util::localizedString($_, 'name'))],
+                        'cast'  => [new IconElement(Type::SPELL, $cast, $entry->name)],
                         'extra' => null
                     );
                 }
             }
         }
 
-        if (!array_filter($rewards))
-            return null;
-
-        return $rewards;
+        // always return all indizes
+        return array_filter($rewards) ? $rewards : null;
     }
 
     private function createMail(array $startEnd) : bool
     {
-        if (!($rmtId = $this->subject->getField('rewardMailTemplateId')))
+        if (!($rmtId = $this->subject->rewardMailTemplateId))
             return false;
 
         if (!($letter = DB::Aowow()->selectRow('SELECT * FROM ::mails WHERE `id` = %i', $rmtId)))
@@ -1183,7 +1161,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
             new LocString($letter, 'subject', UIText::formatHtml(...)),
             new LocString($letter, 'text',    UIText::formatHtml(...)),
             $senderTypeId,
-            $this->subject->getField('rewardMailDelay') ?: null // * 1000 ?
+            $this->subject->rewardMailDelay ?: null
         );
 
         // while mail attachemnts are handled as loot, it has no variance. Always 100% chance, always one item.
@@ -1201,39 +1179,34 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         $gains = [];
 
         // xp
-        $gains[0] = $this->subject->getField('rewardXP');
+        $gains[0] = $this->subject->rewardXP;
 
         // arena points
-        $gains[5] = $this->subject->getField('rewardArenaPoints');
+        $gains[5] = $this->subject->rewardArenaPoints;
 
         // honor points
-        if ($_ = $this->subject->getField('rewardHonorPoints'))
+        if ($_ = $this->subject->rewardHonorPoints)
             $gains[4] = [$_, $side];
         else
             $gains[4] = null;
 
         // talent points
-        $gains[3] = $this->subject->getField('rewardTalents');
+        $gains[3] = $this->subject->rewardTalents;
 
         // title
-        if ($tId = $this->subject->getField('rewardTitleId'))
-            $gains[2] = [$tId, (new TitleList(array(['id', $tId])))->getHtmlizedName()];
+        if ($tId = $this->subject->rewardTitleId)
+            $gains[2] = [$tId, (new TitleEntry($tId))->getHtmlizedName()];
         else
             $gains[2] = null;
 
         // reputation
         $repGains = [];
-        for ($i = 1; $i < 6; $i++)
+        foreach ($this->subject->getRewardReputation() as $fac => $qty)
         {
-            $fac = $this->subject->getField('rewardFactionId'.$i);
-            $qty = $this->subject->getField('rewardFactionValue'.$i);
-            if (!$fac || !$qty)
-                continue;
-
             $rep = array(
                 'qty'  => [$qty, ''],
                 'id'   => $fac,
-                'name' => FactionList::getName($fac)
+                'name' => FactionEntry::getName($fac)
             );
 
             $extra = 0;
@@ -1259,10 +1232,8 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         }
         $gains[1] = $repGains;
 
-        if (!array_filter($gains))
-            return null;
-
-        return $gains;
+        // always return all indizes
+        return array_filter($gains) ? $gains : null;
     }
 
     private function createSeries() : array
@@ -1282,18 +1253,18 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         $listGen = function(array $cnd) use ($makeSeriesItem) : ?array
         {
             $chain = [];
-            $list  = new QuestList($cnd);
+            $list  = new QuestContainer($cnd);
             if ($list->error)
                 return null;
 
-            foreach ($list->iterate() as $tpl)
-                $chain[] = [$makeSeriesItem($tpl)];
+            foreach ($list->iterate() as $entry)
+                $chain[] = [$makeSeriesItem((array)$entry)];
 
             return $chain;
         };
 
         // Breadcrumb
-        if ($bcTargetId = $this->subject->getField('breadcrumbForQuestId'))
+        if ($bcTargetId = $this->subject->breadcrumbForQuestId)
         {
             if ($bcTarget = DB::Aowow()->selectRow('SELECT `id`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8`, `reqRaceMask` FROM ::quests WHERE `id` = %i', $bcTargetId))
             {
@@ -1309,7 +1280,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         // a chain always ends in a single quest, but can have an arbitrary amount of quests leading into it.
         // so we fast forward to the last quest and go backwards from there.
 
-        $lastQuestId = $this->subject->getField('nextQuestIdChain');
+        $lastQuestId = $this->subject->nextQuestIdChain;
         while ($newLast = DB::Aowow()->selectCell('SELECT `nextQuestIdChain` FROM ::quests WHERE `id` = %i AND `id` <> `nextQuestIdChain`', $lastQuestId))
             $lastQuestId = $newLast;
 
@@ -1341,22 +1312,22 @@ class QuestBaseResponse extends TemplateResponse implements ICache
 
         $extraLists = array(
             // Requires all of these quests (Quests that you must follow to get this quest)
-            ['reqQ',       array(DB::OR, [DB::AND, ['nextQuestId', $this->typeId], ['exclusiveGroup', 0, '<']], [DB::AND, ['id', $this->subject->getField('prevQuestId')], ['nextQuestIdChain', $this->typeId, '!']])],
+            ['reqQ',       array(DB::OR, [DB::AND, ['nextQuestId', $this->typeId], ['exclusiveGroup', 0, '<']], [DB::AND, ['id', $this->subject->prevQuestId], ['nextQuestIdChain', $this->typeId, '!']])],
 
             // Requires one of these quests (Requires one of the quests to choose from)
             ['reqOneQ',    array([DB::AND, ['exclusiveGroup', 0, '>='], ['nextQuestId', $this->typeId]])],
 
             // Opens Quests (Quests that become available only after complete this quest (optionally only one))
-            ['opensQ',     array(DB::OR, [DB::AND, ['prevQuestId', $this->typeId], ['id', $this->subject->getField('nextQuestIdChain'), '!']], ['id', $this->subject->getField('nextQuestId')])],
+            ['opensQ',     array(DB::OR, [DB::AND, ['prevQuestId', $this->typeId], ['id', $this->subject->nextQuestIdChain, '!']], ['id', $this->subject->nextQuestId])],
 
             // Closes Quests (Quests that become inaccessible after completing this quest)
-            ['closesQ',    array(['exclusiveGroup', 0, '>'], ['exclusiveGroup', $this->subject->getField('exclusiveGroup')], ['id', $this->typeId, '!'])],
+            ['closesQ',    array(['exclusiveGroup', 0, '>'], ['exclusiveGroup', $this->subject->exclusiveGroup], ['id', $this->typeId, '!'])],
 
             // During the quest available these quests (Quests that are available only at run time this quest)
             ['enablesQ',   array(['prevQuestId', -$this->typeId])],
 
             // Requires an active quest (Quests during the execution of which is available on the quest)
-            ['enabledByQ', array(['id', -$this->subject->getField('prevQuestId')])]
+            ['enabledByQ', array(['id', -$this->subject->prevQuestId])]
         );
 
         foreach ($extraLists as [$section, $condition])
@@ -1374,8 +1345,8 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         $keywords = [$this->h1, Util::ucFirst(Lang::game('quest'))];
         $zone = '';
 
-        $c0 = $this->subject->getField('cat2');
-        if ($_ = $this->subject->getField('cat1'))
+        $c0 = $this->subject->category2;
+        if ($_ = $this->subject->category1)
         {
             $zone = ' '.Lang::quest('cat', $c0, $_);
             $keywords[] = Lang::quest('cat', $c0, $_);
@@ -1395,11 +1366,11 @@ class QuestBaseResponse extends TemplateResponse implements ICache
             3 => Lang::main('parensFmt', ['', Lang::quest('monthly')]),
             default => ''
         };
-        if (!$type && ($_ = $this->subject->getField('questInfoId')))
+        if (!$type && ($_ = $this->subject->questInfoId))
             $type = Lang::main('parensFmt', ['', Lang::quest('questInfo', $_)]);
 
         $level = '';
-        if ($minlvl = $this->subject->getField('minLevel'))
+        if ($minlvl = $this->subject->minLevel)
             $level = ' '.Lang::quest('questLevel', [$minlvl]);
 
         $desc .= ' '.Lang::meta('description', 'quest', [$level, $zone, $type]);
@@ -1439,6 +1410,37 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         $this->buildBasicMetadata($desc);
 
         $this->buildLdJson();
+    }
+
+    // [zoneId => [floor => [[x1, y1], [x2, y2], ..]]]      mapper on quest detail page
+    private static function createQuestSpawns(GameobjectContainer|CreatureContainer $set) : array
+    {
+        $spawns = DB::Aowow()->selectAssoc('SELECT `areaId`, `floor`, `typeId`, `posX`, `posY` FROM ::spawns WHERE `type` = %i AND `typeId` IN %in AND `posX` > 0 AND `posY` > 0', $set::$dbType, $set->getFoundIds());
+        $result = [];
+
+        foreach ($spawns as $s)
+        {
+            if (!($entry = $set->getEntry($s['typeId'])))
+                continue;
+
+            // zone => floor => spawnData
+            // todo (low): why is there a single set of coordinates; which one should be picked, instead of the first? gets used in ShowOnMap.buildTooltip i think
+            $result[$s['areaId']][$s['floor']][$s['typeId']] ??= array(
+                'type'          => $set::$dbType,
+                'id'            => $s['typeId'],
+                'point'         => '',                  // tbd later (start, end, requirement, sourcestart, sourceend, sourcerequirement)
+                'name'          => $entry->name,
+                'coord'         => [$s['posX'], $s['posY']],
+                'coords'        => [],
+                'objective'     => 0,                   // tbd later (1-4 set a color; id of creature this entry gives credit for)
+                'reactalliance' => $entry->A ?: 0,
+                'reacthorde'    => $entry->H ?: 0
+            );
+
+            $result[$s['areaId']][$s['floor']][$s['typeId']]['coords'][] = [$s['posX'], $s['posY']];
+        }
+
+        return $result;
     }
 }
 

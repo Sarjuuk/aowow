@@ -22,7 +22,7 @@ trait SmartHelper
     private function numRange(int $min, int $max, bool $isTime) : string
     {
         if ($isTime)
-            return Util::createNumRange($min, $max, ' &ndash; ', fn($x) => DateTime::formatTimeElapsedFloat($x));
+            return Util::createNumRange($min, $max, ' &ndash; ', DateTime::formatTimeElapsedFloat(...));
 
         return Util::createNumRange($min, $max, ' &ndash; ') ?: 0;
     }
@@ -819,7 +819,7 @@ class SmartAI
         $this->quotes[$creatureId] = $quotes;
 
         if (!empty($this->quotes[$creatureId]))
-            $this->quotes[$creatureId]['src'] = CreatureList::getName($creatureId);
+            $this->quotes[$creatureId]['src'] = CreatureEntry::getName($creatureId);
     }
 
     public function getQuote(int $creatureId, int $group, ?string &$npcSrc) : array

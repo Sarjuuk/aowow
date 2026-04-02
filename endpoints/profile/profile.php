@@ -29,7 +29,7 @@ class ProfileBaseResponse extends TemplateResponse
     public int  $type     = Type::PROFILE;
     public bool $gDataKey = true;
 
-    private ?LocalProfileList $subject = null;
+    private ?LocalProfileEntry $subject = null;
 
     public function __construct(string $idOrProfile)
     {
@@ -124,7 +124,7 @@ class ProfileBaseResponse extends TemplateResponse
 
         if ($this->typeId)
         {
-            $this->subject = new LocalProfileList(array(['id', $this->typeId]));
+            $this->subject = new LocalProfileEntry($this->typeId);
             if ($this->subject->error)
                 $this->notFound();
 
@@ -185,17 +185,16 @@ class ProfileBaseResponse extends TemplateResponse
             return;
         }
 
-        $name   = $this->subject->getField('name');
-        $lvl    = $this->subject->getField('level');
-        $ra     = $this->subject->getField('race');
-        $cl     = $this->subject->getField('class');
-        $gender = $this->subject->getField('gender');
-        $realm  = $this->subject->getField('realmName');
-        $region = $this->subject->getField('region');
+        $name   = $this->subject->name;
+        $lvl    = $this->subject->level;
+        $ra     = $this->subject->race;
+        $cl     = $this->subject->class;
+        $realm  = $this->subject->realmName;
+        $region = $this->subject->region;
 
         $title = '';
-        if ($_ = $this->subject->getField('chosenTitle'))
-            $title = (new TitleList(array(['bitIdx', $_])))->getField($gender ? 'female' : 'male', true);
+        if ($this->subject->title)
+            $title = TitleEntry::getName($this->subject->title, $this->subject->gender);
 
         if ($this->subject->isCustom())
             $name .= Lang::profiler('customProfile');
@@ -208,7 +207,7 @@ class ProfileBaseResponse extends TemplateResponse
         $desc = '';
         if (!$this->subject->isCustom())
             $desc = sprintf(Lang::meta('description', 'profile'), $name, $lvl, Lang::game('ra', $ra), Lang::game('cl', $cl), $realm, strtoupper($region));
-        else if ($_ = $this->subject->getField('description'))
+        else if ($_ = $this->subject->description)
             $desc = $_;
 
         array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [$name, Lang::profiler('profiler'), 'Profiler', ...Lang::meta('tags', 'generic')]]);

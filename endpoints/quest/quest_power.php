@@ -33,12 +33,12 @@ class QuestPowerResponse extends TextResponse implements ICache
 
     protected function generate() : void
     {
-        $quest = new QuestList(array(['id', $this->typeId]));
+        $quest = new QuestEntry($this->typeId);
         if ($quest->error)
             $this->cacheType = CACHE_TYPE_NONE;
         else
             $opts = array(
-                'name'    => UIText::unescapeUISequences($quest->getField('name', true), Lang::FMT_RAW),
+                'name'    => UIText::unescapeUISequences($quest->name, Lang::FMT_RAW),
                 'tooltip' => $quest->renderTooltip(),
                 'daily'   => $quest->isDaily() ? 1 : null
             );
