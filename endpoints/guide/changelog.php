@@ -19,7 +19,7 @@ class GuideChangelogResponse extends TemplateResponse
         'id'  => ['filter' => FILTER_VALIDATE_INT]
     );
 
-    private GuideList $subject;
+    private GuideEntry $subject;
 
     protected function generate() : void
     {
@@ -28,24 +28,23 @@ class GuideChangelogResponse extends TemplateResponse
         if (!$this->assertGET('id'))
             $this->generateNotFound(Lang::game('guide'), Lang::guide('notFound'));
 
-        $this->subject = new GuideList(array(['id', $this->_get['id']]));
-        if ($this->subject->error)
+        if (($this->subject = new GuideEntry($this->_get['id']))->error)
             $this->generateNotFound(Lang::game('guide'), Lang::guide('notFound'));
 
         if (!$this->subject->canBeViewed() && !$this->subject->userCanView())
-            $this->forward('?guides='.$this->subject->getField('category'));
+            $this->forward('?guides='.$this->subject->category);
 
 
-        $this->h1 = Lang::guide('clTitle', [$this->subject->id, $this->subject->getField('title') ?: $this->subject->getField('name')]);
+        $this->h1 = Lang::guide('clTitle', [$this->subject->id, $this->subject->title ?: $this->subject->name]);
 
 
         array_unshift($this->title, strip_tags($this->h1), Lang::game('guide'));
 
 
-        $this->gPageInfo += ['name' => $this->subject->getField('name')];
+        $this->gPageInfo += ['name' => $this->subject->name];
 
 
-        $this->breadcrumb[] = $this->subject->getField('category');
+        $this->breadcrumb[] = $this->subject->category;
 
 
         parent::generate();
@@ -111,7 +110,7 @@ class GuideChangelogResponse extends TemplateResponse
         }
 
         // append creation
-        $buff .= '<li class="guide-changelog-created">'.$inp(0).'<b>'.Lang::guide('clCreated').'</b>'.$now->formatDate($this->subject->getField('date'), true).'</li>'.PHP_EOL.'</ul>'.PHP_EOL;
+        $buff .= '<li class="guide-changelog-created">'.$inp(0).'<b>'.Lang::guide('clCreated').'</b>'.$now->formatDate($this->subject->date, true).'</li>'.PHP_EOL.'</ul>'.PHP_EOL;
 
         if (User::isInGroup(U_GROUP_STAFF) && false)
             $buff .= '<input type="button" value="Compare" onclick="alert(\'NYI\');" style="margin-left: 40px;"/>';
@@ -126,7 +125,7 @@ class GuideChangelogResponse extends TemplateResponse
 
         array_unshift($this->metaTags, ['name' => 'keywords', 'content' => implode(', ', [...Lang::meta('tags', 'home'), ...Lang::meta('tags', 'generic')])]);
 
-        $this->buildBasicMetadata(Lang::meta('description', 'changelog', [$this->subject->getField('title')]));
+        $this->buildBasicMetadata(Lang::meta('description', 'changelog', [$this->subject->title]));
     }
 }
 

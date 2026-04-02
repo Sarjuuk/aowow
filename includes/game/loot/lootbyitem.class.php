@@ -76,7 +76,7 @@ class LootByItem extends Loot
     /**
      * iterate over result set
      *
-     * @return iterable [tabIdx => [lvTemplate, lvData]]
+     * @return \Generator<int, array{string, array[]}> tabIndex => [lvTemplate, lvData]
      */
     public function &iterate() : \Generator
     {
@@ -271,17 +271,17 @@ class LootByItem extends Loot
 
         [$type, &$data, , , &$extraCols, ,] = $this->listviewTabs[$tabId];
 
-        $srcObj = Type::newList($type, [[$dbField, $ids]]);
+        $srcObj = Type::newContainer($type, [[$dbField, $ids]]);
         if (!$srcObj || $srcObj->error)
             return false;
 
         $srcData = $srcObj->getListviewData();
-        $this->storeJSGlobals($srcObj->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
+        $this->storeJSGlobals($srcObj->getJSGlobals(GLOBALINFO_RELATED));
 
         $extraCols[] = '$Listview.extraCols.percent';
 
-        foreach ($srcObj->iterate() as $__)
-            $data[] = array_merge($srcData[$srcObj->id], $result[$srcObj->getField($dbField)]);
+        foreach ($srcObj->iterate() as $entry)
+            $data[] = array_merge($srcData[$srcObj->id], $result[$entry->$dbField]);
 
         return true;
     }
@@ -298,7 +298,7 @@ class LootByItem extends Loot
             $ids, $ids, $ids
         ))
         {
-            $parentObj = new CreatureList(array(['id', $baseIds]));
+            $parentObj = new CreatureContainer(array(['id', $baseIds]));
             if (!$parentObj->error)
             {
                 $this->storeJSGlobals($parentObj->getJSGlobals());
@@ -307,27 +307,27 @@ class LootByItem extends Loot
             }
         }
 
-        $npc = new CreatureList(array([$dbField, $ids]));
+        $npc = new CreatureContainer(array([$dbField, $ids]));
         if ($npc->error)
             return false;
 
         $srcData = $npc->getListviewData();
-        $this->storeJSGlobals($npc->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
+        $this->storeJSGlobals($npc->getJSGlobals(GLOBALINFO_RELATED));
 
-        foreach ($npc->iterate() as $__)
+        foreach ($npc->iterate() as $entry)
         {
             if ($tabId == self::NPC_SKINNED)
                 $tabRef = match(true)
                 {
-                    $npc->isMineable()    => self::NPC_MINED,
-                    $npc->isGatherable()  => self::NPC_GATHERED,
-                    $npc->isSalvageable() => self::NPC_SALVAGED,
+                    $entry->isMineable()    => self::NPC_MINED,
+                    $entry->isGatherable()  => self::NPC_GATHERED,
+                    $entry->isSalvageable() => self::NPC_SALVAGED,
                     default               => self::NPC_SKINNED
                 };
 
             [, &$data, , , &$extraCols, ,] = $this->listviewTabs[$tabRef ?? $tabId];
 
-            $data[]      = array_merge($parentData[$npc->getField('parentId')] ?? $srcData[$npc->id], $result[$npc->getField($dbField)]);
+            $data[]      = array_merge($parentData[$entry->parentId] ?? $srcData[$entry->id], $result[$entry->{$dbField}]);
             $extraCols[] = '$Listview.extraCols.percent';
         }
 
@@ -338,24 +338,24 @@ class LootByItem extends Loot
     {
         $conditions = array(
             DB::OR,
-            [DB::AND, ['effect1CreateItemId', $this->entry], [DB::OR, ['effect1Id', SpellList::EFFECTS_ITEM_CREATE], ['effect1AuraId', SpellList::AURAS_ITEM_CREATE]]],
-            [DB::AND, ['effect2CreateItemId', $this->entry], [DB::OR, ['effect2Id', SpellList::EFFECTS_ITEM_CREATE], ['effect2AuraId', SpellList::AURAS_ITEM_CREATE]]],
-            [DB::AND, ['effect3CreateItemId', $this->entry], [DB::OR, ['effect3Id', SpellList::EFFECTS_ITEM_CREATE], ['effect3AuraId', SpellList::AURAS_ITEM_CREATE]]]
+            [DB::AND, ['effect1CreateItemId', $this->entry], [DB::OR, ['effect1Id', SpellEntry::EFFECTS_ITEM_CREATE], ['effect1AuraId', SpellEntry::AURAS_ITEM_CREATE]]],
+            [DB::AND, ['effect2CreateItemId', $this->entry], [DB::OR, ['effect2Id', SpellEntry::EFFECTS_ITEM_CREATE], ['effect2AuraId', SpellEntry::AURAS_ITEM_CREATE]]],
+            [DB::AND, ['effect3CreateItemId', $this->entry], [DB::OR, ['effect3Id', SpellEntry::EFFECTS_ITEM_CREATE], ['effect3AuraId', SpellEntry::AURAS_ITEM_CREATE]]]
         );
         if ($ids)
             $conditions[] = ['id', $ids];
 
-        $srcObj = new SpellList($conditions);
+        $srcObj = new SpellContainer($conditions);
         if ($srcObj->error)
             return false;
 
-        $this->storeJSGlobals($srcObj->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
+        $this->storeJSGlobals($srcObj->getJSGlobals(GLOBALINFO_RELATED));
         [, &$data, , , &$extraCols, , &$visibleCols] = $this->listviewTabs[self::SPELL_CREATED];
 
         if (!empty($result))
             $extraCols[] = '$Listview.extraCols.percent';
 
-        if ($srcObj->hasSetFields('reagent1', 'reagent2', 'reagent3', 'reagent4', 'reagent5', 'reagent6', 'reagent7', 'reagent8'))
+        if ($srcObj->hasSetFields('reagent'))
             $visibleCols[] = 'reagents';
 
         foreach ($srcObj->getListviewData() as $id => $row)
@@ -374,10 +374,10 @@ class LootByItem extends Loot
         if ($ids)
             $conditions[] = ['rewardMailTemplateId', $ids];
 
-        $quests = new QuestList($conditions);
+        $quests = new QuestContainer($conditions);
         if (!$quests->error)
         {
-            $this->storeJSGlobals($quests->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_REWARDS));
+            $this->storeJSGlobals($quests->getJSGlobals(GLOBALINFO_REWARDS));
             [, &$qData, , , , , ] = $this->listviewTabs[self::QUEST_REWARD];
 
             foreach ($quests->getListviewData() as $id => $row)
@@ -389,10 +389,10 @@ class LootByItem extends Loot
         if ($ar = DB::World()->selectCol('SELECT `ID` FROM achievement_reward WHERE %if', $ids, '`MailTemplateID` IN %in OR %end', $ids, '`ItemID` = %i', $this->entry))
             array_push($conditions, ['id', $ar], DB::OR);
 
-        $achievements = new AchievementList($conditions);
+        $achievements = new AchievementContainer($conditions);
         if (!$achievements->error)
         {
-            $this->storeJSGlobals($achievements->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_REWARDS));
+            $this->storeJSGlobals($achievements->getJSGlobals(GLOBALINFO_REWARDS));
             [, &$aData, , , , &$hiddenCols, &$visibleCols] = $this->listviewTabs[self::ACHIEVEMENT_REWARD];
 
             foreach ($achievements->getListviewData() as $id => $row)
@@ -410,7 +410,7 @@ class LootByItem extends Loot
         if (!$ids)
             return false;
 
-        $srcObj = new GameObjectList(array(['lootId', $ids]));
+        $srcObj = new GameobjectContainer(array(['lootId', $ids]));
         if ($srcObj->error)
             return false;
 
@@ -426,7 +426,7 @@ class LootByItem extends Loot
 
             [, &$tabData, , , &$extraCols, , &$visibleCols] = $this->listviewTabs[$tabId];
 
-            $tabData[]   = array_merge($row, $result[$srcObj->getEntry($id)['lootId']]);
+            $tabData[]   = array_merge($row, $result[$srcObj->getEntry($id)->lootId]);
             $extraCols[] = '$Listview.extraCols.percent';
             if ($tabId != 15)
                 $visibleCols[] = 'skill';

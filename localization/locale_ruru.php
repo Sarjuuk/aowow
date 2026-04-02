@@ -1231,7 +1231,7 @@ $lang = array(
         'unnamed'       => "[Unnamed areatrigger] #%d",
         'types'         => ['Unused', 'Tavern', 'Teleporter', 'Quest Objective', 'Smart Trigger', 'Script']
     ),
-    'gameObject' => array(
+    'gameobject' => array(
         'id'            => "Объект ID: ",
         'notFound'      => "Такой объект не существует.",
         'unnamed'       => "[Unnamed object] #%d",

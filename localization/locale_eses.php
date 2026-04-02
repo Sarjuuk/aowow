@@ -1231,7 +1231,7 @@ $lang = array(
         'unnamed'       => "[Unnamed areatrigger] #%d",
         'types'         => ['Sin usar', 'Taberna', 'Teletransportador', 'Objetivo de misión', 'Activador inteligente', 'Script']
     ),
-    'gameObject' => array(
+    'gameobject' => array(
         'id'            => "ID de Entidad: ",
         'notFound'      => "Esta entidad no existe.",
         'unnamed'       => "[Unnamed object] #%d",

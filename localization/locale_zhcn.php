@@ -1231,7 +1231,7 @@ $lang = array(
         'unnamed'       => "[Unnamed areatrigger] #%d",
         'types'         => ['未使用', '酒馆', '传送门', '任务目标', 'Smart Trigger', '脚本']
     ),
-    'gameObject' => array(
+    'gameobject' => array(
         'id'            => "对象ID：",
         'notFound'      => "这个对象不存在。",
         'unnamed'       => "[Unnamed object] #%d",

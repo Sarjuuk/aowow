@@ -33,14 +33,14 @@ class ObjectPowerResponse extends TextResponse implements ICache
 
     protected function generate() : void
     {
-        $object = new GameObjectList(array(['id', $this->typeId]));
+        $object = new GameobjectEntry($this->typeId);
         if ($object->error)
             $this->cacheType = CACHE_TYPE_NONE;
         else
             $opts = array(
-                'name'    => UIText::unescapeUISequences($object->getField('name', true), Lang::FMT_RAW),
+                'name'    => UIText::unescapeUISequences($object->name, Lang::FMT_RAW),
                 'tooltip' => $object->renderTooltip(),
-                'map'     => $object->getSpawns(SPAWNINFO_SHORT)
+                'map'     => self::createShortSpawns($object)
             );
 
         $this->result = new Tooltip(self::POWER_TEMPLATE, $this->typeId, $opts ?? []);

@@ -9,52 +9,61 @@ if (!CLI)
     die('not in cli mode');
 
 
-class ItemStatSetup extends ItemList
+class ItemStatSetup extends ItemContainer
 {
-    public function __construct(int $start, int $limit, int $itemClass, private bool $applyTriggered, private array $relEnchants, private array $relSpells)
-    {
-        $this->queryOpts['i']['o'] = 'i.id ASC';
-        unset($this->queryOpts['is']);                      // do not reference the stats table we are going to write to
+    public const array NULL_JOIN = ['s' => [0 => []]];
 
+    public function __construct(int $start, int $limit, int $itemClass, private bool $applyTriggered, private EnchantmentContainer $relEnchants, private SpellContainer $relSpells)
+    {
         $conditions = array(
             ['i.id', $start, '>'],
             ['class', $itemClass],
             $limit
         );
 
-        parent::__construct($conditions);
+        $queryOpts = ['i' => array(
+             0  => [],                                      // do not join misc tables
+            's' => [', "" AS "icon"'],                      // placeholder icon so ItemEntry does not crash
+            'o' => ['']                                     // skip sorting
+        )];
+        parent::__construct($conditions, ['queryOpts' => $queryOpts]);
     }
 
     public function writeStatsTable() : void
     {
-        foreach ($this->iterate() as $id => $curTpl)
+        foreach ($this->iterate() as $itemEntry)
         {
-            $spellIds = [];
-
-            for ($i = 1; $i <= 5; $i++)
-                if ($this->curTpl['spellId'.$i] > 0 && !isset($this->relSpells[$this->curTpl['spellId'.$i]]) && (($this->curTpl['class'] == ITEM_CLASS_CONSUMABLE && $this->curTpl['spellTrigger'.$i] == SPELL_TRIGGER_USE) || $this->curTpl['spellTrigger'.$i] == SPELL_TRIGGER_EQUIP))
-                    $spellIds[] = $this->curTpl['spellId'.$i];
-
-            if ($spellIds)                                  // array_merge kills the keys
+            // array_merge kills the keys
+            if ($spellIds = array_column(array_filter($itemEntry->spells, fn($x) => $x[0] > 0 && !$this->relSpells->getEntry($x[0]) && (($itemEntry->class == ITEM_CLASS_CONSUMABLE && $x[1] == SPELL_TRIGGER_USE) || $x[1] == SPELL_TRIGGER_EQUIP)), 0))
             {
-                $newSpells = DB::Aowow()->selectAssoc('SELECT *, id AS ARRAY_KEY FROM ::spell WHERE id IN %in', $spellIds);
-                $this->relSpells = array_replace($this->relSpells, $newSpells);
+                $triggered = [];
+                $newSpells = new SpellContainer([['id', $spellIds]], ['queryOpts' => self::NULL_JOIN]);
+
+                foreach ($newSpells->iterate() as $spellEntry)
+                {
+                    $this->relSpells->import($spellEntry);
+
+                    if ($this->applyTriggered)
+                        foreach ($spellEntry->canTriggerSpell() as $effIdx)
+                            $triggered[] = $spellEntry->effectTriggerSpell[$effIdx];
+                }
 
                 // include triggered spell to calculate nutritional values
-                if ($this->applyTriggered)
-                    if ($t = array_filter(array_merge(array_column($newSpells, 'effect1TriggerSpell'), array_column($newSpells, 'effect2TriggerSpell'), array_column($newSpells, 'effect3TriggerSpell'))))
-                        if ($t = array_diff($t, array_keys($this->relSpells)))
-                            $this->relSpells = array_replace($this->relSpells, DB::Aowow()->selectAssoc('SELECT *, id AS ARRAY_KEY FROM ::spell WHERE id IN %in', $t));
+                if ($t = array_diff($triggered, $this->relSpells->getFoundIds()))
+                {
+                    $foodSpells = new SpellContainer([['id', $t]], ['queryOpts' => self::NULL_JOIN]);
+                    $this->relSpells->import(...$foodSpells->export());
+                }
             }
 
             // fromItem: itemMods, spell, enchants from template - fromJson: calculated stats (feralAP, dps, ...)
-            if ($stats = (new StatsContainer($this->relSpells, $this->relEnchants))->fromItem($curTpl)->fromJson($this->json[$id])->toJson(Stat::FLAG_ITEM | Stat::FLAG_SERVERSIDE))
+            if ($stats = (new StatsContainer($this->relSpells, $this->relEnchants))->fromItem($itemEntry)->fromJson($itemEntry->json)->toJson(Stat::FLAG_ITEM | Stat::FLAG_SERVERSIDE))
             {
                 // manually set stats 0 if empty to distinguish from items that cant have them
                 $shared = ['dps' => 0, 'dmgmin1' => 0, 'dmgmax1' => 0, 'speed' => 0];
-                if ($this->getField('class') == ITEM_CLASS_WEAPON)
-                    $stats += $shared + ($this->isRangedWeapon() ? ['rgddps' => 0, 'rgddmgmin' => 0, 'rgddmgmax' => 0, 'rgdspeed' => 0] : ['mledps' => 0, 'mledmgmin' => 0, 'mledmgmax' => 0, 'mlespeed' => 0]);
-                else if ($this->getField('class') == ITEM_CLASS_ARMOR)
+                if ($itemEntry->class == ITEM_CLASS_WEAPON)
+                    $stats += $shared + ($itemEntry->isRangedWeapon() ? ['rgddps' => 0, 'rgddmgmin' => 0, 'rgddmgmax' => 0, 'rgdspeed' => 0] : ['mledps' => 0, 'mledmgmin' => 0, 'mledmgmax' => 0, 'mlespeed' => 0]);
+                else if ($itemEntry->class == ITEM_CLASS_ARMOR)
                     $stats += ['armorbonus' => 0];          //ArmorDamageModifier only valid on armor(%s)
 
                 DB::Aowow()->qry('INSERT INTO ::item_stats %v', ['type' => Type::ITEM, 'typeId' => $this->id] + $stats);
@@ -69,29 +78,27 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         'stats' => [[], CLISetup::ARGV_PARAM, 'Compiles stats data for type: Item & Enchantment from dbc and world db.']
     );
 
-    protected array $dbcSourceFiles = ['spellitemenchantment'];
-    protected array $setupAfter     = [['items', 'spell'], []];
+    protected array $setupAfter = [['items', 'spell', 'itemenchantment'], []];
 
-    private array $relSpells = [];
+    private SpellContainer $relSpells;
 
-    private function enchantment_stats(?int &$total = 0, ?int &$effective = 0) : array
+    private function enchantment_stats(?int &$total = 0, ?int &$effective = 0) : EnchantmentContainer
     {
-        $enchants  = DB::Aowow()->selectAssoc('SELECT *, `id` AS ARRAY_KEY FROM dbc_spellitemenchantment');
+        $enchants  = new EnchantmentContainer(miscData: ['calcTotal' => true]);
         $spells    = [];
         $stats     = [];
         $effective = 0;
-        $total     = count($enchants);
+        $total     = $enchants->getMatches();
 
-        foreach ($enchants as $eId => $e)
-            for ($i = 1; $i <= 3; $i++)
-                if ($e['object'.$i] > 0 && $e['type'.$i] == ENCHANTMENT_TYPE_EQUIP_SPELL)
-                    $spells[] = $e['object'.$i];
+        foreach ($enchants->iterate() as $eId => $eEntry)
+            for ($i = 0; $i < 3; $i++)
+                if ($eEntry->object[$i] > 0 && $eEntry->type[$i] == ENCHANTMENT_TYPE_EQUIP_SPELL)
+                    $spells[] = $eEntry->object[$i];
 
-        if ($spells)
-            $this->relSpells = DB::Aowow()->selectAssoc('SELECT *, id AS ARRAY_KEY FROM ::spell WHERE id IN %in', $spells);
+        $this->relSpells = new SpellContainer($spells ? [['id', $spells]] : null, ['queryOpts' => ItemStatSetup::NULL_JOIN]);
 
-        foreach ($enchants as $eId => $e)
-            if ($stats = (new StatsContainer($this->relSpells))->fromEnchantment($e)->toJson(Stat::FLAG_ITEM | Stat::FLAG_SERVERSIDE))
+        foreach ($enchants->iterate() as $eId => $eEntry)
+            if ($stats = (new StatsContainer($this->relSpells))->fromEnchantment($eEntry)->toJson(Stat::FLAG_ITEM | Stat::FLAG_SERVERSIDE))
             {
                 DB::Aowow()->qry('INSERT INTO ::item_stats %v', ['type' => Type::ENCHANTMENT, 'typeId' => $eId] + $stats);
                 $effective++;

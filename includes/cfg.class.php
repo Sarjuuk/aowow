@@ -106,7 +106,7 @@ class Cfg
         self::$isLoaded = true;
     }
 
-    public static function add(string $key, /*int|string*/ $value) : string
+    public static function add(string $key, int|string $value) : string
     {
         if (!self::$isLoaded)
             return 'used add() on uninitialized config';
@@ -184,7 +184,7 @@ class Cfg
         return self::$store[$key][self::IDX_VALUE];
     }
 
-    public static function set(string $key, /*int|string*/ $value, ?array &$rebuildFiles = []) : string
+    public static function set(string $key, int|string $value, ?array &$rebuildFiles = []) : string
     {
         if (!self::$isLoaded)
             return 'used set() on uninitialized config';
@@ -314,7 +314,7 @@ class Cfg
     /* internal */
     /************/
 
-    private static function validate(&$value, int $flags = self::FLAG_TYPE_STRING | self::FLAG_PHP, string $comment = ' - ') : string
+    private static function validate(int|string &$value, int $flags = self::FLAG_TYPE_STRING | self::FLAG_PHP, string $comment = ' - ') : string
     {
         $value = preg_replace(self::PATTERN_INVALID_CHARS, '', $value);
 
@@ -376,7 +376,7 @@ class Cfg
         return $msg;
     }
 
-    private static function throwError($msg) : void
+    private static function throwError(string $msg) : void
     {
         if (CLI)
             CLI::write($msg, CLI::LOG_ERROR);
