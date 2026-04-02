@@ -336,9 +336,6 @@ class StatsContainer implements \Countable
 {
     private array $store = [];
 
-    private array $relSpells       = [];
-    private array $relEnchantments = [];
-
     private static array $combinedSpellStats = array (
         Stat::ATTACK_POWER => [Stat::RANGED_ATTACK_POWER, Stat::MELEE_ATTACK_POWER],
         Stat::SPELL_POWER  => [Stat::DAMAGE_SPELL_POWER,  Stat::HEALING_SPELL_POWER],
@@ -348,30 +345,20 @@ class StatsContainer implements \Countable
         // Stat::RESILIENCE_RTG => [Stat::MELEE_CRIT_RTG, Stat::RANGED_CRIT_TAKEN_RTG, Stat::SPELL_CRIT_TAKEN_RTG]
     );
 
-    public function __construct(array $relSpells = [], array $relEnchantments = [])
+    public function __construct(private ?SpellContainer $relSpells = null, private ?EnchantmentContainer $relEnchantments = null)
     {
-        if ($relSpells)
-            $this->relSpells = $relSpells;
-
-        if ($relEnchantments)
-            $this->relEnchantments = $relEnchantments;
     }
 
     /**********/
     /* Source */
     /**********/
 
-    public function fromItem(array $item) : self
+    public function fromItem(ItemEntry $item) : self
     {
-        if (!$item)
-            return $this;
-
         // convert itemMods to stats
-        for ($i = 1; $i <= 10; $i++)
+        foreach ($item->statType as $i => $mod)
         {
-            $mod = $item['statType'.$i];
-            $val = $item['statValue'.$i];
-            if (!$mod || !$val)
+            if (!$mod || !($val = $item->statValue[$i]))
                 continue;
 
             if ($idx = Stat::getIndexFrom(Stat::IDX_ITEM_MOD, $mod))
@@ -379,32 +366,29 @@ class StatsContainer implements \Countable
         }
 
         // also occurs as seperate field (gets summed in calculation but not in tooltip)
-        if ($item['tplBlock'])
-            Util::arraySumByKey($this->store, [Stat::BLOCK => $item['tplBlock']]);
+        if ($item->block)
+            Util::arraySumByKey($this->store, [Stat::BLOCK => $item->block]);
 
         // convert spells to stats
-        for ($i = 1; $i <= 5; $i++)
-            if (in_array($item['spellTrigger'.$i], [SPELL_TRIGGER_EQUIP, SPELL_TRIGGER_USE, SPELL_TRIGGER_USE_NODELAY]))
-                if ($relS = $this->relS($item['spellId'.$i]))
+        foreach ($item->spells as [$spellId, $trigger, , , , , ])
+            if (in_array($trigger, [SPELL_TRIGGER_EQUIP, SPELL_TRIGGER_USE, SPELL_TRIGGER_USE_NODELAY]))
+                if ($relS = $this->relS($spellId))
                     $this->fromSpell($relS);
 
         // for ITEM_CLASS_GEM get stats from enchantment
-        if ($relE = $this->relE($item['gemEnchantmentId']))
-            $this->fromEnchantment($relE);
+        if ($gemE = $this->relE($item->gemEnchantmentId))
+            $this->fromEnchantment($gemE);
 
         return $this;
     }
 
-    public function fromEnchantment(array $enchantment) : self
+    public function fromEnchantment(EnchantmentEntry $enchantment) : self
     {
-        if (!$enchantment)
-            return $this;
-
-        for ($i = 1; $i <= 3; $i++)
+        for ($i = 0; $i < 3; $i++)
         {
-            $type   = $enchantment['type'.$i];
-            $object = $enchantment['object'.$i];
-            $amount = $enchantment['amount'.$i];            // !CAUTION! scaling enchantments are initialized with "0" as amount. 0 is a valid amount!
+            $type   = $enchantment->type[$i];
+            $object = $enchantment->object[$i];
+            $amount = $enchantment->amount[$i];             // !CAUTION! scaling enchantments are initialized with "0" as amount. 0 is a valid amount!
 
             if ($type == ENCHANTMENT_TYPE_EQUIP_SPELL && ($relS = $this->relS($object)))
                 $this->fromSpell($relS);
@@ -416,26 +400,26 @@ class StatsContainer implements \Countable
         return $this;
     }
 
-    public function fromSpell(array $spell, bool $onlyFoodBuff = false) : self
+    public function fromSpell(SpellEntry $spell, bool $onlyFoodBuff = false) : self
     {
         if (!$spell)
             return $this;
 
-        if ($onlyFoodBuff && !($spell['attributes2'] & SPELL_ATTR2_FOOD_BUFF))
+        if ($onlyFoodBuff && !($spell->attributes[2] & SPELL_ATTR2_FOOD_BUFF))
             return $this;
 
         $tmpStore = [];
 
-        for ($i = 1; $i <= 3; $i++)
+        for ($i = 0; $i < 3; $i++)
         {
-            $eff  = $spell['effect'.$i.'Id'];
-            $aura = $spell['effect'.$i.'AuraId'];
-            $mVal = $spell['effect'.$i.'MiscValue'];
-            $amt  = $spell['effect'.$i.'BasePoints'] + $spell['effect'.$i.'DieSides'];
+            $eff  = $spell->effectId[$i];
+            $aura = $spell->effectAuraId[$i];
+            $mVal = $spell->effectMiscValue[$i];
+            $amt  = $spell->effectBasePoints[$i] + $spell->effectDieSides[$i];
 
-            if (in_array($eff, SpellList::EFFECTS_ENCHANTMENT) && ($relE = $this->relE($mVal)))
+            if (in_array($eff, SpellEntry::EFFECTS_ENCHANTMENT) && ($relE = $this->relEnchantments->getEntry($mVal)))
                 $this->fromEnchantment($relE);
-            else if ($aura == SPELL_AURA_PERIODIC_TRIGGER_SPELL && ($ts = $spell['effect'.$i.'TriggerSpell']))
+            else if ($aura == SPELL_AURA_PERIODIC_TRIGGER_SPELL && ($ts = $spell->effectTriggerSpell[$i]))
             {
                 if ($relS = $this->relS($ts))
                     $this->fromSpell($relS, true);
@@ -544,18 +528,27 @@ class StatsContainer implements \Countable
         return count($this->store);
     }
 
+    public function get(int $stat) : int
+    {
+        return $this->store[$stat] ?? 0;
+    }
+
     /****************/
     /* internal use */
     /****************/
 
-    private function relE(int $enchantmentId) : array
+    private function relE(int $enchantmentId) : ?EnchantmentEntry
     {
-        return $this->relEnchantments[$enchantmentId] ?? [];
+        if ($this->relEnchantments)
+            return $this->relEnchantments->getEntry($enchantmentId);
+        return null;
     }
 
-    private function relS(int $spellId) : array
+    private function relS(int $spellId) : ?SpellEntry
     {
-        return $this->relSpells[$spellId] ?? [];
+        if ($this->relSpells)
+            return $this->relSpells->getEntry($spellId);
+        return null;
     }
 
     private static function convertEnchantment(int $type, int $object) : array

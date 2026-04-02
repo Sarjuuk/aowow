@@ -113,7 +113,7 @@ class SearchBaseResponse extends TemplateResponse implements ICache
     {
         foreach ($lvTabs->iterate() as &$listview)
             if ($listview instanceof Listview && $listview->getTemplate() == 'holiday')
-                WorldEventList::updateListview($listview);
+                WorldeventEntry::updateListview($listview);
     }
 
     public static function onBeforeDisplay(Template\PageTemplate $pt, string $url) : never

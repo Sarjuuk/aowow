@@ -20,7 +20,7 @@ class SkillBaseResponse extends TemplateResponse implements ICache
     public int $type   = Type::SKILL;
     public int $typeId = 0;
 
-    private SkillList $subject;
+    private SkillEntry $subject;
 
     public function __construct(string $id)
     {
@@ -32,11 +32,11 @@ class SkillBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new SkillList(array(['id', $this->typeId]));
+        $this->subject = new SkillEntry($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('skill'), Lang::skill('notFound'));
 
-        $this->h1 = $this->subject->getField('name', true);
+        $this->h1 = $this->subject->name;
 
         $this->gPageInfo += array(
             'type'   => $this->type,
@@ -44,7 +44,7 @@ class SkillBaseResponse extends TemplateResponse implements ICache
             'name'   => $this->h1
         );
 
-        $_cat = $this->subject->getField('typeCat');
+        $_cat = $this->subject->typeCat;
 
 
         /*************/
@@ -68,13 +68,13 @@ class SkillBaseResponse extends TemplateResponse implements ICache
         /* Infobox */
         /***********/
 
-        $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
+        $infobox = Lang::getInfoBoxForFlags($this->subject->cuFlags);
 
         // id
         $infobox[] = Lang::skill('id') . $this->typeId;
 
         // icon
-        if ($_ = $this->subject->getField('iconId'))
+        if ($_ = $this->subject->iconId)
         {
             $infobox[] = Util::ucFirst(Lang::game('icon')).Lang::main('colon').'[icondb='.$_.' name=true]';
             $this->extendGlobalIds(Type::ICON, $_);
@@ -82,7 +82,7 @@ class SkillBaseResponse extends TemplateResponse implements ICache
 
         // original name
         if (Lang::getLocale() != Locale::EN)
-            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.$this->subject->getField('name_loc0').'[/copy][/li]';
+            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.($this->subject->name)(Locale::EN).'[/copy][/li]';
 
         if ($infobox)
             $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0');
@@ -92,13 +92,13 @@ class SkillBaseResponse extends TemplateResponse implements ICache
         /* Main Content */
         /****************/
 
-        $this->headIcons  = [$this->subject->getField('iconString')];
+        $this->headIcons  = [$this->subject->icon];
         $this->redButtons = array(
             BUTTON_WOWHEAD => true,
             BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId]
         );
 
-        if ($_ = $this->subject->getField('description', true))
+        if ($_ = $this->subject->description)
             $this->extraText = new Markup($_, ['dbpage' => true, 'allow' => Markup::CLASS_ADMIN], 'text-generic');
 
 
@@ -118,17 +118,17 @@ class SkillBaseResponse extends TemplateResponse implements ICache
                 [DB::OR, ['s.skillLine1', $this->typeId], [DB::AND, ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $this->typeId]]]
             );
 
-            $recipes = new SpellList($condition);           // also relevant for 3
+            $recipes = new SpellContainer($condition);      // also relevant for 3
             if (!$recipes->error)
             {
-                $this->extendGlobalData($recipes->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
+                $this->extendGlobalData($recipes->getJSGlobals(GLOBALINFO_RELATED));
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data'        => $recipes->getListviewData(),
                     'id'          => 'recipes',
                     'name'        => '$LANG.tab_recipes',
                     'visibleCols' => ['reagents', 'source'],
                     'note'        =>  sprintf(Util::$filterResultString, '?spells='.$_cat.'.'.$this->typeId.'&filter=cr=20;crs=1;crv=0')
-                ), SpellList::$brickFile));
+                ), SpellEntry::$brickFile));
             }
 
             // tab: recipe Items [items] (Books)
@@ -138,10 +138,10 @@ class SkillBaseResponse extends TemplateResponse implements ICache
                 ['class', ITEM_CLASS_RECIPE]
             );
 
-            $recipeItems = new ItemList($conditions);
+            $recipeItems = new ItemContainer($conditions);
             if (!$recipeItems->error)
             {
-                $this->extendGlobalData($recipeItems->getJSGlobals(GLOBALINFO_SELF));
+                $this->extendGlobalData($recipeItems->getJSGlobals());
 
                 $tabData = array(
                     'data' => $recipeItems->getListviewData(),
@@ -152,22 +152,21 @@ class SkillBaseResponse extends TemplateResponse implements ICache
                 if ($_ = array_search($this->typeId, $filterRecipe))
                     $tabData['note'] = sprintf(Util::$filterResultString, "?items=9.".$_);
 
-                $this->lvTabs->addListviewTab(new Listview($tabData, ItemList::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview($tabData, ItemEntry::$brickFile));
             }
 
             // tab: crafted items [items]
             $created = [];
-            foreach ($recipes->iterate() as $__)
-                if ($idx = $recipes->canCreateItem())
-                    foreach ($idx as $i)
-                        $created[] = $recipes->getField('effect'.$i.'CreateItemId');
+            foreach ($recipes->iterate() as $entry)
+                foreach ($entry->canCreateItem() as $idx)
+                    $created[] = $entry->effectCreateItemId[$idx];
 
             if ($created)
             {
-                $created = new ItemList(array(['i.id', $created]));
+                $created = new ItemContainer(array(['id', $created]));
                 if (!$created->error)
                 {
-                    $this->extendGlobalData($created->getJSGlobals(GLOBALINFO_SELF));
+                    $this->extendGlobalData($created->getJSGlobals());
 
                     $tabData = array(
                         'data' => $created->getListviewData(),
@@ -175,10 +174,10 @@ class SkillBaseResponse extends TemplateResponse implements ICache
                         'name' => '$LANG.tab_crafteditems',
                     );
 
-                    if (!is_null($_ = ItemListFilter::getCriteriaIndex(86, $this->typeId)))
+                    if (!is_null($_ = ItemFilter::getCriteriaIndex(86, $this->typeId)))
                         $tabData['note'] = sprintf(Util::$filterResultString, "?items&filter=cr=86;crs=".$_.";crv=0");
 
-                    $this->lvTabs->addListviewTab(new Listview($tabData, ItemList::$brickFile));
+                    $this->lvTabs->addListviewTab(new Listview($tabData, ItemEntry::$brickFile));
                 }
             }
 
@@ -188,10 +187,10 @@ class SkillBaseResponse extends TemplateResponse implements ICache
                 ['class', ITEM_CLASS_RECIPE, '!']
             );
 
-            $reqBy = new ItemList($conditions);
+            $reqBy = new ItemContainer($conditions);
             if (!$reqBy->error)
             {
-                $this->extendGlobalData($reqBy->getJSGlobals(GLOBALINFO_SELF));
+                $this->extendGlobalData($reqBy->getJSGlobals());
 
                 $tabData = array(
                     'data' => $reqBy->getListviewData(),
@@ -199,23 +198,23 @@ class SkillBaseResponse extends TemplateResponse implements ICache
                     'name' => '$LANG.tab_requiredby',
                 );
 
-                if (!is_null($_ = ItemListFilter::getCriteriaIndex(99, $this->typeId)))
+                if (!is_null($_ = ItemFilter::getCriteriaIndex(99, $this->typeId)))
                     $tabData['note'] = sprintf(Util::$filterResultString, "?items&filter=cr=99:168;crs=".$_.":2;crv=0:0");
 
-                $this->lvTabs->addListviewTab(new Listview($tabData, ItemList::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview($tabData, ItemEntry::$brickFile));
             }
 
             // tab: required by [itemset]
-            $reqBy = new ItemsetList(array(['skillId', $this->typeId]));
+            $reqBy = new ItemsetContainer(array(['skillId', $this->typeId]));
             if (!$reqBy->error)
             {
-                $this->extendGlobalData($reqBy->getJSGlobals(GLOBALINFO_SELF));
+                $this->extendGlobalData($reqBy->getJSGlobals());
 
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data' => $reqBy->getListviewData(),
                     'id'   => 'required-by-set',
                     'name' => '$LANG.tab_requiredby'
-                ), ItemsetList::$brickFile));
+                ), ItemsetEntry::$brickFile));
             }
         }
 
@@ -226,7 +225,7 @@ class SkillBaseResponse extends TemplateResponse implements ICache
             [DB::AND, ['effect2AuraId', [SPELL_AURA_MOD_SKILL, SPELL_AURA_MOD_SKILL_TALENT]], ['effect2MiscValue', $this->typeId]],
             [DB::AND, ['effect3AuraId', [SPELL_AURA_MOD_SKILL, SPELL_AURA_MOD_SKILL_TALENT]], ['effect3MiscValue', $this->typeId]]
         );
-        $modBy = new SpellList($conditions);
+        $modBy = new SpellContainer($conditions);
         if (!$modBy->error)
         {
             $this->extendGlobalData($modBy->getJSGlobals());
@@ -236,7 +235,7 @@ class SkillBaseResponse extends TemplateResponse implements ICache
                 'id'         => 'modified-by',
                 'name'       => '$LANG.tab_modifiedby',
                 'hiddenCols' => ['skill'],
-            ), SpellList::$brickFile));
+            ), SpellEntry::$brickFile));
         }
 
         // tab: spells [spells] (exclude first tab)
@@ -255,16 +254,16 @@ class SkillBaseResponse extends TemplateResponse implements ICache
                     break 2;
                 }
 
-        $spells = new SpellList($condition);
+        $spells = new SpellContainer($condition);
         if (!$spells->error)
         {
-            foreach ($spells->iterate() as $__)
+            foreach ($spells->iterate() as $entry)
             {
-                $reqClass |= $spells->getField('reqClassMask');
-                $reqRace  |= $spells->getField('reqRaceMask');
+                $reqClass |= $entry->reqClassMask;
+                $reqRace  |= $entry->reqRaceMask;
             }
 
-            $this->extendGlobalData($spells->getJSGlobals(GLOBALINFO_SELF));
+            $this->extendGlobalData($spells->getJSGlobals());
 
             $tabData = array(
                 'data'        => $spells->getListviewData(),
@@ -280,7 +279,7 @@ class SkillBaseResponse extends TemplateResponse implements ICache
                     default => null
                 };
 
-            $this->lvTabs->addListviewTab(new Listview($tabData, SpellList::$brickFile));
+            $this->lvTabs->addListviewTab(new Listview($tabData, SpellEntry::$brickFile));
         }
 
         // tab: trainers [npcs]
@@ -300,7 +299,7 @@ class SkillBaseResponse extends TemplateResponse implements ICache
             $list = $spellIds ? DB::World()->selectCol('SELECT cdt.`CreatureId` FROM creature_default_trainer cdt JOIN trainer_spell ts ON ts.`TrainerId` = cdt.`TrainerId` WHERE ts.`SpellID` IN %in', $spellIds) : [];
             if ($list)
             {
-                $trainer = new CreatureList(array(['ct.id', $list], ['s.guid', NULL, '!'], ['ct.npcflag', 0x10, '&']));
+                $trainer = new CreatureContainer(array(['ct.id', $list], ['s.guid', NULL, '!'], ['ct.npcflag', 0x10, '&']));
 
                 if (!$trainer->error)
                 {
@@ -311,7 +310,7 @@ class SkillBaseResponse extends TemplateResponse implements ICache
                         'data' => $trainer->getListviewData(),
                         'id'   => 'trainer',
                         'name' => '$LANG.tab_trainers',
-                    ), CreatureList::$brickFile));
+                    ), CreatureEntry::$brickFile));
                 }
             }
         }
@@ -336,28 +335,28 @@ class SkillBaseResponse extends TemplateResponse implements ICache
 
         if ($sort)
         {
-            $quests = new QuestList(array(['questSortId', -$sort]));
+            $quests = new QuestContainer(array(['questSortId', -$sort]));
             if (!$quests->error)
             {
                 $this->extendGlobalData($quests->getJSGlobals());
-                $this->lvTabs->addListviewTab(new Listview(['data' => $quests->getListviewData()], QuestList::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview(['data' => $quests->getListviewData()], QuestEntry::$brickFile));
             }
         }
 
         // tab: related classes (apply classes from [spells])
         if ($class = ChrClass::fromMask($reqClass))
         {
-            $classes = new CharClassList(array(['id', $class]));
+            $classes = new CharClassContainer(array(['id', $class]));
             if (!$classes->error)
-                $this->lvTabs->addListviewTab(new Listview(['data' => $classes->getListviewData()], CharClassList::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview(['data' => $classes->getListviewData()], CharClassEntry::$brickFile));
         }
 
         // tab: related races (apply races from [spells])
         if ($race = ChrRace::fromMask($reqRace))
         {
-            $races = new CharRaceList(array(['id', $race]));
+            $races = new CharRaceContainer(array(['id', $race]));
             if (!$races->error)
-                $this->lvTabs->addListviewTab(new Listview(['data' => $races->getListviewData()], CharRaceList::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview(['data' => $races->getListviewData()], CharRaceEntry::$brickFile));
         }
 
         // tab: condition-for
@@ -375,7 +374,7 @@ class SkillBaseResponse extends TemplateResponse implements ICache
         $this->metaTags[] = ['property' => 'og:title', 'content' => $this->h1];
         $this->metaTags[] = ['property' => 'og:type',  'content' => 'article'];
 
-        $catName  = Lang::skill('cat', $this->subject->getField('typeCat'));
+        $catName  = Lang::skill('cat', $this->subject->typeCat);
         $keywords = [$this->h1, Util::ucFirst(Lang::game('skill'))];
 
         $desc = Lang::meta('description', 'genPage', [$this->h1, Util::ucFirst(Lang::game('skill'))]);

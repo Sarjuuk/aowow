@@ -24,7 +24,7 @@ class GuildBaseResponse extends TemplateResponse
 
     public int $type = Type::GUILD;
 
-    private ?LocalGuildList $subject = null;
+    private ?LocalGuildEntry $subject = null;
 
     public function __construct(string $idOrProfile)
     {
@@ -85,7 +85,7 @@ class GuildBaseResponse extends TemplateResponse
             return;
         }
 
-        $this->subject = new LocalGuildList(array(['id', $this->typeId]));
+        $this->subject = new LocalGuildEntry($this->typeId);
         if ($this->subject->error)
             $this->notFound();
 
@@ -93,14 +93,15 @@ class GuildBaseResponse extends TemplateResponse
         if (!$this->subjectName)
             $this->forward($this->subject->getProfileUrl());
 
-        $this->h1 = Lang::profiler('guildRoster', [$this->subject->getField('name')]);
+        $this->h1 = Lang::profiler('guildRoster', [$this->subject->name]);
 
 
         /*************/
         /* Menu Path */
         /*************/
 
-        $this->followBreadcrumbPath();
+        if ($path = $this->followBreadcrumbPath())
+            array_push($this->breadcrumb, ...$path);
 
 
         /**************/
@@ -109,7 +110,7 @@ class GuildBaseResponse extends TemplateResponse
 
         array_unshift(
             $this->title,
-            $this->subject->getField('name').' ('.$this->realm.' - '.Lang::profiler('regions', $this->region).')',
+            $this->subject->name.' ('.$this->realm.' - '.Lang::profiler('regions', $this->region).')',
             Util::ucFirst(Lang::profiler('profiler'))
         );
 
@@ -134,13 +135,13 @@ class GuildBaseResponse extends TemplateResponse
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated');
 
         // tab: members
-        $member = new LocalProfileList(array(['p.guild', $this->typeId]));
+        $member = new LocalProfileContainer(array(['p.guild', $this->typeId]));
         $this->lvTabs->addListviewTab(new Listview(array(
             'data'        => $member->getListviewData(LISTVIEWINFO_CHARACTER | LISTVIEWINFO_GUILD),
             'sort'        => [-15],
             'visibleCols' => ['race', 'classs', 'level', 'talents', 'gearscore', 'achievementpoints', 'guildrank'],
             'hiddenCols'  => ['guild', 'location']
-        ), ProfileList::$brickFile));
+        ), ProfileEntry::$brickFile));
 
         parent::generate();
     }
@@ -158,8 +159,8 @@ class GuildBaseResponse extends TemplateResponse
             return;
         }
 
-        $name    = $this->subject->getField('name');
-        $realm   = $this->subject->getField('realmName');
+        $name    = $this->subject->name;
+        $realm   = $this->subject->realmName;
         $side    = SIDE_NONE;
         $members = 0;
 
