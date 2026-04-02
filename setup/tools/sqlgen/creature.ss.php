@@ -117,7 +117,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
            'UPDATE    ::creature c
             JOIN      dbc_creaturedisplayinfo cdi ON c.displayId1 = cdi.id
             LEFT JOIN dbc_creaturedisplayinfoextra cdie ON cdi.extraInfoId = cdie.id
-            SET       c.textureString = IFNULL(cdie.textureString, cdi.skin1),
+            SET       c.textureString = LOWER(IFNULL(cdie.textureString, cdi.skin1)),
                       c.modelId = cdi.modelId,
                       c.iconString = cdi.iconString,
                       c.humanoid = IF(cdie.id IS NULL, 0, 1)'

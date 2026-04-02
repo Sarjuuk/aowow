@@ -272,9 +272,12 @@ class Lang
     {
         $locks = [];
         $ids   = [];
-        $lock  = DB::Aowow()->selectRow('SELECT * FROM ::lock WHERE `id` = %i', $lockId);
-        if (!$lock)
-            return $locks;
+
+        if (!$lockId)
+            return [];
+
+        if (!($lock = DB::Aowow()->selectRow('SELECT * FROM ::lock WHERE `id` = %i', $lockId)))
+            return [];
 
         for ($i = 1; $i <= 5; $i++)
         {
@@ -285,7 +288,7 @@ class Lang
             switch ($lock['type'.$i])
             {
                 case LOCK_TYPE_ITEM:
-                    if (!($name = ItemList::getName($prop)))
+                    if (!($name = ItemEntry::getName($prop)))
                         continue 2;
 
                     if ($fmt == self::FMT_HTML)
@@ -319,7 +322,7 @@ class Lang
                             $ids[Type::SKILL][] = $skills[$prop];
                         }
                         else
-                            $name = SkillList::getName($prop);
+                            $name = SkillEntry::getName($prop);
                     }
                     // resolve as spell (mostly generic player spells; also: we know effect open lock only exists on effect idx 0)
                     else if ($spellId = DB::Aowow()->selectCell('SELECT `id` FROM ::spell WHERE `effect1Id` = %i AND `effect1MiscValue` = %i AND `skillLine1` <> 0 ORDER BY `id` ASC', SPELL_EFFECT_OPEN_LOCK, $prop))
@@ -340,7 +343,7 @@ class Lang
 
                     break;
                 case LOCK_TYPE_SPELL:
-                    if (!($name = SpellList::getName($prop)))
+                    if (!($name = SpellEntry::getName($prop)))
                         continue 2;
 
                     if ($fmt == self::FMT_HTML)

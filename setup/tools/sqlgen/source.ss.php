@@ -194,9 +194,9 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             SELECT `effect2CreateItemId` AS "itemId", s.`id` FROM dbc_spell s WHERE `effect2CreateItemId` > 0 AND (`effect2Id` IN %in OR `effect2AuraId` IN %in) UNION ALL
             SELECT `effect3CreateItemId` AS "itemId", s.`id` FROM dbc_spell s WHERE `effect3CreateItemId` > 0 AND (`effect3Id` IN %in OR `effect3AuraId` IN %in) ) AS x
             WHERE  x.`id` NOT IN %in',
-            SpellList::EFFECTS_ITEM_CREATE, SpellList::AURAS_ITEM_CREATE,
-            SpellList::EFFECTS_ITEM_CREATE, SpellList::AURAS_ITEM_CREATE,
-            SpellList::EFFECTS_ITEM_CREATE, SpellList::AURAS_ITEM_CREATE,
+            SpellEntry::EFFECTS_ITEM_CREATE, SpellEntry::AURAS_ITEM_CREATE,
+            SpellEntry::EFFECTS_ITEM_CREATE, SpellEntry::AURAS_ITEM_CREATE,
+            SpellEntry::EFFECTS_ITEM_CREATE, SpellEntry::AURAS_ITEM_CREATE,
             $this->disables[Type::SPELL] ?? [0]
         );
 

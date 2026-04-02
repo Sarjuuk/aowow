@@ -57,6 +57,7 @@ class VideoCompleteResponse extends TextResponse
 
     private function handleComplete() : bool
     {
+        $videoInfo = new \stdClass();
         if (!VideoMgr::loadSuggestion($videoInfo, $this->destType, $this->destTypeId, $this->videoHash))
             $this->generate404();
 

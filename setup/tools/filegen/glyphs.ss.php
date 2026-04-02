@@ -52,7 +52,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             WHERE  i.classBak = %i',
             ITEM_CLASS_GLYPH);
 
-        $glyphSpells = new SpellList(array(['s.id', array_keys($glyphList)]));
+        $glyphSpells = new SpellContainer(array(['id', array_keys($glyphList)]));
 
         foreach (CLISetup::$locales as $loc)
         {
@@ -61,19 +61,19 @@ CLISetup::registerSetup("build", new class extends SetupScript
             Lang::load($loc);
 
             $glyphsOut = [];
-            foreach ($glyphSpells->iterate() as $__)
+            foreach ($glyphSpells->iterate() as $id => $spellEntry)
             {
-                $pop = $glyphList[$glyphSpells->id];
+                $pop = $glyphList[$id];
 
                 if (!$pop['glyphEffect'])
                     continue;
 
-                if ($glyphSpells->getField('effect1Id') != SPELL_EFFECT_APPLY_AURA && $glyphSpells->getField('effect2Id') != SPELL_EFFECT_APPLY_AURA && $glyphSpells->getField('effect3Id') != SPELL_EFFECT_APPLY_AURA)
+                if (!in_array(SPELL_EFFECT_APPLY_AURA, $spellEntry->effectId))
                     continue;
 
                 $glyphsOut[$pop['itemId']] = array(
                     'name'        => Util::localizedString($pop, 'name'),
-                    'description' => $glyphSpells->parseText()[0],
+                    'description' => $spellEntry->renderText()[0],
                     'icon'        => $pop['icon'],
                     'type'        => $pop['type'],
                     'classs'      => $pop['classs'],
