@@ -76,14 +76,11 @@ class CompareBaseResponse extends TemplateResponse
                 $this->summary->addGroup($suGroup);
             }
 
-            $iList = new ItemList(array(['i.id', $items]));
+            $iList = new ItemContainer(array(['id', $items]));
             $data  = $iList->getListviewData(LISTVIEWINFO_SUBITEMS | LISTVIEWINFO_ITEMEXTRA);
 
-            foreach ($iList->iterate() as $itemId => $__)
+            foreach ($iList->iterate() as $itemId => $entry)
             {
-                if (empty($data[$itemId]))
-                    continue;
-
                 if (!empty($data[$itemId]['subitems']))
                     foreach ($data[$itemId]['subitems'] as &$si)
                     {
@@ -92,9 +89,9 @@ class CompareBaseResponse extends TemplateResponse
                     }
 
                 $this->cmpItems[$itemId] = [
-                    'name_'.Lang::getLocale()->json() => $iList->getField('name', true),
-                    'quality'                         => $iList->getField('quality'),
-                    'icon'                            => $iList->getField('iconString'),
+                    'name_'.Lang::getLocale()->json() => $entry->name,
+                    'quality'                         => $entry->quality,
+                    'icon'                            => $entry->icon,
                     'jsonequip'                       => $data[$itemId]
                 ];
             }

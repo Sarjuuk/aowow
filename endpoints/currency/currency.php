@@ -20,7 +20,7 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
     public int $type   = Type::CURRENCY;
     public int $typeId = 0;
 
-    private CurrencyList $subject;
+    private CurrencyEntry $subject;
 
     public function __construct(string $id)
     {
@@ -32,11 +32,11 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new CurrencyList(array(['id', $this->typeId]));
+        $this->subject = new CurrencyEntry($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('currency'), Lang::currency('notFound'));
 
-        $this->h1 = $this->subject->getField('name', true);
+        $this->h1 = $this->subject->name;
 
         $this->gPageInfo += array(
             'type'   => $this->type,
@@ -44,7 +44,7 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
             'name'   => $this->h1
         );
 
-        $_relItemId = $this->subject->getField('itemId');
+        $_relItemId = $this->subject->itemId;
 
 
         /**************/
@@ -58,24 +58,24 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
         /* Menu Path */
         /*************/
 
-        $this->breadcrumb[] = $this->subject->getField('category');
+        $this->breadcrumb[] = $this->subject->category;
 
 
         /***********/
         /* Infobox */
         /**********/
 
-        $infobox = Lang::getInfoBoxForFlags(intval($this->subject->getField('cuFlags')));
+        $infobox = Lang::getInfoBoxForFlags(intval($this->subject->cuFlags));
 
         // cap
-        if ($_ = $this->subject->getField('cap'))
+        if ($_ = $this->subject->cap)
             $infobox[] = Lang::currency('cap').Lang::nf($_);
 
         // id
         $infobox[] = Lang::currency('id') . $this->typeId;
 
         // icon
-        if ($_ = $this->subject->getField('iconId'))
+        if ($_ = $this->subject->iconId)
         {
             $infobox[] = Util::ucFirst(Lang::game('icon')).Lang::main('colon').'[icondb='.$_.' name=true]';
             $this->extendGlobalIds(Type::ICON, $_);
@@ -83,7 +83,7 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
 
         // original name
         if (Lang::getLocale() != Locale::EN)
-            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.$this->subject->getField('name_loc0').'[/copy][/li]';
+            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.($this->subject->name)(Locale::EN).'[/copy][/li]';
 
         if ($infobox)
             $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0');
@@ -93,7 +93,7 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
         /* Main Content */
         /****************/
 
-        $hi = $this->subject->getJSGlobals()[Type::CURRENCY][$this->typeId]['icon'];
+        $hi = $this->subject->getJSGlobal()[Type::CURRENCY][$this->typeId]['icon'];
         if ($hi[0] == $hi[1])
             unset($hi[1]);
 
@@ -103,8 +103,8 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
             BUTTON_LINKS   => true
         );
 
-        if ($_ = $this->subject->getField('description', true))
-            $this->extraText = new Markup($_, ['dbpage' => true, 'allow' => Markup::CLASS_ADMIN], 'text-generic');
+        if (!$this->subject->description->isEmpty())
+            $this->extraText = new Markup($this->subject->description, ['dbpage' => true, 'allow' => Markup::CLASS_ADMIN], 'text-generic');
 
 
         /**************/
@@ -141,13 +141,13 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
             }
 
             // tab: sold by
-            $itemObj = new ItemList(array(['id', $_relItemId]));
-            if (!empty($itemObj->getExtendedCost()[$_relItemId]))
+            $itemObj = new ItemEntry($_relItemId);
+            if ($vendorData = $itemObj->getVendorData([$_relItemId]))
             {
-                $vendors = $itemObj->getExtendedCost()[$_relItemId];
-                $this->extendGlobalData($itemObj->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
+                $vendors = array_pop($vendorData);
+                $this->extendGlobalData($itemObj->getJSGlobal(GLOBALINFO_RELATED));
 
-                $soldBy = new CreatureList(array(['id', array_keys($vendors)]));
+                $soldBy = new CreatureContainer(array(['id', array_keys($vendors)]));
                 if (!$soldBy->error)
                 {
                     $sbData    = $soldBy->getListviewData();
@@ -173,9 +173,9 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
                                 $this->extendGlobalIds(Type::WORLDEVENT, $e);
 
                         $row['stock'] = $vendors[$k][0]['stock'];
-                        $row['stack'] = $itemObj->getField('buyCount');
+                        $row['stack'] = $itemObj->buyCount;
                         $row['cost']  = array(
-                            $itemObj->getField('buyPrice'),
+                            $itemObj->buyPrice,
                             $items  ?: null,
                             $tokens ?: null
                         );
@@ -192,7 +192,7 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
                         'id'         => 'sold-by-npc',
                         'extraCols'  => $extraCols,
                         'hiddenCols' => ['level', 'type']
-                    ), CreatureList::$brickFile));
+                    ), CreatureEntry::$brickFile));
                 }
             }
         }
@@ -200,10 +200,10 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
         // tab: created by (spell) [for items its handled in LootByItem]
         if ($this->typeId == CURRENCY_HONOR_POINTS)
         {
-            $createdBy = new SpellList(array(['effect1Id', SPELL_EFFECT_ADD_HONOR], ['effect2Id', SPELL_EFFECT_ADD_HONOR], ['effect3Id', SPELL_EFFECT_ADD_HONOR], DB::OR));
+            $createdBy = new SpellContainer(array(['effect1Id', SPELL_EFFECT_ADD_HONOR], ['effect2Id', SPELL_EFFECT_ADD_HONOR], ['effect3Id', SPELL_EFFECT_ADD_HONOR], DB::OR));
             if (!$createdBy->error)
             {
-                $this->extendGlobalData($createdBy->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
+                $this->extendGlobalData($createdBy->getJSGlobals(GLOBALINFO_RELATED));
 
                 $tabData = array(
                     'data' => $createdBy->getListviewData(),
@@ -211,10 +211,10 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
                     'id'   => 'created-by',
                 );
 
-                if ($createdBy->hasSetFields('reagent1', 'reagent2', 'reagent3', 'reagent4', 'reagent5', 'reagent6', 'reagent7', 'reagent8'))
+                if ($createdBy->hasSetFields('reagent'))
                     $tabData['visibleCols'] = ['reagents'];
 
-                $this->lvTabs->addListviewTab(new Listview($tabData, SpellList::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview($tabData, SpellEntry::$brickFile));
             }
         }
 
@@ -233,14 +233,14 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
         else
             $w = '`reqItemId1` = '.$_relItemId.' OR `reqItemId2` = '.$_relItemId.' OR `reqItemId3` = '.$_relItemId.' OR `reqItemId4` = '.$_relItemId.' OR `reqItemId5` = '.$_relItemId;
 
-        if (!$n && !is_null(ItemListFilter::getCriteriaIndex(158, $_relItemId)))
+        if (!$n && !is_null(ItemFilter::getCriteriaIndex(158, $_relItemId)))
             $n = '?items&filter=cr=158;crs='.$_relItemId.';crv=0';
 
         $xCosts   = DB::Aowow()->selectCol('SELECT `id` FROM ::itemextendedcost WHERE '.$w);
         $boughtBy = $xCosts ? DB::World()->selectCol('SELECT `item` FROM npc_vendor WHERE `extendedCost` IN %in UNION SELECT `item` FROM game_event_npc_vendor WHERE `extendedCost` IN %in', $xCosts, $xCosts) : [];
         if ($boughtBy)
         {
-            $boughtBy = new ItemList(array(['id', $boughtBy]));
+            $boughtBy = new ItemContainer(array(['id', $boughtBy]));
             if (!$boughtBy->error)
             {
                 $tabData = array(
@@ -253,9 +253,9 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
                 if ($n)
                     $tabData['note'] = sprintf(Util::$filterResultString, $n);
 
-                $this->lvTabs->addListviewTab(new Listview($tabData, ItemList::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview($tabData, ItemEntry::$brickFile));
 
-                $this->extendGlobalData($boughtBy->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
+                $this->extendGlobalData($boughtBy->getJSGlobals(GLOBALINFO_RELATED));
             }
         }
 
@@ -267,12 +267,14 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
         $this->metaTags[] = ['property' => 'og:title', 'content' => $this->h1];
         $this->metaTags[] = ['property' => 'og:type',  'content' => 'article'];
 
-        if (!($desc = $this->subject->getField('description', true)))
+        if ($this->subject->description->isEmpty())
             $desc = Lang::meta('description', 'genPage', [$this->h1, Util::ucFirst(Lang::game('currency'))]);
+        else
+            $desc = $this->subject->description;
 
         $keywords = [$this->h1, Util::ucFirst(Lang::game('currency'))];
 
-        if ($catName = Lang::currency('cat', $this->subject->getField('category')))
+        if ($catName = Lang::currency('cat', $this->subject->category))
         {
             $desc .= ' '.Lang::meta('inCategory', [$catName . ' ' . Util::ucFirst(Lang::game('currencies'))]);
             $keywords[] = $catName;
@@ -280,7 +282,7 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
 
         array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [...$keywords, ...Lang::meta('tags', 'generic')]]);
 
-        $this->buildBasicMetadata($desc, $this->subject->getField('iconString'));
+        $this->buildBasicMetadata($desc, $this->subject->icon);
 
         $this->buildLdJson();
     }

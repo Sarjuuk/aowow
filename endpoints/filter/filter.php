@@ -8,9 +8,9 @@ if (!defined('AOWOW_REVISION'))
 
 class FilterBaseResponse extends TextResponse
 {
-    private  array  $catg   = [];
-    private  string $page   = '';
-    private ?Filter $filter = null;
+    private  array        $catg   = [];
+    private  string       $page   = '';
+    private ?DBTypeFilter $filter = null;
 
     public function __construct(string $rawParam)
     {
@@ -53,7 +53,7 @@ class FilterBaseResponse extends TextResponse
 
         // yes, the whole _POST! .. should the input fields be exposed and static so they can be evaluated via BaseResponse::initRequestData() ?
         if (!$this->filter = Type::newFilter($fileStr, $_POST, $opts))
-            trigger_error('Filter::__construct - tried to init filter from bogus GET data', E_USER_WARNING);
+            trigger_error('DBTypeFilter::__construct - tried to init filter from bogus GET data', E_USER_WARNING);
     }
 
     protected function generate() : void

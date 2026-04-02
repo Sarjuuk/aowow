@@ -57,6 +57,7 @@ class VideoConfirmResponse extends TemplateResponse
         $this->h1 = Lang::video('submission');
         array_unshift($this->title, $this->h1);
 
+        $videoInfo = new \stdClass();
         if (!VideoMgr::loadSuggestion($videoInfo, $this->destType, $this->destTypeId, $this->videoHash))
             $this->generateError();
 

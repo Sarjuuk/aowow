@@ -29,7 +29,7 @@ class ItemsetBaseResponse extends TemplateResponse implements ICache
     public ?Summary $summary     = null;
     public ?string  $expansion   = null;
 
-    private ItemsetList $subject;
+    private ItemsetEntry $subject;
 
     public function __construct(string $id)
     {
@@ -41,13 +41,13 @@ class ItemsetBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new ItemsetList(array(['id', $this->typeId]));
+        $this->subject = new ItemsetEntry($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('itemset'), Lang::itemset('notFound'));
 
-        $this->extendGlobalData($this->subject->getJSGlobals());
+        $this->extendGlobalData($this->subject->getJSGlobal());
 
-        $this->h1 = $this->subject->getField('name', true);
+        $this->h1 = $this->subject->name;
 
         $this->gPageInfo += array(
             'type'   => $this->type,
@@ -55,12 +55,12 @@ class ItemsetBaseResponse extends TemplateResponse implements ICache
             'name'   => $this->h1
         );
 
-        $_ta  = $this->subject->getField('contentGroup');
-        $_ty  = $this->subject->getField('type');
-        $_sk  = $this->subject->getField('skillId');
-        $_evt = $this->subject->getField('eventId');
-        $_cnt = count($this->subject->getField('pieces'));
-        $_cl  = ChrClass::fromMask($this->subject->getField('classMask'));
+        $_ta  = $this->subject->contentGroup;
+        $_ty  = $this->subject->type;
+        $_sk  = $this->subject->skillId;
+        $_evt = $this->subject->eventId;
+        $_cnt = count(array_filter($this->subject->items));
+        $_cl  = $this->subject->classes;
 
 
         /*************/
@@ -82,9 +82,9 @@ class ItemsetBaseResponse extends TemplateResponse implements ICache
         /* Infobox */
         /***********/
 
-        $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
+        $infobox = Lang::getInfoBoxForFlags($this->subject->cuFlags);
 
-        if ($this->subject->getField('cuFlags') & CUSTOM_UNAVAILABLE)
+        if ($this->subject->cuFlags & CUSTOM_UNAVAILABLE)
             $infobox[] = Lang::main('unavailable');
 
         // worldevent
@@ -95,16 +95,16 @@ class ItemsetBaseResponse extends TemplateResponse implements ICache
         }
 
         // itemLevel
-        if ($min = $this->subject->getField('minLevel'))
-            $infobox[] = Lang::game('level').Lang::main('colon').Util::createNumRange($min, $this->subject->getField('maxLevel'));
+        if ($min = $this->subject->minLevel)
+            $infobox[] = Lang::game('level').Lang::main('colon').Util::createNumRange($min, $this->subject->maxLevel);
 
         // side if any
-        if ($_ = $this->subject->getField('side'))
+        if ($_ = $this->subject->side)
             $infobox[] = Lang::main('side').'[span class=icon-'.($_ == SIDE_ALLIANCE ? 'alliance' : 'horde').']'.Lang::game('si', $_).'[/span]';
 
         // class
         $jsg = [];
-        if ($cl = Lang::getClassString($this->subject->getField('classMask'), $jsg, Lang::FMT_MARKUP))
+        if ($cl = Lang::getClassString($this->subject->classMask, $jsg, Lang::FMT_MARKUP))
         {
             $this->extendGlobalIds(Type::CHR_CLASS, ...$jsg);
             $t = count($jsg) == 1 ? Lang::game('class') : Lang::game('classes');
@@ -112,8 +112,8 @@ class ItemsetBaseResponse extends TemplateResponse implements ICache
         }
 
         // required level
-        if ($min = $this->subject->getField('minReqLevel'))
-            $infobox[] = Lang::game('reqLevel', [Util::createNumRange($min, $this->subject->getField('maxReqLevel'))]);
+        if ($min = $this->subject->minReqLevel)
+            $infobox[] = Lang::game('reqLevel', [Util::createNumRange($min, $this->subject->maxReqLevel)]);
 
         // type
         if ($_ty)
@@ -124,11 +124,11 @@ class ItemsetBaseResponse extends TemplateResponse implements ICache
             $infobox[] = Lang::itemset('_tag').'[url=?itemsets&filter=ta='.$_ta.']'.Lang::itemset('notes', $_ta).'[/url]';
 
         // id
-        $infobox[] = Lang::itemset('id') . $this->subject->getField('refSetId');
+        $infobox[] = Lang::itemset('id') . $this->subject->refSetId;
 
         // original name
         if (Lang::getLocale() != Locale::EN)
-            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.$this->subject->getField('name_loc0').'[/copy][/li]';
+            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.($this->subject->name)(Locale::EN).'[/copy][/li]';
 
         if ($infobox)
             $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0');
@@ -142,34 +142,32 @@ class ItemsetBaseResponse extends TemplateResponse implements ICache
         $eqList  = [];
         $compare = [];
 
-        if (!$this->subject->pieceToSet)
-            $cnd = [0];
-        else
-            $cnd = ['i.id', array_keys($this->subject->pieceToSet)];
-
-        $iList = new ItemList(array($cnd));
-        $data  = $iList->getListviewData(LISTVIEWINFO_SUBITEMS | LISTVIEWINFO_ITEMEXTRA);
-        foreach ($iList->iterate() as $itemId => $__)
+        if ($this->subject->items)
         {
-            if (empty($data[$itemId]))
-                continue;
+            $pieces = new ItemContainer(array(['id', $this->subject->items]));
+            $data   = $pieces->getListviewData(LISTVIEWINFO_SUBITEMS | LISTVIEWINFO_ITEMEXTRA);
+            foreach ($pieces->iterate() as $itemId => $itemEntry)
+            {
+                if (empty($data[$itemId]))
+                    continue;
 
-            $slot = $iList->getField('slot');
-            $disp = $iList->getField('displayId');
-            if ($slot && $disp)
-                $eqList[] = [$slot, $disp];
+                $slot = $itemEntry->slot;
+                $disp = $itemEntry->displayId;
+                if ($slot && $disp)
+                    $eqList[] = [$slot, $disp];
 
-            $compare[] = $itemId;
+                $compare[] = $itemId;
 
-            $this->pieces[$itemId] = array(
-                array(
-                    'name_'.Lang::getLocale()->json() => $iList->getField('name', true),
-                    'quality'                         => $iList->getField('quality'),
-                    'icon'                            => $iList->getField('iconString'),
-                    'jsonequip'                       => $data[$itemId]
-                ),
-                new IconElement(Type::ITEM, $itemId, $iList->getField('name', true), quality: $iList->getField('quality'), size: IconElement::SIZE_SMALL, align: 'right', element: 'iconlist-icon')
-            );
+                $this->pieces[$itemId] = array(
+                    array(
+                        'name_'.Lang::getLocale()->json() => $itemEntry->name,
+                        'quality'                         => $itemEntry->quality,
+                        'icon'                            => $itemEntry->icon,
+                        'jsonequip'                       => $data[$itemId]
+                    ),
+                    new IconElement(Type::ITEM, $itemId, $itemEntry->name, quality: $itemEntry->quality, size: IconElement::SIZE_SMALL, align: 'right', element: 'iconlist-icon')
+                );
+            }
         }
 
         if ($compare)
@@ -178,20 +176,20 @@ class ItemsetBaseResponse extends TemplateResponse implements ICache
                 'id'       => 'itemset',
                 'parent'   => 'summary-generic',
                 'groups'   => array_map(fn ($x) => [[$x]], $compare),
-                'level'    => $this->subject->getField('maxReqLevel')
+                'level'    => $this->subject->maxReqLevel
             ));
 
         // required skill
         if ($_sk && ($skill = DB::Aowow()->selectRow('SELECT `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8` FROM ::skillline WHERE `id` = %i', $_sk)))
         {
             $spellLink = sprintf('<a href="?spells=11.%s">%s</a>', $_sk, Util::localizedString($skill, 'name', true));
-            $this->bonusExt = ' &ndash; <small><b>'.Lang::game('requires', [Lang::main('parensFmt', [$spellLink, $this->subject->getField('skillLevel')])]).'</b></small>';
+            $this->bonusExt = ' &ndash; <small><b>'.Lang::game('requires', [Lang::main('parensFmt', [$spellLink, $this->subject->skillLevel])]).'</b></small>';
         }
 
         $this->description = $_ta ? Lang::itemset('_desc', [$this->h1, Lang::itemset('notes', $_ta), $_cnt]) : Lang::itemset('_descTagless', [$this->h1, $_cnt]);
-        $this->unavailable = !!($this->subject->getField('cuFlags') & CUSTOM_UNAVAILABLE);
+        $this->unavailable = !!($this->subject->cuFlags & CUSTOM_UNAVAILABLE);
         $this->spells      = $this->subject->getBonuses();
-        $this->expansion   = Util::$expansionString[$this->subject->getField('expansion')];
+        $this->expansion   = Util::$expansionString[$this->subject->expansion];
         $this->redButtons  = array(
             BUTTON_WOWHEAD => $this->typeId > 0,            // bool only
             BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId],
@@ -237,7 +235,7 @@ class ItemsetBaseResponse extends TemplateResponse implements ICache
 
         if ($rel)
         {
-            $relSets = new ItemsetList($rel);
+            $relSets = new ItemsetContainer($rel);
             if (!$relSets->error)
             {
                 $tabData = array(
@@ -249,7 +247,7 @@ class ItemsetBaseResponse extends TemplateResponse implements ICache
                 if (!$relSets->hasDiffFields('classMask'))
                     $tabData['hiddenCols'] = ['classes'];
 
-                $this->lvTabs->addListviewTab(new Listview($tabData, ItemsetList::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview($tabData, ItemsetEntry::$brickFile));
 
                 $this->extendGlobalData($relSets->getJSGlobals());
             }
@@ -268,7 +266,7 @@ class ItemsetBaseResponse extends TemplateResponse implements ICache
             $keywords[] = $p[0]['name_'.Lang::getLocale()->json()];
 
         $class = '';
-        if ($_ = $this->subject->getField('classMask'))
+        if ($_ = $this->subject->classMask)
         {
             if (count($cl = ChrClass::fromMask($_)) == 1)
             {
@@ -279,7 +277,7 @@ class ItemsetBaseResponse extends TemplateResponse implements ICache
 
         $desc = '';
         // desc: base
-        if ($ta  = $this->subject->getField('contentGroup'))
+        if ($ta  = $this->subject->contentGroup)
         {
             $keywords[] = Lang::itemset('notes', $ta);
             $desc = strip_tags(Lang::itemset('_desc', [$this->h1, Lang::itemset('notes', $ta), count($this->pieces)]));
@@ -290,16 +288,11 @@ class ItemsetBaseResponse extends TemplateResponse implements ICache
             $desc = strip_tags(Lang::itemset('_descTagless', [$this->h1, count($this->pieces)]));
 
         // desc: bonuses
-        $bo = [];
-        for ($i = 1; $i < 9; $i++)
-            if ($_ = $this->subject->getField('bonus'.$i))
-                $bo[] = $_;
-
-        $desc .= ' '.Lang::meta('setbonus', [Lang::concat(array_unique($bo))]);
+        $desc .= ' '.Lang::meta('setbonus', [Lang::concat(array_unique(array_filter($this->subject->boni)))]);
 
         // desc: reqlvel
-        if ($mrl = $this->subject->getField('minReqLevel'))
-            $desc .= ' '.Lang::game('reqLevel', [Util::createNumRange($mrl, $this->subject->getField('maxReqLevel'), ' - ')]).'.';
+        if ($mrl = $this->subject->minReqLevel)
+            $desc .= ' '.Lang::game('reqLevel', [Util::createNumRange($mrl, $this->subject->maxReqLevel, ' - ')]).'.';
 
         array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [...$keywords, ...Lang::meta('tags', 'generic')]]);
 

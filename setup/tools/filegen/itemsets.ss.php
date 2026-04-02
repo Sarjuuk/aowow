@@ -91,7 +91,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
                 // costy and locale-independent -> cache
                 if ($_spells)
-                    $jsonBonus += (new SpellList(array(['s.id', $_spells])))->getStatGain();
+                    $jsonBonus += (new SpellContainer(array(['id', $_spells])))->getStatGain();
 
                 $setbonus = [];
                 for ($i = 1; $i < 9; $i++)

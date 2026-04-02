@@ -390,17 +390,21 @@ trait TrProfiler
         }
     }
 
-    private function followBreadcrumbPath() : void
+    private function followBreadcrumbPath() : array
     {
+        $path = [];
+
         if ($this->region)
         {
-            $this->breadcrumb[] = $this->region;
+            $path[] = $this->region;
 
             if ($this->realm)
-                $this->breadcrumb[] = Profiler::urlize($this->realm, true);
-            // else
-                // $this->breadcrumb[] = Profiler::urlize(Cfg::get('BATTLEGROUP'));
+                $path[] = Profiler::urlize($this->realm, true);
+         // else
+             // $path[] = Profiler::urlize(Cfg::get('BATTLEGROUP'));
         }
+
+        return $path;
     }
 }
 
@@ -662,7 +666,7 @@ abstract class BaseResponse
 
     protected static function sanitizeFilter(string $filter) : string
     {
-        return preg_replace(Filter::PATTERN_PARAM, '', $filter);
+        return preg_replace(DBTypeFilter::PATTERN_PARAM, '', $filter);
     }
 
 

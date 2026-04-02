@@ -100,7 +100,7 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
         if ($this->category)
             $this->subCat = '='.implode('.', $this->category);
 
-        $this->filter = new ItemListFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
+        $this->filter = new ItemFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
         if ($this->filter->shouldReload)
         {
             $_SESSION['error']['fi'] = $this->filter::class;
@@ -126,9 +126,10 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
         /* evaluate filter */
         /*******************/
 
-        $fiForm = $this->filter->values;
+        $fiForm       = $this->filter->values;
+        $xCols        = $this->filter->fiExtraCols;
+        $fiRelEnchant = $this->filter->queryOpts['relEnchant'] ?? null;
 
-        $xCols = $this->filter->fiExtraCols;
 
         $infoMask = LISTVIEWINFO_ITEMEXTRA;
         if (array_intersect([63, 64, 125], $xCols))         // 63:buyPrice; 64:sellPrice; 125:reqarenartng
@@ -201,11 +202,11 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
         $upgItemData = [];
         if ($this->filter->upgrades && $this->filter->fiSetWeights)
         {
-            $upgItems = new ItemList(array(['id', array_keys($this->filter->upgrades)]), ['extraOpts' => $this->filter->extraOpts]);
+            $upgItems = new ItemContainer(array(['id', array_keys($this->filter->upgrades)]), ['queryOpts' => $this->filter->queryOpts]);
             if (!$upgItems->error)
             {
-                $upgItemData = $upgItems->getListviewData($infoMask);
-                $this->extendGlobalData($upgItems->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
+                $upgItemData = $upgItems->getListviewData($infoMask, ['relEnchant' => $fiRelEnchant]);
+                $this->extendGlobalData($upgItems->getJSGlobals(GLOBALINFO_RELATED));
             }
         }
 
@@ -223,10 +224,10 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
             }
 
             if ($singleSlot && empty($fiForm['gb']))        // enforce group by slot
-                $fiForm['gb'] = ItemListFilter::GROUP_BY_SLOT;
+                $fiForm['gb'] = ItemFilter::GROUP_BY_SLOT;
             else if (!$singleSlot)                          // multiples can only be grouped by slot
             {
-                $fiForm['gb'] = ItemListFilter::GROUP_BY_SLOT;
+                $fiForm['gb'] = ItemFilter::GROUP_BY_SLOT;
                 $maxResults = 25;
                 $this->sharedLV['customFilter'] = '$fi_filterUpgradeListview';
             }
@@ -255,8 +256,8 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
         );
         $groups     = [];
         $nameSource = [];
-        $grouping   = $fiForm['gb'] ?? ItemListFilter::GROUP_BY_NONE;
-        $extraOpts  = [];
+        $grouping   = $fiForm['gb'] ?? ItemFilter::GROUP_BY_NONE;
+        $queryOpts  = [];
         $maxResults = Listview::DEFAULT_SIZE;
         $forceTabs  = false;
         $tabs       = [];
@@ -265,7 +266,7 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
         {
             // slot: (try to limit the lookups by class grouping and intersecting with preselected slots)
             // if intersect yields an empty array no lookups will occur
-            case ItemListFilter::GROUP_BY_SLOT:
+            case ItemFilter::GROUP_BY_SLOT:
                 if (isset($this->category[0]) && $this->category[0] == ITEM_CLASS_ARMOR)
                     $groups = $availableSlots[ITEM_CLASS_ARMOR];
                 else if (isset($this->category[0]) && $this->category[0] == ITEM_CLASS_WEAPON)
@@ -286,31 +287,30 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
                 }
 
                 break;
-            case ItemListFilter::GROUP_BY_LEVEL:            // itemlevel: first, try to find 10 level steps within range (if given) as tabs
+            case ItemFilter::GROUP_BY_LEVEL:                // itemlevel: first, try to find 10 level steps within range (if given) as tabs
                 // ohkayy, maybe i need to rethink $this
-                $this->filterOpts = $this->filter->extraOpts;
+                $this->filterOpts = $this->filter->queryOpts;
                 $this->filterOpts['is']['o'] = [null];      // remove 'order by' from ::item_stats
-                $extraOpts = array_merge($this->filterOpts, ['i'  => ['g' => ['itemlevel'], 'o' => ['itemlevel DESC']]]);
+                $queryOpts = array_merge($this->filterOpts, ['i'  => ['g' => ['itemlevel'], 'o' => ['itemlevel DESC']]]);
 
-                $levelRef = new ItemList(array_merge($conditions, [10]), ['extraOpts' => $extraOpts]);
-                foreach ($levelRef->iterate() as $_)
+                $levelRef = new ItemContainer(array_merge($conditions, [10]), ['queryOpts' => $queryOpts]);
+                foreach ($levelRef->iterate() as $entry)
                 {
-                    $l = $levelRef->getField('itemLevel');
-                    $groups[] = $l;
-                    $nameSource[$l] = Lang::game('level').' '.$l;
+                    $groups[] = $entry->itemLevel;
+                    $nameSource[$entry->itemLevel] = Lang::game('level').' '.$entry->itemLevel;
                 }
 
                 if ($groups)
                 {
                     $l = -end($groups);
                     $groups[] = $l;                         // push last value as negativ to signal misc group after $this level
-                    $extraOpts = ['i' => ['o' => ['itemlevel DESC']]];
+                    $queryOpts = ['i' => ['o' => ['itemlevel DESC']]];
                     $nameSource[$l] = Lang::item('tabOther');
                     $forceTabs = true;
                 }
 
                 break;
-            case ItemListFilter::GROUP_BY_SOURCE:           // source
+            case ItemFilter::GROUP_BY_SOURCE:               // source
                 $groups = [1, 2, 3, 4, 5, 10, 11, 12, 0];
                 $nameSource = Lang::game('sources');
                 $forceTabs = true;
@@ -318,7 +318,7 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
                 break;
             // none
             default:
-                $grouping  = ItemListFilter::GROUP_BY_NONE;
+                $grouping  = ItemFilter::GROUP_BY_NONE;
                 $groups[0] = null;
         }
 
@@ -335,13 +335,13 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
         {
             $finalCnd = match ($grouping)
             {
-                ItemListFilter::GROUP_BY_SLOT   => array_merge($conditions, [['slot', $group], $maxResults]),
-                ItemListFilter::GROUP_BY_LEVEL  => array_merge($conditions, [['itemlevel', abs($group), $group > 0 ? null : '<'], $maxResults]),
-                ItemListFilter::GROUP_BY_SOURCE => array_merge($conditions, [$group ? ['src.src'.$group, null, '!'] : ['src.typeId', null], $maxResults]),
-                default                         => $conditions
+                ItemFilter::GROUP_BY_SLOT   => array_merge($conditions, [['slot', $group], $maxResults]),
+                ItemFilter::GROUP_BY_LEVEL  => array_merge($conditions, [['itemlevel', abs($group), $group > 0 ? null : '<'], $maxResults]),
+                ItemFilter::GROUP_BY_SOURCE => array_merge($conditions, [$group ? ['src.src'.$group, null, '!'] : ['src.typeId', null], $maxResults]),
+                default                     => $conditions
             };
 
-            $items = new ItemList($finalCnd, ['extraOpts' => array_merge($extraOpts, $this->filter->extraOpts), 'calcTotal' => true]);
+            $items = new ItemContainer($finalCnd, ['queryOpts' => array_merge($queryOpts, $this->filter->queryOpts), 'calcTotal' => true]);
 
             if ($items->error)
                 continue;
@@ -350,22 +350,22 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
             if ($this->filter->getSetCriteria(92) && is_array($this->sharedLV['extraCols']))
             {
                 $this->sharedLV['extraCols']['cost'] = '$Listview.extraCols.cost';
-                $data = $items->getListviewData($infoMask | LISTVIEWINFO_VENDOR);
+                $data = $items->getListviewData($infoMask | LISTVIEWINFO_VENDOR, ['relEnchant' => $fiRelEnchant]);
             }
             else
-                $data = $items->getListviewData($infoMask);
+                $data = $items->getListviewData($infoMask, ['relEnchant' => $fiRelEnchant]);
 
             $tabData = array_merge(
                 ['data' => $data],
                 $this->sharedLV
             );
-            $this->extendGlobalData($items->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
+            $this->extendGlobalData($items->getJSGlobals(GLOBALINFO_RELATED));
 
             $upg = [];
             if ($upgItemData)
             {
                 // slot: match upgradeItem to slot
-                if ($grouping == ItemListFilter::GROUP_BY_SLOT)
+                if ($grouping == ItemFilter::GROUP_BY_SLOT)
                 {
                     $upg = array_keys(array_filter($this->filter->upgrades, fn($x) => $x == $group));
 
@@ -388,9 +388,9 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
             {
                 $tabData['id'] = match ($grouping)
                 {
-                    ItemListFilter::GROUP_BY_SLOT   => 'slot-'.$group,
-                    ItemListFilter::GROUP_BY_LEVEL  => $group > 0 ? 'level-'.$group : 'other',
-                    ItemListFilter::GROUP_BY_SOURCE => $group ? 'source-'.$group : 'unknown'
+                    ItemFilter::GROUP_BY_SLOT   => 'slot-'.$group,
+                    ItemFilter::GROUP_BY_LEVEL  => $group > 0 ? 'level-'.$group : 'other',
+                    ItemFilter::GROUP_BY_SOURCE => $group ? 'source-'.$group : 'unknown'
                 };
 
                 $tabData['name'] = $nameSource[$group];
@@ -413,11 +413,11 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
 
                 switch ($grouping)
                 {
-                    case ItemListFilter::GROUP_BY_SLOT:
+                    case ItemFilter::GROUP_BY_SLOT:
                         $override['sl'] = $group;
                         $tabData['note'] = '$$WH.sprintf(LANG.lvnote_viewmoreslot, \''.$catg.'\', \''.$this->filter->buildGETParam($override).'\')';
                         break;
-                    case ItemListFilter::GROUP_BY_LEVEL:
+                    case ItemFilter::GROUP_BY_LEVEL:
                         if ($group > 0)
                         {
                             $override['minle'] = $group;
@@ -428,7 +428,7 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
 
                         $tabData['note'] = '$$WH.sprintf(LANG.lvnote_viewmorelevel, \''.$catg.'\', \''.$this->filter->buildGETParam($override).'\')';
                         break;
-                    case ItemListFilter::GROUP_BY_SOURCE:
+                    case ItemFilter::GROUP_BY_SOURCE:
                         if ($_ = [null, 3, 4, 5, 6, 7, 9, 10, 11][$group])
                             $tabData['note'] = '$$WH.sprintf(LANG.lvnote_viewmoresource, \''.$catg.'\', \''.$this->filter->buildGETParam($override, [[128, $_, 0]]).'\')';
 
@@ -462,7 +462,7 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
             $tabs[] = ['data' => []];
 
         foreach ($tabs as $t)
-            $this->lvTabs->addListviewTab(new Listview($t, ItemList::$brickFile));
+            $this->lvTabs->addListviewTab(new Listview($t, ItemEntry::$brickFile));
 
         $this->redButtons[BUTTON_WOWHEAD] = true;
         if ($fiQuery = $this->filter->buildGETParam())
@@ -502,7 +502,7 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
         if ($this->filter->wtCnd)
             $cnd[] = $this->filter->wtCnd;
 
-        $anyColor = new ItemList($cnd, ['extraOpts' => $this->filter->extraOpts]);
+        $anyColor = new ItemContainer($cnd, ['queryOpts' => $this->filter->queryOpts]);
         if (!$anyColor->error)
         {
             $this->extendGlobalData($anyColor->getJSGlobals());
@@ -513,7 +513,7 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
         {
             $mask = 1 << $i;
             $q    = !$i ? ITEM_QUALITY_RARE : $this->filter->values['gm']; // meta gems are always included.. ($q is backReferenced)
-            $byColor = new ItemList($cnd, ['extraOpts' => $this->filter->extraOpts]);
+            $byColor = new ItemContainer($cnd, ['queryOpts' => $this->filter->queryOpts]);
             if (!$byColor->error)
             {
                 $this->extendGlobalData($byColor->getJSGlobals());

@@ -22,7 +22,7 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
     public array  $effects    = [];
     public string $activation = '';
 
-    private EnchantmentList $subject;
+    private EnchantmentEntry $subject;
 
     public function __construct(string $id)
     {
@@ -34,13 +34,13 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new EnchantmentList(array(['id', $this->typeId]));
+        $this->subject = new EnchantmentEntry($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('enchantment'), Lang::enchantment('notFound'));
 
-        $this->extendGlobalData($this->subject->getJSGlobals());
+        $this->extendGlobalData($this->subject->getJSGlobal());
 
-        $this->h1 = $this->subject->getField('name', true);
+        $this->h1 = $this->subject->name;
 
         $this->gPageInfo += array(
             'type'   => $this->type,
@@ -67,19 +67,19 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
         /* Infobox */
         /***********/
 
-        $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
+        $infobox = Lang::getInfoBoxForFlags($this->subject->cuFlags);
 
         // reqLevel
-        if ($_ = $this->subject->getField('requiredLevel'))
+        if ($_ = $this->subject->requiredLevel)
             $infobox[] = sprintf(Lang::game('reqLevel'), $_);
 
         // reqskill
-        if ($_ = $this->subject->getField('skillLine'))
+        if ($_ = $this->subject->skillLine)
         {
             $this->extendGlobalIds(Type::SKILL, $_);
 
             $foo = Lang::game('requires', ['&nbsp;[skill='.$_.']']);
-            if ($_ = $this->subject->getField('skillLevel'))
+            if ($_ = $this->subject->skillLevel)
                 $foo .= Lang::main('parensFmt', ['', $_]);
 
             $infobox[] = $foo;
@@ -90,7 +90,7 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
 
         // original name
         if (Lang::getLocale() != Locale::EN)
-            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.$this->subject->getField('name_loc0').'[/copy][/li]';
+            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.($this->subject->name)(Locale::EN).'[/copy][/li]';
 
         if ($infobox)
             $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0');
@@ -107,11 +107,11 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
 
         $this->effects = [];
         // 3 effects
-        for ($i = 1; $i < 4; $i++)
+        for ($i = 0; $i < 3; $i++)
         {
-            $_ty  = $this->subject->getField('type'.$i);
-            $_qty = $this->subject->getField('amount'.$i);
-            $_obj = $this->subject->getField('object'.$i);
+            $_ty  = $this->subject->type[$i];
+            $_qty = $this->subject->amount[$i];
+            $_obj = $this->subject->object[$i];
             $_tip = [];
 
             switch ($_ty)
@@ -119,9 +119,11 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
                 case ENCHANTMENT_TYPE_COMBAT_SPELL:
                 case ENCHANTMENT_TYPE_EQUIP_SPELL:
                 case ENCHANTMENT_TYPE_USE_SPELL:
-                    [$spellId, $trigger, $charges, $procChance] = $this->subject->getField('spells')[$i];
-                    $spl  = $this->subject->getRelSpell($spellId);
-                    $this->effects[$i] = array(
+                    [$spellId, $trigger, $charges, $procChance] = $this->subject->spells[$i];
+                    if ($spl  = $this->subject->getRelSpell($spellId))
+                        $this->extendGlobalData($spl->getJSGlobal());
+
+                    $this->effects[$i + 1] = array(
                         'name'  => $this->fmtStaffTip(Lang::item('trigger', $trigger), 'Type: '.$_ty),
                         'proc'  => $procChance,
                         'value' => $_qty ?: null,
@@ -129,7 +131,7 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
                         'icon'  => new IconElement(
                             Type::SPELL,
                             $spellId,
-                            !$spl ? Util::ucFirst(Lang::game('spell')).' #'.$spellId : Util::localizedString($spl, 'name'),
+                            $spl?->name ?: Util::ucFirst(Lang::game('spell')).' #'.$spellId,
                             $charges,
                             link: !!$spl
                         )
@@ -144,7 +146,7 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
                 case ENCHANTMENT_TYPE_TOTEM:
                 case ENCHANTMENT_TYPE_PRISMATIC_SOCKET:
                 case ENCHANTMENT_TYPE_RESISTANCE:
-                    $this->effects[$i] = array(
+                    $this->effects[$i + 1] = array(
                         'name'  => $this->fmtStaffTip(Lang::enchantment('types', $_ty), 'Type: '.$_ty),
                         'proc'  => null,
                         'value' => $_qty,
@@ -152,12 +154,12 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
                         'icon'  => null
                     );
                     if ($_ty == ENCHANTMENT_TYPE_RESISTANCE)
-                        $this->effects[$i]['name'] .= Lang::main('colon').'('.$this->fmtStaffTip(Lang::getMagicSchools(1 << $_obj), 'Object: '.$_obj).')';
+                        $this->effects[$i + 1]['name'] .= Lang::main('colon').'('.$this->fmtStaffTip(Lang::getMagicSchools(1 << $_obj), 'Object: '.$_obj).')';
             }
         }
 
         // activation conditions
-        if ($_ = $this->subject->getField('conditionId'))
+        if ($_ = $this->subject->conditionId)
             $this->activation = Game::getEnchantmentCondition($_);
 
 
@@ -168,7 +170,7 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
 
         // used by gem
-        $gemList = new ItemList(array(['gemEnchantmentId', $this->typeId]));
+        $gemList = new ItemContainer(array(['gemEnchantmentId', $this->typeId]));
         if (!$gemList->error)
         {
             $this->extendGlobalData($gemList->getJSGlobals());
@@ -176,11 +178,11 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
                 'data' => $gemList->getListviewData(),
                 'name' => '$LANG.tab_usedby + \' \' + LANG.gems',
                 'id'   => 'used-by-gem',
-            ), ItemList::$brickFile));
+            ), ItemEntry::$brickFile));
         }
 
         // used by socket bonus
-        $socketsList = new ItemList(array(['socketBonus', $this->typeId]));
+        $socketsList = new ItemContainer(array(['socketBonus', $this->typeId]));
         if (!$socketsList->error)
         {
             $this->extendGlobalData($socketsList->getJSGlobals());
@@ -188,18 +190,18 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
                 'data' => $socketsList->getListviewData(),
                 'name' => '$LANG.tab_socketbonus',
                 'id'   => 'used-by-socketbonus',
-            ), ItemList::$brickFile));
+            ), ItemEntry::$brickFile));
         }
 
         // used by spell
         // used by useItem
         $cnd = array(
             DB::OR,
-            [DB::AND, ['effect1Id', SpellList::EFFECTS_ENCHANTMENT], ['effect1MiscValue', $this->typeId]],
-            [DB::AND, ['effect2Id', SpellList::EFFECTS_ENCHANTMENT], ['effect2MiscValue', $this->typeId]],
-            [DB::AND, ['effect3Id', SpellList::EFFECTS_ENCHANTMENT], ['effect3MiscValue', $this->typeId]],
+            [DB::AND, ['effect1Id', SpellEntry::EFFECTS_ENCHANTMENT], ['effect1MiscValue', $this->typeId]],
+            [DB::AND, ['effect2Id', SpellEntry::EFFECTS_ENCHANTMENT], ['effect2MiscValue', $this->typeId]],
+            [DB::AND, ['effect3Id', SpellEntry::EFFECTS_ENCHANTMENT], ['effect3MiscValue', $this->typeId]],
         );
-        $spellList = new SpellList($cnd);
+        $spellList = new SpellContainer($cnd);
         if (!$spellList->error)
         {
             $spellData = $spellList->getListviewData();
@@ -215,37 +217,34 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
                 [DB::AND, ['spellTrigger5', [SPELL_TRIGGER_USE, SPELL_TRIGGER_USE_NODELAY]], ['spellId5', $spellIds]]
             );
 
-            $ubItems = new ItemList($conditions);
+            $ubItems = new ItemContainer($conditions);
             if (!$ubItems->error)
             {
-                $this->extendGlobalData($ubItems->getJSGlobals(GLOBALINFO_SELF));
+                $this->extendGlobalData($ubItems->getJSGlobals());
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data' => $ubItems->getListviewData(),
                     'name' => '$LANG.tab_usedby + \' \' + LANG.types[3][0]',
                     'id'   => 'used-by-item',
-                ), ItemList::$brickFile));
+                ), ItemEntry::$brickFile));
             }
 
             // remove found spells if they are used by an item
             if (!$ubItems->error)
             {
-                foreach ($spellList->iterate() as $sId => $__)
+                foreach ($spellList->iterate() as $sId => $spellEntry)
                 {
                     // if Perm. Enchantment display both
-                    for ($i = 1; $i < 4; $i++)
-                        if ($spellList->getField('effect'.$i.'Id') == SPELL_EFFECT_ENCHANT_ITEM)
+                    for ($i = 0; $i < 3; $i++)
+                        if ($spellEntry->effectId[$i] == SPELL_EFFECT_ENCHANT_ITEM)
                             continue 2;
 
-                    foreach ($ubItems->iterate() as $__)
+                    foreach ($ubItems->iterate() as $itemEntry)
                     {
-                        for ($i = 1; $i < 6; $i++)
-                        {
-                            if ($ubItems->getField('spellId'.$i) == $sId)
-                            {
-                                unset($spellData[$sId]);
-                                break 2;
-                            }
-                        }
+                        if (!in_array($sId, array_column($itemEntry->spells, 0)))
+                            continue;
+
+                        unset($spellData[$sId]);
+                        break;
                     }
                 }
             }
@@ -255,7 +254,7 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
                     'data' => $spellData,
                     'name' => '$LANG.tab_usedby + \' \' + LANG.types[6][0]',
                     'id'   => 'used-by-spell',
-                ), SpellList::$brickFile));
+                ), SpellEntry::$brickFile));
         }
 
         // used by randomAttrItem
@@ -271,13 +270,13 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
                 foreach ($iet as $tplId => $data)
                     $randIds[$ire[$data['ench']]['id'] > 0 ? $tplId : -$tplId] = $ire[$data['ench']]['id'];
 
-                $randItems = new ItemList(array(['randomEnchant', array_keys($randIds)]));
+                $randItems = new ItemContainer(array(['randomEnchant', array_keys($randIds)]));
                 if (!$randItems->error)
                 {
                     $data = $randItems->getListviewData();
-                    foreach ($randItems->iterate() as $iId => $__)
+                    foreach ($randItems->iterate() as $iId => $itemEntry)
                     {
-                        $re = $randItems->getField('randomEnchant');
+                        $re = $itemEntry->randomEnchant;
 
                         $data[$iId]['percent'] = $iet[abs($re)]['chance'];
                         $data[$iId]['count']   = 1;         // expected by js or the pct-col becomes unsortable
@@ -285,13 +284,13 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
                         $data[$iId]['name']   .= ' '.Util::localizedString($ire[$iet[abs($re)]['ench']], 'name');
                     }
 
-                    $this->extendGlobalData($randItems->getJSGlobals(GLOBALINFO_SELF));
+                    $this->extendGlobalData($randItems->getJSGlobals());
                     $this->lvTabs->addListviewTab(new Listview(array(
                         'data'      => $data,
                         'id'        => 'used-by-rand',
                         'name'      => '$LANG.tab_usedby + \' \' + \''.Lang::item('_rndEnchants').'\'',
                         'extraCols' => ['$Listview.extraCols.percent']
-                    ), ItemList::$brickFile));
+                    ), ItemEntry::$brickFile));
                 }
             }
         }
@@ -301,19 +300,10 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
 
     private function getDistinctType() : int
     {
-        $type = 0;
-        for ($i = 1; $i < 4; $i++)
-        {
-            if (!($_ = $this->subject->getField('type'.$i)))
-                continue;
-
-            if ($type && $type != $_)                       // already set
-                return 0;
-
-            $type = $_;
-        }
-
-        return $type;
+        $types = array_unique(array_filter($this->subject->type));
+        if (count($types) == 1)
+            return array_pop($types);
+        return 0;
     }
 
     protected function generateMetadata(bool $useArticle = true) : void

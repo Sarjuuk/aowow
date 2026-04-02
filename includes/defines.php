@@ -208,11 +208,6 @@ define('LISTVIEWINFO_GUILD',                0x0400);        // old: PROFILEINFO_
 define('LISTVIEWINFO_ARENA',                0x0800);        // old: PROFILEINFO_ARENA
 define('LISTVIEWINFO_USER',                 0x1000);        // old: PROFILEINFO_USER
 
-define('SPAWNINFO_ZONES',                   1);             // not a mask, mutually exclusive
-define('SPAWNINFO_SHORT',                   2);
-define('SPAWNINFO_FULL',                    3);
-define('SPAWNINFO_QUEST',                   4);
-
 
 // Community Content
 define('CC_FLAG_STICKY',                    0x1);
@@ -301,6 +296,7 @@ define('SRC_PICKPOCKETING',  21);
 define('SRC_SALVAGING',      22);
 define('SRC_SKINNING',       23);
 // define('SRC_INGAME_STORE',   24);                        // not in 3.3.5
+define('MAX_SOURCES',        25);
 
 define('SRC_SUB_PVP_ARENA', 1);
 define('SRC_SUB_PVP_BG',    2);
@@ -315,6 +311,10 @@ define('SRC_FLAG_RAID_DROP',    0x20);
 /*
  * Game
  */
+
+define('MONEY_COPPER', 1);
+define('MONEY_SILVER', MONEY_COPPER / 100);
+define('MONEY_GOLD',   MONEY_SILVER / 100);
 
 // Custom Flags (shared)
 define('CUSTOM_HAS_COMMENT',                0x01000000);
@@ -846,7 +846,7 @@ define('QUEST_FLAG_SPECIAL_DUNGEON_FINDER',  0x08);
 define('QUEST_FLAG_SPECIAL_MONTHLY',         0x10);
 define('QUEST_FLAG_SPECIAL_SPELLCAST',       0x20);    // not documented in wiki! :[
 
-// GameObject
+// Gameobject
 define('OBJECT_DOOR',                       0);
 define('OBJECT_BUTTON',                     1);
 define('OBJECT_QUESTGIVER',                 2);
