@@ -64,7 +64,7 @@ class PetsBaseResponse extends TemplateResponse implements ICache
             $conditions[] = ['type', $this->category[0]];
 
         $tabData = [];
-        $pets = new PetList($conditions);
+        $pets = new PetContainer($conditions);
         if (!$pets->error)
         {
             $this->extendGlobalData($pets->getJSGlobals(GLOBALINFO_RELATED));
@@ -84,7 +84,7 @@ class PetsBaseResponse extends TemplateResponse implements ICache
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
 
-        $this->lvTabs->addListviewTab(new Listview($tabData, PetList::$brickFile, 'petFoodCol'));
+        $this->lvTabs->addListviewTab(new Listview($tabData, PetEntry::$brickFile, 'petFoodCol'));
 
         parent::generate();
     }

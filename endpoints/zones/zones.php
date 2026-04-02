@@ -87,7 +87,7 @@ class ZonesBaseResponse extends TemplateResponse implements ICache
             }
         }
 
-        $zones = new ZoneList($conditions);
+        $zones = new ZoneContainer($conditions);
 
         if (!$zones->hasSetFields('type'))
             $hiddenCols[] = 'instancetype';
@@ -98,7 +98,7 @@ class ZonesBaseResponse extends TemplateResponse implements ICache
             'data'       => $zones->getListviewData(),
             'visibleCols'=> $visibleCols ?: null,
             'hiddenCols' => $hiddenCols  ?: null
-        ), ZoneList::$brickFile));
+        ), ZoneEntry::$brickFile));
 
 
         /**************/

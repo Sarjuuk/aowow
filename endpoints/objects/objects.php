@@ -36,7 +36,7 @@ class ObjectsBaseResponse extends TemplateResponse implements ICache
         if ($this->category)
             $this->subCat = '='.implode('.', $this->category);
 
-        $this->filter = new GameObjectListFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
+        $this->filter = new GameobjectFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
         if ($this->filter->shouldReload)
         {
             $_SESSION['error']['fi'] = $this->filter::class;
@@ -75,7 +75,7 @@ class ObjectsBaseResponse extends TemplateResponse implements ICache
 
         array_unshift($this->title, $this->h1);
         if ($this->category)
-            array_unshift($this->title, Lang::gameObject('cat', $this->category[0]));
+            array_unshift($this->title, Lang::gameobject('cat', $this->category[0]));
 
 
         /****************/
@@ -90,7 +90,7 @@ class ObjectsBaseResponse extends TemplateResponse implements ICache
         }
 
         $tabData = ['data' => []];
-        $objects = new GameObjectList($conditions, ['extraOpts' => $this->filter->extraOpts, 'calcTotal' => true]);
+        $objects = new GameobjectContainer($conditions, ['queryOpts' => $this->filter->queryOpts, 'calcTotal' => true]);
         if (!$objects->error)
         {
             $tabData['data'] = $objects->getListviewData();
@@ -107,7 +107,7 @@ class ObjectsBaseResponse extends TemplateResponse implements ICache
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
 
-        $this->lvTabs->addListviewTab(new Listview($tabData, GameObjectList::$brickFile));
+        $this->lvTabs->addListviewTab(new Listview($tabData, GameobjectEntry::$brickFile));
 
         parent::generate();
     }
@@ -116,7 +116,7 @@ class ObjectsBaseResponse extends TemplateResponse implements ICache
     {
         $keywords = [$this->h1];
         if ($this->category && $this->category[0])          // dnd 'Other' catg
-            array_unshift($keywords, Lang::gameObject('cat', $this->category[0]));
+            array_unshift($keywords, Lang::gameobject('cat', $this->category[0]));
 
         $this->metaTags[] = ['property' => 'og:title', 'content' => reset($keywords)];
         $this->metaTags[] = ['property' => 'og:type',  'content' => 'website'];

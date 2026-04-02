@@ -55,7 +55,7 @@ class AchievementsBaseResponse extends TemplateResponse implements ICache
         if ($this->category)
             $this->subCat = '='.implode('.', $this->category);
 
-        $this->filter = new AchievementListFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
+        $this->filter = new AchievementFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
         if ($this->filter->shouldReload)
         {
             $_SESSION['error']['fi'] = $this->filter::class;
@@ -119,7 +119,7 @@ class AchievementsBaseResponse extends TemplateResponse implements ICache
             $this->fiMenuExtension = $fiQuery;
         }
 
-        $acvList = new AchievementList($conditions, ['calcTotal' => true]);
+        $acvList = new AchievementContainer($conditions, ['calcTotal' => true]);
         if (!$acvList->getMatches() && $this->category)
         {
             // ToDo - we also branch into here if the filter prohibits results. That should be skipped.
@@ -129,7 +129,7 @@ class AchievementsBaseResponse extends TemplateResponse implements ICache
             if ($catList = DB::Aowow()->SelectCol('SELECT `id` FROM ::achievementcategory WHERE `parentCat` IN %in OR `parentCat2` IN %in ', $this->category, $this->category))
                 $conditions[] = ['category', $catList];
 
-            $acvList = new AchievementList($conditions, ['calcTotal' => true]);
+            $acvList = new AchievementContainer($conditions, ['calcTotal' => true]);
         }
 
         $tabData = [];
@@ -138,7 +138,7 @@ class AchievementsBaseResponse extends TemplateResponse implements ICache
             $tabData['data'] = $acvList->getListviewData();
 
             // fill g_items, g_titles, g_achievements
-            $this->extendGlobalData($acvList->getJSGlobals());
+            $this->extendGlobalData($acvList->getJSGlobals(GLOBALINFO_REWARDS));
 
             // if we are have different cats display field
             if ($acvList->hasDiffFields('category'))
@@ -156,7 +156,7 @@ class AchievementsBaseResponse extends TemplateResponse implements ICache
         }
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
 
-        $this->lvTabs->addListviewTab(new Listview($tabData, AchievementList::$brickFile));
+        $this->lvTabs->addListviewTab(new Listview($tabData, AchievementEntry::$brickFile));
 
         parent::generate();
 

@@ -60,12 +60,11 @@ class IconElement
         else
             $this->align = $align;
 
+        // don't generate warning .. too much faulty dbc data exists
         if ($type && $typeId && !Type::validateIds($type, $typeId))
-        {
-            $link = false;
-            trigger_error('IconElement::__construct - invalid typeId '.$typeId.' for '.Type::getFileString($type).'.', E_USER_WARNING);
-        }
-        else if (!$type || !$typeId)
+            $type = $typeId = 0;
+
+        if (!$type || !$typeId)
             $link = false;
 
         if ($link || $url)

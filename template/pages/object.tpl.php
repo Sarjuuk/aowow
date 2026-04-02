@@ -30,14 +30,14 @@
     $this->brick('markup', ['markup' => $this->article]);
 
 if ($this->relBoss):
-    echo '                <div>'.sprintf(Lang::gameObject('npcLootPH'), $this->h1, $this->relBoss[0], $this->relBoss[1]).'</div>'.PHP_EOL;
+    echo '                <div>'.sprintf(Lang::gameobject('npcLootPH'), $this->h1, $this->relBoss[0], $this->relBoss[1]).'</div>'.PHP_EOL;
     echo '                <div class="pad"></div>';
 endif;
 
 if ($this->map):
     $this->brick('mapper');
 else:
-    echo Lang::gameObject('unkPosition');
+    echo Lang::gameobject('unkPosition');
 endif;
 
 $this->brick('book');

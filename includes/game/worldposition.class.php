@@ -194,7 +194,7 @@ abstract class WorldPosition
      * you should rely on your core to calculate zone id and zone coordinates for creature/gameobject spawns
      *
      * @param   int                 $areaId or zone id (used interchangeably) to test on
-     * @param   array<float, float> $set    [posX, posY] set of coordinates to test. Set null on mismatch.
+     * @param   array{float, float} $set    [posX, posY] set of coordinates to test. Set null on mismatch.
      * @return  bool                        check success
      */
     private static function alphaMapCheck(int $areaId, array &$set) : bool
