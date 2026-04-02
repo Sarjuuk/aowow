@@ -195,8 +195,8 @@ class LootByContainer extends Loot
      */
     public function formatListview(array $difficultyEntries = []) : array
     {
-        $items = new ItemList(array(['id', $this->itemIds]));
-        $this->storeJSGlobals($items->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
+        $items = new ItemContainer(array(['id', $this->itemIds]));
+        $this->storeJSGlobals($items->getJSGlobals(GLOBALINFO_RELATED));
         $itemRows = $items->getListviewData();
 
         foreach ($this->rawLoot as $entry => $lootRows)
@@ -268,7 +268,7 @@ class LootByContainer extends Loot
                         $extra = ['stack' => [$loot['min'], $loot['max']]];
 
                         // unsure if correct - tag item as trash if chance < 1% and tagged as having many sources
-                        if ($base['count'] < 100 && $items->getEntry($loot['content'])['moreMask'] & SRC_FLAG_COMMON)
+                        if ($base['count'] < 100 && $items->getEntry($loot['content'])->moreMask & SRC_FLAG_COMMON)
                             $extra['commondrop'] = 1;
 
                         // staff or unmergable - separate loot rows

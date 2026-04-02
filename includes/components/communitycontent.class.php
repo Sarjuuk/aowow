@@ -98,9 +98,9 @@ class CommunityContent
     {
         foreach (self::$subjCache as $type => $ids)
             if ($_ = array_filter($ids, 'is_numeric'))
-                if (!($obj = Type::newList($type, [['id', array_keys($_)]]))->error)
-                    foreach ($obj->iterate() as $id => $__)
-                        self::$subjCache[$type][$id] = $obj->getField('name', true, true);
+                if (!($obj = Type::newContainer($type, [['id', array_keys($_)]]))->error)
+                    foreach ($obj->iterate() as $id => $entry)
+                        self::$subjCache[$type][$id] = $entry?->name ?? '';
     }
 
     public static function getCommentPreviews(array $opt = [], ?int &$nFound = 0, bool $dateFmt = true, int $resultLimit = PHP_INT_MAX) : array

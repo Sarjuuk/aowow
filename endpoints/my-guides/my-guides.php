@@ -33,7 +33,7 @@ class MyguidesBaseResponse extends TemplateResponse
 
         $this->redButtons = [BUTTON_GUIDE_NEW => User::canWriteGuide()];
 
-        $guides = new GuideList(array(['userId', User::$id]));
+        $guides = new GuideContainer(array(['userId', User::$id]));
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
 
@@ -43,7 +43,7 @@ class MyguidesBaseResponse extends TemplateResponse
             'hiddenCols'  => ['patch', 'author'],
             'visibleCols' => ['status'],
             'extraCols'   => ['$Listview.extraCols.date']
-        ), GuideList::$brickFile));
+        ), GuideEntry::$brickFile));
 
         parent::generate();
     }

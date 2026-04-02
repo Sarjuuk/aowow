@@ -27,7 +27,7 @@ class RaceBaseResponse extends TemplateResponse implements ICache
     public int     $typeId    = 0;
     public ?string $expansion = null;
 
-    private CharRaceList $subject;
+    private CharRaceEntry $subject;
 
     public function __construct(string $id)
     {
@@ -39,11 +39,11 @@ class RaceBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new CharRaceList(array(['id', $this->typeId]));
+        $this->subject = new CharRaceEntry($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('race'), Lang::race('notFound'));
 
-        $this->h1 = $this->subject->getField('name', true);
+        $this->h1 = $this->subject->name;
 
         $this->gPageInfo += array(
             'type'   => $this->type,
@@ -72,28 +72,28 @@ class RaceBaseResponse extends TemplateResponse implements ICache
 
         $ra = ChrRace::from($this->typeId);
 
-        $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
+        $infobox = Lang::getInfoBoxForFlags($this->subject->cuFlags);
 
         // side
-        if ($_ = $this->subject->getField('side'))
+        if ($_ = $this->subject->side)
             $infobox[] = Lang::main('side').'[span class=icon-'.($_ == SIDE_HORDE ? 'horde' : 'alliance').']'.Lang::game('si', $_).'[/span]';
 
         // faction
-        if ($_ = $this->subject->getField('factionId'))
+        if ($_ = $this->subject->factionId)
         {
             $this->extendGlobalIds(Type::FACTION, $_);
             $infobox[] = Util::ucFirst(Lang::game('faction')).Lang::main('colon').'[faction='.$_.']';
         }
 
         // leader
-        if ($_ = $this->subject->getField('leader'))
+        if ($_ = $this->subject->leader)
         {
             $this->extendGlobalIds(Type::NPC, $_);
             $infobox[] = Lang::race('racialLeader').'[npc='.$_.']';
         }
 
         // start area
-        if ($_ = $this->subject->getField('startAreaId'))
+        if ($_ = $this->subject->startAreaId)
         {
             $this->extendGlobalIds(Type::ZONE, $_);
             $infobox[] = Lang::race('startZone').Lang::main('colon').'[zone='.$_.']';
@@ -103,8 +103,8 @@ class RaceBaseResponse extends TemplateResponse implements ICache
         $infobox[] = Lang::race('id') . $this->typeId;
 
         // icon
-        $mIcon = $this->subject->getField('iconId0');
-        $fIcon = $this->subject->getField('iconId1');
+        $mIcon = $this->subject->iconId[0];
+        $fIcon = $this->subject->iconId[1];
         if ($mIcon || $fIcon)
         {
             $buff = '';
@@ -124,7 +124,7 @@ class RaceBaseResponse extends TemplateResponse implements ICache
 
         // original name
         if (Lang::getLocale() != Locale::EN)
-            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.$this->subject->getField('name_loc0').'[/copy][/li]';
+            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.($this->subject->name)(Locale::EN).'[/copy][/li]';
 
         if ($infobox)
             $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0');
@@ -134,15 +134,15 @@ class RaceBaseResponse extends TemplateResponse implements ICache
         /* Main Content */
         /****************/
 
-        $this->expansion  = Util::$expansionString[$this->subject->getField('expansion')];
+        $this->expansion  = Util::$expansionString[$this->subject->expansion];
         $this->redButtons = array(
             BUTTON_WOWHEAD => true,
             BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId]
         );
 
-        if ($_ = $this->subject->getField('iconStringMale'))
+        if ($_ = $this->subject->icon[0])
             $this->headIcons[] = $_;
-        if ($_ = $this->subject->getField('iconStringFemale'))
+        if ($_ = $this->subject->icon[1])
             $this->headIcons[] = $_;
 
 
@@ -153,11 +153,11 @@ class RaceBaseResponse extends TemplateResponse implements ICache
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
 
         // tab: classes
-        $classes = new CharClassList(array(['racemask', $ra->toMask(), '&']));
+        $classes = new CharClassContainer(array(['racemask', $ra->toMask(), '&']));
         if (!$classes->error)
         {
             $this->extendGlobalData($classes->getJSGlobals());
-            $this->lvTabs->addListviewTab(new Listview(['data' => $classes->getListviewData()], CharClassList::$brickFile));
+            $this->lvTabs->addListviewTab(new Listview(['data' => $classes->getListviewData()], CharClassEntry::$brickFile));
         }
 
         // tab: languages
@@ -166,7 +166,7 @@ class RaceBaseResponse extends TemplateResponse implements ICache
             ['reqRaceMask', $ra->toMask(), '&']             // only languages are race-restricted
         );
 
-        $tongues = new SpellList($conditions);
+        $tongues = new SpellContainer($conditions);
         if (!$tongues->error)
         {
             $this->extendGlobalData($tongues->getJSGlobals());
@@ -175,7 +175,7 @@ class RaceBaseResponse extends TemplateResponse implements ICache
                 'id'         => 'languages',
                 'name'       => '$LANG.tab_languages',
                 'hiddenCols' => ['reagents']
-            ), SpellList::$brickFile));
+            ), SpellEntry::$brickFile));
         }
 
         // tab: racial-traits
@@ -184,7 +184,7 @@ class RaceBaseResponse extends TemplateResponse implements ICache
             ['reqRaceMask', $ra->toMask(), '&']
         );
 
-        $racials = new SpellList($conditions);
+        $racials = new SpellContainer($conditions);
         if (!$racials->error)
         {
             $this->extendGlobalData($racials->getJSGlobals());
@@ -197,7 +197,7 @@ class RaceBaseResponse extends TemplateResponse implements ICache
             if ($racials->hasDiffFields('reqClassMask'))
                 $tabData['visibleCols'] = ['classes'];
 
-            $this->lvTabs->addListviewTab(new Listview($tabData, SpellList::$brickFile));
+            $this->lvTabs->addListviewTab(new Listview($tabData, SpellEntry::$brickFile));
         }
 
         // tab: quests
@@ -207,11 +207,11 @@ class RaceBaseResponse extends TemplateResponse implements ICache
             [['reqRaceMask', ChrRace::MASK_ALLIANCE, '&'], ChrRace::MASK_ALLIANCE, '!']
         );
 
-        $quests = new QuestList($conditions);
+        $quests = new QuestContainer($conditions);
         if (!$quests->error)
         {
-            $this->extendGlobalData($quests->getJSGlobals());
-            $this->lvTabs->addListviewTab(new Listview(['data' => $quests->getListviewData()], QuestList::$brickFile));
+            $this->extendGlobalData($quests->getJSGlobals(GLOBALINFO_REWARDS));
+            $this->lvTabs->addListviewTab(new Listview(['data' => $quests->getListviewData()], QuestEntry::$brickFile));
         }
 
         // tab: mounts
@@ -226,7 +226,7 @@ class RaceBaseResponse extends TemplateResponse implements ICache
                     ['i.subClass', 5],                              // mounts
                 );
 
-                $mounts = new ItemList($conditions);
+                $mounts = new ItemContainer($conditions);
                 if (!$mounts->error)
                 {
                     $this->extendGlobalData($mounts->getJSGlobals());
@@ -235,7 +235,7 @@ class RaceBaseResponse extends TemplateResponse implements ICache
                         'id'         => 'mounts',
                         'name'       => '$LANG.tab_mounts',
                         'hiddenCols' => ['slot', 'type']
-                    ), ItemList::$brickFile));
+                    ), ItemEntry::$brickFile));
                 }
             }
         }
@@ -243,10 +243,10 @@ class RaceBaseResponse extends TemplateResponse implements ICache
         // tab: sounds
         if ($vo = DB::Aowow()->selectCol('SELECT `soundId` AS ARRAY_KEY, `gender` FROM ::races_sounds WHERE `raceId` = %i', $this->typeId))
         {
-            $sounds = new SoundList(array(['id', array_keys($vo)]));
+            $sounds = new SoundContainer(array(['id', array_keys($vo)]));
             if (!$sounds->error)
             {
-                $this->extendGlobalData($sounds->getJSGlobals(GLOBALINFO_SELF));
+                $this->extendGlobalData($sounds->getJSGlobals());
                 $data = $sounds->getListviewData();
                 foreach ($data as $id => &$d)
                     $d['gender'] = $vo[$id];
@@ -254,7 +254,7 @@ class RaceBaseResponse extends TemplateResponse implements ICache
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data' => $data,
                     'extraCols' => ['$Listview.templates.title.columns[1]']
-                ), SoundList::$brickFile));
+                ), SoundEntry::$brickFile));
             }
         }
 
@@ -268,16 +268,17 @@ class RaceBaseResponse extends TemplateResponse implements ICache
         if ($extraCrt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` IN %in AND `value2` = %i', [ACHIEVEMENT_CRITERIA_DATA_TYPE_S_PLAYER_CLASS_RACE, ACHIEVEMENT_CRITERIA_DATA_TYPE_T_PLAYER_CLASS_RACE], $this->typeId))
             $conditions = [DB::OR, $conditions, ['ac.id', $extraCrt]];
 
-        $crtOf = new AchievementList($conditions);
+        $crtOf = new AchievementContainer($conditions);
         if (!$crtOf->error)
         {
-            $this->extendGlobalData($crtOf->getJSGlobals());
+            $this->extendGlobalData($crtOf->getJSGlobals(GLOBALINFO_REWARDS));
 
             $this->lvTabs->addListviewTab(new Listview(array(
-                'data' => $crtOf->getListviewData(),
-                'name' => '$LANG.tab_criteriaof',
-                'id'   => 'criteria-of'
-            ), AchievementList::$brickFile));
+                'data'        => $crtOf->getListviewData(),
+                'name'        => '$LANG.tab_criteriaof',
+                'id'          => 'criteria-of',
+                'visibleCols' => ['category']
+            ), AchievementEntry::$brickFile));
         }
 
         // tab: condition-for
@@ -298,7 +299,7 @@ class RaceBaseResponse extends TemplateResponse implements ICache
         $this->metaTags[] = ['property' => 'og:type',  'content' => 'article'];
 
         $keywords = [$this->h1, Util::ucFirst(Lang::game('race'))];
-        if ($_ = $this->subject->getField('side'))
+        if ($_ = $this->subject->side)
             $keywords[] = Lang::game('si', $_);
 
         array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [...$keywords, ...Lang::meta('tags', 'generic')]]);
