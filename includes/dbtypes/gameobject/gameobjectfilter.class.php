@@ -1,0 +1,117 @@
+<?php
+
+namespace Aowow;
+
+if (!defined('AOWOW_REVISION'))
+    die('illegal access');
+
+
+class GameobjectFilter extends DBTypeFilter
+{
+    protected string $type  = 'objects';
+    protected static array $enums = array(
+         1 => parent::ENUM_ZONE,
+        16 => parent::ENUM_EVENT,
+        50 => [1, 2, 3, 4, 663, 883]
+    );
+
+    protected static array $genericFilter = array(
+         1 => [parent::CR_ENUM,     's.areaId',        false,                true], // foundin
+         2 => [parent::CR_CALLBACK, 'cbQuestRelation', 'startsQuests',       0x1 ], // startsquest [side]
+         3 => [parent::CR_CALLBACK, 'cbQuestRelation', 'endsQuests',         0x2 ], // endsquest [side]
+         4 => [parent::CR_CALLBACK, 'cbOpenable',      null,                 null], // openable [yn]
+         5 => [parent::CR_NYI_PH,   null,              0                         ], // averagemoneycontained [op] [int] - GOs don't contain money, match against 0
+         7 => [parent::CR_NUMERIC,  'reqSkill',        NUM_CAST_INT              ], // requiredskilllevel
+        11 => [parent::CR_FLAG,     'cuFlags',         CUSTOM_HAS_SCREENSHOT     ], // hasscreenshots
+        13 => [parent::CR_FLAG,     'cuFlags',         CUSTOM_HAS_COMMENT        ], // hascomments
+        15 => [parent::CR_NUMERIC,  'id',              NUM_CAST_INT              ], // id
+        16 => [parent::CR_CALLBACK, 'cbRelEvent',      null,                 null], // relatedevent (ignore removed by event)
+        18 => [parent::CR_FLAG,     'cuFlags',         CUSTOM_HAS_VIDEO          ], // hasvideos
+        50 => [parent::CR_ENUM,     'spellFocusId',    true,                 true], // spellfocus
+    );
+
+    protected static array $inputFields = array(
+        'cr'  => [parent::V_LIST,  [[1, 5], 7, 11, 13, 15, 16, 18, 50],              true ], // criteria ids
+        'crs' => [parent::V_LIST,  [parent::ENUM_NONE, parent::ENUM_ANY, [0, 5000]], true ], // criteria operators
+        'crv' => [parent::V_REGEX, parent::PATTERN_INT,                              true ], // criteria values - only numeric input values expected
+        'na'  => [parent::V_NAME,  false,                                            false], // name - only printable chars, no delimiter
+        'ma'  => [parent::V_EQUAL, 1,                                                false]  // match any / all filter
+    );
+
+    protected function createSQLForValues() : array
+    {
+        $parts = [];
+        $_v    = $this->values;
+
+        // name
+        if ($_v['na'])
+        {
+            if ($_ = $this->buildMatchLookup([['na', 'nml.nName']]))
+                $parts[] = $_;
+            else if ($_ = $this->buildLikeLookup([['na', 'name_loc'.Lang::getLocale()->value]]))
+                $parts[] = $_;
+        }
+
+        return $parts;
+    }
+
+    protected function cbOpenable(int $cr, int $crs, string $crv) : ?array
+    {
+        if ($this->int2Bool($crs))
+            return $crs ? [DB::OR, ['flags', 0x2, '&'], ['type', 3]] : [DB::AND, [['flags', 0x2, '&'], 0], ['type', 3, '!']];
+
+        return null;
+    }
+
+    protected function cbQuestRelation(int $cr, int $crs, string $crv, string $field, int $value) : ?array
+    {
+        switch ($crs)
+        {
+            case 1:                                 // any
+                return [DB::AND, ['qse.method', $value, '&'], ['qse.questId', null, '!']];
+            case 2:                                 // alliance only
+                return [DB::AND, ['qse.method', $value, '&'], ['qse.questId', null, '!'], [['qt.reqRaceMask', ChrRace::MASK_HORDE, '&'], 0], ['qt.reqRaceMask', ChrRace::MASK_ALLIANCE, '&']];
+            case 3:                                 // horde only
+                return [DB::AND, ['qse.method', $value, '&'], ['qse.questId', null, '!'], [['qt.reqRaceMask', ChrRace::MASK_ALLIANCE, '&'], 0], ['qt.reqRaceMask', ChrRace::MASK_HORDE, '&']];
+            case 4:                                 // both
+                return [DB::AND, ['qse.method', $value, '&'], ['qse.questId', null, '!'], [DB::OR, [DB::AND, ['qt.reqRaceMask', ChrRace::MASK_ALLIANCE, '&'], ['qt.reqRaceMask', ChrRace::MASK_HORDE, '&']], ['qt.reqRaceMask', 0]]];
+            case 5:                                 // none         todo (low): broken, if entry starts and ends quests...
+                $this->queryOpts['o']['h'][] = $field.' = 0';
+                return [1];
+        }
+
+        return null;
+    }
+
+    protected function cbRelEvent(int $cr, int $crs, string $crv) : ?array
+    {
+        if ($crs == parent::ENUM_ANY)
+        {
+            if ($eventIds = DB::Aowow()->selectCol('SELECT `id` FROM ::events WHERE `holidayId` <> 0'))
+                if ($goGuids  = DB::World()->selectCol('SELECT DISTINCT `guid` FROM game_event_gameobject WHERE `eventEntry` IN %in', $eventIds))
+                    return ['s.guid', $goGuids];
+
+            return [0];
+        }
+        else if ($crs == parent::ENUM_NONE)
+        {
+            if ($eventIds = DB::Aowow()->selectCol('SELECT `id` FROM ::events WHERE `holidayId` <> 0'))
+                if ($goGuids  = DB::World()->selectCol('SELECT DISTINCT `guid` FROM game_event_gameobject WHERE `eventEntry` IN %in', $eventIds))
+                    return [DB::OR, ['s.guid', $goGuids, '!'], ['s.guid', null]];
+
+            return [0];
+        }
+        else if (in_array($crs, self::$enums[$cr]))
+        {
+            if ($eventIds = DB::Aowow()->selectCol('SELECT `id` FROM ::events WHERE `holidayId` = %i', $crs))
+                if ($goGuids  = DB::World()->selectCol('SELECT DISTINCT `guid` FROM game_event_gameobject WHERE `eventEntry` IN %in', $eventIds))
+                    return ['s.guid', $goGuids];
+
+            return [0];
+        }
+
+        return null;
+    }
+}
+
+?>

@@ -288,7 +288,7 @@ class Lang
         $locks = [];
         $ids   = [];
 
-        if (!$lockId || !($lock  = DB::Aowow()->selectRow('SELECT * FROM ::lock WHERE `id` = %i', $lockId)))
+        if (!$lockId || !($lock = DB::Aowow()->selectRow('SELECT * FROM ::lock WHERE `id` = %i', $lockId)))
             return [];
 
         for ($i = 1; $i <= 5; $i++)                         // cols 6-8 are empty in default dbc and have been left out
@@ -298,7 +298,7 @@ class Lang
             switch ($lock['type'.$i])
             {
                 case LOCK_TYPE_ITEM:
-                    if (!($name = ItemList::getName($prop)))
+                    if (!($name = ItemEntry::getName($prop)))
                         continue 2;
 
                     if ($fmt == self::FMT_HTML)
@@ -336,7 +336,7 @@ class Lang
                             $ids[Type::SKILL][] = $skills[$prop];
                         }
                         else
-                            $name = SkillList::getName($prop);
+                            $name = SkillEntry::getName($prop);
                     }
                     // resolve as spell (mostly generic player spells; also: we know effect open lock only exists on effect idx 0)
                     else if ($spellId = DB::Aowow()->selectCell('SELECT `id` FROM ::spell WHERE `effect1Id` = %i AND `effect1MiscValue` = %i AND `skillLine1` <> 0 ORDER BY `id` ASC', SPELL_EFFECT_OPEN_LOCK, $prop))
@@ -355,18 +355,18 @@ class Lang
                     $locks[] = [$name, Type::SKILL, $lock['reqSkill'.$i]];
                     break;
                 case LOCK_TYPE_SPELL:
-                    if (($spell = new SpellList(array(['id', $prop])))->error)
+                    if (($spell = new SpellEntry($prop))->error)
                         continue 2;
 
                     if ($fmt == self::FMT_HTML)
-                        $name = $interactive ? '<a class="q1" href="?spell='.$prop.'">'.$spell->getField('name', true).'</a>' : '<span class="q1">'.$spell->getField('name', true).'</span>';
+                        $name = $interactive ? '<a class="q1" href="?spell='.$prop.'">'.$spell->name.'</a>' : '<span class="q1">'.$spell->name.'</span>';
                     else if ($interactive && $fmt == self::FMT_MARKUP)
                     {
                         $name = '[spell='.$prop.']';
                         $ids[Type::SPELL][] = $prop;
                     }
 
-                    $locks[] = [$name, Type::SPELL, $spell->getReagentsForCurrent()];
+                    $locks[] = [$name, Type::SPELL, $spell->getReagents()];
                     break;
             }
 
@@ -497,7 +497,7 @@ class Lang
         return self::concat($tmp, self::CONCAT_NONE);
     }
 
-    public static function formatSkillBreakpoints(array $bp, int $fmt = self::FMT_MARKUP) : string
+    public static function formatDifficultyBreakpoints(array $bp, int $fmt = self::FMT_MARKUP) : string
     {
         $buff = [];
 
@@ -529,17 +529,18 @@ class Lang
 
     public static function zoneFromMap(int $mapId) : string
     {
-        return match($mapId)
+        switch ($mapId)
         {
-            0       => self::maps('EasternKingdoms'),
-            1       => self::maps('Kalimdor'),
-            530     => self::maps('Outland'),
-            571     => self::maps('Northrend'),
-            default => (function(int $mapId) {
-                $z = DB::Aowow()->selectRow('SELECT `id`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8` FROM ::zones WHERE `mapId` = %i', $mapId);
-                return $z ? '<a href="?zone='.$z['id'].'">'.Util::localizedString($z, 'name', true).'</a>' : '';
-            })($mapId)
-        };
+            case 0:   return self::maps('EasternKingdoms');
+            case 1:   return self::maps('Kalimdor');
+            case 530: return self::maps('Outland');
+            case 571: return self::maps('Northrend');
+        }
+
+        if ($z = DB::Aowow()->selectRow('SELECT `id`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8` FROM ::zones WHERE `mapId` = %i', $mapId))
+            return '<a href="?zone='.$z['id'].'">'.Util::localizedString($z, 'name', true).'</a>';
+
+        return 'Unknown map #'.$mapId;
     }
 
     public static function nf(float $number, int $decimals = 0, bool $no1k = false) : string

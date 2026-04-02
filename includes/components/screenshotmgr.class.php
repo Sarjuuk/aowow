@@ -184,14 +184,14 @@ class ScreenshotMgr extends ImageUpload
                 if (!$ids)
                     continue;
 
-                $obj = Type::newList($t, [['id', $ids]]);
+                $obj = Type::newContainer($t, [['id', $ids]]);
                 if (!$obj || $obj->error)
                     continue;
 
                 foreach ($pages as &$p)
                     if ($p['type'] == $t)
-                        if ($obj->getEntry($p['typeId']))
-                            $p['name'] = $obj->getField('name', true);
+                        if ($e = $obj->getEntry($p['typeId']))
+                            $p['name'] = $e?->name ?? '';
             }
 
             foreach ($pages as &$p)

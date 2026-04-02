@@ -30,7 +30,7 @@ class SearchJsonResponse extends TextResponse implements ICache
         'type'   => ['filter' => FILTER_VALIDATE_INT, 'options' => ['min_range' => Type::ITEM, 'max_range' => Type::ITEMSET]]
     );
 
-    private array $extraOpts = [];                          // for weighted search
+    private array $queryOpts = [];                          // for weighted search
     private array $extraCnd  = [];                          // for weighted search
 
     public function __construct(string $rawParam)
@@ -41,10 +41,10 @@ class SearchJsonResponse extends TextResponse implements ICache
 
         if ($this->_get['wt'] && $this->_get['wtv'])        // slots and type should get ignored
         {
-            $itemFilter = new ItemListFilter($this->_get);
+            $itemFilter = new ItemFilter($this->_get);
             if ($_ = $itemFilter->createConditionsForWeights())
             {
-                $this->extraOpts  = $itemFilter->extraOpts;
+                $this->queryOpts  = $itemFilter->queryOpts;
                 $this->extraCnd[] = $_;
             }
         }
@@ -58,7 +58,7 @@ class SearchJsonResponse extends TextResponse implements ICache
         else if ($this->_get['type'] == Type::ITEMSET)
             $this->searchMask |= 1 << Search::MOD_ITEM | 1 << Search::MOD_ITEMSET;
 
-        $this->searchObj = new Search($this->query, $this->searchMask, $this->extraCnd, $this->extraOpts);
+        $this->searchObj = new Search($this->query, $this->searchMask, $this->extraCnd, $this->queryOpts);
     }
 
     // !note! dear reader, if you ever try to generate a string, that is to be evaled by JS, NEVER EVER terminate with a \n   .....   $totalHoursWasted +=2;
