@@ -10,7 +10,7 @@ class CreatureList extends DBTypeList
 {
     use spawnHelper;
 
-    public static int    $type      = Type::NPC;
+    public static int    $dbType    = Type::NPC;
     public static string $brickFile = 'npc';
     public static string $dataTable = '::creature';
 

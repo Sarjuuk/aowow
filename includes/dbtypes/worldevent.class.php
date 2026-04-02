@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 
 class WorldEventList extends DBTypeList
 {
-    public static int    $type      = Type::WORLDEVENT;
+    public static int    $dbType    = Type::WORLDEVENT;
     public static string $brickFile = 'event';
     public static string $dataTable = '::events';
 

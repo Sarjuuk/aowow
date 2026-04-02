@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 
 class CurrencyList extends DBTypeList
 {
-    public static int    $type      = Type::CURRENCY;
+    public static int    $dbType    = Type::CURRENCY;
     public static string $brickFile = 'currency';
     public static string $dataTable = '::currencies';
 

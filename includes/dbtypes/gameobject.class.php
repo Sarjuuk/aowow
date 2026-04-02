@@ -10,7 +10,7 @@ class GameObjectList extends DBTypeList
 {
     use listviewHelper, spawnHelper;
 
-    public static int    $type      = Type::OBJECT;
+    public static int    $dbType    = Type::OBJECT;
     public static string $brickFile = 'object';
     public static string $dataTable = '::objects';
 

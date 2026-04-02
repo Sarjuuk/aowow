@@ -10,7 +10,7 @@ class TitleList extends DBTypeList
 {
     use listviewHelper;
 
-    public static int    $type      = Type::TITLE;
+    public static int    $dbType    = Type::TITLE;
     public static string $brickFile = 'title';
     public static string $dataTable = '::titles';
     public        array  $sources   = [];

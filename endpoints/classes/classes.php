@@ -37,9 +37,9 @@ class ClassesBaseResponse extends TemplateResponse implements ICache
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
 
-        $classes = new CharClassList();
+        $classes = new CharClassSet();
         if (!$classes->error)
-            $this->lvTabs->addListviewTab(new Listview(['data' => $classes->getListviewData()], CharClassList::$brickFile));
+            $this->lvTabs->addListviewTab(new Listview(['data' => $classes->getListviewData()], CharClass::$brickFile));
 
         parent::generate();
     }

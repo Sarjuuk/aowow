@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 
 class FactionList extends DBTypeList
 {
-    public static int    $type      = Type::FACTION;
+    public static int    $dbType    = Type::FACTION;
     public static string $brickFile = 'faction';
     public static string $dataTable = '::factions';
 

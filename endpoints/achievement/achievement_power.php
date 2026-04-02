@@ -33,14 +33,14 @@ class AchievementPowerResponse extends TextResponse implements ICache
 
     protected function generate() : void
     {
-        $achievement = new AchievementList(array(['id', $this->typeId]));
+        $achievement = new Achievement($this->typeId);
         if ($achievement->error)
             $this->cacheType = CACHE_TYPE_NONE;
         else
             $opts = array(
-                'name'    => $achievement->getField('name', true),
+                'name'    => $achievement->name,
                 'tooltip' => $achievement->renderTooltip(),
-                'icon'    => $achievement->getField('iconString')
+                'icon'    => $achievement->icon
             );
 
         $this->result = new Tooltip(self::POWER_TEMPLATE, $this->typeId, $opts ?? []);

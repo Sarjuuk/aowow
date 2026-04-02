@@ -592,7 +592,7 @@ trait listviewHelper
 */
 trait spawnHelper
 {
-    private $spawnResult = array(
+    private array $spawnResult = array(
         SPAWNINFO_FULL  => null,
         SPAWNINFO_SHORT => null,
         SPAWNINFO_ZONES => null,
@@ -913,7 +913,7 @@ trait sourceHelper
 
         $s = array_keys($this->sources[$this->id]);
         if ($this->curTpl['moreType'] && $this->curTpl['moreTypeId'] && ($srcData = $this->sourceMore[$this->curTpl['moreType']]->getSourceData($this->curTpl['moreTypeId'])))
-            $sm = $srcData[$this->curTpl['moreTypeId']];
+            $sm = $srcData; // [$this->curTpl['moreTypeId']];
         else if (!empty($this->sources[$this->id][SRC_PVP]))
             $sm['p'] = $this->sources[$this->id][SRC_PVP][0];
 

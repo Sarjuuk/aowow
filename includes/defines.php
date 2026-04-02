@@ -316,6 +316,10 @@ define('SRC_FLAG_RAID_DROP',    0x20);
  * Game
  */
 
+define('MONEY_COPPER', 1);
+define('MONEY_SILVER', MONEY_COPPER / 100);
+define('MONEY_GOLD',   MONEY_SILVER / 100);
+
 // Custom Flags (shared)
 define('CUSTOM_HAS_COMMENT',                0x01000000);
 define('CUSTOM_HAS_SCREENSHOT',             0x02000000);

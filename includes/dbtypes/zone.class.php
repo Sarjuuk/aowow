@@ -10,7 +10,7 @@ class ZoneList extends DBTypeList
 {
     use listviewHelper;
 
-    public static int    $type      = Type::ZONE;
+    public static int    $dbType    = Type::ZONE;
     public static string $brickFile = 'zone';
     public static string $dataTable = '::zones';
 

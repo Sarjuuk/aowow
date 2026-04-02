@@ -42,6 +42,10 @@ require_once 'includes/cfg.class.php';                      // Config holder
 require_once 'includes/user.class.php';                     // Session handling (could be skipped for CLI context except for username and password validation used in account creation)
 require_once 'includes/game/misc.php';                      // Misc game related data & functions
 
+
+// hmm .. should every autoloader be differentiated by namespace?
+
+
 // game client data interfaces
 spl_autoload_register(function (string $class) : void
 {
@@ -51,12 +55,14 @@ spl_autoload_register(function (string $class) : void
     if (preg_match('/[^\w]/i', $class))
         return;
 
-    if ($class == 'Stat' || $class == 'StatsContainer')     // entity statistics conversion
+    $class = strtolower($class);
+
+    if ($class == 'stat' || $class == 'statscontainer')     // entity statistics conversion
         require_once 'includes/game/chrstatistics.php';
-    else if (file_exists('includes/game/'.strtolower($class).'.class.php'))
-        require_once 'includes/game/'.strtolower($class).'.class.php';
-    else if (file_exists('includes/game/loot/'.strtolower($class).'.class.php'))
-        require_once 'includes/game/loot/'.strtolower($class).'.class.php';
+    else if (file_exists('includes/game/'.$class.'.class.php'))
+        require_once 'includes/game/'.$class.'.class.php';
+    else if (file_exists('includes/game/loot/'.$class.'.class.php'))
+        require_once 'includes/game/loot/'.$class.'.class.php';
 });
 
 // our site components
@@ -68,12 +74,14 @@ spl_autoload_register(function (string $class) : void
     if (preg_match('/[^\w]/i', $class))
         return;
 
-    if (file_exists('includes/components/'.strtolower($class).'.class.php'))
-        require_once 'includes/components/'.strtolower($class).'.class.php';
-    else if (file_exists('includes/components/frontend/'.strtolower($class).'.class.php'))
-        require_once 'includes/components/frontend/'.strtolower($class).'.class.php';
-    else if (file_exists('includes/components/response/'.strtolower($class).'.class.php'))
-        require_once 'includes/components/response/'.strtolower($class).'.class.php';
+    $class = strtolower($class);
+
+    if (file_exists('includes/components/'.$class.'.class.php'))
+        require_once 'includes/components/'.$class.'.class.php';
+    else if (file_exists('includes/components/frontend/'.$class.'.class.php'))
+        require_once 'includes/components/frontend/'.$class.'.class.php';
+    else if (file_exists('includes/components/response/'.$class.'.class.php'))
+        require_once 'includes/components/response/'.$class.'.class.php';
 });
 
 // TC systems in components
@@ -93,6 +101,26 @@ spl_autoload_register(function (string $class) : void
         case __NAMESPACE__.'\Conditions':
             require_once 'includes/components/Conditions/Conditions.class.php';
             break;
+    }
+});
+
+// dbtype autloader mk II
+spl_autoload_register(function (string $class) : void
+{
+    if ($i = strrpos($class, '\\'))
+        $class = substr($class, $i + 1);
+
+    if (preg_match('/[^\w]/i', $class))
+        return;
+
+    $dir = strtr($class, ['Set' => '', 'Filter' => '']);
+
+    if (file_exists('includes/dbtypes/'.$dir.'/'.$class.'.class.php'))
+    {
+        require_once 'includes/dbtypes/dbquery.class.php';
+        require_once 'includes/dbtypes/dbtype.class.php';
+        require_once 'includes/dbtypes/dbtypeset.class.php';
+        require_once 'includes/dbtypes/'.$dir.'/'.$class.'.class.php';
     }
 });
 

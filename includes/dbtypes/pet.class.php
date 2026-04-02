@@ -10,7 +10,7 @@ class PetList extends DBTypeList
 {
     use ListviewHelper;
 
-    public static int    $type      = Type::PET;
+    public static int    $dbType    = Type::PET;
     public static string $brickFile = 'pet';
     public static string $dataTable = '::pet';
 

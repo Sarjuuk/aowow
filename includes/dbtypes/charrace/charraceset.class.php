@@ -1,0 +1,24 @@
+<?php
+
+namespace Aowow;
+
+if (!defined('AOWOW_REVISION'))
+    die('illegal access');
+
+
+class CharRaceSet extends DBTypeSet
+{
+    public static int $dbType = Type::CHR_RACE;
+
+    /**
+     * iterate over fetched sets
+     *
+     * @return \Generator<int, CharRace> id => character race template
+     */
+    public function iterate() : \Generator
+    {
+        yield from parent::iterate();
+    }
+}
+
+?>

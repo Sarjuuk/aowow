@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 
 class QuestList extends DBTypeList
 {
-    public static int    $type      = Type::QUEST;
+    public static int    $dbType    = Type::QUEST;
     public static string $brickFile = 'quest';
     public static string $dataTable = '::quests';
     public        array  $requires  = [];

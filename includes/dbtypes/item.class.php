@@ -10,7 +10,7 @@ class ItemList extends DBTypeList
 {
     use ListviewHelper, sourceHelper;
 
-    public static int    $type       = Type::ITEM;
+    public static int    $dbType     = Type::ITEM;
     public static string $brickFile  = 'item';
     public static string $dataTable  = '::items';
     public        array  $json       = [];

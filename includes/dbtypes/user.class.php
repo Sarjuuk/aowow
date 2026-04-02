@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 
 class UserList extends DBTypeList
 {
-    public static int    $type       = Type::USER;
+    public static int    $dbType     = Type::USER;
     public static string $brickFile  = 'user';
     public static string $dataTable  = '';
     public static int    $contribute = CONTRIBUTE_NONE;
