@@ -51,7 +51,7 @@ audio processing may require [lame](https://sourceforge.net/projects/lame/files/
 `git clone git@github.com:Sarjuuk/MPQExtractor.git MPQExtractor`  
 
 #### 2. Prepare the database  
-Ensure that the account you are going to use has **full** access on the database AoWoW is going to occupy and ideally only **read** access on the world database you are going to reference.  
+Ensure that the account you are going to use has **full** access on the database AoWoW is going to occupy and ideally only **read** access on the world and optionally auth and characters databases you are going to reference.  
 Import files 01 - 03 from `setup/sql/` in order into the AoWoW database `mysql --default-character-set=utf8 -p {your-db-here} < setup/sql/01-db_structure.sql`, etc.  
 
 **Optional**: If you are using MySQL ≥ 8.4.0 and want to support fulltext search for locale zhCN, additionally import `setup/sql/04-db_optional_mysql_only.sql`. Enables this in settings after AoWoW has been set up.  
@@ -104,7 +104,7 @@ When you've created your admin account you are done.
 ## Troubleshooting
 
 Q: The Page appears white, without any styles.  
-A: The static content is not being displayed. You are either using SSL and AoWoW is unable to detect it or STATIC_HOST is not defined properly. Either way this can be fixed via config `php aowow --siteconfig`
+A: The static content is not being displayed. You are either using SSL and AoWoW is unable to detect it or STATIC_HOST is not defined properly. Either way this can be fixed via config `php aowow --configure`
 
 Q: Fatal error: Can't inherit abstract function \<functionName> (previously declared abstract in \<className>) in \<path>  
 A: You are using multiple cache optimization modules for php that are in conflict with each other. (Zend OPcache, XCache, ..) Disable all but one.

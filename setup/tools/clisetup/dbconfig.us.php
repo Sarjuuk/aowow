@@ -85,7 +85,7 @@ CLISetup::registerUtility(new class extends UtilityScript
                     {
                         CLI::write();
                         if (!DB::isConnectable(DB_AUTH) || !$this->test())
-                            CLI::write('[db] auth server not yet set up.', CLI::LOG_ERROR);
+                            CLI::write('[db] auth db not yet set up.', CLI::LOG_ERROR);
                         else if ($realms = DB::Auth()->selectAssoc('SELECT `id` AS "0", `name` AS "1", `icon` AS "2", `timezone` AS "3", `allowedSecurityLevel` AS "4" FROM realmlist'))
                         {
                             $tbl = [['Realm Id', 'Name', 'Type', 'Region', 'GMLevel', 'Status']];
@@ -309,15 +309,21 @@ CLISetup::registerUtility(new class extends UtilityScript
             $buff[] = $dbInfo['prefix'] ? 'pre.: '.$dbInfo['prefix'] : '';
             $buff[] = $note;
         }
+        else if ($idx == DB_AUTH)
+            $buff[] = CLI::bold('<optional>');
         else
-            $buff[] = CLI::bold('<empty>');
+            $buff[] = CLI::bold('<required>');
 
         return $buff;
     }
 
     public function writeCLIHelp() : bool
     {
-        CLI::write('  Remember to use the correct Realm Id from '.CLI::bold('`logon`.`realmlist`').' when connecting to your characters DB.', -1, false);
+        CLI::write('  Connecting to '.CLI::bold('`auth`').' is optional and only required when using the character profiler tool or using the game accounts for login.', -1, false);
+        CLI::write();
+        CLI::write('  Connecting to '.CLI::bold('`characters`').' is optional and only required when using the character profiler tool.', -1, false);
+        CLI::write('    Remember to use the correct Realm Id from '.CLI::bold('`auth`.`realmlist`').' when connecting to your characters DB.', -1, false);
+        CLI::write();
         CLI::write('  To remove a db entry edit it and leave all fields empty.', -1, false);
         CLI::write();
         CLI::write();

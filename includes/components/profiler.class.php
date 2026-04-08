@@ -257,7 +257,7 @@ class Profiler
     {
         self::getRealms();
 
-        // sort depends on encountered order in `logon`.`realmlist`. Is that a problem?
+        // sort depends on encountered order in `auth`.`realmlist`. Is that a problem?
         return array_unique(array_column(self::$realms, 'region'));
     }
 

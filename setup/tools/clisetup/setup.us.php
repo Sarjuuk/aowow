@@ -170,8 +170,10 @@ CLISetup::registerUtility(new class extends UtilityScript
         CLI::write('  usage: php aowow --setup [--locales: --datasrc:] [--step=<step>]', -1, false);
         CLI::write();
         CLI::write('  Initially essential connection information are set up and basic connectivity tests run afterwards.', -1, false);
+        CLI::write();
         CLI::write('  In the main stage dbc and world data is compiled into the database and required sound, image and data files are generated.', -1, false);
         CLI::write('    This should not require further input and will take about 15-20 minutes, plus 10 minutes per additional locale.', -1, false);
+        CLI::write();
         CLI::write('  Lastly pending updates are applied and you are prompted to create an administrator account.', -1, false);
 
         if (($startStep = $this->getSavedStartStep()) !== 0)

@@ -111,8 +111,13 @@ CLISetup::registerUtility(new class extends UtilityScript
         CLI::write();
         CLI::write('  Checks /setup/sql/updates for new *.sql files and applies them. If required by an applied update, the --sql and --build command are triggered afterwards.', -1, false);
         CLI::write('  Use this after fetching the latest rev. from Github.', -1, false);
-        CLI::write();
-        CLI::write('  Last Update: '.date(Util::$dateFormatInternal, $this->date).' (Part #'.$this->part.')', -1, false);
+
+        if ($this->date)
+        {
+            CLI::write();
+            CLI::write('  Last Update: '.date(Util::$dateFormatInternal, $this->date).' (Part #'.$this->part.')', -1, false);
+        }
+
         CLI::write();
         CLI::write();
 
