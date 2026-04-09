@@ -329,7 +329,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
     {
         $condition = array(
             [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0],
-            [['flags', 1, '&'], 0],                     // no statistics
+            [['flags', 1, '&'], 0],                         // no statistics
         );
         $achievez = new AchievementList($condition);
 
@@ -343,8 +343,10 @@ CLISetup::registerSetup("build", new class extends SetupScript
             $buff      = "var _ = g_achievements;\n";
             foreach ($achievez->getListviewData(ACHIEVEMENTINFO_PROFILE) as $id => $data)
             {
-                $sumPoints += $data['points'];
-                $buff      .= '_['.$id.'] = '.Util::toJSON($data).";\n";
+                if ($data['side'] & SIDE_ALLIANCE)          // both sides have the same point total
+                    $sumPoints += $data['points'];
+
+                $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
             }
 
             // categories to sort by
