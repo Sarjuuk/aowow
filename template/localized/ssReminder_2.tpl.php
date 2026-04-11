@@ -1,4 +1,8 @@
-<?php namespace Aowow\Template; ?>
+<?php
+    namespace Aowow\Template;
+
+    /** @var PageTemplate $this */
+?>
 
                     <h2><img src="<?=$this->gStaticUrl; ?>/images/icons/bubble-big.gif" width="32" height="29" alt="" style="vertical-align:middle;margin-right:8px">Rappel</h2>
                     Votre capture d'écran <b class="q10">ne</b> sera pas approuvée si elle ne respecte pas les directives suivantes.

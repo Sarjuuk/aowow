@@ -2,31 +2,35 @@
     namespace Aowow\Template;
 
     use \Aowow\Lang;
+
+    /** @var PageTemplate $this */
 ?>
 
         <div class="footer">
+
 <?php
 if ($this->pageStats):
-    echo "            <table style=\"margin:auto;\">\n";
+    echo '            <table style="margin:auto;">'.PHP_EOL;
 
     if ($x = $this->pageStats['sql']):
-        echo '                <tr><td style="text-align:left;">'.Lang::main('numSQL') .'</td><td>'.$x['count']."</td></tr>\n";
-        echo '                <tr><td style="text-align:left;">'.Lang::main('timeSQL').'</td><td>'.$x['time']."</td></tr>\n";
+        echo '                <tr><td style="text-align:left;">'.Lang::main('numSQL') .'</td><td>'.$x['count']."</td></tr>".PHP_EOL;
+        echo '                <tr><td style="text-align:left;">'.Lang::main('timeSQL').'</td><td>'.$x['time']."</td></tr>".PHP_EOL;
     endif;
 
     if ($x = $this->pageStats['time']):
-        echo '                <tr><td style="text-align:left;">Page generated in</td><td>'.$x."</td></tr>\n";
+        echo '                <tr><td style="text-align:left;">Page generated in</td><td>'.$x."</td></tr>".PHP_EOL;
     endif;
 
     if ($this->pageStats['cache'] && $this->pageStats['cache'][0] == CACHE_MODE_FILECACHE):
-        echo "                <tr><td style=\"text-align:left;\">Stored in filecache</td><td>".$this->pageStats['cache'][1]."</td></tr>\n";
+        echo '                <tr><td style="text-align:left;">Stored in filecache</td><td>'.$this->pageStats['cache'][1].'</td></tr>'.PHP_EOL;
     elseif ($this->pageStats['cache'] && $this->pageStats['cache'][0] == CACHE_MODE_MEMCACHED):
-        echo "                <tr><td style=\"text-align:left;\">Stored in Memcached</td><td>".$this->pageStats['cache'][1]."</td></tr>\n";
+        echo '                <tr><td style="text-align:left;">Stored in Memcached</td><td>'.$this->pageStats['cache'][1].'</td></tr>'.PHP_EOL;
     endif;
 
-    echo "            </table>\n";
+    echo '            </table>'.PHP_EOL;
 endif;
 ?>
+
         </div>
     </div><!-- #wrapper .nosidebar -->
     </div><!-- #layout-inner -->
@@ -44,6 +48,8 @@ endif;
 <script type="text/javascript">
     window.open("/", "SqlLog", "width=1800,height=200,top=100,left=100,status=no,location=no,toolbar=no,menubar=no")?.document?.write('<?=$this->dbProfiles;?>');
 </script>
+
 <?php endif; ?>
+
 </body>
 </html>

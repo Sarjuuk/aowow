@@ -1,14 +1,19 @@
 <?php
     namespace Aowow\Template;
+
+    /** @var PageTemplate $this */
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
+
 <?php $this->brick('head'); ?>
 </head>
 
 <body<?=($this->user::isPremium() ? ' class="premium-logo"' : ''); ?>>
 <div id="layers"></div>
+
 <?php if ($this->headerLogo): ?>
 <style type="text/css">
     .header-logo {
@@ -16,7 +21,9 @@
        margin-bottom: 1px !important;
     }
 </style>
+
 <?php endif; ?>
+
 <div class="layout nosidebar" id="layout">
     <div class="layout-inner" id="layout-inner">
     <div class="header" id="header">

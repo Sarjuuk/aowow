@@ -1,8 +1,11 @@
 <?php
     namespace Aowow\Template;
 
+    /** @var PageTemplate $this */
+
     $this->brick('header');
 ?>
+
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
@@ -16,11 +19,13 @@
             <div class="text">
                 <div id="compare-generic"></div>
                 <script type="text/javascript">//<![CDATA[
+
 <?php
 foreach ($this->cmpItems as $iId => $iData):
-    echo '                        g_items.add('.$iId.', '.$this->json($iData).");\n";
+    echo '                        g_items.add('.$iId.', '.$this->json($iData).');'.PHP_EOL;
 endforeach;
 ?>
+
                     <?=$this->summary; ?>
                 //]]></script>
             </div>

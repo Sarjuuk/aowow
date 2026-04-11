@@ -3,26 +3,32 @@
 
     use \Aowow\Lang;
 
+    /** @var PageTemplate $this */
+
 $this->brick('header');
 $f = $this->filter->values;                                 // shorthand
 ?>
+
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
 
 <?php
-$this->brick('announcement');
+    $this->brick('announcement');
 
-$this->brick('pageTemplate', ['fiQuery' => $this->filter->query, 'fiMenuItem' => [4]]);
+    $this->brick('pageTemplate', ['fiQuery' => $this->filter->query, 'fiMenuItem' => [4]]);
 ?>
+
             <div id="fi" style="display: <?=($this->filter->query ? 'block' : 'none'); ?>;">
                 <form action="?filter=npcs<?=$this->subCat; ?>" method="post" name="fi" onsubmit="return fi_submit(this)" onreset="return fi_reset(this)">
                     <div class="text">
-<?php
-$this->brick('headIcons');
 
-$this->brick('redButtons');
+<?php
+    $this->brick('headIcons');
+
+    $this->brick('redButtons');
 ?>
+
                         <h1><?=$this->h1; ?></h1>
                     </div>
                     <div class="rightpanel">
@@ -33,6 +39,7 @@ $this->brick('redButtons');
 <?=$this->makeOptionsList(Lang::npc('rank'), $f['cl'], 28); ?>
                         </select>
                     </div>
+
 <?php if ($this->petFamPanel): ?>
                     <div class="rightpanel2">
                         <div style="float: left"><?=Lang::npc('petFamily'); ?></div><small><a href="javascript:;" onclick="document.forms['fi'].elements['fa[]'].selectedIndex = -1; return false" onmousedown="return false"><?=Lang::main('clear'); ?></a></small>
@@ -41,7 +48,9 @@ $this->brick('redButtons');
 <?=$this->makeOptionsList(Lang::game('fa'), $f['fa'], 28); ?>
                         </select>
                     </div>
+
 <?php endif; ?>
+
                     <table>
                         <tr>
                             <td><?=$this->ucFirst(Lang::main('name')).Lang::main('colon'); ?></td>

@@ -3,10 +3,13 @@
 
     use \Aowow\Lang;
 
+    /** @var PageTemplate $this */
+
     $this->brick('header');
 
     $iconOffset = 0;
 ?>
+
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
@@ -26,10 +29,10 @@
                 <h1 class="h1-icon"><?=$this->h1; ?></h1>
 
 <?php
-$this->brick('tooltip');
+    $this->brick('tooltip');
 
 if ($this->tools):
-    echo "                <div style=\"float: left; margin-right: 75px\">\n";
+    echo '                <div style="float: left; margin-right: 75px">'.PHP_EOL;
 endif;
 
 if ($this->reagents[1]):
@@ -38,40 +41,48 @@ if ($this->reagents[1]):
 endif;
 
 if ($this->tools):
-    echo "                </div>\n";
+    echo '                </div>'.PHP_EOL;
 
     if ($this->reagents[0]):
-        echo "                <div style=\"float: left\">\n";
+        echo '                <div style="float: left">'.PHP_EOL;
     endif;
 ?>
+
                 <h3><?=Lang::spell('tools'); ?></h3>
                 <table class="iconlist">
+
 <?php
     foreach ($this->tools as $icon):
         echo $icon->renderContainer(20, $iconOffset, true);
     endforeach;
 ?>
+
                 </table>
                 <script type="text/javascript">
+
 <?php
     foreach ($this->tools as $icon):
         echo $icon->renderJS(20);
     endforeach;
 ?>
+
                 </script>
+
 <?php
     if ($this->reagents[0]):
-        echo "                </div>\n";
+        echo '                </div>'.PHP_EOL;
     endif;
 endif;
 ?>
+
                 <div class="clear"></div>
 
 <?php
-$this->brick('markup', ['markup' => $this->article]);
+    $this->brick('markup', ['markup' => $this->article]);
 
 if ($this->transfer):
-    echo "    <div class=\"pad\"></div>\n    ".$this->transfer."\n";
+    echo '    <div class="pad"></div>'.PHP_EOL;
+    echo '    '.$this->transfer.PHP_EOL;
 endif;
 ?>
 
@@ -133,36 +144,43 @@ endif;
                         <th><dfn title="<?=Lang::spell('_globCD').'">'.Lang::spell('_gcd');?></dfn></th>
                         <td><?=$this->gcd;?></td>
                     </tr>
+
 <?php
 if ($this->stances):
 ?>
+
                     <tr>
                         <th><?=Lang::spell('_forms');?></th>
                         <td colspan="3"><?=$this->stances;?></td>
                     </tr>
+
 <?php
 endif;
 
 if ($this->items):
 ?>
+
                     <tr>
                         <th><?=Lang::game('requires2');?></th>
                         <td colspan="3"><?=$this->items;?></td>
                     </tr>
+
 <?php
 endif;
 
 $iconTabIdx = 0;
 foreach ($this->effects as $i => $e):
 ?>
+
                     <tr>
                         <th><?=Lang::spell('_effect').' #'.$i;?></th>
                         <td colspan="3" style="line-height: 17px">
+
 <?php
     echo '                            '.$e['name'];
 
     if ($e['footer']):
-        echo "<small><br />".implode("<br />", $e['footer'])."</small>\n";
+        echo '<small><br />'.implode('<br />', $e['footer']).'</small>'.PHP_EOL;
     endif;
 
     if ($e['markup']):
@@ -173,6 +191,7 @@ $WH.aE(window,\'load\',function(){$WH.ge(\'spelleffectmarkup-'.$i.'\').innerHTML
 
     if ($e['icon']):
 ?>
+
                             <table class="icontab">
                                 <tr>
                                     <?=$e['icon']->renderContainer(iconIdxOffset: $iconTabIdx); ?>
@@ -182,12 +201,14 @@ $WH.aE(window,\'load\',function(){$WH.ge(\'spelleffectmarkup-'.$i.'\').innerHTML
                             <script type="text/javascript">
                                 <?=$e['icon']->renderJS(); ?>
                             </script>
+
 <?php
     endif;
 
     if ($e['perfectItem']):
         ['spellId' => $si, 'spellName' => $sn, 'item' => $it, 'icon' => $ic, 'chance' => $ch] = $e['perfectItem'];
 ?>
+
                             <small><a href="?spell=<?=$si;?>" class="icontiny"><img src="<?=$this->gStaticUrl;?>/images/wow/icons/tiny/<?=$ic;?>.gif" align="absmiddle">
                                 <span class="tinyicontxt"><?=$sn;?></span></a><?=Lang::main('colon').' '.$ch.'%';?></small><table class="icontab">
                             <?=$it->renderContainer(0, $iconTabIdx, true); ?></table>
@@ -201,7 +222,9 @@ $WH.aE(window,\'load\',function(){$WH.ge(\'spelleffectmarkup-'.$i.'\').innerHTML
 
     if ($e['modifies']):
 ?>
+
                             <br /><small><?=Lang::spell('_affected');?></small>
+
 <?php
         for ($type = 0; $type < 2; $type++):                // [classSpells, miscSpells]
             if (!$e['modifies'][$type])
@@ -216,17 +239,18 @@ $WH.aE(window,\'load\',function(){$WH.ge(\'spelleffectmarkup-'.$i.'\').innerHTML
 
             foreach ($e['modifies'][$type] as $idx => [$icon, $ranks]):
                 if (!$idx || !($idx % 3))
-                    echo "<tr".($folded ? ' style="display:none;"' : '').">";
+                    echo '<tr'.($folded ? ' style="display:none;"' : '').'>';
 
                 $icon->renderContainer(iconIdxOffset: $iconTabIdx); // just to assign iconOffset
-                echo "<th id=\"icontab-icon".$iconTabIdx."\"></th><td><a href=\"?spell=".$icon->typeId."\">".($type ? $icon->text : "<b>".$icon->text."</b>")."</a>".($ranks ? "<br /><small>(".Lang::spell('_rankRange', $ranks).")</small>" : '')."</td>\n";
+                echo '<th id="icontab-icon'.$iconTabIdx.'"></th><td><a href="?spell='.$icon->typeId.'">'.($type ? $icon->text : '<b>'.$icon->text.'</b>').'</a>'.($ranks ? '<br /><small>('.Lang::spell('_rankRange', $ranks).')</small>' : '').'</td>'.PHP_EOL;
 
                 if ($idx == count($e['modifies'][$type]) - 1 || !(($idx + 1) % 3))
-                    echo "</tr>";
+                    echo '</tr>';
 
                 if ($idx == 17 && count($e['modifies'][$type]) > 21):
                     $folded = true;
 ?>
+
                 <tr class="icontab-revealer">
                     <td colspan="6">
                         <a onclick="$(this).closest('table').addClass('show-all')">
@@ -234,18 +258,22 @@ $WH.aE(window,\'load\',function(){$WH.ge(\'spelleffectmarkup-'.$i.'\').innerHTML
                         </a>
                     </td>
                 </tr>
+
 <?php
                 endif;
 
             endforeach;
 ?>
+
                             </table>
 
                             <script type="text/javascript">//<![CDATA[
+
 <?php
             foreach ($e['modifies'][$type] as [$icon, ])
                 echo $icon->renderJS(32);
 ?>
+
                             //]]></script>
 
 <?php
@@ -255,13 +283,16 @@ $WH.aE(window,\'load\',function(){$WH.ge(\'spelleffectmarkup-'.$i.'\').innerHTML
         endfor;
     endif;
 ?>
+
                         </td>
                     </tr>
+
 <?php
 endforeach;
 
 if ($this->attributes):
 ?>
+
                     <tr>
                         <th><?=Lang::game('flags');?></th>
                             <td colspan="3" style="line-height:17px">
@@ -272,7 +303,9 @@ if ($this->attributes):
 ?></ul>
                         </td>
                     </tr>
+
 <?php endif; ?>
+
                 </table>
 
                 <h2 class="clear"><?=Lang::main('related');?></h2>
@@ -283,6 +316,7 @@ $this->brick('lvTabs');
 
 $this->brick('contribute');
 ?>
+
             <div class="clear"></div>
         </div><!-- main-contents -->
     </div><!-- main -->

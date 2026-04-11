@@ -3,8 +3,11 @@
 
     use \Aowow\Lang;
 
+    /** @var PageTemplate $this */
+
     $this->brick('header');
 ?>
+
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
@@ -18,60 +21,73 @@
 ?>
 
             <div class="text">
+
 <?php
-$this->brick('redButtons');
+    $this->brick('redButtons');
 
 if ($this->expansion):
-    echo '                <h1 class="h1-icon"><span class="icon-'.$this->expansion.'-right">'.$this->h1."</span></h1>\n";
+    echo '                <h1 class="h1-icon"><span class="icon-'.$this->expansion.'-right">'.$this->h1.'</span></h1>'.PHP_EOL;
 else:
-    echo '                <h1>'.$this->h1."</h1>\n";
+    echo '                <h1>'.$this->h1.'</h1>'.PHP_EOL;
 endif;
 if ($this->unavailable):
 ?>
+
                 <div class="pad"></div>
                 <b style="color: red"><?=Lang::itemset('_unavailable'); ?></b>
                 <div class="pad"></div>
+
 <?php
 endif;
 $this->brick('markup', ['markup' => $this->article]);
 
 echo $this->description;
 ?>
+
                 <script type="text/javascript">//<![CDATA[
+
 <?php
 foreach ($this->pieces as $iId => [$piece, ]):
-    echo "                    g_items.add(".$iId.", ".$this->json($piece).");\n";
+    echo '                    g_items.add('.$iId.', '.$this->json($piece).');'.PHP_EOL;
 endforeach;
 ?>
+
                 //]]></script>
 
                 <table class="iconlist">
+
 <?php
 $iconIdx = 0;
 foreach ($this->pieces as [, $icon]):
     echo $icon->renderContainer(20, $iconIdx, true);
 endforeach;
 ?>
+
                 </table>
 
                 <script type="text/javascript">//<![CDATA[
+
 <?php
 foreach ($this->pieces as [, $icon]):
     echo $icon->renderJS(20);
 endforeach;
 ?>
+
                 //]]></script>
 
                 <h3><?=Lang::itemset('_setBonuses').$this->bonusExt; ?></h3>
 
-<?="                ".Lang::itemset('_conveyBonus')."\n"; ?>
+<?='                '.Lang::itemset('_conveyBonus').PHP_EOL; ?>
                 <ul>
+
 <?php
 foreach ($this->spells as [$nItems, $spellId, $text]):
-    echo '                    <li><div>'.Lang::itemset('_pieces', [$nItems]).'<a href="?spell='.$spellId.'">'.$text."</a></div></li>\n";
+    echo '                    <li><div>'.Lang::itemset('_pieces', [$nItems]).'<a href="?spell='.$spellId.'">'.$text.'</a></div></li>'.PHP_EOL;
 endforeach;
 ?>
+
                 </ul>
+
 <?php
 if ($this->summary):
 ?>
@@ -82,6 +98,7 @@ if ($this->summary):
                 <script type="text/javascript">//<![CDATA[
                     <?=$this->summary; ?>
                 //]]></script>
+
 <?php
 endif;
 ?>

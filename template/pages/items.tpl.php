@@ -1,28 +1,34 @@
 <?php
     namespace Aowow\Template;
 
-    use Aowow\Lang;
+    use \Aowow\Lang;
 
-$this->brick('header');
-$f = $this->filter->values;                                 // shorthand
+    /** @var PageTemplate $this */
+
+    $this->brick('header');
+    $f = $this->filter->values;                             // shorthand
 ?>
+
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
 
 <?php
-$this->brick('announcement');
+    $this->brick('announcement');
 
-$this->brick('pageTemplate', ['fiQuery' => $this->filter->query, 'fiMenuItem' => [0]]);
+    $this->brick('pageTemplate', ['fiQuery' => $this->filter->query, 'fiMenuItem' => [0]]);
 ?>
+
             <div id="fi" style="display: <?=($this->filter->query ? 'block' : 'none'); ?>;">
                 <form action="?filter=items<?=$this->subCat; ?>" method="post" name="fi" onsubmit="return fi_submit(this)" onreset="return fi_reset(this)">
                     <div class="text">
-<?php
-$this->brick('headIcons');
 
-$this->brick('redButtons');
+<?php
+    $this->brick('headIcons');
+
+    $this->brick('redButtons');
 ?>
+
                         <h1><?=$this->h1; ?></h1>
                     </div>
                     <div class="rightpanel">
@@ -37,6 +43,7 @@ $this->brick('redButtons');
 <?php
 if ($this->slotList):
 ?>
+
                     <div class="rightpanel2">
                         <div style="float: left"><?=Lang::item('slot'); ?></div>
                         <small><a href="javascript:;" onclick="document.forms['fi'].elements['sl[]'].selectedIndex = -1; return false" onmousedown="return false"><?=Lang::main('clear'); ?></a></small>
@@ -45,11 +52,13 @@ if ($this->slotList):
 <?=$this->makeOptionsList($this->slotList, $f['sl'], 28); ?>
                         </select>
                     </div>
+
 <?php
 endif;
 
 if ($this->typeList):
 ?>
+
                     <div class="rightpanel2">
                         <div style="float: left"><?=Lang::game('type'); ?></div>
                         <small><a href="javascript:;" onclick="document.forms['fi'].elements['ty[]'].selectedIndex = -1; return false" onmousedown="return false"><?=Lang::main('clear'); ?></a></small>
@@ -62,6 +71,7 @@ if ($this->typeList):
 }); ?>
                         </select>
                     </div>
+
 <?php endif; ?>
 
                     <table>
@@ -141,7 +151,7 @@ if ($this->typeList):
 
                     <div class="clear"></div>
                     <div class="padded">
-                        <?=Lang::main('groupBy')."\n"; ?>
+                        <?=Lang::main('groupBy').PHP_EOL; ?>
 <?=$this->makeRadiosList('gb', Lang::main('gb'), $f['gb'] ?? '', 24, fn($v, &$k) => ($k = $k ?: '') || 1); ?>
                     </div>
 

@@ -3,6 +3,7 @@
 
     use \Aowow\Lang;
 ?>
+
             <div class="pad3"></div>
 
             <script type="text/javascript">//<![CDATA[
@@ -30,10 +31,13 @@
                 <div class="inputbox">
                     <h1><?=$head ?? ''; ?></h1>
                     <div id="inputbox-error"><?=$error ?? ''; ?></div>
+
 <?php if ($message ?? ''): ?>
                     <?=$message; ?>
                     <div class="pad2"></div>
+
 <?php endif; ?>
+
                     <div style="text-align: center">
                         <?=Lang::account('email').Lang::main('colon'); ?><input type="text" name="email" value="" id="email-generic" style="width: 12em" />
                         <div class="pad2"></div>

@@ -1,6 +1,8 @@
 <?php
     namespace Aowow\Template;
 
+    /** @var PageTemplate $this */
+
     $this->brick('header');
 ?>
 
@@ -554,6 +556,7 @@ $this->brick('announcement');
 
 $this->brick('pageTemplate');
 ?>
+
             <div class="text">
                 <h1><?=$this->h1;?></h1>
 
@@ -564,6 +567,7 @@ $this->brick('pageTemplate');
 
     echo $this->extraHTML ?? '';
 ?>
+
                 <h2>Edit<span id="wt-name"></span><span id="status-ic" style="float:right;"></span></h2>
                 <div class="wt-edit">
                     <div style="display:inline-block; vertical-align:top;"><div class="pad2" style="color: white; font-size: 15px; font-weight: bold;">Icon</div><input type="text" id="wt-icon" size="30" /></div>

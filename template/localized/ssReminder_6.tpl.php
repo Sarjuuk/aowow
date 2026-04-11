@@ -1,4 +1,8 @@
-<?php namespace Aowow\Template; ?>
+<?php
+    namespace Aowow\Template;
+
+    /** @var PageTemplate $this */
+?>
 
                     <h2><img src="<?=$this->gStaticUrl; ?>/images/icons/bubble-big.gif" width="32" height="29" alt="" style="vertical-align:middle;margin-right:8px">Recordatorio</h2>
                     Su captura de pantalla <b class="q10">no</b> será aprobada si no cumple con las siguientes directrices.

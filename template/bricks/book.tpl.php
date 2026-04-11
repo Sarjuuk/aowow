@@ -3,7 +3,10 @@
 
     use \Aowow\Lang;
 
+    /** @var PageTemplate $this */
+
 if ($this->book): ?>
+
                 <div class="clear"></div>
                 <h3><?=Lang::item('content'); ?></h3>
 
@@ -11,4 +14,5 @@ if ($this->book): ?>
                 <script>//<![CDATA[
                     <?=$this->book; ?>
                 //]]></script>
+
 <?php endif; ?>

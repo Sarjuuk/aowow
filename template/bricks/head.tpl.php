@@ -2,6 +2,8 @@
     namespace Aowow\Template;
 
     use \Aowow\Lang;
+
+    /** @var PageTemplate $this */
 ?>
 
     <title><?=$this->concat('title', ' - '); ?></title>
@@ -14,32 +16,39 @@
         var g_serverTime = <?=$this->gServerTime; ?>;
         var g_staticUrl = "<?=$this->gStaticUrl; ?>";
         var g_host = "<?=$this->gHost; ?>";
+
 <?php
 if ($this->gDataKey):
-        echo "        var g_dataKey = '".$_SESSION['dataKey']."'\n";
+        echo "        var g_dataKey = '".$_SESSION['dataKey']."'".PHP_EOL;
 endif;
 ?>
+
     </script>
 <?=$this->renderArray('js', 4); ?>
 <script type="text/javascript">
         var g_user = <?=$this->gUser; ?>;
+
 <?php
 if ($this->gFavorites):
-    echo "        g_favorites = ".$this->gFavorites.";\n";
+    echo '        g_favorites = '.$this->gFavorites.';'.PHP_EOL;
 endif;
 ?>
+
     </script>
 
 <?php if ($this->hasAnalytics): ?>
     <script>
         $WH.Track.gaInit();
     </script>
+
 <?php
 endif;
 
 if ($this->rss):
 ?>
+
     <link rel="alternate" type="application/rss+xml" title="<?=$this->concat('title', ' - '); ?>" href="<?=$this->rss; ?>"/>
+
 <?php
 endif;
 ?>

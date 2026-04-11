@@ -1,28 +1,34 @@
 <?php
     namespace Aowow\Template;
 
-    use Aowow\Lang;
+    use \Aowow\Lang;
 
-$this->brick('header');
-$f = $this->filter->values;                                 // shorthand
+    /** @var PageTemplate $this */
+
+    $this->brick('header');
+    $f = $this->filter->values;                             // shorthand
 ?>
+
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
 
 <?php
-$this->brick('announcement');
+    $this->brick('announcement');
 
-$this->brick('pageTemplate', ['fiQuery' => $this->filter->query, 'fiMenuItem' => [3]]);
+    $this->brick('pageTemplate', ['fiQuery' => $this->filter->query, 'fiMenuItem' => [3]]);
 ?>
+
             <div id="fi" style="display: <?=($this->filter->query ? 'block' : 'none'); ?>;">
                 <form action="?filter=quests<?=$this->subCat; ?>" method="post" name="fi" onsubmit="return fi_submit(this)" onreset="return fi_reset(this)">
                     <div class="text">
-<?php
-$this->brick('headIcons');
 
-$this->brick('redButtons');
+<?php
+    $this->brick('headIcons');
+
+    $this->brick('redButtons');
 ?>
+
                         <h1><?=$this->h1; ?></h1>
                     </div>
                     <div class="rightpanel">

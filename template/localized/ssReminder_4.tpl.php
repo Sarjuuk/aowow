@@ -1,4 +1,8 @@
-<?php namespace Aowow\Template; ?>
+<?php
+    namespace Aowow\Template;
+
+    /** @var PageTemplate $this */
+?>
 
                     <h2><img src="<?=$this->gStaticUrl; ?>/images/icons/bubble-big.gif" width="32" height="29" alt="" style="vertical-align:middle;margin-right:8px">提醒</h2>
                     如果您的截图不符合以下指南，将<b class="q10">不会</b>被通过审核。

@@ -1,4 +1,9 @@
-<?php namespace Aowow\Template; ?>
+<?php
+    namespace Aowow\Template;
+
+    /** @var PageTemplate $this */
+?>
+
 <!DOCTYPE html>
 <html>
 <head>

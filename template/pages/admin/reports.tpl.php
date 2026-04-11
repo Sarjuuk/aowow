@@ -1,6 +1,8 @@
 <?php
     namespace Aowow\Template;
 
+    /** @var PageTemplate $this */
+
     $this->brick('header');
 ?>
 
@@ -12,10 +14,11 @@
         <div class="main-contents" id="main-contents">
 
 <?php
-$this->brick('announcement');
+    $this->brick('announcement');
 
-$this->brick('pageTemplate');
+    $this->brick('pageTemplate');
 ?>
+
             <div class="text">
                 <h1><?=$this->h1;?></h1>
 
@@ -26,6 +29,7 @@ $this->brick('pageTemplate');
 
     echo $this->extraHTML ?? '';
 ?>
+
             </div>
         </div><!-- main-contents -->
     </div><!-- main -->

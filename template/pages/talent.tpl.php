@@ -1,10 +1,11 @@
 <?php
     namespace Aowow\Template;
 
-    use \Aowow\Lang;
+    /** @var PageTemplate $this */
 
     $this->brick('header');
 ?>
+
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">

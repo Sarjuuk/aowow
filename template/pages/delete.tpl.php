@@ -1,11 +1,15 @@
 <?php
     namespace Aowow\Template;
 
+    /** @var PageTemplate $this */
+
     $this->brick('header');
 ?>
+
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
+
 <?php
     $this->brick('announcement');
 
@@ -19,6 +23,7 @@ else:
     $this->localizedBrick('delete-account');
 endif;
 ?>
+
             </div>
         </div><!-- main-contents -->
     </div><!-- main -->

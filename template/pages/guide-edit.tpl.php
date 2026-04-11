@@ -3,22 +3,28 @@
 
     use \Aowow\Lang;
 
+    /** @var PageTemplate $this */
+
     $this->brick('header');
 ?>
+
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
 
 <?php
-$this->brick('announcement');
+    $this->brick('announcement');
 
-$this->brick('pageTemplate');
+    $this->brick('pageTemplate');
 ?>
+
             <div class="text">
                 <h1><?=$this->h1; ?></h1>
+
 <?php
     $this->brick('markup', ['markup' => $this->article]);
 ?>
+
             </div>
             <div class="pad"></div>
 <!-- start insert -->
@@ -204,6 +210,7 @@ $this->brick('pageTemplate');
                     <td></td>
                     <td colspan="3"><span id="desc-info"></span></td>
                 </tr>
+
 <?php
 /*
                 <tr>
@@ -217,14 +224,17 @@ $this->brick('pageTemplate');
                 </tr>
 */
 ?>
+
                 <tr>
                     <th><?=Lang::main('status');?></th>
                     <td colspan="3"><dfn title="<?=Lang::guide('editor', 'statusTip', $this->editStatus);?>" style="color:<?=$this->editStatusColor;?>"><?=Lang::guide('status', $this->editStatus);?></dfn>
+
 <?php
 if ($this->isDraft && $this->typeId):
-    echo '                        <small>(<a href="?guide='.$this->typeId.'&rev='.$this->editRev.'" target="_blank" class="q1">'.Lang::guide('editor', 'testGuide')."</a>)</small>\n";
+    echo '                        <small>(<a href="?guide='.$this->typeId.'&rev='.$this->editRev.'" target="_blank" class="q1">'.Lang::guide('editor', 'testGuide').'</a>)</small>'.PHP_EOL;
 endif;
 ?>
+
                     </td>
                 </tr>
 
@@ -269,6 +279,7 @@ endif;
             </div>
 
 <?php endif; ?>
+
             <div class="guide-submission">
                 <div class="guide-submission-options">
                     <button type="button" class="btn btn-site" data-type="save" onclick="$('.guide-submission').attr('data-type', 'save'); $('#changelog').focus();"><?=Lang::guide('editor', 'save');?></button>

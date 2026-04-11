@@ -3,8 +3,11 @@
 
     use \Aowow\Lang;
 
+    /** @var PageTemplate $this */
+
     $this->brick('header');
 ?>
+
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
@@ -17,12 +20,14 @@
 
             <div class="text">
                 <h1><?=Lang::account('settings');?></h1>
+
 <?php
 // Banned-Minibox
 if ($this->bans):
     foreach ($this->bans as $b):
         [$end, $reason, $name] = $b;
 ?>
+
                 <div style="max-width:300px;" class="minibox minibox-left">
                     <h1 class="q10"><?=Lang::account('accBanned'); ?></h1>
                     <ul style="text-align:left">
@@ -31,7 +36,9 @@ if ($this->bans):
                         <li><div><?='<b>'.Lang::account('reason').'</b>'.'<span class="msg-failure">'.($reason ?: Lang::account('noReason')).'</span>';?></div></li>
                     </ul>
                 </div>
+
 <?php endforeach; ?>
+
             </div>
 
 <?php else: ?>
@@ -51,6 +58,7 @@ if ($this->bans):
 
 <?php if ([$type, $msg] = $this->generalMessage): ?>
                             <div class="box"><div class="msg-<?=($type ? 'success' : 'failure');?>"><?=$msg;?></div></div>
+
 <?php endif; ?>
 
                             <div style="text-align: left">
@@ -88,11 +96,13 @@ if ($this->bans):
 <?php
     if ($this->cfg('ACC_AUTH_MODE') == AUTH_MODE_SELF):
 ?>
+
                     <div id="tab-personal" style="display: none">
                         <h2 class="first" id="change-email-address"><?=Lang::account('email');?></h2>
 
 <?php if ([$type, $msg] = $this->emailMessage): ?>
                         <div class="box"><div class="msg-<?=($type ? 'success' : 'failure');?>"><?=$msg;?></div></div>
+
 <?php endif; ?>
 
                         <form action="?account=update-email" name="ce" method="post" id="change-email">
@@ -108,12 +118,16 @@ if ($this->bans):
 
 <?php if ([$type, $msg] = $this->usernameMessage): ?>
                         <div class="box"><div class="msg-<?=($type ? 'success' : 'failure');?>"><?=$msg;?></div></div>
+
 <?php endif; ?>
 
                         <div><?=Lang::account('usernameNote', [$this->renameCD]);?></div>
+
 <?php if ($this->activeCD): ?>
                         <div class="msg-failure pad3"><br /><?=Lang::account('activeCD', [$this->activeCD]);?></div>
+
 <?php endif; ?>
+
                         <form action="?account=update-username" name="ce" method="post" id="change-username">
                             <table cellspacing="5" cellpadding="0" border="0">
                                 <tr><td nowrap="nowrap"><?=Lang::account('curName');?></td><td><input disabled="disabled" name="current-username" style="width: 15em" value="<?=$this->curName;?>" readonly="readonly" /></td></tr>
@@ -127,6 +141,7 @@ if ($this->bans):
 
 <?php if ([$type, $msg] = $this->passwordMessage): ?>
                         <div class="box"><div class="msg-<?=($type ? 'success' : 'failure');?>"><?=$msg;?></div></div>
+
 <?php endif; ?>
 
                         <form action="?account=update-password" name="cp" method="post" id="change-password">
@@ -147,6 +162,7 @@ if ($this->bans):
                     </div>
 
 <?php endif; ?>
+
                     <div id="tab-community" style="display: none">
                         <h2 class="first"><?=Lang::account('userPage');?></h2>
 
@@ -154,7 +170,9 @@ if ($this->bans):
 
 <?php if ([$type, $msg] = $this->communityMessage): ?>
                         <div class="box"><div class="msg-<?=($type ? 'success' : 'failure');?>"><?=$msg;?></div></div>
+
 <?php endif; ?>
+
                         <form action="?account=update-community-settings" name="community-settings" method="post" onsubmit="return spd(this)/*  && sfs(this) */">
                             <?=Lang::account('publicDescNote', [urlencode($this->user::$username)]);?>
 
@@ -168,6 +186,7 @@ if ($this->bans):
                                 <div class="pad"></div>
                                 <input type="submit" value="<?=Lang::main('save');?>" name="do-community-settings-update" />
                             </div>
+
 <?php
 /*      signature not used
                             <h2><?=Lang::account('forums');?></h2>
@@ -186,12 +205,14 @@ if ($this->bans):
                             </div>
 */
 ?>
+
                         </form>
 
                         <h3 id="forum-avatar"><?=Lang::account('avatar');?></h3>
 
 <?php if ([$type, $msg] = $this->avatarMessage): ?>
                         <div class="box"><div class="msg-<?=($type ? 'success' : 'failure');?>"><?=$msg;?></div></div>
+
 <?php endif; ?>
 
                         <form action="?account=forum-avatar" name="fa" method="post" enctype="multipart/form-data" onsubmit="return fa_validateForm(this)">
@@ -228,9 +249,12 @@ if ($this->bans):
                                     </div>
                                 </td></tr>
                             </table>
+
 <?php else: ?>
                             <input type="radio" name="avatar" value="2" id="avaOpt2" onclick="faChange(2)" disabled="disabled" /> <label for="avaOpt2" class="q0"><?=Lang::account('custom'); ?></label>&nbsp;&nbsp;<span class="premium-feature-icon-small"></span><table id="avaSel2" style="display:none"></table>
+
 <?php endif; ?>
+
                             <div class="clear"></div>
 
                             <script type="text/javascript">
@@ -249,8 +273,10 @@ if ($this->bans):
 
                     <div id="tab-premium" style="display: none; min-height: 70px;">
                         <h3 class="first"><?=Lang::account('premiumStatus');?></h3>
+
 <?php if (!$this->user::isPremium()): ?>
                         <ul><li><div><?=Lang::account('status').Lang::main('colon').'<b class="q10">'.Lang::account('inactive'); ?></b></div></li></ul>
+
 <?php else: ?>
                         <ul><li><div><?=Lang::account('status').Lang::main('colon').'<b class="q2">'.Lang::account('active'); ?></b></div></li></ul>
                         <h2><?=Lang::account('manageAvatars');?></h2>
@@ -263,6 +289,7 @@ if ($this->bans):
     <?php if ([$type, $msg] = $this->premiumborderMessage): ?>
                             <div class="box"><div class="msg-<?=($type ? 'success' : 'failure');?>"><?=$msg;?></div></div>
     <?php endif; ?>
+
                         <form action="?account=premium-border" method="POST">
                             <div style="width:500px; padding-left:25px;" class="pad2">
                                 <div style="display:flex; justify-content: space-between;" id="ipb-container"></div>
@@ -292,20 +319,26 @@ if ($this->bans):
                             });
                         </script>
                     </div>
+
 <?php endif; ?>
+
                 </div>
             </div>
 
             <script type="text/javascript">
                 var _ = new Tabs({parent: $WH.ge('tabs-generic')});
                 _.add('<?=Lang::account('tabGeneral');?>', {id: 'general'});
+
 <?php if ($this->cfg('ACC_AUTH_MODE') == AUTH_MODE_SELF): ?>
                 _.add('<?=Lang::account('tabPersonal');?>', {id: 'personal'});
+
 <?php endif; ?>
+
                 _.add('<?=Lang::account('tabCommunity');?>', {id: 'community'});
                 _.add('<?=Lang::account('tabPremium');?>', {id: 'premium'});
                 _.flush();
             </script>
+
 <?php endif; ?>
 
             <div class="clear"></div>

@@ -2,7 +2,10 @@
     namespace Aowow\Template;
 
     use \Aowow\Lang;
+
+    /** @var PageTemplate $this */
 ?>
+
             <div class="pad3"></div>
 
             <script type="text/javascript">
@@ -53,13 +56,17 @@
 <?php if ($hasRecovery): ?>
                     <br />
                     <div style="position: absolute; right: 5px; bottom: 5px; white-space: nowrap;"><?=Lang::account('forgot').Lang::main('colon'); ?><a href="?account=forgot-username"><?=Lang::account('forgotUser'); ?></a> | <a href="?account=forgot-password"><?=Lang::account('forgotPass'); ?></a> | <a href="?account=resend"><?=Lang::account('inputbox', 'head', 'resendMail'); ?></a></div>
+
 <?php endif; ?>
+
                 </div>
             </form>
 
             <div class="pad3"></div>
+
 <?php if ($this->cfg('ACC_ALLOW_REGISTER')): ?>
             <div style="text-align: center; line-height: 1.5em; font-size: 125%"><?=Lang::account('accCreate'); ?></div>
+
 <?php endif; ?>
 
             <script type="text/javascript">$WH.ge('username-generic').focus()</script>

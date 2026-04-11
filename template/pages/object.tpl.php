@@ -3,8 +3,11 @@
 
     use \Aowow\Lang;
 
+    /** @var PageTemplate $this */
+
     $this->brick('header');
 ?>
+
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
@@ -18,6 +21,7 @@
 ?>
 
             <div class="text">
+
 <?php $this->brick('redButtons'); ?>
 
                 <h1><?=$this->h1; ?></h1>
@@ -26,7 +30,7 @@
     $this->brick('markup', ['markup' => $this->article]);
 
 if ($this->relBoss):
-    echo "                <div>".sprintf(Lang::gameObject('npcLootPH'), $this->h1, $this->relBoss[0], $this->relBoss[1])."</div>\n";
+    echo '                <div>'.sprintf(Lang::gameObject('npcLootPH'), $this->h1, $this->relBoss[0], $this->relBoss[1]).'</div>'.PHP_EOL;
     echo '                <div class="pad"></div>';
 endif;
 

@@ -9,6 +9,7 @@
 <?php
 if ($enhanced):
 ?>
+
 <style type="text/css">
     .iconlist-col              { float: left; width: 31%; margin-right: 2%; }
     .iconlist                  { border-collapse: collapse; margin-top: 4px; }
@@ -165,14 +166,17 @@ function iconlist_expandall(tableid,doexpand) {
     }
 }
 //]]></script>
+
 <?php
 endif;
 ?>
 
 <table class="iconlist" id="reagent-list-generic">
+
 <?php
 if ($enhanced):
 ?>
+
     <tr>
         <th></th>
         <th align="left">
@@ -180,6 +184,7 @@ if ($enhanced):
             <input type="button" style="font-size: 11px; margin-right: 0.5em" onclick="iconlist_expandall('reagent-list-generic', false);" value="<?=Lang::spell('_collapseAll'); ?>">
         </th>
     </tr>
+
 <?php
 endif;
 
@@ -198,17 +203,20 @@ foreach ($reagents as $k => ['path' => $path, 'level' => $level, 'final' => $fin
         echo '<div class="iconlist-tree disclosure-off" onclick="iconlist_showhide(this);" style="padding-left: 0; cursor: pointer; width: 15px; float: left" id="spn.reagent-list-generic.'.$path.'">&nbsp;</div>';
     endif;
 
-    echo '<span class="'.$icon->quality.'">'.($icon->href ? '<a href="?'.$typeStr.'='.$icon->typeId.'">'.$icon->text.'</a>' : $icon->text).'</span>'.($icon->num > 1 ? '&nbsp;('.$icon->num.')' : '')."</td></tr>\n";
+    echo '<span class="'.$icon->quality.'">'.($icon->href ? '<a href="?'.$typeStr.'='.$icon->typeId.'">'.$icon->text.'</a>' : $icon->text).'</span>'.($icon->num > 1 ? '&nbsp;('.$icon->num.')' : '').'</td></tr>'.PHP_EOL;
 endforeach;
 ?>
+
 </table>
 
 <script type="text/javascript">//<![CDATA[
+
 <?php
 foreach ($reagents as ['icon' => $icon]):
     echo $icon->renderJS(4);
 endforeach;
 ?>
+
 //]]></script>
 
 <div class="clear"></div>

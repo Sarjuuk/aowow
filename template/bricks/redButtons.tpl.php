@@ -2,6 +2,8 @@
     namespace Aowow\Template;
 
     use \Aowow\Lang;
+
+    /** @var PageTemplate $this */
 ?>
 
 <?php

@@ -3,6 +3,7 @@
 
     use \Aowow\Lang;
 ?>
+
             <div class="pad3"></div>
 
             <script type="text/javascript">

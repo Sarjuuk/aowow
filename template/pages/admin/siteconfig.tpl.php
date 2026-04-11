@@ -1,6 +1,8 @@
 <?php
     namespace Aowow\Template;
 
+    /** @var PageTemplate $this */
+
     $this->brick('header');
 ?>
 
@@ -281,6 +283,7 @@
 
     $this->brick('lvTabs');
 ?>
+
             <div class="clear"></div>
         </div><!-- main-contents -->
     </div><!-- main -->

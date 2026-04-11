@@ -1,17 +1,21 @@
 <?php
     namespace Aowow\Template;
 
+    /** @var PageTemplate $this */
+
     $this->brick('header');
 ?>
+
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
 
 <?php
-$this->brick('announcement');
+    $this->brick('announcement');
 
-$this->brick('pageTemplate');
+    $this->brick('pageTemplate');
 ?>
+
             <div class="text">
                 <h1><?=$this->h1; ?></h1>
 
@@ -114,18 +118,20 @@ $this->brick('pageTemplate');
 
                         return true;
                     }
+
 <?php
 if ($this->getAll):
-    echo "                    var vi_getAll = true;\n";
+    echo '                    var vi_getAll = true;'.PHP_EOL;
 endif;
 if ($this->viPages):
-    echo "                    var vim_videoPages = ".$this->json($this->viPages).";\n";
-    echo "                    vim_UpdatePages();\n";
+    echo '                    var vim_videoPages = ".$this->json($this->viPages).";'.PHP_EOL;
+    echo '                    vim_UpdatePages();'.PHP_EOL;
 elseif ($this->viData):
-    echo "                    var vim_videoData = ".$this->json($this->viData).";\n";
-    echo "                    vim_UpdateList();\n";
+    echo '                    var vim_videoData = ".$this->json($this->viData).";'.PHP_EOL;
+    echo '                    vim_UpdateList();'.PHP_EOL;
 endif;
 ?>
+
                     vi_OnResize();
                 </script>
             </div>

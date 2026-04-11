@@ -3,28 +3,34 @@
 
     use \Aowow\Lang;
 
-$this->brick('header');
-$f = $this->filter->values;                                 // shorthand
+    /** @var PageTemplate $this */
+
+    $this->brick('header');
+    $f = $this->filter->values;                             // shorthand
 ?>
+
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
 
 <?php
-$this->brick('announcement');
+    $this->brick('announcement');
 
-$this->brick('pageTemplate', ['fiQuery' => $this->filter->query, 'fiMenuItem' => array_slice($this->pageTemplate['breadcrumb'], 0, 3)]);
+    $this->brick('pageTemplate', ['fiQuery' => $this->filter->query, 'fiMenuItem' => array_slice($this->pageTemplate['breadcrumb'], 0, 3)]);
 
 # pr_setRegionRealm($WH.ge('fi').firstChild, realm, region) - never have \n\s before <form>, it will become firstChild (a text node)
 ?>
+
             <div id="fi" style="display: <?=($this->filter->query ? 'block' : 'none'); ?>;"><form
                 action="?filter=arena-teams&<?=$this->subCat; ?>" method="post" name="fi" onsubmit="return fi_submit(this)" onreset="return fi_reset(this)">
                     <div class="text">
-<?php
-$this->brick('headIcons');
 
-$this->brick('redButtons');
+<?php
+    $this->brick('headIcons');
+
+    $this->brick('redButtons');
 ?>
+
                         <h1><?=$this->h1; ?></h1>
                     </div>
                     <table>

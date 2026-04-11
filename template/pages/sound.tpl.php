@@ -3,8 +3,11 @@
 
     use \Aowow\Lang;
 
+    /** @var PageTemplate $this */
+
     $this->brick('header');
 ?>
+
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
@@ -16,6 +19,7 @@
 ?>
 
             <div class="text">
+
 <?php
     $this->brick('redButtons');
 ?>
@@ -27,6 +31,7 @@
 
     $this->brickIf($this->map, 'mapper');
 ?>
+
                 <ol id="soundfilelist"></ol>
                 <div id="mainsound"></div>
                 <script type="text/javascript">//<![CDATA[

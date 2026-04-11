@@ -2,29 +2,37 @@
     namespace Aowow\Template;
 
     use \Aowow\Lang;
+
+    /** @var PageTemplate $this */
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
+
 <?php $this->brick('head'); ?>
 
 </head>
 <body class="home<?=($this->user::isPremium() ? ' premium-logo' : ''); ?>">
     <div id="layers"></div>
+
 <?php
 if ($this->homeTitle):
-    echo "    <script>document.title = '".$this->homeTitle."';</script>\n";
+    echo "    <script>document.title = '".$this->homeTitle."';</script>".PHP_EOL;
 endif;
 
 if ($this->altHomeLogo):
 ?>
+
     <style type="text/css">
     .home-logo {
         background: url(<?=$this->altHomeLogo; ?>) no-repeat center 0 !important;
         margin-bottom: 1px !important;
     }
     </style>
+
 <?php endif; ?>
+
     <div class="home-wrapper">
         <h1><?=$this->concat('title'); ?></h1>
         <div class="home-logo" id="home-logo"></div>
@@ -47,39 +55,49 @@ if ($this->altHomeLogo):
 
 <?php elseif ($this->featuredBox): ?>
        <div class="pad"></div>
+
 <?php
 endif;
 
 if ($this->featuredBox):
 ?>
+
         <div class="home-featuredbox<?=$this->featuredBox['extended'] ? ' home-featuredbox-extended' : ''; ?>" style="background-image: url(<?=$this->featuredBox['boxBG']; ?>);" id="home-featuredbox">
+
 <?php if ($this->featuredBox['overlays']): ?>
             <div class="home-featuredbox-links">
+
 <?php
         foreach ($this->featuredBox['overlays'] as ['url' => $u, 'title' => $t, 'left' => $l, 'width' => $w]):
-                echo '                <a href="'.$u.'" title="'.$t.'" style="left: '.$l.'px; top: 18px; width:'.$w.'px; height: 160px"></a>'."\n";
-                echo '                <var style="left: '.$l.'px; top: 18px; width:'.$w.'px; height: 160px"></var>'."\n";
+                echo '                <a href="'.$u.'" title="'.$t.'" style="left: '.$l.'px; top: 18px; width:'.$w.'px; height: 160px"></a>'.PHP_EOL;
+                echo '                <var style="left: '.$l.'px; top: 18px; width:'.$w.'px; height: 160px"></var>'.PHP_EOL;
         endforeach;
 ?>
+
             </div>
+
 <?php endif; ?>
+
             <div class="home-featuredbox-inner text" id="news-generic"></div>
         </div>
 
 <?php
 endif;
 ?>
+
         <script type="text/javascript">//<![CDATA[
+
 <?php
 if ($this->locale->value):
-    echo "            Locale.set(".$this->locale->value.");\n";
+    echo '            Locale.set('.$this->locale->value.');'.PHP_EOL;
 endif;
 echo $this->renderGlobalVars(12);
 
 if ($this->featuredBox):
-    echo "            ".$this->featuredBox['markup'];
+    echo '            '.$this->featuredBox['markup'];
 endif;
 ?>
+
         //]]></script>
     </div>
 

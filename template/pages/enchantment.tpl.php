@@ -3,8 +3,11 @@
 
     use \Aowow\Lang;
 
+    /** @var PageTemplate $this */
+
     $this->brick('header');
 ?>
+
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
@@ -36,21 +39,26 @@
                         <col width="42%" />
                         <col width="50%" />
                     </colgroup>
+
 <?php
 if ($this->activation):
 ?>
+
                     <tr>
                         <th><?=Lang::enchantment('activation'); ?></th>
                         <td colspan="2"><?=$this->activation; ?></td>
                     </tr>
+
 <?php
 endif;
 
 foreach ($this->effects as $i => $e):
 ?>
+
                     <tr>
                         <th><?=Lang::spell('_effect').' #'.$i; ?></th>
                         <td colspan="3" style="line-height: 17px">
+
 <?php
     echo '                            '.$e['name'].($e['tip'] ? Lang::main('colon').'(<span '.($e['tip'][0] ? 'class="tip" ' : '').'id="efftip-'.$i.'"></span>)' : '').'<small>';
 
@@ -68,24 +76,29 @@ foreach ($this->effects as $i => $e):
         endif;
     endif;
 
-    echo "</small>\n";
+    echo '</small>'.PHP_EOL;
 
     if ($e['tip']):
 ?>
+
                             <script type="text/javascript">
+
 <?php
-        echo "                                \$WH.ae(\$WH.ge('efftip-".$i."'), \$WH.ct(LANG.traits['".$e['tip'][1]."'][0]));\n";
+        echo "                                \$WH.ae(\$WH.ge('efftip-".$i."'), \$WH.ct(LANG.traits['".$e['tip'][1]."'][0]));".PHP_EOL;
         if ($e['tip'][0]):
-            echo "                                g_addTooltip(\$WH.ge('efftip-".$i."'), 'Object: ".$e['tip'][0]."', 'q');\n";
+            echo "                                g_addTooltip(\$WH.ge('efftip-".$i."'), 'Object: ".$e['tip'][0]."', 'q');".PHP_EOL;
         endif;
 ?>
+
                             </script>
+
 <?php
     endif;
 
 
     if ($e['icon']):
 ?>
+
                             <table class="icontab">
                                 <tr>
                                     <?=$e['icon']->renderContainer(0, $i); ?>
@@ -95,14 +108,18 @@ foreach ($this->effects as $i => $e):
                             <script type="text/javascript">
                                 <?=$e['icon']->renderJS(); ?>
                             </script>
+
 <?php
     endif;
 ?>
+
                         </td>
                     </tr>
+
 <?php
 endforeach;
 ?>
+
                 </table>
 
                 <h2 class="clear"><?=Lang::main('related'); ?></h2>
@@ -113,6 +130,7 @@ $this->brick('lvTabs');
 
 $this->brick('contribute');
 ?>
+
             <div class="clear"></div>
         </div><!-- main-contents -->
     </div><!-- main -->

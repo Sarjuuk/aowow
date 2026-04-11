@@ -1,24 +1,30 @@
 <?php
     namespace Aowow\Template;
 
-    use \Aowow\Lang;
+    /** @var PageTemplate $this */
 ?>
 
 <?php
 if (($this->lvTabs && count($this->lvTabs)) || $this->charactersLvData || $this->profilesLvData || $this->contribute):
     if ($this->lvTabs?->isTabbed()):
 ?>
+
             <div class="clear"></div>
             <div id="tabs-generic"></div>
+
 <?php endif; ?>
+
             <div id="lv-generic" class="listview">
+
 <?php
     foreach ($this->lvTabs?->getDataContainer() ?? [] as $container):
         echo '                '.$container.PHP_EOL;
     endforeach;
 ?>
+
             </div>
             <script type="text/javascript">//<![CDATA[
+
 <?php
     // seems like WH keeps their modules separated, as fi_gemScores should be with the other fi_ items but are here instead and originally the dbtype globals used by the listviews were also here)
     // May 2025: WH no longer calculates gems into item scores. Dude .. why?
@@ -47,10 +53,12 @@ if (($this->lvTabs && count($this->lvTabs)) || $this->charactersLvData || $this-
     endif;
 
     if ($flushTabs = $this->lvTabs?->getFlush()):
-        echo "                ".$flushTabs.PHP_EOL;
+        echo '                '.$flushTabs.PHP_EOL;
     endif;
 ?>
+
             //]]></script>
+
 <?php
 endif;
 ?>

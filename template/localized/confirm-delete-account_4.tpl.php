@@ -1,3 +1,9 @@
+<?php
+    namespace Aowow\Template;
+
+    /** @var PageTemplate $this */
+?>
+
 <div class="account-delete-box text">
     <form action="<?=$this->deleteFormTarget;?>" method="POST">
         <h1 class="heading-size-1">请确认删除账户</h1>

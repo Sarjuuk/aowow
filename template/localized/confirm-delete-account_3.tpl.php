@@ -1,3 +1,9 @@
+<?php
+    namespace Aowow\Template;
+
+    /** @var PageTemplate $this */
+?>
+
 <div class="account-delete-box text">
     <form action="<?=$this->deleteFormTarget;?>" method="POST">
         <h1 class="heading-size-1">Bitte Kontolöschung bestätigen</h1>

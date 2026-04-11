@@ -3,8 +3,11 @@
 
     use \Aowow\Lang;
 
+    /** @var PageTemplate $this */
+
     $this->brick('header');
 ?>
+
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
@@ -14,7 +17,9 @@
 
     $this->brick('pageTemplate');
 ?>
+
             <div class="text">
+
 <?php
     $this->brick('redButtons');
 
@@ -38,15 +43,20 @@
         echo '                <h2 class="clear">'.$this->tabsTitle.'</h2>';
     endif;
 ?>
+
             </div>
+
 <?php
     if ($this->lvTabs):
         $this->brick('lvTabs');
 ?>
+
         <div class="clear"></div>
+
 <?php
     endif;
 ?>
+
         </div><!-- main-contents -->
     </div><!-- main -->
 

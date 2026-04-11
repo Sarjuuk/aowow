@@ -1,17 +1,21 @@
 <?php
     namespace Aowow\Template;
 
+    /** @var PageTemplate $this */
+
     $this->brick('header');
 ?>
+
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
 
 <?php
-$this->brick('announcement');
+    $this->brick('announcement');
 
-$this->brick('pageTemplate');
+    $this->brick('pageTemplate');
 ?>
+
             <div class="text">
                 <h1><?=$this->h1; ?></h1>
 
@@ -114,18 +118,20 @@ $this->brick('pageTemplate');
 
                         return true;
                     }
+
 <?php
 if ($this->getAll):
-    echo "                    var ss_getAll = true;\n";
+    echo '                    var ss_getAll = true;'.PHP_EOL;
 endif;
 if ($this->ssPages):
-    echo "                    var ssm_screenshotPages = ".$this->json($this->ssPages).";\n";
-    echo "                    ssm_UpdatePages();\n";
+    echo '                    var ssm_screenshotPages = ".$this->json($this->ssPages).";'.PHP_EOL;
+    echo '                    ssm_UpdatePages();'.PHP_EOL;
 elseif ($this->ssData):
-    echo "                    var ssm_screenshotData = ".$this->json($this->ssData).";\n";
-    echo "                    ssm_UpdateList();\n";
+    echo '                    var ssm_screenshotData = ".$this->json($this->ssData).";'.PHP_EOL;
+    echo '                    ssm_UpdateList();'.PHP_EOL;
 endif;
 ?>
+
                     ss_OnResize();
                 </script>
             </div>
