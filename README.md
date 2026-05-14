@@ -18,7 +18,7 @@ Also, this project is not meant to be used for commercial purposes of any kind!
 
 ## Requirements
 
-+ Webserver running PHP ≥ 8.2 including extensions:
++ Webserver running x64 PHP ≥ 8.2 including extensions:
   + [SimpleXML](https://www.php.net/manual/en/book.simplexml.php)
   + [GD](https://www.php.net/manual/en/book.image)
   + [MySQL Improved](https://www.php.net/manual/en/book.mysqli.php)

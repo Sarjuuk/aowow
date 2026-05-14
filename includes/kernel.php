@@ -18,16 +18,19 @@ $reqExt = ['SimpleXML', 'gd', 'mysqli', 'mbstring', 'fileinfo', 'intl'/*, 'gmp'*
 $badExt = [];
 $error  = '';
 if ($ext = array_filter($reqExt, fn($x) => !extension_loaded($x)))
-    $error .= 'Required Extension <b>'.implode(', ', $ext)."</b> was not found. Please check if it should exist, using \"<i>php -m</i>\"\n\n";
+    $error .= 'Required Extension <b>'.implode(', ', $ext).'</b> was not found. Please check if it should exist, using "<i>php -m</i>"'. PHP_EOL . PHP_EOL;
 
 if ($ext = array_filter($badExt, fn($x) => extension_loaded($x)))
-    $error .= 'Loaded Extension <b>'.implode(', ', $ext)."</b> is incompatible and must be disabled.\n\n";
+    $error .= 'Loaded Extension <b>'.implode(', ', $ext).'</b> is incompatible and must be disabled.'. PHP_EOL . PHP_EOL;
 
 if (version_compare(PHP_VERSION, '8.2.0') < 0)
-    $error .= 'PHP Version <b>8.2</b> or higher required! Your version is <b>'.PHP_VERSION."</b>.\nCore functions are unavailable!\n";
+    $error .= 'PHP Version <b>8.2</b> or higher required! Your version is <b>'.PHP_VERSION.'</b>.' . PHP_EOL . 'Core functions are unavailable!'. PHP_EOL . PHP_EOL;
+
+if (PHP_INT_SIZE != 8)                                      // required for packing character guids and realmIds
+    $error .= 'PHP must be compiled for x64 systems!' . PHP_EOL . PHP_EOL;
 
 if ($error)
-    die(CLI ? strip_tags($error) : $error);
+    die(CLI ? (CLI_HAS_E ? "[\e[31mERR\e[0m] " : '') . strip_tags($error) : $error);
 
 
 require_once 'includes/defines.php';
