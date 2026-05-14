@@ -6,9 +6,9 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class ArenaTeamList extends DBTypeList
+class ArenaTeam extends DBTypeList
 {
-    use profilerHelper, listviewHelper;
+    use TrProfilerHelper;
 
     public static int $contribute = CONTRIBUTE_NONE;
 
@@ -45,53 +45,7 @@ class ArenaTeamList extends DBTypeList
 }
 
 
-class ArenaTeamListFilter extends Filter
-{
-    use TrProfilerFilter;
-
-    protected string $type          = 'arenateams';
-    protected static array $genericFilter = [];
-    protected static array $inputFields   = array(
-        'ex' => [parent::V_EQUAL,    'on',                 false], // only match exact - must be defined before 'na' as it's test relies on 'ex's value
-        'na' => [parent::V_NAME,     true,                 false], // name - only printable chars, no delimiter
-        'ma' => [parent::V_EQUAL,    1,                    false], // match any / all filter
-        'si' => [parent::V_LIST,     [1, 2],               false], // side
-        'sz' => [parent::V_LIST,     [2, 3, 5],            false], // tema size
-        'rg' => [parent::V_CALLBACK, 'cbRegionCheck',      false], // region
-        'bg' => [parent::V_EQUAL,    null,                 false], // battlegroup - unsued here, but var expected by template
-        'sv' => [parent::V_CALLBACK, 'cbServerCheck',      false]  // server
-    );
-
-    public array $extraOpts = [];
-
-    protected function createSQLForValues() : array
-    {
-        $parts = [];
-        $_v    = $this->values;
-
-        // region (rg), battlegroup (bg) and server (sv) are passed to ArenaTeamList as miscData and handled there
-
-        // name [str]
-        if ($_v['na'])
-            if ($_ = $this->buildLikeLookup([['na', 'at.name']], $_v['ex'] == 'on'))
-                $parts[] = $_;
-
-        // side [list]
-        if ($_v['si'] == SIDE_ALLIANCE)
-            $parts[] = ['c.race', ChrRace::fromMask(ChrRace::MASK_ALLIANCE)];
-        else if ($_v['si'] == SIDE_HORDE)
-            $parts[] = ['c.race', ChrRace::fromMask(ChrRace::MASK_HORDE)];
-
-        // size [int]
-        if ($_v['sz'])
-            $parts[] = ['at.type', $_v['sz']];
-
-        return $parts;
-    }
-}
-
-
-class RemoteArenaTeamList extends ArenaTeamList
+class RemoteArenaTeam extends ArenaTeam
 {
     protected string $queryBase = 'SELECT `at`.*, `at`.`arenaTeamId` AS ARRAY_KEY FROM arena_team at';
     protected array  $queryOpts = array(
@@ -106,7 +60,7 @@ class RemoteArenaTeamList extends ArenaTeamList
     public function __construct(array $conditions = [], array $miscData = [])
     {
         // select DB by realm
-        if (!$this->selectRealms($miscData))
+        if (!$this->getRealmDBs($miscData))
         {
             trigger_error('RemoteArenaTeamList::__construct - cannot access any realm.', E_USER_WARNING);
             return;
@@ -286,7 +240,7 @@ class RemoteArenaTeamList extends ArenaTeamList
 }
 
 
-class LocalArenaTeamList extends ArenaTeamList
+class LocalArenaTeam extends ArenaTeam
 {
     protected string $queryBase = 'SELECT at.*, at.id AS ARRAY_KEY FROM ::profiler_arena_team at';
     protected array  $queryOpts = array(

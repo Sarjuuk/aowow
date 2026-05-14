@@ -33,7 +33,7 @@ interface ISource
     'c2':   subCat [Quests]
   'icon':   iconString
 */
-trait TrSource
+trait TrSourceHelper
 {
     protected  array $sources    = [];
     protected ?array $sourceMore = null;
@@ -41,7 +41,7 @@ trait TrSource
     // set when constructing implementing class
     protected ?int   $moreType   = null;
     protected ?int   $moreTypeId = null;
-    protected ?int   $moreZone   = null;
+    protected ?int   $moreZoneId = null;
     protected ?int   $srcFlags   = null;                    // from moreMask
 
     public function getRawSource(int $src) : array
@@ -65,12 +65,12 @@ trait TrSource
                     $buff[$this->moreType][] = $this->moreTypeId;
 
             foreach ($buff as $type => $ids)
-                $this->sourceMore[$type] = Type::newList($type, [['id', $ids]]);
+                $this->sourceMore[$type] = Type::newSet($type, [['id', $ids]]);
         }
 
         $s = array_keys($this->sources[$this->id]);
         if ($this->moreType && $this->moreTypeId && ($srcData = $this->sourceMore[$this->moreType]->getSourceData($this->moreTypeId)))
-            $sm = $srcData[$this->moreTypeId];
+            $sm = $srcData; // [$this->moreTypeId];
         else if (!empty($this->sources[$this->id][SRC_PVP]))
             $sm['p'] = $this->sources[$this->id][SRC_PVP][0];
 
@@ -417,24 +417,19 @@ trait TrProfilerHelper
     public static $brickFile = 'profile';                   // profile is multipurpose
 
     private int $subjectGUID = 0;
-
-    private int $realmId   = 0;
-    private int $realmGUID = 0;
+    private int $realmId     = 0;
+    private int $realmGUID   = 0;
 
     // sooo subjectGUID cant' be used as $id, because it's not unique across realms <realmId>:<subjectGUID>
     // so we pack them .. assumes PHP_INT_SIZE == 8 / an x64 system
     public function packId() : int
     {
-        assert(PHP_INT_SIZE == 8, 'x64 php required');
-
         return ($this->realmId & 0xFFFF) << 40 | ($this->realmGUID & 0xFFFFFFFFFF);
     }
 
     public function unpackId(int $packedId) : void
     {
-        assert(PHP_INT_SIZE == 8, 'x64 php required');
-
-        $this->realmGUID = ($packedId >> 40) & 0xFFFF;
+        $this->realmId   = ($packedId >> 40) & 0xFFFF;
         $this->realmGUID =  $packedId        & 0xFFFFFFFFFF;
     }
 

@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 
 class Achievement extends DBType implements ISource, ITooltip
 {
-    use TrSource;
+    use TrSourceHelper;
 
     private ?array $criteria  = null;
     private ?array $rewards   = null;

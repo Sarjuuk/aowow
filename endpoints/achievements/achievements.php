@@ -156,7 +156,7 @@ class AchievementsBaseResponse extends TemplateResponse implements ICache
         }
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
 
-        $this->lvTabs->addListviewTab(new Listview($tabData, AchievementList::$brickFile));
+        $this->lvTabs->addListviewTab(new Listview($tabData, Achievement::$brickFile));
 
         parent::generate();
 

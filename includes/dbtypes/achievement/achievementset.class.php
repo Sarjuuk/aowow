@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 
 class AchievementSet extends DBTypeSet implements IListview, ISource
 {
-    use TrSource;
+    use TrSourceHelper;
 
     public static int $dbType = Type::ACHIEVEMENT;
 
@@ -18,7 +18,6 @@ class AchievementSet extends DBTypeSet implements IListview, ISource
 
         $rewards = Achievement::fetchRewards(...$this->getFoundIds());
 
-        /** @var Achievement $entry */
         foreach ($this->iterate() as $id => $entry)
             $entry->setRewards($rewards[$id] ?? []);
     }

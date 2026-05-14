@@ -114,7 +114,7 @@ abstract class Type
         self::GUIDE       => [GuideList::class,       'guide',       '',                     self::FLAG_DB_TYPE],
         self::PROFILE     => [ProfileList::class,     'profile',     '',                     self::FLAG_FILTRABLE], // x - not known in javascript
         self::GUILD       => [GuildList::class,       'guild',       '',                     self::FLAG_FILTRABLE], // x
-        self::ARENA_TEAM  => [ArenaTeamList::class,   'arena-team',  '',                     self::FLAG_FILTRABLE], // x
+        self::ARENA_TEAM  => [ArenaTeam::class,   'arena-team',  '',                     self::FLAG_FILTRABLE], // x
         self::USER        => [UserList::class,        'user',        'g_users',              self::FLAG_NONE],      // x
         self::EMOTE       => [EmoteList::class,       'emote',       'g_emotes',             self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE],
         self::ENCHANTMENT => [EnchantmentList::class, 'enchantment', 'g_enchantments',       self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
@@ -154,6 +154,7 @@ abstract class Type
         {
             Type::ACHIEVEMENT,
             Type::AREATRIGGER,
+            Type::ARENA_TEAM,
             Type::CHR_RACE,
             Type::CHR_CLASS => 'List',
             default => ''
