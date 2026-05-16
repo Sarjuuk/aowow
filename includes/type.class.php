@@ -108,7 +108,7 @@ abstract class Type
         self::CHR_RACE    => [CharRace::class,    'race',        'g_races',              self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE],
         self::SKILL       => [SkillList::class,       'skill',       'g_skills',             self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
         self::STATISTIC   => [Achievement::class, 'achievement', 'g_achievements',       self::FLAG_NONE], // alias for achievements; exists only for Markup
-        self::CURRENCY    => [CurrencyList::class,    'currency',    'g_gatheredcurrencies', self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
+        self::CURRENCY    => [Currency::class,    'currency',    'g_gatheredcurrencies', self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
         self::SOUND       => [SoundList::class,       'sound',       'g_sounds',             self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
         self::ICON        => [IconList::class,        'icon',        'g_icons',              self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
         self::GUIDE       => [GuideList::class,       'guide',       '',                     self::FLAG_DB_TYPE],

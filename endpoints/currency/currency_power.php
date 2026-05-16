@@ -33,14 +33,14 @@ class CurrencyPowerResponse extends TextResponse implements ICache
 
     protected function generate() : void
     {
-        $currency = new CurrencyList(array(['id', $this->typeId]));
+        $currency = new Currency($this->typeId);
         if ($currency->error)
             $this->cacheType = CACHE_TYPE_NONE;
         else
             $opts = array(
-                'name'    => $currency->getField('name', true),
+                'name'    => $currency->name,
                 'tooltip' => $currency->renderTooltip(),
-                'icon'    => $currency->getField('iconString')
+                'icon'    => $currency->icon
             );
 
         $this->result = new Tooltip(self::POWER_TEMPLATE, $this->typeId, $opts ?? []);
