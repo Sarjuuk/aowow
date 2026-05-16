@@ -89,13 +89,13 @@ class FactionsBaseResponse extends TemplateResponse implements ICache
         }
 
         $data = [];
-        $factions = new FactionList($conditions);
+        $factions = new FactionSet($conditions);
         if (!$factions->error)
             $data = $factions->getListviewData();
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
 
-        $this->lvTabs->addListviewTab(new Listview(['data' => $data], FactionList::$brickFile));
+        $this->lvTabs->addListviewTab(new Listview(['data' => $data], Faction::$brickFile));
 
         parent::generate();
     }

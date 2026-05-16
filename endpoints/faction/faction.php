@@ -20,7 +20,7 @@ class FactionBaseResponse extends TemplateResponse implements ICache
     public int $type   = Type::FACTION;
     public int $typeId = 0;
 
-    private FactionList $subject;
+    private Faction $subject;
 
     public function __construct(string $id)
     {
@@ -32,11 +32,11 @@ class FactionBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new FactionList(array(['id', $this->typeId]));
+        $this->subject = new Faction($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('faction'), Lang::faction('notFound'));
 
-        $this->h1 = $this->subject->getField('name', true);
+        $this->h1 = $this->subject->name;
 
         $this->gPageInfo += array(
             'type'   => $this->type,
@@ -56,23 +56,20 @@ class FactionBaseResponse extends TemplateResponse implements ICache
         /* Page Title */
         /**************/
 
-        if ($foo = $this->subject->getField('cat'))
-        {
-            if ($bar = $this->subject->getField('cat2'))
-                $this->breadcrumb[] = $bar;
-
-            $this->breadcrumb[] = $foo;
-        }
+        if ($_ = $this->subject->category2)
+            $this->breadcrumb[] = $_;
+        if ($_ = $this->subject->category)
+            $this->breadcrumb[] = $_;
 
 
         /***********/
         /* Infobox */
         /***********/
 
-        $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
+        $infobox = Lang::getInfoBoxForFlags($this->subject->cuFlags);
 
         // Quartermaster if any
-        if ($ids = $this->subject->getField('qmNpcIds'))
+        if ($ids = $this->subject->qmNpcIds)
         {
             $this->extendGlobalIds(Type::NPC, ...$ids);
 
@@ -93,14 +90,14 @@ class FactionBaseResponse extends TemplateResponse implements ICache
         }
 
         // side if any
-        if ($_ = $this->subject->getField('side'))
+        if ($_ = $this->subject->side)
             $infobox[] = Lang::main('side').'[span class=icon-'.($_ == SIDE_ALLIANCE ? 'alliance' : 'horde').']'.Lang::game('si', $_).'[/span]';
 
         // id
         $infobox[] = Lang::faction('id') . $this->typeId;
 
         // profiler relateed (note that this is part of the cache. I don't think this is important enough to calc for every view)
-        if (Cfg::get('PROFILER_ENABLE') && !($this->subject->getField('cuFlags') & CUSTOM_EXCLUDE_FOR_LISTVIEW))
+        if (Cfg::get('PROFILER_ENABLE') && !($this->subject->cuFlags & CUSTOM_EXCLUDE_FOR_LISTVIEW))
         {
             $x = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ::profiler_completion_reputation WHERE `exalted` = 1 AND `factionId` = %i', $this->typeId);
             $y = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ::profiler_profiles WHERE `custom` = 0 AND `stub` = 0');
@@ -111,7 +108,7 @@ class FactionBaseResponse extends TemplateResponse implements ICache
 
         // original name
         if (Lang::getLocale() != Locale::EN)
-            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.$this->subject->getField('name_loc0').'[/copy][/li]';
+            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.($this->subject->name)(Locale::EN).'[/copy][/li]';
 
         if ($infobox)                                       // unsure if this should be tracked (needs data dump in User::getCompletion())
             $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0', 0);
@@ -141,18 +138,18 @@ class FactionBaseResponse extends TemplateResponse implements ICache
             ['repIdx', -1, '!']                             // only gainable
         );
 
-        if ($p = $this->subject->getField('parentFactionId')) // linked via parent
+        if ($p = $this->subject->parentFactionId)           // linked via parent
             $conditions[] = [DB::OR, ['id', $p], ['parentFactionId', $p]];
         else                                                // self as parent
             $conditions[] = ['parentFactionId', $this->typeId];
 
-        $spillover = new FactionList($conditions);
+        $spillover = new FactionSet($conditions);
         $this->extendGlobalData($spillover->getJSGlobals());
 
         $buff = '';
-        foreach ($spillover->iterate() as $spillId => $__)
-            if ($val = ($spillover->getField('spilloverRateIn') * $this->subject->getField('spilloverRateOut') * 100))
-                $buff .= '[tr][td][faction='.$spillId.'][/td][td][span class=q'.($val > 0 ? '2]+' : '10]').$val.'%[/span][/td][td]'.Lang::game('rep', $spillover->getField('spilloverMaxRank')).'[/td][/tr]';
+        foreach ($spillover->iterate() as $spillId => $spillEntry)
+            if ($val = ($spillEntry->spilloverRateIn * $this->subject->spilloverRateOut * 100))
+                $buff .= '[tr][td][faction='.$spillId.'][/td][td][span class=q'.($val > 0 ? '2]+' : '10]').$val.'%[/span][/td][td]'.Lang::game('rep', $spillEntry->spilloverMaxRank).'[/td][/tr]';
 
         if ($buff)
             $this->extraText = new Markup(
@@ -192,18 +189,13 @@ class FactionBaseResponse extends TemplateResponse implements ICache
 
         // factionchange-equivalent
         if ($pendant = DB::World()->selectCell('SELECT IF(`horde_id` = %i, `alliance_id`, -`horde_id`) FROM player_factionchange_reputations WHERE `alliance_id` = %i OR `horde_id` = %i', $this->typeId, $this->typeId, $this->typeId))
-        {
-            $altFac = new FactionList(array(['id', abs($pendant)]));
-            if (!$altFac->error)
-            {
+            if ($altName = Faction::getName(abs($pendant)))
                 $this->transfer = Lang::faction('_transfer', array(
-                    $altFac->id,
-                    $altFac->getField('name', true),
+                    abs($pendant),
+                    $altName,
                     $pendant > 0 ? 'alliance' : 'horde',
                     $pendant > 0 ? Lang::game('si', SIDE_ALLIANCE) : Lang::game('si', SIDE_HORDE)
                 ));
-            }
-        }
 
 
         /**************/
@@ -233,7 +225,7 @@ class FactionBaseResponse extends TemplateResponse implements ICache
 
         // tab: creatures with onKill reputation
         // only if you can actually gain reputation by kills
-        if ($this->subject->getField('reputationIndex') != -1)
+        if ($this->subject->reputationIndex != -1)
         {
             // inherit siblings/children from $spillover
             $cRep = DB::World()->selectCol('SELECT DISTINCT `creature_id` AS ARRAY_KEY, `qty` FROM (
@@ -246,7 +238,7 @@ class FactionBaseResponse extends TemplateResponse implements ICache
 
             if ($cRep)
             {
-                $killCreatures = new CreatureList(array(Listview::DEFAULT_SIZE, ['id', array_keys($cRep)]), ['calcTotal' => true]);
+                $killCreatures = new CreatureSet(array(Listview::DEFAULT_SIZE, ['id', array_keys($cRep)]), ['calcTotal' => true]);
                 if (!$killCreatures->error)
                 {
                     $data = $killCreatures->getListviewData();
@@ -260,19 +252,19 @@ class FactionBaseResponse extends TemplateResponse implements ICache
                     );
 
                     if ($killCreatures->getMatches() > Listview::DEFAULT_SIZE)
-                        if (!is_null(CreatureListFilter::getCriteriaIndex(42, $this->typeId)))
+                        if (!is_null(CreatureFilter::getCriteriaIndex(42, $this->typeId)))
                             $tabData['note'] = sprintf(Util::$filterResultString, '?npcs&filter=cr=42;crs='.$this->typeId.';crv=0');
 
                     $this->addDataLoader('zones');
-                    $this->lvTabs->addListviewTab(new Listview($tabData, CreatureList::$brickFile, 'npcRepCol'));
+                    $this->lvTabs->addListviewTab(new Listview($tabData, Creature::$brickFile, 'npcRepCol'));
                 }
             }
         }
 
         // tab: members
-        if ($_ = $this->subject->getField('templateIds'))
+        if ($_ = $this->subject->templateIds)
         {
-            $members = new CreatureList(array(Listview::DEFAULT_SIZE, ['faction', $_]), ['calcTotal' => true]);
+            $members = new CreatureSet(array(Listview::DEFAULT_SIZE, ['faction', $_]), ['calcTotal' => true]);
             if (!$members->error)
             {
                 $tabData = array(
@@ -282,16 +274,16 @@ class FactionBaseResponse extends TemplateResponse implements ICache
                 );
 
                 if ($members->getMatches() > Listview::DEFAULT_SIZE)
-                    if (!is_null(CreatureListFilter::getCriteriaIndex(3, $this->typeId)))
+                    if (!is_null(CreatureFilter::getCriteriaIndex(3, $this->typeId)))
                         $tabData['note'] = sprintf(Util::$filterResultString, '?npcs&filter=cr=3;crs='.$this->typeId.';crv=0');
 
                 $this->addDataLoader('zones');
-                $this->lvTabs->addListviewTab(new Listview($tabData, CreatureList::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview($tabData, Creature::$brickFile));
             }
         }
 
         // tab: objects
-        if ($_ = $this->subject->getField('templateIds'))
+        if ($_ = $this->subject->templateIds)
         {
             $objects = new GameObjectList(array(['faction', $_]));
             if (!$objects->error)
@@ -333,7 +325,7 @@ class FactionBaseResponse extends TemplateResponse implements ICache
             ['ac.type', ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION],
             ['ac.value1', $this->typeId]
         );
-        $acvs = new AchievementList($conditions);
+        $acvs = new AchievementSet($conditions);
         if (!$acvs->error)
         {
             $this->extendGlobalData($acvs->getJSGlobals(GLOBALINFO_ANY));
@@ -343,7 +335,7 @@ class FactionBaseResponse extends TemplateResponse implements ICache
                 'id'          => 'criteria-of',
                 'name'        => '$LANG.tab_criteriaof',
                 'visibleCols' => ['category']
-            ), AchievementList::$brickFile));
+            ), Achievement::$brickFile));
         }
 
         // tab: condition-for
