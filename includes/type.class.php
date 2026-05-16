@@ -99,7 +99,7 @@ abstract class Type
         self::QUEST       => [QuestList::class,       'quest',       'g_quests',             self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
         self::SPELL       => [SpellList::class,       'spell',       'g_spells',             self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
         self::ZONE        => [ZoneList::class,        'zone',        'g_gatheredzones',      self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE],
-        self::FACTION     => [FactionList::class,     'faction',     'g_factions',           self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE],
+        self::FACTION     => [Faction::class,     'faction',     'g_factions',           self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE],
         self::PET         => [PetList::class,         'pet',         'g_pets',               self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
         self::ACHIEVEMENT => [Achievement::class, 'achievement', 'g_achievements',       self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
         self::TITLE       => [TitleList::class,       'title',       'g_titles',             self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE],
