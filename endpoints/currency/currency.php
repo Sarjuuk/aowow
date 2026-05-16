@@ -20,7 +20,7 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
     public int $type   = Type::CURRENCY;
     public int $typeId = 0;
 
-    private CurrencyList $subject;
+    private Currency $subject;
 
     public function __construct(string $id)
     {
@@ -32,11 +32,11 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new CurrencyList(array(['id', $this->typeId]));
+        $this->subject = new Currency($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('currency'), Lang::currency('notFound'));
 
-        $this->h1 = $this->subject->getField('name', true);
+        $this->h1 = $this->subject->name;
 
         $this->gPageInfo += array(
             'type'   => $this->type,
@@ -44,7 +44,7 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
             'name'   => $this->h1
         );
 
-        $_relItemId = $this->subject->getField('itemId');
+        $_relItemId = $this->subject->itemId;
 
 
         /**************/
@@ -58,24 +58,24 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
         /* Menu Path */
         /*************/
 
-        $this->breadcrumb[] = $this->subject->getField('category');
+        $this->breadcrumb[] = $this->subject->category;
 
 
         /***********/
         /* Infobox */
         /**********/
 
-        $infobox = Lang::getInfoBoxForFlags(intval($this->subject->getField('cuFlags')));
+        $infobox = Lang::getInfoBoxForFlags(intval($this->subject->cuFlags));
 
         // cap
-        if ($_ = $this->subject->getField('cap'))
+        if ($_ = $this->subject->cap)
             $infobox[] = Lang::currency('cap').Lang::nf($_);
 
         // id
         $infobox[] = Lang::currency('id') . $this->typeId;
 
         // icon
-        if ($_ = $this->subject->getField('iconId'))
+        if ($_ = $this->subject->iconId)
         {
             $infobox[] = Util::ucFirst(Lang::game('icon')).Lang::main('colon').'[icondb='.$_.' name=true]';
             $this->extendGlobalIds(Type::ICON, $_);
@@ -83,7 +83,7 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
 
         // original name
         if (Lang::getLocale() != Locale::EN)
-            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.$this->subject->getField('name_loc0').'[/copy][/li]';
+            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.($this->subject->name)(Locale::EN).'[/copy][/li]';
 
         if ($infobox)
             $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0');
@@ -93,7 +93,7 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
         /* Main Content */
         /****************/
 
-        $hi = $this->subject->getJSGlobals()[Type::CURRENCY][$this->typeId]['icon'];
+        $hi = $this->subject->getJSGlobal()[Type::CURRENCY][$this->typeId]['icon'];
         if ($hi[0] == $hi[1])
             unset($hi[1]);
 
@@ -103,8 +103,8 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
             BUTTON_LINKS   => true
         );
 
-        if ($_ = $this->subject->getField('description', true))
-            $this->extraText = new Markup($_, ['dbpage' => true, 'allow' => Markup::CLASS_ADMIN], 'text-generic');
+        if (!$this->subject->description->isEmpty())
+            $this->extraText = new Markup($this->subject->description, ['dbpage' => true, 'allow' => Markup::CLASS_ADMIN], 'text-generic');
 
 
         /**************/
@@ -147,7 +147,7 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
                 $vendors = $itemObj->getExtendedCost()[$_relItemId];
                 $this->extendGlobalData($itemObj->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
-                $soldBy = new CreatureList(array(['id', array_keys($vendors)]));
+                $soldBy = new CreatureSet(array(['id', array_keys($vendors)]));
                 if (!$soldBy->error)
                 {
                     $sbData    = $soldBy->getListviewData();
@@ -192,7 +192,7 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
                         'id'         => 'sold-by-npc',
                         'extraCols'  => $extraCols,
                         'hiddenCols' => ['level', 'type']
-                    ), CreatureList::$brickFile));
+                    ), Creature::$brickFile));
                 }
             }
         }
