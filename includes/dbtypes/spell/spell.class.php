@@ -255,13 +255,13 @@ class Spell extends DBType
 
     public const /* string */ QUERY_BASE = 'SELECT s.*, s.`id` AS ARRAY_KEY FROM ::spell s';
     public const /* array  */ QUERY_OPTS = array(
-                        's'   => [['src', 'sr', 'ic', 'ica']],  //  6: Type::SPELL
-                        'nml' => ['j' => ['::spell_search nml ON nml.`id` = s.`id` AND nml.`locale` = DB_LOC_I']],
-                        'ic'  => ['j' => ['::icons ic  ON ic.`id`  = s.`iconId`',    true], 's' => ', ic.`name` AS "icon"'],
-                        'ica' => ['j' => ['::icons ica ON ica.`id` = s.`iconIdAlt`', true], 's' => ', ica.`name` AS "iconAlt"'],
-                        'sr'  => ['j' => ['::spellrange sr ON sr.`id` = s.`rangeId`'], 's' => ', sr.`rangeMinHostile`, sr.`rangeMinFriend`, sr.`rangeMaxHostile`, sr.`rangeMaxFriend`, sr.`name_loc0` AS "rangeText_loc0", sr.`name_loc2` AS "rangeText_loc2", sr.`name_loc3` AS "rangeText_loc3", sr.`name_loc4` AS "rangeText_loc4", sr.`name_loc6` AS "rangeText_loc6", sr.`name_loc8` AS "rangeText_loc8"'],
-                        'src' => ['j' => ['::source src ON `type` = 6 AND `typeId` = s.`id`', true], 's' => ', `moreType`, `moreTypeId`, `moreZoneId`, `moreMask`, `src1`, `src2`, `src3`, `src4`, `src5`, `src6`, `src7`, `src8`, `src9`, `src10`, `src11`, `src12`, `src13`, `src14`, `src15`, `src16`, `src17`, `src18`, `src19`, `src20`, `src21`, `src22`, `src23`, `src24`']
-                    );
+        's'   => [['src', 'sr', 'ic', 'ica']],              //  6: Type::SPELL
+        'nml' => ['j' => ['::spell_search nml ON nml.`id` = s.`id` AND nml.`locale` = DB_LOC_I']],
+        'ic'  => ['j' => ['::icons ic  ON ic.`id`  = s.`iconId`',    true], 's' => ', ic.`name` AS "icon"'],
+        'ica' => ['j' => ['::icons ica ON ica.`id` = s.`iconIdAlt`', true], 's' => ', ica.`name` AS "iconAlt"'],
+        'sr'  => ['j' => ['::spellrange sr ON sr.`id` = s.`rangeId`'], 's' => ', sr.`rangeMinHostile`, sr.`rangeMinFriend`, sr.`rangeMaxHostile`, sr.`rangeMaxFriend`, sr.`name_loc0` AS "rangeText_loc0", sr.`name_loc2` AS "rangeText_loc2", sr.`name_loc3` AS "rangeText_loc3", sr.`name_loc4` AS "rangeText_loc4", sr.`name_loc6` AS "rangeText_loc6", sr.`name_loc8` AS "rangeText_loc8"'],
+        'src' => ['j' => ['::source src ON `type` = 6 AND `typeId` = s.`id`', true], 's' => ', `moreType`, `moreTypeId`, `moreZoneId`, `moreMask`, `src1`, `src2`, `src3`, `src4`, `src5`, `src6`, `src7`, `src8`, `src9`, `src10`, `src11`, `src12`, `src13`, `src14`, `src15`, `src16`, `src17`, `src18`, `src19`, `src20`, `src21`, `src22`, `src23`, `src24`']
+    );
 
     public function __construct(int|array $initData, array $extraOpts = [], bool $calcTotal = false)
     {
@@ -303,44 +303,19 @@ class Spell extends DBType
 
         $this->skillLines = $sl;
 
-        // assign attributes
-        $fields = ['attributes', 'attributesEx', 'attributesExB', 'attributesExC', 'attributesExD', 'attributesExE', 'attributesExF', 'attributesExG'];
-        $attr   = [];
-        foreach ($fields as $i => $f)
-        {
-            $attr[$i] = $initData[$f];
-            unset($initData[$f]);
-        }
-
-        $this->attributes = $attr;
+        // attributes
+        $this->attributes = [$initData['attributes0'], $initData['attributes1'], $initData['attributes2'], $initData['attributes3'], $initData['attributes4'], $initData['attributes5'], $initData['attributes6'], $initData['attributes7']];
 
         // tools
-        $t = $tc = [];
-        for ($i = 1; $i < 3; $i++)
-        {
-            $t[]  = $initData['tool'.$i];
-            $tc[] = $initData['toolCategory'.$i];
-            unset($initData['tool'.$i], $initData['toolCategory'.$i]);
-        }
-
-        $this->tool = $t;
-        $this->toolCategory = $tc;
+        $this->tool         = [$initData['tool1'],         $initData['tool2']];
+        $this->toolCategory = [$initData['toolCategory1'], $initData['toolCategory2']];
 
         // reagents
-        $r = $rc = [];
-        for ($i = 1; $i < 9; $i++)
-        {
-            $r[]  = $initData['reagent'.$i];
-            $rc[] = $initData['reagentCount'.$i];
-            unset($initData['reagent'.$i], $initData['reagentCount'.$i]);
-        }
-
-        $this->reagent = $r;
-        $this->reagentCount = $rc;
+        $this->reagent      = [$initData['reagent1'],     $initData['reagent2'],     $initData['reagent3'],     $initData['reagent4'],     $initData['reagent5'],     $initData['reagent6'],     $initData['reagent7'],     $initData['reagent8']];
+        $this->reagentCount = [$initData['reagentCount1'],$initData['reagentCount2'],$initData['reagentCount3'],$initData['reagentCount4'],$initData['reagentCount5'],$initData['reagentCount6'],$initData['reagentCount7'],$initData['reagentCount8']];
 
         // spellFamilyFlags
         $this->spellFamilyFlags = [$initData['spellFamilyFlags1'], $initData['spellFamilyFlags2'], $initData['spellFamilyFlags3']];
-        unset($initData['spellFamilyFlags1'], $initData['spellFamilyFlags2'], $initData['spellFamilyFlags3']);
 
         $effBuff = [];
         foreach ($initData as $k => $v)
@@ -377,6 +352,353 @@ class Spell extends DBType
         foreach ($effBuff as $k => $v)
             if (property_exists($this, $k))
                 $this->$k = $v;
+    }
+
+    /**
+     * @param int $addInfoMask
+     * * `0x0080 - LISTVIEWINFO_MODEL`:
+     */
+    public function getListviewRow(int $addInfoMask = 0x0) : array
+    {
+        $data = [];
+
+        $quality = ($this->cuFlags & SPELL_CU_QUALITY_MASK) >> 8;
+        $talent  = $this->cuFlags & (SPELL_CU_TALENT | SPELL_CU_TALENTSPELL) && $this->spellLevel <= 1;
+
+        $data = array(
+            'id'           => $this->id,
+            'name'         => ($quality ?: '@').$this->name,
+            'icon'         => $this->iconAlt ?: $this->icon,
+            'level'        => $talent ? $this->talentLevel : $this->spellLevel,
+            'school'       => $this->schoolMask,
+            'cat'          => $this->typeCat,
+            'trainingcost' => $this->trainingCost,
+            'skill'        => count($this->skillLines) > 4 ? array_splice($this->skillLines, 3, replacement: -1) : $this->skillLines, // display max 4 skillLines (fills max three lines in listview)
+            'reagents'     => array_values($this->getReagents()),
+            'source'       => []
+         // 'talentspec'   => $this->skillLines[0]      not used: g_chr_specs has the wrong structure for it; also setting .cat and .type does the same
+        );
+
+        // Proficiencies
+        if ($this->typeCat == -11)
+            foreach (self::PROFICIENCY_CATEGORY as $cat => $type)
+                if (in_array($this->skillLines[0], self::SKILLLINE_CATEGORY[$cat]))
+                    $data['type'] = $type;
+
+        // creates item
+        foreach ($this->canCreateItem() as $idx)
+        {
+            $max = $this->effectDieSides[$idx] + $this->effectBasePoints[$idx];
+            $min = $this->effectDieSides[$idx] > 1 ? 1 : $max;
+
+            $data['creates'] = [$this->effectCreateItemId[$idx], $min, $max];
+            break;
+        }
+
+        // Profession
+        if (in_array($this->typeCat, [9, 11]))
+        {
+            if ($la = $this->learnedAt)
+                $data['learnedat'] = $la;
+            else if (($la = $this->reqSkillLevel) > 1)
+                $data['learnedat'] = $la;
+
+            $data['colors'] = $this->getSkillBreakpoints();
+        }
+
+        // glyph
+        if ($this->typeCat == -13)
+            $data['glyphtype'] = $this->cuFlags & SPELL_CU_GLYPH_MAJOR ? 1 : 2;
+
+        if (!$this->rank->isEmpty())
+            $data['rank'] = $this->rank;
+
+        if ($mask = $this->reqClassMask)
+            $data['reqclass'] = $mask;
+
+        if ($mask = $this->reqRaceMask)
+            $data['reqrace'] = $mask;
+
+        return $data;
+    }
+
+    public function getJSGlobal(int $addMask = GLOBALINFO_SELF, ?array &$extra = []) : array
+    {
+        $data  = [];
+
+        if ($addMask & GLOBALINFO_RELATED)
+        {
+            // reagents
+            foreach ($this->getReagents() as $iId => $_)
+                $data[Type::ITEM][$iId] = $iId;
+
+            // created items
+            foreach ($this->canCreateItem() as $effIdx)
+                $data[Type::ITEM][$this->effectCreateItemId[$effIdx]] = $this->effectCreateItemId[$effIdx];
+        }
+
+        if ($addMask & GLOBALINFO_RELATED)
+        {
+            foreach (ChrClass::fromMask($this->reqClassMask) as $cId)
+                $data[Type::CHR_CLASS][$cId] = $cId;
+
+            foreach (ChrRace::fromMask($this->reqRaceMask) as $rId)
+                $data[Type::CHR_RACE][$rId] = $rId;
+
+            // play sound effect
+            for ($i = 0; $i < 3; $i++)
+                if ($this->effectId[$i] == SPELL_EFFECT_PLAY_SOUND || $this->effectId[$i] == SPELL_EFFECT_PLAY_MUSIC)
+                    $data[Type::SOUND][$this->effectMiscValue[$i]] = $this->effectMiscValue[$i];
+        }
+
+        if ($addMask & GLOBALINFO_SELF)
+        {
+            $data[Type::SPELL][$this->id] = array(
+                'icon' => $this->iconAlt ?: $this->icon,
+                'name' => $this->name
+            );
+
+            if (in_array($this->typeCat, [-5, -6, 9, 11]))
+                $data[Type::SPELL][$this->id]['completion_category'] = $this->typeCat;
+        }
+
+        if ($addMask & GLOBALINFO_EXTRA)
+        {
+            $spells = $buffSpells = [];
+
+            $buff = $this->renderBuff(MAX_LEVEL, buffSpells: $buffSpells);
+            $tTip = $this->renderTooltip(MAX_LEVEL, ttSpells: $spells);
+
+            foreach ($spells as $relId => $_)
+                $data[Type::SPELL][$relId] ??= $relId;
+
+            foreach ($buffSpells as $relId => $_)
+                $data[Type::SPELL][$relId] ??= $relId;
+
+            $extra[$this->id] = array(
+             // 'id'         => $this->id,
+                'tooltip'    => $tTip,
+                'buff'       => $buff ?: null,
+                'spells'     => $spells,
+                'buffspells' => $buffSpells ?: null
+            );
+        }
+
+        return $data;
+    }
+
+    public function getSourceData() : array
+    {
+        return array(
+            'n'    => $this->name,
+            't'    => Type::SPELL,
+            'ti'   => $this->id,
+            's'    => $this->skillLines[0] ?? 0,
+            'c'    => $this->typeCat,
+            'icon' => $this->iconAlt ?: $this->icon,
+        );
+    }
+
+    public function renderTooltip(int $level = MAX_LEVEL, int $interactive = self::INTERACTIVE_EMBEDDED, array &$ttSpells = []) : ?string
+    {
+        $this->interactive = $interactive;
+        $this->charLevel   = $level;
+
+        // fetch needed texts
+        $name  = $this->name;
+        $rank  = $this->rank;
+        $tools = $this->getTools();
+        $cool  = $this->createCooldown();
+        $cast  = $this->createCastTime();
+        $cost  = $this->createPowerCost();
+        $range = $this->createRanges();
+
+        [$desc, $spells, ] = $this->renderText('description');
+
+        array_walk_recursive($ttSpells, fn(&$x) => $x = UIText::format($x, Lang::FMT_HTML));
+
+        // get reagents
+        $reagents = $this->getReagents();
+        foreach ($reagents as $k => [$rItemId, ])
+        {
+            if ($rName = ItemList::getName($rItemId))
+                $reagents[$k] += [2 => '<a href="?item='.$rItemId.'">'.$rName.'</a>', 3 => true];
+            else
+                $reagents[$k] += [2 => 'Item #'.$rItemId, 3 => false];
+        }
+
+        $reagents = array_reverse($reagents);
+
+        // get stances
+        $stances = '';
+        if ($this->stanceMask && !($this->attributes[2] & SPELL_ATTR2_NOT_NEED_SHAPESHIFT))
+            $stances = Lang::game('requires2').' '.Lang::getStances($this->stanceMask);
+
+        // get item requirement (skip for professions)
+        $reqItems = '';
+        if ($this->typeCat != 11)
+        {
+            $class    = $this->equippedItemClass;
+            $mask     = $this->equippedItemSubClassMask;
+            $reqItems = Lang::getRequiredItems($class, $mask);
+        }
+
+        // get created items (may need improvement)
+        $createItem = '';
+        if (in_array($this->typeCat, [9, 11]))              // only professions
+        {
+            foreach ($this->canCreateItem() as $idx)
+            {
+                // $ciEntry = new Item($this->effectCreateItemId[$idx]);
+                $ciEntry = new ItemList(array(['id', $this->effectCreateItemId[$idx]]));
+                if ($ciEntry->error)
+                    continue;
+
+                // should only create one item
+                $createItem = $ciEntry->renderTooltip(true, $this->id);
+                break;
+            }
+        }
+
+        $x = '';
+        $x .= '<table><tr><td>';
+
+        // name & rank
+        if ($rank)
+            $x .= '<table width="100%"><tr><td><b>'.$name.'</b></td><th><b class="q0">'.$rank.'</b></th></tr></table>';
+        else
+            $x .= '<b>'.$name.'</b><br />';
+
+        // powerCost & ranges
+        if ($range && $cost)
+            $x .= '<table width="100%"><tr><td>'.$cost.'</td><th>'.$range.'</th></tr></table>';
+        else if ($cost || $range)
+            $x .= $range.$cost.'<br />';
+
+        // castTime & cooldown
+        if ($cast && $cool)                                 // tabled layout
+        {
+            $x .= '<table width="100%">';
+            $x .= '<tr><td>'.$cast.'</td><th>'.$cool.'</th></tr>';
+            if ($stances)
+                $x.= '<tr><td colspan="2">'.$stances.'</td></tr>';
+
+            $x .= '</table>';
+        }
+        else if ($cast || $cool)                            // line-break layout
+        {
+            $x .= $cast.$cool;
+
+            if ($stances)
+                $x .= '<br />'.$stances;
+        }
+
+        $x .= '</td></tr></table>';
+
+        $xTmp = [];
+
+        if ($tools)
+        {
+            $_ = Lang::spell('tools').':<br/><div class="indent q1">';
+            while ($tool = array_pop($tools))
+            {
+                if (isset($tool['itemId']))
+                    $_ .= '<a href="?item='.$tool['itemId'].'">'.$tool['name'].'</a>';
+                else if (isset($tool['id']))
+                    $_ .= '<a href="?items&filter=cr=91;crs='.$tool['id'].';crv=0">'.$tool['name'].'</a>';
+                else
+                    $_ .= $tool['name'];
+
+                $_ .= empty($tools) ? '<br />' : Lang::main('comma');
+            }
+
+            $xTmp[] = $_.'</div>';
+        }
+
+        if ($reagents)
+        {
+            $_  = Lang::spell('reagents').':<br/><div class="indent q1">';
+            $_ .= Lang::concat($reagents, Lang::CONCAT_NONE, fn($x) => $x[1] > 1 ? Lang::main('parensFmt', [$x[2], $x[1]]) : $x[2]); // [itemId, qty, text]
+            $_ .= '<br />';
+
+            $xTmp[] = $_.'</div>';
+        }
+
+        if ($reqItems)
+            $xTmp[] = Lang::game('requires2').' '.$reqItems;
+
+        if ($desc)
+            $xTmp[] = '<span class="q">'.$desc.'</span>';
+
+        if ($createItem)
+            $xTmp[] = $createItem;
+
+        if ($xTmp)
+            $x .= '<table><tr><td>'.implode('<br />', $xTmp).'</td></tr></table>';
+
+        // scaling information - spellId:min:max:curr[:scalingDistribution:ScalingFlags]
+        $scalingInfo = array(
+            $this->id,
+            $this->isScaling ? ($this->baseLevel ?: 1) : 1,
+            $this->isScaling ? ($this->maxLevel ?: MAX_LEVEL) : 1
+        );
+
+        if ($this->attributes[0] & SPELL_ATTR0_LEVEL_DAMAGE_CALCULATION)
+        {
+            $scalingInfo[] = $this->spellLevel ?: 1;
+            $scalingInfo[] = 1;                             // in 4.x+ proper scaling information; for us just to flag a npc spell as level damage scaling
+            $scalingInfo[] = 1;
+        }
+        else
+            $scalingInfo[] = min($this->charLevel, $scalingInfo[2]);
+
+        $x .= '<!--?'.implode(':', $scalingInfo).'-->';
+
+        return $x;
+    }
+
+    public function renderBuff(int $level = MAX_LEVEL, int $interactive = self::INTERACTIVE_EMBEDDED, array &$buffSpells = []) : ?string
+    {
+        // doesn't have a buff
+        if ($this->buff->isEmpty())
+            return null;
+
+        $this->interactive = $interactive;
+        $this->charLevel   = $level;
+
+        $x = '<table><tr>';
+
+        // spellName
+        $x .= '<td><b class="q">'.$this->name.'</b></td>';
+
+        // dispelType (if applicable)
+        if ($this->dispelType)
+            if ($dispel = Lang::game('dt', $this->dispelType))
+                $x .= '<th><b class="q">'.$dispel.'</b></th>';
+
+        $x .= '</tr></table>';
+
+        $x .= '<table><tr><td>';
+
+        // parse Buff-Text
+        [$buffTT, $buffSpells, ] = $this->renderText('buff');
+
+        array_walk_recursive($buffSpells, fn(&$x) => $x = UIText::format($x, Lang::FMT_HTML));
+
+        $x .= $buffTT.'<br />';
+
+        // duration
+        if ($this->duration > 0 && !($this->attributes[5] & SPELL_ATTR5_HIDE_DURATION))
+            $x .= '<span class="q">'.Lang::formatTime($this->duration, 'spell', 'timeRemaining').'<span>';
+
+        $x .= '</td></tr></table>';
+
+        $min = $this->isScaling ? ($this->baseLevel ?: 1) : 1;
+        $max = $this->isScaling ? MAX_LEVEL : 1;
+        // scaling information - spellId:min:max:curr
+        $x .= '<!--?'.$this->id.':'.$min.':'.$max.':'.min($this->charLevel, $max).'-->';
+
+        return $x;
     }
 
     // required for item-comparison
@@ -608,7 +930,7 @@ class Spell extends DBType
     {
         $data = [];
 
-        for ($i = 1; $i <= 8; $i++)
+        for ($i = 0; $i < 8; $i++)
             if ($this->reagent[$i] > 0 && $this->reagentCount[$i])
                 $data[$this->reagent[$i]] = [$this->reagent[$i], $this->reagentCount[$i]];
 
@@ -620,7 +942,7 @@ class Spell extends DBType
     {
         $tools = [];
 
-        for ($i = 1; $i <= 2; $i++)
+        for ($i = 0; $i < 2; $i++)
         {
             // TotemCategory
             if ($_ = $this->toolCategory[$i])
@@ -881,6 +1203,130 @@ class Spell extends DBType
         return [$min + $maxBase, $max + $maxBase, $modMin, $modMax];
     }
 
+    public function getTalentHead() : string
+    {
+        // power cost: pct over static
+        $cost = $this->createPowerCost();
+
+        // ranges
+        $range = $this->createRanges();
+
+        // cast times
+        $cast = $this->createCastTime();
+
+        // cooldown or categorycooldown
+        $cool = $this->createCooldown();
+
+        // assemble parts
+        // upper: cost :: range
+        // lower: time :: cooldown
+        $x = '';
+
+        // upper
+        if ($cost && $range)
+            $x .= '<table width="100%"><tr><td>'.$cost.'</td><th>'.$range.'</th></tr></table>';
+        else
+            $x .= $cost.$range;
+
+        if (($cost xor $range) && ($cast xor $cool))
+            $x .= '<br />';
+
+        // lower
+        if ($cast && $cool)
+            $x .= '<table width="100%"><tr><td>'.$cast.'</td><th>'.$cool.'</th></tr></table>';
+        else
+            $x .= $cast.$cool;
+
+        return $x;
+    }
+
+    public function getSkillBreakpoints() : array
+    {
+        $gry = $this->skillLevelGrey;
+        $ylw = $this->skillLevelYellow;
+        $grn = (int)(($ylw + $gry) / 2);
+        $org = $this->learnedAt;
+
+        if ($ylw < $org)
+            $ylw = 0;
+
+        if ($grn < $org || $grn < $ylw)
+            $grn = 0;
+
+        if ($org >= $ylw || $org >= $grn || $org >= $gry)
+            $org = 0;
+
+        return $gry > 1 ? [$org, $ylw, $grn, $gry] : [];
+    }
+
+    // mostly similar to TC
+    public function getCastingTimeForBonus(bool $asDOT = false) : int
+    {
+        $areaTargets = [7, 8, 15, 16, 20, 24, 30, 31, 33, 34, 37, 54, 56, 59, 104, 108];
+        $castingTime = $this->IsChanneledSpell() ? $this->duration : ($this->castTime * 1000);
+
+        if (!$castingTime)
+            return 3500;
+
+        $castingTime = clamp($castingTime, 1500, 7000);
+
+        if ($asDOT && !$this->isChanneledSpell())
+            $castingTime = 3500;
+
+        $overTime = 0;
+        $nEffects = 0;
+        $isDirect = false;
+        $isArea   = false;
+
+        for ($i = 0; $i < 3; $i++)
+        {
+            if (in_array($this->effectId[$i], Spell::EFFECTS_DIRECT_SCALING))
+                $isDirect = true;
+            else if (in_array($this->effectAuraId[$i], Spell::AURAS_PERIODIC_SCALING))
+            {
+                if ($_ = $this->duration)
+                    $overTime = $_;
+            }
+            else if ($this->effectAuraId[$i])
+                $nEffects++;
+
+            if (in_array($this->effectImplicitTargetA[$i], $areaTargets) || in_array($this->effectImplicitTargetB[$i], $areaTargets))
+                $isArea = true;
+        }
+
+        // Combined Spells with Both Over Time and Direct Damage
+        if ($overTime > 0 && $castingTime > 0 && $isDirect)
+        {
+            // mainly for DoTs which are 3500 here otherwise
+            $originalCastTime = $this->castTime * 1000;
+            if ($this->attributes[0] & SPELL_ATTR0_REQ_AMMO)
+                $originalCastTime += 500;
+
+            $originalCastTime = clamp($originalCastTime, 1500, 7000);
+
+            // Portion to Over Time
+            $PtOT = ($overTime / 15000) / (($overTime / 15000) + ($originalCastTime / 3500));
+
+            if ($asDOT)
+                $castingTime = $castingTime * $PtOT;
+            else if ($PtOT < 1)
+                $castingTime = $castingTime * (1 - $PtOT);
+            else
+                $castingTime = 0;
+        }
+
+        // Area Effect Spells receive only half of bonus
+        if ($isArea)
+            $castingTime /= 2;
+
+        // -5% of total per any additional effect
+        $castingTime -= ($nEffects * 175);
+        if ($castingTime < 0)
+            $castingTime = 0;
+
+        return $castingTime;
+    }
+
     // at most one model per spell expected
     public function getFirstObjectMorphEntry() : ?int
     {
@@ -996,7 +1442,7 @@ class Spell extends DBType
     /**********************/
 
     // oooo..kaaayy.. parsing text in 6 or 7 easy steps
-    public function parseText(string $property = 'description', int $level = MAX_LEVEL, ?int $interactive = null) : array
+    public function renderText(string $property = 'description', int $level = MAX_LEVEL, ?int $interactive = null) : array
     {
         /*
             documentation .. sort of .. updated with https://docs.google.com/spreadsheets/d/1B8clv9zgnXij_spRhRArj7MdRotl0QpD3AjcQ-CCPFA
@@ -1114,7 +1560,7 @@ class Spell extends DBType
         if (!isset($this->$property) || !is_a($this->{$property}, LocString::class) || $this->{$property}->isEmpty())
             return ['', [], false];
 
-        $data = (string)$this->$property;
+        $data = (string)$this->{$property};
 
         // step 1: if the text is supplemented with text-variables, get and replace them
         if ($this->prepareDescriptionVariables())
@@ -1191,6 +1637,37 @@ class Spell extends DBType
             return $text;
 
         return sprintf(Util::$dfnString, $tooltip, $text);
+    }
+
+    private function prepareDescriptionVariables() : bool
+    {
+        if ($this->spellDescriptionVariableId <= 0)
+            return false;
+
+        if ($this->descriptionVariables)
+            return true;
+
+        $spellVars = DB::Aowow()->SelectCell('SELECT `vars` FROM ::spellvariables WHERE `id` = %i', $this->spellDescriptionVariableId);
+        foreach (explode("\n", $spellVars) as $sv)
+            if (preg_match('/\$(\w*\d*)=(.*)/i', trim($sv), $m))
+                $this->descriptionVariables[$m[1]] = $m[2];
+
+        // replace self-references
+        do
+        {
+            $finished = true;
+            foreach ($this->descriptionVariables as $k => $sv)
+            {
+                if (!preg_match('/\$<(\w*\d*)>/i', $sv, $m))
+                    continue;
+
+                $this->descriptionVariables[$k] = str_replace('$<'.$m[1].'>', '${'.$this->descriptionVariables[$m[1]].'}', $sv);
+                $finished = false;
+            }
+        }
+        while (!$finished);
+
+        return true;
     }
 
     private function resolveEvaluation(string $formula) : string
@@ -1687,37 +2164,6 @@ class Spell extends DBType
         return [$return, $fSuffix, $fStat];
     }
 
-    private function prepareDescriptionVariables() : bool
-    {
-        if ($this->spellDescriptionVariableId <= 0)
-            return false;
-
-        if ($this->descriptionVariables)
-            return true;
-
-        $spellVars = DB::Aowow()->SelectCell('SELECT `vars` FROM ::spellvariables WHERE `id` = %i', $this->spellDescriptionVariableId);
-        foreach (explode("\n", $spellVars) as $sv)
-            if (preg_match('/\$(\w*\d*)=(.*)/i', trim($sv), $m))
-                $this->descriptionVariables[$m[1]] = $m[2];
-
-        // replace self-references
-        do
-        {
-            $finished = true;
-            foreach ($this->descriptionVariables as $k => $sv)
-            {
-                if (!preg_match('/\$<(\w*\d*)>/i', $sv, $m))
-                    continue;
-
-                $this->descriptionVariables[$k] = str_replace('$<'.$m[1].'>', '${'.$this->descriptionVariables[$m[1]].'}', $sv);
-                $finished = false;
-            }
-        }
-        while (!$finished);
-
-        return true;
-    }
-
     private function handleFormulas(string $data, bool $topLevel = false) : string
     {
         // they are stacked recursively but should be balanced .. hf
@@ -1940,477 +2386,6 @@ class Spell extends DBType
         }
 
         return $data;
-    }
-
-    public function renderBuff(int $level = MAX_LEVEL, int $interactive = self::INTERACTIVE_EMBEDDED, array &$buffSpells = []) : ?string
-    {
-        // doesn't have a buff
-        if ($this->buff->isEmpty())
-            return null;
-
-        $this->interactive = $interactive;
-        $this->charLevel   = $level;
-
-        $x = '<table><tr>';
-
-        // spellName
-        $x .= '<td><b class="q">'.$this->name.'</b></td>';
-
-        // dispelType (if applicable)
-        if ($this->dispelType)
-            if ($dispel = Lang::game('dt', $this->dispelType))
-                $x .= '<th><b class="q">'.$dispel.'</b></th>';
-
-        $x .= '</tr></table>';
-
-        $x .= '<table><tr><td>';
-
-        // parse Buff-Text
-        [$buffTT, $buffSpells, ] = $this->parseText('buff');
-
-        array_walk_recursive($buffSpells, fn(&$x) => $x = UIText::format($x, Lang::FMT_HTML));
-
-        $x .= $buffTT.'<br />';
-
-        // duration
-        if ($this->duration > 0 && !($this->attributes[5] & SPELL_ATTR5_HIDE_DURATION))
-            $x .= '<span class="q">'.Lang::formatTime($this->duration, 'spell', 'timeRemaining').'<span>';
-
-        $x .= '</td></tr></table>';
-
-        $min = $this->isScaling ? ($this->baseLevel ?: 1) : 1;
-        $max = $this->isScaling ? MAX_LEVEL : 1;
-        // scaling information - spellId:min:max:curr
-        $x .= '<!--?'.$this->id.':'.$min.':'.$max.':'.min($this->charLevel, $max).'-->';
-
-        return $x;
-    }
-
-    public function renderTooltip(int $level = MAX_LEVEL, int $interactive = self::INTERACTIVE_EMBEDDED, array &$ttSpells = []) : ?string
-    {
-        $this->interactive = $interactive;
-        $this->charLevel   = $level;
-
-        // fetch needed texts
-        $name  = $this->name;
-        $rank  = $this->rank;
-        $tools = $this->getTools();
-        $cool  = $this->createCooldown();
-        $cast  = $this->createCastTime();
-        $cost  = $this->createPowerCost();
-        $range = $this->createRanges();
-
-        [$desc, $ttSpells, ] = $this->parseText('description');
-
-        array_walk_recursive($ttSpells, fn(&$x) => $x = UIText::format($x, Lang::FMT_HTML));
-
-        // get reagents
-        $reagents = $this->getReagents();
-        foreach ($reagents as $k => [$rItemId, ])
-        {
-            if ($rName = ItemList::getName($rItemId))
-                $reagents[$k] += [2 => '<a href="?item='.$rItemId.'">'.$rName.'</a>', 3 => true];
-            else
-                $reagents[$k] += [2 => 'Item #'.$rItemId, 3 => false];
-        }
-
-        $reagents = array_reverse($reagents);
-
-        // get stances
-        $stances = '';
-        if ($this->stanceMask && !($this->attributes[2] & SPELL_ATTR2_NOT_NEED_SHAPESHIFT))
-            $stances = Lang::game('requires2').' '.Lang::getStances($this->stanceMask);
-
-        // get item requirement (skip for professions)
-        $reqItems = '';
-        if ($this->typeCat != 11)
-        {
-            $class    = $this->equippedItemClass;
-            $mask     = $this->equippedItemSubClassMask;
-            $reqItems = Lang::getRequiredItems($class, $mask);
-        }
-
-        // get created items (may need improvement)
-        $createItem = '';
-        if (in_array($this->typeCat, [9, 11]))              // only professions
-        {
-            foreach ($this->canCreateItem() as $idx)
-            {
-                // $ciEntry = new Item($this->effectCreateItemId[$idx]);
-                $ciEntry = new ItemList(array(['id', $this->effectCreateItemId[$idx]]));
-                if ($ciEntry->error)
-                    continue;
-
-                // should only create one item
-                $createItem = $ciEntry->renderTooltip(true, $this->id);
-                break;
-            }
-        }
-
-        $x = '';
-        $x .= '<table><tr><td>';
-
-        // name & rank
-        if ($rank)
-            $x .= '<table width="100%"><tr><td><b>'.$name.'</b></td><th><b class="q0">'.$rank.'</b></th></tr></table>';
-        else
-            $x .= '<b>'.$name.'</b><br />';
-
-        // powerCost & ranges
-        if ($range && $cost)
-            $x .= '<table width="100%"><tr><td>'.$cost.'</td><th>'.$range.'</th></tr></table>';
-        else if ($cost || $range)
-            $x .= $range.$cost.'<br />';
-
-        // castTime & cooldown
-        if ($cast && $cool)                                 // tabled layout
-        {
-            $x .= '<table width="100%">';
-            $x .= '<tr><td>'.$cast.'</td><th>'.$cool.'</th></tr>';
-            if ($stances)
-                $x.= '<tr><td colspan="2">'.$stances.'</td></tr>';
-
-            $x .= '</table>';
-        }
-        else if ($cast || $cool)                            // line-break layout
-        {
-            $x .= $cast.$cool;
-
-            if ($stances)
-                $x .= '<br />'.$stances;
-        }
-
-        $x .= '</td></tr></table>';
-
-        $xTmp = [];
-
-        if ($tools)
-        {
-            $_ = Lang::spell('tools').':<br/><div class="indent q1">';
-            while ($tool = array_pop($tools))
-            {
-                if (isset($tool['itemId']))
-                    $_ .= '<a href="?item='.$tool['itemId'].'">'.$tool['name'].'</a>';
-                else if (isset($tool['id']))
-                    $_ .= '<a href="?items&filter=cr=91;crs='.$tool['id'].';crv=0">'.$tool['name'].'</a>';
-                else
-                    $_ .= $tool['name'];
-
-                $_ .= empty($tools) ? '<br />' : Lang::main('comma');
-            }
-
-            $xTmp[] = $_.'</div>';
-        }
-
-        if ($reagents)
-        {
-            $_  = Lang::spell('reagents').':<br/><div class="indent q1">';
-            $_ .= Lang::concat($reagents, Lang::CONCAT_NONE, fn($x) => $x[1] > 1 ? Lang::main('parensFmt', [$x[2], $x[1]]) : $x[2]); // [itemId, qty, text]
-            $_ .= '<br />';
-
-            $xTmp[] = $_.'</div>';
-        }
-
-        if ($reqItems)
-            $xTmp[] = Lang::game('requires2').' '.$reqItems;
-
-        if ($desc)
-            $xTmp[] = '<span class="q">'.$desc.'</span>';
-
-        if ($createItem)
-            $xTmp[] = $createItem;
-
-        if ($xTmp)
-            $x .= '<table><tr><td>'.implode('<br />', $xTmp).'</td></tr></table>';
-
-        // scaling information - spellId:min:max:curr[:scalingDistribution:ScalingFlags]
-        $scalingInfo = array(
-            $this->id,
-            $this->isScaling ? ($this->baseLevel ?: 1) : 1,
-            $this->isScaling ? ($this->maxLevel ?: MAX_LEVEL) : 1
-        );
-
-        if ($this->attributes[0] & SPELL_ATTR0_LEVEL_DAMAGE_CALCULATION)
-        {
-            $scalingInfo[] = $this->spellLevel ?: 1;
-            $scalingInfo[] = 1;                             // in 4.x+ proper scaling information; for us just to flag a npc spell as level damage scaling
-            $scalingInfo[] = 1;
-        }
-        else
-            $scalingInfo[] = min($this->charLevel, $scalingInfo[2]);
-
-        $x .= '<!--?'.implode(':', $scalingInfo).'-->';
-
-        return $x;
-    }
-
-    public function getTalentHead() : string
-    {
-        // power cost: pct over static
-        $cost = $this->createPowerCost();
-
-        // ranges
-        $range = $this->createRanges();
-
-        // cast times
-        $cast = $this->createCastTime();
-
-        // cooldown or categorycooldown
-        $cool = $this->createCooldown();
-
-        // assemble parts
-        // upper: cost :: range
-        // lower: time :: cooldown
-        $x = '';
-
-        // upper
-        if ($cost && $range)
-            $x .= '<table width="100%"><tr><td>'.$cost.'</td><th>'.$range.'</th></tr></table>';
-        else
-            $x .= $cost.$range;
-
-        if (($cost xor $range) && ($cast xor $cool))
-            $x .= '<br />';
-
-        // lower
-        if ($cast && $cool)
-            $x .= '<table width="100%"><tr><td>'.$cast.'</td><th>'.$cool.'</th></tr></table>';
-        else
-            $x .= $cast.$cool;
-
-        return $x;
-    }
-
-    public function getSkillBreakpoints() : array
-    {
-        $gry = $this->skillLevelGrey;
-        $ylw = $this->skillLevelYellow;
-        $grn = (int)(($ylw + $gry) / 2);
-        $org = $this->learnedAt;
-
-        if ($ylw < $org)
-            $ylw = 0;
-
-        if ($grn < $org || $grn < $ylw)
-            $grn = 0;
-
-        if ($org >= $ylw || $org >= $grn || $org >= $gry)
-            $org = 0;
-
-        return $gry > 1 ? [$org, $ylw, $grn, $gry] : [];
-    }
-
-    /**
-     * @param int $addInfoMask
-     * * `0x0080 - LISTVIEWINFO_MODEL`:
-     */
-    public function getListviewRow(int $addInfoMask = 0x0) : array
-    {
-        $data = [];
-
-        $quality = ($this->cuFlags & SPELL_CU_QUALITY_MASK) >> 8;
-        $talent  = $this->cuFlags & (SPELL_CU_TALENT | SPELL_CU_TALENTSPELL) && $this->spellLevel <= 1;
-
-        $data = array(
-            'id'           => $this->id,
-            'name'         => ($quality ?: '@').$this->name,
-            'icon'         => $this->iconAlt ?: $this->icon,
-            'level'        => $talent ? $this->talentLevel : $this->spellLevel,
-            'school'       => $this->schoolMask,
-            'cat'          => $this->typeCat,
-            'trainingcost' => $this->trainingCost,
-            'skill'        => count($this->skillLines) > 4 ? array_splice($this->skillLines, 3, replacement: -1) : $this->skillLines, // display max 4 skillLines (fills max three lines in listview)
-            'reagents'     => array_values($this->getReagents()),
-            'source'       => []
-         // 'talentspec'   => $this->skillLines[0]      not used: g_chr_specs has the wrong structure for it; also setting .cat and .type does the same
-        );
-
-        // Proficiencies
-        if ($this->typeCat == -11)
-            foreach (self::PROFICIENCY_CATEGORY as $cat => $type)
-                if (in_array($this->skillLines[0], self::SKILLLINE_CATEGORY[$cat]))
-                    $data['type'] = $type;
-
-        // creates item
-        foreach ($this->canCreateItem() as $idx)
-        {
-            $max = $this->effectDieSides[$idx] + $this->effectBasePoints[$idx];
-            $min = $this->effectDieSides[$idx] > 1 ? 1 : $max;
-
-            $data['creates'] = [$this->effectCreateItemId[$idx], $min, $max];
-            break;
-        }
-
-        // Profession
-        if (in_array($this->typeCat, [9, 11]))
-        {
-            if ($la = $this->learnedAt)
-                $data['learnedat'] = $la;
-            else if (($la = $this->reqSkillLevel) > 1)
-                $data['learnedat'] = $la;
-
-            $data['colors'] = $this->getSkillBreakpoints();
-        }
-
-        // glyph
-        if ($this->typeCat == -13)
-            $data['glyphtype'] = $this->cuFlags & SPELL_CU_GLYPH_MAJOR ? 1 : 2;
-
-        if (!$this->rank->isEmpty())
-            $data['rank'] = $this->rank;
-
-        if ($mask = $this->reqClassMask)
-            $data['reqclass'] = $mask;
-
-        if ($mask = $this->reqRaceMask)
-            $data['reqrace'] = $mask;
-
-        return $data;
-    }
-
-    public function getJSGlobal(int $addMask = GLOBALINFO_SELF, ?array &$extra = []) : array
-    {
-        $data  = [];
-
-        if ($addMask & GLOBALINFO_RELATED)
-        {
-            // reagents
-            foreach ($this->getReagents() as $iId => $_)
-                $data[Type::ITEM][$iId] = $iId;
-
-            // created items
-            foreach ($this->canCreateItem() as $effIdx)
-                $data[Type::ITEM][$this->effectCreateItemId[$effIdx]] = $this->effectCreateItemId[$effIdx];
-        }
-
-        if ($addMask & GLOBALINFO_RELATED)
-        {
-            foreach (ChrClass::fromMask($this->reqClassMask) as $cId)
-                $data[Type::CHR_CLASS][$cId] = $cId;
-
-            foreach (ChrRace::fromMask($this->reqRaceMask) as $rId)
-                $data[Type::CHR_RACE][$rId] = $rId;
-
-            // play sound effect
-            for ($i = 0; $i < 3; $i++)
-                if ($this->effectId[$i] == SPELL_EFFECT_PLAY_SOUND || $this->effectId[$i] == SPELL_EFFECT_PLAY_MUSIC)
-                    $data[Type::SOUND][$this->effectMiscValue[$i]] = $this->effectMiscValue[$i];
-        }
-
-        if ($addMask & GLOBALINFO_SELF)
-        {
-            $data[Type::SPELL][$this->id] = array(
-                'icon' => $this->iconAlt ?: $this->icon,
-                'name' => $this->name
-            );
-
-            if (in_array($this->typeCat, [-5, -6, 9, 11]))
-                $data[Type::SPELL][$this->id]['completion_category'] = $this->typeCat;
-        }
-
-        if ($addMask & GLOBALINFO_EXTRA)
-        {
-            $spells = $buffSpells = [];
-
-            $buff = $this->renderBuff(MAX_LEVEL, buffSpells: $buffSpells);
-            $tTip = $this->renderTooltip(MAX_LEVEL, ttSpells: $spells);
-
-            foreach ($spells as $relId => $_)
-                $data[Type::SPELL][$relId] ??= $relId;
-
-            foreach ($buffSpells as $relId => $_)
-                $data[Type::SPELL][$relId] ??= $relId;
-
-            $extra[$this->id] = array(
-             // 'id'         => $this->id,
-                'tooltip'    => $tTip,
-                'buff'       => $buff ?: null,
-                'spells'     => $spells,
-                'buffspells' => $buffSpells ?: null
-            );
-        }
-
-        return $data;
-    }
-
-    // mostly similar to TC
-    public function getCastingTimeForBonus(bool $asDOT = false) : int
-    {
-        $areaTargets = [7, 8, 15, 16, 20, 24, 30, 31, 33, 34, 37, 54, 56, 59, 104, 108];
-        $castingTime = $this->IsChanneledSpell() ? $this->duration : ($this->castTime * 1000);
-
-        if (!$castingTime)
-            return 3500;
-
-        $castingTime = clamp($castingTime, 1500, 7000);
-
-        if ($asDOT && !$this->isChanneledSpell())
-            $castingTime = 3500;
-
-        $overTime = 0;
-        $nEffects = 0;
-        $isDirect = false;
-        $isArea   = false;
-
-        for ($i = 0; $i < 3; $i++)
-        {
-            if (in_array($this->effectId[$i], Spell::EFFECTS_DIRECT_SCALING))
-                $isDirect = true;
-            else if (in_array($this->effectAuraId[$i], Spell::AURAS_PERIODIC_SCALING))
-            {
-                if ($_ = $this->duration)
-                    $overTime = $_;
-            }
-            else if ($this->effectAuraId[$i])
-                $nEffects++;
-
-            if (in_array($this->effectImplicitTargetA[$i], $areaTargets) || in_array($this->effectImplicitTargetB[$i], $areaTargets))
-                $isArea = true;
-        }
-
-        // Combined Spells with Both Over Time and Direct Damage
-        if ($overTime > 0 && $castingTime > 0 && $isDirect)
-        {
-            // mainly for DoTs which are 3500 here otherwise
-            $originalCastTime = $this->castTime * 1000;
-            if ($this->attributes[0] & SPELL_ATTR0_REQ_AMMO)
-                $originalCastTime += 500;
-
-            $originalCastTime = clamp($originalCastTime, 1500, 7000);
-
-            // Portion to Over Time
-            $PtOT = ($overTime / 15000) / (($overTime / 15000) + ($originalCastTime / 3500));
-
-            if ($asDOT)
-                $castingTime = $castingTime * $PtOT;
-            else if ($PtOT < 1)
-                $castingTime = $castingTime * (1 - $PtOT);
-            else
-                $castingTime = 0;
-        }
-
-        // Area Effect Spells receive only half of bonus
-        if ($isArea)
-            $castingTime /= 2;
-
-        // -5% of total per any additional effect
-        $castingTime -= ($nEffects * 175);
-        if ($castingTime < 0)
-            $castingTime = 0;
-
-        return $castingTime;
-    }
-
-    public function getSourceData() : array
-    {
-        return array(
-            'n'    => $this->name,
-            't'    => Type::SPELL,
-            'ti'   => $this->id,
-            's'    => $this->skillLines[0] ?? 0,
-            'c'    => $this->typeCat,
-            'icon' => $this->iconAlt ?: $this->icon,
-        );
     }
 }
 

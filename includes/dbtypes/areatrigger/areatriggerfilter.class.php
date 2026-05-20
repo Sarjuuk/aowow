@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class AreaTriggerFilter extends Filter
+class AreatriggerFilter extends Filter
 {
     protected string $type          = 'areatrigger';
 

@@ -25,6 +25,14 @@ class ArenaTeamSet extends DBTypeSet implements IListview
     {
         yield from parent::iterate();
     }
+
+    /**
+     * @return ?ArenaTeam
+     */
+    public function getEntry(string|int $id) : ?ArenaTeam
+    {
+        return parent::getEntry($id);
+    }
 }
 
 ?>

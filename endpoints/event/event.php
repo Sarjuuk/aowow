@@ -242,14 +242,14 @@ class EventBaseResponse extends TemplateResponse implements ICache
             $this->lvTabs->addListviewTab(new Listview($tabData, QuestList::$brickFile));
 
             $questItems = [];
-            foreach (array_column($quests->rewards, Type::ITEM) as $arr)
-                $questItems = array_merge($questItems, array_keys($arr));
+            if ($_ = $quests->getItemRewards())
+                $questItems = array_merge($questItems, array_keys($_));
 
-            foreach (array_column($quests->choices, Type::ITEM) as $arr)
-                $questItems = array_merge($questItems, array_keys($arr));
+            if ($_ = $quests->getItemChoices())
+                $questItems = array_merge($questItems, array_keys($_));
 
-            foreach (array_column($quests->requires, Type::ITEM) as $arr)
-                $questItems = array_merge($questItems, $arr);
+            if ($_ = $quests->getItemRequirements())
+                $questItems = array_merge($questItems, array_keys($_));
 
             if ($questItems)
                 $itemCnd[] = ['id', $questItems];

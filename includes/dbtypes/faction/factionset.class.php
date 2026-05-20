@@ -19,6 +19,14 @@ class FactionSet extends DBTypeSet
     {
         yield from parent::iterate();
     }
+
+    /**
+     * @return ?Faction
+     */
+    public function getEntry(string|int $id) : ?Faction
+    {
+        return parent::getEntry($id);
+    }
 }
 
 ?>

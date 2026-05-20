@@ -32,6 +32,14 @@ class AchievementSet extends DBTypeSet implements IListview, ISource
         yield from parent::iterate();
     }
 
+    /**
+     * @return ?Achievement
+     */
+    public function getEntry(string|int $id) : ?Achievement
+    {
+        return parent::getEntry($id);
+    }
+
     public function getSourceData(int $_id = 0) : array
     {
         $data = [];
