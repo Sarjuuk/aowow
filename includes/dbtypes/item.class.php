@@ -968,7 +968,7 @@ class ItemList extends DBTypeList
                 $itemSpells = new SpellList(array(['s.id', array_keys($itemSpellsAndTrigger)]));
                 foreach ($itemSpells->iterate() as $sId => $__)
                 {
-                    [$parsed, $_, $scaling] = $itemSpells->parseText('description', $_reqLvl > 1 ? $_reqLvl : MAX_LEVEL);
+                    [$parsed, $_, $scaling] = $itemSpells->renderText('description', $_reqLvl > 1 ? $_reqLvl : MAX_LEVEL);
                     if (!$parsed && User::isInGroup(U_GROUP_EMPLOYEE))
                         $parsed = '<span style="opacity:.75">&lt;'.$itemSpells->getField('name', true, true).'&gt;</span>';
                     else if (!$parsed)
@@ -1069,7 +1069,7 @@ class ItemList extends DBTypeList
                     $boni = new SpellList(array(['s.id', array_keys($setSpellsAndIdx)]));
                     foreach ($boni->iterate() as $__)
                     {
-                        [$parsed, $_, $scaling] = $boni->parseText('description', $_reqLvl > 1 ? $_reqLvl : MAX_LEVEL);
+                        [$parsed, $_, $scaling] = $boni->renderText('description', $_reqLvl > 1 ? $_reqLvl : MAX_LEVEL);
                         if ($scaling && $interactive)
                             $causesScaling = true;
 

@@ -19,6 +19,14 @@ class CharRaceSet extends DBTypeSet
     {
         yield from parent::iterate();
     }
+
+    /**
+     * @return ?CharRace
+     */
+    public function getEntry(string|int $id) : ?CharRace
+    {
+        return parent::getEntry($id);
+    }
 }
 
 ?>

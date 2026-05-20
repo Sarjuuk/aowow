@@ -19,6 +19,14 @@ class CurrencySet extends DBTypeSet
     {
         yield from parent::iterate();
     }
+
+    /**
+     * @return ?Currency
+     */
+    public function getEntry(string|int $id) : ?Currency
+    {
+        return parent::getEntry($id);
+    }
 }
 
 ?>

@@ -153,7 +153,7 @@ abstract class DBTypeSet
                     continue;
                 }
 
-                if ($entry->$str)
+                if ((is_array($entry->$str) && array_filter($entry->$str)) || (!is_array($entry->$str) && $entry->$str))
                 {
                     $result |= 1 << $k;
                     unset($fields[$k]);
@@ -230,7 +230,7 @@ abstract class DBTypeSet
         $data = [];
 
         foreach ($this->iterate() as $entry)
-            Util::mergeJsGlobals($data, $entry->getJSGlobal());
+            Util::mergeJsGlobals($data, $entry->getJSGlobal($addMask));
 
         return $data;
     }

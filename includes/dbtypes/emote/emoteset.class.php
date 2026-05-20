@@ -19,6 +19,14 @@ class EmoteSet extends DBTypeSet
     {
         yield from parent::iterate();
     }
+
+    /**
+     * @return ?Emote
+     */
+    public function getEntry(string|int $id) : ?Emote
+    {
+        return parent::getEntry($id);
+    }
 }
 
 ?>

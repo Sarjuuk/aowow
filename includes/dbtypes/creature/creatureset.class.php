@@ -21,9 +21,9 @@ class CreatureSet extends DBTypeSet
     }
 
     /**
-     * @return Creature creature template
+     * @return ?Creature creature template
      */
-    public function getEntry(int|string $id) : Creature
+    public function getEntry(int|string $id) : ?Creature
     {
         return parent::getEntry($id);
     }

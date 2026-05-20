@@ -465,14 +465,14 @@ class SpellsBaseResponse extends TemplateResponse implements ICache
             $tabData['_truncated'] = 1;
         }
 
-        $mask = $spells->hasSetFields('skillLines', 'trainingCost', 'reqClassMask', null, 'reagent1', 'reagent2', 'reagent3', 'reagent4', 'reagent5', 'reagent6', 'reagent7', 'reagent8');
+        $mask = $spells->hasSetFields('skillLines', 'trainingCost', 'reqClassMask', null, 'reagent');
         if (!($mask & 0x1) && $this->category && !in_array($this->category[0], [9, 11]))
             $hiddenCols[] = 'skill';
         if ($mask & 0x2)
             $visibleCols[] = 'trainingcost';
         if (($mask & 0x4) && !in_array('singleclass', $visibleCols))
             $visibleCols[] = 'classes';
-        if ($mask & 0xFF0)
+        if ($mask & 0x10)
             $visibleCols[] = 'reagents';
 
 

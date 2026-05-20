@@ -27,10 +27,10 @@ class CharRace extends DBType
 
     public const /* string */ QUERY_BASE = 'SELECT r.*, r.`id` AS ARRAY_KEY FROM ::races r';
     public const /* array */  QUERY_OPTS = array(
-                        'r'  => [['ic0', 'ic1']],
-                        'ic0' => ['j' => ['::icons ic0 ON ic0.`id` = r.`iconId0`', true], 's' => ', ic0.`name` AS "iconStringMale"'],
-                        'ic1' => ['j' => ['::icons ic1 ON ic1.`id` = r.`iconId1`', true], 's' => ', ic1.`name` AS "iconStringFemale"']
-                    );
+        'r'  => [['ic0', 'ic1']],
+        'ic0' => ['j' => ['::icons ic0 ON ic0.`id` = r.`iconId0`', true], 's' => ', ic0.`name` AS "iconStringMale"'],
+        'ic1' => ['j' => ['::icons ic1 ON ic1.`id` = r.`iconId1`', true], 's' => ', ic1.`name` AS "iconStringFemale"']
+    );
 
     public function applyInitData(array $initData) : void
     {

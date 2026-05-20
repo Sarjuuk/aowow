@@ -146,7 +146,7 @@ class ItemsetList extends DBTypeList
         foreach ($spells as &$s)
         {
             if ($setSpells->getEntry($s[1]))
-                $s[2] = $setSpells->parseText('description', $this->getField('maxReqLevel') ?: MAX_LEVEL)[0];
+                $s[2] = $setSpells->renderText('description', $this->getField('maxReqLevel') ?: MAX_LEVEL)[0];
             else
                 $s[2] = Lang::spell('unkAura', [$s[1]]);
         }

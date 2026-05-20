@@ -506,11 +506,11 @@ abstract class DBType
         return [$this->id];
     }
 
-    public function getEntry(int $id) : bool
-    {
-        // on lists forwarded array pointer to provided entry
-        return $this->id == $id;
-    }
+    // public function getEntry(int $id) : bool
+    // {
+    //     // on lists forwarded array pointer to provided entry
+    //     return $this->id == $id;
+    // }
 
     // readonly props may only be written like they were private; so force per DBType implementation
     public function applyInitData(array $initData) : void

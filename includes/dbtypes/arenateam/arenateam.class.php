@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class ArenaTeam extends DBTypeList
+class ArenaTeam extends DBType
 {
     use TrProfilerHelper;
 

@@ -23,9 +23,9 @@ class SpellSet extends DBTypeSet
     }
 
     /**
-     * @return Spell
+     * @return ?Spell
      */
-    public function getEntry(string|int $id) : Spell
+    public function getEntry(string|int $id) : ?Spell
     {
         return parent::getEntry($id);
     }
@@ -54,7 +54,6 @@ class SpellSet extends DBTypeSet
                     $idBuff[Type::OBJECT][] = $_;
             }
 
-            trigger_error('fixme', E_USER_NOTICE);
             if ($entry->moreType && $entry->moreTypeId)
                 $idBuff[$entry->moreType][] = $entry->moreTypeId;
         }
@@ -67,7 +66,9 @@ class SpellSet extends DBTypeSet
             $data[$id] = $entry->getListviewRow($addInfoMask);
 
             // Sources
-            $entry->prepareSourceMore($objBuff[$entry->moreType]->getEntry($entry->moreTypeId));
+            if ($entry->moreType && $entry->moreTypeId)
+                $entry->prepareSourceMore($objBuff[$entry->moreType]->getEntry($entry->moreTypeId));
+
             if ([$s, $sm] = $entry->getSources())
             {
                 $data[$this->id]['source'] = $s;

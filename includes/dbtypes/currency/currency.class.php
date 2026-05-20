@@ -23,9 +23,9 @@ class Currency extends DBType
 
     public const /* string */ QUERY_BASE = 'SELECT c.*, c.`id` AS ARRAY_KEY FROM ::currencies c';
     public const /* array  */ QUERY_OPTS = array(
-                        'c'  => [['ic']],
-                        'ic' => ['j' => ['::icons ic ON ic.`id` = c.`iconId`', true], 's' => ', ic.`name` AS "iconString"']
-                    );
+        'c'  => [['ic']],
+        'ic' => ['j' => ['::icons ic ON ic.`id` = c.`iconId`', true], 's' => ', ic.`name` AS "iconString"']
+    );
 
     public function applyInitData(array $initData) : void
     {

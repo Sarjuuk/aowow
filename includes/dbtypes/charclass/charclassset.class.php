@@ -19,6 +19,14 @@ class CharClassSet extends DBTypeSet
     {
         yield from parent::iterate();
     }
+
+    /**
+     * @return ?CharClass
+     */
+    public function getEntry(string|int $id) : ?CharClass
+    {
+        return parent::getEntry($id);
+    }
 }
 
 ?>

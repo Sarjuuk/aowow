@@ -309,7 +309,7 @@ class FactionBaseResponse extends TemplateResponse implements ICache
             $this->extendGlobalData($quests->getJSGlobals(GLOBALINFO_ANY));
 
             $tabData = array(
-                'data'      => $quests->getListviewData($this->typeId),
+                'data'      => $quests->getListviewData(reputationCol: $this->typeId),
                 'extraCols' => '$_'
             );
 

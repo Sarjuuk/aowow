@@ -30,10 +30,10 @@ class Faction extends DBType
 
     public const /* string */ QUERY_BASE = 'SELECT f.*, f.`parentFactionId` AS "category", f.`id` AS ARRAY_KEY FROM ::factions f';
     public const /* array  */ QUERY_OPTS = array(
-                        'f'  => [['f2']],
-                        'f2' => ['j' => ['::factions f2 ON f.`parentFactionId` = f2.`id`', true], 's' => ', IFNULL(f2.`parentFactionId`, 0) AS "category2"'],
-                        'ft' => ['j' => '::factiontemplate ft ON ft.`factionId` = f.`id`']
-                    );
+        'f'  => [['f2']],
+        'f2' => ['j' => ['::factions f2 ON f.`parentFactionId` = f2.`id`', true], 's' => ', IFNULL(f2.`parentFactionId`, 0) AS "category2"'],
+        'ft' => ['j' => '::factiontemplate ft ON ft.`factionId` = f.`id`']
+    );
 
     public function applyInitData(array $initData) : void
     {
@@ -83,7 +83,6 @@ class Faction extends DBType
     }
 
     public function renderTooltip() : ?string { return null; }
-
 }
 
 ?>

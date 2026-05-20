@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class AreaTrigger extends DBType
+class Areatrigger extends DBType
 {
     use TrSpawnHelper;
 
@@ -25,9 +25,9 @@ class AreaTrigger extends DBType
 
     public const /* string */ QUERY_BASE = 'SELECT a.*, a.id AS ARRAY_KEY FROM ::areatrigger a';
     public const /* array */  QUERY_OPTS = array(
-                        'a' => [['s']],                     // guid < 0 are teleporter targets, so exclude them here
-                        's' => ['j' => ['::spawns s ON s.`type` = 503 AND s.`typeId` = a.`id` AND s.`guid` > 0', true], 's' => ', GROUP_CONCAT(s.`areaId` ORDER BY s.`typeId` DESC) AS "areaId"', 'g' => 'a.`id`']
-                    );
+        'a' => [['s']],                                     // guid < 0 are teleporter targets, so exclude them here
+        's' => ['j' => ['::spawns s ON s.`type` = 503 AND s.`typeId` = a.`id` AND s.`guid` > 0', true], 's' => ', GROUP_CONCAT(s.`areaId` ORDER BY s.`typeId` DESC) AS "areaId"', 'g' => 'a.`id`']
+    );
 
     public function applyInitData(array $initData) : void
     {
