@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 
 class ObjectPowerResponse extends TextResponse implements ICache
 {
-    use TrCache, TrTooltip;
+    use TrCache, TrTooltip, TrSpawns;
 
     private const /* string */ POWER_TEMPLATE = '$WowheadPower.registerObject(%d, %d, %s);';
 
@@ -40,7 +40,7 @@ class ObjectPowerResponse extends TextResponse implements ICache
             $opts = array(
                 'name'    => UIText::unescapeUISequences($object->name, Lang::FMT_RAW),
                 'tooltip' => $object->renderTooltip(),
-                'map'     => $object->getSpawns(SPAWNINFO_SHORT)
+                'map'     => self::createShortSpawns($object)
             );
 
         $this->result = new Tooltip(self::POWER_TEMPLATE, $this->typeId, $opts ?? []);

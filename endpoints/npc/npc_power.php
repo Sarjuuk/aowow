@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 
 class NpcPowerResponse extends TextResponse implements ICache
 {
-    use TrCache, TrTooltip;
+    use TrCache, TrTooltip, TrSpawns;
 
     private const /* string */ POWER_TEMPLATE = '$WowheadPower.registerNpc(%d, %d, %s);';
 
@@ -40,7 +40,7 @@ class NpcPowerResponse extends TextResponse implements ICache
             $opts = array(
                 'name'    => $creature->name,
                 'tooltip' => $creature->renderTooltip(),
-                'map'     => $creature->getSpawns(SPAWNINFO_SHORT)
+                'map'     => self::createShortSpawns($creature)
             );
 
         $this->result = new Tooltip(self::POWER_TEMPLATE, $this->typeId, $opts ?? []);

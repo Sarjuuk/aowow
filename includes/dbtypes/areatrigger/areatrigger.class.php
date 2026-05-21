@@ -8,8 +8,6 @@ if (!defined('AOWOW_REVISION'))
 
 class Areatrigger extends DBType
 {
-    use TrSpawnHelper;
-
     public readonly  int        $cuFlags;
     public readonly  string     $name;                       // not localized
     public readonly  int        $type;

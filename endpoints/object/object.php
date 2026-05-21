@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 
 class ObjectBaseResponse extends TemplateResponse implements ICache
 {
-    use TrDetailPage, TrCache;
+    use TrDetailPage, TrCache, TrSpawns;
 
     protected  int    $cacheType  = CACHE_TYPE_DETAIL_PAGE;
 
@@ -294,7 +294,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
             );
 
         // get spawns and path
-        if ($spawns = $this->subject->getSpawns(SPAWNINFO_FULL))
+        if ($spawns = self::createFullSpawns($this->subject))
         {
             $this->addDataLoader('zones');
             $this->map = array(

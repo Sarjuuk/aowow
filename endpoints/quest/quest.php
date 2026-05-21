@@ -662,7 +662,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         // ..adding creature kill requirements
         if ($olNPCData && !$olNPCData->error)
         {
-            $spawns = $olNPCData->getSpawns(SPAWNINFO_QUEST);
+            $spawns = self::createQuestSpawns($olNPCData);
             $addObjectiveSpawns($spawns, function ($npcId, $npcData) use ($olNPCs, &$objectiveIdx)
             {
                 $npcData['point'] = 'requirement';          // always requirement
@@ -685,7 +685,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         // ..adding object interaction requirements
         if ($olGOData && !$olGOData->error)
         {
-            $spawns = $olGOData->getSpawns(SPAWNINFO_QUEST);
+            $spawns = self::createQuestSpawns($olGOData);
             $addObjectiveSpawns($spawns, function ($goId, $goData) use ($olGOs, &$objectiveIdx)
             {
                 foreach ($olGOs as $_goId => $go)
@@ -710,7 +710,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
             if (!$npcs->error)
             {
                 $startEndDupe = [];                         // if quest starter/ender is the same creature, we need to add it twice
-                $spawns       = $npcs->getSpawns(SPAWNINFO_QUEST);
+                $spawns       = self::createQuestSpawns($npcs);
                 $addObjectiveSpawns($spawns, function ($npcId, $npcData) use ($mapNPCs, &$startEndDupe, $itemObjectives)
                 {
                     foreach ($mapNPCs as $mn)
@@ -763,7 +763,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
             if (!$gos->error)
             {
                 $startEndDupe = [];                         // if quest starter/ender is the same object, we need to add it twice
-                $spawns       = $gos->getSpawns(SPAWNINFO_QUEST);
+                $spawns       = self::createQuestSpawns($gos);
                 $addObjectiveSpawns($spawns, function ($goId, $goData) use ($mapGOs, &$startEndDupe, $itemObjectives)
                 {
                     foreach ($mapGOs as $mgo)
@@ -1335,6 +1335,37 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                 $series[] = [$_, sprintf(Util::$dfnString, Lang::quest($section.'Desc'), Lang::quest($section)), true];
 
         return $series;
+    }
+
+    // [zoneId => [floor => [[x1, y1], [x2, y2], ..]]]      mapper on quest detail page
+    private static function createQuestSpawns(GameobjectSet|CreatureSet $set) : array
+    {
+        $spawns = DB::Aowow()->selectAssoc('SELECT `areaId`, `floor`, `typeId`, `posX`, `posY` FROM ::spawns WHERE `type` = %i AND `typeId` IN %in AND `posX` > 0 AND `posY` > 0', $set::$dbType, $set->getFoundIds());
+        $result = [];
+
+        foreach ($spawns as $s)
+        {
+            if (!($entry = $set->getEntry($s['typeId'])))
+                continue;
+
+            // zone => floor => spawnData
+            // todo (low): why is there a single set of coordinates; which one should be picked, instead of the first? gets used in ShowOnMap.buildTooltip i think
+            $result[$s['areaId']][$s['floor']][$s['typeId']] ??= array(
+                'type'          => $set::$dbType,
+                'id'            => $s['typeId'],
+                'point'         => '',                  // tbd later (start, end, requirement, sourcestart, sourceend, sourcerequirement)
+                'name'          => $entry->name,
+                'coord'         => [$s['posX'], $s['posY']],
+                'coords'        => [],
+                'objective'     => 0,                   // tbd later (1-4 set a color; id of creature this entry gives credit for)
+                'reactalliance' => $entry->A ?: 0,
+                'reacthorde'    => $entry->H ?: 0
+            );
+
+            $result[$s['areaId']][$s['floor']][$s['typeId']]['coords'][] = [$s['posX'], $s['posY']];
+        }
+
+        return $result;
     }
 }
 

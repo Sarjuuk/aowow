@@ -8,8 +8,6 @@ if (!defined('AOWOW_REVISION'))
 
 class Creature extends DBType
 {
-    use TrSpawnHelper;
-
     public readonly int       $cuFlags;
     public readonly  LocString $name;
     public readonly  LocString $subname;
@@ -132,11 +130,10 @@ class Creature extends DBType
      * * `0x0020 - LISTVIEWINFO_TAMEABLE`: include texture
      * * `0x0040 - LISTVIEWINFO_REPUTATION`: include repreward
      */
-    public function getListviewRow(int $addInfoMask = 0x0) : array
+    public function getListviewRow(int $addInfoMask = 0x0, ?array $location = null) : array
     {
-        if ($location = $this->getSpawns(SPAWNINFO_ZONES))
-            if (count($location) > 3)
-                array_splice($location, 3, replacement: -1);
+        if (count($location) > 3)
+            array_splice($location, 3, replacement: -1);
 
         $data = array(
             'family'         => $this->family,

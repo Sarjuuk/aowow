@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 
 class ItemBaseResponse extends TemplateResponse implements ICache
 {
-    use TrDetailPage, TrCache;
+    use TrDetailPage, TrCache, TrSpawns;
 
     protected  int    $cacheType   = CACHE_TYPE_DETAIL_PAGE;
 
@@ -482,7 +482,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                     if (!$fishedIn->error)
                     {
                         // show mapper for fishing locations
-                        if ($nodeSpawns = $fishedIn->getSpawns(SPAWNINFO_FULL, true, true, true, true))
+                        if ($nodeSpawns = self::createFullSpawns($fishedIn, true, true, true, true))
                         {
                             $this->map = array(
                                 ['parent' => 'mapper-generic'], // Mapper
@@ -746,7 +746,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
             if (!$soldBy->error)
             {
                 // show mapper for vendors
-                if ($vendorSpawns = $soldBy->getSpawns(SPAWNINFO_FULL, true, true, true, true))
+                if ($vendorSpawns = self::createFullSpawns($soldBy, true, true, true, true))
                 {
                     $this->map = array(
                         ['parent' => 'mapper-generic'],     // Mapper

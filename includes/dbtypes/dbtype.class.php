@@ -145,92 +145,143 @@ interface IListview
 
     impossible := you are not keen on reading wmo data and match it to DungeonMapChunk.dbc;
 */
-trait TrSpawnHelper
+/** set of spawnpoint related aggregators */
+trait TrSpawns
 {
-    private array $spawnResult = array(
-        SPAWNINFO_FULL  => null,
-        SPAWNINFO_SHORT => null,
-        SPAWNINFO_ZONES => null,
-        SPAWNINFO_QUEST => null
-    );
-
-    private function createShortSpawns() : void             // [zoneId, floor, [[x1, y1], [x2, y2], ..]] as tooltip2 if enabled by <a rel="map" ...> or anchor #map (one area, one floor, one creature, no survivors)
+    /**
+     * for locations-column in listview
+     *
+     * @param DBTypeSet $set limited to:
+     * * `CreatureSet`
+     * * `GameobjectSet`
+     * @return array [zoneId1, zoneId2, ..] up to three. If more, then `-1` indicates omitted zones
+     */
+    public static function createZoneSpawns(GameobjectSet|CreatureSet $set) : array
     {
-        $this->spawnResult[SPAWNINFO_SHORT] = new \StdClass;
+        $result = DB::Aowow()->selectCol(
+           'SELECT `typeId` AS ARRAY_KEY, GROUP_CONCAT(`areaId` ORDER BY `n` DESC)
+            FROM (SELECT `typeId`, `areaId`, COUNT(1) AS "n" FROM ::spawns WHERE `type` = %i AND `typeId` IN %in AND `posX` > 0 AND `posY` > 0 GROUP BY `typeId`, `areaId`) x
+            GROUP BY `typeId`',
+            self::$dbType, $set->getfoundIDs()
+        ) ?: [];
 
-        // first get zone/floor with the most spawns
-        if ($res = DB::Aowow()->selectRow('SELECT `areaId`, `floor` FROM ::spawns WHERE `type` = %i AND `typeId` = %i AND `posX` > 0 AND `posY` > 0 GROUP BY `areaId`, `floor` ORDER BY COUNT(1) DESC LIMIT 1', self::$dbType, $this->id))
-        {
-            // get relevant spawn points
-            $points = DB::Aowow()->selectAssoc('SELECT `posX`, `posY` FROM ::spawns WHERE `type` = %i AND `typeId` = %i AND `areaId` = %i AND `floor` = %i AND `posX` > 0 AND `posY` > 0', self::$dbType, $this->id, $res['areaId'], $res['floor']);
-            $spawns = [];
-            foreach ($points as $p)
-                $spawns[] = [$p['posX'], $p['posY']];
+        foreach ($result as &$r)
+            $r = explode(',', $r);
 
-            $this->spawnResult[SPAWNINFO_SHORT]->zone   = $res['areaId'];
-            $this->spawnResult[SPAWNINFO_SHORT]->coords = [$res['floor'] => $spawns];
-        }
+        return $result;
     }
 
-    // for display on map (object/npc detail page)
-    private function createFullSpawns(bool $skipWPs = false, bool $skipAdmin = false, bool $hasLabel = false, bool $hasLink = false) : void
+    /**
+     * tooltip2 for spawnable entities
+     * enabled by <a rel="map" ...> or anchor #map
+     * (one area, one floor, one creature, no survivors)
+     *
+     * @param DBType $entity limited to:
+     * * `Creature`
+     * * `Gameobject`
+     * * `Sound`
+     * * `Areatrigger`
+     * @return \StdClass [zoneId, floor, [[x1, y1], [x2, y2], ..]]
+     */
+    public static function createShortSpawns(DBType $entity) : \StdClass
     {
-        $data     = [];
-        $wpSum    = [];
-        $wpIdx    = 0;
+        // first - get zone/floor with the most spawns
+        // second - get relevant spawn points
+        $result = new \StdClass;
+
+        if ($entity::$dbType == Type::NPC || $entity::$dbType == Type::OBJECT || $entity::$dbType == Type::SOUND || $entity::$dbType == Type::AREATRIGGER)
+            if ($res = DB::Aowow()->selectRow('SELECT `areaId`, `floor` FROM ::spawns WHERE `type` = %i AND `typeId` = %i AND `posX` > 0 AND `posY` > 0 GROUP BY `areaId`, `floor` ORDER BY COUNT(1) DESC LIMIT 1', $entity::$dbType, $entity->id))
+            {
+                $result->zone   = $res['areaId'];
+                $result->coords = array(
+                    $res['floor'] => DB::Aowow()->selectAssoc('SELECT `posX` AS "0", `posY` AS "1" FROM ::spawns WHERE `type` = %i AND `typeId` = %i AND `areaId` = %i AND `floor` = %i AND `posX` > 0 AND `posY` > 0', $entity::$dbType, $entity->id, $res['areaId'], $res['floor']) ?: []
+                );
+            }
+
+        return $result;
+    }
+
+    /**
+     * for display on map on detail page
+     * (for historic reasons )
+     * @param DBType|DBTypeSet $set limited to:
+     * * `Creature` `CreatureSet`
+     * * `Gameobject` `GameobjectSet`
+     * * `Sound` `SoundSet`
+     * * `Areatrigger` `AreatriggerSet`
+     * @param bool $skipWPs do not display waypoints
+     * @param bool $skipAdmin neither display admin info nor attach spawnposfix menu
+     * @param bool $hasLabel use entities name as tooltip if it would otherwise be empty
+     * @param bool $hasLink attach link to entity to pip
+     * @return array [zoneId => [floor => ['coords' => [[x, y, opts], ...], count => n]]]
+     */
+    private static function createFullSpawns(DBType|DBTypeSet $set, bool $skipWPs = false, bool $skipAdmin = false, bool $hasLabel = false, bool $hasLink = false) : array
+    {
+        // works for both Sets and Entities
+        if ($set::$dbType != Type::NPC && $set::$dbType != Type::OBJECT && $set::$dbType != Type::SOUND && $set::$dbType != Type::AREATRIGGER)
+            return [];
+
+        if ($set instanceof DBType)
+        {
+            $tmp = $set;
+            ($set = Type::newSet($set::$dbType, null))->import($tmp);
+            unset($tmp);
+        }
+
+        $result   = [];
+        $wpSum    = [];                                     // subtract from pip total later to get spawn count
+        $wpIdx    = 0;                                      // map pip color
         $worldPos = [];
         $spawns   = DB::Aowow()->selectAssoc(
            'SELECT CASE WHEN z.`type` = %i THEN 1
                         WHEN z.`type` = %i THEN 2
                         WHEN z.`type` = %i THEN 2
                         ELSE 0
-                   END AS "mapType", s.*
+                   END AS "mapType",
+                   IF (s`pathId`, -s`pathId`, s`typeId`) AS "creatureOrPath"
+                   s.*
             FROM   ::spawns s
             JOIN   ::zones z ON s.areaId = z.id
             WHERE s.`type` = %i AND s.`typeId` IN %in AND s.`posX` > 0 AND s.`posY` > 0',
             MAP_TYPE_DUNGEON_HC, MAP_TYPE_MMODE_RAID, MAP_TYPE_MMODE_RAID_HC,
-            self::$dbType, $this->getFoundIDs()
+            $set::$dbType, $set->getFoundIDs()
         ) ?: [];
 
         if (!$skipAdmin && User::isInGroup(U_GROUP_MODERATOR))
             if ($guids = array_column(array_filter($spawns, fn($x) => $x['guid'] > 0 || $x['type'] != Type::NPC), 'guid'))
-                $worldPos = WorldPosition::getForGUID(self::$dbType, ...$guids);
+                $worldPos = WorldPosition::getForGUID($set::$dbType, ...$guids);
+
+        // check, if we can attach waypoints to creature
+        // we will get a nice clusterfuck of dots if we do this for more GUIDs, than we have colors though
+        $wPoints = [];
+        $wpSum   = [];
+        if (!$skipWPs && $spawns && count($spawns) < 6 && $set::$dbType == Type::NPC)
+            $wPoints = DB::Aowow()->selectAssoc('SELECT cw.`creatureOrPath` AS ARRAY_KEY, cw.`floor` AS ARRAY_KEY2, cw.* FROM ::creature_waypoints cw WHERE cw.`creatureOrPath` = %i AND cw.`floor` = %i', array_column($spawns, 'creatureOrPath'));
 
         foreach ($spawns as $s)
         {
             $isAccessory = $s['guid'] < 0 && $s['type'] == Type::NPC;
 
-            // check, if we can attach waypoints to creature
-            // we will get a nice clusterfuck of dots if we do this for more GUIDs, than we have colors though
-            if (!$skipWPs && count($spawns) < 6 && $s['type'] == Type::NPC)
+            foreach ($wPoints[$s['creatureOrPath']][$s['floor']] ?? [] as $i => $p)
             {
-                if ($wPoints = DB::Aowow()->selectAssoc('SELECT * FROM ::creature_waypoints WHERE creatureOrPath = %i AND floor = %i', $s['pathId'] ? -$s['pathId'] : $this->id, $s['floor']))
-                {
-                    foreach ($wPoints as $i => $p)
-                    {
-                        $label = [Lang::npc('waypoint').Lang::main('colon').$p['point']];
+                $label = [Lang::npc('waypoint').Lang::main('colon').$p['point']];
 
-                        if ($p['wait'])
-                            $label[] = Lang::npc('wait').Lang::main('colon').DateTime::formatTimeElapsedFloat($p['wait']);
+                if ($p['wait'])
+                    $label[] = Lang::npc('wait').Lang::main('colon').DateTime::formatTimeElapsedFloat($p['wait']);
 
-                        $opts = array(                      // \0 doesn't get printed and tricks Util::toJSON() into handling this as a string .. i feel slightly dirty now
-                            'label' => "\0$<br /><span class=\"q0\">".implode('<br />', $label).'</span>',
-                            'type'  => $wpIdx
-                        );
+                $opts = array(                              // \0 doesn't get printed and tricks Util::toJSON() into handling this as a string .. i feel slightly dirty now
+                    'label' => "\0$<br /><span class=\"q0\">".implode('<br />', $label).'</span>',
+                    'type'  => $wpIdx
+                );
 
-                        // connective line
-                        if ($i > 0 && $wPoints[$i - 1]['areaId'] == $p['areaId'])
-                            $opts['lines'] = [[$wPoints[$i - 1]['posX'], $wPoints[$i - 1]['posY']]];
+                // connective line
+                if ($i > 0 && $wPoints[$i - 1]['areaId'] == $p['areaId'])
+                    $opts['lines'] = [[$wPoints[$i - 1]['posX'], $wPoints[$i - 1]['posY']]];
 
-                        $data[$p['areaId']][$p['floor']]['coords'][] = [$p['posX'], $p['posY'], $opts];
-                        if (empty($wpSum[$p['areaId']][$p['floor']]))
-                            $wpSum[$p['areaId']][$p['floor']] = 1;
-                        else
-                            $wpSum[$p['areaId']][$p['floor']]++;
-                    }
-                    $wpIdx++;
-                }
+                $result[$p['areaId']][$p['floor']]['coords'][] = [$p['posX'], $p['posY'], $opts];
+                $wpSum[$p['areaId']][$p['floor']] = ($wpSum[$p['areaId']][$p['floor']] ?? 0) + 1;
             }
+            $wpIdx++;
 
             $opts   = $menu = $tt = $info = [];
             $footer = '';
@@ -264,20 +315,17 @@ trait TrSpawnHelper
                 if ($s['StringId'])
                     $info[6] = 'StringId'.Lang::main('colon').$s['StringId'];
 
-                if ($s['type'] == Type::AREATRIGGER)
+                // teleporter endpoint
+                if ($s['type'] == Type::AREATRIGGER && $s['guid'] < 0)
                 {
-                    // teleporter endpoint
-                    if ($s['guid'] < 0)
-                    {
-                        $opts['type'] = 4;
-                        $info[7] = 'Teleport Destination';
-                    }
-                    else
-                    {
-                        $o = Util::O2Deg($this->orientation);
-                        $info[7] = 'Orientation'.Lang::main('colon').$o[0].'° ('.$o[1].')';
-                    }
+                    $opts['type'] = 4;
+                    $info[7] = 'Teleport Destination';
                 }
+                /* can no longer access $this .. also mostly useless, so away it goes
+                 *
+                 * [$num, $word] = Util::O2Deg($this->orientation);
+                 * $info[7] = 'Orientation'.Lang::main('colon').$num.'° ('.$word.')';
+                 */
 
                 // guid < 0 are vehicle accessories. those are moved by moving the vehicle
                 if (User::isInGroup(U_GROUP_MODERATOR) && $worldPos && !$isAccessory && isset($worldPos[$s['guid']]))
@@ -302,115 +350,39 @@ trait TrSpawnHelper
             if ($footer)
                 $tt['footer'] = $footer;
 
-            if ($tt && $this->getEntry($s['typeId']))
-                $opts['tooltip'] = [(string)$this->name => $tt];
-            else if ($hasLabel && $this->getEntry($s['typeId']))
-                $opts['label'] = $this->name;
+            /** @var Creature|Gameobject|Sound|Areatrigger $entry */
+            if ($entry = $set->getEntry($s['typeId']))
+            {
+                if ($tt)
+                    $opts['tooltip'] = [(string)$entry->name => $tt];
+                else if ($hasLabel)
+                    $opts['label'] = $entry->name;
+            }
 
             if ($hasLink)
-                $opts['url'] = '?' . Type::getFileString(self::$dbType) . '=' . $s['typeId'];
+                $opts['url'] = '?' . Type::getFileString($set::$dbType) . '=' . $s['typeId'];
 
             if ($menu)
                 $opts['menu'] = $menu;
 
-            $data[$s['areaId']] [$s['floor']] ['coords'] [] = [$s['posX'], $s['posY'], $opts];
+            $result[$s['areaId']] [$s['floor']] ['coords'] [] = [$s['posX'], $s['posY'], $opts];
         }
 
-        foreach ($data as $a => &$areas)
+        foreach ($result as $a => &$areas)
             foreach ($areas as $f => &$floor)
                 $floor['count'] = count($floor['coords']) - ($wpSum[$a][$f] ?? 0);
 
-        uasort($data, [$this, 'sortBySpawnCount']);
-        $this->spawnResult[SPAWNINFO_FULL] = $data;
+        uasort($result, self::sortBySpawnCount(...));
+
+        return $result;
     }
 
-    private function sortBySpawnCount(array $a, array $b) : int
+    private static function sortBySpawnCount(array $a, array $b) : int
     {
         $aCount = current($a)['count'];
         $bCount = current($b)['count'];
 
         return $bCount <=> $aCount;                         // sort descending
-    }
-
-    private function createZoneSpawns() : void              // [zoneId1, zoneId2, ..]             for locations-column in listview
-    {
-        $res = DB::Aowow()->selectCol(
-           'SELECT `typeId` AS ARRAY_KEY, GROUP_CONCAT(`areaId` ORDER BY `n` DESC)
-            FROM (SELECT `typeId`, `areaId`, COUNT(1) AS "n" FROM ::spawns WHERE `type` = %i AND `typeId` IN %in AND `posX` > 0 AND `posY` > 0 GROUP BY `typeId`, `areaId`) x
-            GROUP BY `typeId`',
-            self::$dbType, $this->getfoundIDs()
-        ) ?: [];
-
-        foreach ($res as &$r)
-            $r = explode(',', $r);
-
-        $this->spawnResult[SPAWNINFO_ZONES] = $res;
-    }
-
-    // TODO - move to quest endpoint (its only point of use)
-    private function createQuestSpawns() : void             // [zoneId => [floor => [[x1, y1], [x2, y2], ..]]]      mapper on quest detail page
-    {
-        if (self::$dbType == Type::SOUND)
-            return;
-
-        $res    = DB::Aowow()->selectAssoc('SELECT `areaId`, `floor`, `typeId`, `posX`, `posY` FROM ::spawns WHERE `type` = %i AND `typeId` IN %in AND `posX` > 0 AND `posY` > 0', self::$dbType, $this->getFoundIDs());
-        $spawns = [];
-        foreach ($res as $data)
-        {
-            // zone => floor => spawnData
-            // todo (low): why is there a single set of coordinates; which one should be picked, instead of the first? gets used in ShowOnMap.buildTooltip i think
-            if (!isset($spawns[$data['areaId']][$data['floor']][$data['typeId']]))
-            {
-                $spawns[$data['areaId']][$data['floor']][$data['typeId']] = array(
-                    'type'          => self::$dbType,
-                    'id'            => $data['typeId'],
-                    'point'         => '',                      // tbd later (start, end, requirement, sourcestart, sourceend, sourcerequirement)
-                    'name'          => Util::localizedString($this->templates[$data['typeId']], 'name'),
-                    'coord'         => [$data['posX'], $data['posY']],
-                    'coords'        => [[$data['posX'], $data['posY']]],
-                    'objective'     => 0,                       // tbd later (1-4 set a color; id of creature this entry gives credit for)
-                    'reactalliance' => $this->templates[$data['typeId']]['A'] ?: 0,
-                    'reacthorde'    => $this->templates[$data['typeId']]['H'] ?: 0
-                );
-            }
-            else
-                $spawns[$data['areaId']][$data['floor']][$data['typeId']]['coords'][] = [$data['posX'], $data['posY']];
-        }
-
-        $this->spawnResult[SPAWNINFO_QUEST] = $spawns;
-    }
-
-    public function getSpawns(int $mode, bool ...$info) : array|\StdClass
-    {
-        // only Creatures, GOs and SoundEmitters can be spawned
-        if (!self::$dbType || !$this->getFoundIds() || (self::$dbType != Type::NPC && self::$dbType != Type::OBJECT && self::$dbType != Type::SOUND && self::$dbType != Type::AREATRIGGER))
-            return [];
-
-        switch ($mode)
-        {
-            case SPAWNINFO_SHORT:
-                if ($this->spawnResult[SPAWNINFO_SHORT] === null)
-                    $this->createShortSpawns();
-
-                return $this->spawnResult[SPAWNINFO_SHORT];
-            case SPAWNINFO_FULL:
-                if (empty($this->spawnResult[SPAWNINFO_FULL]))
-                    $this->createFullSpawns(...$info);
-
-                return $this->spawnResult[SPAWNINFO_FULL];
-            case SPAWNINFO_ZONES:
-                if (empty($this->spawnResult[SPAWNINFO_ZONES]))
-                    $this->createZoneSpawns();
-
-                return $this->spawnResult[SPAWNINFO_ZONES][$this->id] ?? [];
-            case SPAWNINFO_QUEST:
-                if (empty($this->spawnResult[SPAWNINFO_QUEST]))
-                    $this->createQuestSpawns();
-
-                return $this->spawnResult[SPAWNINFO_QUEST];
-        }
-
-        return [];
     }
 }
 

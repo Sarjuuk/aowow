@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 
 class AreatriggerBaseResponse extends TemplateResponse implements ICache
 {
-    use TrDetailPage, TrCache;
+    use TrDetailPage, TrCache, TrSpawns;
 
     protected  int    $cacheType         = CACHE_TYPE_DETAIL_PAGE;
     protected  int    $requiredUserGroup = U_GROUP_STAFF;
@@ -67,7 +67,7 @@ class AreatriggerBaseResponse extends TemplateResponse implements ICache
         /****************/
 
         // get spawns
-        if ($spawns = $this->subject->getSpawns(SPAWNINFO_FULL))
+        if ($spawns = self::createFullSpawns($this->subject))
         {
             $this->addDataLoader('zones');
             $this->map = array(
