@@ -22,7 +22,7 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
     public array  $effects    = [];
     public string $activation = '';
 
-    private EnchantmentList $subject;
+    private Enchantment $subject;
 
     public function __construct(string $id)
     {
@@ -34,13 +34,13 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new EnchantmentList(array(['id', $this->typeId]));
+        $this->subject = new Enchantment($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('enchantment'), Lang::enchantment('notFound'));
 
-        $this->extendGlobalData($this->subject->getJSGlobals());
+        $this->extendGlobalData($this->subject->getJSGlobal());
 
-        $this->h1 = $this->subject->getField('name', true);
+        $this->h1 = $this->subject->name;
 
         $this->gPageInfo += array(
             'type'   => $this->type,
@@ -67,19 +67,19 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
         /* Infobox */
         /***********/
 
-        $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
+        $infobox = Lang::getInfoBoxForFlags($this->subject->cuFlags);
 
         // reqLevel
-        if ($_ = $this->subject->getField('requiredLevel'))
+        if ($_ = $this->subject->requiredLevel)
             $infobox[] = sprintf(Lang::game('reqLevel'), $_);
 
         // reqskill
-        if ($_ = $this->subject->getField('skillLine'))
+        if ($_ = $this->subject->skillLine)
         {
             $this->extendGlobalIds(Type::SKILL, $_);
 
             $foo = Lang::game('requires', ['&nbsp;[skill='.$_.']']);
-            if ($_ = $this->subject->getField('skillLevel'))
+            if ($_ = $this->subject->skillLevel)
                 $foo .= Lang::main('parensFmt', ['', $_]);
 
             $infobox[] = $foo;
@@ -90,7 +90,7 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
 
         // original name
         if (Lang::getLocale() != Locale::EN)
-            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.$this->subject->getField('name_loc0').'[/copy][/li]';
+            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.($this->subject->name)(Locale::EN).'[/copy][/li]';
 
         if ($infobox)
             $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0');
@@ -107,11 +107,11 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
 
         $this->effects = [];
         // 3 effects
-        for ($i = 1; $i < 4; $i++)
+        for ($i = 0; $i < 3; $i++)
         {
-            $_ty  = $this->subject->getField('type'.$i);
-            $_qty = $this->subject->getField('amount'.$i);
-            $_obj = $this->subject->getField('object'.$i);
+            $_ty  = $this->subject->type[$i];
+            $_qty = $this->subject->amount[$i];
+            $_obj = $this->subject->object[$i];
             $_tip = [];
 
             switch ($_ty)
@@ -119,7 +119,7 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
                 case ENCHANTMENT_TYPE_COMBAT_SPELL:
                 case ENCHANTMENT_TYPE_EQUIP_SPELL:
                 case ENCHANTMENT_TYPE_USE_SPELL:
-                    [$spellId, $trigger, $charges, $procChance] = $this->subject->getField('spells')[$i];
+                    [$spellId, $trigger, $charges, $procChance] = $this->subject->spells[$i];
                     $spl  = $this->subject->getRelSpell($spellId);
                     $this->effects[$i] = array(
                         'name'  => $this->fmtStaffTip(Lang::item('trigger', $trigger), 'Type: '.$_ty),
@@ -129,7 +129,7 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
                         'icon'  => new IconElement(
                             Type::SPELL,
                             $spellId,
-                            !$spl ? Util::ucFirst(Lang::game('spell')).' #'.$spellId : Util::localizedString($spl, 'name'),
+                            $spl?->name ?: Util::ucFirst(Lang::game('spell')).' #'.$spellId,
                             $charges,
                             link: !!$spl
                         )
@@ -157,7 +157,7 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
         }
 
         // activation conditions
-        if ($_ = $this->subject->getField('conditionId'))
+        if ($_ = $this->subject->conditionId)
             $this->activation = Game::getEnchantmentCondition($_);
 
 
@@ -195,11 +195,11 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
         // used by useItem
         $cnd = array(
             DB::OR,
-            [DB::AND, ['effect1Id', SpellList::EFFECTS_ENCHANTMENT], ['effect1MiscValue', $this->typeId]],
-            [DB::AND, ['effect2Id', SpellList::EFFECTS_ENCHANTMENT], ['effect2MiscValue', $this->typeId]],
-            [DB::AND, ['effect3Id', SpellList::EFFECTS_ENCHANTMENT], ['effect3MiscValue', $this->typeId]],
+            [DB::AND, ['effect1Id', Spell::EFFECTS_ENCHANTMENT], ['effect1MiscValue', $this->typeId]],
+            [DB::AND, ['effect2Id', Spell::EFFECTS_ENCHANTMENT], ['effect2MiscValue', $this->typeId]],
+            [DB::AND, ['effect3Id', Spell::EFFECTS_ENCHANTMENT], ['effect3MiscValue', $this->typeId]],
         );
-        $spellList = new SpellList($cnd);
+        $spellList = new SpellSet($cnd);
         if (!$spellList->error)
         {
             $spellData = $spellList->getListviewData();
@@ -229,22 +229,19 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
             // remove found spells if they are used by an item
             if (!$ubItems->error)
             {
-                foreach ($spellList->iterate() as $sId => $__)
+                foreach ($spellList->iterate() as $sId => $spellEntry)
                 {
                     // if Perm. Enchantment display both
-                    for ($i = 1; $i < 4; $i++)
-                        if ($spellList->getField('effect'.$i.'Id') == SPELL_EFFECT_ENCHANT_ITEM)
+                    for ($i = 0; $i < 3; $i++)
+                        if ($spellEntry->effectId[$i] == SPELL_EFFECT_ENCHANT_ITEM)
                             continue 2;
 
-                    foreach ($ubItems->iterate() as $__)
+                    foreach ($ubItems->iterate() as $itemEntry)
                     {
-                        for ($i = 1; $i < 6; $i++)
+                        if (array_search($sId, $itemEntry->spellId) !== false)
                         {
-                            if ($ubItems->getField('spellId'.$i) == $sId)
-                            {
-                                unset($spellData[$sId]);
-                                break 2;
-                            }
+                            unset($spellData[$sId]);
+                            break;
                         }
                     }
                 }
@@ -255,7 +252,7 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
                     'data' => $spellData,
                     'name' => '$LANG.tab_usedby + \' \' + LANG.types[6][0]',
                     'id'   => 'used-by-spell',
-                ), SpellList::$brickFile));
+                ), Spell::$brickFile));
         }
 
         // used by randomAttrItem
@@ -301,19 +298,10 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
 
     private function getDistinctType() : int
     {
-        $type = 0;
-        for ($i = 1; $i < 4; $i++)
-        {
-            if (!($_ = $this->subject->getField('type'.$i)))
-                continue;
-
-            if ($type && $type != $_)                       // already set
-                return 0;
-
-            $type = $_;
-        }
-
-        return $type;
+        $types = array_unique(array_filter($this->subject->type));
+        if (count($types) == 1)
+            return array_pop($types);
+        return 0;
     }
 }
 

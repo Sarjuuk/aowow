@@ -81,7 +81,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                     'quality'     => $g['quality'],
                     'icon'        => strToLower($g['icon']),
                     'enchantment' => $enchantments->getField('name', true),
-                    'jsonequip'   => $enchantments->getStatGainForCurrent(),
+                    'jsonequip'   => $enchantments->getStatGain(),
                     'colors'      => $g['colors'],
                     'expansion'   => $g['expansion'],
                     'gearscore'   => Util::getGemScore($g['itemLevel'], $g['quality'], $g['requiredSkill'] == SKILL_JEWELCRAFTING, $g['itemId'])

@@ -36,7 +36,7 @@ class EnchantmentsBaseResponse extends TemplateResponse implements ICache
         if ($this->category)
             $this->subCat = '='.implode('.', $this->category);
 
-        $this->filter = new EnchantmentListFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
+        $this->filter = new EnchantmentFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
         if ($this->filter->shouldReload)
         {
             $_SESSION['error']['fi'] = $this->filter::class;
@@ -91,7 +91,7 @@ class EnchantmentsBaseResponse extends TemplateResponse implements ICache
             'name' => Util::ucFirst(Lang::game('enchantments'))
         );
 
-        $ench = new EnchantmentList($conditions, ['calcTotal' => true]);
+        $ench = new EnchantmentSet($conditions, ['calcTotal' => true]);
 
         $tabData['data'] = $ench->getListviewData();
         $this->extendGlobalData($ench->getJSGlobals());
@@ -125,7 +125,7 @@ class EnchantmentsBaseResponse extends TemplateResponse implements ICache
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
 
-        $this->lvTabs->addListviewTab(new Listview($tabData, EnchantmentList::$brickFile, 'enchantment'));
+        $this->lvTabs->addListviewTab(new Listview($tabData, Enchantment::$brickFile, 'enchantment'));
 
         parent::generate();
     }
