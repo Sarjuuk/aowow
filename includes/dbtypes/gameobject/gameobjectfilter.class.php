@@ -6,145 +6,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class GameObjectList extends DBTypeList
-{
-    use listviewHelper, spawnHelper;
-
-    public static int    $dbType    = Type::OBJECT;
-    public static string $brickFile = 'object';
-    public static string $dataTable = '::objects';
-
-    protected string $queryBase = 'SELECT o.*, o.`id` AS ARRAY_KEY FROM ::objects o';
-    protected array  $queryOpts = array(
-                        'o'   => [['ft', 'qse']],
-                        'nml' => ['j' => ['::objects_search nml ON nml.`id` = o.`id` AND nml.`locale` = DB_LOC_I']],
-                        'ft'  => ['j' => ['::factiontemplate ft ON ft.`id` = o.`faction`', true], 's' => ', ft.`factionId`, IFNULL(ft.`A`, 0) AS "A", IFNULL(ft.`H`, 0) AS "H"'],
-                        'qse' => ['j' => ['::quests_startend qse ON qse.`type` = 2 AND qse.`typeId` = o.id', true], 's' => ', IF(MIN(qse.`method`) = 1 OR MAX(qse.`method`) = 3, 1, 0) AS "startsQuests", IF(MIN(qse.`method`) = 2 OR MAX(qse.`method`) = 3, 1, 0) AS "endsQuests"', 'g' => 'o.`id`'],
-                        'qt'  => ['j' => '::quests qt ON qse.`questId` = qt.`id`'],
-                        's'   => ['j' => '::spawns s ON s.`type` = 2 AND s.`typeId` = o.`id`']
-                    );
-
-    public function __construct(array $conditions = [], array $miscData = [])
-    {
-        parent::__construct($conditions, $miscData);
-
-        if ($this->error)
-            return;
-
-        // post processing
-        foreach ($this->iterate() as $_id => &$curTpl)
-        {
-            if (!$curTpl['name_loc'.Lang::getLocale()->value])
-                $curTpl['name_loc'.Lang::getLocale()->value] = Lang::gameObject('unnamed', [$_id]);
-
-            // unpack miscInfo
-            $curTpl['mStone']    =
-            $curTpl['capture']   =
-            $curTpl['lootStack'] = null;
-            $curTpl['spells']    = [];
-
-            if (in_array($curTpl['type'], [OBJECT_GOOBER, OBJECT_RITUAL, OBJECT_SPELLCASTER, OBJECT_FLAGSTAND, OBJECT_FLAGDROP, OBJECT_AURA_GENERATOR, OBJECT_TRAP]))
-                $curTpl['spells'] = array_combine(['onUse', 'onSuccess', 'aura', 'triggered'], [$curTpl['onUseSpell'], $curTpl['onSuccessSpell'], $curTpl['auraSpell'], $curTpl['triggeredSpell']]);
-
-            if (!$curTpl['miscInfo'])
-                continue;
-
-            switch ($curTpl['type'])
-            {
-                case OBJECT_CHEST:
-                case OBJECT_FISHINGHOLE:
-                    $curTpl['lootStack'] = explode(' ', $curTpl['miscInfo']);
-                    break;
-                case OBJECT_CAPTURE_POINT:
-                    $curTpl['capture'] = explode(' ', $curTpl['miscInfo']);
-                    break;
-                case OBJECT_MEETINGSTONE:
-                    $curTpl['mStone'] = explode(' ', $curTpl['miscInfo']);
-                    break;
-            }
-        }
-    }
-
-    public function getListviewData() : array
-    {
-        $data = [];
-        foreach ($this->iterate() as $__)
-        {
-            if ($location = $this->getSpawns(SPAWNINFO_ZONES))
-                if (count($location) > 3)
-                    array_splice($location, 3, replacement: -1);
-
-            $data[$this->id] = array(
-                'id'       => $this->id,
-                'name'     => UIText::unescapeUISequences($this->getField('name', true), Lang::FMT_RAW),
-                'type'     => $this->getField('typeCat'),
-                'location' => $location
-            );
-
-            if (!empty($this->curTpl['reqSkill']))
-                $data[$this->id]['skill'] = $this->curTpl['reqSkill'];
-
-            if ($this->curTpl['startsQuests'])
-                $data[$this->id]['hasQuests'] = 1;
-
-        }
-
-        return $data;
-    }
-
-    public function renderTooltip($interactive = false) : ?string
-    {
-        if (!$this->curTpl)
-            return null;
-
-        $x  = '<table>';
-        $x .= '<tr><td><b class="q">'.UIText::unescapeUISequences($this->getField('name', true), Lang::FMT_HTML).'</b></td></tr>';
-        if ($this->curTpl['typeCat'])
-            if ($_ = Lang::gameObject('type', $this->curTpl['typeCat']))
-                $x .= '<tr><td>'.$_.'</td></tr>';
-
-        if (isset($this->curTpl['lockId']))
-            if ($locks = Lang::getLocks($this->curTpl['lockId']))
-                foreach ($locks as $l)
-                    $x .= '<tr><td>'.Lang::game('requires', [$l]).'</td></tr>';
-
-        $x .= '</table>';
-
-        return $x;
-    }
-
-    public function getJSGlobals(int $addMask = 0) : array
-    {
-        $data = [];
-
-        foreach ($this->iterate() as $__)
-            $data[Type::OBJECT][$this->id] = ['name' => UIText::unescapeUISequences($this->getField('name', true), Lang::FMT_RAW)];
-
-        return $data;
-    }
-
-    public function getSourceData(int $id = 0) : array
-    {
-        $data = [];
-
-        foreach ($this->iterate() as $__)
-        {
-            if ($id && $id != $this->id)
-                continue;
-
-            $data[$this->id] = array(
-                'n'  => $this->getField('name', true),
-                't'  => Type::OBJECT,
-                'ti' => $this->id
-            );
-        }
-
-        return $data;
-    }
-}
-
-
-class GameObjectListFilter extends Filter
+class GameobjectFilter extends Filter
 {
     protected string $type  = 'objects';
     protected static array $enums = array(
@@ -203,7 +65,7 @@ class GameObjectListFilter extends Filter
         return null;
     }
 
-    protected function cbQuestRelation(int $cr, int $crs, string $crv, $field, $value) : ?array
+    protected function cbQuestRelation(int $cr, int $crs, string $crv, string $field, int $value) : ?array
     {
         switch ($crs)
         {

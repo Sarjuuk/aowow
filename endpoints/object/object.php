@@ -25,7 +25,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
     private array $difficulties = [];
     private int   $mapType      = 0;
 
-    private GameObjectList $subject;
+    private GameObject $subject;
 
     public function __construct(string $id)
     {
@@ -37,11 +37,11 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new GameObjectList(array(['id', $this->typeId]));
+        $this->subject = new Gameobject($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('object'), Lang::gameObject('notFound'));
 
-        $this->h1 = UIText::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_HTML);
+        $this->h1 = UIText::unescapeUISequences($this->subject->name, Lang::FMT_HTML);
 
         $this->gPageInfo += array(
             'type'   => $this->type,
@@ -54,14 +54,14 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         /* Menu Path */
         /*************/
 
-        $this->breadcrumb[] = $this->subject->getField('typeCat');
+        $this->breadcrumb[] = $this->subject->typeCat;
 
 
         /**************/
         /* Page Title */
         /**************/
 
-        array_unshift($this->title, UIText::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_RAW), Util::ucFirst(Lang::game('object')));
+        array_unshift($this->title, UIText::unescapeUISequences($this->subject->name, Lang::FMT_RAW), Util::ucFirst(Lang::game('object')));
 
 
         /**********************/
@@ -99,7 +99,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         /* Infobox */
         /***********/
 
-        $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
+        $infobox = Lang::getInfoBoxForFlags($this->subject->cuFlags);
 
         // Event (ignore events, where the object only gets removed)
         if ($_ = DB::World()->selectCol('SELECT DISTINCT ge.`eventEntry` FROM game_event ge, game_event_gameobject geg, gameobject g WHERE ge.`eventEntry` = geg.`eventEntry` AND g.`guid` = geg.`guid` AND g.`id` = %i', $this->typeId))
@@ -113,7 +113,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         }
 
         // Faction
-        if ($_ = DB::Aowow()->selectCell('SELECT `factionId` FROM ::factiontemplate WHERE `id` = %i', $this->subject->getField('faction')))
+        if ($_ = DB::Aowow()->selectCell('SELECT `factionId` FROM ::factiontemplate WHERE `id` = %i', $this->subject->faction))
         {
             $this->extendGlobalIds(Type::FACTION, $_);
             $infobox[] = Util::ucFirst(Lang::game('faction')).Lang::main('colon').'[faction='.$_.']';
@@ -126,27 +126,27 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
             -1      => 'q10',                               // q10 red
             default => 'q'                                  // q   yellow
         };
-        $infobox[] = Lang::npc('react', ['[color='.$color($this->subject->getField('A')).']A[/color] [color='.$color($this->subject->getField('H')).']H[/color]']);
+        $infobox[] = Lang::npc('react', ['[color='.$color($this->subject->A).']A[/color] [color='.$color($this->subject->H).']H[/color]']);
 
         // reqSkill +  difficulty
-        switch ($this->subject->getField('typeCat'))
+        switch ($this->subject->typeCat)
         {
             case -3:                                        // Herbalism
-                $infobox[] = Lang::game('requires', [Lang::main('parensFmt', [Lang::spell('lockType', 2), $this->subject->getField('reqSkill')])]);
-                $infobox[] = Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill(SKILL_HERBALISM, $this->subject->getField('reqSkill')));
+                $infobox[] = Lang::game('requires', [Lang::main('parensFmt', [Lang::spell('lockType', 2), $this->subject->reqSkill])]);
+                $infobox[] = Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill(SKILL_HERBALISM, $this->subject->reqSkill));
                 break;
             case -4:                                        // Mining
-                $infobox[] = Lang::game('requires', [Lang::main('parensFmt', [Lang::spell('lockType', 3), $this->subject->getField('reqSkill')])]);
-                $infobox[] = Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill(SKILL_MINING, $this->subject->getField('reqSkill')));
+                $infobox[] = Lang::game('requires', [Lang::main('parensFmt', [Lang::spell('lockType', 3), $this->subject->reqSkill])]);
+                $infobox[] = Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill(SKILL_MINING, $this->subject->reqSkill));
                 break;
             case -5:                                        // Lockpicking
-                $infobox[] = Lang::game('requires', [Lang::main('parensFmt', [Lang::spell('lockType', 1), $this->subject->getField('reqSkill')])]);
-                $infobox[] = Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill(SKILL_LOCKPICKING, $this->subject->getField('reqSkill')));
+                $infobox[] = Lang::game('requires', [Lang::main('parensFmt', [Lang::spell('lockType', 1), $this->subject->reqSkill])]);
+                $infobox[] = Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill(SKILL_LOCKPICKING, $this->subject->reqSkill));
                 break;
             default:                                        // requires key .. maybe
             {
                 $ids = $l = [];
-                $locks = Lang::getLocks($this->subject->getField('lockId'), $ids, true, Lang::FMT_MARKUP);
+                $locks = Lang::getLocks($this->subject->lockId, $ids, true, Lang::FMT_MARKUP);
 
                 foreach ($ids as $type => $typeIds)
                     $this->extendGlobalIds($type, ...$typeIds);
@@ -165,7 +165,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         }
 
         // linked trap
-        if ($_ = $this->subject->getField('linkedTrap'))
+        if ($_ = $this->subject->linkedTrap)
         {
             $this->extendGlobalIds(Type::OBJECT, $_);
             $infobox[] = Lang::gameObject('trap').Lang::main('colon').'[object='.$_.']';
@@ -174,12 +174,12 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         // trap for X (note: moved to lv-tabs)
 
         // SpellFocus
-        if ($_ = $this->subject->getField('spellFocusId'))
+        if ($_ = $this->subject->spellFocusId)
         {
             if ($sfo = DB::Aowow()->selectRow('SELECT * FROM ::spellfocusobject WHERE `id` = %i', $_))
             {
                 $n = Util::localizedString($sfo, 'name');
-                if (!is_null(GameObjectListFilter::getCriteriaIndex(50, $_)))
+                if (!is_null(GameObjectFilter::getCriteriaIndex(50, $_)))
                     $n = '[url=?objects&filter=cr=50;crs='.$_.';crv=0]'.$n.'[/url]';
 
                 $infobox[] = '[tooltip name=focus]'.Lang::gameObject('focusDesc').'[/tooltip][span class=tip tooltip=focus]'.Lang::gameObject('focus').Lang::main('colon').$n.'[/span]';
@@ -187,7 +187,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         }
 
         // lootinfo: [min, max, restock]
-        if (([$min, $max, $restock] = $this->subject->getField('lootStack')) && $min)
+        if (([$min, $max, $restock] = $this->subject->lootStack) && $min)
         {
             $buff = Lang::spell('spellModOp', 4).Lang::main('colon').Util::createNumRange($min, $max);
 
@@ -196,7 +196,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         }
 
         // meeting stone (only on type: OBJECT_MEETINGSTONE)
-        if ([$minLevel, $maxLevel, $zone] = $this->subject->getField('mStone'))
+        if ([$minLevel, $maxLevel, $zone] = $this->subject->meetingStone)
         {
             $this->extendGlobalIds(Type::ZONE, $zone);
             $m = Lang::game('meetingStone').'[zone='.$zone.']';
@@ -206,7 +206,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         }
 
         // capture area (only on type: OBJECT_CAPTURE_POINT)
-        if ([$minPlayer, $maxPlayer, $minTime, $maxTime, $radius] = $this->subject->getField('capture'))
+        if ([$minPlayer, $maxPlayer, $minTime, $maxTime, $radius] = $this->subject->capturePoint)
         {
             $buff = Lang::gameObject('capturePoint');
 
@@ -233,7 +233,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
 
         // original name
         if (Lang::getLocale() != Locale::EN)
-            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.$this->subject->getField('name_loc0').'[/copy][/li]';
+            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.($this->subject->name)(Locale::EN).'[/copy][/li]';
 
         // used in mode
         foreach ($this->difficulties as $n => $id)
@@ -246,7 +246,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
 
             // AI
             $scripts = null;
-            if ($_ = $this->subject->getField('ScriptOrAI'))
+            if ($_ = $this->subject->ScriptOrAI)
                 $scripts = ($_ == 'SmartGameObjectAI' ? 'AI' :  'Script').Lang::main('colon').$_;
 
             if ($moreAI = array_filter(array_column($spawnData, 1, 0)))
@@ -264,7 +264,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
 
             // StringId
             $stringIDs = null;
-            if ($_ = $this->subject->getField('StringId'))
+            if ($_ = $this->subject->StringId)
                 $stringIDs = 'StringID'.Lang::main('colon').$_;
 
             if ($moreStrings = array_filter(array_column($spawnData, 2, 0)))
@@ -287,7 +287,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         /****************/
 
         // pageText / book
-        if ($this->book = Game::getBook($this->subject->getField('pageTextId')))
+        if ($this->book = Game::getBook($this->subject->pageTextId))
             $this->addScript(
                 [SC_JS_FILE,  'js/Book.js'],
                 [SC_CSS_FILE, 'css/Book.css']
@@ -326,7 +326,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
 
         // Smart AI
         $sai = null;
-        if ($this->subject->getField('ScriptOrAI') == 'SmartGameObjectAI')
+        if ($this->subject->ScriptOrAI == 'SmartGameObjectAI')
         {
             $sai = new SmartAI(SmartAI::SRC_TYPE_OBJECT, $this->typeId);
             if (!$sai->prepare())                           // no smartAI found .. check per guid
@@ -353,7 +353,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         $this->redButtons  = array(
             BUTTON_WOWHEAD => true,
             BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId],
-            BUTTON_VIEW3D  => ['displayId' => $this->subject->getField('displayId'), 'type' => Type::OBJECT, 'typeId' => $this->typeId]
+            BUTTON_VIEW3D  => ['displayId' => $this->subject->displayId, 'type' => Type::OBJECT, 'typeId' => $this->typeId]
         );
 
 
@@ -379,7 +379,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
             [DB::AND, ['effect3Id', $summonEffects], ['effect3MiscValue', $this->typeId]]
         );
 
-        $summons = new SpellList($conditions);
+        $summons = new SpellSet($conditions);
         if (!$summons->error)
         {
             $this->extendGlobalData($summons->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
@@ -388,13 +388,13 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                 'data' => $summons->getListviewData(),
                 'id'   => 'summoned-by',
                 'name' => '$LANG.tab_summonedby'
-            ), SpellList::$brickFile));
+            ), Spell::$brickFile));
         }
 
         // tab: related spells
-        if ($_ = $this->subject->getField('spells'))
+        if ($_ = $this->subject->spells)
         {
-            $relSpells = new SpellList(array(['id', $_]));
+            $relSpells = new SpellSet(array(['id', $_]));
             if (!$relSpells->error)
             {
                 $this->extendGlobalData($relSpells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
@@ -409,12 +409,12 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                     'name'       => '$LANG.tab_spells',
                     'hiddenCols' => ['skill'],
                     'extraCols'  => ["\$Listview.funcBox.createSimpleCol('trigger', 'Condition', '10%', 'trigger')"]
-                ), SpellList::$brickFile));
+                ), Spell::$brickFile));
             }
         }
 
         // tab: criteria of
-        $acvs = new AchievementList(array(['ac.type', [ACHIEVEMENT_CRITERIA_TYPE_USE_GAMEOBJECT, ACHIEVEMENT_CRITERIA_TYPE_FISH_IN_GAMEOBJECT]], ['ac.value1', $this->typeId]));
+        $acvs = new AchievementSet(array(['ac.type', [ACHIEVEMENT_CRITERIA_TYPE_USE_GAMEOBJECT, ACHIEVEMENT_CRITERIA_TYPE_FISH_IN_GAMEOBJECT]], ['ac.value1', $this->typeId]));
         if (!$acvs->error)
         {
             $this->extendGlobalData($acvs->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
@@ -423,23 +423,23 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                 'data' => $acvs->getListviewData(),
                 'id'   => 'criteria-of',
                 'name' => '$LANG.tab_criteriaof'
-            ), AchievementList::$brickFile));
+            ), Achievement::$brickFile));
         }
 
         // tab: starts quest
         // tab: ends quest
-        $startEnd = new QuestList(array(['qse.type', Type::OBJECT], ['qse.typeId', $this->typeId]));
+        $startEnd = new QuestSet(array(['qse.type', Type::OBJECT], ['qse.typeId', $this->typeId]));
         if (!$startEnd->error)
         {
             $this->extendGlobalData($startEnd->getJSGlobals());
             $lvData = $startEnd->getListviewData();
             $start  = $end = [];
 
-            foreach ($startEnd->iterate() as $id => $__)
+            foreach ($startEnd->iterate() as $id => $entry)
             {
-                if ($startEnd->getField('method') & 0x1)
+                if ($entry->method & 0x1)
                     $start[] = $lvData[$id];
-                if ($startEnd->getField('method') & 0x2)
+                if ($entry->method & 0x2)
                     $end[]   = $lvData[$id];
             }
 
@@ -448,34 +448,34 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                     'data' => $start,
                     'name' => '$LANG.tab_starts',
                     'id'   => 'starts'
-                ), QuestList::$brickFile));
+                ), Quest::$brickFile));
 
             if ($end)
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data' => $end,
                     'name' => '$LANG.tab_ends',
                     'id'   => 'ends'
-                ), QuestList::$brickFile));
+                ), Quest::$brickFile));
         }
 
         // tab: related quests
-        if ($_ = $this->subject->getField('reqQuest'))
+        if ($this->subject->reqQuest)
         {
-            $relQuest = new QuestList(array(['id', $_]));
+            $relQuest = new Quest($this->subject->reqQuest);
             if (!$relQuest->error)
             {
-                $this->extendGlobalData($relQuest->getJSGlobals());
+                $this->extendGlobalData($relQuest->getJSGlobal());
 
                 $this->lvTabs->addListviewTab(new Listview(array(
-                    'data' => $relQuest->getListviewData(),
+                    'data' => [$relQuest->getListviewRow()],
                     'name' => '$LANG.tab_quests',
                     'id'   => 'quests'
-                ), QuestList::$brickFile));
+                ), Quest::$brickFile));
             }
         }
 
         // tab: contains
-        if ($_ = $this->subject->getField('lootId'))
+        if ($this->subject->lootId)
         {
             // check if loot_link entry exists (only difficulty: 1)
             if ($npcId = DB::Aowow()->selectCell('SELECT `npcId` FROM ::loot_link WHERE `objectId` = %i AND `difficulty` = 1', $this->typeId))
@@ -497,7 +497,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                     $lootEntries = array_combine(array_map(fn($x) => 1 << (2 - $x), array_keys($lootEntries)), array_values($lootEntries));
             }
             else
-                $lootEntries = [4 => $_];
+                $lootEntries = [4 => $this->subject->lootId];
 
             $goLoot = new LootByContainer();
             if ($goLoot->getByContainer(Loot::GAMEOBJECT, $lootEntries))
@@ -535,9 +535,9 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: Spell Focus for
-        if ($sfId = $this->subject->getField('spellFocusId'))
+        if ($sfId = $this->subject->spellFocusId)
         {
-            $focusSpells = new SpellList(array(Listview::DEFAULT_SIZE, ['spellFocusObject', $sfId]), ['calcTotal' => true]);
+            $focusSpells = new SpellSet(array(Listview::DEFAULT_SIZE, ['spellFocusObject', $sfId]), ['calcTotal' => true]);
             if (!$focusSpells->error)
             {
                 $tabData = array(
@@ -555,12 +555,12 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                     $tabData['_truncated'] = 1;
                 }
 
-                $this->lvTabs->addListviewTab(new Listview($tabData, SpellList::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview($tabData, Spell::$brickFile));
             }
         }
 
         // tab: trap for X
-        $trigger = new GameObjectList(array(['linkedTrap', $this->typeId]));
+        $trigger = new GameobjectSet(array(['linkedTrap', $this->typeId]));
         if (!$trigger->error)
         {
             $this->extendGlobalData($trigger->getJSGlobals());
@@ -571,7 +571,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                 'name' => Lang::gameObject('triggeredBy'),
                 'id'   => 'triggerd-by',
                 'note' => sprintf(Util::$filterResultString, '?objects=6')
-            ), GameObjectList::$brickFile));
+            ), GameObject::$brickFile));
         }
 
         // tab: see also
@@ -583,7 +583,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                 ['id', $this->typeId, '!']
             );
 
-            $saObjects = new GameObjectList($conditions);
+            $saObjects = new GameobjectSet($conditions);
             if (!$saObjects->error)
             {
                 $data = $saObjects->getListviewData();
@@ -615,12 +615,12 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                 if (isset($saE))
                     $tabData['extraCols'] = $saE;
 
-                $this->lvTabs->addListviewTab(new Listview($tabData, GameObjectList::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview($tabData, Gameobject::$brickFile));
             }
         }
 
         // tab: Same model as
-        $sameModel = new GameObjectList(array(['displayId', $this->subject->getField('displayId')], ['id', $this->typeId, '!']));
+        $sameModel = new GameObjectSet(array(['displayId', $this->subject->displayId], ['id', $this->typeId, '!']));
         if (!$sameModel->error)
         {
             $this->extendGlobalData($sameModel->getJSGlobals());
@@ -630,7 +630,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                 'data' => $sameModel->getListviewData(),
                 'name' => '$LANG.tab_samemodelas',
                 'id'   => 'same-model-as'
-            ), GameObjectList::$brickFile));
+            ), Gameobject::$brickFile));
         }
 
         // tab: condition-for
