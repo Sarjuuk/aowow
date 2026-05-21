@@ -20,12 +20,19 @@ abstract class DBTypeSet
     private array $itrStack    = [];
     private int   $resultTotal = 0;
 
-    public function __construct(array $conditions = [], array $miscData = [])
+    public function __construct(?array $conditions = [], array $miscData = [])
     {
         $query    = Type::getClassConst(static::$dbType, 'QUERY_BASE');
         $baseOpts = Type::getClassConst(static::$dbType, 'QUERY_OPTS');
         if (!$query)
             return;
+
+        // we want en empty set to import DBtypes into later on
+        if (is_null($conditions))
+        {
+            $this->error = false;
+            return;
+        }
 
         $dbQuery = new DBQuery($query, $baseOpts, $miscData['extraOpts'] ?? [], $miscData['calcTotal'] ?? false);
         if (!$dbQuery->build($conditions))
@@ -130,6 +137,23 @@ abstract class DBTypeSet
     public function getMatches() : int
     {
         return $this->resultTotal;
+    }
+
+    public function export(int ...$ids) : array
+    {
+        if (!$ids)
+            return $this->sets;
+
+        return array_filter($this->sets, fn($x) => in_array($x, $ids), ARRAY_FILTER_USE_KEY);
+    }
+
+    public function import(DBType ...$entries) : void
+    {
+        foreach ($entries as $e)
+            if ($e::$dbType == static::$dbType)
+                $this->sets[$e->id] = $e;
+
+        $this->reset();
     }
 
 

@@ -135,7 +135,7 @@ abstract class Type
         return new (self::$data[$type][self::IDX_OBJECT])($initData);
     }
 
-    public static function newSet(int $type, array $conditions = []) : ?DBTypeSet
+    public static function newSet(int $type, ?array $conditions = []) : ?DBTypeSet
     {
         if (!self::exists($type))
             return null;

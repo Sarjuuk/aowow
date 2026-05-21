@@ -1560,12 +1560,12 @@ class ItemList extends DBTypeList
             array_column($randEnchants, 'enchantId5')
         ));
 
-        $enchants = new EnchantmentList(array(['id', $enchIds]));
-        foreach ($enchants->iterate() as $eId => $_)
+        $enchants = new EnchantmentSet(array(['id', $enchIds]));
+        foreach ($enchants->iterate() as $eId => $entry)
         {
             $this->rndEnchIds[$eId] = array(
-                'text'  => $enchants->getField('name', true),
-                'stats' => $enchants->getStatGainForCurrent()
+                'text'  => $entry->name,
+                'stats' => $entry->getStatGain()
             );
         }
 
