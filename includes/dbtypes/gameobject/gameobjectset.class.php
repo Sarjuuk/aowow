@@ -8,6 +8,8 @@ if (!defined('AOWOW_REVISION'))
 
 class GameobjectSet extends DBTypeSet
 {
+    use TrSpawns;
+
     public static int $dbType = Type::OBJECT;
 
     public function __construct(array $conditions = [], array $miscData = [])
@@ -31,6 +33,18 @@ class GameobjectSet extends DBTypeSet
     public function getEntry(string|int $id) : ?Gameobject
     {
         return parent::getEntry($id);
+    }
+
+    /** returns data portion of a listview js object */
+    public function getListviewData(int $addInfoMask = 0x0) : array
+    {
+        $data = [];
+        $location = self::createZoneSpawns($this);
+
+        foreach ($this->iterate() as $id => $entry)
+            $data[$id] = $entry->getListviewRow($addInfoMask, $location[$id] ?? null);
+
+        return $data;
     }
 }
 

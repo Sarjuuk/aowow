@@ -208,11 +208,6 @@ define('LISTVIEWINFO_GUILD',                0x0400);        // old: PROFILEINFO_
 define('LISTVIEWINFO_ARENA',                0x0800);        // old: PROFILEINFO_ARENA
 define('LISTVIEWINFO_USER',                 0x1000);        // old: PROFILEINFO_USER
 
-define('SPAWNINFO_ZONES',                   1);             // not a mask, mutually exclusive
-define('SPAWNINFO_SHORT',                   2);
-define('SPAWNINFO_FULL',                    3);
-define('SPAWNINFO_QUEST',                   4);
-
 
 // Community Content
 define('CC_FLAG_STICKY',                    0x1);

@@ -8,6 +8,8 @@ if (!defined('AOWOW_REVISION'))
 
 class CreatureSet extends DBTypeSet
 {
+    use TrSpawns;
+
     public static int $dbType = Type::NPC;
 
     /**
@@ -42,6 +44,8 @@ class CreatureSet extends DBTypeSet
         if (!$this->getFoundIDs())
             return [];
 
+        $location = self::createZoneSpawns($this);
+
         if ($addInfoMask & LISTVIEWINFO_REPUTATION)
             $rewRep = DB::World()->selectCol(
                'SELECT `creature_id` AS ARRAY_KEY, `RewOnKillRepFaction1` AS ARRAY_KEY2, `RewOnKillRepValue1` FROM creature_onkill_reputation WHERE `creature_id` IN %in AND `RewOnKillRepFaction1` > 0 UNION
@@ -66,7 +70,7 @@ class CreatureSet extends DBTypeSet
             }
             else
             {
-                $data[$id] = $entry->getListviewRow($addInfoMask);
+                $data[$id] = $entry->getListviewRow($addInfoMask, $location[$id] ?? null);
 
                 if ($addInfoMask & LISTVIEWINFO_REPUTATION)
                     foreach ($rewRep[$this->id] ?? [] as $fac => $val)

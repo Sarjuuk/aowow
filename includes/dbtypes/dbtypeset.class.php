@@ -238,12 +238,12 @@ abstract class DBTypeSet
     }
 
     /** returns data portion of a listview js object */
-    public function getListviewData() : array
+    public function getListviewData(int $addInfoMask = 0x0) : array
     {
         $data = [];
 
         foreach ($this->iterate() as $id => $entry)
-            $data[$id] = $entry->getListviewRow();
+            $data[$id] = $entry->getListviewRow($addInfoMask);
 
         return $data;
     }
