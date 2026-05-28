@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class EmoteSet extends DBTypeSet
+class EmoteContainer extends DBTypeContainer
 {
     public static int $dbType = Type::EMOTE;
 

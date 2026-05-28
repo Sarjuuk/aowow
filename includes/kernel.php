@@ -116,13 +116,13 @@ spl_autoload_register(function (string $class) : void
     if (preg_match('/[^\w]/i', $class))
         return;
 
-    $dir = strtr($class, ['Set' => '', 'Filter' => '']);
+    $dir = strtr($class, ['Container' => '', 'Filter' => '']);
 
     if (file_exists('includes/dbtypes/'.$dir.'/'.$class.'.class.php'))
     {
         require_once 'includes/dbtypes/dbquery.class.php';
         require_once 'includes/dbtypes/dbtype.class.php';
-        require_once 'includes/dbtypes/dbtypeset.class.php';
+        require_once 'includes/dbtypes/dbtypecontainer.class.php';
         require_once 'includes/dbtypes/'.$dir.'/'.$class.'.class.php';
     }
 });

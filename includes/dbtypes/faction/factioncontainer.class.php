@@ -6,14 +6,14 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class AreatriggerSet extends DBTypeSet
+class FactionContainer extends DBTypeContainer
 {
-    public static int $dbType = Type::AREATRIGGER;
+    public static int $dbType = Type::FACTION;
 
     /**
      * iterate over fetched sets
      *
-     * @return \Generator<int, Areatrigger> id => areatrigger template
+     * @return \Generator<int, Faction> id => faction template
      */
     public function iterate() : \Generator
     {
@@ -21,9 +21,9 @@ class AreatriggerSet extends DBTypeSet
     }
 
     /**
-     * @return ?Areatrigger
+     * @return ?Faction
      */
-    public function getEntry(string|int $id) : ?Areatrigger
+    public function getEntry(string|int $id) : ?Faction
     {
         return parent::getEntry($id);
     }

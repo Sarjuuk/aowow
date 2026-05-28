@@ -6,14 +6,14 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class CharRaceSet extends DBTypeSet
+class CharClassContainer extends DBTypeContainer
 {
-    public static int $dbType = Type::CHR_RACE;
+    public static int $dbType = Type::CHR_CLASS;
 
     /**
      * iterate over fetched sets
      *
-     * @return \Generator<int, CharRace> id => character race template
+     * @return \Generator<int, CharClass> id => character class template
      */
     public function iterate() : \Generator
     {
@@ -21,9 +21,9 @@ class CharRaceSet extends DBTypeSet
     }
 
     /**
-     * @return ?CharRace
+     * @return ?CharClass
      */
-    public function getEntry(string|int $id) : ?CharRace
+    public function getEntry(string|int $id) : ?CharClass
     {
         return parent::getEntry($id);
     }

@@ -1560,7 +1560,7 @@ class ItemList extends DBTypeList
             array_column($randEnchants, 'enchantId5')
         ));
 
-        $enchants = new EnchantmentSet(array(['id', $enchIds]));
+        $enchants = new EnchantmentContainer(array(['id', $enchIds]));
         foreach ($enchants->iterate() as $eId => $entry)
         {
             $this->rndEnchIds[$eId] = array(

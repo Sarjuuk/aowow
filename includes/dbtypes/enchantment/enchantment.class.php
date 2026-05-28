@@ -32,9 +32,9 @@ class Enchantment extends DBType
     public static string $brickFile = 'enchantment';
     public static string $dataTable = '::itemenchantment';
 
-    private ?SpellSet $relSpells  = null;
-    private  array    $jsonStats  = [];
-    private  array    $triggerIds = [];
+    private ?SpellContainer $relSpells  = null;
+    private  array          $jsonStats  = [];
+    private  array          $triggerIds = [];
 
     public const /* string */ QUERY_BASE = 'SELECT ie.*, ie.id AS ARRAY_KEY FROM ::itemenchantment ie';
     public const /* array  */ QUERY_OPTS = array(           // 502 => Type::ENCHANTMENT
@@ -179,7 +179,7 @@ class Enchantment extends DBType
     public function setRelSpells(Spell ...$entries) : void
     {
         if (!$this->relSpells)
-            $this->relSpells = new SpellSet(null);
+            $this->relSpells = new SpellContainer(null);
 
         $this->relSpells->import(...$entries);
     }
@@ -192,7 +192,7 @@ class Enchantment extends DBType
         if (!($spellIds = array_column($this->spells, 0)))
             return false;
 
-        $this->relSpells = new SpellSet(array(['id', $spellIds]));
+        $this->relSpells = new SpellContainer(array(['id', $spellIds]));
         return $this->relSpells->error;
     }
 }

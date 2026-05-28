@@ -45,11 +45,14 @@ trait TrSourceHelper
     private ?array $source     = null;
     private ?array $sourceMore = null;
 
-    private function initSources(array $initData) : void
+    private function initSources(array &$initData) : void
     {
         $src = [];
         for ($i = SRC_CRAFTED; $i < MAX_SOURCES; $i++)
+        {
             $src[$i][] = $initData['src'.$i] ?: null;
+            unset($initData['src'.$i]);
+        }
 
         $this->sources = $src;
     }
@@ -151,12 +154,12 @@ trait TrSpawns
     /**
      * for locations-column in listview
      *
-     * @param DBTypeSet $set limited to:
+     * @param DBTypeContainer $set limited to:
      * * `CreatureSet`
      * * `GameobjectSet`
      * @return array [zoneId1, zoneId2, ..] up to three. If more, then `-1` indicates omitted zones
      */
-    public static function createZoneSpawns(GameobjectSet|CreatureSet $set) : array
+    public static function createZoneSpawns(GameobjectContainer|CreatureContainer $set) : array
     {
         $result = DB::Aowow()->selectCol(
            'SELECT `typeId` AS ARRAY_KEY, GROUP_CONCAT(`areaId` ORDER BY `n` DESC)
@@ -204,7 +207,7 @@ trait TrSpawns
     /**
      * for display on map on detail page
      * (for historic reasons )
-     * @param DBType|DBTypeSet $set limited to:
+     * @param DBType|DBTypeContainer $set limited to:
      * * `Creature` `CreatureSet`
      * * `Gameobject` `GameobjectSet`
      * * `Sound` `SoundSet`
@@ -215,7 +218,7 @@ trait TrSpawns
      * @param bool $hasLink attach link to entity to pip
      * @return array [zoneId => [floor => ['coords' => [[x, y, opts], ...], count => n]]]
      */
-    private static function createFullSpawns(DBType|DBTypeSet $set, bool $skipWPs = false, bool $skipAdmin = false, bool $hasLabel = false, bool $hasLink = false) : array
+    private static function createFullSpawns(DBType|DBTypeContainer $set, bool $skipWPs = false, bool $skipAdmin = false, bool $hasLabel = false, bool $hasLink = false) : array
     {
         // works for both Sets and Entities
         if ($set::$dbType != Type::NPC && $set::$dbType != Type::OBJECT && $set::$dbType != Type::SOUND && $set::$dbType != Type::AREATRIGGER)
@@ -224,7 +227,7 @@ trait TrSpawns
         if ($set instanceof DBType)
         {
             $tmp = $set;
-            ($set = Type::newSet($set::$dbType, null))->import($tmp);
+            ($set = Type::newContainer($set::$dbType, null))->import($tmp);
             unset($tmp);
         }
 

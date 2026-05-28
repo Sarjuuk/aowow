@@ -81,7 +81,7 @@ class AreatriggersBaseResponse extends TemplateResponse implements ICache
             $conditions[] = $_;
 
         $tabData = [];
-        $trigger = new AreaTriggerSet($conditions, ['calcTotal' => true]);
+        $trigger = new AreaTriggerContainer($conditions, ['calcTotal' => true]);
         if (!$trigger->error)
         {
             $tabData['data'] = $trigger->getListviewData();

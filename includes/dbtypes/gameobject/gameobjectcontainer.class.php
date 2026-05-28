@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class GameobjectSet extends DBTypeSet
+class GameobjectContainer extends DBTypeContainer
 {
     use TrSpawns;
 

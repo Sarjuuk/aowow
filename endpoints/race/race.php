@@ -153,7 +153,7 @@ class RaceBaseResponse extends TemplateResponse implements ICache
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
 
         // tab: classes
-        $classes = new CharClassSet(array(['racemask', $ra->toMask(), '&']));
+        $classes = new CharClassContainer(array(['racemask', $ra->toMask(), '&']));
         if (!$classes->error)
         {
             $this->extendGlobalData($classes->getJSGlobals());
@@ -268,7 +268,7 @@ class RaceBaseResponse extends TemplateResponse implements ICache
         if ($extraCrt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` IN %in AND `value2` = %i', [ACHIEVEMENT_CRITERIA_DATA_TYPE_S_PLAYER_CLASS_RACE, ACHIEVEMENT_CRITERIA_DATA_TYPE_T_PLAYER_CLASS_RACE], $this->typeId))
             $conditions = [DB::OR, $conditions, ['ac.id', $extraCrt]];
 
-        $crtOf = new AchievementSet($conditions);
+        $crtOf = new AchievementContainer($conditions);
         if (!$crtOf->error)
         {
             $this->extendGlobalData($crtOf->getJSGlobals());

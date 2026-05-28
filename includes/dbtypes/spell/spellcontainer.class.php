@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class SpellSet extends DBTypeSet
+class SpellContainer extends DBTypeContainer
 {
     public static int $dbType = Type::SPELL;
 
@@ -59,7 +59,7 @@ class SpellSet extends DBTypeSet
         }
 
         foreach ($idBuff as $type => $ids)
-            $objBuff[$type] = Type::newSet($type, [['id', $ids]]);
+            $objBuff[$type] = Type::newContainer($type, [['id', $ids]]);
 
         foreach ($this->iterate() as $id => $entry)
         {

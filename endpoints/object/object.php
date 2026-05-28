@@ -379,7 +379,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
             [DB::AND, ['effect3Id', $summonEffects], ['effect3MiscValue', $this->typeId]]
         );
 
-        $summons = new SpellSet($conditions);
+        $summons = new SpellContainer($conditions);
         if (!$summons->error)
         {
             $this->extendGlobalData($summons->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
@@ -394,7 +394,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         // tab: related spells
         if ($_ = $this->subject->spells)
         {
-            $relSpells = new SpellSet(array(['id', $_]));
+            $relSpells = new SpellContainer(array(['id', $_]));
             if (!$relSpells->error)
             {
                 $this->extendGlobalData($relSpells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
@@ -414,7 +414,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: criteria of
-        $acvs = new AchievementSet(array(['ac.type', [ACHIEVEMENT_CRITERIA_TYPE_USE_GAMEOBJECT, ACHIEVEMENT_CRITERIA_TYPE_FISH_IN_GAMEOBJECT]], ['ac.value1', $this->typeId]));
+        $acvs = new AchievementContainer(array(['ac.type', [ACHIEVEMENT_CRITERIA_TYPE_USE_GAMEOBJECT, ACHIEVEMENT_CRITERIA_TYPE_FISH_IN_GAMEOBJECT]], ['ac.value1', $this->typeId]));
         if (!$acvs->error)
         {
             $this->extendGlobalData($acvs->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
@@ -428,7 +428,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
 
         // tab: starts quest
         // tab: ends quest
-        $startEnd = new QuestSet(array(['qse.type', Type::OBJECT], ['qse.typeId', $this->typeId]));
+        $startEnd = new QuestContainer(array(['qse.type', Type::OBJECT], ['qse.typeId', $this->typeId]));
         if (!$startEnd->error)
         {
             $this->extendGlobalData($startEnd->getJSGlobals());
@@ -537,7 +537,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         // tab: Spell Focus for
         if ($sfId = $this->subject->spellFocusId)
         {
-            $focusSpells = new SpellSet(array(Listview::DEFAULT_SIZE, ['spellFocusObject', $sfId]), ['calcTotal' => true]);
+            $focusSpells = new SpellContainer(array(Listview::DEFAULT_SIZE, ['spellFocusObject', $sfId]), ['calcTotal' => true]);
             if (!$focusSpells->error)
             {
                 $tabData = array(
@@ -560,7 +560,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: trap for X
-        $trigger = new GameobjectSet(array(['linkedTrap', $this->typeId]));
+        $trigger = new GameobjectContainer(array(['linkedTrap', $this->typeId]));
         if (!$trigger->error)
         {
             $this->extendGlobalData($trigger->getJSGlobals());
@@ -583,7 +583,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                 ['id', $this->typeId, '!']
             );
 
-            $saObjects = new GameobjectSet($conditions);
+            $saObjects = new GameobjectContainer($conditions);
             if (!$saObjects->error)
             {
                 $data = $saObjects->getListviewData();
@@ -620,7 +620,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: Same model as
-        $sameModel = new GameObjectSet(array(['displayId', $this->subject->displayId], ['id', $this->typeId, '!']));
+        $sameModel = new GameObjectContainer(array(['displayId', $this->subject->displayId], ['id', $this->typeId, '!']));
         if (!$sameModel->error)
         {
             $this->extendGlobalData($sameModel->getJSGlobals());

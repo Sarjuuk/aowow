@@ -41,7 +41,7 @@ class RacesBaseResponse extends TemplateResponse implements ICache
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
 
-        $races = new CharRaceSet($conditions);
+        $races = new CharRaceContainer($conditions);
         if (!$races->error)
             $this->lvTabs->addListviewTab(new Listview(['data' => $races->getListviewData()], CharRace::$brickFile));
 

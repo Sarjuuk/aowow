@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class AchievementSet extends DBTypeSet implements IListview, ISource
+class AchievementContainer extends DBTypeContainer implements IListview, ISource
 {
     use TrSourceHelper;
 

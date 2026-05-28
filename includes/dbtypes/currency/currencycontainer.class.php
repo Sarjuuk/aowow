@@ -6,14 +6,14 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class CharClassSet extends DBTypeSet
+class CurrencyContainer extends DBTypeContainer
 {
-    public static int $dbType = Type::CHR_CLASS;
+    public static int $dbType = Type::CURRENCY;
 
     /**
      * iterate over fetched sets
      *
-     * @return \Generator<int, CharClass> id => character class template
+     * @return \Generator<int, Currency> id => currency template
      */
     public function iterate() : \Generator
     {
@@ -21,9 +21,9 @@ class CharClassSet extends DBTypeSet
     }
 
     /**
-     * @return ?CharClass
+     * @return ?Currency
      */
-    public function getEntry(string|int $id) : ?CharClass
+    public function getEntry(string|int $id) : ?Currency
     {
         return parent::getEntry($id);
     }

@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class ArenaTeamSet extends DBTypeSet implements IListview
+class ArenaTeamContainer extends DBTypeContainer implements IListview
 {
     public static int $dbType = Type::ARENA_TEAM;
 

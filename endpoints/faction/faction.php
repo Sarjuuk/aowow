@@ -143,7 +143,7 @@ class FactionBaseResponse extends TemplateResponse implements ICache
         else                                                // self as parent
             $conditions[] = ['parentFactionId', $this->typeId];
 
-        $spillover = new FactionSet($conditions);
+        $spillover = new FactionContainer($conditions);
         $this->extendGlobalData($spillover->getJSGlobals());
 
         $buff = '';
@@ -238,7 +238,7 @@ class FactionBaseResponse extends TemplateResponse implements ICache
 
             if ($cRep)
             {
-                $killCreatures = new CreatureSet(array(Listview::DEFAULT_SIZE, ['id', array_keys($cRep)]), ['calcTotal' => true]);
+                $killCreatures = new CreatureContainer(array(Listview::DEFAULT_SIZE, ['id', array_keys($cRep)]), ['calcTotal' => true]);
                 if (!$killCreatures->error)
                 {
                     $data = $killCreatures->getListviewData();
@@ -264,7 +264,7 @@ class FactionBaseResponse extends TemplateResponse implements ICache
         // tab: members
         if ($_ = $this->subject->templateIds)
         {
-            $members = new CreatureSet(array(Listview::DEFAULT_SIZE, ['faction', $_]), ['calcTotal' => true]);
+            $members = new CreatureContainer(array(Listview::DEFAULT_SIZE, ['faction', $_]), ['calcTotal' => true]);
             if (!$members->error)
             {
                 $tabData = array(
@@ -325,7 +325,7 @@ class FactionBaseResponse extends TemplateResponse implements ICache
             ['ac.type', ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION],
             ['ac.value1', $this->typeId]
         );
-        $acvs = new AchievementSet($conditions);
+        $acvs = new AchievementContainer($conditions);
         if (!$acvs->error)
         {
             $this->extendGlobalData($acvs->getJSGlobals(GLOBALINFO_ANY));

@@ -422,7 +422,7 @@ class SpellsBaseResponse extends TemplateResponse implements ICache
             }
         }
 
-        $spells = new SpellSet($conditions, ['calcTotal' => true]);
+        $spells = new SpellContainer($conditions, ['calcTotal' => true]);
 
         $this->extendGlobalData($spells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 

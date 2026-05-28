@@ -92,7 +92,7 @@ class IconBaseResponse extends TemplateResponse implements ICache
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
 
         // used by: spell
-        $ubSpells = new SpellSet(array(['iconId', $this->typeId]));
+        $ubSpells = new SpellContainer(array(['iconId', $this->typeId]));
         if (!$ubSpells->error)
         {
             $this->extendGlobalData($ubSpells->getJSGlobals(GLOBALINFO_RELATED | GLOBALINFO_SELF));
@@ -114,7 +114,7 @@ class IconBaseResponse extends TemplateResponse implements ICache
         // }
 
         // used by: achievement
-        $ubAchievements = new AchievementSet(array(['iconId', $this->typeId]));
+        $ubAchievements = new AchievementContainer(array(['iconId', $this->typeId]));
         if (!$ubAchievements->error)
         {
             $this->extendGlobalData($ubAchievements->getJSGlobals());
@@ -125,7 +125,7 @@ class IconBaseResponse extends TemplateResponse implements ICache
         }
 
         // used by: currency
-        $ubCurrencies = new CurrencySet(array(['iconId', $this->typeId]));
+        $ubCurrencies = new CurrencyContainer(array(['iconId', $this->typeId]));
         if (!$ubCurrencies->error)
         {
             $this->extendGlobalData($ubCurrencies->getJSGlobals());
@@ -147,7 +147,7 @@ class IconBaseResponse extends TemplateResponse implements ICache
         // }
 
         // used by: player class
-        $ubClasses = new CharClassSet(array(['iconId', $this->typeId]));
+        $ubClasses = new CharClassContainer(array(['iconId', $this->typeId]));
         if (!$ubClasses->error)
         {
             $this->extendGlobalData($ubClasses->getJSGlobals());

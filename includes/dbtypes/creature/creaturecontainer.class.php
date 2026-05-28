@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class CreatureSet extends DBTypeSet
+class CreatureContainer extends DBTypeContainer
 {
     use TrSpawns;
 

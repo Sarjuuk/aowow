@@ -92,7 +92,7 @@ class IconsBaseResponse extends TemplateResponse implements ICache
             $this->wowheadLink .= '&filter='.$fiQuery;
          // note: do not propagate filter to menu. Its just for categories
 
-        $icons = new IconSet($conditions, ['calcTotal' => true]);
+        $icons = new IconContainer($conditions, ['calcTotal' => true]);
 
         $tabData['data'] = $icons->getListviewData();
         $this->extendGlobalData($icons->getJSGlobals());
