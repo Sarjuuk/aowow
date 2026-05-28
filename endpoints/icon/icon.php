@@ -21,7 +21,7 @@ class IconBaseResponse extends TemplateResponse implements ICache
     public int    $typeId = 0;
     public string $icon   = '';
 
-    private IconList $subject;
+    private Icon $subject;
 
     public function __construct(string $id)
     {
@@ -33,14 +33,16 @@ class IconBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new IconList(array(['id', $this->typeId]));
+        $this->subject = new Icon($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('icon'), Lang::icon('notFound'));
 
-        $this->extendGlobalData($this->subject->getJSGlobals());
+        $this->subject->setIconCounts();
 
-        $this->h1   = $this->subject->getField('name_source');
-        $this->icon = $this->subject->getField('name', true, true);
+        $this->extendGlobalData($this->subject->getJSGlobal());
+
+        $this->h1   = $this->subject->name_source;
+        $this->icon = $this->subject->name;
 
         $this->gPageInfo += array(
             'type'   => $this->type,
@@ -53,24 +55,17 @@ class IconBaseResponse extends TemplateResponse implements ICache
         /* Menu Path */
         /*************/
 
-        $cats  = [1 => 'nItems', 2 => 'nSpells', 3 => 'nAchievements', 6 => 'nCurrencies', 9 => 'nPets'/* , 11 => '' */];
-        $crumb = '';
-        foreach ($cats as $cat => $field)
-        {
-            if (!$this->subject->getField($field))
-                continue;
+        $catgs = array_filter(array(
+            1  => $this->subject->nItems,
+            2  => $this->subject->nSpells,
+            3  => $this->subject->nAchievements,
+            6  => $this->subject->nCurrencies,
+            9  => $this->subject->nPets,
+            11 => $this->subject->nClasses
+        ));
 
-            if ($crumb)
-            {
-                $crumb = 0;
-                break;
-            }
-
-            $crumb = $cat;
-        }
-
-        if ($crumb)
-            $this->breadcrumb[] = $crumb;
+        if (count($catgs) == 1)
+            $this->breadcrumb[] = key($catgs);
 
 
         /**************/
@@ -97,58 +92,69 @@ class IconBaseResponse extends TemplateResponse implements ICache
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
 
         // used by: spell
-        $ubSpells = new SpellList(array(['iconId', $this->typeId]));
+        $ubSpells = new SpellSet(array(['iconId', $this->typeId]));
         if (!$ubSpells->error)
         {
             $this->extendGlobalData($ubSpells->getJSGlobals(GLOBALINFO_RELATED | GLOBALINFO_SELF));
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $ubSpells->getListviewData(),
                 'id'   => 'used-by-spell'
-            ), SpellList::$brickFile));
+            ), Spell::$brickFile));
         }
 
         // used by: item
-        $ubItems = new ItemList(array(['iconId', $this->typeId]));
-        if (!$ubItems->error)
-        {
-            $this->extendGlobalData($ubItems->getJSGlobals());
-            $this->lvTabs->addListviewTab(new Listview(array(
-                'data' => $ubItems->getListviewData(),
-                'id'   => 'used-by-item'
-            ), ItemList::$brickFile));
-        }
+        // $ubItems = new ItemList(array(['iconId', $this->typeId]));
+        // if (!$ubItems->error)
+        // {
+        //     $this->extendGlobalData($ubItems->getJSGlobals());
+        //     $this->lvTabs->addListviewTab(new Listview(array(
+        //         'data' => $ubItems->getListviewData(),
+        //         'id'   => 'used-by-item'
+        //     ), ItemList::$brickFile));
+        // }
 
         // used by: achievement
-        $ubAchievements = new AchievementList(array(['iconId', $this->typeId]));
+        $ubAchievements = new AchievementSet(array(['iconId', $this->typeId]));
         if (!$ubAchievements->error)
         {
             $this->extendGlobalData($ubAchievements->getJSGlobals());
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $ubAchievements->getListviewData(),
                 'id'   => 'used-by-achievement'
-            ), AchievementList::$brickFile));
+            ), Achievement::$brickFile));
         }
 
         // used by: currency
-        $ubCurrencies = new CurrencyList(array(['iconId', $this->typeId]));
+        $ubCurrencies = new CurrencySet(array(['iconId', $this->typeId]));
         if (!$ubCurrencies->error)
         {
             $this->extendGlobalData($ubCurrencies->getJSGlobals());
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $ubCurrencies->getListviewData(),
                 'id'   => 'used-by-currency'
-            ), CurrencyList::$brickFile));
+            ), Currency::$brickFile));
         }
 
         // used by: hunter pet
-        $ubPets = new PetList(array(['iconId', $this->typeId]));
-        if (!$ubPets->error)
+        // $ubPets = new PetList(array(['iconId', $this->typeId]));
+        // if (!$ubPets->error)
+        // {
+        //     $this->extendGlobalData($ubPets->getJSGlobals());
+        //     $this->lvTabs->addListviewTab(new Listview(array(
+        //         'data' => $ubPets->getListviewData(),
+        //         'id'   => 'used-by-pet'
+        //     ), PetList::$brickFile));
+        // }
+
+        // used by: player class
+        $ubClasses = new CharClassSet(array(['iconId', $this->typeId]));
+        if (!$ubClasses->error)
         {
-            $this->extendGlobalData($ubPets->getJSGlobals());
+            $this->extendGlobalData($ubClasses->getJSGlobals());
             $this->lvTabs->addListviewTab(new Listview(array(
-                'data' => $ubPets->getListviewData(),
-                'id'   => 'used-by-pet'
-            ), PetList::$brickFile));
+                'data' => $ubClasses->getListviewData(),
+                'id'   => 'used-by-class'
+            ), CharClass::$brickFile));
         }
 
         parent::generate();

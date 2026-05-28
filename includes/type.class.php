@@ -110,7 +110,7 @@ abstract class Type
         self::STATISTIC   => [Achievement::class, 'achievement', 'g_achievements',       self::FLAG_NONE], // alias for achievements; exists only for Markup
         self::CURRENCY    => [Currency::class,    'currency',    'g_gatheredcurrencies', self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
         self::SOUND       => [SoundList::class,       'sound',       'g_sounds',             self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
-        self::ICON        => [IconList::class,        'icon',        'g_icons',              self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
+        self::ICON        => [Icon::class,        'icon',        'g_icons',              self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
         self::GUIDE       => [GuideList::class,       'guide',       '',                     self::FLAG_DB_TYPE],
         self::PROFILE     => [ProfileList::class,     'profile',     '',                     self::FLAG_FILTRABLE], // x - not known in javascript
         self::GUILD       => [GuildList::class,       'guild',       '',                     self::FLAG_FILTRABLE], // x

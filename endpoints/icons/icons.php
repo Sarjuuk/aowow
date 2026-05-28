@@ -33,7 +33,7 @@ class IconsBaseResponse extends TemplateResponse implements ICache
         if ($this->category)
             $this->subCat = '='.implode('.', $this->category);
 
-        $this->filter = new IconListFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
+        $this->filter = new IconFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
         if ($this->filter->shouldReload)
         {
             $_SESSION['error']['fi'] = $this->filter::class;
@@ -92,7 +92,7 @@ class IconsBaseResponse extends TemplateResponse implements ICache
             $this->wowheadLink .= '&filter='.$fiQuery;
          // note: do not propagate filter to menu. Its just for categories
 
-        $icons = new IconList($conditions, ['calcTotal' => true]);
+        $icons = new IconSet($conditions, ['calcTotal' => true]);
 
         $tabData['data'] = $icons->getListviewData();
         $this->extendGlobalData($icons->getJSGlobals());
@@ -105,7 +105,7 @@ class IconsBaseResponse extends TemplateResponse implements ICache
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
 
-        $this->lvTabs->addListviewTab(new Listview($tabData, IconList::$brickFile));
+        $this->lvTabs->addListviewTab(new Listview($tabData, Icon::$brickFile));
 
         parent::generate();
     }
