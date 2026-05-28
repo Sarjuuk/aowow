@@ -27,9 +27,9 @@ class NpcBaseResponse extends TemplateResponse implements ICache
     public  array  $reputation  = [];
     public  string $subname     = '';
 
-    private  Creature    $subject;
-    private ?CreatureSet $altNPCs  = null;
-    private  array       $soundIds = [];
+    private  Creature          $subject;
+    private ?CreatureContainer $altNPCs  = null;
+    private  array             $soundIds = [];
 
     public function __construct(string $id)
     {
@@ -81,11 +81,11 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         if ($this->subject->cuFlags & NPC_CU_DIFFICULTY_DUMMY)
             $this->placeholder = [$this->subject->parentId, $this->subject->parent];
         else if ($_altIds = array_filter($this->subject->difficultyEntries))
-            $this->altNPCs = new CreatureSet(array(['id', array_keys($_altIds)]));
+            $this->altNPCs = new CreatureContainer(array(['id', array_keys($_altIds)]));
 
         if ($_ = DB::World()->selectCol('SELECT DISTINCT `entry` FROM vehicle_template_accessory WHERE `accessory_entry` = %i', $this->typeId))
         {
-            $vehicles = new CreatureSet(array(['id', $_]));
+            $vehicles = new CreatureContainer(array(['id', $_]));
             foreach ($vehicles->iterate() as $id => $entry)
                 $this->accessory[] = [$id, $entry->name];
         }
@@ -468,7 +468,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         $sb = SmartAI::getOwnerOfNPCSummon($this->typeId);
         if (!empty($sb[Type::NPC]))
         {
-            $sbNPC = new CreatureSet(array(['id', $sb[Type::NPC]]));
+            $sbNPC = new CreatureContainer(array(['id', $sb[Type::NPC]]));
             if (!$sbNPC->error)
             {
                 $this->extendGlobalData($sbNPC->getJSGlobals());
@@ -777,7 +777,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         if ($extraCrt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` = %i AND `value1` = %i', ACHIEVEMENT_CRITERIA_DATA_TYPE_T_CREATURE, $this->typeId))
             $conditions = [DB::OR, $conditions, ['ac.id', $extraCrt]];
 
-        $crtOf = new AchievementSet($conditions);
+        $crtOf = new AchievementContainer($conditions);
         if (!$crtOf->error)
         {
             $this->extendGlobalData($crtOf->getJSGlobals());
@@ -810,7 +810,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         // tab: passengers
         if ($_ = DB::World()->selectCol('SELECT `accessory_entry` AS ARRAY_KEY, GROUP_CONCAT(`seat_id` SEPARATOR ", ") FROM vehicle_template_accessory WHERE `entry` = %i GROUP BY `accessory_entry`', $this->typeId))
         {
-            $passengers = new CreatureSet(array(['id', array_keys($_)]));
+            $passengers = new CreatureContainer(array(['id', array_keys($_)]));
             if (!$passengers->error)
             {
                 $data = $passengers->getListviewData();

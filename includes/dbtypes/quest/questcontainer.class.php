@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class QuestSet extends DBTypeSet
+class QuestContainer extends DBTypeContainer
 {
     public static int $dbType = Type::QUEST;
 

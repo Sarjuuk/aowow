@@ -6,14 +6,14 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class CurrencySet extends DBTypeSet
+class AreatriggerContainer extends DBTypeContainer
 {
-    public static int $dbType = Type::CURRENCY;
+    public static int $dbType = Type::AREATRIGGER;
 
     /**
      * iterate over fetched sets
      *
-     * @return \Generator<int, Currency> id => currency template
+     * @return \Generator<int, Areatrigger> id => areatrigger template
      */
     public function iterate() : \Generator
     {
@@ -21,9 +21,9 @@ class CurrencySet extends DBTypeSet
     }
 
     /**
-     * @return ?Currency
+     * @return ?Areatrigger
      */
-    public function getEntry(string|int $id) : ?Currency
+    public function getEntry(string|int $id) : ?Areatrigger
     {
         return parent::getEntry($id);
     }

@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class IconSet extends DBTypeSet
+class IconContainer extends DBTypeContainer
 {
     public static int $dbType = Type::ICON;
 

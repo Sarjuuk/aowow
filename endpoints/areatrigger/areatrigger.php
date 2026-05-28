@@ -129,7 +129,7 @@ class AreatriggerBaseResponse extends TemplateResponse implements ICache
         }
         else if ($_type == AT_TYPE_SCRIPT)
         {
-            $relTrigger = new AreaTriggerSet(array(['id', $this->typeId, '!'], ['name', $this->subject->name]));
+            $relTrigger = new AreaTriggerContainer(array(['id', $this->typeId, '!'], ['name', $this->subject->name]));
             if (!$relTrigger->error)
                 $this->lvTabs->addListviewTab(new Listview(['data' => $relTrigger->getListviewData(), 'name' => Util::ucFirst(Lang::game('areatrigger'))], AreaTrigger::$brickFile, 'areatrigger'));
         }

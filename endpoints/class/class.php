@@ -187,11 +187,11 @@ class ClassBaseResponse extends TemplateResponse implements ICache
                 'sort'            => ['-level', 'type', 'name'],
                 'computeDataFunc' => '$Listview.funcBox.initSpellFilter',
                 'onAfterCreate'   => '$Listview.funcBox.addSpellIndicator'
-            ), SpellList::$brickFile));
+            ), Spell::$brickFile));
         }
 
         // tab: races
-        $races = new CharRaceSet(array(['classMask', $cl->toMask(), '&']));
+        $races = new CharRaceContainer(array(['classMask', $cl->toMask(), '&']));
         if (!$races->error)
             $this->lvTabs->addListviewTab(new Listview(['data' => $races->getListviewData()], CharRace::$brickFile));
 
@@ -210,7 +210,7 @@ class ClassBaseResponse extends TemplateResponse implements ICache
             ['trainerRequirement', $this->typeId]
         );
 
-        $trainer = new CreatureSet($conditions);
+        $trainer = new CreatureContainer($conditions);
         if (!$trainer->error)
         {
             $this->addDataLoader('zones');
@@ -271,7 +271,7 @@ class ClassBaseResponse extends TemplateResponse implements ICache
             [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0]
         );
 
-        $quests = new QuestList($conditions);
+        $quests = new QuestContainer($conditions);
         if (!$quests->error)
         {
             $this->extendGlobalData($quests->getJSGlobals());
@@ -279,7 +279,7 @@ class ClassBaseResponse extends TemplateResponse implements ICache
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $quests->getListviewData(),
                 'sort' => ['reqlevel', 'name']
-            ), QuestList::$brickFile));
+            ), Quest::$brickFile));
         }
 
         // tab: criteria-of
@@ -292,7 +292,7 @@ class ClassBaseResponse extends TemplateResponse implements ICache
         if ($extraCrt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` IN %in AND `value1` = %i', [ACHIEVEMENT_CRITERIA_DATA_TYPE_S_PLAYER_CLASS_RACE, ACHIEVEMENT_CRITERIA_DATA_TYPE_T_PLAYER_CLASS_RACE], $this->typeId))
             $conditions = [DB::OR, $conditions, ['ac.id', $extraCrt]];
 
-        $crtOf = new AchievementSet($conditions);
+        $crtOf = new AchievementContainer($conditions);
         if (!$crtOf->error)
         {
             $this->extendGlobalData($crtOf->getJSGlobals());

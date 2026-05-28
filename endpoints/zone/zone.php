@@ -320,7 +320,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
 
                 if ($tpl['startsQuests'])
                 {
-                        $started = new QuestSet(array(['qse.method', 1, '&'], ['qse.type', Type::OBJECT], ['qse.typeId', $tpl['id']]));
+                        $started = new QuestContainer(array(['qse.method', 1, '&'], ['qse.type', Type::OBJECT], ['qse.typeId', $tpl['id']]));
                         if ($started->error)
                             continue;
 

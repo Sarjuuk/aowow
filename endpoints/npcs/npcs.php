@@ -103,7 +103,7 @@ class NpcsBaseResponse extends TemplateResponse implements ICache
 
         // beast subtypes are selected via filter
         $tabData = ['data' => []];
-        $npcs    = new CreatureSet($conditions, ['extraOpts' => $this->filter->extraOpts, 'calcTotal' => true]);
+        $npcs    = new CreatureContainer($conditions, ['extraOpts' => $this->filter->extraOpts, 'calcTotal' => true]);
         if (!$npcs->error)
         {
             $tabData['data'] = $npcs->getListviewData($fiRepCols ? LISTVIEWINFO_REPUTATION : 0x0);

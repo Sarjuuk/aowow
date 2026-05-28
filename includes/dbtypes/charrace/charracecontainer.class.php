@@ -6,14 +6,14 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class FactionSet extends DBTypeSet
+class CharRaceContainer extends DBTypeContainer
 {
-    public static int $dbType = Type::FACTION;
+    public static int $dbType = Type::CHR_RACE;
 
     /**
      * iterate over fetched sets
      *
-     * @return \Generator<int, Faction> id => faction template
+     * @return \Generator<int, CharRace> id => character race template
      */
     public function iterate() : \Generator
     {
@@ -21,9 +21,9 @@ class FactionSet extends DBTypeSet
     }
 
     /**
-     * @return ?Faction
+     * @return ?CharRace
      */
-    public function getEntry(string|int $id) : ?Faction
+    public function getEntry(string|int $id) : ?CharRace
     {
         return parent::getEntry($id);
     }

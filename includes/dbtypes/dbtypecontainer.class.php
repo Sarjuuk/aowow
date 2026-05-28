@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
     die("illegal access");
 
 
-abstract class DBTypeSet
+abstract class DBTypeContainer
 {
     protected array  $sets     = [];
     protected DBType $curEntry;

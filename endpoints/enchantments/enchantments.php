@@ -91,7 +91,7 @@ class EnchantmentsBaseResponse extends TemplateResponse implements ICache
             'name' => Util::ucFirst(Lang::game('enchantments'))
         );
 
-        $ench = new EnchantmentSet($conditions, ['calcTotal' => true]);
+        $ench = new EnchantmentContainer($conditions, ['calcTotal' => true]);
 
         $tabData['data'] = $ench->getListviewData();
         $this->extendGlobalData($ench->getJSGlobals());

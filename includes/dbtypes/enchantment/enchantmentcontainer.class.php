@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class EnchantmentSet extends DBTypeSet
+class EnchantmentContainer extends DBTypeContainer
 {
     public static int $dbType = Type::ENCHANTMENT;
 
@@ -24,7 +24,7 @@ class EnchantmentSet extends DBTypeSet
         if (!$spellIds)
             return;
 
-        $relSpells = new SpellSet(array(['id', $spellIds]));
+        $relSpells = new SpellContainer(array(['id', $spellIds]));
         if ($relSpells->error)
             return;
 

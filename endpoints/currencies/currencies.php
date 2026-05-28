@@ -63,7 +63,7 @@ class CurrenciesBaseResponse extends TemplateResponse implements ICache
         if ($this->category)
             $conditions[] = ['category', $this->category[0]];
 
-        $money = new CurrencySet($conditions);
+        $money = new CurrencyContainer($conditions);
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
 

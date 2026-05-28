@@ -176,7 +176,7 @@ class EmoteBaseResponse extends TemplateResponse implements ICache
             ['ac.type', ACHIEVEMENT_CRITERIA_TYPE_DO_EMOTE],
             ['ac.value1', $this->typeId],
         );
-        $acv = new AchievementSet($condition);
+        $acv = new AchievementContainer($condition);
         if (!$acv->error)
         {
             $this->extendGlobalData($acv->getJSGlobals());

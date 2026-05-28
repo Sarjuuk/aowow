@@ -89,7 +89,7 @@ class FactionsBaseResponse extends TemplateResponse implements ICache
         }
 
         $data = [];
-        $factions = new FactionSet($conditions);
+        $factions = new FactionContainer($conditions);
         if (!$factions->error)
             $data = $factions->getListviewData();
 

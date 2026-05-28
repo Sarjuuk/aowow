@@ -147,7 +147,7 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
                 $vendors = $itemObj->getExtendedCost()[$_relItemId];
                 $this->extendGlobalData($itemObj->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
-                $soldBy = new CreatureSet(array(['id', array_keys($vendors)]));
+                $soldBy = new CreatureContainer(array(['id', array_keys($vendors)]));
                 if (!$soldBy->error)
                 {
                     $sbData    = $soldBy->getListviewData();

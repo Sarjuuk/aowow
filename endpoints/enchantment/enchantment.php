@@ -199,7 +199,7 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
             [DB::AND, ['effect2Id', Spell::EFFECTS_ENCHANTMENT], ['effect2MiscValue', $this->typeId]],
             [DB::AND, ['effect3Id', Spell::EFFECTS_ENCHANTMENT], ['effect3MiscValue', $this->typeId]],
         );
-        $spellList = new SpellSet($cnd);
+        $spellList = new SpellContainer($cnd);
         if (!$spellList->error)
         {
             $spellData = $spellList->getListviewData();

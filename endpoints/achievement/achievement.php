@@ -142,7 +142,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
         $series = [];
         if ($c = $this->subject->chainId)
         {
-            $chainAcv = new AchievementSet(array(['chainId', $c]));
+            $chainAcv = new AchievementContainer(array(['chainId', $c]));
 
             foreach ($chainAcv->iterate() as $aId => $acv)
             {
@@ -291,7 +291,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
                     break;
                 // link to quest
                 case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST:
-                    $crtIcon = new IconElement(Type::QUEST, $obj, $crtName ?: QuestList::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
+                    $crtIcon = new IconElement(Type::QUEST, $obj, $crtName ?: Quest::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
                     break;
                 // link to spell
                 case ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET:
@@ -299,7 +299,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
                 case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL:
                 case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL:
                 case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2:
-                    $crtIcon = new IconElement(Type::SPELL, $obj, $crtName ?: SpellList::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
+                    $crtIcon = new IconElement(Type::SPELL, $obj, $crtName ?: Spell::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
                     $this->extendGlobalIds(Type::SPELL, $obj);
                     break;
                 // link to item
@@ -313,16 +313,16 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
                     break;
                 // link to faction (/w target reputation)
                 case ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION:
-                    $crtIcon = new IconElement(Type::FACTION, $obj, $crtName ?: FactionList::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon', extraText: '('.Lang::getReputationLevelForPoints($qty).')');
+                    $crtIcon = new IconElement(Type::FACTION, $obj, $crtName ?: Faction::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon', extraText: '('.Lang::getReputationLevelForPoints($qty).')');
                     break;
                 // link to GObject
                 case ACHIEVEMENT_CRITERIA_TYPE_USE_GAMEOBJECT:
                 case ACHIEVEMENT_CRITERIA_TYPE_FISH_IN_GAMEOBJECT:
-                    $crtIcon = new IconElement(Type::OBJECT, $obj, $crtName ?: GameObjectList::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
+                    $crtIcon = new IconElement(Type::OBJECT, $obj, $crtName ?: Gameobject::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
                     break;
                 // link to emote
                 case ACHIEVEMENT_CRITERIA_TYPE_DO_EMOTE:
-                    $crtIcon = new IconElement(Type::EMOTE, $obj, $crtName ?: EmoteList::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
+                    $crtIcon = new IconElement(Type::EMOTE, $obj, $crtName ?: Emote::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
                     break;
                 default:
                     // Add a gold coin icon if required
@@ -355,7 +355,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
                         break;
                     case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AURA:
                     case ACHIEVEMENT_CRITERIA_DATA_TYPE_T_AURA:
-                        $extraData[] = SpellList::makeLink($xData['value1']);
+                        $extraData[] = Spell::makeLink($xData['value1']);
                         break;
                     case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AREA:
                         $extraData[] = ZoneList::makeLink($xData['value1']);
@@ -408,7 +408,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
             ['name_loc'.Lang::getLocale()->value, (string)$this->subject->name],
             ['id', $this->typeId, '!']
         );
-        $saList = new AchievementSet($conditions);
+        $saList = new AchievementContainer($conditions);
         if (!$saList->error)
         {
             $this->extendGlobalData($saList->getJSGlobals());
@@ -429,7 +429,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
 
         if (!empty($refs))
         {
-            $coList = new AchievementSet(array(['id', $refs]));
+            $coList = new AchievementContainer(array(['id', $refs]));
             if (!$coList->error)
             {
                 $this->extendGlobalData($coList->getJSGlobals());

@@ -135,12 +135,12 @@ abstract class Type
         return new (self::$data[$type][self::IDX_OBJECT])($initData);
     }
 
-    public static function newSet(int $type, ?array $conditions = []) : ?DBTypeSet
+    public static function newContainer(int $type, ?array $conditions = []) : ?DBTypeContainer
     {
         if (!self::exists($type))
             return null;
 
-        return new (self::$data[$type][self::IDX_OBJECT].'Set')($conditions);
+        return new (self::$data[$type][self::IDX_OBJECT].'Container')($conditions);
     }
 
     // DELETEME - tmp achievement test backwards compat
@@ -151,7 +151,7 @@ abstract class Type
 
         try
         {
-            return new (self::$data[$type][self::IDX_OBJECT].'Set')($conditions);
+            return new (self::$data[$type][self::IDX_OBJECT].'Container')($conditions);
         }
         catch (\Exception $e)
         {

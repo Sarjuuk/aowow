@@ -124,7 +124,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                 ['ac.value1', $this->subject->questSortIdBak],
                 ['a.faction', $_side, '&']
             );
-            $loremaster = new AchievementSet($conditions);
+            $loremaster = new AchievementContainer($conditions);
             $this->extendGlobalData($loremaster->getJSGlobals(GLOBALINFO_SELF));
 
             switch (count($loremaster->getFoundIds()))
@@ -378,7 +378,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         // .. creature kills
         if ($ids = array_keys($olNPCs))
         {
-            $olNPCData = new CreatureSet(array(DB::OR, ['id', $ids], ['killCredit1', $ids], ['killCredit2', $ids]));
+            $olNPCData = new CreatureContainer(array(DB::OR, ['id', $ids], ['killCredit1', $ids], ['killCredit2', $ids]));
             $this->extendGlobalData($olNPCData->getJSGlobals(GLOBALINFO_SELF));
 
             // create proxy-references
@@ -451,7 +451,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         // reputation required
         if ($olFactions = $this->subject->getRequiredReputation())
         {
-            $olFactionsData = new FactionSet(array(['id', array_keys($olFactions)]));
+            $olFactionsData = new FactionContainer(array(['id', array_keys($olFactions)]));
             $this->extendGlobalData($olFactionsData->getJSGlobals(GLOBALINFO_SELF));
 
             foreach ($olFactions as $fId => $val)
@@ -649,7 +649,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                 }
             }
             // complete-spell
-            else if ($endSpell = new SpellSet(array(DB::OR, [DB::AND, ['effect1Id', SPELL_EFFECT_QUEST_COMPLETE], ['effect1MiscValue', $this->typeId]], [DB::AND, ['effect2Id', SPELL_EFFECT_QUEST_COMPLETE], ['effect2MiscValue', $this->typeId]], [DB::AND, ['effect3Id', SPELL_EFFECT_QUEST_COMPLETE], ['effect3MiscValue', $this->typeId]])))
+            else if ($endSpell = new SpellContainer(array(DB::OR, [DB::AND, ['effect1Id', SPELL_EFFECT_QUEST_COMPLETE], ['effect1MiscValue', $this->typeId]], [DB::AND, ['effect2Id', SPELL_EFFECT_QUEST_COMPLETE], ['effect2MiscValue', $this->typeId]], [DB::AND, ['effect3Id', SPELL_EFFECT_QUEST_COMPLETE], ['effect3MiscValue', $this->typeId]])))
             {
                 foreach ($endSpell->iterate() as $entry)
                 {
@@ -706,7 +706,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         // .. adding npc from: droping queststart item; dropping item needed to collect; starting quest; ending quest
         if ($mapNPCs)
         {
-            $npcs = new CreatureSet(array(['id', array_column($mapNPCs, 0)]));
+            $npcs = new CreatureContainer(array(['id', array_column($mapNPCs, 0)]));
             if (!$npcs->error)
             {
                 $startEndDupe = [];                         // if quest starter/ender is the same creature, we need to add it twice
@@ -920,7 +920,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
 
         // tab: see also
-        $seeAlso = new QuestSet(array(['name_loc'.Lang::getLocale()->value, Util::htmlEscape($this->subject->name)], ['id', $this->typeId, '!']));
+        $seeAlso = new QuestContainer(array(['name_loc'.Lang::getLocale()->value, Util::htmlEscape($this->subject->name)], ['id', $this->typeId, '!']));
         if (!$seeAlso->error)
         {
             $this->extendGlobalData($seeAlso->getJSGlobals());
@@ -932,7 +932,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: criteria of
-        $criteriaOf = new AchievementSet(array(['ac.type', ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST], ['ac.value1', $this->typeId]));
+        $criteriaOf = new AchievementContainer(array(['ac.type', ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST], ['ac.value1', $this->typeId]));
         if (!$criteriaOf->error)
         {
             $this->extendGlobalData($criteriaOf->getJSGlobals());
@@ -947,7 +947,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         if ($qp = DB::World()->selectCol('SELECT qpm2.`questId` FROM quest_pool_members qpm1 JOIN quest_pool_members qpm2 ON qpm1.`poolId` = qpm2.`poolId` WHERE qpm1.`questId` = %i', $this->typeId))
         {
             $max = DB::World()->selectCell('SELECT `numActive` FROM quest_pool_template qpt JOIN quest_pool_members qpm ON qpm.`poolId` = qpt.`poolId` WHERE qpm.`questId` = %i', $this->typeId);
-            $pooledQuests = new QuestSet(array(['id', $qp]));
+            $pooledQuests = new QuestContainer(array(['id', $qp]));
             if (!$pooledQuests->error)
             {
                 $this->extendGlobalData($pooledQuests->getJSGlobals());
@@ -1056,7 +1056,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
 
         if ($currency = array_filter($this->subject->getRewardCurrencies(), fn($x) => $x != CURRENCY_ARENA_POINTS && $x != CURRENCY_HONOR_POINTS, ARRAY_FILTER_USE_KEY))
         {
-            $rewCurr  = new CurrencySet(array(['id', array_keys($currency)]));
+            $rewCurr  = new CurrencyContainer(array(['id', array_keys($currency)]));
             if (!$rewCurr->error)
             {
                 $this->extendGlobalData($rewCurr->getJSGlobals());
@@ -1082,7 +1082,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
 
         if ($cast > 0 || $displ > 0)
         {
-            $rewSpells = new SpellSet(array(['id', [$displ, $cast]]));
+            $rewSpells = new SpellContainer(array(['id', [$displ, $cast]]));
             $this->extendGlobalData($rewSpells->getJSGlobals());
 
             if (User::isInGroup(U_GROUP_EMPLOYEE))          // accurately display, what spell is what
@@ -1107,7 +1107,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
 
                 if ($teach)
                 {
-                    $taught = new SpellSet(array(['id', array_keys($teach)]));
+                    $taught = new SpellContainer(array(['id', array_keys($teach)]));
                     if (!$taught->error)
                     {
                         $this->extendGlobalData($taught->getJSGlobals());
@@ -1253,7 +1253,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         $listGen = function(array $cnd) use ($makeSeriesItem) : ?array
         {
             $chain = [];
-            $list  = new QuestSet($cnd);
+            $list  = new QuestContainer($cnd);
             if ($list->error)
                 return null;
 
@@ -1338,7 +1338,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
     }
 
     // [zoneId => [floor => [[x1, y1], [x2, y2], ..]]]      mapper on quest detail page
-    private static function createQuestSpawns(GameobjectSet|CreatureSet $set) : array
+    private static function createQuestSpawns(GameobjectContainer|CreatureContainer $set) : array
     {
         $spawns = DB::Aowow()->selectAssoc('SELECT `areaId`, `floor`, `typeId`, `posX`, `posY` FROM ::spawns WHERE `type` = %i AND `typeId` IN %in AND `posX` > 0 AND `posY` > 0', $set::$dbType, $set->getFoundIds());
         $result = [];

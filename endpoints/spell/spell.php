@@ -283,7 +283,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
         if ($formSpells)
         {
-            $abilities = new SpellSet(array(['id', $formSpells]));
+            $abilities = new SpellContainer(array(['id', $formSpells]));
             if (!$abilities->error)
             {
                 $tabData = array(
@@ -329,7 +329,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
             $sub = [DB::OR, ['s.spellFamilyFlags1', $m1, '&'], ['s.spellFamilyFlags2', $m2, '&'], ['s.spellFamilyFlags3', $m3, '&']];
 
-            $modSpells = new SpellSet($conditions);
+            $modSpells = new SpellContainer($conditions);
             if (!$modSpells->error)
             {
                 foreach ($modSpells->iterate() as $id => $entry)
@@ -412,7 +412,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
         if (count($sub) > 1)
         {
-            $modsSpell = new SpellSet($conditions);
+            $modsSpell = new SpellContainer($conditions);
             if (!$modsSpell->error)
             {
                 $tabData = array(
@@ -444,7 +444,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         if ($this->difficulties)
             $conditions = [DB::OR, [DB::AND, ...$conditions], [DB::AND, ['s.id', $this->difficulties], ['s.id', $this->typeId, '!']]];
 
-        $saSpells = new SpellSet($conditions);
+        $saSpells = new SpellContainer($conditions);
         if (!$saSpells->error)
         {
             $data = $saSpells->getListviewData();
@@ -497,7 +497,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             if (!User::isInGroup(U_GROUP_STAFF) && $this->subject->spellFamilyId)
                 $conditions[] = ['spellFamilyId', $this->subject->spellFamilyId];
 
-            $cdSpells = new SpellSet($conditions);
+            $cdSpells = new SpellContainer($conditions);
             if (!$cdSpells->error)
             {
                 $this->lvTabs->addListviewTab(new Listview(array(
@@ -519,7 +519,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 [DB::AND, ['effect2Id', SPELL_EFFECT_APPLY_GLYPH], ['effect2MiscValue', $gpIds]],
                 [DB::AND, ['effect3Id', SPELL_EFFECT_APPLY_GLYPH], ['effect3MiscValue', $gpIds]]
             );
-            $glyphSpells = new SpellSet($conditions);
+            $glyphSpells = new SpellContainer($conditions);
             if (!$glyphSpells->error)
             {
                 $this->lvTabs->addListviewTab(new Listview(array(
@@ -542,7 +542,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 [DB::AND, ['effect2AuraId', SPELL_AURA_OVERRIDE_SPELLS], ['effect2MiscValue', $so]],
                 [DB::AND, ['effect3AuraId', SPELL_AURA_OVERRIDE_SPELLS], ['effect3MiscValue', $so]]
             );
-            $ubSpells = new SpellSet($conditions);
+            $ubSpells = new SpellContainer($conditions);
             if (!$ubSpells->error)
             {
                 $this->lvTabs->addListviewTab(new Listview(array(
@@ -623,7 +623,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         {
             if (!empty($ubSAI[Type::AREATRIGGER]))
             {
-                $ubTriggers = new AreaTriggerSet(array(['id', $ubSAI[Type::AREATRIGGER]]));
+                $ubTriggers = new AreaTriggerContainer(array(['id', $ubSAI[Type::AREATRIGGER]]));
                 if (!$ubTriggers->error)
                 {
                     $this->lvTabs->addListviewTab(new Listview(array(
@@ -647,7 +647,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         if ($extraCrt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` IN %in AND `value1` = %i', [ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AURA, ACHIEVEMENT_CRITERIA_DATA_TYPE_T_AURA], $this->typeId))
             $conditions = [DB::OR, $conditions, ['ac.id', $extraCrt]];
 
-        $coAchievemnts = new AchievementSet($conditions);
+        $coAchievemnts = new AchievementContainer($conditions);
         if (!$coAchievemnts->error)
         {
             $this->lvTabs->addListviewTab(new Listview(array(
@@ -682,7 +682,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         // tab: bonus loot
         if ($extraItemData = DB::World()->selectAssoc('SELECT `spellId` AS ARRAY_KEY, `additionalCreateChance` AS "0", `additionalMaxNum` AS "1" FROM skill_extra_item_template WHERE `requiredSpecialization` = %i', $this->typeId))
         {
-            $extraSpells = new SpellSet(array(['id', array_keys($extraItemData)]));
+            $extraSpells = new SpellContainer(array(['id', array_keys($extraItemData)]));
             if (!$extraSpells->error)
             {
                 $this->extendGlobalData($extraSpells->getJSGlobals(GLOBALINFO_RELATED));
@@ -740,7 +740,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                     foreach ($filtered as $gr)
                         $cnd[] = ['s.id', $gr];
 
-                    $stacks = new SpellSet($cnd);
+                    $stacks = new SpellContainer($cnd);
                     if (!$stacks->error)
                     {
                         $lvData = $stacks->getListviewData();
@@ -788,7 +788,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             $related[] = $row['related'];
 
         if ($related)
-            $linked = new SpellSet(array(['s.id', $related]));
+            $linked = new SpellContainer(array(['s.id', $related]));
 
         if (isset($linked) && !$linked->error)
         {
@@ -828,7 +828,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             [DB::AND, [DB::OR, ['effect3Id', Spell::EFFECTS_TRIGGER], ['effect3AuraId', Spell::AURAS_TRIGGER]], ['effect3TriggerSpell', $this->typeId]],
         );
 
-        $trigger = new SpellSet($conditions);
+        $trigger = new SpellContainer($conditions);
         if (!$trigger->error)
         {
             $this->lvTabs->addListviewTab(new Listview(array(
@@ -855,7 +855,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         if ($spellClick = DB::World()->selectCol('SELECT `npc_entry` FROM npc_spellclick_spells WHERE `spell_id` = %i', $this->typeId))
             $conditions[] = ['id', $spellClick];
 
-        $ubCreature = new CreatureSet($conditions);
+        $ubCreature = new CreatureContainer($conditions);
         if (!$ubCreature->error)
         {
             $this->addDataLoader('zones');
@@ -977,7 +977,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         // tab: teaches
         if ($ids = Game::getTaughtSpells($this->subject))
         {
-            $teaches = new SpellSet(array(['id', $ids]));
+            $teaches = new SpellContainer(array(['id', $ids]));
             if (!$teaches->error)
             {
                 $this->extendGlobalData($teaches->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
@@ -1019,7 +1019,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
             if ($trainers)
             {
-                $tbTrainer = new CreatureSet(array(['ct.id', array_keys($trainers)], ['s.guid', null, '!'], ['ct.npcflag', NPC_FLAG_TRAINER, '&']));
+                $tbTrainer = new CreatureContainer(array(['ct.id', array_keys($trainers)], ['s.guid', null, '!'], ['ct.npcflag', NPC_FLAG_TRAINER, '&']));
                 if (!$tbTrainer->error)
                 {
                     $this->extendGlobalData($tbTrainer->getJSGlobals());
@@ -1069,7 +1069,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             [DB::AND, ['effect3Id', Spell::EFFECTS_TEACH], ['effect3TriggerSpell', $this->typeId]],
         );
 
-        $tbSpell = new SpellSet($conditions);
+        $tbSpell = new SpellContainer($conditions);
         $tbsData = [];
         if (!$tbSpell->error)
         {
@@ -1134,7 +1134,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             [DB::AND, ['type2', [ENCHANTMENT_TYPE_COMBAT_SPELL, ENCHANTMENT_TYPE_EQUIP_SPELL, ENCHANTMENT_TYPE_USE_SPELL]], ['object2', $this->typeId]],
             [DB::AND, ['type3', [ENCHANTMENT_TYPE_COMBAT_SPELL, ENCHANTMENT_TYPE_EQUIP_SPELL, ENCHANTMENT_TYPE_USE_SPELL]], ['object3', $this->typeId]]
         );
-        $enchList = new EnchantmentSet($conditions);
+        $enchList = new EnchantmentContainer($conditions);
         if (!$enchList->error)
         {
             $this->lvTabs->addListviewTab(new Listview(array(
