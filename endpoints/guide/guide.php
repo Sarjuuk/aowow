@@ -28,7 +28,7 @@ class GuideBaseResponse extends TemplateResponse implements ICache
     public  array $guideRating   = [];
     public ?int   $guideRevision = null;
 
-    private GuideList $subject;
+    private GuideEntry $subject;
 
     public function __construct(string $nameOrId)
     {
@@ -54,14 +54,14 @@ class GuideBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new GuideList(array(['id', $this->typeId]));
+        $this->subject = new GuideEntry($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('guide'), Lang::guide('notFound'));
 
         if (!$this->subject->canBeViewed() && !$this->subject->userCanView())
-            $this->forward('?guides='.$this->subject->getField('category'));
+            $this->forward('?guides='.$this->subject->category);
 
-        $this->guideStatus = $this->subject->getField('status');
+        $this->guideStatus = $this->subject->status;
         if ($this->guideStatus != GuideMgr::STATUS_APPROVED && $this->guideStatus != GuideMgr::STATUS_ARCHIVED)
         {
             $this->cacheType  = CACHE_TYPE_NONE;
@@ -73,13 +73,13 @@ class GuideBaseResponse extends TemplateResponse implements ICache
             $this->guideRevision = $this->_get['rev'];
         // has publicly viewable version
         else if ($this->subject->canBeViewed())
-            $this->guideRevision = $this->subject->getField('rev');
+            $this->guideRevision = $this->subject->rev;
 
-        $this->h1 = $this->subject->getField('name');
+        $this->h1 = $this->subject->name;
 
         $this->gPageInfo += array(
             'name'   => $this->h1,
-            'author' => $this->subject->getField('author')
+            'author' => $this->subject->author
         );
 
 
@@ -87,7 +87,7 @@ class GuideBaseResponse extends TemplateResponse implements ICache
         /* Menu Path */
         /*************/
 
-        if ($x = $this->subject?->getField('category'))
+        if ($x = $this->subject?->category)
             $this->breadcrumb[] = $x;
 
 
@@ -95,20 +95,20 @@ class GuideBaseResponse extends TemplateResponse implements ICache
         /* Page Title */
         /**************/
 
-        array_unshift($this->title, $this->subject->getField('title'), Lang::game('guides'));
+        array_unshift($this->title, $this->subject->title, Lang::game('guides'));
 
 
         /***********/
         /* Infobox */
         /***********/
 
-        if (!($this->subject->getField('cuFlags') & GUIDE_CU_NO_QUICKFACTS))
+        if (!($this->subject->cuFlags & GUIDE_CU_NO_QUICKFACTS))
             $this->generateInfobox();
 
         // needs post-cache updating
-        if (!($this->subject->getField('cuFlags') & GUIDE_CU_NO_RATING))
+        if (!($this->subject->cuFlags & GUIDE_CU_NO_RATING))
             $this->guideRating = array(
-                $this->subject->getField('rating'),         // avg rating
+                $this->subject->rating,                     // avg rating
                 User::canUpvote() && User::canDownvote() ? 'true' : 'false',
                 $this->subject->getField('_self'),          // my rating amt; 0 = no vote
                 $this->typeId                               // guide Id
@@ -139,15 +139,15 @@ class GuideBaseResponse extends TemplateResponse implements ICache
     {
         $infobox = [];
 
-        if ($this->subject->getField('cuFlags') & CC_FLAG_STICKY)
+        if ($this->subject->cuFlags & CC_FLAG_STICKY)
             $infobox[] = '[span class=guide-sticky]'.Lang::guide('sticky').'[/span]';
 
-        $infobox[] = Lang::guide('author').'[url=?user='.$this->subject->getField('author').']'.$this->subject->getField('author').'[/url]';
+        $infobox[] = Lang::guide('author').'[url=?user='.$this->subject->author.']'.$this->subject->author.'[/url]';
 
-        if ($this->subject->getField('category') == 1)
+        if ($this->subject->category == 1)
         {
-            $c = $this->subject->getField('classId');
-            $s = $this->subject->getField('specId');
+            $c = $this->subject->classId;
+            $s = $this->subject->specId;
             if ($c > 0)
             {
                 $this->extendGlobalIds(Type::CHR_CLASS, $c);
@@ -158,7 +158,7 @@ class GuideBaseResponse extends TemplateResponse implements ICache
         }
 
         // $infobox[] = Lang::guide('patch').Lang::main('colon').'3.3.5'; // replace with date
-        $infobox[] = Lang::guide('added').'[tooltip name=added]'.date('l, G:i:s', $this->subject->getField('date')).'[/tooltip][span class=tip tooltip=added]'.date(Lang::main('dateFmtShort'), $this->subject->getField('date')).'[/span]';
+        $infobox[] = Lang::guide('added').'[tooltip name=added]'.date('l, G:i:s', $this->subject->date).'[/tooltip][span class=tip tooltip=added]'.date(Lang::main('dateFmtShort'), $this->subject->date).'[/span]';
 
         if ($this->guideStatus == GuideMgr::STATUS_ARCHIVED)
             $infobox[] = Lang::guide('status', GuideMgr::STATUS_ARCHIVED);

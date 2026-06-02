@@ -13,7 +13,7 @@ class SpellContainer extends DBTypeContainer
     /**
      * iterate over fetched sets
      *
-     * @return \Generator<int, Spell> id => spell template
+     * @return \Generator<int, SpellEntry> id => spell template
      */
     public function iterate() : \Generator
     {
@@ -21,11 +21,11 @@ class SpellContainer extends DBTypeContainer
     }
 
     /**
-     * @return ?Spell
+     * @return ?SpellEntry
      */
-    public function getEntry(string|int $id) : ?Spell
+    public function getEntry(null|string|int $key = null) : ?SpellEntry
     {
-        return parent::getEntry($id);
+        return parent::getEntry($key);
     }
 
     /**

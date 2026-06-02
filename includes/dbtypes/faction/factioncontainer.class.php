@@ -13,7 +13,7 @@ class FactionContainer extends DBTypeContainer
     /**
      * iterate over fetched sets
      *
-     * @return \Generator<int, Faction> id => faction template
+     * @return \Generator<int, FactionEntry> id => faction template
      */
     public function iterate() : \Generator
     {
@@ -21,11 +21,11 @@ class FactionContainer extends DBTypeContainer
     }
 
     /**
-     * @return ?Faction
+     * @return ?FactionEntry
      */
-    public function getEntry(string|int $id) : ?Faction
+    public function getEntry(null|string|int $key = null) : ?FactionEntry
     {
-        return parent::getEntry($id);
+        return parent::getEntry($key);
     }
 }
 

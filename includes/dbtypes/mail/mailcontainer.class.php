@@ -13,7 +13,7 @@ class MailContainer extends DBTypeContainer
     /**
      * iterate over fetched sets
      *
-     * @return \Generator<int, Mail> id => mail template
+     * @return \Generator<int, MailEntry> id => mail template
      */
     public function iterate() : \Generator
     {
@@ -21,11 +21,11 @@ class MailContainer extends DBTypeContainer
     }
 
     /**
-     * @return ?Mail
+     * @return ?MailEntry
      */
-    public function getEntry(string|int $id) : ?Mail
+    public function getEntry(null|string|int $key = null) : ?MailEntry
     {
-        return parent::getEntry($id);
+        return parent::getEntry($key);
     }
 }
 

@@ -20,7 +20,7 @@ class GameobjectContainer extends DBTypeContainer
     /**
      * iterate over fetched sets
      *
-     * @return \Generator<int, Gameobject> id => go template
+     * @return \Generator<int, GameobjectEntry> id => go template
      */
     public function iterate() : \Generator
     {
@@ -28,11 +28,11 @@ class GameobjectContainer extends DBTypeContainer
     }
 
     /**
-     * @return ?Gameobject
+     * @return ?GameobjectEntry
      */
-    public function getEntry(string|int $id) : ?Gameobject
+    public function getEntry(null|string|int $key = null) : ?GameobjectEntry
     {
-        return parent::getEntry($id);
+        return parent::getEntry($key);
     }
 
     /** returns data portion of a listview js object */

@@ -355,7 +355,7 @@ abstract class DBTypeList
     }
 
     // read-access to templates
-    public function getEntry(string|int $id) : ?array
+    public function getEntry(null|string|int $key = null) : ?array
     {
         if (isset($this->templates[$id]))
         {
@@ -464,7 +464,7 @@ abstract class DBTypeList
 
     public static function makeLink(int $id, int $fmt = Lang::FMT_HTML, string $cssClass = '') : string
     {
-        if ($n = static::getName($id))
+        if ($n = staticEntry::getName($id))
             return Lang::makeLink(static::$type, $id, $n, $fmt, $cssClass);
 
         return '';

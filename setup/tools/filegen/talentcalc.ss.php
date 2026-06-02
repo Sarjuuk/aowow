@@ -49,12 +49,12 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
         // my neighbour is noisy as fuck and my head hurts, so ..
         $this->petFamIcons = ['Ability_Druid_KingoftheJungle', 'Ability_Druid_DemoralizingRoar', 'Ability_EyeOfTheOwl']; // .. i've no idea where to fetch these from
-        $this->spellMods   = (new SpellList(array(['typeCat', -2])))->getProfilerMods();
+        $this->spellMods   = (new SpellContainer(array(['typeCat', -2])))->getProfilerMods();
 
         $petIcons  = Util::toJSON(DB::Aowow()->SelectCol('SELECT `id` AS ARRAY_KEY, LOWER(SUBSTRING_INDEX(`iconString`, "\\", -1)) AS "iconString" FROM dbc_creaturefamily WHERE `petTalentType` IN (0, 1, 2)'));
 
         $tSpellIds = DB::Aowow()->selectCol('SELECT `rank1` FROM dbc_talent UNION SELECT `rank2` FROM dbc_talent UNION SELECT `rank3` FROM dbc_talent UNION SELECT `rank4` FROM dbc_talent UNION SELECT `rank5` FROM dbc_talent');
-        $this->tSpells = new SpellList(array(['s.id', $tSpellIds]));
+        $this->tSpells = new SpellContainer(array(['id', $tSpellIds]));
 
         foreach (CLISetup::$locales as $loc)
         {
@@ -111,7 +111,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
             if (!$classMask)
             {
-                $petFamId                = log($tabs[$tabIdx]['creatureFamilyMask'], 2);
+                $petFamId                = intval(log($tabs[$tabIdx]['creatureFamilyMask'], 2));
                 $result[$tabIdx]['icon'] = $this->petFamIcons[$petFamId];
                 $petCategories           = DB::Aowow()->SelectCol('SELECT `id` AS ARRAY_KEY, `categoryEnumID` FROM dbc_creaturefamily WHERE `petTalentType` = %i', $petFamId);
                 $result[$tabIdx]['f']    = array_keys($petCategories);

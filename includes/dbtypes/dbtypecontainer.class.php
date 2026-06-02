@@ -8,8 +8,8 @@ if (!defined('AOWOW_REVISION'))
 
 abstract class DBTypeContainer
 {
-    protected array  $sets     = [];
-    protected DBType $curEntry;
+    protected array       $sets     = [];
+    protected DBTypeEntry $curEntry;
 
     public static int        $dbType;
     public static int        $contribute = CONTRIBUTE_ANY;
@@ -39,7 +39,7 @@ abstract class DBTypeContainer
             return;
 
         foreach ($dbQuery->fetch() as $id => $data)
-            $this->sets[$id] = Type::newType(static::$dbType, (array)$data);
+            $this->sets[$id] = Type::newEntry(static::$dbType, (array)$data);
 
         $this->error = empty($this->sets);
 
@@ -54,7 +54,7 @@ abstract class DBTypeContainer
     /**
      * iterate over fetched sets
      *
-     * @return \Generator<int, DBType> id => current template
+     * @return \Generator<int, DBTypeEntry> id => current template
      */
     public function iterate() : \Generator
     {
@@ -103,14 +103,17 @@ abstract class DBTypeContainer
     }
 
     // read-access to sets
-    public function getEntry(string|int $id) : ?DBType
+    public function getEntry(null|string|int $key = null) : ?DBTypeEntry
     {
-        if (isset($this->sets[$id]))
+        if (is_null($key))
+            return $this->curEntry;
+
+        if (isset($this->sets[$key]))
         {
-            unset($this->curEntry);                           // kill reference or strange stuff will happen
-            $this->curEntry = $this->sets[$id];
-            $this->id     = $id;
-            return $this->sets[$id];
+            unset($this->curEntry);                         // kill reference or strange stuff will happen
+            $this->curEntry = $this->sets[$key];
+            $this->id     = $key;
+            return $this->sets[$key];
         }
 
         return null;
@@ -147,7 +150,7 @@ abstract class DBTypeContainer
         return array_filter($this->sets, fn($x) => in_array($x, $ids), ARRAY_FILTER_USE_KEY);
     }
 
-    public function import(DBType ...$entries) : void
+    public function import(DBTypeEntry ...$entries) : void
     {
         foreach ($entries as $e)
             if ($e::$dbType == static::$dbType)

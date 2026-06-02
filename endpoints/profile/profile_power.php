@@ -61,8 +61,8 @@ class ProfilePowerResponse extends TextResponse implements ICache
 
             if (!$this->subjectName)                        // implicit isCustom
                 $n .= Lang::profiler('customProfile');
-            else if ($_ = $profile->getField('title'))
-                if ($title = (new TitleList(array(['id', $_])))?->getField($g ? 'female' : 'male', true))
+            else if ($profile->title)
+                if ($title = (new TitleEntry($profile->title))?->${$g ? 'female' : 'male'})
                     $n = sprintf($title, $n);
 
             $opts = array(

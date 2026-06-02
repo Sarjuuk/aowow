@@ -16,7 +16,7 @@ class AchievementContainer extends DBTypeContainer implements IListview, ISource
     {
         parent::__construct($conditions, $miscData);
 
-        $rewards = Achievement::fetchRewards(...$this->getFoundIds());
+        $rewards = AchievementEntry::fetchRewards(...$this->getFoundIds());
 
         foreach ($this->iterate() as $id => $entry)
             $entry->setRewards($rewards[$id] ?? []);
@@ -25,7 +25,7 @@ class AchievementContainer extends DBTypeContainer implements IListview, ISource
     /**
      * iterate over fetched sets
      *
-     * @return \Generator<int, Achievement> id => achievement template
+     * @return \Generator<int, AchievementEntry> id => achievement template
      */
     public function iterate() : \Generator
     {
@@ -33,11 +33,11 @@ class AchievementContainer extends DBTypeContainer implements IListview, ISource
     }
 
     /**
-     * @return ?Achievement
+     * @return ?AchievementEntry
      */
-    public function getEntry(string|int $id) : ?Achievement
+    public function getEntry(null|string|int $key = null) : ?AchievementEntry
     {
-        return parent::getEntry($id);
+        return parent::getEntry($key);
     }
 
     public function getSourceData(int $_id = 0) : array

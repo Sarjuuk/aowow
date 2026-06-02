@@ -103,7 +103,7 @@ class CommunityContent
             if (!$_)
                 continue;
 
-            $obj = Type::newList($type, [['id', $_]]);
+            $obj = Type::newContainer($type, [['id', $_]]);
             if (!$obj)
                 continue;
 

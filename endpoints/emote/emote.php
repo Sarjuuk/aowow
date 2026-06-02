@@ -20,7 +20,7 @@ class EmoteBaseResponse extends TemplateResponse implements ICache
     public int $type   = Type::EMOTE;
     public int $typeId = 0;
 
-    private Emote $subject;
+    private EmoteEntry $subject;
 
     public function __construct(string $id)
     {
@@ -37,7 +37,7 @@ class EmoteBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new Emote($this->typeId);
+        $this->subject = new EmoteEntry($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('emote'), Lang::emote('notFound'));
 
@@ -180,7 +180,7 @@ class EmoteBaseResponse extends TemplateResponse implements ICache
         if (!$acv->error)
         {
             $this->extendGlobalData($acv->getJSGlobals());
-            $this->lvTabs->addListviewTab(new Listview(['data' => $acv->getListviewData()], Achievement::$brickFile));
+            $this->lvTabs->addListviewTab(new Listview(['data' => $acv->getListviewData()], AchievementEntry::$brickFile));
         }
 
         // tab: sound
@@ -194,7 +194,7 @@ class EmoteBaseResponse extends TemplateResponse implements ICache
 
         if ($ems)
         {
-            $sounds = new SoundList(array(['id', array_keys($ems)]));
+            $sounds = new SoundContainer(array(['id', array_keys($ems)]));
             if (!$sounds->error)
             {
                 $this->extendGlobalData($sounds->getJSGlobals(GLOBALINFO_SELF));
@@ -209,7 +209,7 @@ class EmoteBaseResponse extends TemplateResponse implements ICache
                     'data'      => $data,
                     //               gender                                  races
                     'extraCols' => ['$Listview.templates.title.columns[1]', '$Listview.templates.classs.columns[1]']
-                ), SoundList::$brickFile));
+                ), SoundEntry::$brickFile));
             }
         }
 

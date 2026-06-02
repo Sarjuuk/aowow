@@ -318,7 +318,7 @@ abstract class Filter
          * - in the POST step there may be excess criteria selectors with a value of '', as unselecting a criteria that is not the last will not remove the row from the UI
          * - if there are no criteria selected, the placeholder selection will always be sent as ['', null, null], similar to the previous quirk
          *
-         * same for stat weights on ItemListFilter
+         * same for stat weights on ItemFilter
          */
         if (!empty($this->rawData['cr']))
             $this->rawData['cr'] = array_filter($this->rawData['cr'], fn($x) => $x !== '') ?: null;

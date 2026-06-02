@@ -36,7 +36,7 @@ class ObjectsBaseResponse extends TemplateResponse implements ICache
         if ($this->category)
             $this->subCat = '='.implode('.', $this->category);
 
-        $this->filter = new GameObjectFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
+        $this->filter = new GameobjectFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
         if ($this->filter->shouldReload)
         {
             $_SESSION['error']['fi'] = $this->filter::class;
@@ -107,7 +107,7 @@ class ObjectsBaseResponse extends TemplateResponse implements ICache
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
 
-        $this->lvTabs->addListviewTab(new Listview($tabData, GameObject::$brickFile));
+        $this->lvTabs->addListviewTab(new Listview($tabData, GameobjectEntry::$brickFile));
 
         parent::generate();
     }

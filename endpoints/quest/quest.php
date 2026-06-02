@@ -35,7 +35,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
     public  int         $suggestedPl   = 1;
     public  bool        $unavailable   = false;
 
-    private Quest $subject;
+    private QuestEntry $subject;
 
     public function __construct(string $id)
     {
@@ -47,7 +47,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new Quest($this->typeId);
+        $this->subject = new QuestEntry($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('quest'), Lang::quest('notFound'));
 
@@ -315,7 +315,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
 
         if ($ids = array_filter(array_column($olItems, 0)))
         {
-            $olItemData = new ItemList(array(['id', $ids]));
+            $olItemData = new ItemContainer(array(['id', $ids]));
             $this->extendGlobalData($olItemData->getJSGlobals(GLOBALINFO_SELF));
 
             $providedRequired = false;
@@ -426,25 +426,24 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         // .. GO interactions
         if ($ids = array_keys($olGOs))
         {
-            $olGOData = new GameObjectList(array(['id', $ids]));
+            $olGOData = new GameobjectContainer(array(['id', $ids]));
             $this->extendGlobalData($olGOData->getJSGlobals(GLOBALINFO_SELF));
 
             foreach ($olGOs as $i => [$qty, $altText])
             {
-                if (!$i)
-                    continue;
-
-                if (!$olGOData->getEntry($i))
-                    $this->objectiveList[] = new IconElement(0, 0, Util::ucFirst(Lang::game('object')).' #'.$i, $qty > 1 ? $qty : '', size: IconElement::SIZE_SMALL);
-                else
+                if ($entry = $olGOData->getEntry($i))
+                {
                     $this->objectiveList[] = new IconElement(
                         Type::OBJECT,
                         $i,
-                        $altText ?: UIText::unescapeUISequences(Util::localizedString($olGOData->getEntry($i), 'name'), Lang::FMT_HTML),
+                        $altText ?: UIText::unescapeUISequences($entry->name, Lang::FMT_HTML),
                         $qty > 1 ? $qty : '',
                         size: IconElement::SIZE_SMALL,
                         element: 'iconlist-icon',
                     );
+                }
+                else
+                    $this->objectiveList[] = new IconElement(0, 0, Util::ucFirst(Lang::game('object')).' #'.$i, $qty > 1 ? $qty : '', size: IconElement::SIZE_SMALL);
             }
         }
 
@@ -474,7 +473,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         if ($_ = $this->subject->sourceSpellId)
         {
             $this->extendGlobalIds(Type::SPELL, $_);
-            $this->objectiveList[] = new IconElement(Type::SPELL, $_, Spell::getName($_), extraText: Lang::quest('provided'), element: 'iconlist-icon', size: IconElement::SIZE_SMALL);
+            $this->objectiveList[] = new IconElement(Type::SPELL, $_, Spellentry::getName($_), extraText: Lang::quest('provided'), element: 'iconlist-icon', size: IconElement::SIZE_SMALL);
         }
 
         // required money
@@ -719,7 +718,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                             continue;
 
                         if ($mn[2])                         // source for itemId
-                            $npcData['item'] = ItemList::getName($mn[2]);
+                            $npcData['item'] = ItemEntry::getName($mn[2]);
 
                         switch ($mn[1])                     // method
                         {
@@ -759,7 +758,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         // .. adding go from: containing queststart item; containing item needed to collect; starting quest; ending quest
         if ($mapGOs)
         {
-            $gos = new GameObjectList(array(['id', array_column($mapGOs, 0)]));
+            $gos = new GameobjectContainer(array(['id', array_column($mapGOs, 0)]));
             if (!$gos->error)
             {
                 $startEndDupe = [];                         // if quest starter/ender is the same object, we need to add it twice
@@ -772,7 +771,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                             continue;
 
                         if ($mgo[2])                        // source for itemId
-                            $goData['item'] = ItemList::getName($mgo[2]);
+                            $goData['item'] = ItemEntry::getName($mgo[2]);
 
                         switch ($mgo[1])                    // method
                         {
@@ -820,14 +819,14 @@ class QuestBaseResponse extends TemplateResponse implements ICache
             arsort($zoneOrder);
             $zoneOrder = array_flip(array_keys($zoneOrder));
 
-            $areas = new ZoneList(array(['id', array_keys($mObjectives)]));
+            $areas = new ZoneContainer(array(['id', array_keys($mObjectives)]));
             if (!$areas->error)
             {
-                foreach ($areas->iterate() as $id => $__)
+                foreach ($areas->iterate() as $id => $areaEntry)
                 {
                     // [zoneId, selectionPriority] - determines which map link is preselected. (highest index)
                     $mZones[$zoneOrder[$id]]  = [$id, count($zoneOrder) - $zoneOrder[$id]];
-                    $mObjectives[$id]['zone'] = $areas->getField('name', true);
+                    $mObjectives[$id]['zone'] = $areaEntry->name;
                 }
             }
 
@@ -900,7 +899,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         // factionchange-equivalent
         if ($pendant = DB::World()->selectCell('SELECT IF(`horde_id` = %i, `alliance_id`, -`horde_id`) FROM player_factionchange_quests WHERE `alliance_id` = %i OR `horde_id` = %i', $this->typeId, $this->typeId, $this->typeId))
         {
-            $altQuest = new Quest(abs($pendant));
+            $altQuest = new QuestEntry(abs($pendant));
             if (!$altQuest->error)
             {
                 $this->transfer = Lang::quest('_transfer', array(
@@ -928,7 +927,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                 'data' => $seeAlso->getListviewData(),
                 'name' => '$LANG.tab_seealso',
                 'id'   => 'see-also'
-            ), Quest::$brickFile));
+            ), QuestEntry::$brickFile));
         }
 
         // tab: criteria of
@@ -940,7 +939,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                 'data' => $criteriaOf->getListviewData(),
                 'name' => '$LANG.tab_criteriaof',
                 'id'   => 'criteria-of'
-            ), Achievement::$brickFile));
+            ), AchievementEntry::$brickFile));
         }
 
         // tab: spawning pool (for the swarm)
@@ -956,7 +955,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                     'name' => 'Quest Pool',
                     'id'   => 'quest-pool',
                     'note' => Lang::quest('questPoolDesc', [$max])
-                ), Quest::$brickFile));
+                ), QuestEntry::$brickFile));
             }
         }
 
@@ -1019,17 +1018,17 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         // itemChoices
         if ($choices = $this->subject->getRewardChoiceItems())
         {
-            $choiceItems = new ItemList(array(['id', array_keys($choices)]));
+            $choiceItems = new ItemContainer(array(['id', array_keys($choices)]));
             if (!$choiceItems->error)
             {
                 $this->extendGlobalData($choiceItems->getJSGlobals());
                 foreach ($choices as $id => $num)           // itr over $choices to preserve display order
-                    if ($choiceItems->getEntry($id))
+                    if ($entry = $choiceItems->getEntry($id))
                         $rewards[2][] = new IconElement(
                             Type::ITEM,
                             $id,
-                            UIText::unescapeUISequences($choiceItems->getField('name', true), Lang::FMT_HTML),
-                            quality: $choiceItems->getField('quality'),
+                            UIText::unescapeUISequences($entry->name, Lang::FMT_HTML),
+                            quality: $entry->quality,
                             num: $num
                         );
             }
@@ -1038,17 +1037,17 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         // itemRewards
         if ($reward = $this->subject->getRewardItems())
         {
-            $rewItems = new ItemList(array(['id', array_keys($reward)]));
+            $rewItems = new ItemContainer(array(['id', array_keys($reward)]));
             if (!$rewItems->error)
             {
                 $this->extendGlobalData($rewItems->getJSGlobals());
                 foreach ($reward as $id => $num)            // itr over $reward to preserve display order
-                    if ($rewItems->getEntry($id))
+                    if ($entry = $rewItems->getEntry($id))
                         $rewards[1][] = new IconElement(
                             Type::ITEM,
                             $id,
-                            UIText::unescapeUISequences($rewItems->getField('name', true), Lang::FMT_HTML),
-                            quality: $rewItems->getField('quality'),
+                            UIText::unescapeUISequences($entry->name, Lang::FMT_HTML),
+                            quality: $entry->quality,
                             num: $num
                         );
             }
@@ -1195,7 +1194,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
 
         // title
         if ($tId = $this->subject->rewardTitleId)
-            $gains[2] = [$tId, (new TitleList(array(['id', $tId])))->getHtmlizedName()];
+            $gains[2] = [$tId, (new TitleEntry($tId))->getHtmlizedName()];
         else
             $gains[2] = null;
 
@@ -1206,7 +1205,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
             $rep = array(
                 'qty'  => [$qty, ''],
                 'id'   => $fac,
-                'name' => Faction::getName($fac)
+                'name' => FactionEntry::getName($fac)
             );
 
             $extra = 0;
@@ -1264,7 +1263,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         };
 
         // Breadcrumb
-        if ($bcTargetId = $this->subject->getField('breadcrumbForQuestId'))
+        if ($bcTargetId = $this->subject->breadcrumbForQuestId)
         {
             if ($bcTarget = DB::Aowow()->selectRow('SELECT `id`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8`, `reqRaceMask` FROM ::quests WHERE `id` = %i', $bcTargetId))
             {

@@ -35,26 +35,26 @@ class EventPowerResponse extends TextResponse implements ICache
 
     protected function generate() : void
     {
-        $worldevent = new WorldEventList(array(['id', $this->typeId]));
+        $worldevent = new WorldeventEntry($this->typeId);
         if ($worldevent->error)
             $this->cacheType = CACHE_TYPE_NONE;
         else
         {
-            $icon = $worldevent->getField('iconString');
+            $icon = $worldevent->icon;
             if ($icon == 'trade_engineering')
                 $icon = null;
 
             $opts = array(
-                'name'    => $worldevent->getField('name', true),
+                'name'    => $worldevent->name,
                 'tooltip' => $worldevent->renderTooltip(),
                 'icon'    => $icon
             );
 
             $this->dates = array(
-                'firstDate' => $worldevent->getField('startTime'),
-                'lastDate'  => $worldevent->getField('endTime'),
-                'length'    => $worldevent->getField('length'),
-                'rec'       => $worldevent->getField('occurence')
+                'firstDate' => $worldevent->startTime,
+                'lastDate'  => $worldevent->endTime,
+                'length'    => $worldevent->length,
+                'rec'       => $worldevent->occurence
             );
 
             $this->setOnCacheLoaded([self::class, 'onBeforeDisplay'], $this->dates);

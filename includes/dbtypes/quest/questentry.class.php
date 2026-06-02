@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class Quest extends DBType
+class QuestEntry extends DBTypeEntry
 {
     public readonly  int       $cuFlags;
     public readonly  LocString $name;
@@ -382,9 +382,9 @@ class Quest extends DBType
             if (!$ot->isEmpty())
                 $name = $ot;
             else if ($rng > 0)
-                $name = Creature::getName($rng);
+                $name = CreatureEntry::getName($rng);
             else if ($rng < 0)
-                $name = UIText::unescapeUISequences(Gameobject::getName(-$rng), Lang::FMT_HTML);
+                $name = UIText::unescapeUISequences(GameobjectEntry::getName(-$rng), Lang::FMT_HTML);
 
             $xReq .= '<br /> - '.($name ?: Util::ucFirst(Lang::game($rng > 0 ? 'npc' : 'object')).' #'.abs($rng)).($qty > 1 ? ' x '.$qty : '');
         }
@@ -394,7 +394,7 @@ class Quest extends DBType
             if (($riQty = $this->reqItemCount[$i]) < 1)
                 continue;
 
-            $name = UIText::unescapeUISequences(ItemList::getName($ri), Lang::FMT_HTML) ?: Util::ucFirst(Lang::game('item')).' #'.$ri;
+            $name = UIText::unescapeUISequences(ItemEntry::getName($ri), Lang::FMT_HTML) ?: Util::ucFirst(Lang::game('item')).' #'.$ri;
 
             $xReq .= '<br /> - '.$name.($riQty > 1 ? ' x '.$riQty : '');
         }

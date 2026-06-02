@@ -25,7 +25,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
     public  array  $zoneMusic = [];
     public ?string $expansion = null;
 
-    private ZoneList $subject;
+    private ZoneEntry $subject;
 
     public function __construct(string $id)
     {
@@ -37,11 +37,11 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new ZoneList(array(['id', $this->typeId]));
+        $this->subject = new ZoneEntry($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('zone'), Lang::zone('notFound'));
 
-        $this->h1 = $this->subject->getField('name', true);
+        $this->h1 = $this->subject->name;
 
         $this->gPageInfo += array(
             'type'   => $this->type,
@@ -49,18 +49,18 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
             'name'   => $this->h1
         );
 
-        $_parentArea = $this->subject->getField('parentArea');
-        $_type       = $this->subject->getField('type');
+        $_parentArea = $this->subject->parentArea;
+        $_type       = $this->subject->type;
 
 
         /*************/
         /* Menu Path */
         /*************/
 
-        $this->breadcrumb[] = $this->subject->getField('category');
+        $this->breadcrumb[] = $this->subject->category;
 
-        if (in_array($this->subject->getField('category'), [MAP_TYPE_DUNGEON, MAP_TYPE_RAID]))
-            $this->breadcrumb[] = $this->subject->getField('expansion');
+        if (in_array($this->subject->category, [MAP_TYPE_DUNGEON, MAP_TYPE_RAID]))
+            $this->breadcrumb[] = $this->subject->expansion;
 
 
         /**************/
@@ -86,32 +86,27 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
         foreach ($quickFactsRows as $er)
             $this->extendGlobalData(Markup::parseTags($er));
 
-        $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
+        $infobox = Lang::getInfoBoxForFlags($this->subject->cuFlags);
 
         if ($topRows = array_filter($quickFactsRows, fn($x) => $x < 0, ARRAY_FILTER_USE_KEY))
             $infobox = array_merge($infobox, $topRows);
 
         // City
-        if ($this->subject->getField('flags') & AREA_FLAG_SLAVE_CAPITAL && !$_parentArea)
+        if ($this->subject->flags & AREA_FLAG_SLAVE_CAPITAL && !$_parentArea)
             $infobox[] = Lang::zone('city');
 
         // Auto repop
-        if ($this->subject->getField('flags') & AREA_FLAG_NEED_FLY && !$_parentArea)
+        if ($this->subject->flags & AREA_FLAG_NEED_FLY && !$_parentArea)
             $infobox[] = Lang::zone('autoRez');
 
         // Level
-        if ($_ = $this->subject->getField('levelMin'))
-        {
-            if ($_ < $this->subject->getField('levelMax'))
-                $_ .= ' - '.$this->subject->getField('levelMax');
-
-            $infobox[] = Lang::game('level').Lang::main('colon').$_;
-        }
+        if ($_ = $this->subject->levelMin)
+            $infobox[] = Lang::game('level').Lang::main('colon').Util::createNumRange($_, $this->subject->levelMax, ' - ');
 
         // required Level
-        if ($_ = $this->subject->getField('levelReq'))
+        if ($_ = $this->subject->levelReq)
         {
-            if ($__ = $this->subject->getField('levelReqLFG'))
+            if ($__ = $this->subject->levelReqLFG)
                 $buff = Lang::zone('reqLevels', [$_, $__]);
             else
                 $buff = Lang::main('_reqLevel').Lang::main('colon').$_;
@@ -120,7 +115,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
         }
 
         // Territory
-        $faction = $this->subject->getField('faction');
+        $faction = $this->subject->faction;
         $wrap    = match ($faction)
         {
             TEAM_ALLIANCE => '[span class=icon-alliance]%s[/span]',
@@ -132,16 +127,16 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
         $infobox[] = Lang::zone('territory').sprintf($wrap, Lang::zone('territories', $faction));
 
         // Instance Type
-        $infobox[] = Lang::zone('instanceType').'[span class=icon-instance'.$this->subject->getField('type').']'.Lang::zone('instanceTypes', $this->subject->getField('type')).'[/span]';
+        $infobox[] = Lang::zone('instanceType').'[span class=icon-instance'.$this->subject->type.']'.Lang::zone('instanceTypes', $this->subject->type).'[/span]';
 
         // Heroic mode
-        if ($_ = $this->subject->getField('levelHeroic'))
+        if ($_ = $this->subject->levelHeroic)
             $infobox[] = '[icon preset=heroic]'.Lang::zone('hcAvailable', [$_]).'[/icon]';
 
         // number of players
-        if ($_ = $this->subject->getField('maxPlayer'))
+        if ($_ = $this->subject->maxPlayer)
         {
-            if (in_array($this->subject->getField('category'), [6, 9]))
+            if (in_array($this->subject->category, [6, 9]))
                 $infobox[] = Lang::zone('numPlayersVs', [$_]);
             else
                 $infobox[] = Lang::zone('numPlayers', [$_ == -2 ? '10/25' : $_]);
@@ -169,11 +164,11 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
             $this->addMoveLocationMenu($pa['areaId'], $pa['floor']);
 
             $pins = str_pad($pa['posX'] * 10, 3, '0', STR_PAD_LEFT) . str_pad($pa['posY'] * 10, 3, '0', STR_PAD_LEFT);
-            $infobox[] = Lang::zone('location').'[lightbox=map zone='.$pa['areaId'].' '.($pa['floor'] > 1 ? 'floor='.--$pa['floor'] : '').' pins='.$pins.']'.ZoneList::getName($pa['areaId']).'[/lightbox]';
+            $infobox[] = Lang::zone('location').'[lightbox=map zone='.$pa['areaId'].' '.($pa['floor'] > 1 ? 'floor='.--$pa['floor'] : '').' pins='.$pins.']'.ZoneEntry::getName($pa['areaId']).'[/lightbox]';
         }
 
         // Attunement Quest/Achievements & Keys
-        if ($attmnt = $this->subject->getField('attunes'))
+        if ($attmnt = $this->subject->attunes)
         {
             foreach ($attmnt as $type => $ids)
             {
@@ -193,7 +188,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
 
         // original name
         if (Lang::getLocale() != Locale::EN)
-            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.$this->subject->getField('name_loc0').'[/copy][/li]';
+            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.($this->subject->name)(Locale::EN).'[/copy][/li]';
 
         if ($botRows = array_filter($quickFactsRows, fn($x) => $x > 0, ARRAY_FILTER_USE_KEY))
             $infobox = array_merge($infobox, $botRows);
@@ -244,9 +239,9 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
         if (!User::isInGroup(U_GROUP_STAFF))
             $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 
-        $objectSpawns   = new GameObjectList($conditions, ['calcTotal' => true]);
-        $creatureSpawns = new CreatureList($conditions, ['calcTotal' => true]);
-        $atSpawns       = new AreaTriggerList($conditions);
+        $objectSpawns   = new GameobjectContainer($conditions, ['calcTotal' => true]);
+        $creatureSpawns = new CreatureContainer($conditions, ['calcTotal' => true]);
+        $atSpawns       = new AreatriggerContainer($conditions);
 
         $questsLV = $rewardsLV = [];
 
@@ -282,20 +277,17 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
             $som = [];
             foreach ($oSpawns as $spawn)
             {
-                $tpl = $objectSpawns->getEntry($spawn['typeId']);
-                if (!$tpl)
+                if (!($objEntry = $objectSpawns->getEntry($spawn['typeId'])))
                     continue;
 
-                $n = Util::localizedString($tpl, 'name');
-
-                $what = match ((int)$tpl['typeCat'])
+                $what = match ($objEntry->typeCat)
                 {
                     -3      => 'herb',
                     -4      => 'vein',
                      9      => 'book',
                     25      => 'pool',
-                     0      => $tpl['type'] == 19 ? 'mail' : '',
-                    -6      => $tpl['spellFocusId'] == 1 ? 'anvil' : ($tpl['spellFocusId'] == 3 ? 'forge' : ''),
+                     0      => $objEntry->type == 19 ? 'mail' : '',
+                    -6      => $objEntry->spellFocusId == 1 ? 'anvil' : ($objEntry->spellFocusId == 3 ? 'forge' : ''),
                     default => ''
                 };
 
@@ -304,86 +296,82 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
                     $blob = array(
                         'coords' => [[$spawn['posX'], $spawn['posY']]],
                         'level'  => $spawn['floor'],
-                        'name'   => $n,
+                        'name'   => $objEntry->name,
                         'type'   => Type::OBJECT,
-                        'id'     => $tpl['id']
+                        'id'     => $objEntry->id
                     );
 
                     if ($what == 'mail')
                     {
-                        $blob['side'] = (($tpl['A'] < 0 ? 0 : SIDE_ALLIANCE) | ($tpl['H'] < 0 ? 0 : SIDE_HORDE));
-                        $addToSOM($what, $tpl['id'], $blob);
+                        $blob['side'] = (($objEntry->A < 0 ? 0 : SIDE_ALLIANCE) | ($objEntry->H < 0 ? 0 : SIDE_HORDE));
+                        $addToSOM($what, $objEntry->id, $blob);
                     }
                     else
-                        $addToSOM($what, $n, $blob);
+                        $addToSOM($what, $objEntry->name, $blob);
                 }
 
-                if ($tpl['startsQuests'])
+                if ($objEntry->startsQuests)
                 {
-                        $started = new QuestContainer(array(['qse.method', 1, '&'], ['qse.type', Type::OBJECT], ['qse.typeId', $tpl['id']]));
-                        if ($started->error)
+                    $started = new QuestContainer(array(['qse.method', 1, '&'], ['qse.type', Type::OBJECT], ['qse.typeId', $objEntry->id]));
+                    if ($started->error)
+                        continue;
+
+                    // store data for misc tabs
+                    foreach ($started->getListviewData() as $id => $data)
+                    {
+                        if ($started->questSortId > 0 && !in_array($started->questSortId, $relQuestZOS))
                             continue;
 
-                        // store data for misc tabs
-                        foreach ($started->getListviewData() as $id => $data)
-                        {
-                            if ($started->getField('questSortId') > 0 && !in_array($started->getField('questSortId'), $relQuestZOS))
-                                continue;
+                        if (!empty($started->rewards[$id][Type::ITEM]))
+                            $rewardsLV = array_merge($rewardsLV, array_keys($started->rewards[$id][Type::ITEM]));
 
-                            if (!empty($started->rewards[$id][Type::ITEM]))
-                                $rewardsLV = array_merge($rewardsLV, array_keys($started->rewards[$id][Type::ITEM]));
+                        if (!empty($started->choices[$id][Type::ITEM]))
+                            $rewardsLV = array_merge($rewardsLV, array_keys($started->choices[$id][Type::ITEM]));
 
-                            if (!empty($started->choices[$id][Type::ITEM]))
-                                $rewardsLV = array_merge($rewardsLV, array_keys($started->choices[$id][Type::ITEM]));
+                        $questsLV[$id] = $data;
+                    }
 
-                            $questsLV[$id] = $data;
-                        }
+                    $this->extendGlobalData($started->getJSGlobals());
 
-                        $this->extendGlobalData($started->getJSGlobals());
+                    if (($objEntry->A != -1) && ($_ = $started->getSOMData(SIDE_ALLIANCE)))
+                        $addToSOM('alliancequests', $objEntry->name, array(
+                            'coords' => [[$spawn['posX'], $spawn['posY']]],
+                            'level'  => $spawn['floor'],
+                            'name'   => $objEntry->name,
+                            'type'   => Type::OBJECT,
+                            'id'     => $objEntry->id,
+                            'side'   => (($objEntry->A < 0 ? 0 : SIDE_ALLIANCE) | ($objEntry->H < 0 ? 0 : SIDE_HORDE)),
+                            'quests' => array_values($_)
+                        ));
 
-                        if (($tpl['A'] != -1) && ($_ = $started->getSOMData(SIDE_ALLIANCE)))
-                            $addToSOM('alliancequests', $n, array(
-                                'coords' => [[$spawn['posX'], $spawn['posY']]],
-                                'level'  => $spawn['floor'],
-                                'name'   => $n,
-                                'type'   => Type::OBJECT,
-                                'id'     => $tpl['id'],
-                                'side'   => (($tpl['A'] < 0 ? 0 : SIDE_ALLIANCE) | ($tpl['H'] < 0 ? 0 : SIDE_HORDE)),
-                                'quests' => array_values($_)
-                            ));
-
-                        if (($tpl['H'] != -1) && ($_ = $started->getSOMData(SIDE_HORDE)))
-                            $addToSOM('hordequests', $n, array(
-                                'coords' => [[$spawn['posX'], $spawn['posY']]],
-                                'level'  => $spawn['floor'],
-                                'name'   => $n,
-                                'type'   => Type::OBJECT,
-                                'id'     => $tpl['id'],
-                                'side'   => (($tpl['A'] < 0 ? 0 : SIDE_ALLIANCE) | ($tpl['H'] < 0 ? 0 : SIDE_HORDE)),
-                                'quests' => array_values($_)
-                            ));
+                    if (($objEntry->H != -1) && ($_ = $started->getSOMData(SIDE_HORDE)))
+                        $addToSOM('hordequests', $objEntry->name, array(
+                            'coords' => [[$spawn['posX'], $spawn['posY']]],
+                            'level'  => $spawn['floor'],
+                            'name'   => $objEntry->name,
+                            'type'   => Type::OBJECT,
+                            'id'     => $objEntry->id,
+                            'side'   => (($objEntry->A < 0 ? 0 : SIDE_ALLIANCE) | ($objEntry->H < 0 ? 0 : SIDE_HORDE)),
+                            'quests' => array_values($_)
+                        ));
                 }
             }
 
             $flightNodes = [];
             foreach ($cSpawns as $spawn)
             {
-                $tpl = $creatureSpawns->getEntry($spawn['typeId']);
-                if (!$tpl)
+                if (!($npcEntry = $creatureSpawns->getEntry($spawn['typeId'])))
                     continue;
-
-                $n  = Util::localizedString($tpl, 'name');
-                $sn = Util::localizedString($tpl, 'subname');
 
                 $somNPC = array(
                     'coords'        => [[$spawn['posX'], $spawn['posY']]],
                     'level'         => $spawn['floor'],
-                    'name'          => $n,
+                    'name'          => $npcEntry->name,
                     'type'          => Type::NPC,
-                    'id'            => $tpl['id'],
-                    'reacthorde'    => $tpl['H'] ?: 1,      // no neutral (0) setting
-                    'reactalliance' => $tpl['A'] ?: 1,
-                    'description'   => $sn
+                    'id'            => $npcEntry->id,
+                    'reacthorde'    => $npcEntry->H ?: 1,   // no neutral (0) setting
+                    'reactalliance' => $npcEntry->A ?: 1,
+                    'description'   => $npcEntry->subname
                 );
 
                 $flagsMap = array(
@@ -402,65 +390,65 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
                 );
 
                 foreach ($flagsMap as $flag => $what)
-                    if ($tpl['npcflag'] & $flag)
-                        $addToSOM($what, $n, $somNPC);
+                    if ($npcEntry->npcflag & $flag)
+                        $addToSOM($what, $npcEntry->name, $somNPC);
 
-                if ($creatureSpawns->isBoss())
-                    $addToSOM('boss', $n, $somNPC);
-                else if ($tpl['rank'] == NPC_RANK_RARE_ELITE || $tpl['rank'] == NPC_RANK_RARE)
-                    $addToSOM('rare', $n, $somNPC);
+                if ($npcEntry->isBoss())
+                    $addToSOM('boss', $npcEntry->npcflag, $somNPC);
+                else if ($npcEntry->rank == NPC_RANK_RARE_ELITE || $npcEntry->rank == NPC_RANK_RARE)
+                    $addToSOM('rare', $npcEntry->npcflag, $somNPC);
 
-                if ($tpl['npcflag'] & NPC_FLAG_FLIGHT_MASTER)
-                    $flightNodes[$tpl['id']] = [$spawn['posX'], $spawn['posY']];
+                if ($npcEntry->npcflag & NPC_FLAG_FLIGHT_MASTER)
+                    $flightNodes[$npcEntry->id] = [$spawn['posX'], $spawn['posY']];
 
-                if ($tpl['startsQuests'])
+                if ($npcEntry->startsQuests)
                 {
-                        $started = new QuestList(array(['qse.method', 1, '&'], ['qse.type', Type::NPC], ['qse.typeId', $tpl['id']]));
-                        if ($started->error)
+                    $started = new QuestContainer(array(['qse.method', 1, '&'], ['qse.type', Type::NPC], ['qse.typeId', $npcEntry->id]));
+                    if ($started->error)
+                        continue;
+
+                    // store data for misc tabs
+                    foreach ($started->getListviewData() as $id => $data)
+                    {
+                        if ($started->questSortId > 0 && !in_array($started->questSortId, $relQuestZOS))
                             continue;
 
-                        // store data for misc tabs
-                        foreach ($started->getListviewData() as $id => $data)
-                        {
-                            if ($started->getField('questSortId') > 0 && !in_array($started->getField('questSortId'), $relQuestZOS))
-                                continue;
+                        if (!empty($started->rewards[$id][Type::ITEM]))
+                            $rewardsLV = array_merge($rewardsLV, array_keys($started->rewards[$id][Type::ITEM]));
 
-                            if (!empty($started->rewards[$id][Type::ITEM]))
-                                $rewardsLV = array_merge($rewardsLV, array_keys($started->rewards[$id][Type::ITEM]));
+                        if (!empty($started->choices[$id][Type::ITEM]))
+                            $rewardsLV = array_merge($rewardsLV, array_keys($started->choices[$id][Type::ITEM]));
 
-                            if (!empty($started->choices[$id][Type::ITEM]))
-                                $rewardsLV = array_merge($rewardsLV, array_keys($started->choices[$id][Type::ITEM]));
+                        $questsLV[$id] = $data;
+                    }
 
-                            $questsLV[$id] = $data;
-                        }
+                    $this->extendGlobalData($started->getJSGlobals());
 
-                        $this->extendGlobalData($started->getJSGlobals());
+                    if (($npcEntry->A != -1) && ($_ = $started->getSOMData(SIDE_ALLIANCE)))
+                        $addToSOM('alliancequests', $npcEntry->name, array(
+                            'coords'        => [[$spawn['posX'], $spawn['posY']]],
+                            'level'         => $spawn['floor'],
+                            'name'          => $npcEntry->name,
+                            'type'          => Type::NPC,
+                            'id'            => $npcEntry->id,
+                            'reacthorde'    => $npcEntry->H,
+                            'reactalliance' => $npcEntry->A,
+                            'side'          => (($npcEntry->A < 0 ? 0 : SIDE_ALLIANCE) | ($npcEntry->H < 0 ? 0 : SIDE_HORDE)),
+                            'quests'        => array_values($_)
+                        ));
 
-                        if (($tpl['A'] != -1) && ($_ = $started->getSOMData(SIDE_ALLIANCE)))
-                            $addToSOM('alliancequests', $n, array(
-                                'coords'        => [[$spawn['posX'], $spawn['posY']]],
-                                'level'         => $spawn['floor'],
-                                'name'          => $n,
-                                'type'          => Type::NPC,
-                                'id'            => $tpl['id'],
-                                'reacthorde'    => $tpl['H'],
-                                'reactalliance' => $tpl['A'],
-                                'side'          => (($tpl['A'] < 0 ? 0 : SIDE_ALLIANCE) | ($tpl['H'] < 0 ? 0 : SIDE_HORDE)),
-                                'quests'        => array_values($_)
-                            ));
-
-                        if (($tpl['H'] != -1) && ($_ = $started->getSOMData(SIDE_HORDE)))
-                            $addToSOM('hordequests', $n, array(
-                                'coords'        => [[$spawn['posX'], $spawn['posY']]],
-                                'level'         => $spawn['floor'],
-                                'name'          => $n,
-                                'type'          => Type::NPC,
-                                'id'            => $tpl['id'],
-                                'reacthorde'    => $tpl['H'],
-                                'reactalliance' => $tpl['A'],
-                                'side'          => (($tpl['A'] < 0 ? 0 : SIDE_ALLIANCE) | ($tpl['H'] < 0 ? 0 : SIDE_HORDE)),
-                                'quests'        => array_values($_)
-                            ));
+                    if (($npcEntry->H != -1) && ($_ = $started->getSOMData(SIDE_HORDE)))
+                        $addToSOM('hordequests', $npcEntry->name, array(
+                            'coords'        => [[$spawn['posX'], $spawn['posY']]],
+                            'level'         => $spawn['floor'],
+                            'name'          => $npcEntry->name,
+                            'type'          => Type::NPC,
+                            'id'            => $npcEntry->id,
+                            'reacthorde'    => $npcEntry->H,
+                            'reactalliance' => $npcEntry->A,
+                            'side'          => (($npcEntry->A < 0 ? 0 : SIDE_ALLIANCE) | ($npcEntry->H < 0 ? 0 : SIDE_HORDE)),
+                            'quests'        => array_values($_)
+                        ));
                 }
             }
 
@@ -469,18 +457,16 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
                 if ($spawn['guid'] < 0)                     // skip teleporter endpoints
                     continue;
 
-                $tpl = $atSpawns->getEntry($spawn['typeId']);
-                if (!$tpl)
+                if (!($atEntry = $atSpawns->getEntry($spawn['typeId'])))
                     continue;
 
-                $n = Util::localizedString($tpl, 'name');
-                $addToSOM('areatrigger', $n, array(
+                $addToSOM('areatrigger', $atEntry->name, array(
                     'coords'        => [[$spawn['posX'], $spawn['posY']]],
                     'level'         => $spawn['floor'],
-                    'name'          => $n,
+                    'name'          => $atEntry->name,
                     'type'          => Type::AREATRIGGER,
                     'id'            => $spawn['typeId'],
-                    'description'   => Lang::game('type').Lang::areatrigger('types', $tpl['type'])
+                    'description'   => Lang::game('type').Lang::areatrigger('types', $atEntry->type)
                 ));
             }
 
@@ -572,13 +558,17 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
         {
             // Issue 1 - if the bosses drop items that are also sold by vendors moreZoneId will be 0 as vendor location and boss location are likely in conflict with each other
             // Issue 2 - if the boss/chest isn't spawned the loot will not show up
-            $items   = new ItemList(array(['src.moreZoneId', $this->typeId], ['src.src2', 0, '>'], ['quality', ITEM_QUALITY_UNCOMMON, '>=']), ['calcTotal' => true]);
+            $items   = new ItemContainer(array(['src.moreZoneId', $this->typeId], ['src.src2', 0, '>'], ['quality', ITEM_QUALITY_UNCOMMON, '>=']), ['calcTotal' => true]);
             $data    = $items->getListviewData();
             $subTabs = false;
-            foreach ($items->iterate() as $id => $__)
+
+            $items->prepareSourceMore();
+            assert(false, 'uhhh...');
+
+            foreach ($items->iterate() as $id => $itemEntry)
             {
-                $src = $items->getRawSource(SRC_DROP);
-                $map = ($items->getField('moreMask') ?: 0) & (SRC_FLAG_DUNGEON_DROP | SRC_FLAG_RAID_DROP);
+                $src = $itemEntry->getRawSource(SRC_DROP);
+                $map = ($itemEntry->moreMask ?: 0) & (SRC_FLAG_DUNGEON_DROP | SRC_FLAG_RAID_DROP);
                 if (!$src || !$map)
                     continue;
 
@@ -601,12 +591,12 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
                 'onAfterCreate'   => $subTabs ? '$Listview.funcBox.addModeIndicator' : null
             );
 
-            if (!is_null(ItemListFilter::getCriteriaIndex(16, $this->typeId)))
+            if (!is_null(ItemFilter::getCriteriaIndex(16, $this->typeId)))
                 $tabData['note'] = sprintf(Util::$filterResultString, '?items&filter=cr=16;crs='.$this->typeId.';crv=0');
 
             $this->extendGlobalData($items->getJSGlobals(GLOBALINFO_SELF));
 
-            $this->lvTabs->addListviewTab(new Listview($tabData, ItemList::$brickFile));
+            $this->lvTabs->addListviewTab(new Listview($tabData, ItemEntry::$brickFile));
         }
 
         // tab: npcs
@@ -614,7 +604,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
         {
             $tabData = ['data' => $creatureSpawns->getListviewData()];
 
-            if (!is_null(CreatureListFilter::getCriteriaIndex(6, $this->typeId)))
+            if (!is_null(CreatureFilter::getCriteriaIndex(6, $this->typeId)))
                 $tabData['note'] = sprintf(Util::$filterResultString, '?npcs&filter=cr=6;crs='.$this->typeId.';crv=0');
 
             if ($creatureSpawns->getMatches() > Listview::DEFAULT_SIZE)
@@ -622,7 +612,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
 
             $this->extendGlobalData($creatureSpawns->getJSGlobals(GLOBALINFO_SELF));
 
-            $this->lvTabs->addListviewTab(new Listview($tabData, CreatureList::$brickFile));
+            $this->lvTabs->addListviewTab(new Listview($tabData, CreatureEntry::$brickFile));
         }
 
         // tab: objects
@@ -630,7 +620,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
         {
             $tabData = ['data' => $objectSpawns->getListviewData()];
 
-            if (!is_null(GameObjectListFilter::getCriteriaIndex(1, $this->typeId)))
+            if (!is_null(GameobjectFilter::getCriteriaIndex(1, $this->typeId)))
                 $tabData['note'] = sprintf(Util::$filterResultString, '?objects&filter=cr=1;crs='.$this->typeId.';crv=0');
 
             if ($objectSpawns->getMatches() > Listview::DEFAULT_SIZE)
@@ -638,10 +628,10 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
 
             $this->extendGlobalData($objectSpawns->getJSGlobals(GLOBALINFO_SELF));
 
-            $this->lvTabs->addListviewTab(new Listview($tabData, GameObjectList::$brickFile));
+            $this->lvTabs->addListviewTab(new Listview($tabData, GameobjectEntry::$brickFile));
         }
 
-        $quests = new QuestList(array(['questSortId', $this->typeId]));
+        $quests = new QuestContainer(array(['questSortId', $this->typeId]));
         if (!$quests->error)
         {
             $this->extendGlobalData($quests->getJSGlobals());
@@ -667,14 +657,14 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
                 if (!in_array($this->typeId, $children))
                     continue;
 
-                if (!is_null(ItemListFilter::getCriteriaIndex(126, $this->typeId)))
+                if (!is_null(ItemFilter::getCriteriaIndex(126, $this->typeId)))
                     $tabData['note'] = '$$WH.sprintf(LANG.lvnote_zonequests, '.$parent.', '.$this->typeId.',"'.$this->subject->getField('name', true).'", '.$this->typeId.')';
                 else
                     $tabData['note'] = '$$WH.sprintf(LANG.lvnote_questsind, '.$parent.', '.$this->typeId.',"'.$this->subject->getField('name', true).'")';
                 break;
             }
 
-            $this->lvTabs->addListviewTab(new Listview($tabData, QuestList::$brickFile));
+            $this->lvTabs->addListviewTab(new Listview($tabData, QuestEntry::$brickFile));
         }
 
         // tab: starts-quest
@@ -690,14 +680,14 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
 
         if ($questStartItem)
         {
-            $qsiList = new ItemList(array(['id', array_keys($questStartItem)]));
+            $qsiList = new ItemContainer(array(['id', array_keys($questStartItem)]));
             if (!$qsiList->error)
             {
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data' => $qsiList->getListviewData(),
                     'name' => '$LANG.tab_startsquest',
                     'id'   => 'starts-quest'
-                ), ItemList::$brickFile));
+                ), ItemEntry::$brickFile));
 
                 $this->extendGlobalData($qsiList->getJSGlobals(GLOBALINFO_SELF));
             }
@@ -706,11 +696,11 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
         // tab: quest-rewards [ids collected by SOM-routine]
         if ($rewardsLV)
         {
-            $rewards = new ItemList(array(['id', array_unique($rewardsLV)]));
+            $rewards = new ItemContainer(array(['id', array_unique($rewardsLV)]));
             if (!$rewards->error)
             {
                 $note = null;
-                if (!is_null(ItemListFilter::getCriteriaIndex(126, $this->typeId)))
+                if (!is_null(ItemFilter::getCriteriaIndex(126, $this->typeId)))
                     $note = sprintf(Util::$filterResultString, '?items&filter=cr=126;crs='.$this->typeId.';crv=0');
 
                 $this->lvTabs->addListviewTab(new Listview(array(
@@ -718,7 +708,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
                     'name' => '$LANG.tab_questrewards',
                     'id'   => 'quest-rewards',
                     'note' => $note
-                ), ItemList::$brickFile));
+                ), ItemEntry::$brickFile));
 
                 $this->extendGlobalData($rewards->getJSGlobals(GLOBALINFO_SELF));
             }
@@ -754,7 +744,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
 
         }
 
-        $crtOf = new AchievementList($conditions);
+        $crtOf = new AchievementContainer($conditions);
         if (!$crtOf->error)
         {
             $this->extendGlobalData($crtOf->getJSGlobals());
@@ -763,7 +753,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
                 'data' => $crtOf->getListviewData(),
                 'name' => '$LANG.tab_criteriaof',
                 'id'   => 'criteria-of'
-            ), AchievementList::$brickFile));
+            ), AchievementEntry::$brickFile));
         }
 
         // tab: fishing
@@ -787,13 +777,13 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
                 'hiddenCols'      => ['side'],
                 'note'            => $note,
                 'computeDataFunc' => '$Listview.funcBox.initLootTable'
-            ), ItemList::$brickFile));
+            ), ItemEntry::$brickFile));
         }
 
         // tab: spells
         if ($saData = DB::World()->selectAssoc('SELECT * FROM spell_area WHERE `area` = %i', $this->typeId))
         {
-            $spells = new SpellList(array(['id', array_column($saData, 'spell')]));
+            $spells = new SpellContainer(array(['id', array_column($saData, 'spell')]));
             if (!$spells->error)
             {
                 $lvSpells = $spells->getListviewData();
@@ -828,12 +818,12 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
                     'data'       => $lvSpells,
                     'hiddenCols' => ['skill'],
                     'extraCols'  => $extraCols ?: null
-                ), SpellList::$brickFile));
+                ), SpellEntry::$brickFile));
             }
         }
 
         // tab: subzones
-        $subZones = new ZoneList(array(['parentArea', $this->typeId]));
+        $subZones = new ZoneContainer(array(['parentArea', $this->typeId]));
         if (!$subZones->error)
         {
             $this->lvTabs->addListviewTab(new Listview(array(
@@ -841,7 +831,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
                 'name'       => '$LANG.tab_zones',
                 'id'         => 'subzones',
                 'hiddenCols' => ['territory', 'instancetype']
-            ), ZoneList::$brickFile));
+            ), ZoneEntry::$brickFile));
 
             $this->extendGlobalData($subZones->getJSGlobals(GLOBALINFO_SELF));
         }
@@ -873,7 +863,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
 
         if ($soundIds)
         {
-            $music = new SoundList(array(['id', array_unique($soundIds)]));
+            $music = new SoundContainer(array(['id', array_unique($soundIds)]));
             if (!$music->error)
             {
                 // tab
@@ -891,7 +881,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
 
                 $tabData['data'] = $data;
 
-                $this->lvTabs->addListviewTab(new Listview($tabData, SoundList::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview($tabData, SoundEntry::$brickFile));
 
                 $this->extendGlobalData($music->getJSGlobals(GLOBALINFO_SELF));
 

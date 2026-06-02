@@ -21,7 +21,7 @@ class TitleBaseResponse extends TemplateResponse implements ICache
     public  int    $typeId    = 0;
     public ?string $expansion = null;
 
-    private TitleList $subject;
+    private TitleEntry $subject;
 
     public function __construct(string $id)
     {
@@ -33,7 +33,7 @@ class TitleBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new TitleList(array(['id', $this->typeId]));
+        $this->subject = new TitleEntry($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('title'), Lang::title('notFound'));
 
@@ -45,14 +45,14 @@ class TitleBaseResponse extends TemplateResponse implements ICache
             'name'   => $this->h1
         );
 
-        $_title = Util::ucFirst($this->subject->getField('name'));
+        $_title = Util::ucFirst($this->subject->name);
 
 
         /*************/
         /* Menu Path */
         /*************/
 
-        $this->breadcrumb[] = $this->subject->getField('category');;
+        $this->breadcrumb[] = $this->subject->category;;
 
 
         /**************/
@@ -66,19 +66,19 @@ class TitleBaseResponse extends TemplateResponse implements ICache
         /* Infobox */
         /***********/
 
-        $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
+        $infobox = Lang::getInfoBoxForFlags($this->subject->cuFlags);
 
-        $infobox[] = Lang::main('side') . match ($this->subject->getField('side'))
+        $infobox[] = Lang::main('side') . match ($this->subject->side)
         {
             SIDE_ALLIANCE => '[span class=icon-alliance]'.Lang::game('si', SIDE_ALLIANCE).'[/span]',
             SIDE_HORDE    => '[span class=icon-horde]'.Lang::game('si', SIDE_HORDE).'[/span]',
             default       => Lang::game('si', SIDE_BOTH)    // 0, 3
         };
 
-        if ($g = $this->subject->getField('gender'))
+        if ($g = $this->subject->gender)
             $infobox[] = Lang::main('gender').Lang::main('colon').'[span class=icon-'.($g == 2 ? 'female' : 'male').']'.Lang::main('sex', $g).'[/span]';
 
-        if ($eId = $this->subject->getField('eventId'))
+        if ($eId = $this->subject->eventId)
         {
             $this->extendGlobalIds(Type::WORLDEVENT, $eId);
             $infobox[] = Lang::game('eventShort', ['[event='.$eId.']']);
@@ -99,7 +99,7 @@ class TitleBaseResponse extends TemplateResponse implements ICache
 
         // original name
         if (Lang::getLocale() != Locale::EN)
-            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.$this->subject->getField('name_loc0').'[/copy][/li]';
+            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.($this->subject->name)(Locale::EN).'[/copy][/li]';
 
         if ($infobox)
             $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0', 1);
@@ -109,7 +109,7 @@ class TitleBaseResponse extends TemplateResponse implements ICache
         /* Main Content */
         /****************/
 
-        $this->expansion  = Util::$expansionString[$this->subject->getField('expansion')];
+        $this->expansion  = Util::$expansionString[$this->subject->expansion];
         $this->redButtons = array(
             BUTTON_WOWHEAD => true,
             BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId]
@@ -118,7 +118,7 @@ class TitleBaseResponse extends TemplateResponse implements ICache
         // factionchange-equivalent
         if ($pendant = DB::World()->selectCell('SELECT IF(`horde_id` = %i, `alliance_id`, -`horde_id`) FROM player_factionchange_titles WHERE `alliance_id` = %i OR `horde_id` = %i', $this->typeId, $this->typeId, $this->typeId))
         {
-            $altTitle = new TitleList(array(['id', abs($pendant)]));
+            $altTitle = new TitleEntry(abs($pendant));
             if (!$altTitle->error)
             {
                 $this->transfer = Lang::title('_transfer', array(
@@ -138,7 +138,7 @@ class TitleBaseResponse extends TemplateResponse implements ICache
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
 
         // tab: reward-from-quest
-        $quests = new QuestList(array(['rewardTitleId', $this->typeId]));
+        $quests = new QuestContainer(array(['rewardTitleId', $this->typeId]));
         if (!$quests->error)
         {
             $this->extendGlobalData($quests->getJSGlobals(GLOBALINFO_REWARDS));
@@ -149,13 +149,13 @@ class TitleBaseResponse extends TemplateResponse implements ICache
                 'name'        => '$LANG.tab_rewardfrom',
                 'hiddenCols'  => ['experience', 'money'],
                 'visibleCols' => ['category']
-            ), QuestList::$brickFile));
+            ), QuestEntry::$brickFile));
         }
 
         // tab: reward-from-achievement
         if ($aIds = DB::World()->selectCol('SELECT `ID` FROM achievement_reward WHERE `TitleA` = %i OR `TitleH` = %i', $this->typeId, $this->typeId))
         {
-            $acvs = new AchievementList(array(['id', $aIds]));
+            $acvs = new AchievementContainer(array(['id', $aIds]));
             if (!$acvs->error)
             {
                 $this->extendGlobalData($acvs->getJSGlobals());
@@ -166,14 +166,14 @@ class TitleBaseResponse extends TemplateResponse implements ICache
                     'name'        => '$LANG.tab_rewardfrom',
                     'visibleCols' => ['category'],
                     'sort'        => ['reqlevel', 'name']
-                ), AchievementList::$brickFile));
+                ), AchievementEntry::$brickFile));
             }
         }
 
         // tab: criteria-of
         if ($crt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` = %i AND `value1` = %i', ACHIEVEMENT_CRITERIA_DATA_TYPE_S_KNOWN_TITLE, $this->typeId))
         {
-            $acvs = new AchievementList(array(['ac.id', $crt]));
+            $acvs = new AchievementContainer(array(['ac.id', $crt]));
             if (!$acvs->error)
             {
                 $this->extendGlobalData($acvs->getJSGlobals());
@@ -183,7 +183,7 @@ class TitleBaseResponse extends TemplateResponse implements ICache
                     'id'          => 'criteria-of',
                     'name'        => '$LANG.tab_criteriaof',
                     'visibleCols' => ['category']
-                ), AchievementList::$brickFile));
+                ), AchievementEntry::$brickFile));
             }
         }
 

@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class Currency extends DBType
+class CurrencyEntry extends DBTypeEntry
 {
     public readonly int       $cuFlags;
     public readonly LocString $name;
@@ -24,7 +24,7 @@ class Currency extends DBType
     public const /* string */ QUERY_BASE = 'SELECT c.*, c.`id` AS ARRAY_KEY FROM ::currencies c';
     public const /* array  */ QUERY_OPTS = array(
         'c'  => [['ic']],
-        'ic' => ['j' => ['::icons ic ON ic.`id` = c.`iconId`', true], 's' => ', ic.`name` AS "iconString"']
+        'ic' => ['j' => ['::icons ic ON ic.`id` = c.`iconId`', true], 's' => ', ic.`name` AS "icon"']
     );
 
     public function applyInitData(array $initData) : void
@@ -34,14 +34,15 @@ class Currency extends DBType
         $this->name        = new LocString($initData, 'name',        pruneFromSrc: true);
         $this->description = new LocString($initData, 'description', pruneFromSrc: true);
 
-        $this->icon = $initData['iconString'] ?: DEFAULT_ICON;
-
         foreach ($initData as $k => $v)
         {
             switch ($k)
             {
                 case 'id':                                  // id defined by parent
                     continue 2;
+                case 'icon':                                // fix missing icons
+                    $this->$k = $v ?: DEFAULT_ICON;
+                    break;
                 default:
                     if (property_exists($this, $k))
                         $this->$k = $v;

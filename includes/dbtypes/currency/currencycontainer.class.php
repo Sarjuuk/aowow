@@ -13,7 +13,7 @@ class CurrencyContainer extends DBTypeContainer
     /**
      * iterate over fetched sets
      *
-     * @return \Generator<int, Currency> id => currency template
+     * @return \Generator<int, CurrencyEntry> id => currency template
      */
     public function iterate() : \Generator
     {
@@ -21,11 +21,11 @@ class CurrencyContainer extends DBTypeContainer
     }
 
     /**
-     * @return ?Currency
+     * @return ?CurrencyEntry
      */
-    public function getEntry(string|int $id) : ?Currency
+    public function getEntry(null|string|int $key = null) : ?CurrencyEntry
     {
-        return parent::getEntry($id);
+        return parent::getEntry($key);
     }
 }
 

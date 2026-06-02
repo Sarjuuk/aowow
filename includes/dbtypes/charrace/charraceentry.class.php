@@ -6,20 +6,23 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class CharRace extends DBType
+class CharRaceEntry extends DBTypeEntry
 {
     public readonly int       $cuFlags;
     public readonly LocString $name;
     public readonly int       $classMask;
+ // public readonly int       $flags;
     public readonly int       $factionId;
-    public readonly int       $leader;
     public readonly int       $startAreaId;
+    public readonly int       $leader;
+ // public readonly int       $baseLanguage;
     public readonly int       $side;
-    public readonly int       $expansion;
+    public readonly string    $fileString;
     /** @var int[] $iconId [male, female] */
     public readonly array     $iconId;
     /** @var string[] $icon [male, female] */
     public readonly array     $icon;
+    public readonly int       $expansion;
 
     public static int    $dbType    = Type::CHR_RACE;
     public static string $brickFile = 'race';

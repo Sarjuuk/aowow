@@ -41,11 +41,11 @@ class SpellBaseResponse extends TemplateResponse implements ICache
     public ?array  $targetAura = null;
     public  array  $tooltip    = [];
 
-    private Spell $subject;
-    private int   $firstRank    = 0;
-    private array $modelInfo    = [];
-    private array $difficulties = [];
-    private int   $mapType      = 0;
+    private SpellEntry $subject;
+    private int        $firstRank    = 0;
+    private array      $modelInfo    = [];
+    private array      $difficulties = [];
+    private int        $mapType      = 0;
 
     public function __construct(string $id)
     {
@@ -57,7 +57,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new Spell($this->typeId);
+        $this->subject = new SpellEntry($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('spell'), Lang::spell('notFound'));
 
@@ -179,7 +179,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         // factionchange-equivalent
         if ($pendant = DB::World()->selectCell('SELECT IF(`horde_id` = %i, `alliance_id`, -`horde_id`) FROM player_factionchange_spells WHERE `alliance_id` = %i OR `horde_id` = %i', $this->typeId, $this->typeId, $this->typeId))
         {
-            $altSpell = new Spell(abs($pendant));
+            $altSpell = new SpellEntry(abs($pendant));
             if (!$altSpell->error)
             {
                 $this->transfer = Lang::spell('_transfer', array(
@@ -296,7 +296,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 if (!$abilities->hasSetFields('skillLines'))
                     $tabData['hiddenCols'] = ['skill'];
 
-                $this->lvTabs->addListviewTab(new Listview($tabData, Spell::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview($tabData, SpellEntry::$brickFile));
 
                 $this->extendGlobalData($abilities->getJSGlobals(GLOBALINFO_SELF));
             }
@@ -382,7 +382,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             if ($hideSkillCol)
                 $tabData['hiddenCols'] = ['skill'];
 
-            $this->lvTabs->addListviewTab(new Listview($tabData, Spell::$brickFile));
+            $this->lvTabs->addListviewTab(new Listview($tabData, SpellEntry::$brickFile));
         }
 
         // tab: [$this is] modified by
@@ -425,7 +425,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 if (!$modsSpell->hasSetFields('skillLines'))
                     $tabData['hiddenCols'] = ['skill'];
 
-                $this->lvTabs->addListviewTab(new Listview($tabData, Spell::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview($tabData, SpellEntry::$brickFile));
 
                 $this->extendGlobalData($modsSpell->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
             }
@@ -479,7 +479,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             if (isset($saE))
                 $tabData['extraCols'] = $saE;
 
-            $this->lvTabs->addListviewTab(new Listview($tabData, Spell::$brickFile));
+            $this->lvTabs->addListviewTab(new Listview($tabData, SpellEntry::$brickFile));
 
             $this->extendGlobalData($saSpells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
         }
@@ -504,7 +504,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                     'data' => $cdSpells->getListviewData(),
                     'name' => '$LANG.tab_sharedcooldown',
                     'id'   => 'shared-cooldown'
-                ), Spell::$brickFile));
+                ), SpellEntry::$brickFile));
 
                 $this->extendGlobalData($cdSpells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
             }
@@ -527,7 +527,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                     'visibleCols' => ['singleclass', 'glyphtype'],
                     'id'          => 'glyphs',
                     'name'        => '$LANG.tab_glyphs'
-                ), Spell::$brickFile));
+                ), SpellEntry::$brickFile));
 
                 $this->extendGlobalData($glyphSpells->getJSGlobals(GLOBALINFO_SELF));
             }
@@ -549,7 +549,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                     'data' => $ubSpells->getListviewData(),
                     'id'   => 'used-by-spell',
                     'name' => '$LANG.tab_usedby'
-                ), Spell::$brickFile));
+                ), SpellEntry::$brickFile));
 
                 $this->extendGlobalData($ubSpells->getJSGlobals(GLOBALINFO_SELF));
             }
@@ -562,14 +562,14 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             ['spell5', $this->typeId], ['spell6', $this->typeId], ['spell7', $this->typeId], ['spell8', $this->typeId]
         );
 
-        $ubSets = new ItemsetList($conditions);
+        $ubSets = new ItemsetContainer($conditions);
         if (!$ubSets->error)
         {
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $ubSets->getListviewData(),
                 'id'   => 'used-by-itemset',
                 'name' => '$LANG.tab_usedby'
-            ), ItemsetList::$brickFile));
+            ), ItemsetEntry::$brickFile));
 
             $this->extendGlobalData($ubSets->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
         }
@@ -584,14 +584,14 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             [DB::AND, ['spellTrigger5', SPELL_TRIGGER_LEARN, '!'], ['spellId5', $this->typeId]]
         );
 
-        $ubItems = new ItemList($conditions);
+        $ubItems = new ItemContainer($conditions);
         if (!$ubItems->error)
         {
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $ubItems->getListviewData(),
                 'id'   => 'used-by-item',
                 'name' => '$LANG.tab_usedby'
-            ), ItemList::$brickFile));
+            ), ItemEntry::$brickFile));
 
             $this->extendGlobalData($ubItems->getJSGlobals(GLOBALINFO_SELF));
         }
@@ -605,7 +605,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         if (!empty($ubSAI[Type::OBJECT]))
             $conditions[] = ['id', $ubSAI[Type::OBJECT]];
 
-        $ubObjects = new GameObjectList($conditions);
+        $ubObjects = new GameobjectContainer($conditions);
         if (!$ubObjects->error)
         {
             $this->addDataLoader('zones');
@@ -613,7 +613,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 'data' => $ubObjects->getListviewData(),
                 'id'   => 'used-by-object',
                 'name' => '$LANG.tab_usedby'
-            ), GameObjectList::$brickFile));
+            ), GameobjectEntry::$brickFile));
 
             $this->extendGlobalData($ubObjects->getJSGlobals());
         }
@@ -623,14 +623,14 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         {
             if (!empty($ubSAI[Type::AREATRIGGER]))
             {
-                $ubTriggers = new AreaTriggerContainer(array(['id', $ubSAI[Type::AREATRIGGER]]));
+                $ubTriggers = new AreatriggerContainer(array(['id', $ubSAI[Type::AREATRIGGER]]));
                 if (!$ubTriggers->error)
                 {
                     $this->lvTabs->addListviewTab(new Listview(array(
                         'data' => $ubTriggers->getListviewData(),
                         'id'   => 'used-by-areatrigger',
                         'name' => '$LANG.tab_usedby'
-                    ), AreaTrigger::$brickFile, 'areatrigger'));
+                    ), AreatriggerEntry::$brickFile, 'areatrigger'));
                 }
             }
         }
@@ -654,7 +654,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 'data' => $coAchievemnts->getListviewData(),
                 'id'   => 'criteria-of',
                 'name' => '$LANG.tab_criteriaof'
-            ), Achievement::$brickFile));
+            ), AchievementEntry::$brickFile));
 
             $this->extendGlobalData($coAchievemnts->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
         }
@@ -676,7 +676,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 'hiddenCols'      => ['side', 'slot', 'source', 'reqlevel'],
                 'extraCols'       => array_unique($extraCols),
                 'computeDataFunc' => '$Listview.funcBox.initLootTable'
-            ), ItemList::$brickFile));
+            ), ItemEntry::$brickFile));
         }
 
         // tab: bonus loot
@@ -704,7 +704,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                     'id'         => 'bonusloot',
                     'hiddenCols' => ['side', 'reqlevel'],
                     'extraCols'  => ['$Listview.extraCols.percent']
-                ), Spell::$brickFile));
+                ), SpellEntry::$brickFile));
             }
         }
 
@@ -768,7 +768,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                             if (isset($sH))
                                 $tabData['hiddenCols'] = $sH;
 
-                            $this->lvTabs->addListviewTab(new Listview($tabData, Spell::$brickFile));
+                            $this->lvTabs->addListviewTab(new Listview($tabData, SpellEntry::$brickFile));
                         }
                     }
                 }
@@ -814,7 +814,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 'name'        => Lang::spell('linkedWith'),
                 'hiddenCols'  => ['skill', 'name'],
                 'visibleCols' => ['linkedTrigger', 'linkedEffect']
-            ), Spell::$brickFile));
+            ), SpellEntry::$brickFile));
 
             $this->extendGlobalData($linked->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
         }
@@ -823,9 +823,9 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         // tab: triggered by
         $conditions = array(
             DB::OR,
-            [DB::AND, [DB::OR, ['effect1Id', Spell::EFFECTS_TRIGGER], ['effect1AuraId', Spell::AURAS_TRIGGER]], ['effect1TriggerSpell', $this->typeId]],
-            [DB::AND, [DB::OR, ['effect2Id', Spell::EFFECTS_TRIGGER], ['effect2AuraId', Spell::AURAS_TRIGGER]], ['effect2TriggerSpell', $this->typeId]],
-            [DB::AND, [DB::OR, ['effect3Id', Spell::EFFECTS_TRIGGER], ['effect3AuraId', Spell::AURAS_TRIGGER]], ['effect3TriggerSpell', $this->typeId]],
+            [DB::AND, [DB::OR, ['effect1Id', SpellEntry::EFFECTS_TRIGGER], ['effect1AuraId', SpellEntry::AURAS_TRIGGER]], ['effect1TriggerSpell', $this->typeId]],
+            [DB::AND, [DB::OR, ['effect2Id', SpellEntry::EFFECTS_TRIGGER], ['effect2AuraId', SpellEntry::AURAS_TRIGGER]], ['effect2TriggerSpell', $this->typeId]],
+            [DB::AND, [DB::OR, ['effect3Id', SpellEntry::EFFECTS_TRIGGER], ['effect3AuraId', SpellEntry::AURAS_TRIGGER]], ['effect3TriggerSpell', $this->typeId]],
         );
 
         $trigger = new SpellContainer($conditions);
@@ -835,7 +835,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 'data' => $trigger->getListviewData(),
                 'id'   => 'triggered-by',
                 'name' => '$LANG.tab_triggeredby'
-            ), Spell::$brickFile));
+            ), SpellEntry::$brickFile));
 
             $this->extendGlobalData($trigger->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
         }
@@ -863,7 +863,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 'data' => $ubCreature->getListviewData(),
                 'id'   => 'used-by-npc',
                 'name' => '$LANG.tab_usedby'
-            ), Creature::$brickFile));
+            ), CreatureEntry::$brickFile));
 
             $this->extendGlobalData($ubCreature->getJSGlobals(GLOBALINFO_SELF));
         }
@@ -871,7 +871,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         // tab: zone
         if ($areaSpells = DB::World()->selectAssoc('SELECT `area` AS ARRAY_KEY, `aura_spell` AS "0", `quest_start` AS "1", `quest_end` AS "2", `quest_start_status` AS "3", `quest_end_status` AS "4", `racemask` AS "5", `gender` AS "6" FROM spell_area WHERE `spell` = %i', $this->typeId))
         {
-            $zones = new ZoneList(array(['id', array_keys($areaSpells)]));
+            $zones = new ZoneContainer(array(['id', array_keys($areaSpells)]));
             if (!$zones->error)
             {
                 $lvZones = $zones->getListviewData();
@@ -891,7 +891,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                     $row['__condition'] = $condition;
 
                     // merge subzones, into one row, if: spell_area data is identical && parentZone is shared
-                    if ($p = $zones->getEntry($areaId)['parentArea'])
+                    if ($p = $zones->getEntry($areaId)?->parentArea)
                     {
                         $parents[] = $p;
                         $row['__parent'] = $p;
@@ -928,7 +928,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 // overwrite lvData with parent-lvData (condition and subzones are kept)
                 if ($parents)
                 {
-                    $parents = (new ZoneList(array(['id', $parents])))->getListviewData();
+                    $parents = (new ZoneContainer(array(['id', $parents])))->getListviewData();
                     foreach ($resultLv as &$_)
                         if (isset($parents[$_['__parent']]))
                             $_ = array_merge($_, $parents[$_['__parent']]);
@@ -970,7 +970,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                     $tabData['hiddenCols'] = ['instancetype'];
                 }
 
-                $this->lvTabs->addListviewTab(new Listview($tabData, ZoneList::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview($tabData, ZoneEntry::$brickFile));
             }
         }
 
@@ -1002,7 +1002,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 if (!$teaches->hasSetFields('skillLines'))
                     $tabData['hiddenCols'] = ['skill'];
 
-                $this->lvTabs->addListviewTab(new Listview($tabData, Spell::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview($tabData, SpellEntry::$brickFile));
             }
         }
 
@@ -1056,7 +1056,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                         $tabData['extraCols'] = $extraCols;
 
                     $this->addDataLoader('zones');
-                    $this->lvTabs->addListviewTab(new Listview($tabData, Creature::$brickFile));
+                    $this->lvTabs->addListviewTab(new Listview($tabData, CreatureEntry::$brickFile));
                 }
             }
         }
@@ -1064,9 +1064,9 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         // tab: taught by spell
         $conditions = array(
             DB::OR,
-            [DB::AND, ['effect1Id', Spell::EFFECTS_TEACH], ['effect1TriggerSpell', $this->typeId]],
-            [DB::AND, ['effect2Id', Spell::EFFECTS_TEACH], ['effect2TriggerSpell', $this->typeId]],
-            [DB::AND, ['effect3Id', Spell::EFFECTS_TEACH], ['effect3TriggerSpell', $this->typeId]],
+            [DB::AND, ['effect1Id', SpellEntry::EFFECTS_TEACH], ['effect1TriggerSpell', $this->typeId]],
+            [DB::AND, ['effect2Id', SpellEntry::EFFECTS_TEACH], ['effect2TriggerSpell', $this->typeId]],
+            [DB::AND, ['effect3Id', SpellEntry::EFFECTS_TEACH], ['effect3TriggerSpell', $this->typeId]],
         );
 
         $tbSpell = new SpellContainer($conditions);
@@ -1078,7 +1078,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 'data' => $tbSpell->getListviewData(),
                 'id'   => 'taught-by-spell',
                 'name' => '$LANG.tab_taughtby'
-            ), Spell::$brickFile));
+            ), SpellEntry::$brickFile));
 
             $this->extendGlobalData($tbSpell->getJSGlobals(GLOBALINFO_SELF));
         }
@@ -1093,14 +1093,14 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         if ($tbsData)
             array_push($conditions, ['rewardSpell', $tbsData], ['rewardSpellCast', $tbsData]);
 
-        $tbQuest = new QuestList($conditions);
+        $tbQuest = new QuestContainer($conditions);
         if (!$tbQuest->error)
         {
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $tbQuest->getListviewData(),
                 'id'   => 'reward-from-quest',
                 'name' => '$LANG.tab_rewardfrom'
-            ), QuestList::$brickFile));
+            ), QuestEntry::$brickFile));
 
             $this->extendGlobalData($tbQuest->getJSGlobals());
         }
@@ -1115,14 +1115,14 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             [DB::AND, ['spellTrigger5', SPELL_TRIGGER_LEARN], ['spellId5', $this->typeId]],
         );
 
-        $tbItem = new ItemList($conditions);
+        $tbItem = new ItemContainer($conditions);
         if (!$tbItem->error)
         {
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $tbItem->getListviewData(),
                 'id'   => 'taught-by-item',
                 'name' => '$LANG.tab_taughtby'
-            ), ItemList::$brickFile));
+            ), ItemEntry::$brickFile));
 
             $this->extendGlobalData($tbItem->getJSGlobals(GLOBALINFO_SELF));
         }
@@ -1140,7 +1140,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $enchList->getListviewData(),
                 'name' => Util::ucFirst(Lang::game('enchantments'))
-            ), Enchantment::$brickFile, 'enchantment'));
+            ), EnchantmentEntry::$brickFile, 'enchantment'));
 
             $this->extendGlobalData($enchList->getJSGlobals());
         }
@@ -1156,7 +1156,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         array_shift($activitySounds);                       // remove id-column
         if ($soundIDs = $activitySounds + $seSounds)
         {
-            $sounds = new SoundList(array(['id', $soundIDs]));
+            $sounds = new SoundContainer(array(['id', $soundIDs]));
             if (!$sounds->error)
             {
                 $data = $sounds->getListviewData();
@@ -1169,7 +1169,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                     $tabData['visibleCols'] = ['activity'];
 
                 $this->extendGlobalData($sounds->getJSGlobals(GLOBALINFO_SELF));
-                $this->lvTabs->addListviewTab(new Listview($tabData, SoundList::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview($tabData, SoundEntry::$brickFile));
             }
         }
 
@@ -1197,7 +1197,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         if ($lockIds)
         {
             // objects
-            $lockedObj = new GameObjectList(array(['lockId', $lockIds]));
+            $lockedObj = new GameobjectContainer(array(['lockId', $lockIds]));
             if (!$lockedObj->error)
             {
                 $this->addDataLoader('zones');
@@ -1206,10 +1206,10 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                     'name'        => '$LANG.tab_unlocks',
                     'id'          => 'unlocks-object',
                     'visibleCols' => $lockedObj->hasSetFields('reqSkill') ? ['skill'] : null
-                ), GameObjectList::$brickFile));
+                ), GameobjectEntry::$brickFile));
             }
 
-            $lockedItm = new ItemList(array(['lockId', $lockIds]));
+            $lockedItm = new ItemContainer(array(['lockId', $lockIds]));
             if (!$lockedItm->error)
             {
                 $this->extendGlobalData($lockedItm->getJSGlobals(GLOBALINFO_SELF));
@@ -1218,7 +1218,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                     'data' => $lockedItm->getListviewData(),
                     'name' => '$LANG.tab_unlocks',
                     'id'   => 'unlocks-item'
-                ), ItemList::$brickFile));
+                ), ItemEntry::$brickFile));
             }
         }
 
@@ -1390,7 +1390,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
         foreach ($this->subject->getReagents() as [$iId, $num])
         {
-            $name = ItemList::getName($iId, $quality);
+            $name = ItemEntry::getName($iId, $quality);
 
             $data = array(
                 'path'    => Type::ITEM.'-'.$iId,           // id of the html-element
@@ -1623,7 +1623,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             if (in_array($i, $itemIdx))
             {
                 $itemId = $this->subject->effectCreateItemId[$i];
-                $name   = ItemList::getName($itemId, $quality);
+                $name   = ItemEntry::getName($itemId, $quality);
 
                 $_icon = new IconElement(
                     Type::ITEM,
@@ -1635,9 +1635,9 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 );
 
                 // perfect Items
-                if ($perfItem && ($name = ItemList::getName($perfItem['itemId'], $quality)))
+                if ($perfItem && ($name = ItemEntry::getName($perfItem['itemId'], $quality)))
                 {
-                    $cndSpell = new Spell($perfItem['reqSpellId']);
+                    $cndSpell = new SpellEntry($perfItem['reqSpellId']);
                     if (!$cndSpell->error)
                     {
                         $_perfItem = array(
@@ -1651,7 +1651,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 }
                 else if ($extraItem = DB::World()->selectRow('SELECT * FROM skill_extra_item_template WHERE `spellid` = %i', $this->typeId))
                 {
-                    $cndSpell = new Spell($extraItem['requiredSpecialization']);
+                    $cndSpell = new SpellEntry($extraItem['requiredSpecialization']);
                     if (!$cndSpell->error)
                     {
                         $_perfItem = array(
@@ -1681,7 +1681,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
                 if ($triggeredSpell > 0)                    // Dummy Auras are probably scripted
                 {
-                    $trig = new Spell($triggeredSpell);
+                    $trig = new SpellEntry($triggeredSpell);
 
                     $_icon = new IconElement(
                         Type::SPELL,
@@ -1740,12 +1740,12 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                     if ($effMV <= 0)
                         $_nameMV = $this->fmtStaffTip(Lang::spell('currentArea'), 'MiscValue: '.$effMV);
                     else
-                        $_nameMV = ZoneList::makeLink($effMV) ?: Util::ucFirst(Lang::game('zone')).' #'.$effMV;
+                        $_nameMV = ZoneEntry::makeLink($effMV) ?: Util::ucFirst(Lang::game('zone')).' #'.$effMV;
                     break;
                 case SPELL_EFFECT_QUEST_COMPLETE:
                 case SPELL_EFFECT_CLEAR_QUEST:
                 case SPELL_EFFECT_QUEST_FAIL:
-                    $_nameMV = QuestList::makeLink($effMV) ?: Util::ucFirst(Lang::game('quest')).' #'.$effMV;
+                    $_nameMV = QuestEntry::makeLink($effMV) ?: Util::ucFirst(Lang::game('quest')).' #'.$effMV;
                     break;
                 case SPELL_EFFECT_SUMMON_PET:
                     $effMVB = 67;                           // TC uses hardcoded summon property 67
@@ -1757,7 +1757,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 case SPELL_EFFECT_SUMMON_DEMON:
                 case SPELL_EFFECT_KILL_CREDIT:
                 case SPELL_EFFECT_KILL_CREDIT2:
-                    $_nameMV = Creature::makeLink($effMV) ?: Util::ucFirst(Lang::game('npc')).' #'.$effMV;
+                    $_nameMV = CreatureEntry::makeLink($effMV) ?: Util::ucFirst(Lang::game('npc')).' #'.$effMV;
                     break;
                 case SPELL_EFFECT_OPEN_LOCK:
                     if ($effMV && ($_ = Lang::spell('lockType', $effMV)))
@@ -1767,7 +1767,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 case SPELL_EFFECT_ENCHANT_ITEM_TEMPORARY:
                 case SPELL_EFFECT_ENCHANT_HELD_ITEM:
                 case SPELL_EFFECT_ENCHANT_ITEM_PRISMATIC:
-                    $_nameMV = Enchantment::makeLink($effMV, cssClass: 'q2') ?: Util::ucFirst(Lang::game('enchantment')).' #'.$effMV;
+                    $_nameMV = EnchantmentEntry::makeLink($effMV, cssClass: 'q2') ?: Util::ucFirst(Lang::game('enchantment')).' #'.$effMV;
                     break;
                 case SPELL_EFFECT_DISPEL:
                 case SPELL_EFFECT_STEAL_BENEFICIAL_BUFF:
@@ -1784,7 +1784,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 case SPELL_EFFECT_SUMMON_OBJECT_SLOT2:
                 case SPELL_EFFECT_SUMMON_OBJECT_SLOT3:
                 case SPELL_EFFECT_SUMMON_OBJECT_SLOT4:
-                    $_nameMV = GameobjectList::makeLink($effMV) ?: Util::ucFirst(Lang::game('object')).' #'.$effMV;
+                    $_nameMV = GameobjectEntry::makeLink($effMV) ?: Util::ucFirst(Lang::game('object')).' #'.$effMV;
                     break;
                 case SPELL_EFFECT_ACTIVATE_OBJECT:
                     if ($_ = Lang::gameObject('actions', $effMV))
@@ -1792,7 +1792,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                     break;
                 case SPELL_EFFECT_APPLY_GLYPH:
                     if ($_ = DB::Aowow()->selectCell('SELECT `spellId` FROM ::glyphproperties WHERE `id` = %i', $effMV))
-                        $_nameMV = Spell::makeLink($_) ?: Util::ucFirst(Lang::game('spell')).' #'.$_;
+                        $_nameMV = SpellEntry::makeLink($_) ?: Util::ucFirst(Lang::game('spell')).' #'.$_;
                     break;
                 case SPELL_EFFECT_SKINNING:
                     $_ = match ($effMV)
@@ -1811,7 +1811,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                     break;
                 case SPELL_EFFECT_SKILL_STEP:
                 case SPELL_EFFECT_SKILL:
-                    $_nameMV = SkillList::makeLink($effMV) ?: Util::ucFirst(Lang::game('skill')).' #'.$effMV;
+                    $_nameMV = SkillEntry::makeLink($effMV) ?: Util::ucFirst(Lang::game('skill')).' #'.$effMV;
                     break;
                 case SPELL_EFFECT_ACTIVATE_RUNE:
                     if ($_ = Lang::spell('powerRunes', $effMV))
@@ -1828,7 +1828,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                         $_nameMV = Util::ucFirst(Lang::game('sound')).' #'.$effMV;
                     break;
                 case SPELL_EFFECT_REPUTATION:
-                    $_nameMV = Faction::makeLink($effMV) ?: Util::ucFirst(Lang::game('faction')).' #'.$effMV;
+                    $_nameMV = FactionEntry::makeLink($effMV) ?: Util::ucFirst(Lang::game('faction')).' #'.$effMV;
 
                     // apply custom reward rated
                     if ($cuRate = DB::World()->selectCell('SELECT `spell_rate` FROM reputation_reward_rate WHERE `spell_rate` <> 1 AND `faction` = %i', $effMV))
@@ -2017,7 +2017,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                         case SPELL_AURA_MOD_SKILL:                            // temp
                         case SPELL_AURA_MOD_SKILL_TALENT:                     // perm
                             $valueFmt = '%+d';
-                            $_nameMV = SkillList::makeLink($effMV) ?: Util::ucFirst(Lang::game('skill')).' #'.$effMV;
+                            $_nameMV = SkillEntry::makeLink($effMV) ?: Util::ucFirst(Lang::game('skill')).' #'.$effMV;
                             break;
                         case SPELL_AURA_ADD_PCT_MODIFIER:
                             $valueFmt = '%s%%';
@@ -2068,7 +2068,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                         case SPELL_AURA_CHANGE_MODEL_FOR_ALL_HUMANOIDS:
                         case SPELL_AURA_X_RAY:
                         case SPELL_AURA_MOD_FAKE_INEBRIATE:
-                            $_nameMV = Creature::makeLink($effMV) ?: Util::ucFirst(Lang::game('npc')).' #'.$effMV;
+                            $_nameMV = CreatureEntry::makeLink($effMV) ?: Util::ucFirst(Lang::game('npc')).' #'.$effMV;
                             break;
                         case SPELL_AURA_FORCE_REACTION:
                             $_footer['value'][1] = $this->fmtStaffTip(Lang::game('rep', $_footer['value'][1]), $_footer['value'][1]);
@@ -2078,7 +2078,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                             if ($effAura == SPELL_AURA_MOD_FACTION_REPUTATION_GAIN)
                                 $valueFmt = '%s%%';
 
-                            $_nameMV = Faction::makeLink($effMV) ?:Util::ucFirst(Lang::game('faction')).' #'.$effMV;
+                            $_nameMV = FactionEntry::makeLink($effMV) ?:Util::ucFirst(Lang::game('faction')).' #'.$effMV;
                             break;                          // also breaks for SPELL_AURA_FORCE_REACTION
                         case SPELL_AURA_OVERRIDE_SPELLS:
                             if ($so = DB::Aowow()->selectRow('SELECT `spellId1`, `spellId2`, `spellId3`, `spellId4`, `spellId5` FROM ::spelloverride WHERE `id` = %i', $effMV))
@@ -2172,14 +2172,14 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 if ($staffTT)
                     $buffer .= $staffTT;
 
-                if (in_array($effId, Spell::EFFECTS_SCALING_DAMAGE))
+                if (in_array($effId, SpellEntry::EFFECTS_SCALING_DAMAGE))
                 {
                     if ($scaling[2])
                         $buffer .= Lang::spell('apMod', [$scaling[2]]);
                     if ($scaling[0])
                         $buffer .= Lang::spell('spMod', [$scaling[0]]);
                 }
-                if (in_array($effAura, Spell::AURAS_SCALING_DAMAGE))
+                if (in_array($effAura, SpellEntry::AURAS_SCALING_DAMAGE))
                 {
                     if ($scaling[3])
                         $buffer .= Lang::spell('apMod', [$scaling[3]]);
@@ -2300,7 +2300,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
                 break;
             case -11:
-                foreach (Spell::SKILLLINE_CATEGORY as $catg => $skills)
+                foreach (SpellEntry::SKILLLINE_CATEGORY as $catg => $skills)
                     if (in_array($sl[0] ?? [], $skills))
                         $this->breadcrumb[] = $catg;
                 break;
@@ -2363,7 +2363,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             if ($sfObj = DB::Aowow()->selectRow('SELECT * FROM ::spellfocusobject WHERE `id` = %i', $_))
             {
                 $n = Util::localizedString($sfObj, 'name');
-                if (!is_null(GameObjectListFilter::getCriteriaIndex(50, $_)))
+                if (!is_null(GameobjectFilter::getCriteriaIndex(50, $_)))
                     $n = '[url=?objects&filter=cr=50;crs='.$_.';crv=0]'.$n.'[/url]';
                 else if ($objId = DB::Aowow()->selectCell('SELECT `id` FROM ::objects WHERE `spellFocusId` = %i', $_))
                     $n = '[url=?object='.$objId.']'.$n.'[/url]';

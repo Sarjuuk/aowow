@@ -588,6 +588,9 @@ class User
         if ($_ = self::getWeightScales())
             $gUser['weightscales'] = $_;
 
+        if ($_ = self::getCompletion())
+            $gUser['completion'] = $_;
+
         if ($_ = self::getCookies())
             $gUser['cookies'] = $_;
 
@@ -705,7 +708,7 @@ class User
         $data = [];
         foreach ($res as $type => $ids)
         {
-            $tc = Type::newList($type, [['id', $ids]]);
+            $tc = Type::newContainer($type, [['id', $ids]]);
             if (!$tc || $tc->error)
                 continue;
 

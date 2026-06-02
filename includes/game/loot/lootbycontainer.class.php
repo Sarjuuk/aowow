@@ -172,7 +172,7 @@ class LootByContainer extends Loot
             if (!$lootRows)
                 continue;
 
-            $items = new ItemList(array(['i.id', $itemIds]));
+            $items = new ItemContainer(array(['id', $itemIds]));
             $this->storeJSGlobals($items->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
             $itemRows = $items->getListviewData();
 
@@ -248,7 +248,7 @@ class LootByContainer extends Loot
                         $extra = ['stack' => [$loot['min'], $loot['max']]];
 
                         // unsure if correct - tag item as trash if chance < 1% and tagged as having many sources
-                        if ($base['count'] < 100 && $items->getEntry($loot['content'])['moreMask'] & SRC_FLAG_COMMON)
+                        if ($base['count'] < 100 && $items->getEntry($loot['content'])->moreMask & SRC_FLAG_COMMON)
                             $extra['commondrop'] = 1;
 
                         if (!User::isInGroup(U_GROUP_EMPLOYEE))

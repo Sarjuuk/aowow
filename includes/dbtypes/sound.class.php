@@ -100,7 +100,7 @@ class SoundList extends DBTypeList
     public function renderTooltip() : ?string { return null; }
 }
 
-class SoundListFilter extends Filter
+class SoundFilter extends Filter
 {
     protected string $type        = 'sounds';
     protected static array $inputFields = array(

@@ -21,7 +21,7 @@ class PetBaseResponse extends TemplateResponse implements ICache
     public  int    $typeId     = 0;
     public ?string $expansion  = null;
 
-    private PetList $subject;
+    private PetEntry $subject;
 
     public function __construct(string $id)
     {
@@ -33,11 +33,11 @@ class PetBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new PetList(array(['id', $this->typeId]));
+        $this->subject = new PetEntry($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('pet'), Lang::pet('notFound'));
 
-        $this->h1 = $this->subject->getField('name', true);
+        $this->h1 = $this->subject->name;
 
         $this->gPageInfo += array(
             'type'   => $this->type,
@@ -50,7 +50,7 @@ class PetBaseResponse extends TemplateResponse implements ICache
         /* Menu Path */
         /*************/
 
-        $this->breadcrumb[] = $this->subject->getField('type');
+        $this->breadcrumb[] = $this->subject->type;
 
 
         /**************/
@@ -64,20 +64,20 @@ class PetBaseResponse extends TemplateResponse implements ICache
         /* Infobox */
         /***********/
 
-        $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
+        $infobox = Lang::getInfoBoxForFlags($this->subject->cuFlags);
 
         // level range
-        $infobox[] = Lang::game('level').Lang::main('colon').$this->subject->getField('minLevel').' - '.$this->subject->getField('maxLevel');
+        $infobox[] = Lang::game('level').Lang::main('colon').$this->subject->minLevel.' - '.$this->subject->maxLevel;
 
         // exotic
-        if ($this->subject->getField('exotic'))
+        if ($this->subject->exotic)
             $infobox[] = '[url=?spell=53270]'.Lang::pet('exotic').'[/url]';
 
         // id
         $infobox[] = Lang::pet('id') . $this->typeId;
 
         // icon
-        if ($_ = $this->subject->getField('iconId'))
+        if ($_ = $this->subject->iconId)
         {
             $infobox[] = Util::ucFirst(Lang::game('icon')).Lang::main('colon').'[icondb='.$_.' name=true]';
             $this->extendGlobalIds(Type::ICON, $_);
@@ -85,7 +85,7 @@ class PetBaseResponse extends TemplateResponse implements ICache
 
         // original name
         if (Lang::getLocale() != Locale::EN)
-            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.$this->subject->getField('name_loc0').'[/copy][/li]';
+            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.($this->subject->name)(Locale::EN).'[/copy][/li]';
 
         if ($infobox)
             $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0');
@@ -95,12 +95,12 @@ class PetBaseResponse extends TemplateResponse implements ICache
         /* Main Content */
         /****************/
 
-        $this->headIcons  = [$this->subject->getField('iconString')];
-        $this->expansion  = Util::$expansionString[$this->subject->getField('expansion')];
+        $this->headIcons  = [$this->subject->icon];
+        $this->expansion  = Util::$expansionString[$this->subject->expansion];
         $this->redButtons = array(
             BUTTON_WOWHEAD => true,
             BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId],
-            BUTTON_TALENT  => ['href' => '?petcalc#'.Util::$tcEncoding[(int)($this->typeId / 10)] . Util::$tcEncoding[(2 * ($this->typeId % 10) + ($this->subject->getField('exotic') ? 1 : 0))], 'pet' => true]
+            BUTTON_TALENT  => ['href' => '?petcalc#'.Util::$tcEncoding[(int)($this->typeId / 10)] . Util::$tcEncoding[(2 * ($this->typeId % 10) + ($this->subject->exotic ? 1 : 0))], 'pet' => true]
         );
 
 
@@ -121,7 +121,7 @@ class PetBaseResponse extends TemplateResponse implements ICache
                 ['ft.H', 1, '<']
             ]
         );
-        $tng = new CreatureList($condition);
+        $tng = new CreatureContainer($condition);
 
         $this->addDataLoader('zones');
         $this->lvTabs->addListviewTab(new Listview(array(
@@ -131,12 +131,12 @@ class PetBaseResponse extends TemplateResponse implements ICache
             'visibleCols' => ['skin'],
             'note'        => sprintf(Util::$filterResultString, '?npcs=1&filter=fa=38'),
             'id'          => 'tameable'
-        ), CreatureList::$brickFile));
+        ), CreatureEntry::$brickFile));
 
         $this->lvTabs->addListviewTab(new Listview(['data' => $tng->getListviewData(LISTVIEWINFO_MODEL)], 'model'));
 
         // tab: diet
-        $food = new ItemList(array(['i.subClass', [ITEM_SUBCLASS_FOOD, ITEM_SUBCLASS_MISC_CONSUMABLE]], ['i.FoodType', $this->subject->getFoodIds()]));
+        $food = new ItemContainer(array(['i.subClass', [ITEM_SUBCLASS_FOOD, ITEM_SUBCLASS_MISC_CONSUMABLE]], ['i.FoodType', $this->subject->getFoodIds()]));
         $this->extendGlobalData($food->getJSGlobals());
 
         $this->lvTabs->addListviewTab(new Listview(array(
@@ -145,18 +145,12 @@ class PetBaseResponse extends TemplateResponse implements ICache
             'hiddenCols' => ['source', 'slot', 'side'],
             'sort'       => ['level'],
             'id'         => 'diet'
-        ), ItemList::$brickFile));
+        ), ItemEntry::$brickFile));
 
         // tab: spells
         $mask = 0x0;
-        foreach (Game::$skillLineMask[-1] as $idx => [$familyId,])
-        {
-            if ($familyId == $this->typeId)
-            {
-                $mask = 1 << $idx;
-                break;
-            }
-        }
+        if (($idx = array_search($this->typeId, array_column(Game::$skillLineMask[-1], 0))) !== false)
+            $mask = 1 << $idx;
         $conditions = [
             ['s.typeCat', -3],                              // Pet-Ability
             [
@@ -170,7 +164,7 @@ class PetBaseResponse extends TemplateResponse implements ICache
             ]
         ];
 
-        $spells = new SpellList($conditions);
+        $spells = new SpellContainer($conditions);
         $this->extendGlobalData($spells->getJSGlobals(GLOBALINFO_SELF));
 
         $this->lvTabs->addListviewTab(new Listview(array(
@@ -178,7 +172,7 @@ class PetBaseResponse extends TemplateResponse implements ICache
             'name'        => '$LANG.tab_abilities',
             'visibleCols' => ['schools', 'level'],
             'id'          => 'abilities'
-        ), SpellList::$brickFile));
+        ), SpellEntry::$brickFile));
 
         // tab: talents
         $conditions = array(
@@ -197,7 +191,7 @@ class PetBaseResponse extends TemplateResponse implements ICache
             PET_TALENT_TYPE_CUNNING  => ['s.cuFlags', SPELL_CU_PET_TALENT_TYPE2, '&']
         };
 
-        $talents = new SpellList($conditions);
+        $talents = new SpellContainer($conditions);
         $this->extendGlobalData($talents->getJSGlobals(GLOBALINFO_SELF));
 
         $this->lvTabs->addListviewTab(new Listview(array(
@@ -207,7 +201,7 @@ class PetBaseResponse extends TemplateResponse implements ICache
             'id'          => 'talents',
             'sort'        => ['tier', 'name'],
             '_petTalents' => 1
-        ), SpellList::$brickFile));
+        ), SpellEntry::$brickFile));
 
         parent::generate();
     }

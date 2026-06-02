@@ -32,7 +32,7 @@ class AreatriggersBaseResponse extends TemplateResponse implements ICache
 
         parent::__construct($rawParam);
 
-        $this->filter = new AreaTriggerFilter($this->_get['filter'] ?? '');
+        $this->filter = new AreatriggerFilter($this->_get['filter'] ?? '');
         if ($this->filter->shouldReload)
         {
             $_SESSION['error']['fi'] = $this->filter::class;
@@ -81,7 +81,7 @@ class AreatriggersBaseResponse extends TemplateResponse implements ICache
             $conditions[] = $_;
 
         $tabData = [];
-        $trigger = new AreaTriggerContainer($conditions, ['calcTotal' => true]);
+        $trigger = new AreatriggerContainer($conditions, ['calcTotal' => true]);
         if (!$trigger->error)
         {
             $tabData['data'] = $trigger->getListviewData();
@@ -96,7 +96,7 @@ class AreatriggersBaseResponse extends TemplateResponse implements ICache
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
 
-        $this->lvTabs->addListviewTab(new Listview($tabData, AreaTrigger::$brickFile, 'areatrigger'));
+        $this->lvTabs->addListviewTab(new Listview($tabData, AreatriggerEntry::$brickFile, 'areatrigger'));
 
         parent::generate();
     }

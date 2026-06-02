@@ -6,21 +6,22 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class CharClass extends DBType
+class CharClassEntry extends DBTypeEntry
 {
     public readonly int       $cuFlags;
     public readonly LocString $name;
-    public readonly int       $raceMask;
-    public readonly int       $roles;
-    public readonly int       $weaponTypeMask;
-    public readonly int       $armorTypeMask;
-    public readonly int       $powerType;
-    public readonly int       $flags;
-    public readonly int       $expansion;
+    public readonly string    $fileString;
     public readonly int       $iconId;
     public readonly string    $icon;
+    public readonly int       $powerType;
+    public readonly int       $raceMask;
+    public readonly int       $roles;
     /** @var int[] $skills */
     public readonly array     $skills;
+    public readonly int       $flags;
+    public readonly int       $weaponTypeMask;
+    public readonly int       $armorTypeMask;
+    public readonly int       $expansion;
 
     public static int    $dbType    = Type::CHR_CLASS;
     public static string $brickFile = 'class';

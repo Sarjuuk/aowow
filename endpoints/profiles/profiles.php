@@ -58,7 +58,7 @@ class ProfilesBaseResponse extends TemplateResponse implements IProfilerList
         if ($this->category)
             $this->subCat = '='.implode('.', $this->category);
 
-        $this->filter = new ProfileListFilter($this->_get['filter'] ?? '', ['realms' => $realms]);
+        $this->filter = new ProfileFilter($this->_get['filter'] ?? '', ['realms' => $realms]);
         if ($this->filter->shouldReload)
         {
             $_SESSION['error']['fi'] = $this->filter::class;
@@ -209,14 +209,14 @@ class ProfilesBaseResponse extends TemplateResponse implements IProfilerList
             'hiddenCols'     => $lvHiddenCols  ?: null,
             'note'           => $lvNote        ?: null,
             '_truncated'     => $lv_truncated  ?: null
-        ), ProfileList::$brickFile));
+        ), ProfileEntry::$brickFile));
 
         parent::generate();
 
         $this->result->registerDisplayHook('filter', [self::class, 'filterFormHook']);
     }
 
-    public static function filterFormHook(Template\PageTemplate &$pt, ProfileListFilter $filter) : void
+    public static function filterFormHook(Template\PageTemplate &$pt, ProfileFilter $filter) : void
     {
         // sort for dropdown-menus
         Lang::sort('game', 'ra');

@@ -17,7 +17,7 @@ class IconContainer extends DBTypeContainer
         if (!$this->getFoundIDs())
             return;
 
-        $iconCounts = Icon::fetchIconCounts(...$this->getFoundIds());
+        $iconCounts = IconEntry::fetchIconCounts(...$this->getFoundIds());
 
         foreach ($this->iterate() as $id => $entry)
             $entry->setIconCounts($iconCounts[$id] ?? []);
@@ -26,7 +26,7 @@ class IconContainer extends DBTypeContainer
     /**
      * iterate over fetched sets
      *
-     * @return \Generator<int, Icon> id => icon entry
+     * @return \Generator<int, IconEntry> id => icon entry
      */
     public function iterate() : \Generator
     {
@@ -34,11 +34,11 @@ class IconContainer extends DBTypeContainer
     }
 
     /**
-     * @return ?Icon
+     * @return ?IconEntry
      */
-    public function getEntry(string|int $id) : ?Icon
+    public function getEntry(null|string|int $key = null) : ?IconEntry
     {
-        return parent::getEntry($id);
+        return parent::getEntry($key);
     }
 }
 

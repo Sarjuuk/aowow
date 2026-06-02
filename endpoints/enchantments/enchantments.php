@@ -125,7 +125,7 @@ class EnchantmentsBaseResponse extends TemplateResponse implements ICache
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
 
-        $this->lvTabs->addListviewTab(new Listview($tabData, Enchantment::$brickFile, 'enchantment'));
+        $this->lvTabs->addListviewTab(new Listview($tabData, EnchantmentEntry::$brickFile, 'enchantment'));
 
         parent::generate();
     }

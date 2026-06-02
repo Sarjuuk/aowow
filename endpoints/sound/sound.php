@@ -20,7 +20,7 @@ class SoundBaseResponse extends TemplateResponse implements ICache
     public int $type   = Type::SOUND;
     public int $typeId = 0;
 
-    private SoundList $subject;
+    private SoundEntry $subject;
 
     public function __construct(string $id)
     {
@@ -32,11 +32,11 @@ class SoundBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new SoundList(array(['id', $this->typeId]));
+        $this->subject = new SoundEntry($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('sound'), Lang::sound('notFound'));
 
-        $this->h1 = $this->subject->getField('name');
+        $this->h1 = $this->subject->name;
 
         $this->gPageInfo += array(
             'type'   => $this->type,
@@ -44,7 +44,7 @@ class SoundBaseResponse extends TemplateResponse implements ICache
             'name'   => $this->h1
         );
 
-        $_cat  = $this->subject->getField('cat');
+        $_cat  = $this->subject->cat;
 
 
         /*************/
@@ -76,7 +76,7 @@ class SoundBaseResponse extends TemplateResponse implements ICache
                 [Lang::sound('foundIn')]                    // foundIn
             );
             foreach ($spawns as $areaId => $__)
-                $this->map[3][$areaId] = ZoneList::getName($areaId);
+                $this->map[3][$areaId] = ZoneEntry::getName($areaId);
         }
 
         // get full path in-game for sound (workaround for missing PlaySoundKit())
@@ -139,11 +139,11 @@ class SoundBaseResponse extends TemplateResponse implements ICache
                 [DB::AND, ['effect3AuraId', SPELL_AURA_SCREEN_EFFECT], ['effect3MiscValue', $seMiscValues]]
             );
 
-        $spells = new SpellList($cnd);
+        $spells = new SpellContainer($cnd);
         if (!$spells->error)
         {
             $this->extendGlobalData($spells->getJSGlobals(GLOBALINFO_SELF));
-            $this->lvTabs->addListviewTab(new Listview(['data' => $spells->getListviewData()], SpellList::$brickFile));
+            $this->lvTabs->addListviewTab(new Listview(['data' => $spells->getListviewData()], SpellEntry::$brickFile));
         }
 
         // tab: Items
@@ -162,18 +162,18 @@ class SoundBaseResponse extends TemplateResponse implements ICache
 
         if ($itemIds = DB::Aowow()->selectCol('SELECT `id` FROM ::items WHERE %or', $where))
         {
-            $items = new ItemList(array(['id', $itemIds]));
+            $items = new ItemContainer(array(['id', $itemIds]));
             if (!$items->error)
             {
                 $this->extendGlobalData($items->getJSGlobals(GLOBALINFO_SELF));
-                $this->lvTabs->addListviewTab(new Listview(['data' => $items->getListviewData()], ItemList::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview(['data' => $items->getListviewData()], ItemEntry::$brickFile));
             }
         }
 
         // tab: Zones
         if ($zoneIds = DB::Aowow()->selectAssoc('SELECT `id`, `worldStateId`, `worldStateValue` FROM ::zones_sounds WHERE `ambienceDay` = %i OR `ambienceNight` = %i OR `musicDay` = %i OR `musicNight` = %i OR `intro` = %i', $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId))
         {
-            $zones = new ZoneList(array(['id', array_column($zoneIds, 'id')]));
+            $zones = new ZoneContainer(array(['id', array_column($zoneIds, 'id')]));
             if (!$zones->error)
             {
                 $this->extendGlobalData($zones->getJSGlobals(GLOBALINFO_SELF));
@@ -184,7 +184,7 @@ class SoundBaseResponse extends TemplateResponse implements ICache
                 $pIds     = array_filter(array_unique(array_values($parents)));
                 if ($pIds)
                 {
-                    $pZones = new ZoneList(array(['id', $pIds]));
+                    $pZones = new ZoneContainer(array(['id', $pIds]));
                     if (!$pZones->error)
                     {
                         $this->extendGlobalData($pZones->getJSGlobals(GLOBALINFO_SELF));
@@ -229,32 +229,32 @@ class SoundBaseResponse extends TemplateResponse implements ICache
                 $tabData['data'] = $zoneData;
                 $tabData['hiddenCols'] = ['territory'];
 
-                $this->lvTabs->addListviewTab(new Listview($tabData, ZoneList::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview($tabData, ZoneEntry::$brickFile));
             }
         }
 
         // tab: Races (VocalUISounds (containing error voice overs))
         if ($vo = DB::Aowow()->selectCol('SELECT `raceId` FROM ::races_sounds WHERE `soundId` = %i GROUP BY `raceId`', $this->typeId))
         {
-            $races = new CharRaceList(array(['id', $vo]));
+            $races = new CharRaceContainer(array(['id', $vo]));
             if (!$races->error)
             {
                 $this->extendGlobalData($races->getJSGlobals(GLOBALINFO_SELF));
-                $this->lvTabs->addListviewTab(new Listview(['data' => $races->getListviewData()], CharRaceList::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview(['data' => $races->getListviewData()], CharRaceEntry::$brickFile));
             }
         }
 
         // tab: Emotes (EmotesTextSound (containing emote audio))
         if ($em = DB::Aowow()->selectCol('SELECT `emoteId` FROM ::emotes_sounds WHERE `soundId` = %i GROUP BY `emoteId` UNION SELECT `id` FROM ::emotes WHERE `soundId` = %i', $this->typeId, $this->typeId))
         {
-            $races = new EmoteList(array(['id', $em]));
+            $races = new EmoteContainer(array(['id', $em]));
             if (!$races->error)
             {
                 $this->extendGlobalData($races->getJSGlobals(GLOBALINFO_SELF));
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data' => $races->getListviewData(),
                     'name' => Util::ucFirst(Lang::game('emotes'))
-                ), EmoteList::$brickFile, 'emote'));
+                ), EmoteEntry::$brickFile, 'emote'));
             }
         }
 
@@ -300,13 +300,13 @@ class SoundBaseResponse extends TemplateResponse implements ICache
             else
                 $extra = array_pop($extra);
 
-            $npcs = new CreatureList($cnds);
+            $npcs = new CreatureContainer($cnds);
             if (!$npcs->error)
             {
                 $this->extendGlobalData($npcs->getJSGlobals(GLOBALINFO_SELF));
 
                 $this->addDataLoader('zones');
-                $this->lvTabs->addListviewTab(new Listview(['data' => $npcs->getListviewData()], CreatureList::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview(['data' => $npcs->getListviewData()], CreatureEntry::$brickFile));
             }
         }
     }

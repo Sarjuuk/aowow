@@ -20,7 +20,7 @@ class FactionBaseResponse extends TemplateResponse implements ICache
     public int $type   = Type::FACTION;
     public int $typeId = 0;
 
-    private Faction $subject;
+    private FactionEntry $subject;
 
     public function __construct(string $id)
     {
@@ -32,7 +32,7 @@ class FactionBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new Faction($this->typeId);
+        $this->subject = new FactionEntry($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('faction'), Lang::faction('notFound'));
 
@@ -189,7 +189,7 @@ class FactionBaseResponse extends TemplateResponse implements ICache
 
         // factionchange-equivalent
         if ($pendant = DB::World()->selectCell('SELECT IF(`horde_id` = %i, `alliance_id`, -`horde_id`) FROM player_factionchange_reputations WHERE `alliance_id` = %i OR `horde_id` = %i', $this->typeId, $this->typeId, $this->typeId))
-            if ($altName = Faction::getName(abs($pendant)))
+            if ($altName = FactionEntry::getName(abs($pendant)))
                 $this->transfer = Lang::faction('_transfer', array(
                     abs($pendant),
                     $altName,
@@ -205,7 +205,7 @@ class FactionBaseResponse extends TemplateResponse implements ICache
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
 
         // tab: items
-        $items = new ItemList(array(Listview::DEFAULT_SIZE, ['requiredFaction', $this->typeId]), ['calcTotal' => true]);
+        $items = new ItemContainer(array(Listview::DEFAULT_SIZE, ['requiredFaction', $this->typeId]), ['calcTotal' => true]);
         if (!$items->error)
         {
             $this->extendGlobalData($items->getJSGlobals(GLOBALINFO_SELF));
@@ -217,10 +217,10 @@ class FactionBaseResponse extends TemplateResponse implements ICache
             );
 
             if ($items->getMatches() > Listview::DEFAULT_SIZE)
-                if (!is_null(ItemListFilter::getCriteriaIndex(17, $this->typeId)))
+                if (!is_null(ItemFilter::getCriteriaIndex(17, $this->typeId)))
                     $tabData['note'] = sprintf(Util::$filterResultString, '?items&filter=cr=17;crs='.$this->typeId.';crv=0');
 
-            $this->lvTabs->addListviewTab(new Listview($tabData, ItemList::$brickFile, 'itemStandingCol'));
+            $this->lvTabs->addListviewTab(new Listview($tabData, ItemEntry::$brickFile, 'itemStandingCol'));
         }
 
         // tab: creatures with onKill reputation
@@ -256,7 +256,7 @@ class FactionBaseResponse extends TemplateResponse implements ICache
                             $tabData['note'] = sprintf(Util::$filterResultString, '?npcs&filter=cr=42;crs='.$this->typeId.';crv=0');
 
                     $this->addDataLoader('zones');
-                    $this->lvTabs->addListviewTab(new Listview($tabData, Creature::$brickFile, 'npcRepCol'));
+                    $this->lvTabs->addListviewTab(new Listview($tabData, CreatureEntry::$brickFile, 'npcRepCol'));
                 }
             }
         }
@@ -278,18 +278,18 @@ class FactionBaseResponse extends TemplateResponse implements ICache
                         $tabData['note'] = sprintf(Util::$filterResultString, '?npcs&filter=cr=3;crs='.$this->typeId.';crv=0');
 
                 $this->addDataLoader('zones');
-                $this->lvTabs->addListviewTab(new Listview($tabData, Creature::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview($tabData, CreatureEntry::$brickFile));
             }
         }
 
         // tab: objects
         if ($_ = $this->subject->templateIds)
         {
-            $objects = new GameObjectContainer(array(['faction', $_]));
+            $objects = new GameobjectContainer(array(['faction', $_]));
             if (!$objects->error)
             {
                 $this->addDataLoader('zones');
-                $this->lvTabs->addListviewTab(new Listview(['data' => $objects->getListviewData()], GameObject::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview(['data' => $objects->getListviewData()], GameobjectEntry::$brickFile));
             }
         }
 
@@ -317,7 +317,7 @@ class FactionBaseResponse extends TemplateResponse implements ICache
                 if (!is_null(QuestFilter::getCriteriaIndex(1, $this->typeId)))
                     $tabData['note'] = sprintf(Util::$filterResultString, '?quests&filter=cr=1;crs='.$this->typeId.';crv=0');
 
-            $this->lvTabs->addListviewTab(new Listview($tabData, Quest::$brickFile, 'questRepCol'));
+            $this->lvTabs->addListviewTab(new Listview($tabData, QuestEntry::$brickFile, 'questRepCol'));
         }
 
         // tab: achievements
@@ -335,7 +335,7 @@ class FactionBaseResponse extends TemplateResponse implements ICache
                 'id'          => 'criteria-of',
                 'name'        => '$LANG.tab_criteriaof',
                 'visibleCols' => ['category']
-            ), Achievement::$brickFile));
+            ), AchievementEntry::$brickFile));
         }
 
         // tab: condition-for

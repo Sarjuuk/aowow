@@ -55,7 +55,7 @@ class GuidesBaseResponse extends TemplateResponse // implements ICache
 
         $this->redButtons = [BUTTON_GUIDE_NEW => User::canWriteGuide()];
 
-        $guides = new GuideList($conditions);
+        $guides = new GuideContainer($conditions);
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
 
@@ -64,7 +64,7 @@ class GuidesBaseResponse extends TemplateResponse // implements ICache
             'name'       => Util::ucFirst(Lang::game('guides')),
             'hiddenCols' => ['patch'],                      // pointless: display date instead
             'extraCols'  => ['$Listview.extraCols.date']    // ok
-        ), GuideList::$brickFile));
+        ), GuideEntry::$brickFile));
 
         parent::generate();
     }

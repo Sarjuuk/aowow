@@ -125,7 +125,7 @@ class NpcsBaseResponse extends TemplateResponse implements ICache
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
 
-        $this->lvTabs->addListviewTab(new Listview($tabData, Creature::$brickFile));
+        $this->lvTabs->addListviewTab(new Listview($tabData, CreatureEntry::$brickFile));
 
         parent::generate();
 

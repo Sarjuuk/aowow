@@ -284,7 +284,7 @@ class Lang
             switch ($lock['type'.$i])
             {
                 case LOCK_TYPE_ITEM:
-                    $name = ItemList::getName($prop);
+                    $name = ItemEntry::getName($prop);
                     if (!$name)
                         continue 2;
 
@@ -320,7 +320,7 @@ class Lang
                             $ids[Type::SKILL][] = $skills[$prop];
                         }
                         else
-                            $name = SkillList::getName($prop);
+                            $name = SkillEntry::getName($prop);
 
                         if ($rank > 0)
                             $name = self::main('parensFmt', [$name, $rank]);
@@ -346,7 +346,7 @@ class Lang
                         continue 2;
                     break;
                 case LOCK_TYPE_SPELL:
-                    $name = SpellList::getName($prop);
+                    $name = SpellEntry::getName($prop);
                     if (!$name)
                         continue 2;
 

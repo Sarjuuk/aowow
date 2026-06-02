@@ -36,7 +36,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
     public  array  $criteria    = [];
     public ?array  $rewards     = null;
 
-    private Achievement $subject;
+    private AchievementEntry $subject;
 
     public function __construct(string $id)
     {
@@ -48,7 +48,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new Achievement($this->typeId);
+        $this->subject = new AchievementEntry($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('achievement'), Lang::achievement('notFound'));
 
@@ -189,16 +189,16 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
         {
             if ($itemRewards = array_filter($foo, fn($x) => $x[0] == Type::ITEM))
             {
-                $bar = new ItemList(array(['i.id', array_column($itemRewards, 1)]));
-                foreach ($bar->iterate() as $id => $__)
-                    $rewItems[] = new IconElement(Type::ITEM, $id, $bar->getField('name', true), quality: $bar->getField('quality'));
+                $set = new ItemContainer(array(['id', array_column($itemRewards, 1)]));
+                foreach ($set->iterate() as $id => $entry)
+                    $rewItems[] = new IconElement(Type::ITEM, $id, $entry->name, quality: $entry->quality);
             }
 
             if ($titleRewards = array_filter($foo, fn($x) => $x[0] == Type::TITLE))
             {
-                $bar = new TitleList(array(['id', array_column($titleRewards, 1)]));
-                foreach ($bar->iterate() as $id => $__)
-                    $rewTitles[] = Lang::achievement('titleReward', [$id, trim(str_replace('%s', '', $bar->getField('male', true)))]);
+                $set = new TitleContainer(array(['id', array_column($titleRewards, 1)]));
+                foreach ($set->iterate() as $id => $entry)
+                    $rewTitles[] = Lang::achievement('titleReward', [$id, trim(str_replace('%s', '', $entry->male))]);
             }
         }
 
@@ -208,7 +208,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
         // factionchange-equivalent
         if ($pendant = DB::World()->selectCell('SELECT IF(`horde_id` = %i, `alliance_id`, -`horde_id`) FROM player_factionchange_achievement WHERE `alliance_id` = %i OR `horde_id` = %i', $this->typeId, $this->typeId, $this->typeId))
         {
-            $altAcv = new Achievement(abs($pendant));
+            $altAcv = new AchievementEntry(abs($pendant));
             if (!$altAcv->error)
             {
                 $this->transfer = Lang::achievement('_transfer', array(
@@ -252,7 +252,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
                 case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE:
                     $killSuffix = Lang::achievement('slain');
                 case ACHIEVEMENT_CRITERIA_TYPE_KILLED_BY_CREATURE:
-                    $crtIcon = new IconElement(Type::NPC, $obj, $crtName ?: Creature::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon', extraText: $crtName ? null : $killSuffix);
+                    $crtIcon = new IconElement(Type::NPC, $obj, $crtName ?: CreatureEntry::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon', extraText: $crtName ? null : $killSuffix);
                     break;
                 // link to area (by map)
                 case ACHIEVEMENT_CRITERIA_TYPE_WIN_BG:
@@ -261,37 +261,37 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
                 case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND:
                 case ACHIEVEMENT_CRITERIA_TYPE_DEATH_AT_MAP:
                     $zoneId  = DB::Aowow()->selectCell('SELECT `id` FROM ::zones WHERE `mapId` = %s', $obj);
-                    $crtIcon = new IconElement(Type::ZONE, $zoneId ?: 0, $crtName ?: ZoneList::getName($zoneId), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
+                    $crtIcon = new IconElement(Type::ZONE, $zoneId ?: 0, $crtName ?: ZoneEntry::getName($zoneId), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
                     break;
                 // link to area
                 case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUESTS_IN_ZONE:
                 case ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL_AT_AREA:
-                    $crtIcon = new IconElement(Type::ZONE, $obj, $crtName ?: ZoneList::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
+                    $crtIcon = new IconElement(Type::ZONE, $obj, $crtName ?: ZoneEntry::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
                     break;
                 // link to skills
                 case ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL:
                 case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LEVEL:
                 case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILLLINE_SPELLS:
                 case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LINE:
-                    $crtIcon = new IconElement(Type::SKILL, $obj, $crtName ?: SkillList::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
+                    $crtIcon = new IconElement(Type::SKILL, $obj, $crtName ?: SkillEntry::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
                     $this->extendGlobalIds(Type::SKILL, $obj);
                     break;
                 // link to class
                 case ACHIEVEMENT_CRITERIA_TYPE_HK_CLASS:
-                    $crtIcon = new IconElement(Type::CHR_CLASS, $obj, $crtName ?: CharClass::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
+                    $crtIcon = new IconElement(Type::CHR_CLASS, $obj, $crtName ?: CharClassEntry::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
                     break;
                 // link to race
                 case ACHIEVEMENT_CRITERIA_TYPE_HK_RACE:
-                    $crtIcon = new IconElement(Type::CHR_RACE, $obj, $crtName ?: CharRace::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
+                    $crtIcon = new IconElement(Type::CHR_RACE, $obj, $crtName ?: CharRaceEntry::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
                     break;
                 // link to achivement
                 case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ACHIEVEMENT:
-                    $crtIcon = new IconElement(Type::ACHIEVEMENT, $obj, $crtName ?: Achievement::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
+                    $crtIcon = new IconElement(Type::ACHIEVEMENT, $obj, $crtName ?: AchievementEntry::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
                     $this->extendGlobalIds(Type::ACHIEVEMENT, $obj);
                     break;
                 // link to quest
                 case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST:
-                    $crtIcon = new IconElement(Type::QUEST, $obj, $crtName ?: Quest::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
+                    $crtIcon = new IconElement(Type::QUEST, $obj, $crtName ?: QuestEntry::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
                     break;
                 // link to spell
                 case ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET:
@@ -299,7 +299,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
                 case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL:
                 case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL:
                 case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2:
-                    $crtIcon = new IconElement(Type::SPELL, $obj, $crtName ?: Spell::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
+                    $crtIcon = new IconElement(Type::SPELL, $obj, $crtName ?: SpellEntry::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
                     $this->extendGlobalIds(Type::SPELL, $obj);
                     break;
                 // link to item
@@ -307,22 +307,22 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
                 case ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM:
                 case ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM:
                 case ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM:
-                    $item = new ItemList([['id', $obj]]);
-                    $crtIcon = new IconElement(Type::ITEM, $obj, $crtName ?: $item->getField('name', true), quality: $item->getField('quality'), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
-                    $this->extendGlobalData($item->getJSGlobals());
+                    $name = ItemEntry::getName($obj, $quality);
+                    $crtIcon = new IconElement(Type::ITEM, $obj, $crtName ?: $name, quality: $quality, size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
+                    $this->extendGlobalIds(Type::ITEM, $obj);
                     break;
                 // link to faction (/w target reputation)
                 case ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION:
-                    $crtIcon = new IconElement(Type::FACTION, $obj, $crtName ?: Faction::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon', extraText: '('.Lang::getReputationLevelForPoints($qty).')');
+                    $crtIcon = new IconElement(Type::FACTION, $obj, $crtName ?: FactionEntry::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon', extraText: '('.Lang::getReputationLevelForPoints($qty).')');
                     break;
                 // link to GObject
                 case ACHIEVEMENT_CRITERIA_TYPE_USE_GAMEOBJECT:
                 case ACHIEVEMENT_CRITERIA_TYPE_FISH_IN_GAMEOBJECT:
-                    $crtIcon = new IconElement(Type::OBJECT, $obj, $crtName ?: Gameobject::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
+                    $crtIcon = new IconElement(Type::OBJECT, $obj, $crtName ?: GameobjectEntry::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
                     break;
                 // link to emote
                 case ACHIEVEMENT_CRITERIA_TYPE_DO_EMOTE:
-                    $crtIcon = new IconElement(Type::EMOTE, $obj, $crtName ?: Emote::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
+                    $crtIcon = new IconElement(Type::EMOTE, $obj, $crtName ?: EmoteEntry::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
                     break;
                 default:
                     // Add a gold coin icon if required
@@ -342,31 +342,33 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
                 switch ($xType)
                 {
                     case ACHIEVEMENT_CRITERIA_DATA_TYPE_T_CREATURE:
-                        $extraData[] = Creature::makeLink($xData['value1']);
+                        $extraData[] = CreatureEntry::makeLink($xData['value1']);
                         break;
                     case ACHIEVEMENT_CRITERIA_DATA_TYPE_T_PLAYER_CLASS_RACE:
                     case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_PLAYER_CLASS_RACE:
                         if ($xData['value1'])
-                            $extraData[] = CharClass::makeLink($xData['value1']);
+                            $extraData[] = CharClassEntry::makeLink($xData['value1']);
 
                         if ($xData['value2'])
-                            $extraData[] = CharRace::makeLink($xData['value2']);
+                            $extraData[] = CharRaceEntry::makeLink($xData['value2']);
 
                         break;
                     case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AURA:
                     case ACHIEVEMENT_CRITERIA_DATA_TYPE_T_AURA:
-                        $extraData[] = Spell::makeLink($xData['value1']);
+                        $extraData[] = SpellEntry::makeLink($xData['value1']);
                         break;
                     case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AREA:
-                        $extraData[] = ZoneList::makeLink($xData['value1']);
+                        $extraData[] = ZoneEntry::makeLink($xData['value1']);
                         break;
                     case ACHIEVEMENT_CRITERIA_DATA_TYPE_SCRIPT:
                         if ($xData['ScriptName'] && User::isInGroup(U_GROUP_STAFF))
                             $extraData[] = 'Script '.$xData['ScriptName'];
                         break;
                     case ACHIEVEMENT_CRITERIA_DATA_TYPE_HOLIDAY:
-                        if ($we = new WorldEventList(array(['holidayId', $xData['value1']])))
-                            $extraData[] = '<a href="?event='.$we->id.'">'.$we->getField('name', true).'</a>';
+                        if ($we = (new WorldeventContainer(array(['holidayId', $xData['value1']])))->getEntry())
+                            $extraData[] = '<a href="?event='.$we->id.'">'.$we->name.'</a>';
+                        else
+                            $extraData[] = 'Unknown Holiday #'.$xData['value1'];
                         break;
                     case ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_ID:
                         $extraData[] = match((int)$xData['value1'])
@@ -376,13 +378,14 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
                             530     => Lang::maps('Outland'),
                             571     => Lang::maps('Northrend'),
                             default => (function(int $mapId) {
-                                $z = new ZoneList(array(['mapId', $mapId]));
-                                return '<a href="?zone='.$z->id.'">'.$z->getField('name', true).'</a>';
+                                if ($z = (new ZoneContainer(array(['mapId', $mapId])))->getEntry())
+                                    return '<a href="?zone='.$z->id.'">'.$z->name.'</a>';
+                                return 'Unknown map #'.$mapId;
                             })($xData['value1'])
                         };
                         break;
                     case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_KNOWN_TITLE:
-                        $extraData[] = TitleList::makeLink($xData['value1']);
+                        $extraData[] = TitleEntry::makeLink($xData['value1']);
                         break;
                     default:
                         if (User::isInGroup(U_GROUP_STAFF))
@@ -418,7 +421,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
                 'id'          => 'see-also',
                 'name'        => '$LANG.tab_seealso',
                 'visibleCols' => ['category']
-            ), Achievement::$brickFile));
+            ), AchievementEntry::$brickFile));
         }
 
         // tab: criteria of
@@ -439,7 +442,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
                     'id'          => 'criteria-of',
                     'name'        => '$LANG.tab_criteriaof',
                     'visibleCols' => ['category']
-                ), Achievement::$brickFile));
+                ), AchievementEntry::$brickFile));
             }
         }
 

@@ -483,7 +483,7 @@ class SpellsBaseResponse extends TemplateResponse implements ICache
             $tabData['hiddenCols'] = array_unique($hiddenCols);
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
-        $this->lvTabs->addListviewTab(new Listview($tabData, Spell::$brickFile));
+        $this->lvTabs->addListviewTab(new Listview($tabData, SpellEntry::$brickFile));
 
         parent::generate();
 

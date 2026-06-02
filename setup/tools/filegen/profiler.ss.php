@@ -68,7 +68,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 continue;
 
             $cond = array_merge($condition, [['questSortId', $cat]]);
-            $questz = new QuestList($cond);
+            $questz = new QuestContainer($cond);
             if ($questz->error)
                 continue;
 
@@ -76,20 +76,18 @@ CLISetup::registerSetup("build", new class extends SetupScript
             $questtotal[$cat2] = [];
 
             // get quests for exclusion
-            foreach ($questz->iterate() as $id => $__)
+            $currencies = [];
+            foreach ($questz->iterate() as $id => $qEntry)
             {
-                $this->sumTotal($questtotal[$cat2], $questz->getField('reqRaceMask') ?: -1, $questz->getField('reqClassMask') ?: -1);
-                if ($skillEx = $this->getExcludeForSkill($questz->getField('reqSkillId')))
+                if ($_= $qEntry->getRewardCurrencies())
+                    $currencies = array_merge(array_keys($_));
+
+                $this->sumTotal($questtotal[$cat2], $qEntry->reqRaceMask ?: -1, $qEntry->reqClassMask ?: -1);
+                if ($skillEx = $this->getExcludeForSkill($qEntry->reqSkillId))
                     $this->addExclusion(Type::QUEST, $id, $skillEx);
             }
 
-            $_ = [];
-            $currencies = array_column($questz->rewards, Type::CURRENCY);
-            foreach ($currencies as $curr)
-                foreach ($curr as $cId => $qty)
-                    $_[] = $cId;
-
-            $relCurr = new CurrencyList(array(['id', $_]));
+            $relCurr = new CurrencyContainer(array(['id', $currencies]));
 
             foreach (CLISetup::$locales as $loc)
             {
@@ -97,9 +95,10 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
                 Lang::load($loc);
 
+                $buff = '';
                 if (!$relCurr->error)
                 {
-                    $buff = "var _ = g_gatheredcurrencies;\n";
+                    $buff .= "var _ = g_gatheredcurrencies;\n";
                     foreach ($relCurr->getListviewData() as $id => $data)
                         $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
                 }
@@ -124,11 +123,11 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
     private function titles(): void
     {
-        $titlez = new TitleList(array([['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0]));
+        $titlez = new TitleContainer(array([['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0]));
 
         // get titles for exclusion
-        foreach ($titlez->iterate() as $id => $__)
-            if (empty($titlez->sources[$id][SRC_QUEST]) && empty($titlez->sources[$id][SRC_ACHIEVEMENT]))
+        foreach ($titlez->iterate() as $id => $tEntry)
+            if (empty($tEntry->sources[SRC_QUEST]) && empty($tEntry->sources[SRC_ACHIEVEMENT]))
                 $this->addExclusion(Type::TITLE, $id, PR_EXCLUDE_GROUP_UNAVAILABLE);
 
         foreach (CLISetup::$locales as $loc)
@@ -160,7 +159,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             ['typeCat', -5],
             ['castTime', 0, '!']
         );
-        $mountz = new SpellList($condition);
+        $mountz = new SpellContainer($condition);
 
         $conditionSet = DB::World()->selectCol('SELECT `SourceEntry` AS ARRAY_KEY, `ConditionValue1` FROM conditions WHERE `SourceTypeOrReferenceId` = %i AND `ConditionTypeOrReference` = %i AND `SourceEntry` IN %in', Conditions::SRC_SPELL, Conditions::SKILL, $mountz->getFoundIDs());
 
@@ -169,8 +168,8 @@ CLISetup::registerSetup("build", new class extends SetupScript
             if ($skillEx = $this->getExcludeForSkill($skill))
                 $this->addExclusion(Type::SPELL, $mount, $skillEx);
 
-        foreach ($mountz->iterate() as $id => $_)
-            if (!$mountz->hasAnySource())
+        foreach ($mountz->iterate() as $id => $mEntry)
+            if (!$mEntry->hasAnySource())
                 $this->addExclusion(Type::SPELL, $id, PR_EXCLUDE_GROUP_UNAVAILABLE);
 
         foreach (CLISetup::$locales as $loc)
@@ -207,11 +206,11 @@ CLISetup::registerSetup("build", new class extends SetupScript
             [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0],
             ['typeCat', -6]
         );
-        $companionz = new SpellList($condition);
+        $companionz = new SpellContainer($condition);
         $legit      = DB::Aowow()->selectCol('SELECT `spellId2` FROM ::items WHERE `class` = %i AND `subClass` = %i AND `spellId1` IN %in AND `spellId2` IN %in', ITEM_CLASS_MISC, 2, LEARN_SPELLS, $companionz->getFoundIDs());
 
-        foreach ($companionz->iterate() as $id => $_)
-            if (!$companionz->hasAnySource())
+        foreach ($companionz->iterate() as $id => $cEntry)
+            if (!$cEntry->hasAnySource())
                 $this->addExclusion(Type::SPELL, $id, PR_EXCLUDE_GROUP_UNAVAILABLE);
 
         foreach (CLISetup::$locales as $loc)
@@ -239,7 +238,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
     private function factions() : void
     {
-        $factionz = new FactionList(array([['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0]));
+        $factionz = new FactionContainer(array([['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0]));
 
         foreach (CLISetup::$locales as $loc)
         {
@@ -280,17 +279,17 @@ CLISetup::registerSetup("build", new class extends SetupScript
         {
             $file    = is_array($s) ? 'sec' : (string)$s;
             $cnd     = array_merge($baseCnd, [['skillLine1', $s]]);
-            $recipez = new SpellList($cnd);
+            $recipez = new SpellContainer($cnd);
             $created = '';
-            foreach ($recipez->iterate() as $id => $_)
+            foreach ($recipez->iterate() as $id => $rEntry)
             {
-                if (!$recipez->hasAnySource())
+                if (!$rEntry->hasAnySource())
                     $this->addExclusion(Type::SPELL, $id, PR_EXCLUDE_GROUP_UNAVAILABLE);
 
-                foreach ($recipez->canCreateItem() as $idx)
+                foreach ($rEntry->canCreateItem() as $idx)
                 {
-                    $id = $recipez->getField('effect'.$idx.'CreateItemId');
-                    $created .= "g_items.add(".$id.", {'icon':'".$recipez->relItems->getEntry($id)['iconString']."'});\n";
+                    $icon = DB::Aowow()->selectCell('SELECT ic.name FROM ::icons ic JOIN ::items i ON i.iconId == ic.id WHERE i.id = %d', $rEntry->effectCreateItemId[$idx]);
+                    $created .= "g_items.add(".$rEntry->effectCreateItemId[$idx].", {'icon':'".$icon."'});\n";
                 }
             }
 
@@ -331,7 +330,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0],
             [['flags', 1, '&'], 0],                         // no statistics
         );
-        $achievez = new AchievementList($condition);
+        $achievez = new AchievementContainer($condition);
 
         foreach (CLISetup::$locales as $loc)
         {

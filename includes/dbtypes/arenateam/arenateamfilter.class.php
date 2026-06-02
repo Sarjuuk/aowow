@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class ArenaTeamFilter extends Filter
+class ArenateamFilter extends Filter
 {
     use TrProfilerFilter;
 
@@ -30,7 +30,7 @@ class ArenaTeamFilter extends Filter
         $parts = [];
         $_v    = $this->values;
 
-        // region (rg), battlegroup (bg) and server (sv) are passed to ArenaTeamList as miscData and handled there
+        // region (rg), battlegroup (bg) and server (sv) are passed to ArenateamList as miscData and handled there
 
         // name [str]
         if ($_v['na'])

@@ -14,7 +14,7 @@ class QuestContainer extends DBTypeContainer
     {
         parent::__construct($conditions, $miscData);
 
-        $rewards = Quest::fetchCurrencyItemPairs();
+        $rewards = QuestEntry::fetchCurrencyItemPairs();
 
         foreach ($this->iterate() as $entry)
             $entry->setCurrencyItems($rewards);
@@ -23,7 +23,7 @@ class QuestContainer extends DBTypeContainer
     /**
      * iterate over fetched sets
      *
-     * @return \Generator<int, Quest> id => quest template
+     * @return \Generator<int, QuestEntry> id => quest template
      */
     public function iterate() : \Generator
     {
@@ -31,11 +31,11 @@ class QuestContainer extends DBTypeContainer
     }
 
     /**
-     * @return ?Quest
+     * @return ?QuestEntry
      */
-    public function getEntry(string|int $id) : ?Quest
+    public function getEntry(null|string|int $key = null) : ?QuestEntry
     {
-        return parent::getEntry($id);
+        return parent::getEntry($key);
     }
 
     /** returns data portion of a listview js object */
@@ -45,6 +45,17 @@ class QuestContainer extends DBTypeContainer
 
         foreach ($this->iterate() as $id => $entry)
             $data[$id] = $entry->getListviewRow($addInfoMask, $reputationCol);
+
+        return $data;
+    }
+
+    public function getSourceData(int $_id = 0) : array
+    {
+        $data = [];
+
+        foreach ($this->iterate() as $id => $entry)
+            if (!$_id || $id == $_id)
+                $data[$id] = $entry->getSourceData();
 
         return $data;
     }

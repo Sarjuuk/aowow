@@ -46,7 +46,7 @@ class ItemPowerResponse extends TextResponse implements ICache
 
     protected function generate() : void
     {
-        $item = new Item($this->typeId, ['enhance' => $this->enhancedTT]);
+        $item = new ItemEntry($this->typeId, ['enhance' => $this->enhancedTT]);
         if ($item->error)
             $this->cacheType = CACHE_TYPE_NONE;
         else

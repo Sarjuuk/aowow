@@ -67,7 +67,7 @@ class CurrenciesBaseResponse extends TemplateResponse implements ICache
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
 
-        $this->lvTabs->addListviewTab(new Listview(['data' => $money->getListviewData()], Currency::$brickFile));
+        $this->lvTabs->addListviewTab(new Listview(['data' => $money->getListviewData()], CurrencyEntry::$brickFile));
 
         parent::generate();
     }

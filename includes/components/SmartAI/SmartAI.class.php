@@ -819,7 +819,7 @@ class SmartAI
         $this->quotes[$creatureId] = $quotes;
 
         if (!empty($this->quotes[$creatureId]))
-            $this->quotes[$creatureId]['src'] = CreatureList::getName($creatureId);
+            $this->quotes[$creatureId]['src'] = CreatureEntry::getName($creatureId);
     }
 
     public function getQuote(int $creatureId, int $group, ?string &$npcSrc) : array

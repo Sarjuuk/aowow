@@ -20,7 +20,7 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
     public int $type   = Type::CURRENCY;
     public int $typeId = 0;
 
-    private Currency $subject;
+    private CurrencyEntry $subject;
 
     public function __construct(string $id)
     {
@@ -32,7 +32,7 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new Currency($this->typeId);
+        $this->subject = new CurrencyEntry($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('currency'), Lang::currency('notFound'));
 
@@ -141,11 +141,11 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
             }
 
             // tab: sold by
-            $itemObj = new Item($_relItemId);
+            $itemObj = new ItemEntry($_relItemId);
             if ($vendorData = $itemObj->getVendorData(targetItem: $_relItemId))
             {
                 $vendors = array_pop($vendorData);
-                $this->extendGlobalData($itemObj->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
+                $this->extendGlobalData($itemObj->getJSGlobal(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
                 $soldBy = new CreatureContainer(array(['id', array_keys($vendors)]));
                 if (!$soldBy->error)
@@ -173,9 +173,9 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
                                 $this->extendGlobalIds(Type::WORLDEVENT, $e);
 
                         $row['stock'] = $vendors[$k][0]['stock'];
-                        $row['stack'] = $itemObj->getField('buyCount');
+                        $row['stack'] = $itemObj->buyCount;
                         $row['cost']  = array(
-                            $itemObj->getField('buyPrice'),
+                            $itemObj->buyPrice,
                             $items  ?: null,
                             $tokens ?: null
                         );
@@ -192,7 +192,7 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
                         'id'         => 'sold-by-npc',
                         'extraCols'  => $extraCols,
                         'hiddenCols' => ['level', 'type']
-                    ), Creature::$brickFile));
+                    ), CreatureEntry::$brickFile));
                 }
             }
         }
@@ -200,7 +200,7 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
         // tab: created by (spell) [for items its handled in LootByItem]
         if ($this->typeId == CURRENCY_HONOR_POINTS)
         {
-            $createdBy = new SpellList(array(['effect1Id', SPELL_EFFECT_ADD_HONOR], ['effect2Id', SPELL_EFFECT_ADD_HONOR], ['effect3Id', SPELL_EFFECT_ADD_HONOR], DB::OR));
+            $createdBy = new SpellContainer(array(['effect1Id', SPELL_EFFECT_ADD_HONOR], ['effect2Id', SPELL_EFFECT_ADD_HONOR], ['effect3Id', SPELL_EFFECT_ADD_HONOR], DB::OR));
             if (!$createdBy->error)
             {
                 $this->extendGlobalData($createdBy->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
@@ -214,7 +214,7 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
                 if ($createdBy->hasSetFields('reagent1', 'reagent2', 'reagent3', 'reagent4', 'reagent5', 'reagent6', 'reagent7', 'reagent8'))
                     $tabData['visibleCols'] = ['reagents'];
 
-                $this->lvTabs->addListviewTab(new Listview($tabData, SpellList::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview($tabData, SpellEntry::$brickFile));
             }
         }
 
@@ -233,14 +233,14 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
         else
             $w = '`reqItemId1` = '.$_relItemId.' OR `reqItemId2` = '.$_relItemId.' OR `reqItemId3` = '.$_relItemId.' OR `reqItemId4` = '.$_relItemId.' OR `reqItemId5` = '.$_relItemId;
 
-        if (!$n && !is_null(ItemListFilter::getCriteriaIndex(158, $_relItemId)))
+        if (!$n && !is_null(ItemFilter::getCriteriaIndex(158, $_relItemId)))
             $n = '?items&filter=cr=158;crs='.$_relItemId.';crv=0';
 
         $xCosts   = DB::Aowow()->selectCol('SELECT `id` FROM ::itemextendedcost WHERE '.$w);
         $boughtBy = $xCosts ? DB::World()->selectCol('SELECT `item` FROM npc_vendor WHERE `extendedCost` IN %in UNION SELECT `item` FROM game_event_npc_vendor WHERE `extendedCost` IN %in', $xCosts, $xCosts) : [];
         if ($boughtBy)
         {
-            $boughtBy = new ItemList(array(['id', $boughtBy]));
+            $boughtBy = new ItemContainer(array(['id', $boughtBy]));
             if (!$boughtBy->error)
             {
                 $tabData = array(
@@ -253,7 +253,7 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
                 if ($n)
                     $tabData['note'] = sprintf(Util::$filterResultString, $n);
 
-                $this->lvTabs->addListviewTab(new Listview($tabData, ItemList::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview($tabData, ItemEntry::$brickFile));
 
                 $this->extendGlobalData($boughtBy->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
             }

@@ -269,9 +269,9 @@ class CreatureFilter extends Filter
             return null;
 
         $facTpls = [];
-        $facs    = new FactionList(array(DB::OR, ['parentFactionId', $crs], ['id', $crs]));
-        foreach ($facs->iterate() as $__)
-            $facTpls = array_merge($facTpls, $facs->getField('templateIds'));
+        $facs    = new FactionContainer(array(DB::OR, ['parentFactionId', $crs], ['id', $crs]));
+        foreach ($facs->iterate() as $entry)
+            $facTpls = array_merge($facTpls, $entry->templateIds);
 
         return $facTpls ? ['faction', $facTpls] : [0];
     }

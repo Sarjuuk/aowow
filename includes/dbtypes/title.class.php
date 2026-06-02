@@ -111,10 +111,10 @@ class TitleList extends DBTypeList
 
         // fill in the details
         if (!empty($sources[SRC_QUEST]))
-            $sources[SRC_QUEST] = (new QuestList(array(['id', $sources[SRC_QUEST]])))->getSourceData();
+            $sources[SRC_QUEST] = (new QuestContainer(array(['id', $sources[SRC_QUEST]])))->getSourceData();
 
         if (!empty($sources[SRC_ACHIEVEMENT]))
-            $sources[SRC_ACHIEVEMENT] = (new AchievementList(array(['id', $sources[SRC_ACHIEVEMENT]])))->getSourceData();
+            $sources[SRC_ACHIEVEMENT] = (new AchievementContainer(array(['id', $sources[SRC_ACHIEVEMENT]])))->getSourceData();
 
         foreach ($this->sources as $id => $src)
         {

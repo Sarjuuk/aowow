@@ -160,10 +160,9 @@ class ProfileLoadResponse extends TextResponse
         $profile['quests'] = [];
         if ($quests = DB::Aowow()->selectCol('SELECT `questId` FROM ::profiler_completion_quests WHERE `id` = %i', $pBase['id']))
         {
-            $qList = new QuestList(array(['id', $quests]));
-            if (!$qList->error)
-                foreach ($qList->iterate() as $id => $__)
-                    $profile['quests'][$id] = [$qList->getField('cat1'), $qList->getField('cat2')];
+            $qList = new QuestContainer(array(['id', $quests]));
+            foreach ($qList->iterate() as $id => $qEntry)
+                $profile['quests'][$id] = [$qEntry->category1, $qEntry->category2];
         }
 
         // skillId => [value, max]
@@ -196,22 +195,21 @@ class ProfileLoadResponse extends TextResponse
         $usedSlots = [];
         if ($this->_get['items'])
         {
-            $phItems = new ItemList(array(['id', $this->_get['items']], ['slot', INVTYPE_NON_EQUIP, '!']));
+            $phItems = new ItemContainer(array(['id', $this->_get['items']], ['slot', INVTYPE_NON_EQUIP, '!']));
             if (!$phItems->error)
             {
                 $data  = $phItems->getListviewData(LISTVIEWINFO_ITEMEXTRA | LISTVIEWINFO_SUBITEMS);
-                foreach ($phItems->iterate() as $iId => $__)
+                foreach ($phItems->iterate() as $iId => $phEntry)
                 {
-                    $sl = $phItems->getField('slot');
                     foreach (Profiler::$slot2InvType as $slot => $invTypes)
                     {
-                        if (in_array($sl, $invTypes) && !in_array($slot, $usedSlots))
+                        if (in_array($phEntry->slot, $invTypes) && !in_array($slot, $usedSlots))
                         {
                             // get and apply inventory
                             $gItems[$iId] = array(
-                                'name_'.Lang::getLocale()->json() => $phItems->getField('name', true),
-                                'quality'                         => $phItems->getField('quality'),
-                                'icon'                            => $phItems->getField('iconString'),
+                                'name_'.Lang::getLocale()->json() => $phEntry->name,
+                                'quality'                         => $phEntry->quality,
+                                'icon'                            => $phEntry->icon,
                                 'jsonequip'                       => $data[$iId]
                             );
                             $profile['inventory'][$slot] = [$iId, 0, 0, 0, 0, 0, 0, 0];
@@ -226,20 +224,20 @@ class ProfileLoadResponse extends TextResponse
 
         if ($items = DB::Aowow()->selectAssoc('SELECT * FROM ::profiler_items WHERE `id` = %i', $pBase['id']))
         {
-            $itemz = new ItemList(array(['id', array_column($items, 'item')]));
+            $itemz = new ItemContainer(array(['id', array_column($items, 'item')]));
             if (!$itemz->error)
             {
                 $data = $itemz->getListviewData(LISTVIEWINFO_ITEMEXTRA | LISTVIEWINFO_SUBITEMS);
 
                 foreach ($items as $i)
                 {
-                    if ($itemz->getEntry($i['item']) && !in_array($i['slot'], $usedSlots))
+                    if (!in_array($i['slot'], $usedSlots) && ($entry = $itemz->getEntry($i['item'])))
                     {
                         // get and apply inventory
-                        $gItems[$i['item']] = array(
-                            'name_'.Lang::getLocale()->json() => $itemz->getField('name', true),
-                            'quality'                         => $itemz->getField('quality'),
-                            'icon'                            => $itemz->getField('iconString'),
+                        $gItems[$i['item']] ??= array(
+                            'name_'.Lang::getLocale()->json() => $entry->name,
+                            'quality'                         => $entry->quality,
+                            'icon'                            => $entry->icon,
                             'jsonequip'                       => $data[$i['item']]
                         );
                         $profile['inventory'][$i['slot']] = [$i['item'], $i['subItem'], $i['permEnchant'], $i['tempEnchant'], $i['gem1'], $i['gem2'], $i['gem3'], $i['gem4']];
@@ -255,7 +253,7 @@ class ProfileLoadResponse extends TextResponse
 
         // if ($au = $char->getField('auras'))
         // {
-            // $auraz = new SpellList(array(['id', $char->getField('auras')]));
+            // $auraz = new SpellContainer(array(['id', $char->getField('auras')]));
             // $dataz = $auraz->getListviewData();
             // $modz  = $auraz->getProfilerMods();
 

@@ -57,6 +57,13 @@ trait TrSourceHelper
         }
 
         $this->sources = $src;
+
+        $this->moreType   = $initData['moreType'];
+        $this->moreTypeId = $initData['moreTypeId'];
+        $this->moreZoneId = $initData['moreZoneId'];
+        $this->moreMask   = $initData['moreMask'];
+
+        unset($initData['moreType'], $initData['moreTypeId'], $initData['moreZoneId'], $initData['moreMask']);
     }
 
     public function getRawSource(int $src) : array
@@ -69,14 +76,14 @@ trait TrSourceHelper
         return !!array_filter($this->sources);
     }
 
-    public function prepareSourceMore(?DBType $src = null) : void
+    public function prepareSourceMore(?DBTypeEntry $src = null) : void
     {
-        if (!$this->sourceMore !== null || !($this instanceof DBType))
+        if (!$this->sourceMore !== null || !($this instanceof DBTypeEntry))
             return;
 
         // not provided by external bulk operation
         if (!$src && $this->moreType && $this->moreTypeId)
-            $src = Type::newType($this->moreType, $this->moreTypeId);
+            $src = Type::newEntry($this->moreType, $this->moreTypeId);
 
         if ($src && $src instanceof ISource && $src->id == $this->id)
             $this->sourceMore = $src->getSourceData();
@@ -98,8 +105,8 @@ trait TrSourceHelper
         if ($_ = $this->sourceMore)
             $sm = $_;
 
-        if ($p = $this->sources[SRC_PVP])
-            $sm['p'] = $p[0];
+        if (!empty($this->sources[SRC_PVP]))
+            $sm['p'] = $this->sources[SRC_PVP][0];
 
         if ($z = $this->moreZoneId)
             $sm['z'] = $z;
@@ -107,7 +114,7 @@ trait TrSourceHelper
         if ($this->moreMask & SRC_FLAG_BOSSDROP)
             $sm['bd'] = 1;
 
-        if ($this->sources[SRC_DROP])
+        if (!empty($this->sources[SRC_DROP]))
         {
             /*
                 mode        srcFlag     log2    dd Flag
@@ -181,14 +188,14 @@ trait TrSpawns
      * enabled by <a rel="map" ...> or anchor #map
      * (one area, one floor, one creature, no survivors)
      *
-     * @param DBType $entity limited to:
-     * * `Creature`
-     * * `Gameobject`
-     * * `Sound`
-     * * `Areatrigger`
+     * @param DBTypeEntry $entity limited to:
+     * * `CreatureEntry`
+     * * `GameobjectEntry`
+     * * `SoundEntry`
+     * * `AreatriggerEntry`
      * @return \StdClass [zoneId, floor, [[x1, y1], [x2, y2], ..]]
      */
-    public static function createShortSpawns(DBType $entity) : \StdClass
+    public static function createShortSpawns(DBTypeEntry $entity) : \StdClass
     {
         // first - get zone/floor with the most spawns
         // second - get relevant spawn points
@@ -209,24 +216,24 @@ trait TrSpawns
     /**
      * for display on map on detail page
      * (for historic reasons )
-     * @param DBType|DBTypeContainer $set limited to:
-     * * `Creature` `CreatureSet`
-     * * `Gameobject` `GameobjectSet`
-     * * `Sound` `SoundSet`
-     * * `Areatrigger` `AreatriggerSet`
+     * @param DBTypeEntry|DBTypeContainer $set limited to:
+     * * `CreatureEntry` `CreatureSet`
+     * * `GameobjectEntry` `GameobjectSet`
+     * * `SoundEntry` `SoundSet`
+     * * `AreatriggerEntry` `AreatriggerSet`
      * @param bool $skipWPs do not display waypoints
      * @param bool $skipAdmin neither display admin info nor attach spawnposfix menu
      * @param bool $hasLabel use entities name as tooltip if it would otherwise be empty
      * @param bool $hasLink attach link to entity to pip
      * @return array [zoneId => [floor => ['coords' => [[x, y, opts], ...], count => n]]]
      */
-    private static function createFullSpawns(DBType|DBTypeContainer $set, bool $skipWPs = false, bool $skipAdmin = false, bool $hasLabel = false, bool $hasLink = false) : array
+    private static function createFullSpawns(DBTypeEntry|DBTypeContainer $set, bool $skipWPs = false, bool $skipAdmin = false, bool $hasLabel = false, bool $hasLink = false) : array
     {
         // works for both Sets and Entities
         if ($set::$dbType != Type::NPC && $set::$dbType != Type::OBJECT && $set::$dbType != Type::SOUND && $set::$dbType != Type::AREATRIGGER)
             return [];
 
-        if ($set instanceof DBType)
+        if ($set instanceof DBTypeEntry)
         {
             $tmp = $set;
             ($set = Type::newContainer($set::$dbType, null))->import($tmp);
@@ -432,7 +439,7 @@ trait TrProfilerHelper
 }
 
 
-abstract class DBType
+abstract class DBTypeEntry
 {
     protected array  $templates = [];
     protected array  $curTpl    = [];
@@ -476,7 +483,7 @@ abstract class DBType
         }
     }
 
-    // readonly props may only be written like they were private; so force per DBType implementation
+    // readonly props may only be written like they were private; so force per DBTypeEntry implementation
     public function applyInitData(array $initData) : void
     {
         $this->id = $initData['id'];

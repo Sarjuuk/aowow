@@ -215,7 +215,7 @@ class Search
     private function _searchCharClass() : ?array            // 0 Classes: $moduleMask & 0x00000001
     {
         $cnd     = array_merge($this->cndBase, [$this->createLikeLookup()]);
-        $classes = new CharClassList($cnd, ['calcTotal' => true]);
+        $classes = new CharClassContainer($cnd, ['calcTotal' => true]);
 
         $data = $classes->getListviewData();
         if (!$data)
@@ -231,7 +231,7 @@ class Search
                 $lvData['_truncated'] = 1;
             }
 
-            return [$lvData, CharClassList::$brickFile];
+            return [$lvData, CharClassEntry::$brickFile];
         }
 
         if ($this->moduleMask & self::TYPE_OPEN)
@@ -239,10 +239,10 @@ class Search
             $result = [];
             $osInfo = [Type::CHR_CLASS, $classes->getMatches(), [], [], 'Class'];
 
-            foreach ($classes->iterate() as $id => $__)
+            foreach ($classes->iterate() as $id => $entry)
             {
-                $result[$id]    = $classes->getField('name', true);
-                $osInfo[2][$id] = 'class_'.strToLower($classes->getField('fileString'));
+                $result[$id]    = $entry->name;
+                $osInfo[2][$id] = 'class_'.strtolower($entry->fileString);
             }
 
             return [$result, ...$osInfo];
@@ -254,7 +254,7 @@ class Search
     private function _searchCharRace() : ?array             // 1 Races: $moduleMask & 0x00000002
     {
         $cnd   = array_merge($this->cndBase, [$this->createLikeLookup()]);
-        $races = new CharRaceList($cnd, ['calcTotal' => true]);
+        $races = new CharRaceContainer($cnd, ['calcTotal' => true]);
 
         $data = $races->getListviewData();
         if (!$data)
@@ -270,7 +270,7 @@ class Search
                 $lvData['_truncated'] = 1;
             }
 
-            return [$lvData, CharRaceList::$brickFile];
+            return [$lvData, CharRaceEntry::$brickFile];
         }
 
         if ($this->moduleMask & self::TYPE_OPEN)
@@ -278,10 +278,10 @@ class Search
             $result = [];
             $osInfo = [Type::CHR_RACE, $races->getMatches(), [], [], 'Race'];
 
-            foreach ($races->iterate() as $id => $__)
+            foreach ($races->iterate() as $id => $entry)
             {
-                $result[$id]    = $races->getField('name', true);
-                $osInfo[2][$id] = 'race_'.strToLower($races->getField('fileString')).'_male';
+                $result[$id]    = $entry->name;
+                $osInfo[2][$id] = 'race_'.strtolower($entry->fileString).'_male';
             }
 
             return [$result, ...$osInfo];
@@ -293,7 +293,7 @@ class Search
     private function _searchTitle() : ?array                // 2 Titles: $moduleMask & 0x00000004
     {
         $cnd    = array_merge($this->cndBase, [$this->createLikeLookup(['male_loc'.Lang::getLocale()->value, 'female_loc'.Lang::getLocale()->value])]);
-        $titles = new TitleList($cnd, ['calcTotal' => true]);
+        $titles = new TitleContainer($cnd, ['calcTotal' => true]);
 
         $data = $titles->getListviewData();
         if (!$data)
@@ -309,7 +309,7 @@ class Search
                 $lvData['_truncated'] = 1;
             }
 
-            return [$lvData, TitleList::$brickFile];
+            return [$lvData, TitleEntry::$brickFile];
         }
 
         if ($this->moduleMask & self::TYPE_OPEN)
@@ -317,10 +317,10 @@ class Search
             $result = [];
             $osInfo = [Type::TITLE, $titles->getMatches(), [], [], 'Title'];
 
-            foreach ($titles->iterate() as $id => $__)
+            foreach ($titles->iterate() as $id => $entry)
             {
-                $result[$id]    = $titles->getField('male', true);
-                $osInfo[2][$id] = $titles->getField('side');
+                $result[$id]    = $entry->male;
+                $osInfo[2][$id] = $entry->side;
             }
 
             return [$result, ...$osInfo];
@@ -338,7 +338,7 @@ class Search
                 [DB::AND, $this->createLikeLookup(['e.description']), ['e.holidayId', 0]]
             )
         ));
-        $wEvents = new WorldEventList($cnd, ['calcTotal' => true]);
+        $wEvents = new WorldEventContainer($cnd, ['calcTotal' => true]);
 
         $data = $wEvents->getListviewData();
         if (!$data)
@@ -357,7 +357,7 @@ class Search
                 $lvData['_truncated'] = 1;
             }
 
-            return [$lvData, WorldEventList::$brickFile];
+            return [$lvData, WorldEventEntry::$brickFile];
         }
 
         if ($this->moduleMask & self::TYPE_OPEN)
@@ -365,8 +365,8 @@ class Search
             $result = [];
             $osInfo = [Type::WORLDEVENT, $wEvents->getMatches(), [], [], 'World Event'];
 
-            foreach ($wEvents->iterate() as $id => $__)
-                $result[$id]    = $wEvents->getField('name', true);
+            foreach ($wEvents->iterate() as $id => $entry)
+                $result[$id] = $entry->name;
 
             return [$result, ...$osInfo];
         }
@@ -377,7 +377,7 @@ class Search
     private function _searchCurrency() : ?array             // 4 Currencies $moduleMask & 0x0000010
     {
         $cnd   = array_merge($this->cndBase, [$this->createLikeLookup()]);
-        $money = new CurrencyList($cnd, ['calcTotal' => true]);
+        $money = new CurrencyContainer($cnd, ['calcTotal' => true]);
 
         $data = $money->getListviewData();
         if (!$data)
@@ -393,7 +393,7 @@ class Search
                 $lvData['_truncated'] = 1;
             }
 
-            return [$lvData, CurrencyList::$brickFile];
+            return [$lvData, CurrencyEntry::$brickFile];
         }
 
         if ($this->moduleMask & self::TYPE_OPEN)
@@ -401,10 +401,10 @@ class Search
             $result = [];
             $osInfo = [Type::CURRENCY, $money->getMatches(), [], [], 'Currency'];
 
-            foreach ($money->iterate() as $id => $__)
+            foreach ($money->iterate() as $id => $entry)
             {
-                $result[$id]    = $money->getField('name', true);
-                $osInfo[2][$id] = $money->getField('iconString');
+                $result[$id]    = $entry->name;
+                $osInfo[2][$id] = $entry->icon;
             }
 
             return [$result, ...$osInfo];
@@ -416,7 +416,7 @@ class Search
     private function _searchItemset(array &$shared) : ?array// 5 Itemsets $moduleMask & 0x0000020
     {
         $cnd  = array_merge($this->cndBase, [$this->createLikeLookup()]);
-        $sets = new ItemsetList($cnd, ['calcTotal' => true]);
+        $sets = new ItemsetContainer($cnd, ['calcTotal' => true]);
 
         $data = $sets->getListviewData();
         if (!$data)
@@ -439,7 +439,7 @@ class Search
             else
                 $lvData['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?itemsets&filter=na='.urlencode($this->query).'\')';
 
-            return [$lvData, ItemsetList::$brickFile];
+            return [$lvData, ItemsetEntry::$brickFile];
         }
 
         if ($this->moduleMask & self::TYPE_OPEN)
@@ -447,10 +447,10 @@ class Search
             $result = [];
             $osInfo = [Type::ITEMSET, $sets->getMatches(), [], [], 'Item Set'];
 
-            foreach ($sets->iterate() as $id => $__)
+            foreach ($sets->iterate() as $id => $entry)
             {
-                $result[$id]    = $sets->getField('name', true);
-                $osInfo[3][$id] = $sets->getField('quality');
+                $result[$id]    = $entry->name;
+                $osInfo[3][$id] = $entry->quality;
             }
 
             return [$result, ...$osInfo];
@@ -458,10 +458,13 @@ class Search
 
         if ($this->moduleMask & self::TYPE_JSON)
         {
-            $shared['pcsToSet'] = $sets->pieceToSet;
+            $shared['pcsToSet'] = [];;
 
-            foreach ($data as &$d)
+            foreach ($data as $id => &$d)
+            {
+                $shared['pcsToSet'] += $sets->getEntry($id)->pieceToSet;
                 unset($d['quality'], $d['heroic']);
+            }
 
             return array_values($data);
         }
@@ -498,7 +501,7 @@ class Search
         else
             $cnd = array_merge($this->cndBase, [$lookup]);
 
-        $items = new ItemList($cnd, $miscData);
+        $items = new ItemContainer($cnd, $miscData);
 
         $data = $items->getListviewData($this->moduleMask & self::TYPE_JSON ? (LISTVIEWINFO_SUBITEMS | LISTVIEWINFO_ITEMEXTRA) : 0);
         if (!$data)
@@ -521,7 +524,7 @@ class Search
             else
                 $lvData['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?items&filter=na='.urlencode($this->query).'\')';
 
-            return [$lvData, ItemList::$brickFile];
+            return [$lvData, ItemEntry::$brickFile];
         }
 
         if ($this->moduleMask & self::TYPE_OPEN)
@@ -529,11 +532,11 @@ class Search
             $result = [];
             $osInfo = [Type::ITEM, $items->getMatches(), [], [], 'Item'];
 
-            foreach ($items->iterate() as $id => $__)
+            foreach ($items->iterate() as $id => $entry)
             {
-                $result[$id]    = $items->getField('name', true);
-                $osInfo[2][$id] = $items->getField('iconString');
-                $osInfo[3][$id] = $items->getField('quality');
+                $result[$id]    = $entry->name;
+                $osInfo[2][$id] = $entry->icon;
+                $osInfo[3][$id] = $entry->quality;
             }
 
             return [$result, ...$osInfo];
@@ -564,7 +567,7 @@ class Search
             [['s.attributes0', 0x80, '&'], 0],
             $lookup
         ));
-        $abilities = new SpellList($cnd, ['calcTotal' => true]);
+        $abilities = new SpellContainer($cnd, ['calcTotal' => true]);
 
         $data = $abilities->getListviewData();
         if (!$data)
@@ -599,7 +602,7 @@ class Search
             else
                 $lvData['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=7&filter=na='.urlencode($this->query).'\')';
 
-            return [$lvData, SpellList::$brickFile];
+            return [$lvData, SpellEntry::$brickFile];
         }
 
         if ($this->moduleMask & self::TYPE_OPEN)
@@ -607,11 +610,11 @@ class Search
             $result = [];
             $osInfo = [Type::SPELL, $abilities->getMatches(), [], [], 'Ability'];
 
-            foreach ($abilities->iterate() as $id => $__)
+            foreach ($abilities->iterate() as $id => $entry)
             {
-                $result[$id]    = $abilities->getField('name', true);
-                $osInfo[2][$id] = $abilities->getField('iconString');
-                $osInfo[3][$id] = $abilities->ranks[$id];
+                $result[$id]    = $entry->name;
+                $osInfo[2][$id] = $entry->icon;
+                $osInfo[3][$id] = $entry->rank;
             }
 
             return [$result, ...$osInfo];
@@ -627,7 +630,7 @@ class Search
             return null;
 
         $cnd     = array_merge($this->cndBase, [['s.typeCat', [-7, -2]], $lookup]);
-        $talents = new SpellList($cnd, ['calcTotal' => true]);
+        $talents = new SpellContainer($cnd, ['calcTotal' => true]);
 
         $data = $talents->getListviewData();
         if (!$data)
@@ -659,7 +662,7 @@ class Search
             else
                 $lvData['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-2&filter=na='.urlencode($this->query).'\')';
 
-            return [$lvData, SpellList::$brickFile];
+            return [$lvData, SpellEntry::$brickFile];
         }
 
         if ($this->moduleMask & self::TYPE_OPEN)
@@ -667,11 +670,11 @@ class Search
             $result = [];
             $osInfo = [Type::SPELL, $talents->getMatches(), [], [], 'Talent'];
 
-            foreach ($talents->iterate() as $id => $__)
+            foreach ($talents->iterate() as $id => $entry)
             {
-                $result[$id]    = $talents->getField('name', true);
-                $osInfo[2][$id] = $talents->getField('iconString');
-                $osInfo[3][$id] = $talents->ranks[$id];
+                $result[$id]    = $entry->name;
+                $osInfo[2][$id] = $entry->icon;
+                $osInfo[3][$id] = $entry->rank;
             }
 
             return [$result, ...$osInfo];
@@ -687,7 +690,7 @@ class Search
             return null;
 
         $cnd    = array_merge($this->cndBase, [['s.typeCat', -13], $lookup]);
-        $glyphs = new SpellList($cnd, ['calcTotal' => true]);
+        $glyphs = new SpellContainer($cnd, ['calcTotal' => true]);
 
         $data = $glyphs->getListviewData();
         if (!$data)
@@ -715,7 +718,7 @@ class Search
             else
                 $lvData['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-13&filter=na='.urlencode($this->query).'\')';
 
-            return [$lvData, SpellList::$brickFile];
+            return [$lvData, SpellEntry::$brickFile];
         }
 
         if ($this->moduleMask & self::TYPE_OPEN)
@@ -723,10 +726,10 @@ class Search
             $result = [];
             $osInfo = [Type::SPELL, $glyphs->getMatches(), [], [], 'Glyph'];
 
-            foreach ($glyphs->iterate() as $id => $__)
+            foreach ($glyphs->iterate() as $id => $entry)
             {
-                $result[$id]    = $glyphs->getField('name', true);
-                $osInfo[2][$id] = $glyphs->getField('iconString');
+                $result[$id]    = $entry->name;
+                $osInfo[2][$id] = $entry->icon;
             }
 
             return [$result, ...$osInfo];
@@ -742,7 +745,7 @@ class Search
             return null;
 
         $cnd  = array_merge($this->cndBase, [['s.typeCat', -11], $lookup]);
-        $prof = new SpellList($cnd, ['calcTotal' => true]);
+        $prof = new SpellContainer($cnd, ['calcTotal' => true]);
 
         $data = $prof->getListviewData();
         if (!$data)
@@ -770,7 +773,7 @@ class Search
             else
                 $lvData['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-11&filter=na='.urlencode($this->query).'\')';
 
-            return [$lvData, SpellList::$brickFile];
+            return [$lvData, SpellEntry::$brickFile];
         }
 
         if ($this->moduleMask & self::TYPE_OPEN)
@@ -778,10 +781,10 @@ class Search
             $result = [];
             $osInfo = [Type::SPELL, $prof->getMatches(), [], [], 'Proficiency'];
 
-            foreach ($prof->iterate() as $id => $__)
+            foreach ($prof->iterate() as $id => $entry)
             {
-                $result[$id]    = $prof->getField('name', true);
-                $osInfo[2][$id] = $prof->getField('iconString');
+                $result[$id]    = $entry->name;
+                $osInfo[2][$id] = $entry->icon;
             }
 
             return [$result, ...$osInfo];
@@ -797,7 +800,7 @@ class Search
             return null;
 
         $cnd  = array_merge($this->cndBase, [['s.typeCat', [9, 11]], $lookup]);
-        $prof = new SpellList($cnd, ['calcTotal' => true]);
+        $prof = new SpellContainer($cnd, ['calcTotal' => true]);
 
         $data = $prof->getListviewData();
         if (!$data)
@@ -825,7 +828,7 @@ class Search
             else
                 $lvData['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=11&filter=na='.urlencode($this->query).'\')';
 
-            return [$lvData, SpellList::$brickFile];
+            return [$lvData, SpellEntry::$brickFile];
         }
 
         if ($this->moduleMask & self::TYPE_OPEN)
@@ -833,10 +836,10 @@ class Search
             $result = [];
             $osInfo = [Type::SPELL, $prof->getMatches(), [], [], 'Profession'];
 
-            foreach ($prof->iterate() as $id => $__)
+            foreach ($prof->iterate() as $id => $entry)
             {
-                $result[$id]    = $prof->getField('name', true);
-                $osInfo[2][$id] = $prof->getField('iconString');
+                $result[$id]    = $entry->name;
+                $osInfo[2][$id] = $entry->icon;
             }
 
             return [$result, ...$osInfo];
@@ -852,7 +855,7 @@ class Search
             return null;
 
         $cnd   = array_merge($this->cndBase, [['s.typeCat', -6], $lookup]);
-        $vPets = new SpellList($cnd, ['calcTotal' => true]);
+        $vPets = new SpellContainer($cnd, ['calcTotal' => true]);
 
         $data = $vPets->getListviewData();
         if (!$data)
@@ -880,7 +883,7 @@ class Search
             else
                 $lvData['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-6&filter=na='.urlencode($this->query).'\')';
 
-            return [$lvData, SpellList::$brickFile];
+            return [$lvData, SpellEntry::$brickFile];
         }
 
         if ($this->moduleMask & self::TYPE_OPEN)
@@ -888,10 +891,10 @@ class Search
             $result = [];
             $osInfo = [Type::SPELL, $vPets->getMatches(), [], [], 'Companion'];
 
-            foreach ($vPets->iterate() as $id => $__)
+            foreach ($vPets->iterate() as $id => $entry)
             {
-                $result[$id]    = $vPets->getField('name', true);
-                $osInfo[2][$id] = $vPets->getField('iconString');
+                $result[$id]    = $entry->name;
+                $osInfo[2][$id] = $entry->icon;
             }
 
             return [$result, ...$osInfo];
@@ -907,7 +910,7 @@ class Search
             return null;
 
         $cnd    = array_merge($this->cndBase, [['s.typeCat', -5], $lookup]);
-        $mounts = new SpellList($cnd, ['calcTotal' => true]);
+        $mounts = new SpellContainer($cnd, ['calcTotal' => true]);
 
         $data = $mounts->getListviewData();
         if (!$data)
@@ -934,7 +937,7 @@ class Search
             else
                 $lvData['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-5&filter=na='.urlencode($this->query).'\')';
 
-            return [$lvData, SpellList::$brickFile];
+            return [$lvData, SpellEntry::$brickFile];
         }
 
         if ($this->moduleMask & self::TYPE_OPEN)
@@ -942,10 +945,10 @@ class Search
             $result = [];
             $osInfo = [Type::SPELL, $mounts->getMatches(), [], [], 'Mount'];
 
-            foreach ($mounts->iterate() as $id => $__)
+            foreach ($mounts->iterate() as $id => $entry)
             {
-                $result[$id]    = $mounts->getField('name', true);
-                $osInfo[2][$id] = $mounts->getField('iconString');
+                $result[$id]    = $entry->name;
+                $osInfo[2][$id] = $entry->icon;
             }
 
             return [$result, ...$osInfo];
@@ -965,7 +968,7 @@ class Search
             [['cuFlags', NPC_CU_DIFFICULTY_DUMMY, '&'], 0], // exclude difficulty entries
             $lookup
         ));
-        $npcs = new CreatureList($cnd, ['calcTotal' => true]);
+        $npcs = new CreatureContainer($cnd, ['calcTotal' => true]);
 
         $data = $npcs->getListviewData();
         if (!$data)
@@ -990,7 +993,7 @@ class Search
             else
                 $lvData['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?npcs&filter=na='.urlencode($this->query).'\')';
 
-            return [$lvData, CreatureList::$brickFile];
+            return [$lvData, CreatureEntry::$brickFile];
         }
 
         if ($this->moduleMask & self::TYPE_OPEN)
@@ -998,10 +1001,10 @@ class Search
             $result = [];
             $osInfo = [Type::NPC, $npcs->getMatches(), [], [], 'NPC'];
 
-            foreach ($npcs->iterate() as $id => $__)
+            foreach ($npcs->iterate() as $id => $entry)
             {
-                $result[$id] = $npcs->getField('name', true);
-                if ($npcs->isBoss())
+                $result[$id] = $entry->name;
+                if ($entry->isBoss())
                     $osInfo[2][$id] = 1;
             }
 
@@ -1021,7 +1024,7 @@ class Search
             [['flags', CUSTOM_UNAVAILABLE | CUSTOM_DISABLED, '&'], 0],
             $lookup
         ));
-        $quests = new QuestList($cnd, ['calcTotal' => true]);
+        $quests = new QuestContainer($cnd, ['calcTotal' => true]);
 
         $data = $quests->getListviewData();
         if (!$data)
@@ -1044,7 +1047,7 @@ class Search
             else
                 $lvData['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?quests&filter=na='.urlencode($this->query).'\')';
 
-            return [$lvData, QuestList::$brickFile];
+            return [$lvData, QuestEntry::$brickFile];
         }
 
         if ($this->moduleMask & self::TYPE_OPEN)
@@ -1052,9 +1055,9 @@ class Search
             $result = [];
             $osInfo = [Type::QUEST, $quests->getMatches(), [], [], 'Quest'];
 
-            foreach ($quests->iterate() as $id => $__)
+            foreach ($quests->iterate() as $id => $entry)
             {
-                $result[$id]    = $quests->getField('name', true);
+                $result[$id]    = $entry->name;
                 $osInfo[2][$id] = $data[$id]['side'];       // why recalculate if already set
             }
 
@@ -1070,7 +1073,7 @@ class Search
             [['flags', ACHIEVEMENT_FLAG_COUNTER, '&'], 0],  // not a statistic
             $this->createLikeLookup()
         ));
-        $acvs = new AchievementList($cnd, ['calcTotal' => true]);
+        $acvs = new AchievementContainer($cnd, ['calcTotal' => true]);
 
         $data = $acvs->getListviewData();
         if (!$data)
@@ -1096,7 +1099,7 @@ class Search
             else
                 $lvData['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?achievements&filter=na='.urlencode($this->query).'\')';
 
-            return [$lvData, AchievementList::$brickFile];
+            return [$lvData, AchievementEntry::$brickFile];
         }
 
         if ($this->moduleMask & self::TYPE_OPEN)
@@ -1104,10 +1107,10 @@ class Search
             $result = [];
             $osInfo = [Type::ACHIEVEMENT, $acvs->getMatches(), [], [], 'Achievement'];
 
-            foreach ($acvs->iterate() as $id => $__)
+            foreach ($acvs->iterate() as $id => $entry)
             {
-                $result[$id]    = $acvs->getField('name', true);
-                $osInfo[2][$id] = $acvs->getField('iconString');
+                $result[$id]    = $entry->name;
+                $osInfo[2][$id] = $entry->icon;
             }
 
             return [$result, ...$osInfo];
@@ -1122,7 +1125,7 @@ class Search
             ['flags', ACHIEVEMENT_FLAG_COUNTER, '&'],       // is a statistic
             $this->createLikeLookup()
         ));
-        $stats = new AchievementList($cnd, ['calcTotal' => true]);
+        $stats = new AchievementContainer($cnd, ['calcTotal' => true]);
 
         $data = $stats->getListviewData();
         if (!$data)
@@ -1151,7 +1154,7 @@ class Search
             else
                 $lvData['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?achievements=1&filter=na='.urlencode($this->query).'\')';
 
-            return [$lvData, AchievementList::$brickFile];
+            return [$lvData, AchievementEntry::$brickFile];
         }
 
         if ($this->moduleMask & self::TYPE_OPEN)
@@ -1159,10 +1162,10 @@ class Search
             $result = [];
             $osInfo = [Type::ACHIEVEMENT, $stats->getMatches(), [], [], 'Statistic'];
 
-            foreach ($stats->iterate() as $id => $__)
+            foreach ($stats->iterate() as $id => $entry)
             {
-                $result[$id]    = $stats->getField('name', true);
-                $osInfo[2][$id] = $stats->getField('iconString');
+                $result[$id]    = $entry->name;
+                $osInfo[2][$id] = $entry->icon;
             }
 
             return [$result, ...$osInfo];
@@ -1174,7 +1177,7 @@ class Search
     private function _searchZone() : ?array                 // 18 Zones $moduleMask & 0x0040000
     {
         $cnd    = array_merge($this->cndBase, [$this->createLikeLookup()]);
-        $zones  = new ZoneList($cnd, ['calcTotal' => true]);
+        $zones  = new ZoneContainer($cnd, ['calcTotal' => true]);
 
         $data = $zones->getListviewData();
         if (!$data)
@@ -1197,7 +1200,7 @@ class Search
             else
                 $lvData['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?achievements&filter=na='.urlencode($this->query).'\')';
 
-            return [$lvData, ZoneList::$brickFile];
+            return [$lvData, ZoneEntry::$brickFile];
         }
 
         if ($this->moduleMask & self::TYPE_OPEN)
@@ -1205,8 +1208,8 @@ class Search
             $result = [];
             $osInfo = [Type::ZONE, $zones->getMatches(), [], [], 'Zone'];
 
-            foreach ($zones->iterate() as $id => $__)
-                $result[$id] = $zones->getField('name', true);
+            foreach ($zones->iterate() as $id => $entry)
+                $result[$id] = $entry->name;
 
             return [$result, ...$osInfo];
         }
@@ -1221,7 +1224,7 @@ class Search
             return null;
 
         $cnd     = array_merge($this->cndBase, [$lookup]);
-        $objects = new GameObjectList($cnd, ['calcTotal' => true]);
+        $objects = new GameobjectContainer($cnd, ['calcTotal' => true]);
 
         $data = $objects->getListviewData();
         if (!$data)
@@ -1244,7 +1247,7 @@ class Search
             else
                 $lvData['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?objects&filter=na='.urlencode($this->query).'\')';
 
-            return [$lvData, GameObjectList::$brickFile];
+            return [$lvData, GameobjectEntry::$brickFile];
         }
 
         if ($this->moduleMask & self::TYPE_OPEN)
@@ -1252,8 +1255,8 @@ class Search
             $result = [];
             $osInfo = [Type::OBJECT, $objects->getMatches(), [], [], 'Object'];
 
-            foreach ($objects->iterate() as $id => $__)
-                $result[$id] = $objects->getField('name', true);
+            foreach ($objects->iterate() as $id => $entry)
+                $result[$id] = $entry->name;
 
             return [$result, ...$osInfo];
         }
@@ -1264,7 +1267,7 @@ class Search
     private function _searchFaction() : ?array              // 20 Factions $moduleMask & 0x0100000
     {
         $cnd      = array_merge($this->cndBase, [$this->createLikeLookup()]);
-        $factions = new FactionList($cnd, ['calcTotal' => true]);
+        $factions = new FactionContainer($cnd, ['calcTotal' => true]);
 
         $data = $factions->getListviewData();
         if (!$data)
@@ -1280,7 +1283,7 @@ class Search
                 $lvData['_truncated'] = 1;
             }
 
-            return [$lvData, FactionList::$brickFile];
+            return [$lvData, FactionEntry::$brickFile];
         }
 
         if ($this->moduleMask & self::TYPE_OPEN)
@@ -1288,8 +1291,8 @@ class Search
             $result = [];
             $osInfo = [Type::FACTION, $factions->getMatches(), [], [], 'Faction'];
 
-            foreach ($factions->iterate() as $id => $__)
-                $result[$id] = $factions->getField('name', true);
+            foreach ($factions->iterate() as $id => $entry)
+                $result[$id] = $entry->name;
 
             return [$result, ...$osInfo];
         }
@@ -1300,7 +1303,7 @@ class Search
     private function _searchSkill() : ?array                // 21 Skills $moduleMask & 0x0200000
     {
         $cnd    = array_merge($this->cndBase, [$this->createLikeLookup()]);
-        $skills = new SkillList($cnd, ['calcTotal' => true]);
+        $skills = new SkillContainer($cnd, ['calcTotal' => true]);
 
         $data = $skills->getListviewData();
         if (!$data)
@@ -1316,7 +1319,7 @@ class Search
                 $lvData['_truncated'] = 1;
             }
 
-            return [$lvData, SkillList::$brickFile];
+            return [$lvData, SkillEntry::$brickFile];
         }
 
         if ($this->moduleMask & self::TYPE_OPEN)
@@ -1324,10 +1327,10 @@ class Search
             $result = [];
             $osInfo = [Type::SKILL, $skills->getMatches(), [], [], 'Skill'];
 
-            foreach ($skills->iterate() as $id => $__)
+            foreach ($skills->iterate() as $id => $entry)
             {
-                $result[$id] = $skills->getField('name', true);
-                $osInfo[2][$id] = $skills->getField('iconString');
+                $result[$id]    = $entry->name;
+                $osInfo[2][$id] = $entry->icon;
             }
 
             return [$result, ...$osInfo];
@@ -1339,7 +1342,7 @@ class Search
     private function _searchPet() : ?array                  // 22 Pets $moduleMask & 0x0400000
     {
         $cnd  = array_merge($this->cndBase, [$this->createLikeLookup()]);
-        $pets = new PetList($cnd, ['calcTotal' => true]);
+        $pets = new PetContainer($cnd, ['calcTotal' => true]);
 
         $data = $pets->getListviewData();
         if (!$data)
@@ -1358,7 +1361,7 @@ class Search
                 $lvData['_truncated'] = 1;
             }
 
-            return [$lvData, PetList::$brickFile, 'petFoodCol'];
+            return [$lvData, PetEntry::$brickFile, 'petFoodCol'];
         }
 
         if ($this->moduleMask & self::TYPE_OPEN)
@@ -1366,10 +1369,10 @@ class Search
             $result = [];
             $osInfo = [Type::PET, $pets->getMatches(), [], [], 'Pet'];
 
-            foreach ($pets->iterate() as $id => $__)
+            foreach ($pets->iterate() as $id => $entry)
             {
-                $result[$id]    = $pets->getField('name', true);
-                $osInfo[2][$id] = $pets->getField('iconString');
+                $result[$id]    = $entry->name;
+                $osInfo[2][$id] = $entry->icon;
             }
 
             return [$result, ...$osInfo];
@@ -1385,7 +1388,7 @@ class Search
             return null;
 
         $cnd          = array_merge($this->cndBase, [['s.typeCat', -8], $lookup]);
-        $npcAbilities = new SpellList($cnd, ['calcTotal' => true]);
+        $npcAbilities = new SpellContainer($cnd, ['calcTotal' => true]);
 
         $data = $npcAbilities->getListviewData();
         if (!$data)
@@ -1414,7 +1417,7 @@ class Search
             else
                 $lvData['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-8&filter=na='.urlencode($this->query).'\')';
 
-            return [$lvData, SpellList::$brickFile];
+            return [$lvData, SpellEntry::$brickFile];
         }
 
         if ($this->moduleMask & self::TYPE_OPEN)
@@ -1422,10 +1425,10 @@ class Search
             $result = [];
             $osInfo = [Type::SPELL, $npcAbilities->getMatches(), [], [], 'Spell'];
 
-            foreach ($npcAbilities->iterate() as $id => $__)
+            foreach ($npcAbilities->iterate() as $id => $entry)
             {
-                $result[$id]    = $npcAbilities->getField('name', true);
-                $osInfo[2][$id] = $npcAbilities->getField('iconString');
+                $result[$id]    = $entry->name;
+                $osInfo[2][$id] = $entry->icon;
             }
 
             return [$result, ...$osInfo];
@@ -1450,7 +1453,7 @@ class Search
             ],
             $lookup
         ));
-        $misc = new SpellList($cnd, ['calcTotal' => true]);
+        $misc = new SpellContainer($cnd, ['calcTotal' => true]);
 
         $data = $misc->getListviewData();
         if (!$data)
@@ -1478,7 +1481,7 @@ class Search
             else
                 $lvData['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=0&filter=na='.urlencode($this->query).'\')';
 
-            return [$lvData, SpellList::$brickFile];
+            return [$lvData, SpellEntry::$brickFile];
         }
 
         if ($this->moduleMask & self::TYPE_OPEN)
@@ -1486,10 +1489,10 @@ class Search
             $result = [];
             $osInfo = [Type::SPELL, $misc->getMatches(), [], [], 'Spell'];
 
-            foreach ($misc->iterate() as $id => $__)
+            foreach ($misc->iterate() as $id => $entry)
             {
-                $result[$id]    = $misc->getField('name', true);
-                $osInfo[2][$id] = $misc->getField('iconString');
+                $result[$id]    = $entry->name;
+                $osInfo[2][$id] = $entry->icon;
             }
 
             return [$result, ...$osInfo];
@@ -1501,7 +1504,7 @@ class Search
     private function _searchEmote() : ?array                // 25 Emotes $moduleMask & 0x2000000
     {
         $cnd   = array_merge($this->cndBase, [$this->createLikeLookup(['cmd', 'meToExt_loc'.Lang::getLocale()->value, 'meToNone_loc'.Lang::getLocale()->value, 'extToMe_loc'.Lang::getLocale()->value, 'extToExt_loc'.Lang::getLocale()->value, 'extToNone_loc'.Lang::getLocale()->value])]);
-        $emote = new EmoteList($cnd, ['calcTotal' => true]);
+        $emote = new EmoteContainer($cnd, ['calcTotal' => true]);
 
         $data = $emote->getListviewData();
         if (!$data)
@@ -1522,7 +1525,7 @@ class Search
                 $lvData['_truncated'] = 1;
             }
 
-            return [$lvData, EmoteList::$brickFile];
+            return [$lvData, EmoteEntry::$brickFile];
         }
 
         if ($this->moduleMask & self::TYPE_OPEN)
@@ -1530,8 +1533,8 @@ class Search
             $result = [];
             $osInfo = [Type::EMOTE, $emote->getMatches(), [], [], 'Emote'];
 
-            foreach ($emote->iterate() as $id => $__)
-                $result[$id] = $emote->getField('name', true);
+            foreach ($emote->iterate() as $id => $entry)
+                $result[$id] = $entry->name;
 
             return [$result, ...$osInfo];
         }
@@ -1542,7 +1545,7 @@ class Search
     private function _searchEnchantment() : ?array          // 26 Enchantments $moduleMask & 0x4000000
     {
         $cnd         = array_merge($this->cndBase, [$this->createLikeLookup(['name_loc'.Lang::getLocale()->value])]);
-        $enchantment = new EnchantmentList($cnd, ['calcTotal' => true]);
+        $enchantment = new EnchantmentContainer($cnd, ['calcTotal' => true]);
 
         $data = $enchantment->getListviewData();
         if (!$data)
@@ -1569,7 +1572,7 @@ class Search
                 $lvData['_truncated'] = 1;
             }
 
-            return [$lvData, EnchantmentList::$brickFile];
+            return [$lvData, EnchantmentEntry::$brickFile];
         }
 
         if ($this->moduleMask & self::TYPE_OPEN)
@@ -1577,8 +1580,8 @@ class Search
             $result = [];
             $osInfo = [Type::ENCHANTMENT, $enchantment->getMatches(), [], [], 'Enchantment'];
 
-            foreach ($enchantment->iterate() as $id => $__)
-                $result[$id] = $enchantment->getField('name', true);
+            foreach ($enchantment->iterate() as $id => $entry)
+                $result[$id] = $entry->name;
 
             return [$result, ...$osInfo];
         }
@@ -1589,7 +1592,7 @@ class Search
     private function _searchSound() : ?array                // 27 Sounds $moduleMask & 0x8000000
     {
         $cnd    = array_merge($this->cndBase, [$this->createLikeLookup(['name'])]);
-        $sounds = new SoundList($cnd, ['calcTotal' => true]);
+        $sounds = new SoundContainer($cnd, ['calcTotal' => true]);
 
         $data = $sounds->getListviewData();
         if (!$data)
@@ -1609,7 +1612,7 @@ class Search
                 $lvData['_truncated'] = 1;
             }
 
-            return [$lvData, SoundList::$brickFile];
+            return [$lvData, SoundEntry::$brickFile];
         }
 
         if ($this->moduleMask & self::TYPE_OPEN)
@@ -1617,8 +1620,8 @@ class Search
             $result = [];
             $osInfo = [Type::SOUND, $sounds->getMatches(), [], [], 'Sound'];
 
-            foreach ($sounds->iterate() as $id => $__)
-                $result[$id] = $sounds->getField('name', true);
+            foreach ($sounds->iterate() as $id => $entry)
+                $result[$id] = $entry->name;
 
             return [$result, ...$osInfo];
         }

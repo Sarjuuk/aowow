@@ -33,7 +33,7 @@ class AchievementPowerResponse extends TextResponse implements ICache
 
     protected function generate() : void
     {
-        $achievement = new Achievement($this->typeId);
+        $achievement = new AchievementEntry($this->typeId);
         if ($achievement->error)
             $this->cacheType = CACHE_TYPE_NONE;
         else

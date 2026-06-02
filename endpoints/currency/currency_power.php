@@ -33,7 +33,7 @@ class CurrencyPowerResponse extends TextResponse implements ICache
 
     protected function generate() : void
     {
-        $currency = new Currency($this->typeId);
+        $currency = new CurrencyEntry($this->typeId);
         if ($currency->error)
             $this->cacheType = CACHE_TYPE_NONE;
         else

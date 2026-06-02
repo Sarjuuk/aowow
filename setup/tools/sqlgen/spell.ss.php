@@ -19,7 +19,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
     protected $dbcSourceFiles  = ['spell', 'spellradius', 'spellduration', 'spellrunecost', 'spellcasttimes', 'skillline', 'skilllineability', 'skillraceclassinfo', 'talent', 'talenttab', 'glyphproperties', 'spellicon', 'itemdisplayinfo'];
     protected $worldDependency = ['item_template', 'creature_template', 'creature_template_addon', 'creature_template_spell', 'smart_scripts', 'trainer_spell', 'disables', 'spell_ranks', 'spell_dbc', 'skill_discovery_template'];
-    protected $setupAfter      = [['icons', 'spellrange'], []]; // spellrange required to use SpellList
+    protected $setupAfter      = [['icons', 'spellrange'], []]; // spellrange required to use SpellEntry
 
     public function generate() : bool
     {
@@ -495,9 +495,9 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             LEFT JOIN dbc_talent t2 ON t2.rank2 = s.id
             LEFT JOIN dbc_talent t3 ON t3.rank3 = s.id
             WHERE     effect3CreateItemId > 0 AND (effect3Id IN %in OR effect3AuraId IN %in) AND t1.id IS NULL AND t2.id IS NULL AND t3.id IS NULL',
-        SpellList::EFFECTS_ITEM_CREATE, SpellList::AURAS_ITEM_CREATE,
-        SpellList::EFFECTS_ITEM_CREATE, SpellList::AURAS_ITEM_CREATE,
-        SpellList::EFFECTS_ITEM_CREATE, SpellList::AURAS_ITEM_CREATE);
+        SpellEntry::EFFECTS_ITEM_CREATE, SpellEntry::AURAS_ITEM_CREATE,
+        SpellEntry::EFFECTS_ITEM_CREATE, SpellEntry::AURAS_ITEM_CREATE,
+        SpellEntry::EFFECTS_ITEM_CREATE, SpellEntry::AURAS_ITEM_CREATE);
 
         $itemInfo = DB::World()->selectAssoc('SELECT entry AS ARRAY_KEY, displayId AS d, Quality AS q FROM item_template WHERE entry IN %in', $itemSpells);
         foreach ($itemSpells as $sId => $itemId)

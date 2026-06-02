@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class Item extends DBType
+class ItemEntry extends DBTypeEntry
 {
     use TrSourceHelper;
 
@@ -496,7 +496,7 @@ class Item extends DBType
                     if ($this->randEnchantEntry['enchantId'.$i] <= 0)
                         continue;
 
-                    $eName = Enchantment::getName($this->randEnchantEntry['enchantId'.$i]);
+                    $eName = EnchantmentEntry::getName($this->randEnchantEntry['enchantId'.$i]);
                     if ($this->randEnchantEntry['allocationPct'.$i] > 0)
                     {
                         $amount = intVal($this->randEnchantEntry['allocationPct'.$i] * $this->generateEnchSuffixFactor());
@@ -710,7 +710,7 @@ class Item extends DBType
             $x .= sprintf('%+d %s<br />', $amt, Lang::game('resistances', $sc));
 
         // Enchantment
-        if ($enchantmentId && ($eName = Enchantment::getName($enchantmentId)))
+        if ($enchantmentId && ($eName = EnchantmentEntry::getName($enchantmentId)))
             $x .= '<span class="q2"><!--e-->'.$eName.'</span><br />';
         else                                                // enchantment placeholder
             $x .= '<!--e-->';
@@ -835,7 +835,7 @@ class Item extends DBType
         // required skill
         if ($reqSkill = $this->requiredSkill)
         {
-            $_ = '<a class="q1" href="?skill='.$reqSkill.'">'.SkillList::getName($reqSkill).'</a>';
+            $_ = '<a class="q1" href="?skill='.$reqSkill.'">'.SkillEntry::getName($reqSkill).'</a>';
             if ($this->requiredSkillRank > 0)
                 $_ = Lang::main('parensFmt', [$_, $this->requiredSkillRank]);
 
@@ -844,11 +844,11 @@ class Item extends DBType
 
         // required spell
         if ($reqSpell = $this->requiredSpell)
-            $x .= Lang::game('requires2').' <a class="q1" href="?spell='.$reqSpell.'">'.Spell::getName($reqSpell).'</a><br />';
+            $x .= Lang::game('requires2').' <a class="q1" href="?spell='.$reqSpell.'">'.SpellEntry::getName($reqSpell).'</a><br />';
 
         // required reputation w/ faction
         if ($reqFac = $this->requiredFaction)
-            $x .= Lang::game('requires', ['<a class="q1" href="?faction='.$reqFac.'">'.Faction::getName($reqFac).'</a> - '.Lang::game('rep', $this->requiredFactionRank)]).'<br />';
+            $x .= Lang::game('requires', ['<a class="q1" href="?faction='.$reqFac.'">'.FactionEntry::getName($reqFac).'</a> - '.Lang::game('rep', $this->requiredFactionRank)]).'<br />';
 
         // locked or openable
         if ($locks = Lang::getLocks($this->lockId, $arr, true))
@@ -929,19 +929,19 @@ class Item extends DBType
                 ['maxLevel', $this->itemLevel, '>=']
             ];
 
-            $itemset = new ItemsetList($condition);
+            $itemset = new ItemsetContainer($condition);
             if (!$itemset->error && $itemset->pieceToSet)
             {
                 // handle special cases where:
-                // > itemset has items of different qualities (handled by not limiting for this in the initial query)
+                // > itemset has items of different qualities (handled by not limiting for quality in the initial query)
                 // > itemset is virtual and multiple instances have the same itemLevel but not quality (filter below)
-                foreach ($itemset->iterate() as $id => $__)
+                foreach ($itemset->iterate() as $id => $entry)
                 {
-                    if ($itemset->getField('quality') == $this->quality)
-                    {
-                        $itemset->pieceToSet = array_filter($itemset->pieceToSet, function($x) use ($id) { return $id == $x; });
-                        break;
-                    }
+                    if ($entry->quality != $this->quality)
+                        continue;
+
+                    $entry->pieceToSet = array_filter($entry->pieceToSet, fn($x) => $id == $x);
+                    break;
                 }
 
                 $pieces = DB::Aowow()->selectAssoc(
@@ -959,7 +959,7 @@ class Item extends DBType
 
                 if ($skId = $itemset->getField('skillId'))  // bonus requires skill to activate
                 {
-                    $xSet .= '<br />'.Lang::game('requires', ['<a href="?skills='.$skId.'" class="q1">'.SkillList::getName($skId).'</a>']);
+                    $xSet .= '<br />'.Lang::game('requires', ['<a href="?skills='.$skId.'" class="q1">'.SkillEntry::getName($skId).'</a>']);
 
                     if ($_ = $itemset->getField('skillLevel'))
                         $xSet = Lang::main('parensFmt', [$xSet, $_]);
@@ -1018,19 +1018,19 @@ class Item extends DBType
         // recipes, vanity pets, mounts
         if ($this->canTeachSpell())
         {
-            $craftSpell = new Spell($this->spells[1][0]);   // ...öööh
+            $craftSpell = new SpellEntry($this->spells[1][0]); // ...eeehh
             if (!$craftSpell->error)
             {
                 $xCraft = '';
                 if ($desc = $this->description)
-                    $x .= '<span class="q2">'.Lang::item('trigger', SPELL_TRIGGER_USE).' <a href="?spell='.$this->spellId2.'">'.$desc.'</a></span><br />';
+                    $x .= '<span class="q2">'.Lang::item('trigger', SPELL_TRIGGER_USE).' <a href="?spell='.$craftSpell->id.'">'.$desc.'</a></span><br />';
 
                 // recipe handling (some stray Techniques have subclass == 0), place at bottom of tooltipp
                 if ($_class == ITEM_CLASS_RECIPE || $this->bagFamily == 16)
                 {
                     if ($craftSpell->canCreateItem())
                     {
-                        $craftItem  = new Item($craftSpell->effectCreateItemId[0]);
+                        $craftItem  = new ItemEntry($craftSpell->effectCreateItemId[0]);
                         if (!$craftItem->error)
                             if ($itemTT = $craftItem->renderTooltip($interactive, $this->id))
                                 $xCraft .= '<div><br />'.$itemTT.'</div>';
@@ -1067,7 +1067,7 @@ class Item extends DBType
             $xMisc[] = $xSet;
 
         // funny, yellow text at the bottom, omit if we have a recipe
-        if ($this->description_loc0 && !$this->canTeachSpell())
+        if (!$this->description->isEmpty() && !$this->canTeachSpell())
             $xMisc[] = '<span class="q">"'.UIText::format($this->description, Lang::FMT_HTML).'"</span>';
 
         // readable
@@ -1271,7 +1271,7 @@ class Item extends DBType
         }
 
         if ($this->class == ITEM_CLASS_ARMOR || $this->class == ITEM_CLASS_WEAPON)
-            $json['gearscore'] = Util::getEquipmentScore($nullable['level'], $this->quality, $nullable['slot'], $nullable['nsockets'] ?? 0);
+            $json['gearscore'] = Util::getEquipmentScore($this->itemLevel, $this->quality, $this->slot, $nullable['nsockets'] ?? 0);
         else if ($this->class == ITEM_CLASS_GEM)
             $json['gearscore'] = Util::getGemScore($nullable['level'], $this->quality, $this->requiredSkill == SKILL_JEWELCRAFTING, $this->id);
 

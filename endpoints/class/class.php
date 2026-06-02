@@ -23,7 +23,7 @@ class ClassBaseResponse extends TemplateResponse implements ICache
     public  int     $typeId    = 0;
     public ?string  $expansion = null;
 
-    private CharClass $subject;
+    private CharClassEntry $subject;
 
     public function __construct(string $id)
     {
@@ -35,7 +35,7 @@ class ClassBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new CharClass($this->typeId);
+        $this->subject = new CharClassEntry($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('class'), Lang::chrClass('notFound'));
 
@@ -96,9 +96,9 @@ class ClassBaseResponse extends TemplateResponse implements ICache
 
         // specs
         $specList = [];
-        $skills = new SkillList(array(['id', $this->subject->skills]));
+        $skills = new SkillContainer(array(['id', $this->subject->skills]));
         foreach ($skills->iterate() as $k => $__)
-            $specList[$k] = '[icon name='.$skills->getField('iconString').'][url=?spells=7.'.$this->typeId.'.'.$k.']'.$skills->getField('name', true).'[/url][/icon]';
+            $specList[$k] = '[icon name='.$skills->icon.'][url=?spells=7.'.$this->typeId.'.'.$k.']'.$skills->name.'[/url][/icon]';
 
         if ($specList)
             $infobox[] = Lang::game('specs').'[ul][li]'.implode('[/li][li]', $specList).'[/li][/ul]';
@@ -168,7 +168,7 @@ class ClassBaseResponse extends TemplateResponse implements ICache
         );
 
         $skillIds  = [];
-        $genSpells = new SpellList($conditions);
+        $genSpells = new SpellContainer($conditions);
         if (!$genSpells->error)
         {
             $this->extendGlobalData($genSpells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
@@ -187,20 +187,20 @@ class ClassBaseResponse extends TemplateResponse implements ICache
                 'sort'            => ['-level', 'type', 'name'],
                 'computeDataFunc' => '$Listview.funcBox.initSpellFilter',
                 'onAfterCreate'   => '$Listview.funcBox.addSpellIndicator'
-            ), Spell::$brickFile));
+            ), SpellEntry::$brickFile));
         }
 
         // tab: races
         $races = new CharRaceContainer(array(['classMask', $cl->toMask(), '&']));
         if (!$races->error)
-            $this->lvTabs->addListviewTab(new Listview(['data' => $races->getListviewData()], CharRace::$brickFile));
+            $this->lvTabs->addListviewTab(new Listview(['data' => $races->getListviewData()], CharRaceEntry::$brickFile));
 
         // tab: skills
         if ($skillIds)
         {
-            $skills = new SkillList(array(['id', $skillIds]));
+            $skills = new SkillContainer(array(['id', $skillIds]));
             if (!$skills->error)
-                $this->lvTabs->addListviewTab(new Listview(['data' => $skills->getListviewData()], SkillList::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview(['data' => $skills->getListviewData()], SkillEntry::$brickFile));
         }
 
         // tab: trainers
@@ -218,7 +218,7 @@ class ClassBaseResponse extends TemplateResponse implements ICache
                 'data' => $trainer->getListviewData(),
                 'id'   => 'trainers',
                 'name' => '$LANG.tab_trainers'
-            ), Creature::$brickFile));
+            ), CreatureEntry::$brickFile));
         }
 
         // tab: items (grouped)
@@ -228,7 +228,7 @@ class ClassBaseResponse extends TemplateResponse implements ICache
             [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0]
         );
 
-        $items = new ItemList($conditions);
+        $items = new ItemContainer($conditions);
         if (!$items->error)
         {
             $this->extendGlobalData($items->getJSGlobals());
@@ -247,11 +247,11 @@ class ClassBaseResponse extends TemplateResponse implements ICache
                 'onAfterCreate'   => '$Listview.funcBox.addSubclassIndicator',
                 'note'            => sprintf(Util::$filterResultString, '?items&filter=cr=152;crs='.$this->typeId.';crv=0'),
                 '_truncated'      => 1
-            ), ItemList::$brickFile));
+            ), ItemEntry::$brickFile));
         }
 
         // tab: itemsets
-        $sets = new ItemsetList(array(['classMask', $cl->toMask(), '&']));
+        $sets = new ItemsetContainer(array(['classMask', $cl->toMask(), '&']));
         if (!$sets->error)
         {
             $this->extendGlobalData($sets->getJSGlobals(GLOBALINFO_SELF));
@@ -261,7 +261,7 @@ class ClassBaseResponse extends TemplateResponse implements ICache
                 'note'       => sprintf(Util::$filterResultString, '?itemsets&filter=cl='.$this->typeId),
                 'hiddenCols' => ['classes'],
                 'sort'       => ['-level', 'name']
-            ), ItemsetList::$brickFile));
+            ), ItemsetEntry::$brickFile));
         }
 
         // tab: quests
@@ -279,7 +279,7 @@ class ClassBaseResponse extends TemplateResponse implements ICache
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $quests->getListviewData(),
                 'sort' => ['reqlevel', 'name']
-            ), Quest::$brickFile));
+            ), QuestEntry::$brickFile));
         }
 
         // tab: criteria-of
@@ -301,7 +301,7 @@ class ClassBaseResponse extends TemplateResponse implements ICache
                 'data' => $crtOf->getListviewData(),
                 'name' => '$LANG.tab_criteriaof',
                 'id'   => 'criteria-of'
-            ), Achievement::$brickFile));
+            ), AchievementEntry::$brickFile));
         }
 
         // tab: condition-for

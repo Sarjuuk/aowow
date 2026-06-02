@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class ArenaTeamContainer extends DBTypeContainer implements IListview
+class ArenateamContainer extends DBTypeContainer implements IListview
 {
     public static int $dbType = Type::ARENA_TEAM;
 
@@ -19,7 +19,7 @@ class ArenaTeamContainer extends DBTypeContainer implements IListview
     /**
      * iterate over fetched sets
      *
-     * @return \Generator<string, ArenaTeam> key => arena team template
+     * @return \Generator<string, ArenateamEntry> key => arena team template
      */
     public function iterate() : \Generator
     {
@@ -27,11 +27,11 @@ class ArenaTeamContainer extends DBTypeContainer implements IListview
     }
 
     /**
-     * @return ?ArenaTeam
+     * @return ?ArenateamEntry
      */
-    public function getEntry(string|int $id) : ?ArenaTeam
+    public function getEntry(null|string|int $key = null) : ?ArenateamEntry
     {
-        return parent::getEntry($id);
+        return parent::getEntry($key);
     }
 }
 

@@ -268,13 +268,13 @@ class UserBaseResponse extends TemplateResponse
         }
 
         // My Guides
-        $guides = new GuideList(array(['status', [GuideMgr::STATUS_APPROVED, GuideMgr::STATUS_ARCHIVED]], ['userId', $this->user['id']]));
+        $guides = new GuideContainer(array(['status', [GuideMgr::STATUS_APPROVED, GuideMgr::STATUS_ARCHIVED]], ['userId', $this->user['id']]));
         if (!$guides->error)
         {
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data'       => $guides->getListviewData(),
                 'hiddenCols' => ['patch']
-            ), GuideList::$brickFile));
+            ), GuideEntry::$brickFile));
         }
 
         parent::generate();
