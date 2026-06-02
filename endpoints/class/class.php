@@ -97,8 +97,8 @@ class ClassBaseResponse extends TemplateResponse implements ICache
         // specs
         $specList = [];
         $skills = new SkillContainer(array(['id', $this->subject->skills]));
-        foreach ($skills->iterate() as $k => $__)
-            $specList[$k] = '[icon name='.$skills->icon.'][url=?spells=7.'.$this->typeId.'.'.$k.']'.$skills->name.'[/url][/icon]';
+        foreach ($skills->iterate() as $k => $entry)
+            $specList[$k] = '[icon name='.$entry->icon.'][url=?spells=7.'.$this->typeId.'.'.$k.']'.$entry->name.'[/url][/icon]';
 
         if ($specList)
             $infobox[] = Lang::game('specs').'[ul][li]'.implode('[/li][li]', $specList).'[/li][/ul]';
