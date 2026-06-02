@@ -165,7 +165,7 @@ class Enchantment extends DBType
         // issue with scaling stats enchantments
         // stats are stored as NOT NULL to be usable by the search filters and such become indistinguishable from scaling enchantments that _actually_ use the value 0
         // so we can't rely on ::item_stats and always have to calc stats
-        return $this->jsonStats ?? (new StatsContainer($this->relSpells->export())->fromEnchantment((array)$this))->toJson();
+        return $this->jsonStats ??= (new StatsContainer($this->relSpells->export())->fromEnchantment((array)$this))->toJson();
     }
 
     public function getRelSpell(int $id) : ?Spell

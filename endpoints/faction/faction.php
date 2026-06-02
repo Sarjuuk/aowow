@@ -285,11 +285,11 @@ class FactionBaseResponse extends TemplateResponse implements ICache
         // tab: objects
         if ($_ = $this->subject->templateIds)
         {
-            $objects = new GameObjectList(array(['faction', $_]));
+            $objects = new GameObjectContainer(array(['faction', $_]));
             if (!$objects->error)
             {
                 $this->addDataLoader('zones');
-                $this->lvTabs->addListviewTab(new Listview(['data' => $objects->getListviewData()], GameObjectList::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview(['data' => $objects->getListviewData()], GameObject::$brickFile));
             }
         }
 
@@ -303,7 +303,7 @@ class FactionBaseResponse extends TemplateResponse implements ICache
             [DB::AND, ['rewardFactionId4', $this->typeId], ['rewardFactionValue4', 0, '>']],
             [DB::AND, ['rewardFactionId5', $this->typeId], ['rewardFactionValue5', 0, '>']]
         );
-        $quests = new QuestList($conditions, ['calcTotal' => true]);
+        $quests = new QuestContainer($conditions, ['calcTotal' => true]);
         if (!$quests->error)
         {
             $this->extendGlobalData($quests->getJSGlobals(GLOBALINFO_ANY));
@@ -314,10 +314,10 @@ class FactionBaseResponse extends TemplateResponse implements ICache
             );
 
             if ($quests->getMatches() > Listview::DEFAULT_SIZE)
-                if (!is_null(QuestListFilter::getCriteriaIndex(1, $this->typeId)))
+                if (!is_null(QuestFilter::getCriteriaIndex(1, $this->typeId)))
                     $tabData['note'] = sprintf(Util::$filterResultString, '?quests&filter=cr=1;crs='.$this->typeId.';crv=0');
 
-            $this->lvTabs->addListviewTab(new Listview($tabData, QuestList::$brickFile, 'questRepCol'));
+            $this->lvTabs->addListviewTab(new Listview($tabData, Quest::$brickFile, 'questRepCol'));
         }
 
         // tab: achievements

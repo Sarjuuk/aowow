@@ -150,16 +150,16 @@ class Achievement extends DBType implements ISource, ITooltip
                 ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2,
                 ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL,
                 ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL,
-                ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2     => SpellList::getName($obj),
+                ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2     => Spell::getName($obj),
                 // link to item (/w icon)
                 ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM,
                 ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM,
                 ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM,
-                ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM      => ItemList::getName($obj),
+                ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM      => Item::getName($obj),
                 // link to faction (/w target reputation)
-                ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION => FactionList::getName($obj),
+                ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION => Faction::getName($obj),
                 // link to quest
-                ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST  => QuestList::getName($obj),
+                ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST  => Quest::getName($obj),
                 default                                   => 'UNK Criteria Type'
             };
 

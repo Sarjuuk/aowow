@@ -2,6 +2,8 @@
 
 namespace Aowow;
 
+use Override;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
@@ -36,6 +38,17 @@ class QuestContainer extends DBTypeContainer
     public function getEntry(string|int $id) : ?Quest
     {
         return parent::getEntry($id);
+    }
+
+    /** returns data portion of a listview js object */
+    public function getListviewData(int $addInfoMask = 0x0, int $reputationCol = 0) : array
+    {
+        $data = [];
+
+        foreach ($this->iterate() as $id => $entry)
+            $data[$id] = $entry->getListviewRow($addInfoMask, $reputationCol);
+
+        return $data;
     }
 
     public function getSOMData(int $side = SIDE_BOTH) : array

@@ -703,70 +703,44 @@ abstract class Util
         $score = $itemLevel;
 
         // quality mod
-        switch ($quality)
+        $score *= match ($quality)
         {
-            case ITEM_QUALITY_POOR:
-                $score = 0;                                 // guessed as crap
-                break;
-            case ITEM_QUALITY_NORMAL:
-                $score = 0;                                 // guessed as crap
-                break;
-            case ITEM_QUALITY_UNCOMMON:
-                $score /= 2.0;
-                break;
-            case ITEM_QUALITY_RARE:
-                $score /= 1.8;
-                break;
-            case ITEM_QUALITY_EPIC:
-                $score /= 1.2;
-                break;
-            case ITEM_QUALITY_LEGENDARY:
-                $score /= 1;
-                break;
-            case ITEM_QUALITY_HEIRLOOM:                     // actual calculation in javascript .. still uses this as some sort of factor..?
-                break;
-            case ITEM_QUALITY_ARTIFACT:
-                break;
-        }
+            ITEM_QUALITY_POOR,
+            ITEM_QUALITY_NORMAL    => 0,                    // guessed as crap
+            ITEM_QUALITY_UNCOMMON  => 1 / 2.0,
+            ITEM_QUALITY_RARE      => 1 / 1.8,
+            ITEM_QUALITY_EPIC      => 1 / 1.2,
+            ITEM_QUALITY_LEGENDARY => 1 / 1,
+            ITEM_QUALITY_HEIRLOOM,
+            ITEM_QUALITY_ARTIFACT  => 1                     // actual calculation in javascript .. still uses this as some sort of factor..?
+        };
 
-        switch ($slot)
+        // slot mod
+        $score *= match ($slot)
         {
-            case INVTYPE_WEAPON:
-            case INVTYPE_WEAPONMAINHAND:
-            case INVTYPE_WEAPONOFFHAND:
-                $score *= 27/64;
-                break;
-            case INVTYPE_SHIELD:
-            case INVTYPE_HOLDABLE:
-                $score *= 9/16;
-                break;
-            case INVTYPE_HEAD:
-            case INVTYPE_CHEST:
-            case INVTYPE_LEGS:
-            case INVTYPE_2HWEAPON:
-                $score *= 1.0;
-                break;
-            case INVTYPE_SHOULDERS:
-            case INVTYPE_HANDS:
-            case INVTYPE_WAIST:
-            case INVTYPE_FEET:
-                $score *= 3/4;
-                break;
-            case INVTYPE_WRISTS:
-            case INVTYPE_NECK:
-            case INVTYPE_CLOAK:
-            case INVTYPE_FINGER:
-            case INVTYPE_TRINKET:
-                $score *= 9/16;
-                break;
-            case INVTYPE_THROWN:
-            case INVTYPE_RANGED:
-            case INVTYPE_RELIC:
-                $score *= 81/256;
-                break;
-            default:
-                $score *= 0.0;
-        }
+            INVTYPE_WEAPON,
+            INVTYPE_WEAPONMAINHAND,
+            INVTYPE_WEAPONOFFHAND   => 27 / 64,
+            INVTYPE_SHIELD,
+            INVTYPE_HOLDABLE        => 9 / 16,
+            INVTYPE_HEAD,
+            INVTYPE_CHEST,
+            INVTYPE_LEGS,
+            INVTYPE_2HWEAPON        => 1,
+            INVTYPE_SHOULDERS,
+            INVTYPE_HANDS,
+            INVTYPE_WAIST,
+            INVTYPE_FEET            => 3 / 4,
+            INVTYPE_WRISTS,
+            INVTYPE_NECK,
+            INVTYPE_CLOAK,
+            INVTYPE_FINGER,
+            INVTYPE_TRINKET         => 9 / 16,
+            INVTYPE_THROWN,
+            INVTYPE_RANGED,
+            INVTYPE_RELIC           => 81 / 256,
+            default                 => 0
+        };
 
         // subtract sockets
         if ($nSockets)
@@ -784,8 +758,7 @@ abstract class Util
     public static function getGemScore(int $itemLevel, int $quality, bool $profSpec = false, int $itemId = 0) : float
     {
         // prepare score-lookup
-        if (empty(self::$perfectGems))
-            self::$perfectGems = DB::World()->selectCol('SELECT perfectItemType FROM skill_perfect_item_template WHERE requiredSpecialization = %i', 55534);
+        self::$perfectGems ??= DB::World()->selectCol('SELECT perfectItemType FROM skill_perfect_item_template WHERE requiredSpecialization = %i', 55534);
 
         // epic - WotLK - increased stats / profession specific (Dragon's Eyes)
         if ($profSpec)
@@ -827,10 +800,7 @@ abstract class Util
 
     public static function getEnchantmentScore(int $itemLevel, int $quality, bool $profSpec = false, int $idOverride = 0) : float
     {
-        if ($itemLevel < 0)                                 // can this even happen?
-            $itemLevel = 0;
-
-        // some hardcoded values, that defy lookups (cheaper but not skillbound profession versions of spell threads, leg armor)
+        // some hardcoded values that defy lookups (cheaper but not skillbound profession versions of spell threads, leg armor)
         if (in_array($idOverride, [3327, 3328, 3872, 3873]))
             return 20.0;
 
@@ -838,7 +808,7 @@ abstract class Util
             return 40.0;
 
         // other than the constraints (0 - 20 points; 40 for profession perks), everything in here is guesswork
-        $score = min($itemLevel, 80);
+        $score = clamp($itemLevel, 0, 80);
 
         switch ($quality)
         {

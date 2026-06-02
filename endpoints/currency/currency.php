@@ -141,10 +141,10 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
             }
 
             // tab: sold by
-            $itemObj = new ItemList(array(['id', $_relItemId]));
-            if (!empty($itemObj->getExtendedCost()[$_relItemId]))
+            $itemObj = new Item($_relItemId);
+            if ($vendorData = $itemObj->getVendorData(targetItem: $_relItemId))
             {
-                $vendors = $itemObj->getExtendedCost()[$_relItemId];
+                $vendors = array_pop($vendorData);
                 $this->extendGlobalData($itemObj->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
                 $soldBy = new CreatureContainer(array(['id', array_keys($vendors)]));

@@ -459,9 +459,9 @@ class Profiler
                 'permEnchant' => $ench[0],
                 'tempEnchant' => $ench[3],
                 'extraSocket' => (int)!!$ench[18],
-                'gem1'        => isset($gemItems[$ench[6]])  ? $gemItems[$ench[6]][0]  : 0,
-                'gem2'        => isset($gemItems[$ench[9]])  ? $gemItems[$ench[9]][0]  : 0,
-                'gem3'        => isset($gemItems[$ench[12]]) ? $gemItems[$ench[12]][0] : 0,
+                'gem1'        => $gemItems[$ench[6]][0]  ?? 0,
+                'gem2'        => $gemItems[$ench[9]][0]  ?? 0,
+                'gem3'        => $gemItems[$ench[12]][0] ?? 0,
                 'gem4'        => 0                  // serverside items cant have more than 3 sockets. (custom profile thing)
             );
 
@@ -573,14 +573,14 @@ class Profiler
 
         // calc gearscore
         if ($items)
-            $data['gearscore'] += (new ItemList(array(['id', array_column($items, 'itemEntry')])))->getScoreTotal($data['class'], $t, $mhItem, $ohItem);
+            $data['gearscore'] += (new ItemContainer(array(['id', array_column($items, 'itemEntry')])))->calcGearscoreTotal($data['class'], $t, $mhItem, $ohItem);
 
         if ($gemItems)
         {
-            $gemScores = new ItemList(array(['id', array_column($gemItems, 0)]));
+            $gemScores = new ItemContainer(array(['id', array_column($gemItems, 0)]));
             foreach ($gemItems as [$itemId, $mult])
-                if (isset($gemScores->json[$itemId]['gearscore']))
-                    $data['gearscore'] += $gemScores->json[$itemId]['gearscore'] * $mult;
+                if ($gemEntry = $gemScores->getEntry($itemId))
+                    $data['gearscore'] += ($gemEntry->json['gearscore'] ?? 0) * $mult;
         }
 
         if ($permEnch)                                      // fuck this shit .. we are guestimating this!

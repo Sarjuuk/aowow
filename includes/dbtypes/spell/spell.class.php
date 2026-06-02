@@ -263,9 +263,9 @@ class Spell extends DBType
         'src' => ['j' => ['::source src ON `type` = 6 AND `typeId` = s.`id`', true], 's' => ', `moreType`, `moreTypeId`, `moreZoneId`, `moreMask`, `src1`, `src2`, `src3`, `src4`, `src5`, `src6`, `src7`, `src8`, `src9`, `src10`, `src11`, `src12`, `src13`, `src14`, `src15`, `src16`, `src17`, `src18`, `src19`, `src20`, `src21`, `src22`, `src23`, `src24`']
     );
 
-    public function __construct(int|array $initData, array $extraOpts = [], bool $calcTotal = false)
+    public function __construct(int|array $initData, array $extraOpts = [])
     {
-        parent::__construct($initData, $extraOpts, $calcTotal);
+        parent::__construct($initData, $extraOpts);
 
         if (isset($extraOpts['interactive']))
             $this->interactive = $extraOpts['interactive'];
@@ -277,6 +277,8 @@ class Spell extends DBType
     public function applyInitData(array $initData) : void
     {
         parent::applyInitData($initData);
+
+        $this->initSources($initData);
 
         $this->name        = new LocString($initData, 'name',        pruneFromSrc: true);
         $this->rank        = new LocString($initData, 'rank',        pruneFromSrc: true);
@@ -521,7 +523,7 @@ class Spell extends DBType
         $reagents = $this->getReagents();
         foreach ($reagents as $k => [$rItemId, ])
         {
-            if ($rName = ItemList::getName($rItemId))
+            if ($rName = Item::getName($rItemId))
                 $reagents[$k] += [2 => '<a href="?item='.$rItemId.'">'.$rName.'</a>', 3 => true];
             else
                 $reagents[$k] += [2 => 'Item #'.$rItemId, 3 => false];

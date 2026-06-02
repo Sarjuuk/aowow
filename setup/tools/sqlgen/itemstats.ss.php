@@ -9,11 +9,10 @@ if (!CLI)
     die('not in cli mode');
 
 
-class ItemStatSetup extends ItemList
+class ItemStatSetup extends ItemContainer
 {
     public function __construct(int $start, int $limit, int $itemClass, private bool $applyTriggered, private array $relEnchants, private array $relSpells)
     {
-        $this->queryOpts['i']['o'] = 'i.id ASC';
         unset($this->queryOpts['is']);                      // do not reference the stats table we are going to write to
 
         $conditions = array(
@@ -22,20 +21,15 @@ class ItemStatSetup extends ItemList
             $limit
         );
 
-        parent::__construct($conditions);
+        parent::__construct($conditions, ['extraOpts' => ['i' => ['o' => 'i.id ASC']]]);
     }
 
     public function writeStatsTable() : void
     {
-        foreach ($this->iterate() as $id => $curTpl)
+        foreach ($this->iterate() as $id => $entry)
         {
-            $spellIds = [];
-
-            for ($i = 1; $i <= 5; $i++)
-                if ($this->curTpl['spellId'.$i] > 0 && !isset($this->relSpells[$this->curTpl['spellId'.$i]]) && (($this->curTpl['class'] == ITEM_CLASS_CONSUMABLE && $this->curTpl['spellTrigger'.$i] == SPELL_TRIGGER_USE) || $this->curTpl['spellTrigger'.$i] == SPELL_TRIGGER_EQUIP))
-                    $spellIds[] = $this->curTpl['spellId'.$i];
-
-            if ($spellIds)                                  // array_merge kills the keys
+            // array_merge kills the keys
+            if ($spellIds = array_column(array_filter($entry->spells, fn($x) => $x[0] > 0 && !isset($this->relSpells[$x[0]]) && (($entry->class == ITEM_CLASS_CONSUMABLE && $x[1] == SPELL_TRIGGER_USE) || $x[1] == SPELL_TRIGGER_EQUIP)), 0))
             {
                 $newSpells = DB::Aowow()->selectAssoc('SELECT *, id AS ARRAY_KEY FROM ::spell WHERE id IN %in', $spellIds);
                 $this->relSpells = array_replace($this->relSpells, $newSpells);
@@ -48,13 +42,13 @@ class ItemStatSetup extends ItemList
             }
 
             // fromItem: itemMods, spell, enchants from template - fromJson: calculated stats (feralAP, dps, ...)
-            if ($stats = (new StatsContainer($this->relSpells, $this->relEnchants))->fromItem($curTpl)->fromJson($this->json[$id])->toJson(Stat::FLAG_ITEM | Stat::FLAG_SERVERSIDE))
+            if ($stats = (new StatsContainer($this->relSpells, $this->relEnchants))->fromItem((array)$entry)->fromJson($entry->json)->toJson(Stat::FLAG_ITEM | Stat::FLAG_SERVERSIDE))
             {
                 // manually set stats 0 if empty to distinguish from items that cant have them
                 $shared = ['dps' => 0, 'dmgmin1' => 0, 'dmgmax1' => 0, 'speed' => 0];
-                if ($this->getField('class') == ITEM_CLASS_WEAPON)
-                    $stats += $shared + ($this->isRangedWeapon() ? ['rgddps' => 0, 'rgddmgmin' => 0, 'rgddmgmax' => 0, 'rgdspeed' => 0] : ['mledps' => 0, 'mledmgmin' => 0, 'mledmgmax' => 0, 'mlespeed' => 0]);
-                else if ($this->getField('class') == ITEM_CLASS_ARMOR)
+                if ($entry->class == ITEM_CLASS_WEAPON)
+                    $stats += $shared + ($entry->isRangedWeapon() ? ['rgddps' => 0, 'rgddmgmin' => 0, 'rgddmgmax' => 0, 'rgdspeed' => 0] : ['mledps' => 0, 'mledmgmin' => 0, 'mledmgmax' => 0, 'mlespeed' => 0]);
+                else if ($entry->class == ITEM_CLASS_ARMOR)
                     $stats += ['armorbonus' => 0];          //ArmorDamageModifier only valid on armor(%s)
 
                 DB::Aowow()->qry('INSERT INTO ::item_stats %v', ['type' => Type::ITEM, 'typeId' => $this->id] + $stats);

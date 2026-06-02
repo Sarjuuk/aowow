@@ -227,12 +227,12 @@ abstract class DBTypeContainer
         return $result;
     }
 
-    public function getAllFields(string $prop, bool $localized = false, bool $silent = false) : array
+    public function getAllFields(string $prop) : array
     {
         $data = [];
 
         foreach ($this->iterate() as $id => $entry)
-            $data[$id] = $entry->$prop; // getField($prop, $localized, $silent); prop should be LocString, so localized/silent should be irrelevant?
+            $data[$id] = $entry->$prop ?? null;
 
         return $data;
     }

@@ -19,8 +19,8 @@ class ItemXmlResponse extends TextResponse implements ICache
         'domain' => ['filter' => FILTER_CALLBACK, 'options' => [Locale::class, 'tryFromDomain']]
     );
 
-    private ItemList $subject;
-    private string   $search = '';
+    private Item   $subject;
+    private string $search = '';
 
     public function __construct(string $param)
     {
@@ -40,24 +40,26 @@ class ItemXmlResponse extends TextResponse implements ICache
     protected function generate() : void
     {
         if ($this->search)
-            $conditions = [['name_loc'.Lang::getLocale()->value, $this->search]];
-        else
-            $conditions = [['i.id', $this->typeId]];
-
-        $this->subject = new ItemList($conditions);
-        if ($this->subject->error)
         {
-            $this->cacheType = CACHE_TYPE_NONE;
-            header('HTTP/1.0 404 Not Found', true, 404);
-
-            $root = new SimpleXML('<aowow />');
-            $root->addChild('error', 'Item not found!');
-            $this->result = $root->asXML();
-
-            return;
+            // DBType cant search for strings, so we have to be roundabout
+            $container = new ItemContainer(array(['name_loc'.Lang::getLocale()->value, $this->search]));
+            if ($container->error)
+            {
+                $this->handleError();
+                return;
+            }
+            $this->subject = $container->getEntry($container->id);
+            $this->typeId  = $this->subject->id;
         }
         else
-            $this->typeId = $this->subject->id;
+        {
+            $this->subject = new Item($this->typeId);
+            if ($this->subject->error)
+            {
+                $this->handleError();
+                return;
+            }
+        }
 
         $root = new SimpleXML('<aowow />');
 
@@ -66,42 +68,32 @@ class ItemXmlResponse extends TextResponse implements ICache
         $xml->addAttribute('id', $this->typeId);
 
         // name
-        $xml->addChild('name')->addCData($this->subject->getField('name', true));
+        $xml->addChild('name')->addCData($this->subject->name);
         // itemlevel
-        $xml->addChild('level', $this->subject->getField('itemLevel'));
+        $xml->addChild('level', $this->subject->itemLevel);
         // quality
-        $xml->addChild('quality', Lang::item('quality', $this->subject->getField('quality')))->addAttribute('id', $this->subject->getField('quality'));
+        $xml->addChild('quality', Lang::item('quality', $this->subject->quality))->addAttribute('id', $this->subject->quality);
         // class
-        $x = Lang::item('cat', $this->subject->getField('class'));
-        $xml->addChild('class')->addCData(is_array($x) ? $x[0] : $x)->addAttribute('id', $this->subject->getField('class'));
+        $x = Lang::item('cat', $this->subject->class);
+        $xml->addChild('class')->addCData(is_array($x) ? $x[0] : $x)->addAttribute('id', $this->subject->class);
         // subclass
-        $xml->addChild('subclass')->addCData($this->getSubclass())->addAttribute('id', $this->subject->getField('subClass'));
+        $xml->addChild('subclass')->addCData($this->getSubclass())->addAttribute('id', $this->subject->subClass);
         // icon + displayId
-        $xml->addChild('icon', $this->subject->getField('iconString'))->addAttribute('displayId', $this->subject->getField('displayId'));
+        $xml->addChild('icon', $this->subject->icon)->addAttribute('displayId', $this->subject->displayId);
         // inventorySlot
-        $xml->addChild('inventorySlot', Lang::item('inventoryType', $this->subject->getField('slot')))->addAttribute('id', $this->subject->getField('slot'));
+        $xml->addChild('inventorySlot', Lang::item('inventoryType', $this->subject->slot))->addAttribute('id', $this->subject->slot);
         // tooltip
         $xml->addChild('htmlTooltip')->addCData($this->subject->renderTooltip());
 
         $this->subject->extendJsonStats();
 
         // json
-        $fields = ['classs', 'displayid', 'dps', 'id', 'level', 'name', 'reqlevel', 'slot', 'slotbak', 'speed', 'subclass'];
-        $json   = [];
-        foreach ($fields as $f)
-        {
-            if (isset($this->subject->json[$this->typeId][$f]))
-            {
-                $_ = $this->subject->json[$this->typeId][$f];
-                if ($f == 'name')
-                    $_ = (7 - $this->subject->getField('quality')).$_;
-
-                $json[$f] = $_;
-            }
-        }
+        $json = array_intersect_key(array_keys($this->subject->json), ['classs', 'displayid', 'dps', 'id', 'level', 'name', 'reqlevel', 'slot', 'slotbak', 'speed', 'subclass']);
+        $json['name'] = (7 - $this->subject->quality).$json['name'];
 
         // itemsource
-        if ($this->subject->getSources($s, $sm))
+        // Sources
+        if ([$s, $sm] = $this->subject->getSources())
         {
             $json['source'] = $s;
             if ($sm)
@@ -112,22 +104,22 @@ class ItemXmlResponse extends TextResponse implements ICache
 
         // jsonEquip missing: avgbuyout
         $json = [];
-        if ($_ = $this->subject->getField('sellPrice'))          // sellprice
+        if ($_ = $this->subject->sellPrice)                 // sellprice
             $json['sellprice'] = $_;
 
-        if ($_ = $this->subject->getField('requiredLevel'))      // reqlevel
+        if ($_ = $this->subject->requiredLevel)             // reqlevel
             $json['reqlevel'] = $_;
 
-        if ($_ = $this->subject->getField('requiredSkill'))      // reqskill
+        if ($_ = $this->subject->requiredSkill)             // reqskill
             $json['reqskill'] = $_;
 
-        if ($_ = $this->subject->getField('requiredSkillRank'))  // reqskillrank
+        if ($_ = $this->subject->requiredSkillRank)         // reqskillrank
             $json['reqskillrank'] = $_;
 
-        if ($_ = $this->subject->getField('cooldown'))           // cooldown
+        if ($_ = $this->subject->cooldown)                  // cooldown
             $json['cooldown'] = $_ / 1000;
 
-        Util::arraySumByKey($json, $this->subject->jsonStats[$this->typeId] ?? []);
+        Util::arraySumByKey($json, $this->subject->itemStats->toJson(Stat::FLAG_ITEM, false));
 
         foreach ($this->subject->json[$this->typeId] as $name => $qty)
             if ($idx = Stat::getIndexFrom(Stat::IDX_JSON_STR, $name))
@@ -149,39 +141,41 @@ class ItemXmlResponse extends TextResponse implements ICache
         // reagents
         $cnd = array(
             DB::OR,
-            [DB::AND, ['effect1CreateItemId', $this->typeId], [DB::OR, ['effect1Id', SpellList::EFFECTS_ITEM_CREATE], ['effect1AuraId', SpellList::AURAS_ITEM_CREATE]]],
-            [DB::AND, ['effect2CreateItemId', $this->typeId], [DB::OR, ['effect2Id', SpellList::EFFECTS_ITEM_CREATE], ['effect2AuraId', SpellList::AURAS_ITEM_CREATE]]],
-            [DB::AND, ['effect3CreateItemId', $this->typeId], [DB::OR, ['effect3Id', SpellList::EFFECTS_ITEM_CREATE], ['effect3AuraId', SpellList::AURAS_ITEM_CREATE]]],
+            [DB::AND, ['effect1CreateItemId', $this->typeId], [DB::OR, ['effect1Id', Spell::EFFECTS_ITEM_CREATE], ['effect1AuraId', Spell::AURAS_ITEM_CREATE]]],
+            [DB::AND, ['effect2CreateItemId', $this->typeId], [DB::OR, ['effect2Id', Spell::EFFECTS_ITEM_CREATE], ['effect2AuraId', Spell::AURAS_ITEM_CREATE]]],
+            [DB::AND, ['effect3CreateItemId', $this->typeId], [DB::OR, ['effect3Id', Spell::EFFECTS_ITEM_CREATE], ['effect3AuraId', Spell::AURAS_ITEM_CREATE]]],
         );
 
-        $spellSource = new SpellList($cnd);
+        $spellSource = new SpellContainer($cnd);
         if (!$spellSource->error)
         {
             $cbNode = $xml->addChild('createdBy');
 
-            foreach ($spellSource->iterate() as $sId => $__)
+            foreach ($spellSource->iterate() as $sId => $spellEntry)
             {
-                foreach ($spellSource->canCreateItem() as $idx)
+                foreach ($spellEntry->canCreateItem() as $idx)
                 {
-                    if ($spellSource->getField('effect'.$idx.'CreateItemId') != $this->typeId)
+                    if ($spellEntry->effectCreateItemId[$idx] != $this->typeId)
                         continue;
 
                     $splNode = $cbNode->addChild('spell');
                     $splNode->addAttribute('id', $sId);
-                    $splNode->addAttribute('name', $spellSource->getField('name', true));
-                    $splNode->addAttribute('icon', $this->subject->getField('iconString'));
-                    $splNode->addAttribute('minCount', $spellSource->getField('effect'.$idx.'BasePoints') + 1);
-                    $splNode->addAttribute('maxCount', $spellSource->getField('effect'.$idx.'BasePoints') + $spellSource->getField('effect'.$idx.'DieSides'));
+                    $splNode->addAttribute('name', $spellEntry->name);
+                    $splNode->addAttribute('icon', $this->subject->icon);
+                    $splNode->addAttribute('minCount', $spellEntry->effectBasePoints[$idx] + 1);
+                    $splNode->addAttribute('maxCount', $spellEntry->effectBasePoints[$idx] + $spellEntry->effectDieSides[$idx]);
 
-                    foreach ($spellSource->getReagents() as $rId => $qty)
+                    $reagents = new ItemContainer(array(['id', array_keys($spellEntry->getReagents())]));
+
+                    foreach ($spellEntry->getReagents() as [$rId, $qty])
                     {
-                        if ($reagent = $spellSource->relItems->getEntry($rId))
+                        if ($reagent = $reagents->getEntry($rId))
                         {
                             $rgtNode = $splNode->addChild('reagent');
                             $rgtNode->addAttribute('id', $rId);
-                            $rgtNode->addAttribute('name', Util::localizedString($reagent, 'name'));
-                            $rgtNode->addAttribute('quality', $reagent['quality']);
-                            $rgtNode->addAttribute('icon', $reagent['iconString']);
+                            $rgtNode->addAttribute('name', $reagent->name);
+                            $rgtNode->addAttribute('quality', $reagent->quality);
+                            $rgtNode->addAttribute('icon', $reagent->icon);
                             $rgtNode->addAttribute('count', $qty[1]);
                         }
                     }
@@ -199,8 +193,8 @@ class ItemXmlResponse extends TextResponse implements ICache
 
     private function getSubclass() : string
     {
-        $c  = $this->subject->getField('class');
-        $sc = $this->subject->getField('subClass');
+        $c  = $this->subject->class;
+        $sc = $this->subject->subClass;
 
         if ($c == ITEM_CLASS_WEAPON)
             $langRef = Lang::spell('weaponSubClass');
@@ -214,6 +208,16 @@ class ItemXmlResponse extends TextResponse implements ICache
             return $langRef[$sc][0];
 
         return $langRef[$sc];
+    }
+
+    private function handleError() : void
+    {
+        $this->cacheType = CACHE_TYPE_NONE;
+        header('HTTP/1.0 404 Not Found', true, 404);
+
+        $root = new SimpleXML('<aowow />');
+        $root->addChild('error', 'Item not found!');
+        $this->result = $root->asXML();
     }
 
     public function getCacheKeyComponents() : array
