@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class Faction extends DBType
+class FactionEntry extends DBTypeEntry
 {
     public readonly int       $cuFlags;
     public readonly LocString $name;

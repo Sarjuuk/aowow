@@ -105,7 +105,7 @@ class IconsBaseResponse extends TemplateResponse implements ICache
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
 
-        $this->lvTabs->addListviewTab(new Listview($tabData, Icon::$brickFile));
+        $this->lvTabs->addListviewTab(new Listview($tabData, IconEntry::$brickFile));
 
         parent::generate();
     }

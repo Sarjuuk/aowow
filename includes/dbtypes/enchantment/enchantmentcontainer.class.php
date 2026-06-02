@@ -34,7 +34,7 @@ class EnchantmentContainer extends DBTypeContainer
     /**
      * iterate over fetched sets
      *
-     * @return \Generator<int, Enchantment> id => enchantment template
+     * @return \Generator<int, EnchantmentEntry> id => enchantment template
      */
     public function iterate() : \Generator
     {
@@ -42,11 +42,11 @@ class EnchantmentContainer extends DBTypeContainer
     }
 
     /**
-     * @return ?Enchantment
+     * @return ?EnchantmentEntry
      */
-    public function getEntry(string|int $id) : ?Enchantment
+    public function getEntry(null|string|int $key = null) : ?EnchantmentEntry
     {
-        return parent::getEntry($id);
+        return parent::getEntry($key);
     }
 }
 

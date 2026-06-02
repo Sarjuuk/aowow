@@ -33,7 +33,7 @@ class ObjectPowerResponse extends TextResponse implements ICache
 
     protected function generate() : void
     {
-        $object = new Gameobject($this->typeId);
+        $object = new GameobjectEntry($this->typeId);
         if ($object->error)
             $this->cacheType = CACHE_TYPE_NONE;
         else

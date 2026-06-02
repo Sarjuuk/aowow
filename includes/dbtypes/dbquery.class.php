@@ -158,7 +158,7 @@ class DBQuery
     }
 
     /**
-     * @return \Generator<int, array> id => DBType data
+     * @return \Generator<int, array> id => DBTypeEntry data
      */
     public function fetch() : \Generator
     {
@@ -178,7 +178,7 @@ class DBQuery
                     // hackfix the inner items query to not contain duplicate column names
                     // yes i know the real solution would be to not have items and item_stats share column names
                     // soon™....
-                    if (get_class($this) == ItemList::class)
+                    if (strpos($this->totalQuery, 'FROM ::items'))
                         $this->totalQuery = str_replace([', `is`.*', ', i.`id` AS "id"'], '', $this->totalQuery);
 
                     $this->resultTotal += DB::{$n}($dbIdx)->selectCell('SELECT COUNT(*) FROM ('.$this->totalQuery.') x', $this->where);

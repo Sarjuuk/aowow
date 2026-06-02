@@ -100,7 +100,7 @@ class ItemsetsBaseResponse extends TemplateResponse implements ICache
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
 
-        $this->lvTabs->addListviewTab(new Listview($tabData, Itemset::$brickFile));
+        $this->lvTabs->addListviewTab(new Listview($tabData, ItemsetEntry::$brickFile));
 
         parent::generate();
 

@@ -13,7 +13,7 @@ class AreatriggerContainer extends DBTypeContainer
     /**
      * iterate over fetched sets
      *
-     * @return \Generator<int, Areatrigger> id => areatrigger template
+     * @return \Generator<int, AreatriggerEntry> id => areatrigger template
      */
     public function iterate() : \Generator
     {
@@ -21,11 +21,11 @@ class AreatriggerContainer extends DBTypeContainer
     }
 
     /**
-     * @return ?Areatrigger
+     * @return ?AreatriggerEntry
      */
-    public function getEntry(string|int $id) : ?Areatrigger
+    public function getEntry(null|string|int $key = null) : ?AreatriggerEntry
     {
-        return parent::getEntry($id);
+        return parent::getEntry($key);
     }
 }
 

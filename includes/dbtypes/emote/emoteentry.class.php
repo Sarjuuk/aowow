@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class Emote extends DBType
+class EmoteEntry extends DBTypeEntry
 {
     public readonly int       $cuFlags;
     public readonly string    $cmd;

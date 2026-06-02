@@ -29,7 +29,7 @@ class ItemsetBaseResponse extends TemplateResponse implements ICache
     public ?Summary $summary     = null;
     public ?string  $expansion   = null;
 
-    private Itemset $subject;
+    private ItemsetEntry $subject;
 
     public function __construct(string $id)
     {
@@ -41,7 +41,7 @@ class ItemsetBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new Itemset($this->typeId);
+        $this->subject = new ItemsetEntry($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('itemset'), Lang::itemset('notFound'));
 
@@ -247,7 +247,7 @@ class ItemsetBaseResponse extends TemplateResponse implements ICache
                 if (!$relSets->hasDiffFields('classMask'))
                     $tabData['hiddenCols'] = ['classes'];
 
-                $this->lvTabs->addListviewTab(new Listview($tabData, Itemset::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview($tabData, ItemsetEntry::$brickFile));
 
                 $this->extendGlobalData($relSets->getJSGlobals());
             }

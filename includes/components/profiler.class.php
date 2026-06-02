@@ -978,7 +978,7 @@ class Profiler
         return self::FETCH_RESULT_OK;
     }
 
-    public static function getArenaTeamFromRealm(int $realmId, int $teamGuid) : int
+    public static function getArenateamFromRealm(int $realmId, int $teamGuid) : int
     {
         $team = DB::Characters($realmId)->selectRow('SELECT `arenaTeamId`, `name`, `type`, `captainGuid`, `rating`, `seasonGames`, `seasonWins`, `weekGames`, `weekWins`, `rank`, `backgroundColor`, `emblemStyle`, `emblemColor`, `borderStyle`, `borderColor` FROM arena_team WHERE `arenaTeamId` = %i', $teamGuid);
         if (!$team)

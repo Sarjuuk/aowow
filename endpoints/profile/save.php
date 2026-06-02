@@ -124,7 +124,7 @@ class ProfileSaveResponse extends TextResponse
                 array_column($this->_post['inv'], 3),       // perm enchantments
                 array_column($this->_post['inv'], 4)        // temp enchantments (not used..?)
             );
-            $enchs = new EnchantmentList(array(['id', $enchIds]));
+            $enchs = DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, 1 FROM ::itemenchantment WHERE `id` IN %in', $enchIds);
 
             // validate items
             $itemIds = array_merge(
@@ -135,7 +135,7 @@ class ProfileSaveResponse extends TextResponse
                 array_column($this->_post['inv'], 8)        // gem slot 4
             );
 
-            $items = new ItemList(array(['id', $itemIds]));
+            $items = new ItemContainer(array(['id', $itemIds]));
             if (!$items->error)
             {
                 foreach ($this->_post['inv'] as $slot => $itemData)
@@ -153,25 +153,25 @@ class ProfileSaveResponse extends TextResponse
                     }
 
                     // item does not exist
-                    if (!$items->getEntry($itemData[1]))
+                    if (!($itemEntry = $items->getEntry($itemData[1])))
                         continue;
 
                     // sub-item check
-                    if (!$items->fetchRandomEnchantment($itemData[1]))
+                    if (!$itemEntry->fetchRandomEnchantment($itemData[1]))
                         $itemData[2] = 0;
 
                     // item sockets are fubar
-                    $nSockets = $items->json[$itemData[1]]['nsockets'] ?? 0;
+                    $nSockets = $itemEntry->json[$itemData[1]]['nsockets'] ?? 0;
                     $nSockets += in_array($slot, [SLOT_WAIST, SLOT_WRISTS, SLOT_HANDS]) ? 1 : 0;
                     for ($i = 5; $i < 9; $i++)
                         if ($itemData[$i] > 0 && (!$items->getEntry($itemData[$i]) || $i >= (5 + $nSockets)))
                             $itemData[$i] = 0;
 
                     // item enchantments are borked
-                    if ($itemData[3] && !$enchs->getEntry($itemData[3]))
+                    if ($itemData[3] && empty($enchs[$itemData[3]]))
                         $itemData[3] = 0;
 
-                    if ($itemData[4] && !$enchs->getEntry($itemData[4]))
+                    if ($itemData[4] && empty($enchs[$itemData[4]]))
                         $itemData[4] = 0;
 
                     // looks good

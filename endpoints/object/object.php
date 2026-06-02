@@ -25,7 +25,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
     private array $difficulties = [];
     private int   $mapType      = 0;
 
-    private GameObject $subject;
+    private GameobjectEntry $subject;
 
     public function __construct(string $id)
     {
@@ -37,7 +37,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new Gameobject($this->typeId);
+        $this->subject = new GameobjectEntry($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('object'), Lang::gameObject('notFound'));
 
@@ -179,7 +179,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
             if ($sfo = DB::Aowow()->selectRow('SELECT * FROM ::spellfocusobject WHERE `id` = %i', $_))
             {
                 $n = Util::localizedString($sfo, 'name');
-                if (!is_null(GameObjectFilter::getCriteriaIndex(50, $_)))
+                if (!is_null(GameobjectFilter::getCriteriaIndex(50, $_)))
                     $n = '[url=?objects&filter=cr=50;crs='.$_.';crv=0]'.$n.'[/url]';
 
                 $infobox[] = '[tooltip name=focus]'.Lang::gameObject('focusDesc').'[/tooltip][span class=tip tooltip=focus]'.Lang::gameObject('focus').Lang::main('colon').$n.'[/span]';
@@ -304,7 +304,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                 [Lang::gameObject('foundIn')]               // foundIn
             );
             foreach ($spawns as $areaId => $_)
-                $this->map[3][$areaId] = ZoneList::getName($areaId);
+                $this->map[3][$areaId] = ZoneEntry::getName($areaId);
         }
 
 
@@ -388,7 +388,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                 'data' => $summons->getListviewData(),
                 'id'   => 'summoned-by',
                 'name' => '$LANG.tab_summonedby'
-            ), Spell::$brickFile));
+            ), SpellEntry::$brickFile));
         }
 
         // tab: related spells
@@ -409,7 +409,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                     'name'       => '$LANG.tab_spells',
                     'hiddenCols' => ['skill'],
                     'extraCols'  => ["\$Listview.funcBox.createSimpleCol('trigger', 'Condition', '10%', 'trigger')"]
-                ), Spell::$brickFile));
+                ), SpellEntry::$brickFile));
             }
         }
 
@@ -423,7 +423,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                 'data' => $acvs->getListviewData(),
                 'id'   => 'criteria-of',
                 'name' => '$LANG.tab_criteriaof'
-            ), Achievement::$brickFile));
+            ), AchievementEntry::$brickFile));
         }
 
         // tab: starts quest
@@ -448,14 +448,14 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                     'data' => $start,
                     'name' => '$LANG.tab_starts',
                     'id'   => 'starts'
-                ), Quest::$brickFile));
+                ), QuestEntry::$brickFile));
 
             if ($end)
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data' => $end,
                     'name' => '$LANG.tab_ends',
                     'id'   => 'ends'
-                ), Quest::$brickFile));
+                ), QuestEntry::$brickFile));
         }
 
         // tab: related quests
@@ -470,7 +470,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                     'data' => [$relQuest->getListviewRow()],
                     'name' => '$LANG.tab_quests',
                     'id'   => 'quests'
-                ), Quest::$brickFile));
+                ), QuestEntry::$brickFile));
             }
         }
 
@@ -530,7 +530,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                     '_totalCount'     => 10000,
                     'computeDataFunc' => '$Listview.funcBox.initLootTable',
                     'onAfterCreate'   => '$Listview.funcBox.addModeIndicator',
-                ), ItemList::$brickFile));
+                ), ItemEntry::$brickFile));
             }
         }
 
@@ -555,7 +555,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                     $tabData['_truncated'] = 1;
                 }
 
-                $this->lvTabs->addListviewTab(new Listview($tabData, Spell::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview($tabData, SpellEntry::$brickFile));
             }
         }
 
@@ -571,7 +571,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                 'name' => Lang::gameObject('triggeredBy'),
                 'id'   => 'triggerd-by',
                 'note' => sprintf(Util::$filterResultString, '?objects=6')
-            ), GameObject::$brickFile));
+            ), GameobjectEntry::$brickFile));
         }
 
         // tab: see also
@@ -615,12 +615,12 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                 if (isset($saE))
                     $tabData['extraCols'] = $saE;
 
-                $this->lvTabs->addListviewTab(new Listview($tabData, Gameobject::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview($tabData, GameobjectEntry::$brickFile));
             }
         }
 
         // tab: Same model as
-        $sameModel = new GameObjectContainer(array(['displayId', $this->subject->displayId], ['id', $this->typeId, '!']));
+        $sameModel = new GameobjectContainer(array(['displayId', $this->subject->displayId], ['id', $this->typeId, '!']));
         if (!$sameModel->error)
         {
             $this->extendGlobalData($sameModel->getJSGlobals());
@@ -630,7 +630,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                 'data' => $sameModel->getListviewData(),
                 'name' => '$LANG.tab_samemodelas',
                 'id'   => 'same-model-as'
-            ), Gameobject::$brickFile));
+            ), GameobjectEntry::$brickFile));
         }
 
         // tab: condition-for

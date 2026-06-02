@@ -188,7 +188,7 @@ class VideoMgr
                 if (!$ids)
                     continue;
 
-                $obj = Type::newList($t, [['id', $ids]]);
+                $obj = Type::newContainer($t, [['id', $ids]]);
                 if (!$obj || $obj->error)
                     continue;
 

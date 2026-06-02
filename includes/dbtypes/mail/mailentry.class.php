@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class Mail extends DBType
+class MailEntry extends DBTypeEntry
 {
     public readonly int       $cuFlags;
     public readonly LocString $name;                        // alias of 'subject'
@@ -31,6 +31,7 @@ class Mail extends DBType
             $subject = new LocString($nameBak);
 
         $this->name = $this->subject = $subject;
+        $this->text = new LocString($initData, 'text', pruneFromSrc: true);
 
         foreach ($initData as $k => $v)
         {
@@ -52,7 +53,7 @@ class Mail extends DBType
         return null;
     }
 
-    public function getListviewRow(int $addInfoMask = 0x0): array
+    public function getListviewRow(int $addInfoMask = 0x0) : array
     {
         return array(
             'id'          => $this->id,

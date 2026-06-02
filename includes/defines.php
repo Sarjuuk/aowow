@@ -846,7 +846,7 @@ define('QUEST_FLAG_SPECIAL_DUNGEON_FINDER',  0x08);
 define('QUEST_FLAG_SPECIAL_MONTHLY',         0x10);
 define('QUEST_FLAG_SPECIAL_SPELLCAST',       0x20);    // not documented in wiki! :[
 
-// GameObject
+// Gameobject
 define('OBJECT_DOOR',                       0);
 define('OBJECT_BUTTON',                     1);
 define('OBJECT_QUESTGIVER',                 2);

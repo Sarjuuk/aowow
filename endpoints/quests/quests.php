@@ -61,7 +61,7 @@ class QuestsBaseResponse extends TemplateResponse implements ICache
             $this->subCat = '='.implode('.', $this->category);
         }
 
-        $this->filter = new QuestListFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
+        $this->filter = new QuestFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
         if ($this->filter->shouldReload)
         {
             $_SESSION['error']['fi'] = $this->filter::class;
@@ -125,7 +125,7 @@ class QuestsBaseResponse extends TemplateResponse implements ICache
             $this->fiMenuExtension = $fiQuery;
         }
 
-        $quests = new QuestList($conditions, ['extraOpts' => $this->filter->extraOpts, 'calcTotal' => true]);
+        $quests = new QuestContainer($conditions, ['extraOpts' => $this->filter->extraOpts, 'calcTotal' => true]);
 
         $this->extendGlobalData($quests->getJSGlobals());
 
@@ -147,7 +147,7 @@ class QuestsBaseResponse extends TemplateResponse implements ICache
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
 
-        $this->lvTabs->addListviewTab(new Listview($tabData, QuestList::$brickFile));
+        $this->lvTabs->addListviewTab(new Listview($tabData, QuestEntry::$brickFile));
 
         parent::generate();
     }

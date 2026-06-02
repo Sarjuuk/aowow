@@ -194,13 +194,13 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
         $result = [];
         $items  = DB::Aowow()->selectAssoc('SELECT `id` AS ARRAY_KEY, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc6`, `name_loc8`, `description_loc0`, `description_loc2`, `description_loc3`, `description_loc6`, `description_loc8`, `spellId1`, `spellId2`, `spellId3`, `spellId4`, `spellId5` FROM ::items');
-        $spells = new SpellList(array(['id',
+        $spells = new SpellContainer(array(['id',
             array_filter(array_column($items, 'spellId1')),
             array_filter(array_column($items, 'spellId2')),
             array_filter(array_column($items, 'spellId3')),
             array_filter(array_column($items, 'spellId4')),
             array_filter(array_column($items, 'spellId5'))
-        ]), ['interactive' => SpellList::INTERACTIVE_NONE]);
+        ]), ['interactive' => SpellEntry::INTERACTIVE_NONE]);
 
 
         $n = count($items) * count($this->locales);
@@ -228,9 +228,8 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                     if (!$sId)
                         continue;
 
-                    if ($spells->getEntry($sId))
-                        if ($_ = $spells->parseText('description')[0])
-                            $effects .= str_replace('<br />', ' ', $_);
+                    if ($_ = $spells->getEntry($sId)?->renderText('description')[0])
+                        $effects .= str_replace('<br />', ' ', $_);
                 }
 
                 if (($effects = self::normalize($effects)) || $name || $desc)
@@ -281,11 +280,11 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                 // so don't do that unless we really really have to
                 if (strpos($spell['description_loc'.$locId], '$') || strpos($spell['buff_loc'.$locId], '$'))
                 {
-                    $splBuf[$id] ??= new SpellList(array(['id', $id]), ['interactive' => SpellList::INTERACTIVE_NONE]);
+                    $splBuf[$id] ??= new SpellEntry($id, ['interactive' => SpellEntry::INTERACTIVE_NONE]);
 
-                    if ($_ = $splBuf[$id]->parseText('description')[0])
+                    if ($_ = $splBuf[$id]->renderText('description')[0])
                         $desc = self::normalize(str_replace('<br />', ' ', $_));
-                    if ($_ = $splBuf[$id]->parseText('buff')[0])
+                    if ($_ = $splBuf[$id]->renderText('buff')[0])
                         $buff = self::normalize(str_replace('<br />', ' ', $_));
                 }
 
@@ -332,6 +331,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
         foreach ($words as $word)
         {
+            $n = null;
             if (($new = trim(preg_replace(Filter::PATTERN_FT, ' ', $word, count: $n))) && $n)
             {
                 if (!strpos($new, ' '))                     // caught trailing dots or something

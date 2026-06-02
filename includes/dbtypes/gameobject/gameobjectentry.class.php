@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class Gameobject extends DBType
+class GameobjectEntry extends DBTypeEntry
 {
     public readonly  int       $cuFlags;
     public readonly  LocString $name;

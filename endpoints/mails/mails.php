@@ -50,7 +50,7 @@ class MailsBaseResponse extends TemplateResponse implements ICache
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
 
-        $this->lvTabs->addListviewTab(new Listview(['data' => $mails->getListviewData()], Mail::$brickFile, 'mail'));
+        $this->lvTabs->addListviewTab(new Listview(['data' => $mails->getListviewData()], MailEntry::$brickFile, 'mail'));
 
         parent::generate();
     }

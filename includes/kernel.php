@@ -116,12 +116,12 @@ spl_autoload_register(function (string $class) : void
     if (preg_match('/[^\w]/i', $class))
         return;
 
-    $dir = strtr($class, ['Container' => '', 'Filter' => '']);
+    $dir = strtr($class, ['Entry' => '', 'Container' => '', 'Filter' => '']);
 
     if (file_exists('includes/dbtypes/'.$dir.'/'.$class.'.class.php'))
     {
         require_once 'includes/dbtypes/dbquery.class.php';
-        require_once 'includes/dbtypes/dbtype.class.php';
+        require_once 'includes/dbtypes/dbtypeentry.class.php';
         require_once 'includes/dbtypes/dbtypecontainer.class.php';
         require_once 'includes/dbtypes/'.$dir.'/'.$class.'.class.php';
     }
@@ -139,7 +139,7 @@ spl_autoload_register(function (string $class) : void
     if (!stripos($class, 'list'))
         return;
 
-    $class = strtolower(str_replace('ListFilter', 'List', $class));
+    $class = strtolower(str_replace('Filter', 'List', $class));
 
     $cl = match ($class)
     {

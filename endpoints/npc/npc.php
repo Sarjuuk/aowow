@@ -27,7 +27,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
     public  array  $reputation  = [];
     public  string $subname     = '';
 
-    private  Creature          $subject;
+    private  CreatureEntry     $subject;
     private ?CreatureContainer $altNPCs  = null;
     private  array             $soundIds = [];
 
@@ -41,7 +41,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new Creature($this->typeId);
+        $this->subject = new CreatureEntry($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('npc'), Lang::npc('notFound'));
 
@@ -300,7 +300,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                 [Lang::npc('foundIn')]                      // foundIn
             );
             foreach ($spawns as $areaId => $_)
-                $this->map[3][$areaId] = ZoneList::getName($areaId);
+                $this->map[3][$areaId] = ZoneEntry::getName($areaId);
         }
 
         // smart AI
@@ -402,7 +402,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
 
         if (count($conditions) > 1)
         {
-            $abilities = new SpellList($conditions);
+            $abilities = new SpellContainer($conditions);
             if (!$abilities->error)
             {
                 $this->extendGlobalData($abilities->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
@@ -432,7 +432,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                         'data' => $normal,
                         'name' => '$LANG.tab_abilities',
                         'id'   => 'abilities'
-                    ), SpellList::$brickFile));
+                    ), SpellEntry::$brickFile));
 
                 if ($controled)
                     $this->lvTabs->addListviewTab(new Listview(array(
@@ -440,7 +440,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                         'name'      => '$LANG.tab_controlledabilities',
                         'id'        => 'controlled-abilities',
                         'extraCols' => $extraCols ?: null
-                    ), SpellList::$brickFile));
+                    ), SpellEntry::$brickFile));
             }
         }
 
@@ -452,7 +452,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
             [DB::AND, ['effect3Id', [SPELL_EFFECT_SUMMON, SPELL_EFFECT_SUMMON_PET, SPELL_EFFECT_SUMMON_DEMON]], ['effect3MiscValue', $this->typeId]]
         );
 
-        $sbSpell = new SpellList($conditions);
+        $sbSpell = new SpellContainer($conditions);
         if (!$sbSpell->error)
         {
             $this->extendGlobalData($sbSpell->getJSGlobals());
@@ -461,7 +461,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                 'data' => $sbSpell->getListviewData(),
                 'name' => '$LANG.tab_summonedby',
                 'id'   => 'summoned-by-spell'
-            ), SpellList::$brickFile));
+            ), SpellEntry::$brickFile));
         }
 
         // tab: summoned by [NPC]
@@ -478,14 +478,14 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                     'data' => $sbNPC->getListviewData(),
                     'name' => '$LANG.tab_summonedby',
                     'id'   => 'summoned-by-npc'
-                ), Creature::$brickFile));
+                ), CreatureEntry::$brickFile));
             }
         }
 
         // tab: summoned by [Object]
         if (!empty($sb[Type::OBJECT]))
         {
-            $sbGO = new GameObjectList(array(['id', $sb[Type::OBJECT]]));
+            $sbGO = new GameobjectContainer(array(['id', $sb[Type::OBJECT]]));
             if (!$sbGO->error)
             {
                 $this->extendGlobalData($sbGO->getJSGlobals());
@@ -495,7 +495,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                     'data' => $sbGO->getListviewData(),
                     'name' => '$LANG.tab_summonedby',
                     'id'   => 'summoned-by-object'
-                ), GameObjectList::$brickFile));
+                ), GameobjectEntry::$brickFile));
             }
         }
 
@@ -510,7 +510,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
 
             if ($tSpells = DB::World()->selectAssoc($teachQuery, $this->typeId))
             {
-                $teaches = new SpellList(array(['id', array_keys($tSpells)]));
+                $teaches = new SpellContainer(array(['id', array_keys($tSpells)]));
                 if (!$teaches->error)
                 {
                     $this->extendGlobalData($teaches->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
@@ -552,7 +552,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                         'id'          => 'teaches',
                         'visibleCols' => ['trainingcost'],
                         'extraCols'   => $extraCols ?: null
-                    ), SpellList::$brickFile));
+                    ), SpellEntry::$brickFile));
                 }
             }
             else
@@ -567,7 +567,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
             $this->typeId, $this->typeId, $this->typeId)
         )
         {
-            $soldItems = new ItemList(array(['id', $sells]));
+            $soldItems = new ItemContainer(array(['id', $sells]));
             if (!$soldItems->error)
             {
                 $colAddIn  = '';
@@ -596,7 +596,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                     'name'      => '$LANG.tab_sells',
                     'id'        => 'currency-for',
                     'extraCols' => array_unique($extraCols)
-                ), ItemList::$brickFile, $colAddIn));
+                ), ItemEntry::$brickFile, $colAddIn));
 
                 $this->extendGlobalData($soldItems->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
             }
@@ -707,24 +707,24 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                 else if ($lootTpl == Loot::SKINNING)
                     $tabData['note'] = '<b>'.Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill($skinTab[2], $this->subject->maxLevel * 5), Lang::FMT_HTML).'</b>';
 
-                $this->lvTabs->addListviewTab(new Listview($tabData, ItemList::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview($tabData, ItemEntry::$brickFile));
             }
         }
 
         // tab: starts quest
         // tab: ends quest
-        $startEnd = new QuestList(array(['qse.type', Type::NPC], ['qse.typeId', $this->typeId]));
+        $startEnd = new QuestContainer(array(['qse.type', Type::NPC], ['qse.typeId', $this->typeId]));
         if (!$startEnd->error)
         {
             $this->extendGlobalData($startEnd->getJSGlobals());
             $lvData = $startEnd->getListviewData();
             $start  = $end = [];
 
-            foreach ($startEnd->iterate() as $id => $__)
+            foreach ($startEnd->iterate() as $id => $entry)
             {
-                if ($startEnd->getField('method') & 0x1)
+                if ($entry->method & 0x1)
                     $start[] = $lvData[$id];
-                if ($startEnd->getField('method') & 0x2)
+                if ($entry->method & 0x2)
                     $end[]   = $lvData[$id];
             }
 
@@ -733,14 +733,14 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                     'data' => $start,
                     'name' => '$LANG.tab_starts',
                     'id'   => 'starts'
-                ), QuestList::$brickFile));
+                ), QuestEntry::$brickFile));
 
             if ($end)
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data' => $end,
                     'name' => '$LANG.tab_ends',
                     'id'   => 'ends'
-                ), QuestList::$brickFile));
+                ), QuestEntry::$brickFile));
         }
 
         // tab: objective of quest
@@ -755,7 +755,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
             for ($j = 1; $j < 5; $j++)
                 $conditions[$j][1][1][] = $kc;
 
-        $objectiveOf = new QuestList($conditions);
+        $objectiveOf = new QuestContainer($conditions);
         if (!$objectiveOf->error)
         {
             $this->extendGlobalData($objectiveOf->getJSGlobals());
@@ -764,7 +764,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                 'data' => $objectiveOf->getListviewData(),
                 'name' => '$LANG.tab_objectiveof',
                 'id'   => 'objective-of'
-            ), QuestList::$brickFile));
+            ), QuestEntry::$brickFile));
         }
 
         // tab: criteria of [ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE_TYPE have no data set to check for]
@@ -786,7 +786,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                 'data' => $crtOf->getListviewData(),
                 'name' => '$LANG.tab_criteriaof',
                 'id'   => 'criteria-of'
-            ), Achievement::$brickFile));
+            ), AchievementEntry::$brickFile));
         }
 
         // tab: same model as
@@ -831,7 +831,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                     $tabData['extraCols'] = ["\$Listview.funcBox.createSimpleCol('seat', '".Lang::npc('seat')."', '10%', 'seat')"];
 
                 $this->addDataLoader('zones');
-                $this->lvTabs->addListviewTab(new Listview($tabData, Creature::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview($tabData, CreatureEntry::$brickFile));
             }
         }
 
@@ -850,7 +850,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
 
         if ($this->soundIds)
         {
-            $sounds = new SoundList(array(['id', $this->soundIds]));
+            $sounds = new SoundContainer(array(['id', $this->soundIds]));
             if (!$sounds->error)
             {
                 $data = $sounds->getListviewData();
@@ -862,7 +862,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                     $this->lvTabs->addListviewTab(new Listview(array(
                         'data'        => $data,
                         'visibleCols' => $activitySounds ? 'activity' : null
-                    ), SoundList::$brickFile));
+                    ), SoundEntry::$brickFile));
             }
         }
 
@@ -891,18 +891,18 @@ class NpcBaseResponse extends TemplateResponse implements ICache
             $entries, $entries
         );
 
-        $factions = new FactionList(array(['id', array_column($rows, 'faction')]));
+        $factions = new FactionContainer(array(['id', array_column($rows, 'faction')]));
         $result   = [];
 
         foreach ($rows as $row)
         {
-            if (!$factions->getEntry($row['faction']))
+            if (!($entry = $factions->getEntry($row['faction'])))
                 continue;
 
             $set = array(
                 $row['faction'],                            // factionId
                 [$row['qty'], 0],                           // qty
-                $factions->getField('name', true),          // name
+                $entry->name,                               // name
                 $row['maxRank'] && $row['maxRank'] < REP_EXALTED ? Lang::game('rep', $row['maxRank']) : null, // cap
                 $row['npc'],                                // npcId
                 0                                           // spilloverCat
@@ -922,8 +922,8 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                 else if ($cuRate)
                     $spill[0][1] = $set[1][1] / 2;
 
-                $spillover[$factions->getField('cat')] = $spill;
-                $set[5] = $factions->getField('cat');       // set spillover
+                $spillover[$entry->category] = $spill;
+                $set[5] = $entry->category;                 // set spillover
             }
 
             $result[] = $set;
@@ -959,7 +959,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         // get spillover factions and apply
         if ($spilledParents)
         {
-            $spilled = new FactionList(array(['parentFactionId', array_keys($spilledParents)]));
+            $spilled = new FactionContainer(array(['parentFactionId', array_keys($spilledParents)]));
 
             foreach ($reputation as $i => [, $data])
             {
@@ -968,10 +968,10 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                     if (!$spillover)
                         continue;
 
-                    foreach ($spilled->iterate() as $spId => $__)
+                    foreach ($spilled->iterate() as $spId => $entry)
                     {
                         // find parent
-                        if ($spilled->getField('parentFactionId') != $spillover)
+                        if ($entry->parentFactionId != $spillover)
                             continue;
 
                         // don't readd parent
@@ -983,7 +983,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                         $reputation[$i][1][] = array(
                             $spId,
                             $spilledParents[$spillover][0],
-                            $spilled->getField('name', true),
+                            $entry->name,
                             $spMax && $spMax < REP_EXALTED ? Lang::game('rep', $spMax) : null
                         );
                     }
@@ -1053,12 +1053,6 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         foreach ($this?->altNPCs?->iterate() ?? [] as $id => $altEntry)
         {
             $m = Lang::game('modes', $mapType, $altIds[$id]);
-
-            // // Mana (may be 0)
-            // $stats['mana'] = $this->subject->manaMin ? Lang::spell('powerTypes', 0).Lang::main('colon').Util::createNumRange($this->subject->manaMin, $this->subject->manaMax, ' - ', Lang::nf(...)) : '';
-
-            // // Armor
-            // $stats['armor'] = Lang::npc('armor').Util::createNumRange($this->subject->armorMin, $this->subject->armorMax, ' - ', Lang::nf(...));
 
             // Health
             $modes['health'][] = sprintf($modeRow, $m, Util::createNumRange($altEntry->healthMin, $altEntry->healthMax, ' - ', Lang::nf(...)));

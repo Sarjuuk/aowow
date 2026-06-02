@@ -19,7 +19,7 @@ class ItemXmlResponse extends TextResponse implements ICache
         'domain' => ['filter' => FILTER_CALLBACK, 'options' => [Locale::class, 'tryFromDomain']]
     );
 
-    private Item   $subject;
+    private ItemEntry   $subject;
     private string $search = '';
 
     public function __construct(string $param)
@@ -41,7 +41,7 @@ class ItemXmlResponse extends TextResponse implements ICache
     {
         if ($this->search)
         {
-            // DBType cant search for strings, so we have to be roundabout
+            // DBTypeEntry cant search for strings, so we have to be roundabout
             $container = new ItemContainer(array(['name_loc'.Lang::getLocale()->value, $this->search]));
             if ($container->error)
             {
@@ -53,7 +53,7 @@ class ItemXmlResponse extends TextResponse implements ICache
         }
         else
         {
-            $this->subject = new Item($this->typeId);
+            $this->subject = new ItemEntry($this->typeId);
             if ($this->subject->error)
             {
                 $this->handleError();
@@ -141,9 +141,9 @@ class ItemXmlResponse extends TextResponse implements ICache
         // reagents
         $cnd = array(
             DB::OR,
-            [DB::AND, ['effect1CreateItemId', $this->typeId], [DB::OR, ['effect1Id', Spell::EFFECTS_ITEM_CREATE], ['effect1AuraId', Spell::AURAS_ITEM_CREATE]]],
-            [DB::AND, ['effect2CreateItemId', $this->typeId], [DB::OR, ['effect2Id', Spell::EFFECTS_ITEM_CREATE], ['effect2AuraId', Spell::AURAS_ITEM_CREATE]]],
-            [DB::AND, ['effect3CreateItemId', $this->typeId], [DB::OR, ['effect3Id', Spell::EFFECTS_ITEM_CREATE], ['effect3AuraId', Spell::AURAS_ITEM_CREATE]]],
+            [DB::AND, ['effect1CreateItemId', $this->typeId], [DB::OR, ['effect1Id', SpellEntry::EFFECTS_ITEM_CREATE], ['effect1AuraId', SpellEntry::AURAS_ITEM_CREATE]]],
+            [DB::AND, ['effect2CreateItemId', $this->typeId], [DB::OR, ['effect2Id', SpellEntry::EFFECTS_ITEM_CREATE], ['effect2AuraId', SpellEntry::AURAS_ITEM_CREATE]]],
+            [DB::AND, ['effect3CreateItemId', $this->typeId], [DB::OR, ['effect3Id', SpellEntry::EFFECTS_ITEM_CREATE], ['effect3AuraId', SpellEntry::AURAS_ITEM_CREATE]]],
         );
 
         $spellSource = new SpellContainer($cnd);

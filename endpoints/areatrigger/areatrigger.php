@@ -21,7 +21,7 @@ class AreatriggerBaseResponse extends TemplateResponse implements ICache
     public int $type   = Type::AREATRIGGER;
     public int $typeId = 0;
 
-    private AreaTrigger $subject;
+    private AreatriggerEntry $subject;
 
     public function __construct(string $id)
     {
@@ -33,7 +33,7 @@ class AreatriggerBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new AreaTrigger($this->typeId);
+        $this->subject = new AreatriggerEntry($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('areatrigger'), Lang::areatrigger('notFound'));
 
@@ -77,7 +77,7 @@ class AreatriggerBaseResponse extends TemplateResponse implements ICache
                 [Lang::areatrigger('foundIn')]              // foundIn
             );
             foreach ($spawns as $areaId => $_)
-                $this->map[3][$areaId] = ZoneList::getName($areaId);
+                $this->map[3][$areaId] = ZoneEntry::getName($areaId);
         }
 
         // Smart AI
@@ -114,24 +114,24 @@ class AreatriggerBaseResponse extends TemplateResponse implements ICache
 
         if ($_type == AT_TYPE_OBJECTIVE)
         {
-            $relQuest = new QuestList(array(['id', $this->subject->quest]));
+            $relQuest = new QuestEntry($this->subject->quest);
             if (!$relQuest->error)
             {
-                $this->extendGlobalData($relQuest->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_REWARDS));
-                $this->lvTabs->addListviewTab(new Listview(['data' => $relQuest->getListviewData()], QuestList::$brickFile));
+                $this->extendGlobalData($relQuest->getJSGlobal(GLOBALINFO_SELF | GLOBALINFO_REWARDS));
+                $this->lvTabs->addListviewTab(new Listview(['data' => [$relQuest->getListviewRow()]], QuestEntry::$brickFile));
             }
         }
         else if ($_type == AT_TYPE_TELEPORT)
         {
-            $relZone = new ZoneList(array(['id', $this->subject->location]));
+            $relZone = new ZoneContainer(array(['id', $this->subject->location]));
             if (!$relZone->error)
-                $this->lvTabs->addListviewTab(new Listview(['data' => $relZone->getListviewData()], ZoneList::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview(['data' => $relZone->getListviewData()], ZoneEntry::$brickFile));
         }
         else if ($_type == AT_TYPE_SCRIPT)
         {
-            $relTrigger = new AreaTriggerContainer(array(['id', $this->typeId, '!'], ['name', $this->subject->name]));
+            $relTrigger = new AreatriggerContainer(array(['id', $this->typeId, '!'], ['name', $this->subject->name]));
             if (!$relTrigger->error)
-                $this->lvTabs->addListviewTab(new Listview(['data' => $relTrigger->getListviewData(), 'name' => Util::ucFirst(Lang::game('areatrigger'))], AreaTrigger::$brickFile, 'areatrigger'));
+                $this->lvTabs->addListviewTab(new Listview(['data' => $relTrigger->getListviewData(), 'name' => Util::ucFirst(Lang::game('areatrigger'))], AreatriggerEntry::$brickFile, 'areatrigger'));
         }
 
         parent::generate();

@@ -13,7 +13,7 @@ class ItemsetContainer extends DBTypeContainer
     /**
      * iterate over fetched sets
      *
-     * @return \Generator<int, Itemset> id => itemset template
+     * @return \Generator<int, ItemsetEntry> id => itemset template
      */
     public function iterate() : \Generator
     {
@@ -21,11 +21,11 @@ class ItemsetContainer extends DBTypeContainer
     }
 
     /**
-     * @return ?Itemset
+     * @return ?ItemsetEntry
      */
-    public function getEntry(string|int $id) : ?Itemset
+    public function getEntry(null|string|int $key = null) : ?ItemsetEntry
     {
-        return parent::getEntry($id);
+        return parent::getEntry($key);
     }
 }
 

@@ -41,7 +41,7 @@ class SearchJsonResponse extends TextResponse implements ICache
 
         if ($this->_get['wt'] && $this->_get['wtv'])        // slots and type should get ignored
         {
-            $itemFilter = new ItemListFilter($this->_get);
+            $itemFilter = new ItemFilter($this->_get);
             if ($_ = $itemFilter->createConditionsForWeights())
             {
                 $this->extraOpts  = $itemFilter->extraOpts;

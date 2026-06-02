@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class Spell extends DBType
+class SpellEntry extends DBTypeEntry
 {
     use TrSourceHelper;
 
@@ -128,8 +128,8 @@ class Spell extends DBType
     public readonly  array     $effectAuraId;
     /** @var int[] $effectPeriode - length: 3 */
     public readonly  array     $effectPeriode;
-    /** @var int[] $effecChainTarget - length: 3 */
-    public readonly  array     $effecChainTarget;
+    /** @var int[] $effectChainTarget - length: 3 */
+    public readonly  array     $effectChainTarget;
     /** @var int[] $effectCreateItemId - length: 3 */
     public readonly  array     $effectCreateItemId;
     /** @var int[] $effectMiscValue - length: 3 */
@@ -246,12 +246,12 @@ class Spell extends DBType
     );
 
     // spell text rendering
-    private        array $descriptionVariables = [];
-    private        array $parsedText           = [];
-    private        array $refSpells            = [];
-    private        int   $interactive          = self::INTERACTIVE_EMBEDDED;
-    private        int   $charLevel            = MAX_LEVEL;
-    private        bool  $isScaling            = false;
+    private array          $descriptionVariables = [];
+    private array          $parsedText           = [];
+    private SpellContainer $refSpells;
+    private int            $interactive          = self::INTERACTIVE_EMBEDDED;
+    private int            $charLevel            = MAX_LEVEL;
+    private bool           $isScaling            = false;
 
     public const /* string */ QUERY_BASE = 'SELECT s.*, s.`id` AS ARRAY_KEY FROM ::spell s';
     public const /* array  */ QUERY_OPTS = array(
@@ -265,6 +265,8 @@ class Spell extends DBType
 
     public function __construct(int|array $initData, array $extraOpts = [])
     {
+        $this->refSpells = new SpellContainer(null);        // initialize empty container
+
         parent::__construct($initData, $extraOpts);
 
         if (isset($extraOpts['interactive']))
@@ -272,6 +274,7 @@ class Spell extends DBType
 
         if (isset($extraOpts['charLevel']))
             $this->charLevel = $extraOpts['charLevel'];
+
     }
 
     public function applyInitData(array $initData) : void
@@ -336,13 +339,13 @@ class Spell extends DBType
                 case 'id':                                  // id defined by parent
                     continue 2;
                 case 'icon':                                // fix missing icons
-                    $this->$k = $initData['icon'] ?: DEFAULT_ICON;
+                    $this->$k = $v ?: DEFAULT_ICON;
                     break;
                 case 'reqClassMask':                        // prepare required classes
-                    $this->$k = ($_ = $initData['reqClassMask'] & ChrClass::MASK_ALL) == ChrClass::MASK_ALL ? 0 : $_;
+                    $this->$k = ($_ = $v & ChrClass::MASK_ALL) == ChrClass::MASK_ALL ? 0 : $_;
                     break;
                 case 'reqRaceMask':                         // prepare required races
-                    $this->$k = ($_ = $initData['reqRaceMask'] & ChrRace::MASK_ALL) == ChrRace::MASK_ALL ? 0 : $_;
+                    $this->$k = ($_ = $v & ChrRace::MASK_ALL) == ChrRace::MASK_ALL ? 0 : $_;
                     break;
                 default:
                     if (property_exists($this, $k))
@@ -354,6 +357,8 @@ class Spell extends DBType
         foreach ($effBuff as $k => $v)
             if (property_exists($this, $k))
                 $this->$k = $v;
+
+        $this->refSpells->import($this);
     }
 
     /**
@@ -515,7 +520,7 @@ class Spell extends DBType
         $cost  = $this->createPowerCost();
         $range = $this->createRanges();
 
-        [$desc, $spells, ] = $this->renderText('description');
+        [$desc, $ttSpells, ] = $this->renderText('description');
 
         array_walk_recursive($ttSpells, fn(&$x) => $x = UIText::format($x, Lang::FMT_HTML));
 
@@ -523,7 +528,7 @@ class Spell extends DBType
         $reagents = $this->getReagents();
         foreach ($reagents as $k => [$rItemId, ])
         {
-            if ($rName = Item::getName($rItemId))
+            if ($rName = ItemEntry::getName($rItemId))
                 $reagents[$k] += [2 => '<a href="?item='.$rItemId.'">'.$rName.'</a>', 3 => true];
             else
                 $reagents[$k] += [2 => 'Item #'.$rItemId, 3 => false];
@@ -552,7 +557,7 @@ class Spell extends DBType
             foreach ($this->canCreateItem() as $idx)
             {
                 // $ciEntry = new Item($this->effectCreateItemId[$idx]);
-                $ciEntry = new ItemList(array(['id', $this->effectCreateItemId[$idx]]));
+                $ciEntry = new ItemEntry($this->effectCreateItemId[$idx]);
                 if ($ciEntry->error)
                     continue;
 
@@ -959,7 +964,7 @@ class Spell extends DBType
             if (!$this->tool[$i])
                 continue;
 
-            $name = ItemList::getName($this->tool[$i], $quality);
+            $name = ItemEntry::getName($this->tool[$i], $quality);
 
             $tools[$i - 1] = array(
                 'itemId'  => $this->tool[$i],
@@ -971,12 +976,12 @@ class Spell extends DBType
         return array_reverse($tools);
     }
 
-    public function getModelInfo(?array $ssfRef = null, ?Creature $npcRef = null, ?GameObjectList $objectRef = null) : array
+    public function getModelInfo(?array $ssfRef = null, ?CreatureEntry $npcRef = null, ?GameobjectEntry $objectRef = null) : array
     {
         // try NPC model from MiscVal
         if ($_ = $this->getFirstCreatureMorphEntry())
         {
-            $npcRef ??= new Creature($_);
+            $npcRef ??= new CreatureEntry($_);
             if (!$npcRef->error)
             {
                 $res = array(
@@ -996,14 +1001,14 @@ class Spell extends DBType
         // try GO model from MiscVal
         if ($_ = $this->getFirstObjectMorphEntry())
         {
-            $objectRef ??= new GameObjectList(array(['id', $_]));
-            if ($objectRef->getEntry($_))
+            $objectRef ??= new GameobjectEntry($_);
+            if (!$objectRef->error)
             {
                 return array(
                     'type'        => Type::OBJECT,
                     'typeId'      => $_,
-                    'displayId'   => $objectRef->getField('displayId'),
-                    'displayName' => $objectRef->getField('name', true)
+                    'displayId'   => $objectRef->displayId,
+                    'displayName' => $objectRef->name
                 );
             }
         }
@@ -1282,9 +1287,9 @@ class Spell extends DBType
 
         for ($i = 0; $i < 3; $i++)
         {
-            if (in_array($this->effectId[$i], Spell::EFFECTS_DIRECT_SCALING))
+            if (in_array($this->effectId[$i], SpellEntry::EFFECTS_DIRECT_SCALING))
                 $isDirect = true;
-            else if (in_array($this->effectAuraId[$i], Spell::AURAS_PERIODIC_SCALING))
+            else if (in_array($this->effectAuraId[$i], SpellEntry::AURAS_PERIODIC_SCALING))
             {
                 if ($_ = $this->duration)
                     $overTime = $_;
@@ -1333,7 +1338,7 @@ class Spell extends DBType
     public function getFirstObjectMorphEntry() : ?int
     {
         for ($i = 0; $i < 3; $i++)
-            if (in_array($this->effectId[$i], Spell::EFFECTS_MODEL_OBJECT))
+            if (in_array($this->effectId[$i], SpellEntry::EFFECTS_MODEL_OBJECT))
                 if ($this->effectMiscValue[$i] > 0)
                     return $this->effectMiscValue[$i];
 
@@ -1344,7 +1349,7 @@ class Spell extends DBType
     public function getFirstCreatureMorphEntry() : ?int
     {
         for ($i = 0; $i < 3; $i++)
-            if (in_array($this->effectId[$i], Spell::EFFECTS_MODEL_NPC) || in_array($this->effectAuraId[$i], Spell::AURAS_MODEL_NPC))
+            if (in_array($this->effectId[$i], SpellEntry::EFFECTS_MODEL_NPC) || in_array($this->effectAuraId[$i], SpellEntry::AURAS_MODEL_NPC))
                 if ($this->effectMiscValue[$i] > 0)
                     return $this->effectMiscValue[$i];
 
@@ -1355,7 +1360,7 @@ class Spell extends DBType
     {
         $idx = [];
         for ($i = 0; $i < 3; $i++)
-            if (in_array($this->effectId[$i], Spell::EFFECTS_ITEM_CREATE) || in_array($this->effectAuraId[$i], Spell::AURAS_ITEM_CREATE))
+            if (in_array($this->effectId[$i], SpellEntry::EFFECTS_ITEM_CREATE) || in_array($this->effectAuraId[$i], SpellEntry::AURAS_ITEM_CREATE))
                 if ($this->effectCreateItemId[$i] > 0)
                     $idx[] = $i;
 
@@ -1366,7 +1371,7 @@ class Spell extends DBType
     {
         $idx = [];
         for ($i = 0; $i < 3; $i++)
-            if (in_array($this->effectId[$i], Spell::EFFECTS_TRIGGER) || in_array($this->effectAuraId[$i], Spell::AURAS_TRIGGER))
+            if (in_array($this->effectId[$i], SpellEntry::EFFECTS_TRIGGER) || in_array($this->effectAuraId[$i], SpellEntry::AURAS_TRIGGER))
                 if ($this->effectAuraId[$i] == SPELL_AURA_DUMMY || $this->effectTriggerSpell[$i] > 0 || ($this->effectId[$i] == SPELL_EFFECT_TITAN_GRIP && $this->effectMiscValue[$i] > 0))
                     $idx[] = $i;
 
@@ -1377,7 +1382,7 @@ class Spell extends DBType
     {
         $idx = [];
         for ($i = 0; $i < 3; $i++)
-            if (in_array($this->effectId[$i], Spell::EFFECTS_TEACH))
+            if (in_array($this->effectId[$i], SpellEntry::EFFECTS_TEACH))
                 if ($this->effectTriggerSpell[$i] > 0)
                     $idx[] = $i;
 
@@ -1388,7 +1393,7 @@ class Spell extends DBType
     {
         $idx = [];
         for ($i = 0; $i < 3; $i++)
-            if (in_array($this->effectId[$i], Spell::EFFECTS_ENCHANTMENT))
+            if (in_array($this->effectId[$i], SpellEntry::EFFECTS_ENCHANTMENT))
                 $idx[] = $i;
 
         return $idx;
@@ -1398,7 +1403,7 @@ class Spell extends DBType
     {
         $idx = [];
         for ($i = 0; $i < 3; $i++)
-            if (in_array($this->effectId[$i], Spell::EFFECTS_LDC_SCALING) || in_array($this->effectAuraId[$i], Spell::AURAS_LDC_SCALING))
+            if (in_array($this->effectId[$i], SpellEntry::EFFECTS_LDC_SCALING) || in_array($this->effectAuraId[$i], SpellEntry::AURAS_LDC_SCALING))
                 $idx[] = $i;
 
         return $idx;
@@ -1412,7 +1417,7 @@ class Spell extends DBType
     public function isScalableHealingSpell() : bool
     {
         for ($i = 0; $i < 3; $i++)
-            if (in_array($this->effectId[$i], Spell::EFFECTS_SCALING_HEAL) || in_array($this->effectAuraId[$i], Spell::AURAS_SCALING_HEAL))
+            if (in_array($this->effectId[$i], SpellEntry::EFFECTS_SCALING_HEAL) || in_array($this->effectAuraId[$i], SpellEntry::AURAS_SCALING_HEAL))
                 return true;
 
         return false;
@@ -1421,7 +1426,7 @@ class Spell extends DBType
     public function isScalableDamagingSpell() : bool
     {
         for ($i = 0; $i < 3; $i++)
-            if (in_array($this->effectId[$i], Spell::EFFECTS_SCALING_DAMAGE) || in_array($this->effectAuraId[$i], Spell::AURAS_SCALING_DAMAGE))
+            if (in_array($this->effectId[$i], SpellEntry::EFFECTS_SCALING_DAMAGE) || in_array($this->effectAuraId[$i], SpellEntry::AURAS_SCALING_DAMAGE))
                 return true;
 
         return false;
@@ -1443,7 +1448,15 @@ class Spell extends DBType
     /* SpellText renderer */
     /**********************/
 
-    // oooo..kaaayy.. parsing text in 6 or 7 easy steps
+    /**
+     * oooo..kaaayy.. parsing text in 6 or 7 easy steps
+     * @param string    $property   what text to render
+     * @param int       $level      player character level to scale the tooltip to
+     * @return array<string, int[], bool>
+     *  1) the rendered text
+     *  2) array of referenced spells used in the text
+     *  3) true if tooltip contains combat ratings and needs a levelpicker
+     */
     public function renderText(string $property = 'description', int $level = MAX_LEVEL, ?int $interactive = null) : array
     {
         /*
@@ -1861,13 +1874,14 @@ class Spell extends DBType
             return [null, null, null, null, null];
 
         $effIdx ??= 1;                                      // if EffectIdx is omitted, assume EffectIdx: 1
+        $effIdx--;                                          // and then decrement to match array indizes
 
-        // cache at least some lookups.. should be moved to single spellList :/
-        if ($lookup && $lookup != $this->id && !isset($this->refSpells[$lookup]))
-            $this->refSpells[$lookup] = new Spell($lookup);
+        // cache at least some lookups.. should be moved to single SpellContainer :/
+        if ($lookup && !$this->refSpells->getEntry($lookup))
+            $this->refSpells->import(new SpellEntry($lookup));
 
-        $srcSpell = $lookup && $lookup != $this->id ? $this->refSpells[$lookup] : $this;
-        if ($srcSpell->error)
+        $srcSpell = $this->refSpells->getEntry($lookup ?: $this->id);
+        if (!$srcSpell || $srcSpell->error)
             return [null, null, null, null, null];
 
         switch ($var)
@@ -1887,52 +1901,52 @@ class Spell extends DBType
             // simple cases
             case 'a':                                       // EffectRadiusMin
             case 'A':                                       // EffectRadiusMax
-                $base ??= $srcSpell->getField('effect'.$effIdx.'RadiusMax');
+                $base ??= $srcSpell->effectRadiusMax[$effIdx];
             case 'b':                                       // PointsPerComboPoint
             case 'B':
-                $base ??= $srcSpell->getField('effect'.$effIdx.'PointsPerComboPoint');
+                $base ??= $srcSpell->effectPointsPerComboPoint[$effIdx];
             case 'c':                                       // powerCost
             case 'C':
-                $base ??= $srcSpell->getField('powerCost');
+                $base ??= $srcSpell->powerCost;
             case 'e':                                       // EffectValueMultiplier
             case 'E':
-                $base ??= $srcSpell->getField('effect'.$effIdx.'ValueMultiplier');
+                $base ??= $srcSpell->effectValueMultiplier[$effIdx];
             case 'f':                                       // EffectDamageMultiplier
             case 'F':
-                $base ??= $srcSpell->getField('effect'.$effIdx.'DamageMultiplier');
+                $base ??= $srcSpell->effectDamageMultiplier[$effIdx];
             case 'h':                                       // ProcChance
             case 'H':
-                $base ??= $srcSpell->getField('procChance');
+                $base ??= $srcSpell->procChance;
             case 'i':                                       // MaxAffectedTargets
             case 'I':
-                $base ??= $srcSpell->getField('maxAffectedTargets');
+                $base ??= $srcSpell->maxAffectedTargets;
             case 'n':                                       // ProcCharges
             case 'N':
-                $base ??= $srcSpell->getField('procCharges');
+                $base ??= $srcSpell->procCharges;
             case 'p':                                       // powerCostPercent
             case 'P':
-                $base ??= $srcSpell->getField('powerCostPercent');
+                $base ??= $srcSpell->powerCostPercent;
             case 'q':                                       // EffectMiscValue
             case 'Q':
-                $base ??= $srcSpell->getField('effect'.$effIdx.'MiscValue');
+                $base ??= $srcSpell->effectMiscValue[$effIdx];
             case 'r':                                       // SpellRange
             case 'R':
-                $base ??= $srcSpell->getField('rangeMaxHostile');
+                $base ??= $srcSpell->rangeMaxHostile;
             case 't':                                       // Periode
             case 'T':
-                $base ??= $srcSpell->getField('effect'.$effIdx.'Periode') / 1000;
+                $base ??= $srcSpell->effectPeriode[$effIdx] / 1000;
             case 'u':                                       // StackCount
             case 'U':
-                $base ??= $srcSpell->getField('stackAmount');
+                $base ??= $srcSpell->stackAmount;
             case 'v':                                       // MaxTargetLevel
             case 'V':
-                $base ??= $srcSpell->getField('MaxTargetLevel');
+                $base ??= $srcSpell->maxTargetLevel;
             case 'x':                                       // ChainTargetCount
             case 'X':
-                $base ??= $srcSpell->getField('effect'.$effIdx.'ChainTarget');
+                $base ??= $srcSpell->effectChainTarget[$effIdx];
             case 'bc':                                      // BonusMultiplier
             case 'BC':
-                $base ??= $srcSpell->getField('effect'.$effIdx.'BonusMultiplier');
+                $base ??= $srcSpell->effectBonusMultiplier[$effIdx];
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
@@ -1941,21 +1955,20 @@ class Spell extends DBType
                 break;
             case 'd':                                       // SpellDuration
             case 'D':                                       // todo (med): min/max?; /w unit?
-                $base = $srcSpell->getField('duration');
+                $base = $srcSpell->duration;
 
                 $fmtStringMin = Lang::formatTime($base, 'spell', 'duration');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                $minPoints = max(0, $base);
                 break;
             case 'm':                                       // BasePoints (minValue)
             case 'M':                                       // BasePoints (maxValue)
                 [$min, $max, $modStrMin, $modStrMax] = $srcSpell->calculateAmount($effIdx);
 
-                $mv   = $srcSpell->getField('effect'.$effIdx.'MiscValue');
-                $aura = $srcSpell->getField('effect'.$effIdx.'AuraId');
+                $mv   = $srcSpell->effectMiscValue[$effIdx];
+                $aura = $srcSpell->effectAuraId[$effIdx];
 
                 if (in_array($op, $signs) && is_numeric($oparg))
                 {
@@ -1987,13 +2000,13 @@ class Spell extends DBType
                 break;
             case 'o':                                       // TotalAmount for periodic auras (with variance)
             case 'O':
-                $periode  = $srcSpell->getField('effect'.$effIdx.'Periode');
-                $duration = $srcSpell->getField('duration');
+                $periode  = $srcSpell->effectPeriode[$effIdx];
+                $duration = $srcSpell->duration;
 
                 if (!$periode)
                 {
                     // Mod Power Regeneration & Mod Health Regeneration have an implicit periode of 5sec
-                    $aura = $srcSpell->getField('effect'.$effIdx.'AuraId');
+                    $aura = $srcSpell->effectAuraId[$effIdx];
                     if ($aura == SPELL_AURA_MOD_REGEN || $aura == SPELL_AURA_MOD_POWER_REGEN)
                         $periode = 5000;
                     else
@@ -2022,8 +2035,8 @@ class Spell extends DBType
             case 's':                                       // BasePoints (with variance)
             case 'S':
                 [$min, $max, $modStrMin, $modStrMax] = $srcSpell->calculateAmount($effIdx);
-                $mv   = $srcSpell->getField('effect'.$effIdx.'MiscValue');
-                $aura = $srcSpell->getField('effect'.$effIdx.'AuraId');
+                $mv   = $srcSpell->effectMiscValue[$effIdx];
+                $aura = $srcSpell->effectAuraId[$effIdx];
 
                 if (in_array($op, $signs) && is_numeric($oparg))
                 {
@@ -2335,7 +2348,7 @@ class Spell extends DBType
             // this should be 0 if all went well
             if ($condBrktCnt > 0)
             {
-                trigger_error('Spell::handleConditions() - string contains unbalanced condition', E_USER_WARNING);
+                trigger_error('SpellEntry::handleConditions() - string contains unbalanced condition', E_USER_WARNING);
                 $condParts[3] = $condParts[3] ?? '';
             }
 

@@ -87,7 +87,7 @@ class GuildList extends DBTypeList
 }
 
 
-class GuildListFilter extends Filter
+class GuildFilter extends Filter
 {
     use TrProfilerFilter;
 

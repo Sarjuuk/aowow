@@ -83,7 +83,7 @@ class ArenateamBaseResponse extends TemplateResponse
             return;
         }
 
-        $subject = new LocalArenaTeamList(array(['at.id', $this->typeId]));
+        $subject = new LocalArenateamList(array(['at.id', $this->typeId]));
         if ($subject->error)
             $this->notFound();
 
@@ -136,7 +136,7 @@ class ArenateamBaseResponse extends TemplateResponse
             'sort'        => [-15],
             'visibleCols' => ['race', 'classs', 'level', 'talents', 'gearscore', 'rating', 'wins', 'losses'],
             'hiddenCols'  => ['guild', 'location']
-        ), ProfileList::$brickFile));
+        ), ProfileEntry::$brickFile));
     }
 
     private function notFound() : never

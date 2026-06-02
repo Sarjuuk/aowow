@@ -13,7 +13,7 @@ class EmoteContainer extends DBTypeContainer
     /**
      * iterate over fetched sets
      *
-     * @return \Generator<int, Emote> id => emote template
+     * @return \Generator<int, EmoteEntry> id => emote template
      */
     public function iterate() : \Generator
     {
@@ -21,11 +21,11 @@ class EmoteContainer extends DBTypeContainer
     }
 
     /**
-     * @return ?Emote
+     * @return ?EmoteEntry
      */
-    public function getEntry(string|int $id) : ?Emote
+    public function getEntry(null|string|int $key = null) : ?EmoteEntry
     {
-        return parent::getEntry($id);
+        return parent::getEntry($key);
     }
 }
 

@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class Areatrigger extends DBType
+class AreatriggerEntry extends DBTypeEntry
 {
     public readonly  int        $cuFlags;
     public readonly  string     $name;                       // not localized

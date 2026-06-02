@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class Creature extends DBType
+class CreatureEntry extends DBTypeEntry
 {
     public readonly int       $cuFlags;
     public readonly  LocString $name;

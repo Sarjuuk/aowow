@@ -461,7 +461,7 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
             $tabs[] = ['data' => []];
 
         foreach ($tabs as $t)
-            $this->lvTabs->addListviewTab(new Listview($t, Item::$brickFile));
+            $this->lvTabs->addListviewTab(new Listview($t, ItemEntry::$brickFile));
 
         $this->redButtons[BUTTON_WOWHEAD] = true;
         if ($fiQuery = $this->filter->buildGETParam())

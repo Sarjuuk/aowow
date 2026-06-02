@@ -20,7 +20,7 @@ class MailBaseResponse extends TemplateResponse implements ICache
     public int $type   = Type::MAIL;
     public int $typeId = 0;
 
-    private Mail $subject;
+    private MailEntry $subject;
 
     public function __construct(string $id)
     {
@@ -32,7 +32,7 @@ class MailBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new Mail($this->typeId);
+        $this->subject = new MailEntry($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('mail'), Lang::mail('notFound'));
 
@@ -138,7 +138,7 @@ class MailBaseResponse extends TemplateResponse implements ICache
         // tab: attachment
         if ($this->subject->attachment)
         {
-            $attachment = new Item($this->subject->attachment);
+            $attachment = new ItemEntry($this->subject->attachment);
             if (!$attachment->error)
             {
                 $this->extendGlobalData($attachment->getJSGlobals());
@@ -146,21 +146,21 @@ class MailBaseResponse extends TemplateResponse implements ICache
                     'data' => [$attachment->getListviewRow()],
                     'name' => Lang::mail('attachment'),
                     'id'   => 'attachment'
-                ), Item::$brickFile));
+                ), ItemEntry::$brickFile));
             }
         }
 
         if ($this->typeId < 0 ||                            // used by: achievement
            ($acvId = DB::World()->selectCell('SELECT `ID` FROM achievement_reward WHERE `MailTemplateId` = %i', $this->typeId)))
         {
-            $ubAchievements = new Achievement($this->typeId < 0 ? -$this->typeId : $acvId);
+            $ubAchievements = new AchievementEntry($this->typeId < 0 ? -$this->typeId : $acvId);
             if (!$ubAchievements->error)
             {
                 $this->extendGlobalData($ubAchievements->getJSGlobals());
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data' => [$ubAchievements->getListviewRow()],
                     'id'   => 'used-by-achievement'
-                ), Achievement::$brickFile));
+                ), AchievementEntry::$brickFile));
             }
         }
         else                                                // used by: quest
@@ -172,7 +172,7 @@ class MailBaseResponse extends TemplateResponse implements ICache
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data' => $ubQuests->getListviewData(),
                     'id'   => 'used-by-quest'
-                ), Quest::$brickFile));
+                ), QuestEntry::$brickFile));
             }
         }
 

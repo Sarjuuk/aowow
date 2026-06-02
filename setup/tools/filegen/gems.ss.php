@@ -53,7 +53,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             EXP_BC, EXP_WOTLK
         );
 
-        $enchantments = new EnchantmentList(array(['id', array_column($gems, 'enchId')]));
+        $enchantments = new EnchantmentContainer(array(['id', array_column($gems, 'enchId')]));
         if ($enchantments->error)
         {
             CLI::write('[gems] Required table ::itemenchantment seems to be empty!', CLI::LOG_ERROR);
@@ -70,7 +70,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             $gemsOut = [];
             foreach ($gems as $g)
             {
-                if (!$enchantments->getEntry($g['enchId']))
+                if (!($eEntry = $enchantments->getEntry($g['enchId'])))
                 {
                     CLI::write('[gems] * could not find enchantment #'.$g['enchId'].' referenced by item #'.$g['itemId'], CLI::LOG_WARN);
                     continue;
@@ -80,8 +80,8 @@ CLISetup::registerSetup("build", new class extends SetupScript
                     'name'        => Util::localizedString($g, 'name'),
                     'quality'     => $g['quality'],
                     'icon'        => strToLower($g['icon']),
-                    'enchantment' => $enchantments->getField('name', true),
-                    'jsonequip'   => $enchantments->getStatGain(),
+                    'enchantment' => $eEntry->name,
+                    'jsonequip'   => $eEntry->getStatGain(),
                     'colors'      => $g['colors'],
                     'expansion'   => $g['expansion'],
                     'gearscore'   => Util::getGemScore($g['itemLevel'], $g['quality'], $g['requiredSkill'] == SKILL_JEWELCRAFTING, $g['itemId'])

@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class Enchantment extends DBType
+class EnchantmentEntry extends DBTypeEntry
 {
     public readonly int       $cuFlags;
     public readonly LocString $name;
@@ -163,10 +163,10 @@ class Enchantment extends DBType
         // issue with scaling stats enchantments
         // stats are stored as NOT NULL to be usable by the search filters and such become indistinguishable from scaling enchantments that _actually_ use the value 0
         // so we can't rely on ::item_stats and always have to calc stats
-        return $this->jsonStats ??= (new StatsContainer($this->relSpells->export())->fromEnchantment((array)$this))->toJson();
+        return $this->jsonStats ??= ((new StatsContainer($this->relSpells->export()))->fromEnchantment((array)$this))->toJson();
     }
 
-    public function getRelSpell(int $id) : ?Spell
+    public function getRelSpell(int $id) : ?SpellEntry
     {
         if ($this->relSpells)
             return $this->relSpells->getEntry($id);
@@ -174,7 +174,7 @@ class Enchantment extends DBType
         return null;
     }
 
-    public function setRelSpells(Spell ...$entries) : void
+    public function setRelSpells(SpellEntry ...$entries) : void
     {
         if (!$this->relSpells)
             $this->relSpells = new SpellContainer(null);

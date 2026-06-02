@@ -13,7 +13,7 @@ class ItemContainer extends DBTypeContainer
     /**
      * iterate over fetched sets
      *
-     * @return \Generator<int, Item> id => item entry
+     * @return \Generator<int, ItemEntry> id => item entry
      */
     public function iterate() : \Generator
     {
@@ -21,11 +21,11 @@ class ItemContainer extends DBTypeContainer
     }
 
     /**
-     * @return ?Item
+     * @return ?ItemEntry
      */
-    public function getEntry(string|int $id) : ?Item
+    public function getEntry(null|string|int $key = null) : ?ItemEntry
     {
-        return parent::getEntry($id);
+        return parent::getEntry($key);
     }
 
     /**
@@ -36,7 +36,7 @@ class ItemContainer extends DBTypeContainer
      * * `0x0008 - LISTVIEWINFO_GEMS`: gem infos and score
      * * `0x0010 - LISTVIEWINFO_MODEL`: sameModelAs-Tab
      */
-    public function getListviewData(int $addInfoMask = 0x0): array
+    public function getListviewData(int $addInfoMask = 0x0, ?array $miscData = null) : array
     {
         // random item is random
         if ($addInfoMask & LISTVIEWINFO_SUBITEMS)
@@ -45,7 +45,7 @@ class ItemContainer extends DBTypeContainer
         $data = [];
 
         foreach ($this->iterate() as $id => $entry)
-            $data[$id] = $entry->getListviewRow($addInfoMask);
+            $data[$id] = $entry->getListviewRow($addInfoMask, $miscData);
 
         return $data;
     }

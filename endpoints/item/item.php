@@ -29,7 +29,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
     public ?array  $subItems    = null;
     public  array  $tooltip     = [];
 
-    private Item $subject;
+    private ItemEntry $subject;
 
     public function __construct(string $id)
     {
@@ -41,7 +41,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new Item($this->typeId);
+        $this->subject = new ItemEntry($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('item'), Lang::item('notFound'));
 
@@ -380,7 +380,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         // factionchange-equivalent
         if ($pendant = DB::World()->selectCell('SELECT IF(`horde_id` = %i, `alliance_id`, -`horde_id`) FROM player_factionchange_items WHERE `alliance_id` = %i OR `horde_id` = %i', $this->typeId, $this->typeId, $this->typeId))
         {
-            $altItem = new Item(abs($pendant));
+            $altItem = new ItemEntry(abs($pendant));
             if (!$altItem->error)
             {
                 $this->transfer = Lang::item('_transfer', [
@@ -422,7 +422,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                     'name'      => '$LANG.tab_createdby',
                     'id'        => 'created-by',            // should by exclusive with created-by from spell_loot
                     'extraCols' => ['$Listview.extraCols.percent', '$Listview.extraCols.condition']
-                ), Spell::$brickFile));
+                ), SpellEntry::$brickFile));
             }
         }
 
@@ -464,7 +464,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                 if ($idx == LootByItem::OBJECT_FISHED && !$this->map)
                 {
                     $nodeIds  = array_map(fn($x) => $x['id'], $tabData['data']);
-                    $fishedIn = new GameObjectContainer(array(['id', $nodeIds]));
+                    $fishedIn = new GameobjectContainer(array(['id', $nodeIds]));
                     if (!$fishedIn->error)
                     {
                         // show mapper for fishing locations
@@ -478,7 +478,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                                 Lang::item('fishingLoc')        // title
                             );
                             foreach ($nodeSpawns as $areaId => $_)
-                                $this->map[3][$areaId] = ZoneList::getName($areaId);
+                                $this->map[3][$areaId] = ZoneEntry::getName($areaId);
                         }
                     }
                 }
@@ -519,7 +519,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                 if ($hiddenCols)
                     $tabData['hiddenCols'] = array_unique($hiddenCols);
 
-                $this->lvTabs->addListviewTab(new Listview($tabData, Item::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview($tabData, ItemEntry::$brickFile));
             }
         }
 
@@ -548,7 +548,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                         'id'              => 'contains',
                         'computeDataFunc' => '$Listview.funcBox.initLootTable',
                         'extraCols'       => array_merge(['$Listview.extraCols.percent'], $spellLoot->extraCols)
-                    ), Item::$brickFile));
+                    ), ItemEntry::$brickFile));
             }
         }
 
@@ -569,7 +569,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                     'name'       => '$LANG.tab_cancontain',
                     'id'         => 'can-contain',
                     'hiddenCols' => $hCols
-                ), Item::$brickFile));
+                ), ItemEntry::$brickFile));
             }
         }
 
@@ -586,7 +586,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                     'name'       => '$LANG.tab_canbeplacedin',
                     'id'         => 'can-be-placed-in',
                     'hiddenCols' => ['side']
-                ), Item::$brickFile));
+                ), ItemEntry::$brickFile));
             }
         }
 
@@ -611,7 +611,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
             if (!$criteriaOf->hasSetFields('reward_loc0'))
                 $tabData['hiddenCols'] = ['rewards'];
 
-            $this->lvTabs->addListviewTab(new Listview($tabData, Achievement::$brickFile));
+            $this->lvTabs->addListviewTab(new Listview($tabData, AchievementEntry::$brickFile));
         }
 
         // tab: reagent for
@@ -631,7 +631,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                 'name'        => '$LANG.tab_reagentfor',
                 'id'          => 'reagent-for',
                 'visibleCols' => ['reagents']
-            ), Spell::$brickFile));
+            ), SpellEntry::$brickFile));
         }
 
         // tab: unlocks (object or item)
@@ -655,7 +655,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                     'data' => $lockedObj->getListviewData(),
                     'name' => '$LANG.tab_unlocks',
                     'id'   => 'unlocks-object',
-                ), Gameobject::$brickFile));
+                ), GameobjectEntry::$brickFile));
             }
 
             // items (generally unused. It's the spell on the item, that unlocks stuff)
@@ -668,7 +668,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                     'data' => $lockedItm->getListviewData(),
                     'name' => '$LANG.tab_unlocks',
                     'id'   => 'unlocks-item'
-                ), Item::$brickFile));
+                ), ItemEntry::$brickFile));
             }
         }
 
@@ -684,7 +684,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                     'data' => $starts->getListviewData(),
                     'name' => '$LANG.tab_starts',
                     'id'   => 'starts-quest'
-                ), Quest::$brickFile));
+                ), QuestEntry::$brickFile));
             }
         }
 
@@ -703,7 +703,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                 'data' => $objective->getListviewData(),
                 'name' => '$LANG.tab_objectiveof',
                 'id'   => 'objective-of-quest'
-            ), Quest::$brickFile));
+            ), QuestEntry::$brickFile));
         }
 
         // tab: provided for (quest)
@@ -721,7 +721,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                 'data' => $provided->getListviewData(),
                 'name' => '$LANG.tab_providedfor',
                 'id'   => 'provided-for-quest'
-            ), Quest::$brickFile));
+            ), QuestEntry::$brickFile));
         }
 
         // tab: sold by
@@ -742,7 +742,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                         Lang::item('vendorLoc')             // title
                     );
                     foreach ($vendorSpawns as $areaId => $_)
-                        $this->map[3][$areaId] = ZoneList::getName($areaId);
+                        $this->map[3][$areaId] = ZoneEntry::getName($areaId);
                 }
 
                 $sbData = $soldBy->getListviewData();
@@ -801,7 +801,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                     'id'         => 'sold-by-npc',
                     'extraCols'  => $extraCols,
                     'hiddenCols' => ['level', 'type']
-                ), Creature::$brickFile));
+                ), CreatureEntry::$brickFile));
             }
         }
 
@@ -844,7 +844,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                 if ($n)
                     $tabData['note'] = sprintf(Util::$filterResultString, $n);
 
-                $this->lvTabs->addListviewTab(new Listview($tabData, Item::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview($tabData, ItemEntry::$brickFile));
 
                 $this->extendGlobalData($boughtBy->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
             }
@@ -888,7 +888,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                     'name'        => '$LANG.tab_teaches',
                     'id'          => 'teaches',
                     'visibleCols' => $visCols
-                ), Spell::$brickFile));
+                ), SpellEntry::$brickFile));
             }
         }
 
@@ -923,7 +923,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                 'data' => $saItems->getListviewData(),
                 'name' => '$LANG.tab_seealso',
                 'id'   => 'see-also'
-            ), Item::$brickFile));
+            ), ItemEntry::$brickFile));
         }
 
         // tab: same model as
@@ -985,7 +985,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                     'data' => $cdItems->getListviewData(),
                     'name' => '$LANG.tab_sharedcooldown',
                     'id'   => 'shared-cooldown'
-                ), Item::$brickFile));
+                ), ItemEntry::$brickFile));
 
                 $this->extendGlobalData($cdItems->getJSGlobals(GLOBALINFO_SELF));
             }
@@ -1023,7 +1023,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
             if (!$sounds->error)
             {
                 $this->extendGlobalData($sounds->getJSGlobals(GLOBALINFO_SELF));
-                $this->lvTabs->addListviewTab(new Listview(['data' => $sounds->getListviewData()], Sound::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview(['data' => $sounds->getListviewData()], SoundEntry::$brickFile));
             }
         }
 

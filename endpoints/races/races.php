@@ -43,7 +43,7 @@ class RacesBaseResponse extends TemplateResponse implements ICache
 
         $races = new CharRaceContainer($conditions);
         if (!$races->error)
-            $this->lvTabs->addListviewTab(new Listview(['data' => $races->getListviewData()], CharRace::$brickFile));
+            $this->lvTabs->addListviewTab(new Listview(['data' => $races->getListviewData()], CharRaceEntry::$brickFile));
 
         parent::generate();
     }

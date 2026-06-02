@@ -66,7 +66,6 @@ CLISetup::registerSetup("build", new class extends SetupScript
         // from g_item_slots: 13:"One-Hand", 15:"Ranged", 17:"Two-Hand",
         $slotPointer   = [13, 17, 15, 15, 13, 17, 17, 13, 17, null, 17, null, null, 13, null, 13, null, null, null, null, 17];
 
-        $castItems     = [];
         $enchantSpells = DB::Aowow()->selectAssoc(
            'SELECT    s.`id` AS ARRAY_KEY,
                       `effect1MiscValue`,
@@ -83,7 +82,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
         $enchIds = array_column($enchantSpells, 'effect1MiscValue');
 
-        $enchantments = new EnchantmentList(array(['id', $enchIds]));
+        $enchantments = new EnchantmentContainer(array(['id', $enchIds]));
         if ($enchantments->error)
         {
             CLI::write('[enchants] Required table ::itemenchantment seems to be empty!', CLI::LOG_ERROR);
@@ -91,7 +90,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             return false;
         }
 
-        $castItems = new ItemList(array(['spellId1', array_keys($enchantSpells)], ['src.typeId', null, '!']));
+        $castItems = new ItemContainer(array(['spellId1', array_keys($enchantSpells)], ['src.typeId', null, '!']));
         if ($castItems->error)
         {
             CLI::write('[enchants] Required table ::items seems to be empty!', CLI::LOG_ERROR);
@@ -109,7 +108,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 set_time_limit(5);
 
                 $eId = $es['effect1MiscValue'];
-                if (!$enchantments->getEntry($eId))
+                if (!($eEntry = $enchantments->getEntry($eId)))
                 {
                     CLI::write('[enchants] * could not find enchantment #'.$eId.' referenced by spell #'.$esId, CLI::LOG_WARN);
                     continue;
@@ -149,20 +148,20 @@ CLISetup::registerSetup("build", new class extends SetupScript
                     'source'      => [],                    // <0: item; >0:spell
                     'skill'       => -1,                    // modified if skill
                     'slots'       => [],                    // determined per spell but set per item
-                    'enchantment' => $enchantments->getField('name', true),
-                    'jsonequip'   => $enchantments->getStatGain(),
+                    'enchantment' => $eEntry->name,
+                    'jsonequip'   => $eEntry->getStatGain(),
                     'temp'        => 0,                     // always 0
                     'classes'     => 0,                     // modified by item
                     'gearscore'   => 0                      // set later
                 );
 
-                if ($_ = $enchantments->getField('skillLine'))
+                if ($_ = $eEntry->skillLine)
                     $ench['jsonequip']['reqskill'] = $_;
 
-                if ($_ = $enchantments->getField('skillLevel'))
+                if ($_ = $eEntry->skillLevel)
                     $ench['jsonequip']['reqskillrank'] = $_;
 
-                if (($_ = $enchantments->getField('requiredLevel')) && $_ > 1)
+                if (($_ = $eEntry->requiredLevel) && $_ > 1)
                     $ench['jsonequip']['reqlevel'] = $_;
 
                 // check if the spell has an entry in skill_line_ability -> Source:Profession
@@ -176,42 +175,41 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
                 // check if this spell can be cast via item -> Source:Item
                 // do not reuse enchantment scrolls; do not use items without source
-                $cI = &$castItems;                          // this construct is a bit .. unwieldy
-                foreach ($cI->iterate() as $__)
+                foreach ($castItems->iterate() as $iEntry)
                 {
-                    if ($enchantments->getField('skillLevel'))
+                    if ($eEntry->skillLevel)
                         if ($s = Util::getEnchantmentScore(0, -1, true, $eId))
                             $ench['gearscore'] = $s;
 
-                    if ($cI->getField('spellId1') != $esId)
+                    if ($iEntry->spells[0][0] != $esId)
                         continue;
 
-                    $isScroll = $cI->getField('class') == ITEM_CLASS_CONSUMABLE && $cI->getField('subClass') == ITEM_SUBCLASS_ITEM_ENHANCEMENT && $cI->getField('pickUpSoundId') == 1192;
+                    $isScroll = $iEntry->class == ITEM_CLASS_CONSUMABLE && $iEntry->subClass == ITEM_SUBCLASS_ITEM_ENHANCEMENT && $iEntry->pickUpSoundId == 1192;
 
-                    if ($s = Util::getEnchantmentScore($cI->getField('itemLevel'), $isScroll ? -1 : $cI->getField('quality'), !!$enchantments->getField('skillLevel'), $eId))
+                    if ($s = Util::getEnchantmentScore($iEntry->itemLevel, $isScroll ? -1 : $iEntry->quality, !!$eEntry->skillLevel, $eId))
                         if ($s > $ench['gearscore'])
                             $ench['gearscore'] = $s;
 
                     if ($isScroll)
                         continue;
 
-                    $ench['name'][]   = $cI->getField('name', true);
-                    $ench['source'][] = -$cI->id;
-                    $ench['icon']     = strTolower($cI->getField('iconString'));
+                    $ench['name'][]   = $iEntry->name;
+                    $ench['source'][] = -$iEntry->id;
+                    $ench['icon']     = $iEntry->icon;
                     $ench['slots'][]  = $slot;
 
-                    if ($cI->getField('quality') > $ench['quality'])
-                        $ench['quality'] = $cI->getField('quality');
+                    if ($iEntry->quality > $ench['quality'])
+                        $ench['quality'] = $iEntry->quality;
 
-                    if ($rc = $cI->getField('requiredClass'))
+                    if ($rc = $iEntry->requiredClass)
                     {
                         $ench['classes'] = $rc;
                         $ench['jsonequip']['classes'] = $rc;
                     }
 
                     if (!isset($ench['jsonequip']['reqlevel']))
-                        if ($cI->getField('requiredLevel') > 0)
-                            $ench['jsonequip']['reqlevel'] = $cI->getField('requiredLevel');
+                        if ($iEntry->requiredLevel > 0)
+                            $ench['jsonequip']['reqlevel'] = $iEntry->requiredLevel;
                 }
 
                 // enchant spell not in use

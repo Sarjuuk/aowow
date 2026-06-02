@@ -52,7 +52,7 @@ class EmotesBaseResponse extends TemplateResponse implements ICache
             'name' => Util::ucFirst(Lang::game('emotes'))
         );
 
-        $this->lvTabs->addListviewTab(new Listview($tabData, Emote::$brickFile, 'emote'));
+        $this->lvTabs->addListviewTab(new Listview($tabData, EmoteEntry::$brickFile, 'emote'));
 
         parent::generate();
     }

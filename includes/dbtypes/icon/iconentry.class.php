@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class Icon extends DBType
+class IconEntry extends DBTypeEntry
 {
     public readonly int    $cuFlags;
     /** @var string $name - fixed filename */

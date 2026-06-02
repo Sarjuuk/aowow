@@ -103,9 +103,9 @@ class ProfileList extends DBTypeList
             return null;
 
         $title = '';
-        $name  = $this->getField('name');
-        if ($_ = $this->getField('title'))
-            $title = (new TitleList(array(['id', $_])))->getField($this->getField('gender') ? 'female' : 'male', true);
+        $name  = $this->name;
+        if ($this->title)
+            $title = (new TitleEntry($this->title))->${$this->gender ? 'female' : 'male'};
 
         if ($this->isCustom())
             $name .= Lang::profiler('customProfile');
@@ -209,7 +209,7 @@ class ProfileList extends DBTypeList
 }
 
 
-class ProfileListFilter extends Filter
+class ProfileFilter extends Filter
 {
     use TrProfilerFilter;
 

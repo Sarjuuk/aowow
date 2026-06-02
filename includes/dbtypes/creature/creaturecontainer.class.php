@@ -15,7 +15,7 @@ class CreatureContainer extends DBTypeContainer
     /**
      * iterate over fetched sets
      *
-     * @return \Generator<int, Creature> id => creature template
+     * @return \Generator<int, CreatureEntry> id => creature template
      */
     public function iterate() : \Generator
     {
@@ -23,11 +23,11 @@ class CreatureContainer extends DBTypeContainer
     }
 
     /**
-     * @return ?Creature creature template
+     * @return ?CreatureEntry creature template
      */
-    public function getEntry(int|string $id) : ?Creature
+    public function getEntry(null|string|int $key = null) : ?CreatureEntry
     {
-        return parent::getEntry($id);
+        return parent::getEntry($key);
     }
 
     /**

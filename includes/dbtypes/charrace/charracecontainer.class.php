@@ -13,7 +13,7 @@ class CharRaceContainer extends DBTypeContainer
     /**
      * iterate over fetched sets
      *
-     * @return \Generator<int, CharRace> id => character race template
+     * @return \Generator<int, CharRaceEntry> id => character race template
      */
     public function iterate() : \Generator
     {
@@ -21,11 +21,11 @@ class CharRaceContainer extends DBTypeContainer
     }
 
     /**
-     * @return ?CharRace
+     * @return ?CharRaceEntry
      */
-    public function getEntry(string|int $id) : ?CharRace
+    public function getEntry(null|string|int $key = null) : ?CharRaceEntry
     {
-        return parent::getEntry($id);
+        return parent::getEntry($key);
     }
 }
 

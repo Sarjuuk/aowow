@@ -33,7 +33,7 @@ class NpcPowerResponse extends TextResponse implements ICache
 
     protected function generate() : void
     {
-        $creature = new Creature($this->typeId);
+        $creature = new CreatureEntry($this->typeId);
         if ($creature->error)
             $this->cacheType = CACHE_TYPE_NONE;
         else

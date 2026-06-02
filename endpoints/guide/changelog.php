@@ -26,21 +26,21 @@ class GuideChangelogResponse extends TemplateResponse
         if (!$this->assertGET('id'))
             $this->generateNotFound(Lang::game('guide'), Lang::guide('notFound'));
 
-        $guide = new GuideList(array(['id', $this->_get['id']]));
+        $guide = new GuideEntry($this->_get['id']);
         if ($guide->error)
             $this->generateNotFound(Lang::game('guide'), Lang::guide('notFound'));
 
         if (!$guide->canBeViewed() && !$guide->userCanView())
-            $this->forward('?guides='.$guide->getField('category'));
+            $this->forward('?guides='.$guide->category);
 
-        $this->h1 = Lang::guide('clTitle', [$this->_get['id'], $guide->getField('title')]);
+        $this->h1 = Lang::guide('clTitle', [$this->_get['id'], $guide->title]);
         if (!$this->h1)
-            $this->h1 = $guide->getField('name');
+            $this->h1 = $guide->name;
 
-        $this->gPageInfo += ['name' => $guide->getField('name')];
+        $this->gPageInfo += ['name' => $guide->name];
 
 
-        $this->breadcrumb[] = $guide->getField('category');
+        $this->breadcrumb[] = $guide->category;
 
 
         parent::generate();
@@ -93,7 +93,7 @@ class GuideChangelogResponse extends TemplateResponse
         }
 
         // append creation
-        $buff .= '<li class="guide-changelog-created">'.$inp(0).'<b>'.Lang::guide('clCreated').'</b>'.$now->formatDate($guide->getField('date'), true)."</li>\n</ul>\n";
+        $buff .= '<li class="guide-changelog-created">'.$inp(0).'<b>'.Lang::guide('clCreated').'</b>'.$now->formatDate($guide->date, true)."</li>\n</ul>\n";
 
         if (User::isInGroup(U_GROUP_STAFF) && false)
             $buff .= '<input type="button" value="Compare" onclick="alert(\'NYI\');" style="margin-left: 40px;"/>';

@@ -95,7 +95,7 @@ class FactionsBaseResponse extends TemplateResponse implements ICache
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
 
-        $this->lvTabs->addListviewTab(new Listview(['data' => $data], Faction::$brickFile));
+        $this->lvTabs->addListviewTab(new Listview(['data' => $data], FactionEntry::$brickFile));
 
         parent::generate();
     }

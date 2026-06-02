@@ -352,7 +352,7 @@ class TemplateResponse extends BaseResponse
 
             $this->initJSGlobal($type);
 
-            $obj = Type::newList($type, [['id', array_unique($ids, SORT_NUMERIC)]]);
+            $obj = Type::newContainer($type, [['id', array_unique($ids, SORT_NUMERIC)]]);
             if (!$obj)
                 continue;
 

@@ -33,7 +33,7 @@ class SpellPowerResponse extends TextResponse implements ICache
 
     protected function generate() : void
     {
-        $spell = new Spell($this->typeId);
+        $spell = new SpellEntry($this->typeId);
         if ($spell->error)
             $this->cacheType = CACHE_TYPE_NONE;
         else

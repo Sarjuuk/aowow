@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class ArenaTeam extends DBType
+class ArenateamEntry extends DBTypeEntry
 {
     use TrProfilerHelper;
 
@@ -45,7 +45,7 @@ class ArenaTeam extends DBType
 }
 
 
-class RemoteArenaTeam extends ArenaTeam
+class RemoteArenateam extends ArenateamEntry
 {
     protected string $queryBase = 'SELECT `at`.*, `at`.`arenaTeamId` AS ARRAY_KEY FROM arena_team at';
     protected array  $queryOpts = array(
@@ -62,7 +62,7 @@ class RemoteArenaTeam extends ArenaTeam
         // select DB by realm
         if (!$this->getRealmDBs($miscData))
         {
-            trigger_error('RemoteArenaTeamList::__construct - cannot access any realm.', E_USER_WARNING);
+            trigger_error('RemoteArenateamList::__construct - cannot access any realm.', E_USER_WARNING);
             return;
         }
 
@@ -240,7 +240,7 @@ class RemoteArenaTeam extends ArenaTeam
 }
 
 
-class LocalArenaTeam extends ArenaTeam
+class LocalArenateam extends ArenateamEntry
 {
     protected string $queryBase = 'SELECT at.*, at.id AS ARRAY_KEY FROM ::profiler_arena_team at';
     protected array  $queryOpts = array(
@@ -262,7 +262,7 @@ class LocalArenaTeam extends ArenaTeam
 
         if (!$realms)
         {
-            trigger_error('LocalArenaTeamList::__construct - cannot access any realm.', E_USER_WARNING);
+            trigger_error('LocalArenateamList::__construct - cannot access any realm.', E_USER_WARNING);
             return;
         }
 

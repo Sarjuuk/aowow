@@ -88,7 +88,7 @@ class GuideEditResponse extends TemplateResponse
                 $this->forward('?guide=edit&id='.$this->typeId);
         }
 
-        $guide = new GuideList(array(['id', $this->typeId]));
+        $guide = new GuideEntry($this->typeId);
 
         $this->h1 = Lang::guide('editTitle');
         array_unshift($this->title, $this->h1.Lang::main('colon').$guide->getField('title'), Lang::game('guides'));
@@ -96,15 +96,15 @@ class GuideEditResponse extends TemplateResponse
         Lang::sort('guide', 'category');
 
         // init required template vars
-        $this->editCategory    = $this->_post['category']    ?? $guide->getField('category');
-        $this->editTitle       = $this->_post['title']       ?? $guide->getField('title');
-        $this->editName        = $this->_post['name']        ?? $guide->getField('name');
-        $this->editDescription = $this->_post['description'] ?? $guide->getField('description');
+        $this->editCategory    = $this->_post['category']    ?? $guide->category;
+        $this->editTitle       = $this->_post['title']       ?? $guide->title;
+        $this->editName        = $this->_post['name']        ?? $guide->name;
+        $this->editDescription = $this->_post['description'] ?? $guide->description;
         $this->editText        = $this->_post['body']        ?? $guide->getArticle();
-        $this->editClassId     = $this->_post['classId']     ?? $guide->getField('classId');
-        $this->editSpecId      = $this->_post['specId']      ?? $guide->getField('specId');
-        $this->editLocale      = $this->_post['locale']      ?? Locale::tryFrom($guide->getField('locale'));
-        $this->editStatus      = $this->editStatus           ?: $guide->getField('status');
+        $this->editClassId     = $this->_post['classId']     ?? $guide->classId;
+        $this->editSpecId      = $this->_post['specId']      ?? $guide->specId;
+        $this->editLocale      = $this->_post['locale']      ?? Locale::tryFrom($guide->locale);
+        $this->editStatus      = $this->editStatus           ?: $guide->status;
         $this->editStatusColor = GuideMgr::STATUS_COLORS[$this->editStatus];
 
         $this->extendGlobalData($guide->getJSGlobals());

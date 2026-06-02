@@ -138,7 +138,7 @@ class GuildBaseResponse extends TemplateResponse
             'sort'        => [-15],
             'visibleCols' => ['race', 'classs', 'level', 'talents', 'gearscore', 'achievementpoints', 'guildrank'],
             'hiddenCols'  => ['guild', 'location']
-        ), ProfileList::$brickFile));
+        ), ProfileEntry::$brickFile));
 
         parent::generate();
     }

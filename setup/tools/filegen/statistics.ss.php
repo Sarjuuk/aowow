@@ -85,7 +85,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
         foreach ($raceData as &$rd)
             $rd = array_values($rd + [[], []]);
 
-        $racials = new SpellList(array(['typeCat', -4], ['reqClassMask', 0]));
+        $racials = new SpellContainer(array(['typeCat', -4], ['reqClassMask', 0]));
         $allMods = $racials->getProfilerMods();
         foreach ($allMods as $spellId => $mods)
         {
@@ -93,7 +93,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 continue;
 
             // if there is ever a case where a racial is shared between races i don't want to know about it!
-            $raceId = log($racials->getEntry($spellId)['reqRaceMask'], 2) + 1;
+            $raceId = intval(log($racials->getEntry($spellId)->reqRaceMask, 2) + 1);
             if (!isset($raceData[$raceId]))
                 continue;
 
