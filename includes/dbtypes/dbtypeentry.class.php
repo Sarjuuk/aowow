@@ -469,10 +469,10 @@ abstract class DBTypeEntry
             foreach ($dbQuery->fetch() as $data)
             {
                 $this->applyInitData($data);
+                $this->error = false;
                 break;                                      // should only ever be one row
             }
 
-            $this->error = false;
             return;
         }
 

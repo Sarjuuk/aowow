@@ -156,9 +156,9 @@ class PetBaseResponse extends TemplateResponse implements ICache
             [
                 DB::OR,
                 // match: first skillLine
-                ['skillLine1', $this->subject->getField('skillLineId')],
+                ['skillLine1', $this->subject->skillLineId],
                 // match: second skillLine (if not mask)
-                [DB::AND, ['skillLine1', 0, '>'], ['skillLine2OrMask', $this->subject->getField('skillLineId')]],
+                [DB::AND, ['skillLine1', 0, '>'], ['skillLine2OrMask', $this->subject->skillLineId]],
                 // match: skillLineMask (if mask)
                 [DB::AND, ['skillLine1', -1], ['skillLine2OrMask', $mask, '&']]
             ]
@@ -184,7 +184,7 @@ class PetBaseResponse extends TemplateResponse implements ICache
             ]
         );
 
-        $conditions[] = match($this->subject->getField('type'))
+        $conditions[] = match($this->subject->type)
         {
             PET_TALENT_TYPE_FEROCITY => ['s.cuFlags', SPELL_CU_PET_TALENT_TYPE0, '&'],
             PET_TALENT_TYPE_TENACITY => ['s.cuFlags', SPELL_CU_PET_TALENT_TYPE1, '&'],
