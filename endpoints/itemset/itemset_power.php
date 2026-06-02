@@ -33,12 +33,12 @@ class ItemsetPowerResponse extends TextResponse implements ICache
 
     protected function generate() : void
     {
-        $itemset = new ItemsetList(array(['id', $this->typeId]));
+        $itemset = new Itemset($this->typeId);
         if ($itemset->error)
             $this->cacheType = CACHE_TYPE_NONE;
         else
             $opts = array(
-                'name'    => $itemset->getField('name', true),
+                'name'    => $itemset->name,
                 'tooltip' => $itemset->renderTooltip(),
             );
 
