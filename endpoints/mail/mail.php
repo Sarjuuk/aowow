@@ -20,7 +20,7 @@ class MailBaseResponse extends TemplateResponse implements ICache
     public int $type   = Type::MAIL;
     public int $typeId = 0;
 
-    private MailList $subject;
+    private Mail $subject;
 
     public function __construct(string $id)
     {
@@ -32,18 +32,18 @@ class MailBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new MailList(array(['id', $this->typeId]));
+        $this->subject = new Mail($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('mail'), Lang::mail('notFound'));
 
-        $this->extendGlobalData($this->subject->getJSGlobals());
+        $this->extendGlobalData($this->subject->getJSGlobal());
 
-        $this->h1 = Util::htmlEscape($this->subject->getField('name', true));
+        $this->h1 = Util::htmlEscape($this->subject->subject);
 
         $this->gPageInfo += array(
             'type'   => $this->type,
             'typeId' => $this->typeId,
-            'name'   => $this->subject->getField('name', true)
+            'name'   => $this->subject->subject
         );
 
 
@@ -51,14 +51,14 @@ class MailBaseResponse extends TemplateResponse implements ICache
         /* Page Title */
         /**************/
 
-        array_unshift($this->title, $this->subject->getField('name', true), Util::ucFirst(Lang::game('mail')));
+        array_unshift($this->title, $this->subject->subject, Util::ucFirst(Lang::game('mail')));
 
 
         /***********/
         /* Infobox */
         /***********/
 
-        $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
+        $infobox = Lang::getInfoBoxForFlags($this->subject->cuFlags);
 
         // sender + delay
         if ($this->typeId < 0)                              // def. achievement
@@ -126,7 +126,7 @@ class MailBaseResponse extends TemplateResponse implements ICache
             BUTTON_WOWHEAD => false
         );
 
-        $this->extraText = new Markup(UIText::format($this->subject->getField('text', true), Lang::FMT_MARKUP), ['dbpage' => true, 'allow' => Markup::CLASS_ADMIN], 'text-generic');
+        $this->extraText = new Markup(UIText::format($this->subject->text, Lang::FMT_MARKUP), ['dbpage' => true, 'allow' => Markup::CLASS_ADMIN], 'text-generic');
 
 
         /**************/
@@ -136,43 +136,43 @@ class MailBaseResponse extends TemplateResponse implements ICache
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
 
         // tab: attachment
-        if ($itemId = $this->subject->getField('attachment'))
+        if ($this->subject->attachment)
         {
-            $attachment = new ItemList(array(['id', $itemId]));
+            $attachment = new Item($this->subject->attachment);
             if (!$attachment->error)
             {
                 $this->extendGlobalData($attachment->getJSGlobals());
                 $this->lvTabs->addListviewTab(new Listview(array(
-                    'data' => $attachment->getListviewData(),
+                    'data' => [$attachment->getListviewRow()],
                     'name' => Lang::mail('attachment'),
                     'id'   => 'attachment'
-                ), ItemList::$brickFile));
+                ), Item::$brickFile));
             }
         }
 
         if ($this->typeId < 0 ||                            // used by: achievement
            ($acvId = DB::World()->selectCell('SELECT `ID` FROM achievement_reward WHERE `MailTemplateId` = %i', $this->typeId)))
         {
-            $ubAchievements = new AchievementList(array(['id', $this->typeId < 0 ? -$this->typeId : $acvId]));
+            $ubAchievements = new Achievement($this->typeId < 0 ? -$this->typeId : $acvId);
             if (!$ubAchievements->error)
             {
                 $this->extendGlobalData($ubAchievements->getJSGlobals());
                 $this->lvTabs->addListviewTab(new Listview(array(
-                    'data' => $ubAchievements->getListviewData(),
+                    'data' => [$ubAchievements->getListviewRow()],
                     'id'   => 'used-by-achievement'
-                ), AchievementList::$brickFile));
+                ), Achievement::$brickFile));
             }
         }
         else                                                // used by: quest
         {
-            $ubQuests = new QuestList(array(['rewardMailTemplateId', $this->typeId]));
+            $ubQuests = new QuestContainer(array(['rewardMailTemplateId', $this->typeId]));
             if (!$ubQuests->error)
             {
                 $this->extendGlobalData($ubQuests->getJSGlobals());
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data' => $ubQuests->getListviewData(),
                     'id'   => 'used-by-quest'
-                ), QuestList::$brickFile));
+                ), Quest::$brickFile));
             }
         }
 

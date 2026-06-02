@@ -2,8 +2,6 @@
 
 namespace Aowow;
 
-use Override;
-
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 

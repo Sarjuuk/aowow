@@ -42,7 +42,7 @@ class MailsBaseResponse extends TemplateResponse implements ICache
         /****************/
 
         $tabData = [];
-        $mails = new MailList();
+        $mails = new MailContainer();
         if (!$mails->error)
             $tabData['data'] = $mails->getListviewData();
 
@@ -50,7 +50,7 @@ class MailsBaseResponse extends TemplateResponse implements ICache
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
 
-        $this->lvTabs->addListviewTab(new Listview(['data' => $mails->getListviewData()], MailList::$brickFile, 'mail'));
+        $this->lvTabs->addListviewTab(new Listview(['data' => $mails->getListviewData()], Mail::$brickFile, 'mail'));
 
         parent::generate();
     }
