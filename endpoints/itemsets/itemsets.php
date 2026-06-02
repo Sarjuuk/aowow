@@ -33,7 +33,7 @@ class ItemsetsBaseResponse extends TemplateResponse implements ICache
         if ($this->category)
             $this->subCat = '='.implode('.', $this->category);
 
-        $this->filter = new ItemsetListFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
+        $this->filter = new ItemsetFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
         if ($this->filter->shouldReload)
         {
             $_SESSION['error']['fi'] = $this->filter::class;
@@ -84,9 +84,8 @@ class ItemsetsBaseResponse extends TemplateResponse implements ICache
             $this->fiMenuExtension = $fiQuery;
         }
 
-        $itemsets = new ItemsetList($conditions, ['calcTotal' => true]);
+        $itemsets = new ItemsetContainer($conditions, ['calcTotal' => true]);
         $this->extendGlobalData($itemsets->getJSGlobals());
-
         $tabData = ['data' => $itemsets->getListviewData()];
 
         if ($this->filter->fiExtraCols)
@@ -101,7 +100,7 @@ class ItemsetsBaseResponse extends TemplateResponse implements ICache
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
 
-        $this->lvTabs->addListviewTab(new Listview($tabData, ItemsetList::$brickFile));
+        $this->lvTabs->addListviewTab(new Listview($tabData, Itemset::$brickFile));
 
         parent::generate();
 
