@@ -50,7 +50,9 @@ trait TrSourceHelper
         $src = [];
         for ($i = SRC_CRAFTED; $i < MAX_SOURCES; $i++)
         {
-            $src[$i][] = $initData['src'.$i] ?: null;
+            if ($_ = ($initData['src'.$i] ?? null))
+                $src[$i][] = $_;
+
             unset($initData['src'.$i]);
         }
 
@@ -448,13 +450,12 @@ abstract class DBType
 
     public function __construct(
                   int|array $initData,
-        protected array     $extraOpts = [],
-        protected bool      $calcTotal = false
+        protected array     $extraOpts = []
     )
     {
         if (is_int($initData))
         {
-            $dbQuery = new DBQuery(static::QUERY_BASE, static::QUERY_OPTS, $this->extraOpts, $this->calcTotal);
+            $dbQuery = new DBQuery(static::QUERY_BASE, static::QUERY_OPTS, $this->extraOpts);
             if (!$dbQuery->build([['id', $initData]]))
                 return;
 

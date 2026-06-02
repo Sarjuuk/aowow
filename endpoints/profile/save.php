@@ -157,7 +157,7 @@ class ProfileSaveResponse extends TextResponse
                         continue;
 
                     // sub-item check
-                    if (!$items->getRandEnchantForItem($itemData[1]))
+                    if (!$items->fetchRandomEnchantment($itemData[1]))
                         $itemData[2] = 0;
 
                     // item sockets are fubar

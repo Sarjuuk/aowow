@@ -29,7 +29,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
     public ?array  $subItems    = null;
     public  array  $tooltip     = [];
 
-    private ItemList $subject;
+    private Item $subject;
 
     public function __construct(string $id)
     {
@@ -41,14 +41,14 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new ItemList(array(['i.id', $this->typeId]));
+        $this->subject = new Item($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('item'), Lang::item('notFound'));
 
-        $jsg = $this->subject->getJSGlobals(GLOBALINFO_EXTRA | GLOBALINFO_SELF, $extra);
+        $jsg = $this->subject->getJSGlobal(GLOBALINFO_EXTRA | GLOBALINFO_SELF, $extra);
         $this->extendGlobalData($jsg, $extra);
 
-        $this->h1 = UIText::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_HTML);
+        $this->h1 = UIText::unescapeUISequences($this->subject->name, Lang::FMT_HTML);
 
         $this->gPageInfo += array(
             'type'   => $this->type,
@@ -56,13 +56,13 @@ class ItemBaseResponse extends TemplateResponse implements ICache
             'name'   => $this->h1
         );
 
-        $_flags     = $this->subject->getField('flags');
-        $_slot      = $this->subject->getField('slot');
-        $_class     = $this->subject->getField('class');
-        $_subClass  = $this->subject->getField('subClass');
-        $_bagFamily = $this->subject->getField('bagFamily');
-        $_displayId = $this->subject->getField('displayId');
-        $_ilvl      = $this->subject->getField('itemLevel');
+        $_flags     = $this->subject->flags;
+        $_slot      = $this->subject->slot;
+        $_class     = $this->subject->class;
+        $_subClass  = $this->subject->subClass;
+        $_bagFamily = $this->subject->bagFamily;
+        $_displayId = $this->subject->displayId;
+        $_ilvl      = $this->subject->itemLevel;
 
 
         /*************/
@@ -77,14 +77,14 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         /* Page Title */
         /**************/
 
-        array_unshift($this->title, UIText::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_RAW), Util::ucFirst(Lang::game('item')));
+        array_unshift($this->title, UIText::unescapeUISequences($this->subject->name, Lang::FMT_RAW), Util::ucFirst(Lang::game('item')));
 
 
         /***********/
         /* Infobox */
         /***********/
 
-        $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
+        $infobox = Lang::getInfoBoxForFlags($this->subject->cuFlags);
 
         // itemlevel
         if ($_ilvl && in_array($_class, [ITEM_CLASS_ARMOR, ITEM_CLASS_WEAPON, ITEM_CLASS_AMMUNITION, ITEM_CLASS_GEM]))
@@ -107,7 +107,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         $infobox[] = Lang::item('id') . $this->typeId;
 
         // icon
-        if ($_ = $this->subject->getField('iconId'))
+        if ($_ = $this->subject->iconId)
         {
             $infobox[] = Util::ucFirst(Lang::game('icon')).Lang::main('colon').'[icondb='.$_.' name=true]';
             $this->extendGlobalIds(Type::ICON, $_);
@@ -117,14 +117,14 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         if (!$_slot)
         {
             $hasUse = false;
-            for ($i = 1; $i < 6; $i++)
+            foreach ($this->subject->spells as $idx => [ , $trigger, $charges, , , , ])
             {
-                if ($this->subject->getField('spellId'.$i) <= 0 || in_array($this->subject->getField('spellTrigger'.$i), [SPELL_TRIGGER_EQUIP, SPELL_TRIGGER_HIT]))
+                if ($trigger == SPELL_TRIGGER_EQUIP ||  $trigger ==  SPELL_TRIGGER_HIT)
                     continue;
 
                 $hasUse = true;
 
-                if ($this->subject->getField('spellCharges'.$i) >= 0)
+                if ($charges >= 0)
                     continue;
 
                 $tt = '[tooltip=tooltip_consumedonuse]'.Lang::item('consumable').'[/tooltip]';
@@ -136,22 +136,22 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         }
 
         // related holiday
-        if ($eId = $this->subject->getField('eventId'))
+        if ($eId = $this->subject->eventId)
         {
             $this->extendGlobalIds(Type::WORLDEVENT, $eId);
             $infobox[] = Lang::game('eventShort', ['[event='.$eId.']']);
         }
 
         // tool
-        if ($tId = $this->subject->getField('totemCategory'))
+        if ($tId = $this->subject->totemCategory)
             if ($tName = DB::Aowow()->selectRow('SELECT * FROM ::totemcategory WHERE `id` = %i', $tId))
                 $infobox[] = Lang::item('tool').'[url=?items&filter=cr=91;crs='.$tId.';crv=0]'.Util::localizedString($tName, 'name').'[/url]';
 
         // extendedCost
-        if (!empty($this->subject->getExtendedCost([], $_reqRating)[$this->typeId]))
+        if ($extCost = $this->subject->getExtendedCost(reqRating: $_reqRating, targetItem: $this->typeId))
         {
-            $vendors  = $this->subject->getExtendedCost()[$this->typeId];
-            $stack    = $this->subject->getField('buyCount');
+            $vendors  = array_pop($extCost);
+            $stack    = $this->subject->buyCount;
             $divisor  = $stack;
             $each     = '';
             $handled  = [];
@@ -163,41 +163,32 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                     $tokens   = [];
                     $currency = [];
 
-                    if (!is_array($data))
-                        continue;
-
                     foreach ($data as $c => $qty)
                     {
                         if (is_string($c))
-                        {
-                            unset($data[$c]);               // unset miscData to prevent having two vendors /w the same cost being cached, because of different stock or rating-requirements
                             continue;
-                        }
+
+                        if (is_float($qty / $stack))
+                            $divisor = 1;
 
                         if ($c < 0)                         // currency items (and honor or arena)
                         {
-                            if (is_float($qty / $stack))
-                                $divisor = 1;
-
                             $currency[] = [-$c, $qty];
                             $this->extendGlobalIds(Type::CURRENCY, -$c);
                         }
                         else if ($c > 0)                    // plain items (item1,count1,item2,count2,...)
                         {
-                            if (is_float($qty / $stack))
-                                $divisor = 1;
-
                             $tokens[] = [$c, $qty];
                             $this->extendGlobalIds(Type::ITEM, $c);
                         }
                     }
 
                     // display every cost-combination only once
-                    $hash = md5(serialize($data));
-                    if (in_array($hash, $handled))
+                    $final = [$data[0] ?? 0, $currency, $tokens];
+                    if (in_array($final, $handled))
                         continue;
 
-                    $handled[] = $hash;
+                    $handled[] = $final;
 
                     if (isset($data[0]))
                     {
@@ -209,19 +200,10 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                     else
                         $cost = '[money';
 
-                    $stringify = fn(&$x) => $x = $x[0] . ',' . ($x[1] / $divisor);
-
                     if ($tokens)
-                    {
-                        array_walk($tokens, $stringify);
-                        $cost .= ' items='.implode(',', $tokens);
-                    }
-
+                        $cost .= ' items='.array_reduce($tokens, fn($out, $x) => $out .= ($out ? ',' : '') . $x[0] . ',' . ($x[1] / $divisor));
                     if ($currency)
-                    {
-                        array_walk($currency, $stringify);
-                        $cost .= ' currency='.implode(',', $currency);
-                    }
+                        $cost .= ' currency='.array_reduce($currency, fn($out, $x) => $out .= ($out ? ',' : '') . $x[0] . ',' . ($x[1] / $divisor));
 
                     $cost .= ']';
 
@@ -239,33 +221,33 @@ class ItemBaseResponse extends TemplateResponse implements ICache
             else if (count($costList) > 1)
                 $infobox[] = Lang::item('cost').$each.Lang::main('colon').'[ul][li]'.implode('[/li][li]', $costList).'[/li][/ul]';
 
-            if ($_reqRating && $_reqRating[0])
+            if ([$rating, $bracket] = $_reqRating)
             {
-                $text = str_replace('<br />', ' ', Lang::item('reqRating', $_reqRating[1], [$_reqRating[0]]));
+                $text = str_replace('<br />', ' ', Lang::item('reqRating', $rating, [$bracket]));
                 $infobox[] = Lang::breakTextClean($text, 30, Lang::FMT_MARKUP);
             }
         }
 
         // repair cost
-        if ($_ = $this->subject->getField('repairPrice'))
+        if ($_ = $this->subject->repairPrice)
             $infobox[] = Lang::item('repairCost').'[money='.$_.']';
 
         // avg auction buyout
-        if (in_array($this->subject->getField('bonding'), [0, 2, 3]))
+        if (in_array($this->subject->bonding, [0, 2, 3]))
             if ($_ = Profiler::getBuyoutForItem($this->typeId))
                 $infobox[] = '[tooltip=tooltip_buyoutprice]'.Lang::item('buyout.').'[/tooltip]'.Lang::main('colon').'[money='.$_.']'.$each;
 
         // avg money contained
         if ($_flags & ITEM_FLAG_OPENABLE)
-            if ($_ = intVal(($this->subject->getField('minMoneyLoot') + $this->subject->getField('maxMoneyLoot')) / 2))
+            if ($_ = intVal(($this->subject->minMoneyLoot + $this->subject->maxMoneyLoot) / 2))
                 $infobox[] = Lang::item('worth').'[tooltip=tooltip_avgmoneycontained][money='.$_.'][/tooltip]';
 
         // if it goes into a slot it may be disenchanted
         if ($_slot && $_class != ITEM_CLASS_CONTAINER)
         {
-            if ($this->subject->getField('disenchantId'))
+            if ($this->subject->disenchantId)
             {
-                $_ = $this->subject->getField('requiredDisenchantSkill');
+                $_ = $this->subject->requiredDisenchantSkill;
                 if ($_ < 1)                                 // these are some items, that never went live .. extremely rough emulation here
                     $_ = intVal($_ilvl / 7.5) * 25;
 
@@ -275,16 +257,16 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                 $infobox[] = Lang::item('cantDisenchant');
         }
 
-        if (($_flags & ITEM_FLAG_MILLABLE) && $this->subject->getField('requiredSkill') == SKILL_INSCRIPTION)
+        if (($_flags & ITEM_FLAG_MILLABLE) && $this->subject->requiredSkill == SKILL_INSCRIPTION)
         {
-            $infobox[] = Lang::item('millable').'&nbsp;([tooltip=tooltip_reqinscription]'.$this->subject->getField('requiredSkillRank').'[/tooltip])';
-            $infobox[] = Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill(SKILL_INSCRIPTION, $this->subject->getField('requiredSkillRank')));
+            $infobox[] = Lang::item('millable').'&nbsp;([tooltip=tooltip_reqinscription]'.$this->subject->requiredSkillRank.'[/tooltip])';
+            $infobox[] = Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill(SKILL_INSCRIPTION, $this->subject->requiredSkillRank));
         }
 
-        if (($_flags & ITEM_FLAG_PROSPECTABLE) && $this->subject->getField('requiredSkill') == SKILL_JEWELCRAFTING)
+        if (($_flags & ITEM_FLAG_PROSPECTABLE) && $this->subject->requiredSkill == SKILL_JEWELCRAFTING)
         {
-            $infobox[] = Lang::item('prospectable').'&nbsp;([tooltip=tooltip_reqjewelcrafting]'.$this->subject->getField('requiredSkillRank').'[/tooltip])';
-            $infobox[] = Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill(SKILL_JEWELCRAFTING, $this->subject->getField('requiredSkillRank')));
+            $infobox[] = Lang::item('prospectable').'&nbsp;([tooltip=tooltip_reqjewelcrafting]'.$this->subject->requiredSkillRank.'[/tooltip])';
+            $infobox[] = Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill(SKILL_JEWELCRAFTING, $this->subject->requiredSkillRank));
         }
 
         if ($_flags & ITEM_FLAG_DEPRECATED)
@@ -312,7 +294,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
             $infobox[] = Lang::item('useInShape');
 
         // cant roll need
-        if ($this->subject->getField('flagsExtra') & 0x0100)
+        if ($this->subject->flagsExtra & 0x0100)
             $infobox[] = '[tooltip=tooltip_cannotrollneed]'.Lang::item('noNeedRoll').'[/tooltip]';
 
         // fits into keyring
@@ -323,9 +305,9 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
         // original name
         if (Lang::getLocale() != Locale::EN)
-            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.$this->subject->getField('name_loc0').'[/copy][/li]';
+            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.($this->subject->name)(Locale::EN).'[/copy][/li]';
 
-        $hasCompletion = !($this->subject->getField('cuFlags') & CUSTOM_EXCLUDE_FOR_LISTVIEW) && ($_class == ITEM_CLASS_RECIPE || ($_class == ITEM_CLASS_MISC && in_array($_subClass, [2, 5, -7])));
+        $hasCompletion = !($this->subject->cuFlags & CUSTOM_EXCLUDE_FOR_LISTVIEW) && ($_class == ITEM_CLASS_RECIPE || ($_class == ITEM_CLASS_MISC && in_array($_subClass, [2, 5, -7])));
         if ($infobox)
             $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0', $hasCompletion);
 
@@ -338,13 +320,13 @@ class ItemBaseResponse extends TemplateResponse implements ICache
             $this->addDataLoader('weight-presets');
 
         // pageText
-        if ($this->book = Game::getBook($this->subject->getField('pageTextId')))
+        if ($this->book = Game::getBook($this->subject->pageTextId))
             $this->addScript(
                 [SC_JS_FILE,  'js/Book.js'],
                 [SC_CSS_FILE, 'css/Book.css']
             );
 
-        $this->tooltip    = [$this->subject->getField('iconString'), $this->subject->getField('stackable'), false];
+        $this->tooltip    = [$this->subject->icon, $this->subject->stackable, false];
         $this->redButtons = array(
             BUTTON_WOWHEAD => true,
             BUTTON_VIEW3D  => $this->subject->isDisplayable() ? ['displayId' => $_displayId, 'slot' => $_slot, 'type' => Type::ITEM, 'typeId' => $this->typeId] : false,
@@ -352,16 +334,16 @@ class ItemBaseResponse extends TemplateResponse implements ICache
             BUTTON_EQUIP   => in_array($_class, [ITEM_CLASS_WEAPON, ITEM_CLASS_ARMOR]) && User::getCharacters(),
             BUTTON_UPGRADE => $canBeWeighted ? ['class' => $_class, 'slot' => $_slot] : false,
             BUTTON_LINKS   => array(
-                'linkColor' => 'ff'.Game::$rarityColorStings[$this->subject->getField('quality')],
+                'linkColor' => 'ff'.Game::$rarityColorStings[$this->subject->quality],
                 'linkId'    => 'item:'.$this->typeId.':0:0:0:0:0:0:0:0',
-                'linkName'  => UIText::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_RAW),
+                'linkName'  => UIText::unescapeUISequences($this->subject->name, Lang::FMT_RAW),
                 'type'      => $this->type,
                 'typeId'    => $this->typeId
             )
         );
 
         // availablility
-        $this->unavailable = !!($this->subject->getField('cuFlags') & CUSTOM_UNAVAILABLE);
+        $this->unavailable = !!($this->subject->cuFlags & CUSTOM_UNAVAILABLE);
 
         // subItems
         $this->subject->initSubItems();
@@ -371,7 +353,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
             $this->subItems = array(
                 'data'    => array_values($this->subject->subItems[$this->typeId]),
                 'randIds' => array_keys($this->subject->subItems[$this->typeId]),
-                'quality' => $this->subject->getField('quality')
+                'quality' => $this->subject->quality
             );
 
             // merge identical stats and names for normal users (e.g. spellPower of a specific school became general spellPower with 3.0)
@@ -398,14 +380,14 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         // factionchange-equivalent
         if ($pendant = DB::World()->selectCell('SELECT IF(`horde_id` = %i, `alliance_id`, -`horde_id`) FROM player_factionchange_items WHERE `alliance_id` = %i OR `horde_id` = %i', $this->typeId, $this->typeId, $this->typeId))
         {
-            $altItem = new ItemList(array(['id', abs($pendant)]));
+            $altItem = new Item(abs($pendant));
             if (!$altItem->error)
             {
                 $this->transfer = Lang::item('_transfer', [
                     $altItem->id,
-                    $altItem->getField('quality'),
-                    $altItem->getField('iconString'),
-                    $altItem->getField('name', true),
+                    $altItem->quality,
+                    $altItem->icon,
+                    $altItem->name,
                     $pendant > 0 ? 'alliance' : 'horde',
                     $pendant > 0 ? Lang::game('si', SIDE_ALLIANCE) : Lang::game('si', SIDE_HORDE)
                 ]);
@@ -422,7 +404,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         // tab: createdBy (perfect item specific)
         if ($perfItem = DB::World()->selectAssoc('SELECT *, `spellId` AS ARRAY_KEY FROM skill_perfect_item_template WHERE `perfectItemType` = %i', $this->typeId))
         {
-            $perfSpells = new SpellList(array(['id', array_column($perfItem, 'spellId')]));
+            $perfSpells = new SpellContainer(array(['id', array_column($perfItem, 'spellId')]));
             if (!$perfSpells->error)
             {
                 $lvData = $perfSpells->getListviewData();
@@ -440,7 +422,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                     'name'      => '$LANG.tab_createdby',
                     'id'        => 'created-by',            // should by exclusive with created-by from spell_loot
                     'extraCols' => ['$Listview.extraCols.percent', '$Listview.extraCols.condition']
-                ), SpellList::$brickFile));
+                ), Spell::$brickFile));
             }
         }
 
@@ -462,23 +444,27 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                 if ($idx == LootByItem::ITEM_DISENCHANTED)
                     $tabData['note'] = sprintf(Util::$filterResultString, '?items&filter=cr=163;crs='.$this->typeId.';crv=0');
 
-                if ($idx == LootByItem::NPC_DROPPED && $this->subject->getSources($s, $sm) && $s[0] == SRC_DROP && isset($sm[0]['dd']))
-                    $tabData['note'] = match($sm[0]['dd'])
-                    {
-                        -1      => '$LANG.lvnote_itemdropsinnormalonly',
-                        -2      => '$LANG.lvnote_itemdropsinheroiconly',
-                        -3      => '$LANG.lvnote_itemdropsinnormalheroic',
-                         1      => '$LANG.lvnote_itemdropsinnormal10only',
-                         2      => '$LANG.lvnote_itemdropsinnormal25only',
-                         3      => '$LANG.lvnote_itemdropsinheroic10only',
-                         4      => '$LANG.lvnote_itemdropsinheroic25only',
-                        default => null
-                    };
+                if ($idx == LootByItem::NPC_DROPPED)
+                {
+                    $this->subject->prepareSourceMore();
+                    if ([$s, $sm] = $this->subject->getSources() && $s[0] == SRC_DROP && isset($sm[0]['dd']))
+                        $tabData['note'] = match($sm[0]['dd'])
+                        {
+                            -1      => '$LANG.lvnote_itemdropsinnormalonly',
+                            -2      => '$LANG.lvnote_itemdropsinheroiconly',
+                            -3      => '$LANG.lvnote_itemdropsinnormalheroic',
+                            1      => '$LANG.lvnote_itemdropsinnormal10only',
+                            2      => '$LANG.lvnote_itemdropsinnormal25only',
+                            3      => '$LANG.lvnote_itemdropsinheroic10only',
+                            4      => '$LANG.lvnote_itemdropsinheroic25only',
+                            default => null
+                        };
+                }
 
                 if ($idx == LootByItem::OBJECT_FISHED && !$this->map)
                 {
                     $nodeIds  = array_map(fn($x) => $x['id'], $tabData['data']);
-                    $fishedIn = new GameObjectList(array(['id', $nodeIds]));
+                    $fishedIn = new GameObjectContainer(array(['id', $nodeIds]));
                     if (!$fishedIn->error)
                     {
                         // show mapper for fishing locations
@@ -506,10 +492,10 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
         // tabs: this item contains..
         $sourceFor = array(
-            [Loot::ITEM,        $this->typeId,                            '$LANG.tab_contains',      'contains',      ['$Listview.extraCols.percent'], []                          ],
-            [Loot::PROSPECTING, $this->typeId,                            '$LANG.tab_prospecting',   'prospecting',   ['$Listview.extraCols.percent'], ['side', 'slot', 'reqlevel']],
-            [Loot::MILLING,     $this->typeId,                            '$LANG.tab_milling',       'milling',       ['$Listview.extraCols.percent'], ['side', 'slot', 'reqlevel']],
-            [Loot::DISENCHANT,  $this->subject->getField('disenchantId'), '$LANG.tab_disenchanting', 'disenchanting', ['$Listview.extraCols.percent'], ['side', 'slot', 'reqlevel']]
+            [Loot::ITEM,        $this->typeId,                '$LANG.tab_contains',      'contains',      ['$Listview.extraCols.percent'], []                          ],
+            [Loot::PROSPECTING, $this->typeId,                '$LANG.tab_prospecting',   'prospecting',   ['$Listview.extraCols.percent'], ['side', 'slot', 'reqlevel']],
+            [Loot::MILLING,     $this->typeId,                '$LANG.tab_milling',       'milling',       ['$Listview.extraCols.percent'], ['side', 'slot', 'reqlevel']],
+            [Loot::DISENCHANT,  $this->subject->disenchantId, '$LANG.tab_disenchanting', 'disenchanting', ['$Listview.extraCols.percent'], ['side', 'slot', 'reqlevel']]
         );
 
         foreach ($sourceFor as [$lootTemplate, $lootId, $tabName, $tabId, $extraCols, $hiddenCols])
@@ -533,12 +519,12 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                 if ($hiddenCols)
                     $tabData['hiddenCols'] = array_unique($hiddenCols);
 
-                $this->lvTabs->addListviewTab(new Listview($tabData, ItemList::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview($tabData, Item::$brickFile));
             }
         }
 
-        // append spell loot mimicking item opening
-        if ($this->subject->getField('spellTrigger1') === SPELL_TRIGGER_USE && ($s = $this->subject->getField('spellId1')))
+        // append spell loot mimicking item opening, alsways first spell on item
+        if (isset($this->subject->spells[0]) && $this->subject->spells[0][1] === SPELL_TRIGGER_USE && ($s = $this->subject->spells[0][0]))
         {
             if (($spellLoot = new LootByContainer())->getByContainer(Loot::SPELL, [$s]))
             {
@@ -562,14 +548,14 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                         'id'              => 'contains',
                         'computeDataFunc' => '$Listview.funcBox.initLootTable',
                         'extraCols'       => array_merge(['$Listview.extraCols.percent'], $spellLoot->extraCols)
-                    ), ItemList::$brickFile));
+                    ), Item::$brickFile));
             }
         }
 
         // tab: container can contain
-        if ($this->subject->getField('slots') > 0)
+        if ($this->subject->slots > 0)
         {
-            $contains = new ItemList(array(['bagFamily', $_bagFamily, '&'], ['slots', 1, '<']));
+            $contains = new ItemContainer(array(['bagFamily', $_bagFamily, '&'], ['slots', 1, '<']));
             if (!$contains->error)
             {
                 $this->extendGlobalData($contains->getJSGlobals(GLOBALINFO_SELF));
@@ -583,14 +569,14 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                     'name'       => '$LANG.tab_cancontain',
                     'id'         => 'can-contain',
                     'hiddenCols' => $hCols
-                ), ItemList::$brickFile));
+                ), Item::$brickFile));
             }
         }
 
         // tab: can be contained in (except keys)
         else if ($_bagFamily != 0x0100)
         {
-            $contains = new ItemList(array(['bagFamily', $_bagFamily, '&'], ['slots', 0, '>']));
+            $contains = new ItemContainer(array(['bagFamily', $_bagFamily, '&'], ['slots', 0, '>']));
             if (!$contains->error)
             {
                 $this->extendGlobalData($contains->getJSGlobals(GLOBALINFO_SELF));
@@ -600,7 +586,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                     'name'       => '$LANG.tab_canbeplacedin',
                     'id'         => 'can-be-placed-in',
                     'hiddenCols' => ['side']
-                ), ItemList::$brickFile));
+                ), Item::$brickFile));
             }
         }
 
@@ -610,7 +596,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
             ['ac.value1', $this->typeId]
         );
 
-        $criteriaOf = new AchievementList($conditions);
+        $criteriaOf = new AchievementContainer($conditions);
         if (!$criteriaOf->error)
         {
             $this->extendGlobalData($criteriaOf->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_REWARDS));
@@ -625,7 +611,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
             if (!$criteriaOf->hasSetFields('reward_loc0'))
                 $tabData['hiddenCols'] = ['rewards'];
 
-            $this->lvTabs->addListviewTab(new Listview($tabData, AchievementList::$brickFile));
+            $this->lvTabs->addListviewTab(new Listview($tabData, Achievement::$brickFile));
         }
 
         // tab: reagent for
@@ -635,7 +621,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
             ['reagent5', $this->typeId], ['reagent6', $this->typeId], ['reagent7', $this->typeId], ['reagent8', $this->typeId]
         );
 
-        $reagent = new SpellList($conditions);
+        $reagent = new SpellContainer($conditions);
         if (!$reagent->error)
         {
             $this->extendGlobalData($reagent->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
@@ -645,7 +631,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                 'name'        => '$LANG.tab_reagentfor',
                 'id'          => 'reagent-for',
                 'visibleCols' => ['reagents']
-            ), SpellList::$brickFile));
+            ), Spell::$brickFile));
         }
 
         // tab: unlocks (object or item)
@@ -661,7 +647,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         if ($lockIds)
         {
             // objects
-            $lockedObj = new GameObjectList(array(['lockId', $lockIds]));
+            $lockedObj = new GameobjectContainer(array(['lockId', $lockIds]));
             if (!$lockedObj->error)
             {
                 $this->addDataLoader('zones');
@@ -669,11 +655,11 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                     'data' => $lockedObj->getListviewData(),
                     'name' => '$LANG.tab_unlocks',
                     'id'   => 'unlocks-object',
-                ), GameObjectList::$brickFile));
+                ), Gameobject::$brickFile));
             }
 
             // items (generally unused. It's the spell on the item, that unlocks stuff)
-            $lockedItm = new ItemList(array(['lockId', $lockIds]));
+            $lockedItm = new ItemContainer(array(['lockId', $lockIds]));
             if (!$lockedItm->error)
             {
                 $this->extendGlobalData($lockedItm->getJSGlobals(GLOBALINFO_SELF));
@@ -682,14 +668,14 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                     'data' => $lockedItm->getListviewData(),
                     'name' => '$LANG.tab_unlocks',
                     'id'   => 'unlocks-item'
-                ), ItemList::$brickFile));
+                ), Item::$brickFile));
             }
         }
 
         // tab: starts (quest)
-        if ($qId = $this->subject->getField('startQuest'))
+        if ($qId = $this->subject->startQuest)
         {
-            $starts = new QuestList(array(['id', $qId]));
+            $starts = new QuestContainer(array(['id', $qId]));
             if (!$starts->error)
             {
                 $this->extendGlobalData($starts->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_REWARDS));
@@ -698,7 +684,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                     'data' => $starts->getListviewData(),
                     'name' => '$LANG.tab_starts',
                     'id'   => 'starts-quest'
-                ), QuestList::$brickFile));
+                ), Quest::$brickFile));
             }
         }
 
@@ -708,7 +694,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
             ['reqItemId1', $this->typeId], ['reqItemId2', $this->typeId], ['reqItemId3', $this->typeId],
             ['reqItemId4', $this->typeId], ['reqItemId5', $this->typeId], ['reqItemId6', $this->typeId]
         );
-        $objective = new QuestList($conditions);
+        $objective = new QuestContainer($conditions);
         if (!$objective->error)
         {
             $this->extendGlobalData($objective->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_REWARDS));
@@ -717,7 +703,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                 'data' => $objective->getListviewData(),
                 'name' => '$LANG.tab_objectiveof',
                 'id'   => 'objective-of-quest'
-            ), QuestList::$brickFile));
+            ), Quest::$brickFile));
         }
 
         // tab: provided for (quest)
@@ -726,7 +712,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
             ['reqSourceItemId1', $this->typeId], ['reqSourceItemId2', $this->typeId],
             ['reqSourceItemId3', $this->typeId], ['reqSourceItemId4', $this->typeId]
         );
-        $provided = new QuestList($conditions);
+        $provided = new QuestContainer($conditions);
         if (!$provided->error)
         {
             $this->extendGlobalData($provided->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_REWARDS));
@@ -735,14 +721,14 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                 'data' => $provided->getListviewData(),
                 'name' => '$LANG.tab_providedfor',
                 'id'   => 'provided-for-quest'
-            ), QuestList::$brickFile));
+            ), Quest::$brickFile));
         }
 
         // tab: sold by
-        if (!empty($this->subject->getExtendedCost()[$this->typeId]))
+        if ($vendorData = $this->subject->getVendorData(targetItem: $this->typeId))
         {
-            $vendors = $this->subject->getExtendedCost()[$this->typeId];
-            $soldBy  = new CreatureList(array(['id', array_keys($vendors)]));
+            $vendors = array_pop($vendorData);
+            $soldBy  = new CreatureContainer(array(['id', array_keys($vendors)]));
             if (!$soldBy->error)
             {
                 // show mapper for vendors
@@ -795,13 +781,13 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                     if ($tokens)
                         $row['cost'][] = $tokens;
 
-                    if ($x = $this->subject->getField('buyPrice'))
+                    if ($x = $this->subject->buyPrice)
                         $row['buyprice'] = $x;
 
-                    if ($x = $this->subject->getField('sellPrice'))
+                    if ($x = $this->subject->sellPrice)
                         $row['sellprice'] = $x;
 
-                    if ($x = $this->subject->getField('buyCount'))
+                    if ($x = $this->subject->buyCount)
                         $row['stack'] = $x;
                 }
 
@@ -815,7 +801,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                     'id'         => 'sold-by-npc',
                     'extraCols'  => $extraCols,
                     'hiddenCols' => ['level', 'type']
-                ), CreatureList::$brickFile));
+                ), Creature::$brickFile));
             }
         }
 
@@ -835,18 +821,18 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         else
             $w = '`reqItemId1` = '.$this->typeId.' OR `reqItemId2` = '.$this->typeId.' OR `reqItemId3` = '.$this->typeId.' OR `reqItemId4` = '.$this->typeId.' OR `reqItemId5` = '.$this->typeId;
 
-        if (!$n && !is_null(ItemListFilter::getCriteriaIndex(158, $this->typeId)))
+        if (!$n && !is_null(ItemFilter::getCriteriaIndex(158, $this->typeId)))
             $n = '?items&filter=cr=158;crs='.$this->typeId.';crv=0';
 
         $xCosts   = DB::Aowow()->selectCol('SELECT `id` FROM ::itemextendedcost WHERE '.$w);
         $boughtBy = $xCosts ? DB::World()->selectCol('SELECT `item` FROM npc_vendor WHERE `extendedCost` IN %in UNION SELECT `item` FROM game_event_npc_vendor WHERE `extendedCost` IN %in', $xCosts, $xCosts) : null;
         if ($boughtBy)
         {
-            $boughtBy = new ItemList(array(['id', $boughtBy]));
+            $boughtBy = new ItemContainer(array(['id', $boughtBy]));
             if (!$boughtBy->error)
             {
-                $iCur   = new CurrencyList(array(['itemId', $this->typeId]));
-                $filter = $iCur->error ? [Type::ITEM => $this->typeId] : [Type::CURRENCY => $iCur->id];
+                $iCur = DB::Aowow()->selectCell('SELECT id FROM ::currency WHERE `itemId` = %i', $this->typeId);
+                $filter = $iCur ? [Type::ITEM => $this->typeId] : [Type::CURRENCY => $iCur];
 
                 $tabData = array(
                     'data'      => $boughtBy->getListviewData(LISTVIEWINFO_VENDOR, $filter),
@@ -858,7 +844,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                 if ($n)
                     $tabData['note'] = sprintf(Util::$filterResultString, $n);
 
-                $this->lvTabs->addListviewTab(new Listview($tabData, ItemList::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview($tabData, Item::$brickFile));
 
                 $this->extendGlobalData($boughtBy->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
             }
@@ -866,29 +852,29 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
         // tab: teaches
         $ids = $indirect = [];
+        foreach ($this->subject->spells as $idx => [$spellId, $trigger, , , , , ])
         for ($i = 1; $i < 6; $i++)
         {
-            if ($this->subject->getField('spellTrigger'.$i) == SPELL_TRIGGER_LEARN)
-                $ids[] = $this->subject->getField('spellId'.$i);
-            else if ($this->subject->getField('spellTrigger'.$i) == SPELL_TRIGGER_USE && $this->subject->getField('spellId'.$i) > 0)
-                $indirect[] = $this->subject->getField('spellId'.$i);
+            if ($trigger == SPELL_TRIGGER_LEARN)
+                $ids[] = $spellId;
+            else if ($trigger == SPELL_TRIGGER_USE && $spellId > 0)
+                $indirect[] = $spellId;
         }
 
         // taught indirectly
         if ($indirect)
         {
-            $indirectSpells = new SpellList(array(['id', $indirect]));
-            foreach ($indirectSpells->iterate() as $__)
-                if ($_ = $indirectSpells->canTeachSpell())
-                    foreach ($_ as $idx)
-                        $ids[] = $indirectSpells->getField('effect'.$idx.'TriggerSpell');
+            $indirectSpells = new SpellContainer(array(['id', $indirect]));
+            foreach ($indirectSpells->iterate() as $spellEntry)
+                foreach ($spellEntry->canTeachSpell() as $idx)
+                    $ids[] = $spellEntry->effectTriggerSpell[$idx];
 
             $ids = array_merge($ids, Game::getTaughtSpells($indirect));
         }
 
         if ($ids)
         {
-            $taughtSpells = new SpellList(array(['id', $ids]));
+            $taughtSpells = new SpellContainer(array(['id', $ids]));
             if (!$taughtSpells->error)
             {
                 $this->extendGlobalData($taughtSpells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
@@ -902,7 +888,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                     'name'        => '$LANG.tab_teaches',
                     'id'          => 'teaches',
                     'visibleCols' => $visCols
-                ), SpellList::$brickFile));
+                ), Spell::$brickFile));
             }
         }
 
@@ -911,7 +897,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
             ['id', $this->typeId, '!'],
             [
                 DB::OR,
-                ['name_loc'.Lang::getLocale()->value, $this->subject->getField('name', true)],
+                ['name_loc'.Lang::getLocale()->value, $this->subject->name],
                 [
                     DB::AND,
                     ['class',         $_class],
@@ -919,16 +905,16 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                     ['slot',          $_slot],
                     ['itemLevel',     $_ilvl - 15, '>'],
                     ['itemLevel',     $_ilvl + 15, '<'],
-                    ['quality',       $this->subject->getField('quality')],
-                    ['requiredClass', $this->subject->getField('requiredClass')]
+                    ['quality',       $this->subject->quality],
+                    ['requiredClass', $this->subject->requiredClass]
                 ]
             ]
         );
 
-        if ($_ = $this->subject->getField('itemset'))
+        if ($_ = $this->subject->itemset)
             $conditions[1][] = [DB::AND, ['slot', $_slot], ['itemset', $_]];
 
-        $saItems = new ItemList($conditions);
+        $saItems = new ItemContainer($conditions);
         if (!$saItems->error)
         {
             $this->extendGlobalData($saItems->getJSGlobals(GLOBALINFO_SELF));
@@ -937,14 +923,14 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                 'data' => $saItems->getListviewData(),
                 'name' => '$LANG.tab_seealso',
                 'id'   => 'see-also'
-            ), ItemList::$brickFile));
+            ), Item::$brickFile));
         }
 
         // tab: same model as
         // todo (low): should also work for creatures summoned by item
-        if (($model = $this->subject->getField('model')) && $_slot)
+        if ($this->subject->model && $_slot)
         {
-            $sameModel = new ItemList(array(['model', $model], ['id', $this->typeId, '!'], ['slot', $_slot]));
+            $sameModel = new ItemContainer(array(['model', $this->subject->model], ['id', $this->typeId, '!'], ['slot', $_slot]));
             if (!$sameModel->error)
             {
                 $this->extendGlobalData($sameModel->getJSGlobals(GLOBALINFO_SELF));
@@ -961,15 +947,14 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         // tab: Shared cooldown
         $cdCats    = [];
         $useSpells = [];
-        for ($i = 1; $i < 6; $i++)
+        foreach ($this->subject->spells as $idx => [$spellId , , , , , $category, ])
         {
             // as defined on item
-            if ($this->subject->getField('spellId'.$i) > 0 && $this->subject->getField('spellCategory'.$i) > 0)
-                $cdCats[] = $this->subject->getField('spellCategory'.$i);
+            if ($category > 0)
+                $cdCats[] = $category;
 
             // as defined in spell
-            if ($this->subject->getField('spellId'.$i) > 0)
-                $useSpells[] = $this->subject->getField('spellId'.$i);
+            $useSpells[] = $spellId;
         }
         if ($useSpells)
             if ($_ = DB::Aowow()->selectCol('SELECT `category` FROM ::spell WHERE `id` IN %in AND `recoveryCategory` > 0', $useSpells))
@@ -993,14 +978,14 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                 for ($i = 1; $i < 6; $i++)
                     $conditions[1][] = ['spellId'.$i, $spellsByCat];
 
-            $cdItems = new ItemList($conditions);
+            $cdItems = new ItemContainer($conditions);
             if (!$cdItems->error)
             {
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data' => $cdItems->getListviewData(),
                     'name' => '$LANG.tab_sharedcooldown',
                     'id'   => 'shared-cooldown'
-                ), ItemList::$brickFile));
+                ), Item::$brickFile));
 
                 $this->extendGlobalData($cdItems->getJSGlobals(GLOBALINFO_SELF));
             }
@@ -1011,18 +996,17 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         if ($_class == ITEM_CLASS_WEAPON)
         {
             $scm = (1 << $_subClass);
-            if ($this->subject->getField('soundOverrideSubclass') > 0)
-                $scm = (1 << $this->subject->getField('soundOverrideSubclass'));
+            if ($this->subject->soundOverrideSubclass > 0)
+                $scm = (1 << $this->subject->soundOverrideSubclass);
 
             $soundIds = DB::Aowow()->selectCol('SELECT `soundId` FROM ::items_sounds WHERE `subClassMask` & %i', $scm);
         }
 
-        $fields = ['pickUpSoundId', 'dropDownSoundId', 'sheatheSoundId', 'unsheatheSoundId'];
-        foreach ($fields as $f)
-            if ($x = $this->subject->getField($f))
+        foreach (['pickUpSoundId', 'dropDownSoundId', 'sheatheSoundId', 'unsheatheSoundId'] as $f)
+            if ($x = $this->subject->$f)
                 $soundIds[] = $x;
 
-        if ($x = $this->subject->getField('spellVisualId'))
+        if ($x = $this->subject->spellVisualId)
         {
             if ($spellSounds = DB::Aowow()->selectRow('SELECT * FROM ::spell_sounds WHERE `id` = %i', $x))
             {
@@ -1035,11 +1019,11 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
         if ($soundIds)
         {
-            $sounds = new SoundList(array(['id', $soundIds]));
+            $sounds = new SoundContainer(array(['id', $soundIds]));
             if (!$sounds->error)
             {
                 $this->extendGlobalData($sounds->getJSGlobals(GLOBALINFO_SELF));
-                $this->lvTabs->addListviewTab(new Listview(['data' => $sounds->getListviewData()], SoundList::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview(['data' => $sounds->getListviewData()], Sound::$brickFile));
             }
         }
 
@@ -1063,10 +1047,10 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
     private function followBreadcrumbPath() : array
     {
-        $c    = $this->subject->getField('class');
-        $sc   = $this->subject->getField('subClass');
-        $ssc  = $this->subject->getField('subSubClass');
-        $slot = $this->subject->getField('slot');
+        $c    = $this->subject->class;
+        $sc   = $this->subject->subClass;
+        $ssc  = $this->subject->subSubClass;
+        $slot = $this->subject->slot;
 
         if ($c == ITEM_CLASS_REAGENT)
             return [ITEM_CLASS_MISC, 1];                    // misc > reagents

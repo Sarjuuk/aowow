@@ -8,10 +8,6 @@ if (!defined('AOWOW_REVISION'))
 
 class Game
 {
-    public static array $resistanceFields         = array(
-        null,           'resHoly',      'resFire',      'resNature',    'resFrost',     'resShadow',    'resArcane'
-    );
-
     public static array $rarityColorStings        = array(  // zero-indexed
         '9d9d9d',       'ffffff',       '1eff00',       '0070dd',       'a335ee',       'ff8000',       'e5cc80',       'e6cc80'
     );

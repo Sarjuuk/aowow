@@ -46,7 +46,7 @@ class ItemPowerResponse extends TextResponse implements ICache
 
     protected function generate() : void
     {
-        $item = new ItemList(array(['i.id', $this->typeId]));
+        $item = new Item($this->typeId, ['enhance' => $this->enhancedTT]);
         if ($item->error)
             $this->cacheType = CACHE_TYPE_NONE;
         else
@@ -56,10 +56,10 @@ class ItemPowerResponse extends TextResponse implements ICache
                 $itemString .= $k.(is_array($val) ? implode(',', $val) : $val);
 
             $opts = array(
-                'name'    => UIText::unescapeUISequences($item->getField('name', true, false, $this->enhancedTT), Lang::FMT_RAW),
-                'tooltip' => $item->renderTooltip(enhance: $this->enhancedTT),
-                'icon'    => $item->getField('iconString'),
-                'quality' => $item->getField('quality')
+                'name'    => UIText::unescapeUISequences($item->getNameWithSuffix(), Lang::FMT_RAW),
+                'tooltip' => $item->renderTooltip(),
+                'icon'    => $item->icon,
+                'quality' => $item->quality
             );
         }
 
