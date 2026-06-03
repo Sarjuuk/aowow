@@ -42,10 +42,13 @@ trait TrSourceHelper
     public readonly ?int   $moreMask;                       // srcFlags
 
     // the result for js
-    private ?array $source     = null;
+    public  ?array $source     = null;                      // NOTE! set public because of titles. Never used for anything else? Why cant ttles be handled like the rest? todo: investigate
     private ?array $sourceMore = null;
 
-    private function initSources(array &$initData) : void
+    /**
+     * titles are special and can have an additional achievement source (12) stored in titles table
+     */
+    private function initSources(array &$initData, int $extSrc12 = 0) : void
     {
         $src = [];
         for ($i = SRC_CRAFTED; $i < MAX_SOURCES; $i++)
@@ -55,6 +58,9 @@ trait TrSourceHelper
 
             unset($initData['src'.$i]);
         }
+
+        if ($extSrc12)
+            $src[SRC_ACHIEVEMENT][] = $extSrc12;
 
         $this->sources = $src;
 
