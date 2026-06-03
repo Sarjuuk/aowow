@@ -141,7 +141,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 $buff = "var _ = g_titles;\n";
                 foreach ($titlez->getListviewData() as $id => $data)
                 {
-                    $data['name'] = Util::localizedString($titlez->getEntry($id), $g ? 'female' : 'male');
+                    $data['name'] = $titlez->getEntry($id)->{$g ? 'female' : 'male'};
                     unset($data['namefemale']);
                     $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
                 }
