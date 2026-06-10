@@ -181,6 +181,16 @@ abstract class CLI
         return preg_replace(["/\e\[[\d;]+[mK]/", "/\e\[\d+G/"], ['', "\n"], $msg);
     }
 
+    public static function isAbsolutePath(string $path) : bool
+    {
+        // Windows: starts with a drive letter (C:\) or UNC (\\)
+        if (OS_WIN)
+            return (bool)preg_match('/^[A-Za-z]:[\\\\\/]|^\\\\\\\\/', $path);
+
+        // *nix: starts with /
+        return str_starts_with($path, '/');
+    }
+
     public static function nicePath(string $fileOrPath, string ...$pathParts) : string
     {
         $path = '';
@@ -222,8 +232,6 @@ abstract class CLI
                 $path = '/home/'.substr($path, 1);
             else if (substr($path, 0, 2) == '~/')
                 $path = getenv('HOME').substr($path, 1);
-            else if ($path[0] == DIRECTORY_SEPARATOR && substr($path, 0, 6) != '/home/')
-                $path = substr($path, 1);
         }
 
         return $path;
