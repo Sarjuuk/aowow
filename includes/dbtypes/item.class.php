@@ -888,8 +888,8 @@ class ItemList extends DBTypeList
         }
 
         // required honorRank (not used anymore)
-        if ($rhr = $this->curTpl['requiredHonorRank'])
-            $x .= Lang::game('requires', [implode(' / ', Lang::game('pvpRank', $rhr))]).'<br />';
+        if (($rhr = $this->curTpl['requiredHonorRank']) && is_array($pvpRank = Lang::game('pvpRank', $rhr)))
+            $x .= Lang::game('requires', [implode(' / ', $pvpRank)]).'<br />';
 
         // required CityRank..?
         // what the f..
