@@ -91,7 +91,7 @@ class GuideEditResponse extends TemplateResponse
         $guide = new GuideEntry($this->typeId);
 
         $this->h1 = Lang::guide('editTitle');
-        array_unshift($this->title, $this->h1.Lang::main('colon').$guide->getField('title'), Lang::game('guides'));
+        array_unshift($this->title, $this->h1.Lang::main('colon').$guide->title, Lang::game('guides'));
 
         Lang::sort('guide', 'category');
 
@@ -107,7 +107,7 @@ class GuideEditResponse extends TemplateResponse
         $this->editStatus      = $this->editStatus           ?: $guide->status;
         $this->editStatusColor = GuideMgr::STATUS_COLORS[$this->editStatus];
 
-        $this->extendGlobalData($guide->getJSGlobals());
+        $this->extendGlobalData($guide->getJSGlobal());
 
         parent::generate();
     }
