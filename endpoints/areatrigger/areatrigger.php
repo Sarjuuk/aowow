@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 
 class AreatriggerBaseResponse extends TemplateResponse implements ICache
 {
-    use TrDetailPage, TrCache, TrSpawns;
+    use TrDetailPage, TrCache;
 
     protected  int    $cacheType         = CACHE_TYPE_DETAIL_PAGE;
     protected  int    $requiredUserGroup = U_GROUP_STAFF;

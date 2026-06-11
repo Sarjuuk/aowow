@@ -12,7 +12,7 @@ class AchievementContainer extends DBTypeContainer implements IListview, ISource
 
     public static int $dbType = Type::ACHIEVEMENT;
 
-    public function __construct(array $conditions = [], array $miscData = [])
+    public function __construct(?array $conditions = [], array $miscData = [])
     {
         parent::__construct($conditions, $miscData);
 

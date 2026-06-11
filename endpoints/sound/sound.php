@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 
 class SoundBaseResponse extends TemplateResponse implements ICache
 {
-    use TrDetailPage, TrCache, TrSpawns;
+    use TrDetailPage, TrCache;
 
     protected  int    $cacheType  = CACHE_TYPE_DETAIL_PAGE;
 
@@ -92,7 +92,7 @@ class SoundBaseResponse extends TemplateResponse implements ICache
             )
         );
 
-        $this->extendGlobalData($this->subject->getJSGlobals());
+        $this->extendGlobalData($this->subject->getJSGlobal());
 
         parent::generate();
 

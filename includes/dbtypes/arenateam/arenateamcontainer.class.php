@@ -10,7 +10,7 @@ class ArenateamContainer extends DBTypeContainer implements IListview
 {
     public static int $dbType = Type::ARENA_TEAM;
 
-    public function __construct(array $conditions = [], array $miscData = [])
+    public function __construct(?array $conditions = [], array $miscData = [])
     {
         parent::__construct($conditions, $miscData);
 

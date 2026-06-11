@@ -241,7 +241,7 @@ class AchievementEntry extends DBTypeEntry implements ISource, ITooltip
     {
         // this assumes no ref-loot in mail loot (which is true for a clean TDB)
         // also, the js does not expect an item amount so that's skipped
-        $result  =  DB::World()->selectAssoc(
+        $result = DB::World()->selectAssoc(
            'SELECT    ar.`ID` AS ARRAY_KEY, ar.`TitleA`, ar.`TitleH`, ar.`ItemID`, GROUP_CONCAT(mlt.`Item`) AS "mailItems"
             FROM      achievement_reward ar
             LEFT JOIN mail_loot_template mlt ON mlt.`entry` = ar.`MailTemplateID` AND mlt.`Reference` = 0
