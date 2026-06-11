@@ -10,7 +10,7 @@ class QuestContainer extends DBTypeContainer
 {
     public static int $dbType = Type::QUEST;
 
-    public function __construct(array $conditions = [], array $miscData = [])
+    public function __construct(?array $conditions = [], array $miscData = [])
     {
         parent::__construct($conditions, $miscData);
 

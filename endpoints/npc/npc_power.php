@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 
 class NpcPowerResponse extends TextResponse implements ICache
 {
-    use TrCache, TrTooltip, TrSpawns;
+    use TrCache, TrTooltip;
 
     private const /* string */ POWER_TEMPLATE = '$WowheadPower.registerNpc(%d, %d, %s);';
 
