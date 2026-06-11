@@ -279,7 +279,6 @@ abstract class DBTypeEntry
     public function applyInitData(array $initData) : void
     {
         $this->id = $initData['id'];
-        // cuFlags also here..?
     }
 
     public static function getName(int $id) : ?LocString
