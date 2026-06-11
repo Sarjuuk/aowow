@@ -66,7 +66,7 @@ class EventPowerResponse extends TextResponse implements ICache
     public static function onBeforeDisplay(string $tooltip, array $dates) : string
     {
         // update dates to now()
-        WorldEventList::updateDates($dates, $start, $end);
+        WorldeventEntry::updateDates($dates, $start, $end);
 
         return sprintf(
             $tooltip,

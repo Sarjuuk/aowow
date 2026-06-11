@@ -69,12 +69,12 @@ class EventsBaseResponse extends TemplateResponse implements ICache
                 default => ['e.holidayId', 0]               // also cat 0
             };
 
-        $events = new WorldEventContainer($condition);
+        $events = new WorldeventContainer($condition);
         $this->extendGlobalData($events->getJSGlobals());
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
 
-        $this->lvTabs->addListviewTab(new Listview(['data' => $events->getListviewData()], WorldEventEntry::$brickFile));
+        $this->lvTabs->addListviewTab(new Listview(['data' => $events->getListviewData()], WorldeventEntry::$brickFile));
 
         if ($_ = array_filter($events->getListviewData(), fn($x) => $x['category'] > 0))
             $this->lvTabs->addListviewTab(new Listview(['data' => $_, 'hideCount' => 1], 'calendar'));
@@ -89,7 +89,7 @@ class EventsBaseResponse extends TemplateResponse implements ICache
     {
         foreach ($lvTabs->iterate() as &$listview)
             if (is_object($listview) && ($listview?->getTemplate() == 'holiday' || $listview?->getTemplate() == 'holidaycal'))
-                WorldEventList::updateListview($listview);
+                WorldeventEntry::updateListview($listview);
     }
 }
 
