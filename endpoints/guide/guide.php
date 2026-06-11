@@ -110,7 +110,7 @@ class GuideBaseResponse extends TemplateResponse implements ICache
             $this->guideRating = array(
                 $this->subject->rating,                     // avg rating
                 User::canUpvote() && User::canDownvote() ? 'true' : 'false',
-                $this->subject->getField('_self'),          // my rating amt; 0 = no vote
+                0,                                          // my rating amt; 0 = no vote; set via hook
                 $this->typeId                               // guide Id
             );
 
