@@ -116,7 +116,9 @@ spl_autoload_register(function (string $class) : void
     if (preg_match('/[^\w]/i', $class))
         return;
 
-    $dir = strtr($class, ['Entry' => '', 'Container' => '', 'Filter' => '']);
+    $class = strtolower($class);
+
+    $dir = strtr($class, ['entry' => '', 'container' => '', 'filter' => '']);
 
     if (file_exists('includes/dbtypes/'.$dir.'/'.$class.'.class.php'))
     {

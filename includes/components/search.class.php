@@ -338,7 +338,7 @@ class Search
                 [DB::AND, $this->createLikeLookup(['e.description']), ['e.holidayId', 0]]
             )
         ));
-        $wEvents = new WorldEventContainer($cnd, ['calcTotal' => true]);
+        $wEvents = new WorldeventContainer($cnd, ['calcTotal' => true]);
 
         $data = $wEvents->getListviewData();
         if (!$data)
@@ -357,7 +357,7 @@ class Search
                 $lvData['_truncated'] = 1;
             }
 
-            return [$lvData, WorldEventEntry::$brickFile];
+            return [$lvData, WorldeventEntry::$brickFile];
         }
 
         if ($this->moduleMask & self::TYPE_OPEN)

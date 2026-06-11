@@ -37,12 +37,12 @@ class EventBaseResponse extends TemplateResponse implements ICache
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('event'), Lang::event('notFound'));
 
-        $this->h1    = $this->subject->getField('name', true);
+        $this->h1    = $this->subject->name;
         $this->dates = array(
-            'firstDate' => $this->subject->getField('startTime'),
-            'lastDate'  => $this->subject->getField('endTime'),
-            'length'    => $this->subject->getField('length'),
-            'rec'       => $this->subject->getField('occurence')
+            'firstDate' => $this->subject->startTime,
+            'lastDate'  => $this->subject->endTime,
+            'length'    => $this->subject->length,
+            'rec'       => $this->subject->occurence
         );
 
         $this->gPageInfo += array(
@@ -51,21 +51,14 @@ class EventBaseResponse extends TemplateResponse implements ICache
             'name'   => $this->h1
         );
 
-        $_holidayId = $this->subject->getField('holidayId');
+        $_holidayId = $this->subject->holidayId;
 
 
         /*************/
         /* Menu Path */
         /*************/
 
-        $this->breadcrumb[] = match ($this->subject->getField('scheduleType'))
-        {
-            -1      => 1,
-             0, 1   => 2,
-             2      => 3,
-            ''      => 0,
-            default => 0
-        };
+        $this->breadcrumb[] = $this->subject->category;
 
 
         /**************/
@@ -79,10 +72,10 @@ class EventBaseResponse extends TemplateResponse implements ICache
         /* Infobox */
         /***********/
 
-        $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
+        $infobox = Lang::getInfoBoxForFlags($this->subject->cuFlags);
 
         // boss
-        if ($_ = $this->subject->getField('bossCreature'))
+        if ($_ = $this->subject->bossCreature)
         {
             $this->extendGlobalIds(Type::NPC, $_);
             $infobox[] = Lang::npc('rank', 3).Lang::main('colon').'[npc='.$_.']';
@@ -96,7 +89,7 @@ class EventBaseResponse extends TemplateResponse implements ICache
             $infobox[] = 'Holiday ID'.Lang::main('colon').$_holidayId;
 
         // icon
-        if ($_ = $this->subject->getField('iconId'))
+        if ($_ = $this->subject->iconId)
         {
             $infobox[] = Util::ucFirst(Lang::game('icon')).Lang::main('colon').'[icondb='.$_.' name=true]';
             $this->extendGlobalIds(Type::ICON, $_);
@@ -104,7 +97,7 @@ class EventBaseResponse extends TemplateResponse implements ICache
 
         // original name
         if (Lang::getLocale() != Locale::EN)
-            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.$this->subject->getField('name_loc0').'[/copy][/li]';
+            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.($this->subject->name)(Locale::EN).'[/copy][/li]';
 
         if ($infobox)
             $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0');
@@ -115,13 +108,13 @@ class EventBaseResponse extends TemplateResponse implements ICache
         /****************/
 
         // no entry in ::articles? use default HolidayDescription
-        if ($_holidayId && empty($this->article))
-            $this->article = new Markup($this->subject->getField('description', true), ['dbpage' => true]);
+        if ($_holidayId && empty($this->article) && !$this->subject->description->isEmpty())
+            $this->article = new Markup($this->subject->description, ['dbpage' => true]);
 
         if ($_holidayId)
             $this->wowheadLink = sprintf(WOWHEAD_LINK, Lang::getLocale()->domain(), 'event=', $_holidayId);
 
-        $this->headIcons  = [$this->subject->getField('iconString')];
+        $this->headIcons  = [$this->subject->icon];
         $this->redButtons = array(
             BUTTON_WOWHEAD => $_holidayId > 0,
             BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId]
@@ -179,7 +172,7 @@ class EventBaseResponse extends TemplateResponse implements ICache
 
         // tab: achievements
         $exclAcvs = [];
-        if ($_ = $this->subject->getField('achievementCatOrId'))
+        if ($_ = $this->subject->achievementCatOrId)
         {
             $condition = $_ > 0 ? [['category', $_]] : [['id', -$_]];
             $acvs = new AchievementContainer($condition);
@@ -242,14 +235,8 @@ class EventBaseResponse extends TemplateResponse implements ICache
             $this->lvTabs->addListviewTab(new Listview($tabData, QuestEntry::$brickFile));
 
             $questItems = [];
-            if ($_ = $quests->getItemRewards())
-                $questItems = array_merge($questItems, array_keys($_));
-
-            if ($_ = $quests->getItemChoices())
-                $questItems = array_merge($questItems, array_keys($_));
-
-            if ($_ = $quests->getItemRequirements())
-                $questItems = array_merge($questItems, array_keys($_));
+            foreach ($quests->iterate() as $entry)
+                $questItems = array_merge($questItems, array_filter($entry->rewardItemId), array_filter($entry->rewardChoiceItemId), array_filter($entry->reqItemId));
 
             if ($questItems)
                 $itemCnd[] = ['id', $questItems];
@@ -302,15 +289,15 @@ class EventBaseResponse extends TemplateResponse implements ICache
                 foreach ($relEvents->getFoundIDs() as $id)
                     Conditions::extendListviewRow($relData[$id], Conditions::SRC_NONE, $this->typeId, [-Conditions::ACTIVE_EVENT, $this->typeId]);
 
-                $this->extendGlobalData($this->subject->getJSGlobals());
-                $d = $this->subject->getListviewData();
+                $this->extendGlobalData($this->subject->getJSGlobal());
+                $d = $this->subject->getListviewRow();
                 foreach ($rel as $r)
                     if ($r > 0)
-                        if (Conditions::extendListviewRow($d[$this->typeId], Conditions::SRC_NONE, $this->typeId, [-Conditions::ACTIVE_EVENT, $r]))
+                        if (Conditions::extendListviewRow($d, Conditions::SRC_NONE, $this->typeId, [-Conditions::ACTIVE_EVENT, $r]))
                             $this->extendGlobalIds(Type::WORLDEVENT, $r);
 
                 $tabData = array(
-                    'data'       => array_merge($relData, $d),
+                    'data'       => array_merge($relData, [$this->typeId => $d]),
                     'id'         => 'see-also',
                     'name'       => '$LANG.tab_seealso',
                     'hiddenCols' => ['date'],
@@ -338,13 +325,13 @@ class EventBaseResponse extends TemplateResponse implements ICache
     {
         foreach ($lvTabs->iterate() as &$listview)
             if (is_object($listview) && $listview?->getTemplate() == 'holiday')
-                WorldEventList::updateListview($listview);
+                WorldeventEntry::updateListview($listview);
     }
 
     /* finalize infobox */
     public static function infoboxHook(Template\PageTemplate &$pt, ?InfoboxMarkup &$markup) : void
     {
-        WorldEventList::updateDates($pt->dates, $start, $end, $rec);
+        WorldeventEntry::updateDates($pt->dates, $start, $end, $rec);
         $infobox = [];
 
         // start
