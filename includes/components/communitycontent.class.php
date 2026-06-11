@@ -107,8 +107,8 @@ class CommunityContent
             if (!$obj)
                 continue;
 
-            foreach ($obj->iterate() as $id => $__)
-                self::$subjCache[$type][$id] = $obj->getField('name', true, true);
+            foreach ($obj->iterate() as $id => $entry)
+                self::$subjCache[$type][$id] = $entry?->name ?? '';
         }
     }
 

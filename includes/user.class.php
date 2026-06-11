@@ -698,7 +698,7 @@ class User
 
     public static function getFavorites() : array
     {
-        // if (!self::isLoggedIn() || self::isBanned())
+        if (!self::isLoggedIn() || self::isBanned())
             return [];
 
         $res = DB::Aowow()->selectCol('SELECT `type` AS ARRAY_KEY, `typeId` AS ARRAY_KEY2, `typeId` FROM ::account_favorites WHERE `userId` = %i', self::$id);
@@ -713,8 +713,8 @@ class User
                 continue;
 
             $entities = [];
-            foreach ($tc->iterate() as $id => $__)
-                $entities[] = [$id, $tc->getField('name', true, true)];
+            foreach ($tc->iterate() as $id => $entry)
+                $entities[] = [$id, $entry?->name ?? ''];
 
             if ($entities)
                 $data[] = ['id' => $type, 'entities' => $entities];
