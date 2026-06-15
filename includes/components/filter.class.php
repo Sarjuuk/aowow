@@ -40,8 +40,6 @@ trait TrProfilerFilter
 
 abstract class Filter
 {
-    private static  $wCards = ['*' => '%', '?' => '_'];
-
     public const CR_BOOLEAN   = 1;
     public const CR_FLAG      = 2;
     public const CR_NUMERIC   = 3;
@@ -590,7 +588,8 @@ abstract class Filter
         if ($string === '')
             return null;
 
-        // invalid chars for both LIKE and MATCH
+        // \ % - invalid chars for both LIKE and MATCH
+        // otherwise escaped by \Dibi
         $str = str_replace(['\\', '%'], '', $string);
 
         if ($neg = ($str[0] === '-'))
@@ -608,11 +607,9 @@ abstract class Filter
                 $ft[] = implode('', $tok);
         }
 
-        // escape manually entered _; entering % should be prohibited
-        // then replace search wildcards with sql wildcards
-        $lk = strtr(str_replace('_', '\\_', $str), self::$wCards);
+        $ft ??= [];
 
-        return [$lk, $ft, $neg];
+        return [$str, $ft, $neg];
     }
 
     protected function tokenizeString(string $field, string $string, bool $exact = false, bool $allowShort = false) : bool
