@@ -422,20 +422,20 @@ var fi_filters = {
         { id: 8,    name: 'hasscreenshots', type: 'yn' },
         { id: 17,   name: 'hasvideos',      type: 'yn' },
 
-        { id: 9999, name: 'sepstaffonly',                staffonly: true },
-        { id: 96,   name: 'flags1',       type: 'flags', staffonly: true },
-        { id: 97,   name: 'flags2',       type: 'flags', staffonly: true },
-        { id: 98,   name: 'flags3',       type: 'flags', staffonly: true },
-        { id: 99,   name: 'flags4',       type: 'flags', staffonly: true },
-        { id: 100,  name: 'flags5',       type: 'flags', staffonly: true },
-        { id: 101,  name: 'flags6',       type: 'flags', staffonly: true },
-        { id: 102,  name: 'flags7',       type: 'flags', staffonly: true },
-        { id: 103,  name: 'flags8',       type: 'flags', staffonly: true },
-        { id: 104,  name: 'flags9',       type: 'flags', staffonly: true },
-        { id: 105,  name: 'flags10',      type: 'flags', staffonly: true },
-        { id: 106,  name: 'flags11',      type: 'flags', staffonly: true },
-        { id: 107,  name: 'flags12',      type: 'flags', staffonly: true },
-        { id: 108,  name: 'flags13',      type: 'flags', staffonly: true }
+        { id: 9999, name: 'sepstaffonly',                        staffonly: true }, // aowow - type renamed as 335a only has 8(+1) flag fields
+        { id: 96,   name: 'flags1',       type: 'spell_flags1',  staffonly: true },
+        { id: 97,   name: 'flags2',       type: 'spell_flags2',  staffonly: true },
+        { id: 98,   name: 'flags3',       type: 'spell_flags3',  staffonly: true },
+        { id: 99,   name: 'flags4',       type: 'spell_flags4',  staffonly: true },
+        { id: 100,  name: 'flags5',       type: 'spell_flags5',  staffonly: true },
+        { id: 101,  name: 'flags6',       type: 'spell_flags6',  staffonly: true },
+        { id: 102,  name: 'flags7',       type: 'spell_flags7',  staffonly: true },
+        { id: 103,  name: 'flags8',       type: 'spell_flags8',  staffonly: true },
+        { id: 104,  name: 'flags9',       type: 'spell_flagsCu', staffonly: true },
+     // { id: 105,  name: 'flags10',      type: 'flags',         staffonly: true },
+        { id: 106,  name: 'flags11',      type: 'flags',         staffonly: true },
+        { id: 107,  name: 'flags12',      type: 'flags',         staffonly: true },
+        { id: 108,  name: 'flags13',      type: 'flags',         staffonly: true }
     ],
 
     achievements: [
