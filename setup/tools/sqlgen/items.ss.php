@@ -192,6 +192,9 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         // move temporary enchantments to own category
         DB::Aowow()->qry('UPDATE ::items i, dbc_spell s SET i.subClass = -3 WHERE s.effect1Id = 54 AND s.id = i.spellId1 AND i.class = 0 AND i.subClassBak = 8');
 
+        // move reagents (5/0) to misc > reagents (15/1) (only Ankhs)
+        DB::Aowow()->qry('UPDATE ::items SET class = 15, subClass = 1 WHERE classBak = 5 AND subClassBak = 0');
+
         // move armor tokens to own category
         DB::Aowow()->qry('UPDATE ::items SET subClass = -2 WHERE quality = 4 AND class = 15 AND subClassBak = 0 AND requiredClass > 0');
 
