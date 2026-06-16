@@ -43,6 +43,8 @@ class SpellBaseResponse extends TemplateResponse implements ICache
     public  string $stances    = '';
     public  string $cooldown   = '';
     public  string $duration   = '';
+    public ?array  $casterAura = null;
+    public ?array  $targetAura = null;
     public  array  $tooltip    = [];
 
     private SpellList $subject;
@@ -271,6 +273,27 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
         if (($_ = $this->subject->getField('duration')) && $_ > 0)
             $this->duration = DateTime::formatTimeElapsedFloat($_);
+
+        $auraState = array(
+            $this->subject->getField('casterAuraSpell'),
+            $this->subject->getField('casterAuraSpellNot'),
+            $this->subject->getField('targetAuraSpell'),
+            $this->subject->getField('targetAuraSpellNot')
+        );
+        if ($_ = array_filter($auraState))
+        {
+            $stateData = DB::Aowow()->selectAssoc('SELECT s.id AS ARRAY_KEY, i.`name` AS "icon", s.name_loc0, s.name_loc2, s.name_loc3, s.name_loc4, s.name_loc6, s.name_loc8 FROM ::icons i JOIN ::spell s ON s.iconId = i.id WHERE s.id IN %in', $_);
+
+            foreach ($_ as $idx => $spellId)
+            {
+                if (empty($stateData[$spellId]))
+                    trigger_error('Spell #'.$this->typeId.' has nonexistent spell #'.$spellId.' as aura state'.($idx % 2 ? ' not' : ''), E_USER_WARNING);
+                else if ($idx < 2)
+                    $this->casterAura[$idx % 2] = [$spellId, $stateData[$spellId]['icon'], Util::localizedString($stateData[$spellId], 'name')];
+                else
+                    $this->targetAura[$idx % 2] = [$spellId, $stateData[$spellId]['icon'], Util::localizedString($stateData[$spellId], 'name')];
+            }
+        }
 
 
         /**************/

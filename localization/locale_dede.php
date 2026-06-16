@@ -62,6 +62,8 @@ $lang = array(
         'no'            => "Nein",
         'any'           => "Beliebig",
         'all'           => "Alle",
+        'required'      => 'Benötigt: %s',
+        'disallowed'    => 'Nicht zulässig: %s',
 
         // filter
         'extSearch'     => "Erweiterte Suche",
@@ -1675,6 +1677,8 @@ $lang = array(
         '_seeMore'      => "Mehr anzeigen",
         '_rankRange'    => "Rang:&nbsp;%d&nbsp;-&nbsp;%d",
         '_showXmore'    => "Zeige %d weitere",
+        'casterAura'    => "Aura auf Zauberer",
+        'targetAura'    => "Aura auf Ziel",
 
         'normal'        => "Normal",
         'special'       => "Besonders",

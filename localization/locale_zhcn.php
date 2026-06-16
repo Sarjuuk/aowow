@@ -62,6 +62,8 @@ $lang = array(
         'no'            => "无",
         'any'           => "任意",
         'all'           => "全部",
+        'required'      => '[Required]：%s',
+        'disallowed'    => '[Disallowed]：%s',
 
         // filter
         'extSearch'     => "扩展搜索",
@@ -1675,6 +1677,8 @@ $lang = array(
         '_seeMore'      => "[See more]",
         '_rankRange'    => "排名:&nbsp;%d&nbsp;-&nbsp;%d",
         '_showXmore'    => "[Show %d More]",
+        'casterAura'    => "[Caster Aura]",
+        'targetAura'    => "[Target Aura]",
 
         'normal'        => "普通",
         'special'       => "特殊",

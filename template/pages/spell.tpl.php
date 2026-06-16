@@ -141,11 +141,41 @@ endif;
                         <td><?=($this->cooldown ?: '<span class="q0">'.Lang::main('n_a').'</span>');?></td>
                     </tr>
                     <tr>
-                        <th><dfn title="<?=Lang::spell('_globCD').'">'.Lang::spell('_gcd');?></dfn></th>
+                        <th><dfn title="<?=Lang::spell('_globCD');?>"><?=Lang::spell('_gcd');?></dfn></th>
                         <td><?=$this->gcd;?></td>
                     </tr>
 
 <?php
+if ($this->casterAura):
+?>
+                    <tr>
+                        <th><?=Lang::spell('casterAura');?></th>
+                        <td colspan="3">
+<?php
+    echo Lang::concat($this->casterAura, callback: function($x, $neg) {
+        return Lang::main($neg ? 'disallowed' : 'required', ['<div style="display:inline-block; line-height: 2.0em;"><a href="?spell='.$x[0].'"><span class="iconsmall"><ins style="background-image: url('.$this->gStaticUrl.'/images/wow/icons/small/'.$x[1].'.jpg);"></ins><del></del></span>'.$x[2].'</a></div>']);
+    });
+?>
+                        </td>
+                    </tr>
+<?php
+endif;
+
+if ($this->targetAura):
+?>
+                    <tr>
+                        <th><?=Lang::spell('targetAura');?></th>
+                        <td colspan="3">
+<?php
+    echo Lang::concat($this->targetAura, callback: function($x, $neg) {
+        return Lang::main($neg ? 'disallowed' : 'required', ['<div style="display:inline-block; line-height: 2.0em;"><a href="?spell='.$x[0].'"><span class="iconsmall"><ins style="background-image: url('.$this->gStaticUrl.'/images/wow/icons/small/'.$x[1].'.jpg);"></ins><del></del></span>'.$x[2].'</a></div>']);
+    });
+?>
+                        </td>
+                    </tr>
+<?php
+endif;
+
 if ($this->stances):
 ?>
 
