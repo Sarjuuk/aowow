@@ -126,7 +126,7 @@ class MailBaseResponse extends TemplateResponse implements ICache
             BUTTON_WOWHEAD => false
         );
 
-        $this->extraText = new Markup(Util::parseHtmlText($this->subject->getField('text', true), true), ['dbpage' => true, 'allow' => Markup::CLASS_ADMIN], 'text-generic');
+        $this->extraText = new Markup(UIText::format($this->subject->getField('text', true), Lang::FMT_MARKUP), ['dbpage' => true, 'allow' => Markup::CLASS_ADMIN], 'text-generic');
 
 
         /**************/

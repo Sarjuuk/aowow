@@ -204,7 +204,7 @@ class QuestList extends DBTypeList
                 'id'        => $this->id,
                 'level'     => $this->curTpl['level'],
                 'reqlevel'  => $this->curTpl['minLevel'],
-                'name'      => Lang::unescapeUISequences($this->getField('name', true), Lang::FMT_RAW),
+                'name'      => UIText::unescapeUISequences($this->getField('name', true), Lang::FMT_RAW),
                 'side'      => ChrRace::sideFromMask($this->curTpl['reqRaceMask']),
                 'wflags'    => 0x0,
                 'xp'        => $this->curTpl['rewardXP']
@@ -296,7 +296,7 @@ class QuestList extends DBTypeList
         if (!$text)
             return '';
 
-        $text = Util::parseHtmlText($text);
+        $text = UIText::format($text, Lang::FMT_HTML);
 
         if ($jsEscaped)
             $text = Util::jsEscape($text);
@@ -309,7 +309,7 @@ class QuestList extends DBTypeList
         if (!$this->curTpl)
             return null;
 
-        $title = Lang::unescapeUISequences(Util::htmlEscape($this->getField('name', true)), Lang::FMT_HTML);
+        $title = UIText::unescapeUISequences(Util::htmlEscape($this->getField('name', true)), Lang::FMT_HTML);
         $level = $this->curTpl['level'];
         if ($level < 0)
             $level = 0;
@@ -346,7 +346,7 @@ class QuestList extends DBTypeList
             else if ($rng > 0)
                 $name = CreatureList::getName($rng);
             else if ($rng < 0)
-                $name = Lang::unescapeUISequences(GameObjectList::getName(-$rng), Lang::FMT_HTML);
+                $name = UIText::unescapeUISequences(GameObjectList::getName(-$rng), Lang::FMT_HTML);
 
             if (!$name)
                 $name = Util::ucFirst(Lang::game($rng > 0 ? 'npc' : 'object')).' #'.abs($rng);
@@ -362,7 +362,7 @@ class QuestList extends DBTypeList
             if (!$ri || $riQty < 1)
                 continue;
 
-            $name = Lang::unescapeUISequences(ItemList::getName($ri), Lang::FMT_HTML) ?: Util::ucFirst(Lang::game('item')).' #'.$ri;
+            $name = UIText::unescapeUISequences(ItemList::getName($ri), Lang::FMT_HTML) ?: Util::ucFirst(Lang::game('item')).' #'.$ri;
 
             $xReq .= '<br /> - '.$name.($riQty > 1 ? ' x '.$riQty : '');
         }

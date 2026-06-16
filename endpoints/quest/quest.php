@@ -51,12 +51,12 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('quest'), Lang::quest('notFound'));
 
-        $this->h1 = Lang::unescapeUISequences(Util::htmlEscape($this->subject->getField('name', true)), Lang::FMT_HTML);
+        $this->h1 = UIText::unescapeUISequences(Util::htmlEscape($this->subject->getField('name', true)), Lang::FMT_HTML);
 
         $this->gPageInfo += array(
             'type'   => $this->type,
             'typeId' => $this->typeId,
-            'name'   => Lang::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_HTML)
+            'name'   => UIText::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_HTML)
         );
 
         $_level        = $this->subject->getField('level');
@@ -86,7 +86,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         /* Page Title */
         /**************/
 
-        array_unshift($this->title, Lang::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_RAW), Util::ucFirst(Lang::game('quest')));
+        array_unshift($this->title, UIText::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_RAW), Util::ucFirst(Lang::game('quest')));
 
 
         /***********/
@@ -342,7 +342,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                 $this->objectiveList[] = new IconElement(
                     Type::ITEM,
                     $itemId,
-                    Lang::unescapeUISequences($olItemData->json[$itemId]['name'], Lang::FMT_HTML),
+                    UIText::unescapeUISequences($olItemData->json[$itemId]['name'], Lang::FMT_HTML),
                     num: $qty > 1 ? $qty : '',
                     quality: 7 - $olItemData->json[$itemId]['quality'],
                     size: IconElement::SIZE_SMALL,
@@ -360,7 +360,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                     $this->providedItem = new IconElement(
                         Type::ITEM,
                         $olItems[0][0],
-                        Lang::unescapeUISequences($olItemData->json[$olItems[0][0]]['name'], Lang::FMT_HTML),
+                        UIText::unescapeUISequences($olItemData->json[$olItems[0][0]]['name'], Lang::FMT_HTML),
                         num: $olItems[0][1] > 1 ? $olItems[0][1] : '',
                         quality: 7 - $olItemData->json[$olItems[0][0]]['quality'],
                         size: IconElement::SIZE_SMALL,
@@ -453,7 +453,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                     $this->objectiveList[] = new IconElement(
                         Type::OBJECT,
                         $i,
-                        $altText ?: Lang::unescapeUISequences(Util::localizedString($olGOData->getEntry($i), 'name'), Lang::FMT_HTML),
+                        $altText ?: UIText::unescapeUISequences(Util::localizedString($olGOData->getEntry($i), 'name'), Lang::FMT_HTML),
                         $qty > 1 ? $qty : '',
                         size: IconElement::SIZE_SMALL,
                         element: 'iconlist-icon',
@@ -1047,7 +1047,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                         $rewards[2][] = new IconElement(
                             Type::ITEM,
                             $id,
-                            Lang::unescapeUISequences($choiceItems->getField('name', true), Lang::FMT_HTML),
+                            UIText::unescapeUISequences($choiceItems->getField('name', true), Lang::FMT_HTML),
                             quality: $choiceItems->getField('quality'),
                             num: $num
                         );
@@ -1067,7 +1067,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                         $rewards[1][] = new IconElement(
                             Type::ITEM,
                             $id,
-                            Lang::unescapeUISequences($rewItems->getField('name', true), Lang::FMT_HTML),
+                            UIText::unescapeUISequences($rewItems->getField('name', true), Lang::FMT_HTML),
                             quality: $rewItems->getField('quality'),
                             num: $num
                         );
@@ -1173,8 +1173,8 @@ class QuestBaseResponse extends TemplateResponse implements ICache
 
         $this->mail = array(
             'attachments' => [],
-            'text'        => $letter ? Util::parseHtmlText(Util::localizedString($letter, 'text')) : null,
-            'subject'     => Util::parseHtmlText(Util::localizedString($letter, 'subject')),
+            'text'        => $letter ? UIText::format(Util::localizedString($letter, 'text'), Lang::FMT_HTML) : null,
+            'subject'     => $letter ? UIText::format(Util::localizedString($letter, 'subject'), Lang::FMT_HTML) : null,
             'header'      => array(
                 $rmtId,
                 null,

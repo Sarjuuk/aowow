@@ -38,7 +38,7 @@ class ObjectPowerResponse extends TextResponse implements ICache
             $this->cacheType = CACHE_TYPE_NONE;
         else
             $opts = array(
-                'name'    => Lang::unescapeUISequences($object->getField('name', true), Lang::FMT_RAW),
+                'name'    => UIText::unescapeUISequences($object->getField('name', true), Lang::FMT_RAW),
                 'tooltip' => $object->renderTooltip(),
                 'map'     => $object->getSpawns(SPAWNINFO_SHORT)
             );

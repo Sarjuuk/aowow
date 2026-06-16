@@ -56,7 +56,7 @@ class ItemPowerResponse extends TextResponse implements ICache
                 $itemString .= $k.(is_array($val) ? implode(',', $val) : $val);
 
             $opts = array(
-                'name'    => Lang::unescapeUISequences($item->getField('name', true, false, $this->enhancedTT), Lang::FMT_RAW),
+                'name'    => UIText::unescapeUISequences($item->getField('name', true, false, $this->enhancedTT), Lang::FMT_RAW),
                 'tooltip' => $item->renderTooltip(enhance: $this->enhancedTT),
                 'icon'    => $item->getField('iconString'),
                 'quality' => $item->getField('quality')

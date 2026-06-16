@@ -8,18 +8,21 @@ if (!defined('AOWOW_REVISION'))
 
 class Book implements \JsonSerializable
 {
+    private array $pages;
+
     public function __construct(
-        private  array  $pages,                             // js:array of html
+                 array  $pages,                             // js:array of html
         private  string $parent = 'book-generic',           // HTMLNode.id
         private ?int    $page = null)                       // start page; defaults to 1
     {
-        if (!$this->parent)
+        if (!$parent)
             trigger_error(self::class.'::__construct - initialized without parent element', E_USER_WARNING);
 
-        if (!$this->pages)
+        if (!$pages)
             trigger_error(self::class.'::__construct - initialized without content', E_USER_WARNING);
         else
-            $this->pages = Util::parseHtmlText($this->pages);
+            foreach ($pages as $p)
+                $this->pages[] = UIText::format($p, Lang::FMT_HTML);
     }
 
     public function &iterate() : \Generator

@@ -42,7 +42,7 @@ class EmoteList extends DBTypeList
             $data[$this->id] = array(
                 'id'      => $this->curTpl['id'],
                 'name'    => $this->curTpl['cmd'],
-                'preview' => Util::parseHtmlText($this->getField('meToExt', true) ?: $this->getField('meToNone', true) ?: $this->getField('extToMe', true) ?: $this->getField('extToExt', true) ?: $this->getField('extToNone', true), true)
+                'preview' => UIText::format($this->getField('meToExt', true) ?: $this->getField('meToNone', true) ?: $this->getField('extToMe', true) ?: $this->getField('extToExt', true) ?: $this->getField('extToNone', true), Lang::FMT_MARKUP)
             );
         }
 

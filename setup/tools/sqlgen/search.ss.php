@@ -218,7 +218,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
                 // ui escape sequences not in default 335a, but undestood by client and may be custom
                 if ($_ = Util::localizedString($item, 'name', true))
-                    $name = self::normalize(Lang::unescapeUISequences($_, Lang::FMT_RAW));
+                    $name = self::normalize(UIText::unescapeUISequences($_, Lang::FMT_RAW));
                 if ($_ = Util::localizedString($item, 'description', true))
                     $desc = self::normalize($_);
 

@@ -245,7 +245,7 @@ class Game
                     $msg = '%s '.$msg;
 
                 // fixup: bad case-insensitivity
-                $msg = Util::parseHtmlText(str_replace('%S', '%s', htmlentities($msg)), !$asHTML);
+                $msg = UIText::format(str_replace('%S', '%s', $msg), $asHTML ? Lang::FMT_HTML : Lang::FMT_MARKUP);
 
                 if ($talkSource)
                     $msg = sprintf($msg, $talkSource);

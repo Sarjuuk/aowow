@@ -1839,7 +1839,8 @@ class SpellList extends DBTypeList
         // parse Buff-Text
         [$buffTT, $buffSp, ] = $this->parseText('buff');
 
-        $buffSpells = Util::parseHtmlText($buffSp);
+        foreach ($buffSp as $bs)
+            $buffSpells[] = UIText::format($bs, Lang::FMT_HTML);
 
         $x .= $buffTT.'<br />';
 
@@ -1878,7 +1879,8 @@ class SpellList extends DBTypeList
 
         [$desc, $spells, ] = $this->parseText('description');
 
-        $ttSpells = Util::parseHtmlText($spells);
+        foreach ($spells as $s)
+            $ttSpells[] = UIText::format($s, Lang::FMT_HTML);
 
         // get reagents
         $reagents = $this->getReagentsForCurrent();

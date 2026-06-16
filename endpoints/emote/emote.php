@@ -218,7 +218,7 @@ class EmoteBaseResponse extends TemplateResponse implements ICache
 
     private function prepare(string $emote) : string
     {
-        $emote = Util::parseHtmlText($emote, true);
+        $emote = UIText::format($emote, Lang::FMT_MARKUP);
         return preg_replace('/%\d?\$?s/', '<'.Util::ucFirst(Lang::main('name')).'>', $emote);
     }
 }

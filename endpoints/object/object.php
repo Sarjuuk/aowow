@@ -41,7 +41,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('object'), Lang::gameObject('notFound'));
 
-        $this->h1 = Lang::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_HTML);
+        $this->h1 = UIText::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_HTML);
 
         $this->gPageInfo += array(
             'type'   => $this->type,
@@ -61,7 +61,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         /* Page Title */
         /**************/
 
-        array_unshift($this->title, Lang::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_RAW), Util::ucFirst(Lang::game('object')));
+        array_unshift($this->title, UIText::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_RAW), Util::ucFirst(Lang::game('object')));
 
 
         /**********************/

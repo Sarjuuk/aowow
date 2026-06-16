@@ -469,16 +469,16 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
 
             $this->mail = array(
                 'attachments' => [],
-                'subject'     => Util::parseHtmlText(Util::localizedString($letter, 'subject', true)),
-                'text'        => Util::parseHtmlText(Util::localizedString($letter, 'text', true)),
+                'subject'     => UIText::format(Util::localizedString($letter, 'subject', true), Lang::FMT_HTML),
+                'text'        => UIText::format(Util::localizedString($letter, 'text', true), Lang::FMT_HTML),
                 'header'      => [$_, null, null]
             );
         }
-        else if ($_ = Util::parseHtmlText($this->subject->getField('text', true, true)))
+        else if ($_ = UIText::format($this->subject->getField('text', true, true), Lang::FMT_HTML))
         {
             $this->mail = array(
                 'attachments' => [],
-                'subject'     => Util::parseHtmlText($this->subject->getField('subject', true, true)),
+                'subject'     => UIText::format($this->subject->getField('subject', true, true), Lang::FMT_HTML),
                 'text'        => $_,
                 'header'      => [-$this->typeId, null, null]
             );

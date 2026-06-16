@@ -311,7 +311,7 @@ class ItemList extends DBTypeList
                 $data[$this->id][$k] = $v;
 
             // json vs listview quirk
-            $data[$this->id]['name'] = $data[$this->id]['quality'].Lang::unescapeUISequences($this->getField('name', true), Lang::FMT_RAW);
+            $data[$this->id]['name'] = $data[$this->id]['quality'].UIText::unescapeUISequences($this->getField('name', true), Lang::FMT_RAW);
             unset($data[$this->id]['quality']);
 
             if (!empty($this->relEnchant) && $this->curTpl['randomEnchant'])
@@ -470,7 +470,7 @@ class ItemList extends DBTypeList
             if ($addMask & GLOBALINFO_SELF)
             {
                 $data[Type::ITEM][$id] = array(
-                    'name'    => Lang::unescapeUISequences($this->getField('name', true), Lang::FMT_RAW),
+                    'name'    => UIText::unescapeUISequences($this->getField('name', true), Lang::FMT_RAW),
                     'quality' => $this->curTpl['quality'],
                     'icon'    => $this->curTpl['iconString']
                 );
@@ -519,7 +519,7 @@ class ItemList extends DBTypeList
         if ($this->error)
             return null;
 
-        $_name         = Lang::unescapeUISequences($this->getField('name', true), Lang::FMT_HTML);
+        $_name         = UIText::unescapeUISequences($this->getField('name', true), Lang::FMT_HTML);
         $_reqLvl       = $this->curTpl['requiredLevel'];
         $_quality      = $this->curTpl['quality'];
         $_flags        = $this->curTpl['flags'];
@@ -1153,7 +1153,7 @@ class ItemList extends DBTypeList
 
         // funny, yellow text at the bottom, omit if we have a recipe
         if ($this->curTpl['description_loc0'] && !$this->canTeachSpell())
-            $xMisc[] = '<span class="q">"'.Util::parseHtmlText($this->getField('description', true), false).'"</span>';
+            $xMisc[] = '<span class="q">"'.UIText::format($this->getField('description', true), Lang::FMT_HTML).'"</span>';
 
         // readable
         if ($this->curTpl['pageTextId'])

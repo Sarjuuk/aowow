@@ -38,7 +38,7 @@ class QuestPowerResponse extends TextResponse implements ICache
             $this->cacheType = CACHE_TYPE_NONE;
         else
             $opts = array(
-                'name'    => Lang::unescapeUISequences($quest->getField('name', true), Lang::FMT_RAW),
+                'name'    => UIText::unescapeUISequences($quest->getField('name', true), Lang::FMT_RAW),
                 'tooltip' => $quest->renderTooltip(),
                 'daily'   => $quest->isDaily() ? 1 : null
             );

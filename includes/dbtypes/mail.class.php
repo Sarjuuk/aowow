@@ -47,7 +47,7 @@ class MailList extends DBTypeList
 
         foreach ($this->iterate() as $__)
         {
-            $body = str_replace('[br]', ' ', Util::parseHtmlText($this->getField('text', true), true));
+            $body = UIText::format($this->getField('text', true));
 
             $data[$this->id] = array(
                 'id'              => $this->id,
