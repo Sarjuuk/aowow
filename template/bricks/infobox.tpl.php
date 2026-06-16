@@ -41,8 +41,8 @@ echo '    <table class="infobox">'.PHP_EOL;
     endif;
 
     if ($this->series):
-        foreach ($this->series as [$list, $title]):
-            $this->brick('series', ['list' => $list, 'listTitle' => $title]);
+        foreach ($this->series as [$list, $title, $unordered]):
+            $this->brick('series', ['list' => $list, 'listTitle' => $title, 'unordered' => $unordered]);
         endforeach;
     endif;
 

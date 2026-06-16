@@ -13,7 +13,7 @@
 
 <?php
 foreach ($list as $idx => $itr):
-    echo $this->renderSeriesItem($idx, $itr, 12);
+    echo $this->renderSeriesItem($idx, $itr, $unordered, 12);
 endforeach;
 ?>
 

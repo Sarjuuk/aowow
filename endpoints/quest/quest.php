@@ -1288,34 +1288,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
             );
         };
 
-        // Assumption
-        // a chain always ends in a single quest, but can have an arbitrary amount of quests leading into it.
-        // so we fast forward to the last quest and go backwards from there.
-
-        $lastQuestId = $this->subject->getField('nextQuestIdChain');
-        while ($newLast = DB::Aowow()->selectCell('SELECT `nextQuestIdChain` FROM ::quests WHERE `id` = %i AND `id` <> `nextQuestIdChain`', $lastQuestId))
-            $lastQuestId = $newLast;
-
-        $end   = DB::Aowow()->selectRow('SELECT `id`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8`, `reqRaceMask` FROM ::quests WHERE `id` = %i', $lastQuestId ?: $this->typeId);
-        $chain = array(array($makeSeriesItem($end)));       // series / step / quest
-
-        $prevStepIds = [$lastQuestId ?: $this->typeId];
-        while ($prevQuests = DB::Aowow()->selectAssoc('SELECT `id`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8`, `reqRaceMask` FROM ::quests WHERE `nextQuestIdChain` IN %in AND `id` <> `nextQuestIdChain` AND (`cuFlags` & %i) = 0',
-            $prevStepIds, User::isInGroup(U_GROUP_STAFF) ? CUSTOM_EXCLUDE_FOR_LISTVIEW : 0))
-        {
-            $step = [];
-            foreach ($prevQuests as $pQuest)
-                $step[$pQuest['id']] = $makeSeriesItem($pQuest);
-
-            $prevStepIds = array_keys($step);
-            $chain[]     = $step;
-        }
-
-        if (count($chain) > 1)
-            $series[] = [array_reverse($chain), null];
-
-        // todo (low): sensibly merge the following lists into 'series'
-        $listGen = function($cnd) use ($makeSeriesItem)
+        $listGen = function(array $cnd) use ($makeSeriesItem) : ?array
         {
             $chain = [];
             $list  = new QuestList($cnd);
@@ -1328,15 +1301,62 @@ class QuestBaseResponse extends TemplateResponse implements ICache
             return $chain;
         };
 
+        // Breadcrumb
+        if ($bcTargetId = $this->subject->getField('breadcrumbForQuestId'))
+        {
+            if ($bcTarget = DB::Aowow()->selectRow('SELECT `id`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8`, `reqRaceMask` FROM ::quests WHERE `id` = %i', $bcTargetId))
+            {
+                $series[] = [
+                    [[$makeSeriesItem($bcTarget)]],
+                    sprintf(Util::$dfnString, Lang::quest('breadcrumbForDesc'), Lang::quest('breadcrumbFor')),
+                    true
+                ];
+            }
+        }
+
+        // Assumption
+        // a chain always ends in a single quest, but can have an arbitrary amount of quests leading into it.
+        // so we fast forward to the last quest and go backwards from there.
+
+        $lastQuestId = $this->subject->getField('nextQuestIdChain');
+        while ($newLast = DB::Aowow()->selectCell('SELECT `nextQuestIdChain` FROM ::quests WHERE `id` = %i AND `id` <> `nextQuestIdChain`', $lastQuestId))
+            $lastQuestId = $newLast;
+
+        $end   = DB::Aowow()->selectRow('SELECT `id`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8`, `reqRaceMask` FROM ::quests WHERE `id` = %i', $lastQuestId ?: $this->typeId);
+        $chain = array(array($makeSeriesItem($end)));       // series / step / quest
+
+        $prevStepIds = [$lastQuestId ?: $this->typeId];
+        while ($prevQuests = DB::Aowow()->selectAssoc('SELECT `id`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8`, `reqRaceMask` FROM ::quests WHERE `nextQuestIdChain` IN %in AND `id` <> `nextQuestIdChain` AND (`cuFlags` & %i) = 0 AND `breadcrumbForQuestId` = 0',
+            $prevStepIds, User::isInGroup(U_GROUP_STAFF) ? CUSTOM_EXCLUDE_FOR_LISTVIEW : 0))
+        {
+            $step = [];
+            foreach ($prevQuests as $pQuest)
+                $step[$pQuest['id']] = $makeSeriesItem($pQuest);
+
+            $prevStepIds = array_keys($step);
+            $chain[]     = $step;
+        }
+
+        // Breadcrumb quests that lead into this quest (shown ABOVE series)
+        if ($bcList = $listGen(array(['breadcrumbForQuestId', $this->typeId])))
+            $series[] = [
+                $bcList,
+                sprintf(Util::$dfnString, Lang::quest('breadcrumbQDesc'), Lang::quest('breadcrumbQ')),
+                true
+            ];
+
+        if (count($chain) > 1)
+            $series[] = [array_reverse($chain), null, false];
+
         $extraLists = array(
             // Requires all of these quests (Quests that you must follow to get this quest)
             ['reqQ',       array(DB::OR, [DB::AND, ['nextQuestId', $this->typeId], ['exclusiveGroup', 0, '<']], [DB::AND, ['id', $this->subject->getField('prevQuestId')], ['nextQuestIdChain', $this->typeId, '!']])],
 
             // Requires one of these quests (Requires one of the quests to choose from)
-            ['reqOneQ',    array(DB::OR, [DB::AND, ['exclusiveGroup', 0, '>='], ['nextQuestId', $this->typeId]], ['breadCrumbForQuestId', $this->typeId])],
+            ['reqOneQ',    array([DB::AND, ['exclusiveGroup', 0, '>='], ['nextQuestId', $this->typeId]])],
 
             // Opens Quests (Quests that become available only after complete this quest (optionally only one))
-            ['opensQ',     array(DB::OR, [DB::AND, ['prevQuestId', $this->typeId], ['id', $this->subject->getField('nextQuestIdChain'), '!']], ['id', $this->subject->getField('nextQuestId')], ['id', $this->subject->getField('breadcrumbForQuestId')])],
+            ['opensQ',     array(DB::OR, [DB::AND, ['prevQuestId', $this->typeId], ['id', $this->subject->getField('nextQuestIdChain'), '!']], ['id', $this->subject->getField('nextQuestId')])],
 
             // Closes Quests (Quests that become inaccessible after completing this quest)
             ['closesQ',    array(['exclusiveGroup', 0, '>'], ['exclusiveGroup', $this->subject->getField('exclusiveGroup')], ['id', $this->typeId, '!'])],
@@ -1350,7 +1370,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
 
         foreach ($extraLists as [$section, $condition])
             if ($_ = $listGen($condition))
-                $series[] = [$_, sprintf(Util::$dfnString, Lang::quest($section.'Desc'), Lang::quest($section))];
+                $series[] = [$_, sprintf(Util::$dfnString, Lang::quest($section.'Desc'), Lang::quest($section)), true];
 
         return $series;
     }

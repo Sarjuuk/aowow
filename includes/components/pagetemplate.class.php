@@ -288,9 +288,12 @@ class PageTemplate
         return $buff;
     }
 
-    private function renderSeriesItem(int $idx, array $list, int $lpad = 0) : string
+    private function renderSeriesItem(int $idx, array $list, bool $unordered, int $lpad = 0) : string
     {
-        $result = '<tr><th>'.($idx + 1).'</th><td><div>';
+        if ($unordered)
+            $result = '<tr><th style="padding-left:13px;"></th><td><div>';
+        else
+            $result = '<tr><th>'.($idx + 1).'.</th><td><div>';
 
         $end = array_key_last($list);
         foreach ($list as $k => $i)                         // itemItr
