@@ -66,7 +66,7 @@ class AdminScreenshotsActionStickyResponse extends TextResponse
             unset($ssEntries[$id]);
         }
 
-        if ($ssEntries)
-            trigger_error('AdminScreenshotsActionStickyResponse - screenshot(s) # '.implode(', ', array_keys($ssEntries)).' not in db or flagged as deleted', E_USER_WARNING);
+        if ($errIds = array_diff($this->_get['id'], array_keys($ssEntries)))
+            trigger_error('AdminScreenshotsActionStickyResponse - screenshot(s) #'.implode(', #', $errIds).' not in db or flagged as deleted', E_USER_WARNING);
     }
 }

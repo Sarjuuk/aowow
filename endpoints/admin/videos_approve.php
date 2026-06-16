@@ -38,7 +38,7 @@ class AdminVideosActionApproveResponse extends TextResponse
             unset($viEntries[$id]);
         }
 
-        if (!$viEntries)
-            trigger_error('AdminVideosActionApproveResponse - video(s) # '.implode(', ', array_keys($viEntries)).' not in db or already approved', E_USER_WARNING);
+        if ($errIds = array_diff($this->_get['id'], array_keys($viEntries)))
+            trigger_error('AdminVideosActionApproveResponse - video(s) #'.implode(', #', $errIds).' not in db or already approved', E_USER_WARNING);
     }
 }

@@ -54,7 +54,7 @@ class AdminScreenshotsActionApproveResponse extends TextResponse
             unset($ssEntries[$id]);
         }
 
-        if (!$ssEntries)
-            trigger_error('AdminScreenshotsActionApproveResponse - screenshot(s) # '.implode(', ', array_keys($ssEntries)).' not in db or already approved', E_USER_WARNING);
+        if ($errIds = array_diff($this->_get['id'], array_keys($ssEntries)))
+            trigger_error('AdminScreenshotsActionApproveResponse - screenshot(s) #'.implode(', #', $errIds).' not in db or already approved', E_USER_WARNING);
     }
 }

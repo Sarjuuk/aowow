@@ -50,7 +50,7 @@ class AdminVideosActionStickyResponse extends TextResponse
             unset($viEntries[$id]);
         }
 
-        if ($viEntries)
-            trigger_error('AdminVideosActionStickyResponse - video(s) # '.implode(', ', array_keys($viEntries)).' not in db or flagged as deleted', E_USER_WARNING);
+        if ($errIds = array_diff($this->_get['id'], array_keys($viEntries)))
+            trigger_error('AdminVideosActionStickyResponse - video(s) #'.implode(', #', $errIds).' not in db or flagged as deleted', E_USER_WARNING);
     }
 }
