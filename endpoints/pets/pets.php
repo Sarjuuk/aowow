@@ -69,9 +69,14 @@ class PetsBaseResponse extends TemplateResponse implements ICache
         {
             $this->extendGlobalData($pets->getJSGlobals(GLOBALINFO_RELATED));
 
+            $visCols = ['abilities'];
+
+            // BC/Classic feature; stats harmonized to +5% in WotLK
+            // array_push($visCols, 'health', 'damage', 'armor');
+
             $tabData = array(
                 'data'            => $pets->getListviewData(),
-                'visibleCols'     => ['abilities'],
+                'visibleCols'     => $visCols,
                 'computeDataFunc' => '$_',
                 'hiddenCols'      => !$pets->hasDiffFields('type') ? ['type'] : null
             );

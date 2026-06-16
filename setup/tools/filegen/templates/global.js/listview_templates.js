@@ -5650,7 +5650,7 @@ Listview.templates = {
                 }
             },
             {
-                id: 'damage',                                   // essentially unused, but if someone wants to backport classic
+                id: 'damage',                                   // aowow: essentially unused, but if someone wants to backport classic
                 name: LANG.damage,
                 value: 'damage',
                 hidden: 1,
@@ -5659,7 +5659,7 @@ Listview.templates = {
                 }
             },
             {
-                id: 'armor',                                   // essentially unused, but if someone wants to backport classic
+                id: 'armor',                                   // aowow: essentially unused, but if someone wants to backport classic
                 name: LANG.armor,
                 value: 'armor',
                 hidden: 1,
@@ -5668,7 +5668,7 @@ Listview.templates = {
                 }
             },
             {
-                id: 'health',                                   // essentially unused, but if someone wants to backport classic
+                id: 'health',                                   // aowow: essentially unused, but if someone wants to backport classic
                 name: LANG.health,
                 value: 'health',
                 hidden: 1,

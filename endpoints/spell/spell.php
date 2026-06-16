@@ -93,8 +93,9 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 LEFT JOIN   ::spell s2
                     ON      s1.`SpellFamilyId`     = s2.`SpelLFamilyId`     AND s1.`SpellFamilyFlags1` = s2.`SpelLFamilyFlags1` AND
                             s1.`SpellFamilyFlags2` = s2.`SpellFamilyFlags2` AND s1.`SpellFamilyFlags3` = s2.`SpellFamilyFlags3` AND
-                            s1.`name_loc0` = s2.`name_loc0`                 AND s2.`RankNo` = 1
+                            s2.`RankNo`            = 1                      AND IFNULL(NULLIF(s1.name_loc%i, ""), s1.`name_loc0`) = IFNULL(NULLIF(s2.name_loc%i, ""), s2.`name_loc0`)
                 WHERE       s1.`id` = %i',
+                Lang::getLocale()->value, Lang::getLocale()->value,
                 $this->typeId
             );
 

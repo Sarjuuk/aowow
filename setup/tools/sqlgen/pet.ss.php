@@ -72,7 +72,9 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                    `health` = s.`effect3BasePoints` + s.`effect3DieSides`
             WHERE  p.`skillLineId` = sla.`skillLineId` AND
                    sla.`spellId`   = s.`id` AND
-                   s.`name_loc0`   = "Tamed Pet Passive (DND)"'
+                   (s.`attributes0` & %i) = %i',
+                   SPELL_ATTR0_ABILITY | SPELL_ATTR0_PASSIVE,
+                   SPELL_ATTR0_ABILITY | SPELL_ATTR0_PASSIVE
         );
 
         // assign pet spells

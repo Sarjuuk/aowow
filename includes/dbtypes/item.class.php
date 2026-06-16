@@ -2245,7 +2245,10 @@ class ItemListFilter extends Filter
         }
 
         // only enhance search results if enchantment by name is unique (implies only one enchantment per item is available)
-        if (count(array_unique(array_column($randIds, 'name_loc0'))) == 1)
+        if (count(array_unique(array_column($randIds, 'name_loc'. Lang::getLocale()->value))) == 1 && reset($randIds)['name_loc'.Lang::getLocale()->value])
+            $this->extraOpts['relEnchant'] = $tplIds;
+        // try EN fallback
+        else if (count(array_unique(array_column($randIds, 'name_loc0'))) == 1)
             $this->extraOpts['relEnchant'] = $tplIds;
 
         if ($tplIds)
