@@ -4298,3 +4298,21 @@ a.button-red.fa-clipboard > em > span {
 .progress-icon.with-text {
     padding-left: 16px;
 }
+
+
+/* custom gossip icons */
+.gossip {
+    padding-left: 20px;
+    color: #ffffff !important;
+}
+.gossip-gossip       { background: url(../images/icons/gossip-gossip.png) left center no-repeat; }
+.gossip-vendor       { background: url(../images/icons/gossip-vendor.png) left center no-repeat; }
+.gossip-taxi         { background: url(../images/icons/gossip-taxi.png) left center no-repeat; }
+.gossip-trainer      { background: url(../images/icons/gossip-trainer.png) left center no-repeat; }
+.gossip-binder       { background: url(../images/icons/gossip-binder.png) left center no-repeat; }
+.gossip-healer       { background: url(../images/icons/gossip-healer.png) left center no-repeat; }
+.gossip-banker       { background: url(../images/icons/gossip-banker.png) left center no-repeat; }
+.gossip-petition     { background: url(../images/icons/gossip-petition.png) left center no-repeat; }
+.gossip-tabard       { background: url(../images/icons/gossip-tabard.png) left center no-repeat; }
+.gossip-battlemaster { background: url(../images/icons/gossip-battlemaster.png) left center no-repeat; }
+/* .gossip-auctioneer { background: url(../images/icons/gossip-auctioneer.png) left center no-repeat; } */

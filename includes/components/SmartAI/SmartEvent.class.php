@@ -295,7 +295,7 @@ class SmartEvent
                 break;
             case self::EVENT_GOSSIP_SELECT:                 // 62  -  On gossip clicked (gossip_menu_option335).
                 $gmo = DB::World()->selectRow(
-                   'SELECT    gmo.`OptionText` AS "text_loc0" %if', Lang::getLocale() != Locale::EN, ', gmol.`OptionText` AS %s', 'text_loc' . Lang::getLocale()->value, '%end
+                   'SELECT    gmo.`OptionIcon`, gmo.`OptionText` AS "text_loc0" %if', Lang::getLocale() != Locale::EN, ', gmol.`OptionText` AS %s', 'text_loc' . Lang::getLocale()->value, '%end
                     FROM      gossip_menu_option gmo
                     LEFT JOIN gossip_menu_option_locale gmol ON gmo.`MenuID` = gmol.`MenuID` AND gmo.`OptionID` = gmol.`OptionID` AND gmol.`Locale` = %s
                     WHERE     gmo.`MenuId` = %i AND gmo.`OptionID` = %i',
@@ -303,7 +303,26 @@ class SmartEvent
                 );
 
                 if ($gmo)
-                    $this->param[10] = Util::localizedString($gmo, 'text');
+                {
+                    $this->param[10]  = Util::localizedString($gmo, 'text');
+                    $this->param[11]  = 'gossip';
+                    $this->param[11] .= match($gmo['OptionIcon'])
+                    {
+                        0,  11, 12, 13,
+                        16, 17, 18, 19 => ' gossip-gossip',       // GOSSIP_ICON_CHAT - white chat bubble
+                        1              => ' gossip-vendor',       // GOSSIP_ICON_VENDOR - brown bag
+                        2              => ' gossip-taxi',         // GOSSIP_ICON_TAXI - flightmarker (paperplane)
+                        3              => ' gossip-trainer',      // GOSSIP_ICON_TRAINER - brown book (trainer)
+                        4              => ' gossip-healer',       // GOSSIP_ICON_INTERACT_1 - golden/red-ish interaction wheel
+                        5              => ' gossip-binder',       // GOSSIP_ICON_INTERACT_2 - golden interaction wheel
+                        6              => ' gossip-banker',       // GOSSIP_ICON_MONEY_BAG - brown bag (with gold coin in lower corner)
+                        7              => ' gossip-petition',     // GOSSIP_ICON_TALK - white chat bubble (with "..." inside)
+                        8              => ' gossip-tabard',       // GOSSIP_ICON_TABARD - white tabard
+                        9              => ' gossip-battlemaster', // GOSSIP_ICON_BATTLE - two crossed swords
+                        10,            => '',                     // GOSSIP_ICON_DOT - yellow dot/point - 'auctioneer' @ 0x00ACEF48; icon not in client
+                        default        => ''                      // 14, 15 NULL in client
+                    };
+                }
                 else
                     trigger_error('SmartAI::event - could not find gossip menu option for event #'.$this->type);
                 break;

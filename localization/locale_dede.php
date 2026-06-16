@@ -652,7 +652,7 @@ $lang = array(
             SmartEvent::EVENT_TIMED_EVENT_TRIGGERED   => ['Geplanted Ereignis #[b]%1$d[/b] löst aus', ''],
 /* 60*/     SmartEvent::EVENT_UPDATE                  => ['(%11$s)?Nach %11$s:Sofort;', 'Wiederhole alle %s'],
             SmartEvent::EVENT_LINK                    => ['Nach Ereignis %11$s', ''],
-            SmartEvent::EVENT_GOSSIP_SELECT           => ['Wähle Gossip:[br](%11$s)?[span class=q1]%11$s[/span]:Menü #[b]%1$d[/b] - Option #[b]%2$d[/b];', ''],
+            SmartEvent::EVENT_GOSSIP_SELECT           => ['Wähle Gossip:[br](%11$s)?[span class="%12$s"]%11$s[/span]:Menü #[b]%1$d[/b] - Option #[b]%2$d[/b];', ''],
             SmartEvent::EVENT_JUST_CREATED            => ['Beim ersten Erscheinen in der Welt', ''],
             SmartEvent::EVENT_GOSSIP_HELLO            => ['Öffne Gossip', '(%1$d)?onGossipHello:;(%2$d)?onReportUse:;'],
             SmartEvent::EVENT_FOLLOW_COMPLETED        => ['Ist fertig mit folgen', ''],

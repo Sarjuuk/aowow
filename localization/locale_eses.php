@@ -652,7 +652,7 @@ $lang = array(
             SmartEvent::EVENT_TIMED_EVENT_TRIGGERED   => ['Evento temporizado #[b]%1$d[/b] activado', ''],
 /* 60*/     SmartEvent::EVENT_UPDATE                  => ['(%11$s)?Después de %11$s:Instantáneamente;', 'Repetir cada %s'],
             SmartEvent::EVENT_LINK                    => ['Después del Evento %11$s', ''],
-            SmartEvent::EVENT_GOSSIP_SELECT           => ['Seleccionando opción de charla:[br](%11$s)?[span class=q1]%11$s[/span]:Menú #[b]%1$d[/b] - Opción #[b]%2$d[/b];', ''],
+            SmartEvent::EVENT_GOSSIP_SELECT           => ['Seleccionando opción de charla:[br](%11$s)?[span class="%12$s"]%11$s[/span]:Menú #[b]%1$d[/b] - Opción #[b]%2$d[/b];', ''],
             SmartEvent::EVENT_JUST_CREATED            => ['Al ser invocado por primera vez', ''],
             SmartEvent::EVENT_GOSSIP_HELLO            => ['Abriendo charla', '(%1$d)?onGossipHello:;(%2$d)?onReportUse:;'],
             SmartEvent::EVENT_FOLLOW_COMPLETED        => ['Siguió hasta el final', ''],
