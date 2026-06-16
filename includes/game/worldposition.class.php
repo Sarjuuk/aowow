@@ -6,42 +6,33 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
+/**
+ * collection of functions to get a displayable map point from world coordinates
+ */
 abstract class WorldPosition
 {
-    private static array $zoneMapCache  = [];
-    private static array $alphaMapCache = [];
-    private static array $capitalCities = array(        // capitals take precedence over their surrounding area
-        1497, 1637, 1638, 3487,                         // Undercity,      Ogrimmar,  Thunder Bluff, Silvermoon City
-        1519, 1537, 1657, 3557,                         // Stormwind City, Ironforge, Darnassus,     The Exodar
-        3703, 4395                                      // Shattrath City, Dalaran
+    private const /* string */ ALPHAMAP_PATH = 'cache/alphaMaps/%d.png';
+    private const /* array  */ CAPITAL_CITIES = array(      // capitals take precedence over their surrounding area
+        1497, 1637, 1638, 3487,                             // Undercity,      Ogrimmar,  Thunder Bluff, Silvermoon City
+        1519, 1537, 1657, 3557,                             // Stormwind City, Ironforge, Darnassus,     The Exodar
+        3703, 4395                                          // Shattrath City, Dalaran
     );
 
-    private static function alphaMapCheck(int $areaId, array &$set) : bool
-    {
-        $file = 'cache/alphaMaps/'.$areaId.'.png';
-        if (!file_exists($file))                            // file does not exist (probably instanced area)
-            return false;
+    private static array $zoneMapCache  = [];
+    private static array $alphaMapCache = [];
 
-        // invalid and corner cases (literally)
-        if (empty($set['posX']) || empty($set['posY']) || $set['posX'] >= 100 || $set['posY'] >= 100)
-        {
-            $set = null;
-            return true;
-        }
-
-        if (empty(self::$alphaMapCache[$areaId]))
-            self::$alphaMapCache[$areaId] = imagecreatefrompng($file);
-
-        // alphaMaps are 1000 x 1000, adapt points [black => valid point]
-        if (!imagecolorat(self::$alphaMapCache[$areaId], $set['posX'] * 10, $set['posY'] * 10))
-            $set = null;
-
-        return true;
-    }
-
+    /**
+     * test zone positions for placability and select most centered position
+     * @param   array[] $points [zonePosSet, ...]
+     * * int areaId
+     * * float posX
+     * * float posY
+     * * float dist
+     * @return array            best available $point
+     */
     public static function checkZonePos(array $points) : array
     {
-        $result   = [];
+        $result = [];
 
         foreach ($points as $res)
         {
@@ -58,7 +49,7 @@ abstract class WorldPosition
                     $result = [$q, $res];
             }
             // capitals (auto-discovered) and no hand-made alphaMap available
-            else if (in_array($res['areaId'], self::$capitalCities))
+            else if (in_array($res['areaId'], self::CAPITAL_CITIES))
                 return $res;
             // add with lowest quality if alpha map is missing
             else if (empty($result))
@@ -75,6 +66,21 @@ abstract class WorldPosition
         return $result[1];
     }
 
+    /**
+     * get world position for object type and guid
+     * @param  int      $type           applicable DBType
+     * * Creature
+     * * Gameobject
+     * * Areatrigger
+     * * Sound (emitter)
+     * * Zone (instance teleporter coords)
+     * @param  int[]    $guids          guids to look up
+     * @return array                    [worldPosSet, ...]
+     * * int id DBTypeEntry id
+     * * int mapId
+     * * float posX
+     * * float posY
+     */
     public static function getForGUID(int $type, int ...$guids) : array
     {
         $result = [];
@@ -94,7 +100,6 @@ abstract class WorldPosition
                 $result = DB::Aowow()->selectAssoc('SELECT -`id`  AS ARRAY_KEY,              `id`, `parentMapId` AS `mapId`, `parentX`    AS `posX`, `parentY`    AS `posY` FROM ::zones         WHERE -`id`  IN %in', $guids);
                 break;
             case Type::AREATRIGGER:
-                $result = [];
                 if ($base = array_filter($guids, fn($x) => $x > 0))
                     $result = array_replace($result, DB::AoWoW()->selectAssoc('SELECT `id`   AS ARRAY_KEY, `id`,    `mapId`,                 `posX`,                 `posY` FROM ::areatrigger   WHERE `id`   IN %in', $base));
                 if ($endpoints = array_filter($guids, fn($x) => $x < 0))
@@ -114,13 +119,31 @@ abstract class WorldPosition
         return $result;
     }
 
+    /**
+     * convert world position to zone position and sort results by most centered first
+     * @param  int      $mapId          map id
+     * @param  float    $mapX           world X
+     * @param  float    $mapY           world Y
+     * @param  int      $preferedAreaId try to place zone position within this area (ignored if it would yield no results)
+     * @param  int      $preferedFloor  try to place zone position on this floor (ignored if it would yield no results)
+     * @return array                    [zonePosSet, ...]
+     * * int id dungeonmap id (or 0)
+     * * int areaId
+     * * int floor
+     * * bool multifloor zone has multiple floors
+     * * bool srcPrio takes precedence over similar zone definitions (dungeonmap over worldmaparea)
+     * * float posX zone X
+     * * float posY zone Y
+     * * float dist distance to zone center: i.e. pick priority
+     *
+     * Reminder that world positions are rotated 90° counterclockwise in relation to zone positions
+     */
     public static function toZonePos(int $mapId, float $mapX, float $mapY, int $preferedAreaId = 0, int $preferedFloor = -1) : array
     {
         if (!$mapId < 0)
             return [];
 
-        if (!isset(self::$zoneMapCache[$mapId]))
-            self::initZoneMaps($mapId);
+        self::$zoneMapCache[$mapId] ??= self::loadZones($mapId);
 
         $points = [];
         for ($i = 0; $i < 2; $i++)
@@ -165,9 +188,55 @@ abstract class WorldPosition
         return $points;
     }
 
-    private static function initZoneMaps(int $mapId) : void
+    /**
+     * crude measure to determine if a set of world coordinates is on a displayable part of a map file
+     * alpha maps have to be generated by setup (see: aowow --build=img-maps --help)
+     * you should rely on your core to calculate zone id and zone coordinates for creature/gameobject spawns
+     *
+     * @param   int                 $areaId or zone id (used interchangeably) to test on
+     * @param   array<float, float> $set    [posX, posY] set of coordinates to test. Set null on mismatch.
+     * @return  bool                        check success
+     */
+    private static function alphaMapCheck(int $areaId, array &$set) : bool
     {
-        self::$zoneMapCache[$mapId] = DB::Aowow()->selectAssoc(
+        $file = sprintf(self::ALPHAMAP_PATH, $areaId);
+        if (!file_exists($file))                            // file does not exist (probably instanced area)
+            return false;
+
+        // invalid and corner cases (literally)
+        if (empty($set['posX']) || empty($set['posY']) || $set['posX'] >= 100 || $set['posY'] >= 100)
+        {
+            $set = null;
+            return true;
+        }
+
+        self::$alphaMapCache[$areaId] ??= imagecreatefrompng($file);
+
+        // alphaMaps are 1000 x 1000, adapt points [black => valid point]
+        if (!imagecolorat(self::$alphaMapCache[$areaId], $set['posX'] * 10, $set['posY'] * 10))
+            $set = null;
+
+        return true;
+    }
+
+    /**
+     * load zone data for cache
+     *
+     * @param   int     $mapId  load zone data for this map
+     * @return  array           [zoneDataset, ...]
+     * * int id dungeonmap id (or 0)
+     * * int areaId
+     * * float minX
+     * * float maxX
+     * * float minY
+     * * float maxY
+     * * int floor floor index
+     * * bool srcPrio takes precedence over similar zone definitions (dungeonmap over worldmaparea)
+     * * bool multifloor zone has multiple floors
+     */
+    private static function loadZones(int $mapId) : array
+    {
+        return DB::Aowow()->selectAssoc(
            'SELECT
                 x.`id`,
                 x.`areaId`,
@@ -176,13 +245,13 @@ abstract class WorldPosition
                 IF(useDM.`id`   IS NOT NULL OR x.`defaultDungeonMapId` < 0, 1, 0) AS `srcPrio`,
                 IF(multiDM.`id` IS NOT NULL OR x.`defaultDungeonMapId` < 0, 1, 0) AS `multifloor`
             FROM
-                (SELECT 0 AS `id`, `areaId`,     `mapId`, `right` AS `minY`, `left` AS `maxY`, `top` AS `maxX`, `bottom` AS `minX`, 0 AS `floor`, 0 AS `worldMapAreaId`, `defaultDungeonMapId` FROM aowow_worldmaparea wma UNION
-                 SELECT   dm.`id`, `areaId`, wma.`mapId`,            `minY`,           `maxY`,          `maxX`,             `minX`,      `floor`,      `worldMapAreaId`, `defaultDungeonMapId` FROM aowow_worldmaparea wma
-                 JOIN   aowow_dungeonmap dm ON dm.`mapId` = wma.`mapId` WHERE wma.`mapId` NOT IN (0, 1, 530, 571) OR wma.`areaId` = 4395) x
+                (SELECT 0 AS `id`, `areaId`,     `mapId`, `right` AS `minY`, `left` AS `maxY`, `top` AS `maxX`, `bottom` AS `minX`, 0 AS `floor`, 0 AS `worldMapAreaId`, `defaultDungeonMapId` FROM ::worldmaparea wma UNION
+                 SELECT   dm.`id`, `areaId`, wma.`mapId`,            `minY`,           `maxY`,          `maxX`,             `minX`,      `floor`,      `worldMapAreaId`, `defaultDungeonMapId` FROM ::worldmaparea wma
+                 JOIN   ::dungeonmap dm ON dm.`mapId` = wma.`mapId` WHERE wma.`mapId` NOT IN (0, 1, 530, 571) OR wma.`areaId` = 4395) x
             LEFT JOIN
-                aowow_dungeonmap useDM   ON useDM.`mapId`   = x.`mapId` AND useDM.`worldMapAreaId`   = x.`worldMapAreaId` AND useDM.`floor`   =  x.`floor` AND useDM.`worldMapAreaId`   > 0
+                ::dungeonmap useDM   ON useDM.`mapId`   = x.`mapId` AND useDM.`worldMapAreaId`   = x.`worldMapAreaId` AND useDM.`floor`   =  x.`floor` AND useDM.`worldMapAreaId`   > 0
             LEFT JOIN
-                aowow_dungeonmap multiDM ON multiDM.`mapId` = x.`mapId` AND multiDM.`worldMapAreaId` = x.`worldMapAreaId` AND multiDM.`floor` <> x.`floor` AND multiDM.`worldMapAreaId` > 0
+                ::dungeonmap multiDM ON multiDM.`mapId` = x.`mapId` AND multiDM.`worldMapAreaId` = x.`worldMapAreaId` AND multiDM.`floor` <> x.`floor` AND multiDM.`worldMapAreaId` > 0
             WHERE
                 x.`mapId` = %i AND x.`areaId` <> 0 AND
                 x.`minX` <> 0 AND x.`maxX` <> 0 AND x.`minY` <> 0 AND x.`maxY` <> 0
