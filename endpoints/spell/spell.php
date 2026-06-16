@@ -88,6 +88,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         // returns self or firstRank
         if ($fr = DB::World()->selectCell('SELECT `first_spell_id` FROM spell_ranks WHERE `spell_id` = %i', $this->typeId))
             $this->firstRank = $fr;
+     /* >firstRank is used exclusively to query world db tables. So this expensive else-branch is probably obsolete
         else
             $this->firstRank = DB::Aowow()->selectCell(
                'SELECT      IF(s1.`RankNo` <> 1 AND s2.`id`, s2.`id`, s1.`id`)
@@ -100,7 +101,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 Lang::getLocale()->value, Lang::getLocale()->value,
                 $this->typeId
             );
-
+     */
         $this->h1 = Util::htmlEscape($this->subject->getField('name', true));
 
         $this->gPageInfo += array(
@@ -282,7 +283,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         );
         if ($_ = array_filter($auraState))
         {
-            $stateData = DB::Aowow()->selectAssoc('SELECT s.id AS ARRAY_KEY, i.`name` AS "icon", s.name_loc0, s.name_loc2, s.name_loc3, s.name_loc4, s.name_loc6, s.name_loc8 FROM ::icons i JOIN ::spell s ON s.iconId = i.id WHERE s.id IN %in', $_);
+            $stateData = DB::Aowow()->selectAssoc('SELECT s.id AS ARRAY_KEY, IFNULL(i.`name`, %s) AS "icon", s.name_loc0, s.name_loc2, s.name_loc3, s.name_loc4, s.name_loc6, s.name_loc8 FROM ::spell s LEFT JOIN ::icons i ON s.iconId = i.id WHERE s.id IN %in', DEFAULT_ICON, $_);
 
             foreach ($_ as $idx => $spellId)
             {
