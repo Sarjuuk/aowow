@@ -27,15 +27,20 @@ class ProfileResyncResponse extends TextResponse
     */
     protected function generate() : void
     {
-        if ($chars = DB::Aowow()->selectAssoc('SELECT `realm`, `realmGUID` FROM ::profiler_profiles WHERE `id` IN %in', $this->_get['id']))
+        $this->result = 1;                                  // always
+
+        if (!$this->assertGET('id'))
         {
+            trigger_error('ProfileResyncResponse - invalid id received', E_USER_ERROR);
+            return;
+        }
+
+        if ($chars = DB::Aowow()->selectAssoc('SELECT `id` AS ARRAY_KEY, `realm`, `realmGUID` FROM ::profiler_profiles WHERE `id` IN %in', $this->_get['id']))
             foreach ($chars as $c)
                 Profiler::scheduleResync(Type::PROFILE, $c['realm'], $c['realmGUID']);
-        }
-        else
-            trigger_error('ProfileResyncResponse - profiles '.implode(', ', $this->_get['id']).' not found in db', E_USER_ERROR);
 
-        $this->result = 1;
+        if ($_ = array_diff(array_keys($chars ?: []), $this->_get['id']))
+            trigger_error('ProfileResyncResponse - profiles '.implode(', ', $_).' not found in db', E_USER_ERROR);
     }
 }
 

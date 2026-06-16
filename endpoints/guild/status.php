@@ -22,7 +22,7 @@ class GuildStatusResponse extends TextResponse
 
     protected function generate() : void
     {
-        $this->result = Profiler::resyncStatus(Type::GUILD, $this->_get['id']);
+        $this->result = Profiler::resyncStatus(Type::GUILD, $this->_get['id'] ?: []);
     }
 }
 

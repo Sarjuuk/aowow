@@ -30,9 +30,9 @@ class ProfileStatusResponse extends TextResponse
     protected function generate() : void
     {
         // roster resync for this guild was requested -> get char list
-        if ($this->_get['guild'])
+        if ($this->_get['guild'] && $this->_get['id'])
             $ids = DB::Aowow()->selectCol('SELECT `id` FROM ::profiler_profiles WHERE `guild` IN %in', $this->_get['id']);
-        else if ($this->_get['arena-team'])
+        else if ($this->_get['arena-team'] && $this->_get['id'])
             $ids = DB::Aowow()->selectCol('SELECT `profileId` FROM ::profiler_arena_team_member WHERE `arenaTeamId` IN %in', $this->_get['id']);
         else
             $ids = $this->_get['id'];

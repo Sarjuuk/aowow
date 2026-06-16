@@ -22,7 +22,7 @@ class ArenaTeamStatusResponse extends TextResponse
 
     protected function generate() : void
     {
-        $this->result = Profiler::resyncStatus(Type::ARENA_TEAM, $this->_get['id']);
+        $this->result = Profiler::resyncStatus(Type::ARENA_TEAM, $this->_get['id'] ?: []);
     }
 }
 

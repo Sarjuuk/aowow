@@ -9,8 +9,8 @@ if (!defined('AOWOW_REVISION'))
 class ProfileLoadResponse extends TextResponse
 {
     protected array  $expectedGET = array(
-        'id'    => ['filter' => FILTER_CALLBACK, 'options' => [self::class, 'checkIdList']  ],
-        'items' => ['filter' => FILTER_CALLBACK, 'options' => [self::class, 'checkItemList']]
+        'id'    => ['filter' => FILTER_VALIDATE_INT, 'options' => ['min_range' => 1]            ],
+        'items' => ['filter' => FILTER_CALLBACK,     'options' => [self::class, 'checkItemList']]
     );
 
     public function __construct(string $rawParam)
@@ -40,10 +40,10 @@ class ProfileLoadResponse extends TextResponse
             return;
         }
 
-        $pBase = DB::Aowow()->selectRow('SELECT pg.`name` AS "guildname", p.* FROM ::profiler_profiles p LEFT JOIN ::profiler_guild pg ON pg.`id` = p.`guild` WHERE p.`id` = %i', $this->_get['id'][0]);
+        $pBase = DB::Aowow()->selectRow('SELECT pg.`name` AS "guildname", p.* FROM ::profiler_profiles p LEFT JOIN ::profiler_guild pg ON pg.`id` = p.`guild` WHERE p.`id` = %i', $this->_get['id']);
         if (!$pBase)
         {
-            trigger_error('ProfileLoadResponse - called with invalid profileId #'.$this->_get['id'][0], E_USER_WARNING);
+            trigger_error('ProfileLoadResponse - called with invalid profileId #'.$this->_get['id'], E_USER_WARNING);
             return;
         }
 

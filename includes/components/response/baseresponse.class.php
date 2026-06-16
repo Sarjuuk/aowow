@@ -461,7 +461,7 @@ abstract class BaseResponse
     protected static array $sql = [];                       // debug: sql stats container
 
     protected array $expectedPOST   = [];                   // fill with variables you that are going to be used; eg:
-    protected array $expectedGET    = [];                   // 'id' => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkIdList']
+    protected array $expectedGET    = [];                   // 'id' => ['filter' => FILTER_CALLBACK, 'options' => [self::class, 'checkIdList']]
     protected array $expectedCOOKIE = [];
 
     protected array $_post   = [];                          // the filtered variable result
@@ -612,28 +612,25 @@ abstract class BaseResponse
         return $val === '';                                 // parameter is set and expected to be empty
     }
 
-    protected static function checkIdList(string $val) : array
+    protected static function checkIdList(string $val) : ?array
     {
         if (preg_match('/^-?\d+(,-?\d+)*$/', $val))
             return array_map('intVal', explode(',', $val));
-
-        return [];
+        return null;
     }
 
-    protected static function checkIntArray(string $val) : array
+    protected static function checkIntArray(string $val) : ?array
     {
         if (preg_match('/^-?\d+(:-?\d+)*$/', $val))
             return array_map('intVal', explode(':', $val));
-
-        return [];
+        return null;
     }
 
-    protected static function checkIdListUnsigned(string $val) : array
+    protected static function checkIdListUnsigned(string $val) : ?array
     {
         if (preg_match('/^\d+(,\d+)*$/', $val))
             return array_map('intVal', explode(',', $val));
-
-        return [];
+        return null;
     }
 
     protected static function checkTextLine(string $val) : string
