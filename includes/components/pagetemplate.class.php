@@ -253,7 +253,7 @@ class PageTemplate
 
         $buff = '';
         foreach ($data as $x)
-            $buff .= str_repeat(' ', $lpad) . $x . "\n";
+            $buff .= str_repeat(' ', $lpad) . $x . PHP_EOL;
 
         return $buff;
     }
@@ -270,18 +270,18 @@ class PageTemplate
         {
             $buff .= str_repeat(' ', $lpad).'var _ = '.$jsVar.';';
 
-            foreach ($data as $key => $data)
-                $buff .= ' _['.(is_numeric($key) ? $key : "'".$key."'")."]=".Util::toJSON($data).';';
+            foreach ($data as $key => $var)
+                $buff .= ' _['.(is_numeric($key) ? $key : "'".$key."'")."]=".Util::toJSON($var).';';
 
-            $buff .= "\n";
+            $buff .= PHP_EOL;
 
             if (isset($this->gPageInfo['type']) && isset($this->gPageInfo['typeId']) && isset($extraData[$this->gPageInfo['typeId']]))
             {
-                $buff .= "\n";
+                $buff .= PHP_EOL;
                 foreach ($extraData[$this->gPageInfo['typeId']] as $k => $v)
                     if ($v)
-                        $buff .= str_repeat(' ', $lpad).'_['.$this->gPageInfo['typeId'].'].'.$k.' = '.Util::toJSON($v).";\n";
-                $buff .= "\n";
+                        $buff .= str_repeat(' ', $lpad).'_['.$this->gPageInfo['typeId'].'].'.$k.' = '.Util::toJSON($v).';'.PHP_EOL;
+                $buff .= PHP_EOL;
             }
         }
 
@@ -315,7 +315,7 @@ class PageTemplate
 
         }
 
-        return str_repeat(' ', $lpad) . $result .  "</div></td></tr>\n";
+        return str_repeat(' ', $lpad) . $result . '</div></td></tr>' . PHP_EOL;
     }
 
     private function renderFilter(int $lpad = 0) : string
@@ -350,9 +350,9 @@ class PageTemplate
         if ($this->filter->fiExtraCols)                     // arr:extraCols
             $result[] = 'fi_extraCols = '.Util::toJSON(array_values(array_unique($this->filter->fiExtraCols))).";";
 
-        return str_repeat(' ', $lpad)."<script type=\"text/javascript\">//<![CDATA[\n".
+        return str_repeat(' ', $lpad).'<script type="text/javascript">//<![CDATA['.PHP_EOL.
                    $this->renderArray($result, $lpad + 4).
-               str_repeat(' ', $lpad)."//]]></script>\n";
+               str_repeat(' ', $lpad).'//]]></script>'.PHP_EOL;
     }
 
     private function makeOptionsList(array $data, mixed $selectedIdx = null, int $lpad = 0, ?callable $callback = null) : string
@@ -379,7 +379,7 @@ class PageTemplate
             else if (!is_null($selectedIdx) && $selectedIdx == $idx)
                 $options .= ' selected="selected"';
 
-            $options .= ' value="'.$idx.'">'.$str.'</option>'.($lpad < 0 ? '' : "\n");
+            $options .= ' value="'.$idx.'">'.$str.'</option>'.($lpad < 0 ? '' : PHP_EOL);
         }
 
         return $options;
@@ -409,7 +409,7 @@ class PageTemplate
             foreach ($extraAttributes as $k => $v)
                 $options .= ' '.$k.'="'.$v.'"';
 
-            $options .= '>'.$title.'</label>'.($lpad < 0 ? '' : "\n");
+            $options .= '>'.$title.'</label>'.($lpad < 0 ? '' : PHP_EOL);
         }
 
         return $options;
