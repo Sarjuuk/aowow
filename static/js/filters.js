@@ -323,7 +323,10 @@ var fi_filters = {
         { id: 116,  name: 'onGlobalCooldown',       type: 'yn'                             },
         { id: 28,   name: 'casttime',               type: 'num'                            },
         { id: 27,   name: 'channeled',              type: 'yn'                             },
+        { id: 200,  name: 'cooldown',               type: 'num'                            }, // aowow - custom
+        { id: 26,   name: 'gcdcategory_stc',        type: 'str'                            },
         { id: 40,   name: 'damagetype',             type: 'damagetype'                     },
+        { id: 201,  name: 'duration_stc',           type: 'num'                            }, // aowow - custom
         { id: 109,  name: 'effecttype',             type: 'effecttype'                     },
         { id: 29,   name: 'appliesaura',            type: 'effectauranames'                },
         { id: 15,   name: 'icon',                   type: 'str'                            },
@@ -331,6 +334,10 @@ var fi_filters = {
         { id: 20,   name: 'hasreagents',            type: 'yn'                             },
         { id: 14,   name: 'id',                     type: 'num',            before: 'name' },
         { id: 12,   name: 'lastrank',               type: 'yn'                             },
+     // { id: 121,  name: 'inMyFavorites_stc',      type: 'yn'                             },
+        { id: 117,  name: 'maximumRange_stc',       type: 'num'                            },
+        { id: 118,  name: 'minimumRange_stc',       type: 'num'                            },
+        { id: 120,  name: 'modifiesSpell_filter',   type: 'str'                            },
         { id: 22,   name: 'proficiencytype',        type: 'proficiencytype'                },
         { id: 13,   name: 'rankno',                 type: 'num'                            },
         { id: 3,    name: 'requiresnearbyobject',   type: 'yn'                             },
@@ -338,6 +345,7 @@ var fi_filters = {
         { id: 114,  name: 'requiresfaction',        type: 'side'                           },
         { id: 1,    name: 'manaenergyragecost',     type: 'num'                            },
         { id: 45,   name: 'resourcetype',           type: 'resourcetype'                   },
+        { id: 129,  name: 'givesResourceType_stc',  type: 'resourcetype'                   },
         { id: 25,   name: 'rewardsskillups',        type: 'yn'                             },
      // { id: 110,  name: 'scalingap',              type: 'yn'                             },
         { id: 19,   name: 'scaling',                type: 'yn'                             },
@@ -456,6 +464,7 @@ var fi_filters = {
         { id: 2,   name: 'gearscore',               type: 'num' },
         { id: 3,   name: 'achievementpoints',       type: 'num' },
         { id: 21,  name: 'wearingitem',             type: 'str-small' },
+        { id: 22,  name: 'wearingpermenchant',      type: 'str-small' },
         { id: 23,  name: 'completedachievement',    type: 'str-small' },
 
         { id: 24,  name: 'sepprofession' },

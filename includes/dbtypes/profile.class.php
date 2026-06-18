@@ -208,36 +208,37 @@ class ProfileListFilter extends Filter
 
     protected string $type          = 'profiles';
     protected static array $genericFilter = array(
-         2 => [parent::CR_NUMERIC,  'gearscore',         NUM_CAST_INT              ], // gearscore [num]
-         3 => [parent::CR_CALLBACK, 'cbAchievs',         null,                 null], // achievementpoints [num]
-         5 => [parent::CR_NUMERIC,  'talenttree1',       NUM_CAST_INT              ], // talenttree1 [num]
-         6 => [parent::CR_NUMERIC,  'talenttree2',       NUM_CAST_INT              ], // talenttree2 [num]
-         7 => [parent::CR_NUMERIC,  'talenttree3',       NUM_CAST_INT              ], // talenttree3 [num]
-         9 => [parent::CR_STRING,   'g.name'                                       ], // guildname
-        10 => [parent::CR_CALLBACK, 'cbHasGuildRank',    null,                 null], // guildrank
-        12 => [parent::CR_CALLBACK, 'cbTeamName',        2,                    null], // teamname2v2
-        15 => [parent::CR_CALLBACK, 'cbTeamName',        3,                    null], // teamname3v3
-        18 => [parent::CR_CALLBACK, 'cbTeamName',        5,                    null], // teamname5v5
-        13 => [parent::CR_CALLBACK, 'cbTeamRating',      2,                    null], // teamrtng2v2
-        16 => [parent::CR_CALLBACK, 'cbTeamRating',      3,                    null], // teamrtng3v3
-        19 => [parent::CR_CALLBACK, 'cbTeamRating',      5,                    null], // teamrtng5v5
-        14 => [parent::CR_NYI_PH,   null,                0 /* 2 */                 ], // teamcontrib2v2 [num]
-        17 => [parent::CR_NYI_PH,   null,                0 /* 3 */                 ], // teamcontrib3v3 [num]
-        20 => [parent::CR_NYI_PH,   null,                0 /* 5 */                 ], // teamcontrib5v5 [num]
-        21 => [parent::CR_CALLBACK, 'cbWearsItems',      null,                 null], // wearingitem [str]
-        23 => [parent::CR_CALLBACK, 'cbCompletedAcv',    null,                 null], // completedachievement
-        25 => [parent::CR_CALLBACK, 'cbProfession',      SKILL_ALCHEMY,        null], // alchemy [num]
-        26 => [parent::CR_CALLBACK, 'cbProfession',      SKILL_BLACKSMITHING,  null], // blacksmithing [num]
-        27 => [parent::CR_CALLBACK, 'cbProfession',      SKILL_ENCHANTING,     null], // enchanting [num]
-        28 => [parent::CR_CALLBACK, 'cbProfession',      SKILL_ENGINEERING,    null], // engineering [num]
-        29 => [parent::CR_CALLBACK, 'cbProfession',      SKILL_HERBALISM,      null], // herbalism [num]
-        30 => [parent::CR_CALLBACK, 'cbProfession',      SKILL_INSCRIPTION,    null], // inscription [num]
-        31 => [parent::CR_CALLBACK, 'cbProfession',      SKILL_JEWELCRAFTING,  null], // jewelcrafting [num]
-        32 => [parent::CR_CALLBACK, 'cbProfession',      SKILL_LEATHERWORKING, null], // leatherworking [num]
-        33 => [parent::CR_CALLBACK, 'cbProfession',      SKILL_MINING,         null], // mining [num]
-        34 => [parent::CR_CALLBACK, 'cbProfession',      SKILL_SKINNING,       null], // skinning [num]
-        35 => [parent::CR_CALLBACK, 'cbProfession',      SKILL_TAILORING,      null], // tailoring [num]
-        36 => [parent::CR_CALLBACK, 'cbHasGuild',        null,                 null]  // hasguild [yn]
+         2 => [parent::CR_NUMERIC,  'gearscore',          NUM_CAST_INT                       ], // gearscore [num]
+         3 => [parent::CR_CALLBACK, 'cbAchievs',          null,                 null         ], // achievementpoints [num]
+         5 => [parent::CR_NUMERIC,  'talenttree1',        NUM_CAST_INT                       ], // talenttree1 [num]
+         6 => [parent::CR_NUMERIC,  'talenttree2',        NUM_CAST_INT                       ], // talenttree2 [num]
+         7 => [parent::CR_NUMERIC,  'talenttree3',        NUM_CAST_INT                       ], // talenttree3 [num]
+         9 => [parent::CR_STRING,   'g.name'                                                 ], // guildname
+        10 => [parent::CR_CALLBACK, 'cbHasGuildRank',     null,                 null         ], // guildrank
+        12 => [parent::CR_CALLBACK, 'cbTeamName',         2,                    null         ], // teamname2v2
+        15 => [parent::CR_CALLBACK, 'cbTeamName',         3,                    null         ], // teamname3v3
+        18 => [parent::CR_CALLBACK, 'cbTeamName',         5,                    null         ], // teamname5v5
+        13 => [parent::CR_CALLBACK, 'cbTeamRating',       2,                    null         ], // teamrtng2v2
+        16 => [parent::CR_CALLBACK, 'cbTeamRating',       3,                    null         ], // teamrtng3v3
+        19 => [parent::CR_CALLBACK, 'cbTeamRating',       5,                    null         ], // teamrtng5v5
+        14 => [parent::CR_NYI_PH,   null,                 0 /* 2 */                          ], // teamcontrib2v2 [num]
+        17 => [parent::CR_NYI_PH,   null,                 0 /* 3 */                          ], // teamcontrib3v3 [num]
+        20 => [parent::CR_NYI_PH,   null,                 0 /* 5 */                          ], // teamcontrib5v5 [num]
+        21 => [parent::CR_CALLBACK, 'cbEquippedItemProp', Type::ITEM,           'item'       ], // wearingitem [str]
+        22 => [parent::CR_CALLBACK, 'cbEquippedItemProp', Type::ENCHANTMENT,    'permEnchant'], // wearingpermenchant [str]
+        23 => [parent::CR_CALLBACK, 'cbCompletedAcv',     null,                 null         ], // completedachievement
+        25 => [parent::CR_CALLBACK, 'cbProfession',       SKILL_ALCHEMY,        null         ], // alchemy [num]
+        26 => [parent::CR_CALLBACK, 'cbProfession',       SKILL_BLACKSMITHING,  null         ], // blacksmithing [num]
+        27 => [parent::CR_CALLBACK, 'cbProfession',       SKILL_ENCHANTING,     null         ], // enchanting [num]
+        28 => [parent::CR_CALLBACK, 'cbProfession',       SKILL_ENGINEERING,    null         ], // engineering [num]
+        29 => [parent::CR_CALLBACK, 'cbProfession',       SKILL_HERBALISM,      null         ], // herbalism [num]
+        30 => [parent::CR_CALLBACK, 'cbProfession',       SKILL_INSCRIPTION,    null         ], // inscription [num]
+        31 => [parent::CR_CALLBACK, 'cbProfession',       SKILL_JEWELCRAFTING,  null         ], // jewelcrafting [num]
+        32 => [parent::CR_CALLBACK, 'cbProfession',       SKILL_LEATHERWORKING, null         ], // leatherworking [num]
+        33 => [parent::CR_CALLBACK, 'cbProfession',       SKILL_MINING,         null         ], // mining [num]
+        34 => [parent::CR_CALLBACK, 'cbProfession',       SKILL_SKINNING,       null         ], // skinning [num]
+        35 => [parent::CR_CALLBACK, 'cbProfession',       SKILL_TAILORING,      null         ], // tailoring [num]
+        36 => [parent::CR_CALLBACK, 'cbHasGuild',         null,                 null         ]  // hasguild [yn]
     );
 
     protected static array $inputFields = array(
@@ -270,7 +271,7 @@ class ProfileListFilter extends Filter
         parent::__construct($data, $opts);
 
         if (!empty($this->values['cr']))
-            if (array_intersect($this->values['cr'], [2, 5, 6, 7, 21]))
+            if (array_intersect($this->values['cr'], [2, 5, 6, 7, 21, 22]))
                 $this->useLocalList = true;
     }
 
@@ -375,18 +376,18 @@ class ProfileListFilter extends Filter
         }
     }
 
-    protected function cbWearsItems(int $cr, int $crs, string $crv) : ?array
+    protected function cbEquippedItemProp(int $cr, int $crs, string $crv, int $type, string $field) : ?array
     {
         if (!Util::checkNumeric($crv, NUM_CAST_INT))
             return null;
 
-        if (!Type::validateIds(Type::ITEM, $crv))
+        if (!Type::validateIds($type, $crv))
             return null;
 
         $k = 'i_'.Util::createHash(12);
 
-        $this->extraOpts[$k] = ['j' => [sprintf('::profiler_items %1$s ON `%1$s`.`id` = p.`id` AND `%1$s`.`item` = %2$d', $k, $crv), true]];
-        return [$k.'.item', null, '!'];
+        $this->extraOpts[$k] = ['j' => [sprintf('::profiler_items %1$s ON `%1$s`.`id` = p.`id` AND `%1$s`.`%3$s` = %2$d', $k, $crv, $field), true]];
+        return [$k.'.'.$field, null, '!'];
     }
 
     protected function cbHasGuild(int $cr, int $crs, string $crv) : ?array

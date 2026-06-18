@@ -4264,6 +4264,13 @@ var LANG = {
         effecttype:                 "效果类型",
         scalingap:                  "与攻击伤害成比例",
         scalingsp:                  "与法术伤害成比例",
+        duration_stc:               "持续时间（数秒）",
+        gcdcategory_stc:            "GCD目录",
+        givesResourceType_stc:      "[Gives resource type]",
+        inMyFavorites_stc:          "在我的收藏中",
+        maximumRange_stc:           "最大范围",
+        minimumRange_stc:           "最小范围",
+        modifiesSpell_filter:       "修改法术 #…",
 
         sepattributes:              "属性",
         combatcastable:             "可在战斗中施法",

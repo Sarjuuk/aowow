@@ -44,9 +44,10 @@ abstract class Filter
     public const CR_FLAG      = 2;
     public const CR_NUMERIC   = 3;
     public const CR_STRING    = 4;
-    public const CR_ENUM      = 5;
-    public const CR_STAFFFLAG = 6;
-    public const CR_CALLBACK  = 7;
+    public const CR_NUMSTRING = 5;
+    public const CR_ENUM      = 6;
+    public const CR_STAFFFLAG = 7;
+    public const CR_CALLBACK  = 8;
     public const CR_NYI_PH    = 999;
 
     public const V_EQUAL      = 8;
@@ -112,6 +113,7 @@ abstract class Filter
         [self::CR_FLAG,      <string:colName>, <int:testBit>,   <bool:matchAny>]       # default param2: matchExact
         [self::CR_NUMERIC,   <string:colName>, <int:NUM_FLAGS>, <bool:addExtraCol>]
         [self::CR_STRING,    <string:colName>, <int:STR_FLAGS>, <string:fulltextColName]
+        [self::CR_NUMSTRING, <string:colName>, <int:NUM_FLAGS>, null]                  # input is string but input value expected to be numeric
         [self::CR_ENUM,      <string:colName>, <bool:ANY_NONE>, <bool:isEnumVal>]      # param3 ? crv is val in enum : key in enum
         [self::CR_STAFFFLAG, <string:colName>, null,            null]
         [self::CR_CALLBACK,  <string:fnName>,  <mixed:param1>,  <mixed:param2>]
@@ -429,6 +431,8 @@ abstract class Filter
             {
                 case self::CR_NUMERIC:
                     $_ = $_crs[$i];
+                case self::CR_NUMSTRING:
+                    $_ ??= 3;
                     if (Util::checkNumeric($_crv[$i], $param1) && $this->int2Op($_))
                         continue 2;
                     break;
@@ -849,6 +853,7 @@ abstract class Filter
 
         $result = match ($crType)
         {
+            self::CR_NUMSTRING => $this->genericNumeric($colOrFn, $crv, 3, $param1),
             self::CR_NUMERIC   => $this->genericNumeric($colOrFn, $crv, $crs, $param1),
             self::CR_FLAG      => $this->genericBooleanFlags($colOrFn, $param1, $crs, $param2),
             self::CR_STAFFFLAG => $this->genericBooleanFlags($colOrFn, (1 << ($crs - 1)), true),

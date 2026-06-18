@@ -329,7 +329,7 @@ class CreatureListFilter extends Filter
         31 => [parent::CR_FLAG,     'cuFlags',           CUSTOM_HAS_SCREENSHOT                         ], // hasscreenshots
         32 => [parent::CR_FLAG,     'cuFlags',           NPC_CU_INSTANCE_BOSS                          ], // instanceboss
         33 => [parent::CR_FLAG,     'cuFlags',           CUSTOM_HAS_COMMENT                            ], // hascomments
-        34 => [parent::CR_CALLBACK, 'cbUseModel'                                                       ], // usemodel [str]
+        34 => [parent::CR_NUMSTRING,'modelId',           NUM_CAST_INT                                  ], // usemodel [str]
         35 => [parent::CR_STRING,   'textureString'                                                    ], // useskin [str]
         37 => [parent::CR_NUMERIC,  'id',                NUM_CAST_INT,                       true      ], // id
         38 => [parent::CR_CALLBACK, 'cbRelEvent',        null,                               null      ], // relatedevent [enum]
@@ -555,15 +555,6 @@ class CreatureListFilter extends Filter
             $facTpls = array_merge($facTpls, $facs->getField('templateIds'));
 
         return $facTpls ? ['faction', $facTpls] : [0];
-    }
-
-    // input is string, so there is no prompt for an operator. But a CR_NUMERIC expects crs to not be 0
-    protected function cbUseModel(int $cr, int $crs, string $crv) : ?array
-    {
-        if (!Util::checkNumeric($crv, NUM_CAST_INT))
-            return null;
-
-        return ['modelId', $crv];
     }
 
     protected function cbHasLocation(int $cr, int $crs, string $crv) : ?array

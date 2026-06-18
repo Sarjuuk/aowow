@@ -4223,6 +4223,13 @@ var LANG = {
         effecttype:                 "Effekttyp",
         scalingap:                  "Skaliert mit Angriffskraft",
         scalingsp:                  "Skaliert mit Zaubermacht",
+        duration_stc:               "Dauer (Sekunden)",
+        gcdcategory_stc:            "GCD-Kategorie",
+        givesResourceType_stc:      "Gibt Ressourcenart",
+        inMyFavorites_stc:          "In meinen Favoriten",
+        maximumRange_stc:           "Maximalreichweite",
+        minimumRange_stc:           "Mindestreichweite",
+        modifiesSpell_filter:       "Verändert Zauber #…",
 
         sepattributes:              "Eigenschaften",
         combatcastable:             "Kann im Kampf gewirkt werden",

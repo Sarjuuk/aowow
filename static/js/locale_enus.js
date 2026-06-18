@@ -4267,6 +4267,13 @@ var LANG = {
         effecttype:                 "Effect type",
         scalingap:                  "Scales with attack power",
         scalingsp:                  "Scales with spell power",
+        duration_stc:               "Duration (seconds)",
+        gcdcategory_stc:            "GCD category",
+        givesResourceType_stc:      "Gives resource type",
+        inMyFavorites_stc:          "In my favorites",
+        maximumRange_stc:           "Maximum range",
+        minimumRange_stc:           "Minimum range",
+        modifiesSpell_filter:       "Modifies spell #…",
 
         sepattributes:              "Attributes",
         combatcastable:             "Castable in combat",

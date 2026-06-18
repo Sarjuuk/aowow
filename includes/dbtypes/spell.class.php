@@ -27,6 +27,14 @@ class SpellList extends DBTypeList
         11 => SKILLS_TRADE_PRIMARY                                                                        // prim. Professions
     );
 
+    public const MOD_AURAS                = array(
+        SPELL_AURA_ADD_FLAT_MODIFIER,      SPELL_AURA_ADD_PCT_MODIFIER,                 SPELL_AURA_NO_REAGENT_USE,
+        SPELL_AURA_ABILITY_PERIODIC_CRIT,  SPELL_AURA_MOD_TARGET_ABILITY_ABSORB_SCHOOL, SPELL_AURA_ABILITY_IGNORE_AURASTATE,
+        SPELL_AURA_ALLOW_ONLY_ABILITY,     SPELL_AURA_IGNORE_MELEE_RESET,               SPELL_AURA_ABILITY_CONSUME_NO_AMMO,
+        SPELL_AURA_MOD_IGNORE_SHAPESHIFT,  SPELL_AURA_PERIODIC_HASTE,                   SPELL_AURA_OVERRIDE_CLASS_SCRIPTS,
+        SPELL_AURA_MOD_DAMAGE_FROM_CASTER, SPELL_AURA_ADD_TARGET_TRIGGER,               SPELL_AURA_IGNORE_COMBAT_RESULT,     /* SPELL_AURA_DUMMY ? */
+    );
+
     public const EFFECTS_SCALING_HEAL     = array( // as per Unit::SpellHealingBonusDone() calls in TC
         SPELL_EFFECT_HEAL,                  SPELL_EFFECT_HEAL_PCT,                          SPELL_EFFECT_HEAL_MECHANICAL,                   SPELL_EFFECT_HEALTH_LEECH
     );
@@ -2452,7 +2460,7 @@ class SpellListFilter extends Filter
             3 => 2,                                         // melee
             4 => 3                                          // ranged
         ),
-        45 => array(                                        // power type index
+        45 => array(                                        // power type index (in the future will be PowerType.db2/powerTypeEnum values, hardcoded in 335a)
           // 1 => ??,                                       // burning embers
           // 2 => ??,                                       // chi
           // 3 => ??,                                       // demonic fury
@@ -2495,8 +2503,8 @@ class SpellListFilter extends Filter
         19  => [parent::CR_FLAG,      'attributes0',      SPELL_ATTR0_LEVEL_DAMAGE_CALCULATION                                    ], // scaling
         20  => [parent::CR_CALLBACK,  'cbReagents',                                                                               ], // has Reagents [yn]
         22  => [parent::CR_CALLBACK,  'cbProficiency',   null,                                     null                           ], // proficiencytype [proficiencytype]
-     // 26  => [parent::CR_NUMERIC,   'startRecoveryCategory', NUM_CAST_INT,                       false                          ], // gcd-cat
         25  => [parent::CR_BOOLEAN,   'skillLevelYellow'                                                                          ], // rewardsskillups
+        26  => [parent::CR_NUMSTRING, 'startRecoveryCategory', NUM_CAST_INT                                                       ], // gcd-cat [str]
         27  => [parent::CR_FLAG,      'attributes1',      SPELL_ATTR1_CHANNELED_1,                 true                           ], // channeled [yn]
         28  => [parent::CR_NUMERIC,   'castTime',         NUM_CAST_FLOAT                                                          ], // casttime [num]
         29  => [parent::CR_CALLBACK,  'cbAuraNames',                                                                              ], // appliesaura [effectauranames]
@@ -2575,15 +2583,22 @@ class SpellListFilter extends Filter
         106 => [parent::CR_STAFFFLAG, 'spellFamilyFlags1'                                                                         ], // flags11 [flags]
         107 => [parent::CR_STAFFFLAG, 'spellFamilyFlags2'                                                                         ], // flags12 [flags]
         108 => [parent::CR_STAFFFLAG, 'spellFamilyFlags3'                                                                         ], // flags13 [flags]
-        109 => [parent::CR_CALLBACK,  'cbEffectNames',                                                                            ], // effecttype [effecttype]
+        109 => [parent::CR_CALLBACK,  'cbEffectNames'                                                                             ], // effecttype [effecttype]
      // 110 => [parent::CR_NYI_PH,    null,               null,                                    null                           ], // scalingap [yn]  // unreasonably complex for now
      // 111 => [parent::CR_NYI_PH,    null,               null,                                    null                           ], // scalingsp [yn]  // unreasonably complex for now
         114 => [parent::CR_CALLBACK,  'cbReqFaction'                                                                              ], // requiresfaction [side]
-        116 => [parent::CR_BOOLEAN,   'startRecoveryTime'                                                                         ]  // onGlobalCooldown [yn]
+        116 => [parent::CR_BOOLEAN,   'startRecoveryTime'                                                                         ], // onGlobalCooldown [yn]
+        117 => [parent::CR_NUMERIC,   'sr.rangeMaxHostile', NUM_CAST_INT                                                          ], // maximumRange_stc [num]
+        118 => [parent::CR_NUMERIC,   'sr.rangeMinHostile', NUM_CAST_INT                                                          ], // minimumRange_stc [num]
+        120 => [parent::CR_CALLBACK,  'cbModifiesSpell'                                                                           ], // modifiesSpell_filter [str]
+     // 121 => [parent::CR_NYI_PH,    null                                                                                        ], // inMyFavorites_stc [yn]
+        129 => [parent::CR_CALLBACK,  'cbGivePower'                                                                               ], // givesResourceType_stc [resourcetype]
+        200 => [parent::CR_CALLBACK,  'cbSecToMsec',        'recoveryTime'                                                        ], // cooldown [num] (custom)
+        201 => [parent::CR_CALLBACK,  'cbSecToMsec',        'duration'                                                            ]  // duration [num] (custom)
     );
 
     protected static array $inputFields = array(
-        'cr'    => [parent::V_RANGE,    [1, 116],                                          true ], // criteria ids
+        'cr'    => [parent::V_RANGE,    [1, 201],                                          true ], // criteria ids
         'crs'   => [parent::V_LIST,     [parent::ENUM_NONE, parent::ENUM_ANY, [0, 99999]], true ], // criteria operators
         'crv'   => [parent::V_REGEX,    parent::PATTERN_CRV,                               true ], // criteria values - only printable chars, no delimiters
         'na'    => [parent::V_NAME,     false,                                             false], // name / text - only printable chars, no delimiter
@@ -2875,6 +2890,53 @@ class SpellListFilter extends Filter
             $cnd = [DB::OR, $cnd, [DB::AND, ['skillLine1', -3], ['skillLine2OrMask', $skill2Mask, '&']]];
 
         return $cnd;
+    }
+
+    protected function cbGivePower(int $cr, int $crs, string $crv) : ?array
+    {
+        if (!isset(self::$enums[45][$crs]))
+            return null;
+
+        // wh only checks against SPELL_EFFECT_ENERGIZE as this effect got updated to handle any resource in the modern wow client
+        // 335a has a separate effect for runes and we ignore hardcoded combo points
+        $pt = self::$enums[45][$crs];
+        if ($pt == POWER_RUNE)
+            return [DB::OR, ['effect1Id', SPELL_EFFECT_ACTIVATE_RUNE], ['effect2Id', SPELL_EFFECT_ACTIVATE_RUNE], ['effect3Id', SPELL_EFFECT_ACTIVATE_RUNE]];
+        else if ($pt >= 0)
+            return [DB::OR,
+                [DB::AND, ['effect1Id', SPELL_EFFECT_ENERGIZE], ['effect1MiscValue', $pt]],
+                [DB::AND, ['effect2Id', SPELL_EFFECT_ENERGIZE], ['effect2MiscValue', $pt]],
+                [DB::AND, ['effect3Id', SPELL_EFFECT_ENERGIZE], ['effect3MiscValue', $pt]]
+            ];
+
+        return [0];                                         // dont even try resolving powerDisplayCost or health shenanigans
+    }
+
+    // prompted for sec, stored as msec
+    protected function cbSecToMsec(int $cr, int $crs, string $crv, string $field) : ?array
+    {
+        if (!Util::checkNumeric($crv, NUM_CAST_INT) || !$this->int2Op($crs))
+            return null;
+
+        return [$field, $crv * 1000, $crs];
+    }
+
+    protected function cbModifiesSpell(int $cr, int $crs, string $crv) : ?array
+    {
+        if (!Util::checkNumeric($crv, NUM_CAST_INT))
+            return null;
+
+        if (!($refSpell = DB::Aowow()->selectRow('SELECT `spellFamilyId` AS "0", `spellFamilyFlags1` AS "1", `spellFamilyFlags2` AS "2", `spellFamilyFlags3` AS "3" FROM ::spell WHERE `id` = %i', $crv)))
+            return [0];
+
+        [$fam, $m1, $m2, $m3] = $refSpell;
+
+        return array(
+            DB::OR,
+            [DB::AND, ['s.effect1AuraId', SpellList::MOD_AURAS], ['spellFamilyId', $fam], [DB::OR, ['s.effect1SpellClassMaskA', $m1, '&'], ['s.effect1SpellClassMaskB', $m2, '&'], ['s.effect1SpellClassMaskC', $m3, '&']]],
+            [DB::AND, ['s.effect2AuraId', SpellList::MOD_AURAS], ['spellFamilyId', $fam], [DB::OR, ['s.effect2SpellClassMaskA', $m1, '&'], ['s.effect2SpellClassMaskB', $m2, '&'], ['s.effect2SpellClassMaskC', $m3, '&']]],
+            [DB::AND, ['s.effect3AuraId', SpellList::MOD_AURAS], ['spellFamilyId', $fam], [DB::OR, ['s.effect3SpellClassMaskA', $m1, '&'], ['s.effect3SpellClassMaskB', $m2, '&'], ['s.effect3SpellClassMaskC', $m3, '&']]]
+        );
     }
 }
 

@@ -4223,6 +4223,13 @@ var LANG = {
         effecttype:                 "Tipo de efecto",
         scalingap:                  "Escala con Poder de Ataque",
         scalingsp:                  "Escala con Poder con Hechizos",
+        duration_stc:               "Duración (segundos)",
+        gcdcategory_stc:            "Categoría GCD",
+        givesResourceType_stc:      "Proporciona Recurso de Tipo",
+        inMyFavorites_stc:          "En mis favoritos",
+        maximumRange_stc:           "Rango máximo",
+        minimumRange_stc:           "Rango mínimo",
+        modifiesSpell_filter:       "Modifica hechizo #…",
 
         sepattributes:              "Atributos",
         combatcastable:             "Utilizable en combate",

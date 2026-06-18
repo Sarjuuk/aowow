@@ -4223,6 +4223,13 @@ var LANG = {
         effecttype:                 "Type d'effet",
         scalingap:                  "S'équilibre avec la puissance d'attaque",
         scalingsp:                  "S'équilibre avec la puissance des sorts",
+        duration_stc:               "Durée (secondes)",
+        gcdcategory_stc:            "Catégorie GCD",
+        givesResourceType_stc:      "[Gives resource type]",
+        inMyFavorites_stc:          "Dans mes favoris",
+        maximumRange_stc:           "Portée maximale",
+        minimumRange_stc:           "Portée minimale",
+        modifiesSpell_filter:       "Modifie le sort #…",
 
         sepattributes:              "Attributs",
         combatcastable:             "Utilisable en combat",

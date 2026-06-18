@@ -10,12 +10,6 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 {
     use TrDetailPage, TrCache;
 
-    private const MOD_AURAS = [SPELL_AURA_ADD_FLAT_MODIFIER,      SPELL_AURA_ADD_PCT_MODIFIER,                 SPELL_AURA_NO_REAGENT_USE,
-                               SPELL_AURA_ABILITY_PERIODIC_CRIT,  SPELL_AURA_MOD_TARGET_ABILITY_ABSORB_SCHOOL, SPELL_AURA_ABILITY_IGNORE_AURASTATE,
-                               SPELL_AURA_ALLOW_ONLY_ABILITY,     SPELL_AURA_IGNORE_MELEE_RESET,               SPELL_AURA_ABILITY_CONSUME_NO_AMMO,
-                               SPELL_AURA_MOD_IGNORE_SHAPESHIFT,  SPELL_AURA_PERIODIC_HASTE,                   SPELL_AURA_OVERRIDE_CLASS_SCRIPTS,
-                               SPELL_AURA_MOD_DAMAGE_FROM_CASTER, SPELL_AURA_ADD_TARGET_TRIGGER,               SPELL_AURA_IGNORE_COMBAT_RESULT,     /* SPELL_AURA_DUMMY ? */];
-
     protected  int    $cacheType   = CACHE_TYPE_DETAIL_PAGE;
 
     protected  string $template    = 'spell';
@@ -345,7 +339,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
         for ($i = 1; $i < 4; $i++)
         {
-            if (!in_array($this->subject->getField('effect'.$i.'AuraId'), self::MOD_AURAS))
+            if (!in_array($this->subject->getField('effect'.$i.'AuraId'), SpellList::MOD_AURAS))
                 continue;
 
             $m1 = $this->subject->getField('effect'.$i.'SpellClassMaskA');
@@ -435,7 +429,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
             $sub[] = array(
                 DB::AND,
-                ['s.effect'.$i.'AuraId', self::MOD_AURAS],
+                ['s.effect'.$i.'AuraId', SpellList::MOD_AURAS],
                 [
                     DB::OR,
                     ['s.effect'.$i.'SpellClassMaskA', $m1, '&'],
