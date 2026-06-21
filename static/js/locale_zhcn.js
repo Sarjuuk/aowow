@@ -1008,7 +1008,17 @@ var mn_guides = [
     [2, "专业", '?guides=2'],
     [5, "地下城与团队副本", '?guides=5'],
     [8, "华丽收藏", '?guides=8'],
-    [3, "世界事件", '?guides=3'],
+    [3, "世界事件", '?guides=3', [
+        ["lunar-festival","春节","?guide=lunar-festival"],
+        ["love-is-in-the-air","情人节","?guide=love-is-in-the-air"],
+        ["noblegarden","复活节","?guide=noblegarden"],
+        ["childrens-week","儿童周","?guide=childrens-week"],
+        ["midsummer-fire-festival","仲夏火焰节","?guide=midsummer-fire-festival"],
+        ["brewfest","美酒节","?guide=brewfest"],
+        ["hallows-end","万圣节","?guide=hallows-end"],
+        ["pilgrims-bounty","感恩节","?guide=pilgrims-bounty"],
+        ["winter-veil","冬幕节","?guide=winter-veil"]
+    ]],
     [9, "杂项", '?guides=9']
 ];
 
