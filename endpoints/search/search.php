@@ -36,6 +36,9 @@ class SearchBaseResponse extends TemplateResponse implements ICache
 
         $this->query = $this->_get['search'];               // technically rawParam, but prepared
 
+        if (preg_match('/^ *(\w+) +(-?\d+) *$/i', $this->query, $m) && Type::getIndexFrom(Type::IDX_FILE_STR, $m[1]))
+            $this->forward('?'.$m[1].'='.$m[2]);
+
         $this->searchMask = Search::TYPE_REGULAR | self::SEARCH_MODS_ALL;
 
         $this->searchObj = new Search($this->query, $this->searchMask);
