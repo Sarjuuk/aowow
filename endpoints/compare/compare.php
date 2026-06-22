@@ -111,6 +111,16 @@ class CompareBaseResponse extends TemplateResponse
 
         return $val;
     }
+
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        $this->metaTags[] = ['property' => 'og:title', 'content' => $this->h1];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'website'];
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [...Lang::meta('tags', 'compare'), ...Lang::meta('tags', 'generic')]]);
+
+        $this->buildBasicMetadata();
+    }
 }
 
 ?>

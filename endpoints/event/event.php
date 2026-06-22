@@ -329,8 +329,32 @@ class EventBaseResponse extends TemplateResponse implements ICache
             $this->lvTabs->addDataTab(...$tab);
         }
 
-        $this->result->registerDisplayHook('lvTabs', [self::class, 'tabsHook']);
-        $this->result->registerDisplayHook('infobox', [self::class, 'infoboxHook']);
+        $this->result->registerDisplayHook('lvTabs',       [self::class, 'tabsHook']);
+        $this->result->registerDisplayHook('infobox',      [self::class, 'infoboxHook']);
+        $this->result->registerDisplayHook('metaTags',     [self::class, 'updateMetaHook'], true);
+        $this->result->registerDisplayHook('ldIntangible', [self::class, 'updateMetaHook'], false);
+    }
+
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        $this->metaTags[] = ['property' => 'og:title', 'content' => $this->h1];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'article'];
+
+        $catName  = Lang::event('category', $this->breadcrumb[2]);
+        $keywords = [$this->h1, Util::ucFirst(Lang::game('event'))];
+
+        $desc = Lang::meta('description', 'genPage', [$this->h1, Util::ucFirst(Lang::game('event'))]);
+        if ($catName)
+        {
+            $keywords[] = $catName;
+            $desc      .= ' '.Lang::meta('inCategory', [$catName]);
+        }
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [...$keywords, ...Lang::meta('tags', 'generic')]]);
+
+        $this->buildBasicMetadata($desc, $this->headIcons[0] != 'trade_engineering' ? $this->headIcons[0] : '');
+
+        $this->buildLdJson();
     }
 
     // update dates to now()
@@ -368,6 +392,32 @@ class EventBaseResponse extends TemplateResponse implements ICache
         else if ($markup)
             foreach ($infobox as $ib)
                 $markup->addItem($ib);
+    }
+
+    public static function updateMetaHook(Template\PageTemplate &$pt, array &$var, bool $isMeta) : void
+    {
+        $desc = null;
+        if ($isMeta && ($k = array_find_key($var, fn($x) => ($x['name'] ?? '') == 'description')) !== null)
+            $desc = &$var[$k]['content'];
+        else if (!$isMeta && isset($var['description']))
+            $desc = &$var['description'];
+
+        if (!$desc)
+            return;
+
+        WorldEventList::updateDates($pt->dates, $start, $end);
+
+        // not in progress
+        if ($start > time())
+            return;
+
+        // Intl as baseline does not unterstand day-ordinals. So we have to invoke date() for Locale::EN .. fun
+        $p = Lang::meta('eventEndsFmt');
+        if (Lang::getLocale() == Locale::EN)
+            $p = sprintf($p, date("'jS'", $end));           // single quoted so the string is escaped for Intl
+
+        if ($endStr = \IntlDateFormatter::create(Lang::getLocale()->hreflang(), pattern: $p)?->format($end))
+            $desc .= ' ' . $endStr;
     }
 }
 

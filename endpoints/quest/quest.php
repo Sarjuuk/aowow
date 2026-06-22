@@ -1374,6 +1374,81 @@ class QuestBaseResponse extends TemplateResponse implements ICache
 
         return $series;
     }
+
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        $this->metaTags[] = ['property' => 'og:title', 'content' => $this->h1];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'article'];
+
+        $keywords = [$this->h1, Util::ucFirst(Lang::game('quest'))];
+        $zone = '';
+
+        $c0 = $this->subject->getField('cat2');
+        if ($_ = $this->subject->getField('cat1'))
+        {
+            $zone = ' '.Lang::quest('cat', $c0, $_);
+            $keywords[] = Lang::quest('cat', $c0, $_);
+        }
+        else if ($c0)
+        {
+            $zone = ' '.Lang::quest('cat', $c0, 0);
+            $keywords[] = Lang::quest('cat', $c0, 0);
+        }
+
+        $desc = strip_tags($this->objectives);
+
+        $type = match ($this->subject->isDaily())
+        {
+            1 => Lang::main('parensFmt', ['', Lang::quest('daily')]),
+            2 => Lang::main('parensFmt', ['', Lang::quest('weekly')]),
+            3 => Lang::main('parensFmt', ['', Lang::quest('monthly')]),
+            default => ''
+        };
+        if (!$type && ($_ = $this->subject->getField('questInfoId')))
+            $type = Lang::main('parensFmt', ['', Lang::quest('questInfo', $_)]);
+
+        $level = '';
+        if ($minlvl = $this->subject->getField('minLevel'))
+            $level = ' '.Lang::quest('questLevel', [$minlvl]);
+
+        $desc .= ' '.Lang::meta('description', 'quest', [$level, $zone, $type]);
+
+        // reputation
+        if ([, $reputation, , , ,] = $this->gains)
+        {
+            if ($rep = array_map(fn($x) => sprintf('%+d', $x['qty'][0]).' '.Lang::npc('repWith').' '.$x['name'], $reputation))
+                $desc .= ' '.Lang::concat($rep).'.';
+        }
+
+        // rewards
+        if ([$spells, $items, $choice, ] = $this->rewards)
+        {
+            $rewards = $choices = [];
+            $rewDesc = '';
+
+            foreach ($choice as $c)
+                $choices[] = strip_tags($c->text);
+            foreach ($items as $i)
+                $rewards[] = strip_tags($i->text);
+            foreach ($spells['cast'] ?? [] as $s)
+                $rewards[] = strip_tags($s->text);
+
+            $rewDesc = Lang::concat($rewards);
+            $cStr = Lang::concat($choices, Lang::CONCAT_OR);
+            if ($cStr && $rewDesc)
+                $rewDesc .= Lang::main('and');
+            $rewDesc .= $cStr;
+
+            if ($rewDesc)
+                $desc .= ' '.Lang::meta('questReward', [$rewDesc]);
+        }
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [...$keywords, ...Lang::meta('tags', 'generic')]]);
+
+        $this->buildBasicMetadata($desc);
+
+        $this->buildLdJson();
+    }
 }
 
 ?>

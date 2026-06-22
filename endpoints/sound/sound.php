@@ -310,6 +310,35 @@ class SoundBaseResponse extends TemplateResponse implements ICache
             }
         }
     }
+
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        $this->metaTags[] = ['property' => 'og:title', 'content' => $this->h1];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'article'];
+
+        $catName  = Lang::sound('cat', end($this->breadcrumb));
+        $keywords = [$this->h1, Util::ucFirst(Lang::game('sound'))];
+
+        $desc = Lang::meta('description', 'genPage', [$this->h1, Util::ucFirst(Lang::game('sound'))]);
+        if ($catName && !$this->subject->error)
+        {
+            $jsg = $this->subject->getJSGlobals();
+            if ($f = ($jsg[Type::SOUND][$this->typeId]['files'][0] ?? null))
+            {
+                $this->metaTags[] = ['property' => 'og:audio',      'content' => $f['url']];
+                $this->metaTags[] = ['property' => 'og:audio:type', 'content' => $f['type']];
+            }
+
+            $keywords[] = $catName;
+            $desc      .= ' '.Lang::meta('inCategory', [$catName]);
+        }
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [...$keywords, ...Lang::meta('tags', 'generic')]]);
+
+        $this->buildBasicMetadata($desc);
+
+        $this->buildLdJson();
+    }
 }
 
 ?>

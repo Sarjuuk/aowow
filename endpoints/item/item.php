@@ -1091,6 +1091,160 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
         return $path;
     }
+
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        $this->metaTags[] = ['property' => 'og:title', 'content' => $this->h1];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'article'];
+
+        $keywords     = [$this->h1, Lang::game('items')];
+        $_class       = $this->subject->getField('class');
+        $_subClass    = $this->subject->getField('subClass');
+        $_subSubClass = $this->subject->getField('subSubClass');
+        $_itemLevel   = $this->subject->getField('itemLevel');
+        $_slot        = $this->subject->getField('slot');
+        $_quality     = $this->subject->getField('quality');
+
+        if ($_subSubClass)
+        {
+            if ($_class == ITEM_CLASS_GLYPH)
+            {
+                $keywords[] = Lang::item('cat', $_class, 1, $_subClass);
+                $keywords[] = Lang::item('glyphType', $_subSubClass);
+            }
+            else
+            {
+                $keywords[] = Lang::item('cat', $_class, 0);
+                $keywords[] = Lang::item('cat', $_class, 1, $_subClass, 1, $_subSubClass);
+            }
+        }
+        else
+        {
+            $cl = Lang::item('cat', $_class);
+            if (is_array($cl))
+            {
+                $keywords[] = $cl[0];
+                $keywords[] = current((array)Lang::item('cat', $_class, 1, $_subClass));
+            }
+            else
+                $keywords[] = $cl;
+        }
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [...$keywords, ...Lang::meta('tags', 'generic')]]);
+
+        $desc = '';
+        // ..by cat
+        switch ($_class)
+        {
+            case ITEM_CLASS_CONTAINER:
+            case ITEM_CLASS_QUIVER:
+                $desc = Lang::meta('itemCatDesc', ITEM_CLASS_CONTAINER, [$this->h1, $this->subject->getField('slots'), Lang::item('subClass', $_class, $_subClass)]);
+                break;
+            case ITEM_CLASS_WEAPON:
+                $desc = Lang::meta('itemCatDesc', ITEM_CLASS_WEAPON, [Lang::item('quality', $_quality), Lang::item('inventoryType', $_slot).' '.Lang::item('subClass', $_class, $_subClass), $_itemLevel]);
+                break;
+            case ITEM_CLASS_GEM:
+                $lvl = '';
+                if ($this->subject->getField('gemEnchantmentId'))
+                    $lvl = Lang::quest('questLevel', [$_itemLevel]).' ';
+
+                $desc = Lang::meta('itemCatDesc', ITEM_CLASS_GEM, [$lvl, Lang::item('quality', $_quality), Lang::item('_gemColors', $_subClass)]);
+                break;
+            case ITEM_CLASS_ARMOR:
+                $asc  = $_subClass < 0 ? Lang::item('cat', ITEM_CLASS_ARMOR, 1, $_subClass) : Lang::item('subClass', $_class, $_subClass).' '.Lang::item('cat', ITEM_CLASS_ARMOR, 0);
+                $desc = Lang::meta('itemCatDesc', 4, [Lang::item('quality', $_quality), $asc, $_itemLevel, Lang::item('inventoryType', $_slot)]);
+                break;
+            case ITEM_CLASS_KEY:
+                $desc = Lang::meta('itemCatDesc', ITEM_CLASS_KEY, [$this->h1]);
+                break;
+            case ITEM_CLASS_GLYPH:
+                $desc = Lang::meta('itemCatDesc', ITEM_CLASS_GLYPH, [Lang::game('gl', $_subSubClass), Lang::game('cl', $_subClass)]);
+                break;
+            case ITEM_CLASS_AMMUNITION:
+                $desc = Lang::meta('itemCatDesc', ITEM_CLASS_AMMUNITION, [$this->h1, $this->subject->json[$this->typeId]['dps']]);
+                break;
+            case ITEM_CLASS_TRADEGOOD:
+                if ($_subClass != 2)                        // treat explosives as consumables
+                {
+                    $desc = Lang::meta('itemCatDesc', ITEM_CLASS_TRADEGOOD, [$this->h1]);
+                    break;
+                }
+            default:
+                $lvl = '';
+                if (in_array($_class, [ITEM_CLASS_CONSUMABLE, ITEM_CLASS_TRADEGOOD]))
+                    $lvl = Lang::quest('questLevel', [$_itemLevel]).' ';
+
+                $type = Lang::item('cat', $_class);
+                if (is_array($type) && isset($type[1][$_subClass]))
+                {
+                    $type = $type[1][$_subClass];
+                    if (is_array($type) && isset($type[1][$_subSubClass]))
+                        $type = $type[1][$_subSubClass];
+                }
+
+                $desc = Lang::meta('itemCatDesc', ITEM_CLASS_CONSUMABLE, [$this->h1, $lvl, is_array($type) ? $type[0] : $type]);
+        }
+
+        // source.. (glyph sources are an appendix to description)
+        if ($_class != ITEM_CLASS_GLYPH && $this->subject->getSources($s, $sm))
+        {
+            if ($sm && isset($sm[0]['n']) && Lang::exist('meta', 'itemSourceMore', $s[0])) // test for name; sm can also declare a zone drops
+                $desc .= ' '.Lang::meta('itemSourceMore', $s[0], [$sm[0]['n']]);
+            else if ($s = array_intersect($s, [SRC_CRAFTED, SRC_DROP, SRC_PVP, SRC_QUEST, SRC_VENDOR, SRC_REDEMPTION, SRC_STARTER, SRC_ACHIEVEMENT, SRC_DISENCHANTMENT, SRC_FISHING, SRC_GATHERING, SRC_MILLING, SRC_MINING, SRC_PROSPECTING, SRC_PICKPOCKETING, SRC_SALVAGING, SRC_SKINNING]))
+                $desc .= ' '.Lang::meta('itemSource', 0, [Lang::concat($s, callback: fn($x) => lang::meta('itemSource', 1, $x))]);
+        }
+
+        // category..
+        $desc .= ' '.Lang::meta('inCategory', [end($keywords)]);
+
+        // requires...
+        $req = [];
+        // ..class
+        if ($rc = ($this->subject->getField('requiredClass') & ChrClass::MASK_ALL))
+            if ($_ = Lang::concat(ChrClass::fromMask($rc), Lang::CONCAT_OR, fn($x) => Lang::game('cl', $x)))
+                $req[] = $_;
+
+        // ..race
+        if ($rr = ($this->subject->getField('requiredRace')) & ChrRace::MASK_ALL)
+        {
+            if ($rr == ChrRace::MASK_ALLIANCE)
+                $req[] = Lang::game('ra', -1);
+            else if ($rr == ChrRace::MASK_HORDE)
+                $req[] = Lang::game('ra', -2);
+            else if ($rr && $rr != ChrRace::MASK_ALL)
+                if ($_ = Lang::concat(ChrRace::fromMask($rr), Lang::CONCAT_OR, fn($x) => Lang::game('ra', $x)))
+                    $req[] = $_;
+        }
+
+        // ..honor rank
+        if ($rhr = $this->subject->getField('requiredHonorRank'))
+            $req[] = Lang::game('pvpRank', $rhr);
+
+        // ..skill
+        if ($rs = $this->subject->getField('requiredSkill'))
+        {
+            $b = SkillList::getName($rs);
+            if (($rsr = $this->subject->getField('requiredSkillRank')) > 0)
+                $b .= ' ('.$rsr.')';
+
+            $req[] = $b;
+        }
+
+        // ..spell
+        if ($rs = $this->subject->getField('requiredSpell'))
+            $req[] = SpellList::getName($rs);
+
+        // ..reputation /w
+        if ($rf = $this->subject->getField('requiredFaction'))
+            $req[] = FactionList::getName($rf).' - '.Lang::game('rep', $this->subject->getField('requiredFactionRank'));
+
+        if ($req)
+            $desc .= ' '.Lang::game('requires', [Lang::concat($req)]);
+
+        $this->buildBasicMetadata($desc, $this->subject->getField('iconString'));
+
+        $this->buildLdJson();
+    }
 }
 
 ?>

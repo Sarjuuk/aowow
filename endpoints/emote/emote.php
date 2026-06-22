@@ -221,6 +221,18 @@ class EmoteBaseResponse extends TemplateResponse implements ICache
         $emote = UIText::format($emote, Lang::FMT_MARKUP);
         return preg_replace('/%\d?\$?s/', '<'.Util::ucFirst(Lang::main('name')).'>', $emote);
     }
+
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        $this->metaTags[] = ['property' => 'og:title', 'content' => $this->h1];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'article'];
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [$this->h1, Util::ucFirst(Lang::game('emote')), ...Lang::meta('tags', 'generic')]]);
+
+        $this->buildBasicMetadata(Lang::meta('description', 'genPage', [$this->h1, Util::ucFirst(Lang::game('emote'))]));
+
+        $this->buildLdJson();
+    }
 }
 
 ?>

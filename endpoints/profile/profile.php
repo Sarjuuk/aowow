@@ -29,6 +29,8 @@ class ProfileBaseResponse extends TemplateResponse
     public int  $type     = Type::PROFILE;
     public bool $gDataKey = true;
 
+    private ?LocalProfileList $subject = null;
+
     public function __construct(string $idOrProfile)
     {
         parent::__construct($idOrProfile);
@@ -122,16 +124,16 @@ class ProfileBaseResponse extends TemplateResponse
 
         if ($this->typeId)
         {
-            $subject = new LocalProfileList(array(['id', $this->typeId]));
-            if ($subject->error)
+            $this->subject = new LocalProfileList(array(['id', $this->typeId]));
+            if ($this->subject->error)
                 $this->notFound();
 
-            if (!$subject->isVisibleToUser())
+            if (!$this->subject->isVisibleToUser())
                 $this->notFound();
 
             // character profile accessed by id
-            if (!$subject->isCustom() && !$this->subjectName)
-                $this->forward($subject->getProfileUrl());
+            if (!$this->subject->isCustom() && !$this->subjectName)
+                $this->forward($this->subject->getProfileUrl());
         }
 
         parent::generate();
@@ -173,6 +175,45 @@ class ProfileBaseResponse extends TemplateResponse
         unset($this->typeId);
 
         parent::generateNotFound($head, Lang::profiler('notFound', 'profile'));
+    }
+
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        if (!$this->typeId || !$this->subject)
+        {
+            parent::generateMetadata($useArticle);
+            return;
+        }
+
+        $name   = $this->subject->getField('name');
+        $lvl    = $this->subject->getField('level');
+        $ra     = $this->subject->getField('race');
+        $cl     = $this->subject->getField('class');
+        $gender = $this->subject->getField('gender');
+        $realm  = $this->subject->getField('realmName');
+        $region = $this->subject->getField('region');
+
+        $title = '';
+        if ($_ = $this->subject->getField('chosenTitle'))
+            $title = (new TitleList(array(['bitIdx', $_])))->getField($gender ? 'female' : 'male', true);
+
+        if ($this->subject->isCustom())
+            $name .= Lang::profiler('customProfile');
+        else if ($title)
+            $name = sprintf($title, $name);
+
+        $this->metaTags[] = ['property' => 'og:title', 'content' => Lang::profiler('profiler') . Lang::main('colon') . $name];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'article'];
+
+        $desc = '';
+        if (!$this->subject->isCustom())
+            $desc = sprintf(Lang::meta('description', 'profile'), $name, $lvl, Lang::game('ra', $ra), Lang::game('cl', $cl), $realm, strtoupper($region));
+        else if ($_ = $this->subject->getField('description'))
+            $desc = $_;
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [$name, Lang::profiler('profiler'), 'Profiler', ...Lang::meta('tags', 'generic')]]);
+
+        $this->buildBasicMetadata($desc, $this->subject->getIcon());
     }
 }
 

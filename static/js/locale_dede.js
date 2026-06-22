@@ -2198,6 +2198,8 @@ var g_faction_categories = {
      891: 'Streitkräfte der Allianz',
      892: 'Streitkräfte der Horde',
      980: 'The Burning Crusade',
+     948: 'Test Faction 2',
+     949: 'Test Faction 1',
     1037: 'Vorposten der Allianz',
     1097: 'Wrath of the Lich King'
 };

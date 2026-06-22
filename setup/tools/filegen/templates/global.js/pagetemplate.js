@@ -548,6 +548,7 @@ var PageTemplate = new function()
             return;
 
         var lastIdx = (path.length - 1);
+        var ldCrumbs  = [];
 
         $.each(path, function(idx, menuItem)
         {
@@ -562,19 +563,24 @@ var PageTemplate = new function()
 
             if (menuItem[MENU_IDX_URL])
             {
-                $textHolder = $('<a/>', {
-                    href: Menu.getItemUrl(menuItem)
-                }).appendTo($span);
+                var itemUrl = Menu.getItemUrl(menuItem);
+                $textHolder = $('<a/>', { href: itemUrl }).appendTo($span);
             }
 
-            if (menuOpt.breadcrumb)
-                $textHolder.text(menuOpt.breadcrumb);
-            else
-                $textHolder.text(menuItem[MENU_IDX_NAME]);
+            var menuText = menuOpt.breadcrumb ? menuOpt.breadcrumb.trim() : menuItem[MENU_IDX_NAME].trim();
+            $textHolder.text(menuText);
 
             Menu.add($textHolder, menuItem.parentMenu);
 
             $span.appendTo($bread);
+
+            ldCrumbs.push({
+                name:  menuText,
+                url:   g_host + '/' + itemUrl,
+                image: menuOpt.tinyIcon ? g_staticUrl + '/images/wow/icons/medium/' + menuOpt.tinyIcon.toLowerCase() + '.jpg' : undefined
+             // url:   itemUrl,
+             // image: menuOpt.tinyIcon ? $WH.ensureUrlProtocol($WH.Icon.getIconUrl(menuOpt.tinyIcon, $WH.Icon.MEDIUM)) : undefined
+            });
 
             // Add ellipsis as appropriate
             if (idx == lastIdx && menuItem[MENU_IDX_SUB])
@@ -587,6 +593,8 @@ var PageTemplate = new function()
                 $ellipsis.appendTo($bread);
             }
         });
+
+        $WH.Seo.addJsonLdBreadcrumb(ldCrumbs);
 
         $bread.trigger('update'); // Some features rely on this event to add stuff to the breadcrumb
         $bread.show();

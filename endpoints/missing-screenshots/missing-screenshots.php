@@ -32,7 +32,12 @@ class MissingscreenshotsBaseResponse extends TemplateResponse
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
 
         // limit to 200 entries each (it generates faster, consumes less memory and should be enough options)
-        $cnd = [[['cuFlags', CUSTOM_HAS_SCREENSHOT, '&'], 0], 200];
+        // meta description says it must have at least 1 comment
+        $cnd = array(
+            200,
+            ['cuFlags', CUSTOM_HAS_COMMENT, '&'],
+            [['cuFlags', CUSTOM_HAS_SCREENSHOT, '&'], 0]
+        );
         if (!User::isInGroup(U_GROUP_EMPLOYEE))
             $cnd[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 
@@ -49,9 +54,25 @@ class MissingscreenshotsBaseResponse extends TemplateResponse
         }
 
         if (!$hasTabs)
-            $this->lvTabs->addListviewTab(new Listview(['data' => []], 'item'));
+        {
+            // should be placed below the div.text, but w/e
+            // it tickles me, that this basically unreachable condition was translated. (the other locales are lost to time though)
+            // Пропавшие скриншоты не найдены. Погодите, что?
+            $this->extraHTML = 'No missing screenshots were found. Wait, what?';
+            unset($this->lvTabs);
+        }
 
         parent::generate();
+    }
+
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        $this->metaTags[] = ['property' => 'og:title', 'content' => $this->h1];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'website'];
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [Lang::main('screenshots'), ...Lang::meta('tags', 'generic')]]);
+
+        $this->buildBasicMetadata();
     }
 }
 

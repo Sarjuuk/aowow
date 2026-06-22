@@ -129,6 +129,22 @@ class EnchantmentsBaseResponse extends TemplateResponse implements ICache
 
         parent::generate();
     }
+
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        $tags = [$this->h1];
+        if (count($this->breadcrumb) == 3)
+            array_unshift($tags, reset($this->title));
+
+        $this->metaTags[] = ['property' => 'og:title', 'content' => implode(' ', $tags)];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'website'];
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [...$tags, ...Lang::meta('tags', 'generic')]]);
+
+        $this->buildBasicMetadata(Lang::meta('description', 'genList', [implode(' ', $tags)]));
+
+        $this->buildLdJson();
+    }
 }
 
 ?>

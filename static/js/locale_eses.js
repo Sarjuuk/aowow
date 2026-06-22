@@ -2194,6 +2194,8 @@ var g_faction_categories = {
     1117: 'Cuenca de Sholazar',
      169: 'Cártel Bonvapor',
     1052: 'Expedición de la Horda',
+     948: 'Facción de prueba 2',
+     949: 'Facción de prueba 1',
      891: 'Fuerzas de la Alianza',
      892: 'Fuerzas de la Horda',
       67: 'Horda',

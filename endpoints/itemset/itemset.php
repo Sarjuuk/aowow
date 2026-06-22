@@ -257,6 +257,56 @@ class ItemsetBaseResponse extends TemplateResponse implements ICache
 
         parent::generate();
     }
+
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        $this->metaTags[] = ['property' => 'og:title', 'content' => $this->h1];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'article'];
+
+        $keywords = [$this->h1, Util::ucFirst(Lang::game('itemset'))];
+        foreach ($this->pieces as $p)
+            $keywords[] = $p[0]['name_'.Lang::getLocale()->json()];
+
+        $class = '';
+        if ($_ = $this->subject->getField('classMask'))
+        {
+            if (count($cl = ChrClass::fromMask($_)) == 1)
+            {
+                $class = Lang::game('cl', $cl[0]);
+                $keywords[] = $class;
+            }
+        }
+
+        $desc = '';
+        // desc: base
+        if ($ta  = $this->subject->getField('contentGroup'))
+        {
+            $keywords[] = Lang::itemset('notes', $ta);
+            $desc = strip_tags(Lang::itemset('_desc', [$this->h1, Lang::itemset('notes', $ta), count($this->pieces)]));
+        }
+        else if ($class)
+            $desc = Lang::meta('description', 'itemset', [$class, count($this->pieces)]);
+        else
+            $desc = strip_tags(Lang::itemset('_descTagless', [$this->h1, count($this->pieces)]));
+
+        // desc: bonuses
+        $bo = [];
+        for ($i = 1; $i < 9; $i++)
+            if ($_ = $this->subject->getField('bonus'.$i))
+                $bo[] = $_;
+
+        $desc .= ' '.Lang::meta('setbonus', [Lang::concat(array_unique($bo))]);
+
+        // desc: reqlvel
+        if ($mrl = $this->subject->getField('minReqLevel'))
+            $desc .= ' '.Lang::game('reqLevel', [Util::createNumRange($mrl, $this->subject->getField('maxReqLevel'), ' - ')]).'.';
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [...$keywords, ...Lang::meta('tags', 'generic')]]);
+
+        $this->buildBasicMetadata($desc);
+
+        $this->buildLdJson();
+    }
 }
 
 ?>

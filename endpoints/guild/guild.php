@@ -24,6 +24,8 @@ class GuildBaseResponse extends TemplateResponse
 
     public int $type = Type::GUILD;
 
+    private ?LocalGuildList $subject = null;
+
     public function __construct(string $idOrProfile)
     {
         parent::__construct($idOrProfile);
@@ -83,15 +85,15 @@ class GuildBaseResponse extends TemplateResponse
             return;
         }
 
-        $subject = new LocalGuildList(array(['id', $this->typeId]));
-        if ($subject->error)
+        $this->subject = new LocalGuildList(array(['id', $this->typeId]));
+        if ($this->subject->error)
             $this->notFound();
 
         // guild accessed by id
         if (!$this->subjectName)
-            $this->forward($subject->getProfileUrl());
+            $this->forward($this->subject->getProfileUrl());
 
-        $this->h1 = Lang::profiler('guildRoster', [$subject->getField('name')]);
+        $this->h1 = Lang::profiler('guildRoster', [$this->subject->getField('name')]);
 
 
         /*************/
@@ -107,7 +109,7 @@ class GuildBaseResponse extends TemplateResponse
 
         array_unshift(
             $this->title,
-            $subject->getField('name').' ('.$this->realm.' - '.Lang::profiler('regions', $this->region).')',
+            $this->subject->getField('name').' ('.$this->realm.' - '.Lang::profiler('regions', $this->region).')',
             Util::ucFirst(Lang::profiler('profiler'))
         );
 
@@ -148,6 +150,35 @@ class GuildBaseResponse extends TemplateResponse
         parent::generateNotFound(Lang::game('guild'), Lang::profiler('notFound', 'guild'));
     }
 
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        if (!$this->subject)
+        {
+            parent::generateMetadata($useArticle);
+            return;
+        }
+
+        $name    = $this->subject->getField('name');
+        $realm   = $this->subject->getField('realmName');
+        $side    = SIDE_NONE;
+        $members = 0;
+
+        // this tab always exists
+        foreach ($this->lvTabs->find(id: 'profiles')->iterate() as $row)
+        {
+            $members++;
+            $side |= $row['faction'] ? SIDE_HORDE : SIDE_ALLIANCE;
+        }
+
+        $this->metaTags[] = ['property' => 'og:title', 'content' => Lang::game('guild') . Lang::main('colon') . $name];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'article'];
+
+        $desc = Lang::meta('description', 'guild', [$name, $realm, Lang::game('si', $side ?: SIDE_BOTH), $members]);
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [$name, Util::ucFirst(Lang::game('guilds')), 'Profiler', ...Lang::meta('tags', 'generic')]]);
+
+        $this->buildBasicMetadata($desc);
+    }
 }
 
 ?>

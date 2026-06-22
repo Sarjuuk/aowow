@@ -18,6 +18,70 @@ $lang = array(
         'ab'            => ["an",     "mo",   "sem",      "jour",  "h",      "min",     "s",        "ms"]
     ),
     'lang' => ['anglais', null, 'français', 'allemand', 'chinois', null, 'espagnol', null, 'russe'],
+    'meta' => array(
+        'tags'          => array(
+            'generic' => ['World of Warcraft', 'Database', 'Wrath of the Lich King', 'DB', 'WotLK', 'AoWoW', '3.3.5a'],
+            'error'   => ['404', 'Page non trouvée'],
+            'home'    => ["Outil de comparaison d'objets", 'Calculateur de Talents', 'Calculateur de familiers', 'Profiler'],
+            'maps'    => ['Cartes', 'Zones', 'Marqueurs'],
+            'compare' => ['Comparer', 'Objets', "Ensembles d'objets", 'Balances de statistiques']
+        ),
+        'description' => array(
+            'genList'     => 'Une liste complète dans laquelle rechercher ou filtrer tous les %s in World of Warcraft : Wrath of the Lich King.',
+            'genPage'     => '%s est un %s de World of Warcraft.',
+            'error'       => 'Il semblerait que la page demandée n\'ait pas été trouvée. Peut-être que quelques réglages au AO-815 Moteur Principal de Stabulation...',
+            'home'        => 'Information et aide concernant World of Warcraft et outils de quêtes, objets, talents, donjons, raids et plus !',
+            'changelog'   => 'A changelog of modifications made to the "%s" guide.',
+            'npc'         => '%s est PNJ de %s.',
+            'itemset'     => 'Un ensemble de %2$d objets pour %1$s.',
+            'pet'         => '%s est une famille de familier %s dans World of Warcraft. Ils aiment manger %s.',
+            'quest'       => 'Une Quête%3$s de%2$s de%1$d.',
+            'guild'       => '[%s of %s is guild (%s) with %d members.]',
+            'arena-team'  => '[%s of %s is a %dv%3$d Arena Team.]',
+            'profile'     => 'Profil World of Warcraft de %s: Niveau %d %s %s sur %s %s.'
+        ),
+        'inCategory'    => 'Dans la catégorie %s.',
+        'eventEndsFmt'  => "'Prend fin le' d MMMM 'à' HH:mm.", // intl
+        'iconUsedBy'    => '%s est une icône utilisée avec %s.',
+        'iconUnused'    => '%s est une icône non utilisée.',
+        'setbonus'      => "A des bonus d'ensemble à %s pièces.",
+        'npcFoundIn'    => 'Ce PNJ se trouve dans %s.',
+        'objFoundIn'    => '%s est un objet de World of Warcraft qui peut être trouvé dans %s.',
+        'foundInExt'    => "%d zones additionnelles",
+        'petTraitPref'  => '%s',
+        'questReward'   => 'Donne %s en récompense.',
+        'itemSourceMore'=> array(
+            SRC_DROP           => "C'est dépouillé sur %s.",                                        SRC_QUEST       => "C'est une récompense provenant de %s.",
+            SRC_VENDOR         => "C'est vendu par %s.",                                            SRC_ACHIEVEMENT => "C'est une récompense de haut-fait provenant de %s.",
+            SRC_DISENCHANTMENT => 'Il est désenchanté à partir de %s.',                             SRC_FISHING     => 'Il est pêché à partir de %s.',
+            SRC_GATHERING      => 'Il est récolté à partir de %s.',                                 SRC_MILLING     => 'Il est moulu à partir de %s.',
+            SRC_MINING         => 'Il est miné à partir de %s.',                                    SRC_PROSPECTING => 'Il est prospecté à partir de %s.',
+            SRC_PICKPOCKETING  => 'Il est subtilisé par pickpocket sur %s.',                        SRC_SALVAGING   => 'Il est récupéré à partir de %s.',
+            SRC_SKINNING       => 'Il est dépecé à partir de %s.'
+        ),
+        'itemSource'    => ["C'est %s.", array(
+            SRC_CRAFTED        => 'fabriqué',                                                       SRC_DROP        => 'dépouillé',
+            SRC_PVP            => 'obtenu en JcJ',                                                  SRC_QUEST       => 'une récompense de quête',
+            SRC_VENDOR         => 'vendu par des PNJ',                                              SRC_REDEMPTION  => 'obtenu en ligne',
+            SRC_STARTER        => 'un objet initial',                                               SRC_ACHIEVEMENT => 'une récompense de haut-fait',
+            SRC_DISENCHANTMENT => 'désenchanté',                                                    SRC_FISHING     => 'pêché',
+            SRC_GATHERING      => 'cueilli',                                                        SRC_MILLING     => 'moulu',
+            SRC_MINING         => 'miné',                                                           SRC_PROSPECTING => 'prospecté',
+            SRC_PICKPOCKETING  => 'subtilisé',                                                      SRC_SALVAGING   => 'ferraillé',
+            SRC_SKINNING       => 'dépecé'
+        )],
+        'itemCatDesc' => array(
+            ITEM_CLASS_CONSUMABLE => '%s est une %s%s.',                                                                                 // name, itemLevel?, itemType
+            ITEM_CLASS_CONTAINER  => '%s est un %s de %d emplacements',                                                                  // name, nSlots, bagType
+            ITEM_CLASS_WEAPON     => "Ce/cette %s %s a un niveau d'objet de %d.",                                                        // quality, weaponType, itemLevel
+            ITEM_CLASS_GEM        => 'Ceci est une %2$s %3$s de niveau %1$d.',                                                           // itemLevel?, quality, color
+            ITEM_CLASS_ARMOR      => "Ce %s %s d'objet de niveau %d va dans l'emplacement de \"%s\".",                                   // quality, armorType, itemlevel, equipSlot
+            ITEM_CLASS_AMMUNITION => '%s peut infliger %.1f dégats par seconde.',                                                        // name, dps
+            ITEM_CLASS_TRADEGOOD  => '%s est utilisé pour fabriquer quelque chose.',                                                     // name
+            ITEM_CLASS_KEY        => '%s est une clef; elle va dans votre porte-clef.',                                                  // name
+            ITEM_CLASS_GLYPH      => "Ceci est un glyph %s pour %s. Ceci est vendu à l'Hôtel des Ventes ou est fabriqué par un scribe.", // glyphType, class
+        )
+    ),
     'main' => array(
         'name'          => "nom",
         'link'          => "Lien",
@@ -35,6 +99,7 @@ $lang = array(
         'players'       => "Joueurs",
         'thePlayer'     => "Le joueur",
         'quickFacts'    => "En bref",
+        'comments'      => "Commentaires",
         'screenshots'   => "Captures d'écran",
         'videos'        => "Vidéos",
         'side'          => "Coté : ",
@@ -1200,6 +1265,7 @@ $lang = array(
         'worth'         => "Vaut : %s",
         'unkPosition'   => "L'emplacement de ce PNJ est inconnu.",
         'difficultyPH'  => 'Ce PNJ est un espace réservé pour un autre mode de difficulté <a href="?npc=%1$d">%2$s</a>.',
+        'criteriaOf'    => "Ce PNJ est un objectif de %s.",
         'seat'          => "Siège",
         'accessory'     => "Passager",
         'accessoryFor'  => "Ce PNJ est un passager pour un véhicule.",
@@ -1564,7 +1630,7 @@ $lang = array(
                   495 => "Fjord Hurlant",                 3537 => "Toundra Boréenne",              3711 => "Bassin de Sholazar",            4024 => "Frimarra",                      4197 => "Joug-d'hiver",
                  4395 => "Dalaran",                       4742 => "Accostage de Hrothgar"
             ),
-           -2 => "Non classés"
+           -2 => ["Non classés"]
         )
     ),
     'icon'  => array(
@@ -1636,10 +1702,10 @@ $lang = array(
         'customRewRate' => "Taux de récompense personnalisé",
         '_transfer'     => 'La réputation de cette faction sera convertie en <a href="?faction=%d" class="q1">%s</a> si vous transférez vers <span class="icon-%s">%s</span>.',
         'cat'           => array(
-            1118 => ["Classique", 469 => "Alliance", 169 => "Cartel Gentepression", 67 => "Horde", 891 => "Forces de l'Alliance", 892 => "Forces de la Horde"],
-            980  => ["The Burning Crusade", 936 => "Shattrath"],
-            1097 => ["Wrath of the Lich King", 1052 => "Expédition de la Horde", 1117 => "Bassin de Sholazar", 1037 => "Avant-garde de l'Alliance"],
-            0    => "Autre"
+            1118 => "Classique",                     469 => "Alliance",                 169 => "Cartel Gentepression",        67 => "Horde",                    891 => "Forces de l'Alliance",          892 => "Forces de la Horde",
+             980 => "The Burning Crusade",           936 => "Shattrath",
+            1097 => "Wrath of the Lich King",       1052 => "Expédition de la Horde",   1117 => "Bassin de Sholazar",       1037 => "Avant-garde de l'Alliance",
+               0 => "Autre",                         949 => "Faction de test 1",         948 => "Faction de test 2"
         )
     ),
     'itemset' => array(
@@ -1776,12 +1842,12 @@ $lang = array(
             'crafted' => "les <a href=\"?items&filter=cr=86;crs=%s;crv=0\">objets fabriqués</a>"
         ),
         'cat'           => array(
-              7 => "Techniques",
-            -13 => "Glyphes",
+              7 => ["Techniques"],
+            -13 => ["Glyphes", "Guerrier", "Paladin", "Chasseur", "Voleur", "Prêtre", "DeathChevalier de la mort", "Chaman", "Mage", "Démoniste", null, "Druide"],
             -11 => ["Compétences", 8 => "Armure", 10 => "Langues", 6 => "Armes"],
-             -4 => "Traits raciaux",
-             -2 => "Talents",
-             -6 => "Compagnons",
+             -4 => ["Traits raciaux"],
+             -2 => ["Talents"],
+             -6 => ["Compagnons"],
              -5 => ["Montures", 1=> "Montures Terrestres", 2 => "Montures volantes", 3 => "Divers"],
              -3 => array(
                 "Habilité de familier",     782 => "Goule",             270 => "Générique",             203 => "Araignée",                  213 => "Charognard",            653 => "Chauve-souris",         787 => "Chien du Magma",
@@ -1807,9 +1873,9 @@ $lang = array(
                 197 => ["Couture", 26798 => "Couture d'étoffe lunaire", 26801 => "Couture de tisse-ombre", 26797 => "Couture du feu-sorcier"],
             ),
               9 => ["Compétences secondaires", 185 => "Cuisine", 129 => "Secourisme", 356 => "Pêche", 762 => "Monte"],
-             -9 => "Habilité de MJ",
-             -8 => "Habilité de PNJ",
-              0 => "Non classés"
+             -9 => ["Habilité de MJ"],
+             -8 => ["Habilité de PNJ"],
+              0 => ["Non classés"]
         ),
         'armorSubClass' => array(
             "Divers",                               "Armures en tissu",                     "Armures en cuir",                      "Armures en mailles",                   "Armures en plaques",
@@ -2335,6 +2401,7 @@ $lang = array(
             ENCHANT_CONDITION_NOT_EQUAL_COMPARE  => "des nombres de gemmes %s et %s différents",
             ENCHANT_CONDITION_NOT_EQUAL_VALUE    => "tout nombre sauf %d |4gemme:gemmes; %s"
         ),
+        '_gemColors'    => ['rouges', 'bleues', 'jaunes', 'violettes', 'vertes', 'oranges', 'méta', 'simples', 'prismatiques'],
         'reqRating'     => array(                           // ITEM_REQ_ARENA_RATING*
             "Nécessite une cote d'arène personnelle et en équipe de %d",
             "Nécessite une cote d'arène personnelle et en équipe de %d|nen arène de 3c3 ou 5c5.",

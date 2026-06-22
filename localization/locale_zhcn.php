@@ -18,6 +18,70 @@ $lang = array(
         'ab'            => ["年",    "月",     "周",    "天",  "小时",    "分钟",     "秒",     "毫秒"]
     ),
     'lang' => ['英语', null, '法语', '德语', '中文', null, '西班牙语', null, '俄语'],
+    'meta' => array(
+        'tags'          => array(
+            'generic' => ['魔兽世界', '数据库', '巫妖王之怒', 'DB', 'WotLK', 'AoWoW', '3.3.5a'],
+            'error'   => ['404', 'File Not Found'],
+            'home'    => ['帮助', '模拟器', '工具', '指南', '角色概况'],
+            'maps'    => ['地图', '地区', '标记'],
+            'compare' => ['比较', '物品', '物品组合', '属性权重']
+        ),
+        'description' => array(
+            'genList'     => '[A complete searchable and filterable list of all %s in World of Warcraft: Wrath of the Lich King.]',
+            'genPage'     => '%s [is a World of Warcraft] %s.',
+            'error'       => '[It appears that the page you have requested cannot be found. Perhaps a few tweaks to the AO-815 Major Confabulation Engine would help...]',
+            'home'        => '魔兽世界资讯、帮助、任务工具、物品、天赋、地下城、团队副本等一网打尽！',
+            'changelog'   => '[A changelog of modifications made to the "%s" guide.]',
+            'npc'         => '[%s is a %s NPC.]',
+            'itemset'     => '[A %s item set with %d pieces.]',
+            'pet'         => '[%s are a family of %s pets in World of Warcraft. They like to eat %s.]',
+            'quest'       => '[A%s%s Quest%s.]',
+            'guild'       => '[%s of %s is guild (%s) with %d members.]',
+            'arena-team'  => '[%s of %s is a %dv%3$d Arena Team.]',
+            'profile'     => '[World of Warcraft profile for %s: Level %d %s %s on %s %s.]'
+        ),
+        'inCategory'    => 'In the %s category.',
+        'eventEndsFmt'  => "'[Ends on]' M月d日 HH:mm.", // intl
+        'iconUsedBy'    => '%s is an icon used in %s.',
+        'iconUnused'    => '%s is an unused icon.',
+        'setbonus'      => 'Has set bonuses at %s pieces.',
+        'npcFoundIn'    => 'This NPC can be found in %s.',
+        'objFoundIn'    => '%s is a World of Warcraft object that can be found in %s.',
+        'foundInExt'    => "%d新增地图找到",
+        'petTraitPref'  => '%s',
+        'questReward'   => 'Rewards %s.',
+        'itemSourceMore'=> array(
+            SRC_DROP           => '此为从%s处抢劫得到。',                                                    SRC_QUEST => '此为%s任务奖励。',
+            SRC_VENDOR         => '​此为卖家%s。',                                                       SRC_ACHIEVEMENT => 'It is an achievement reward from %s.',
+            SRC_DISENCHANTMENT => 'It is disenchanted from %s.',                                    SRC_FISHING     => 'It is fished from %s.',
+            SRC_GATHERING      => 'It is gathered from %s.',                                        SRC_MILLING     => 'It is milled from %s.',
+            SRC_MINING         => 'It is mined from %s.',                                           SRC_PROSPECTING => 'It is prospected from %s.',
+            SRC_PICKPOCKETING  => 'It is pickpocketed from %s.',                                    SRC_SALVAGING   => 'It is salvaged from %s.',
+            SRC_SKINNING       => 'It is skinned from %s.'
+        ),
+        'itemSource'    => ['此为%s。', array(
+            SRC_CRAFTED        => '已锻造',                                                            SRC_DROP        => '战利品',
+            SRC_PVP            => 'obtained through PvP',                                           SRC_QUEST       => 'a quest reward',
+            SRC_VENDOR         => '由 NPC 出售',                                                       SRC_REDEMPTION  => 'redeemed online',
+            SRC_STARTER        => 'a starter item',                                                 SRC_ACHIEVEMENT => 'an achievement reward',
+            SRC_DISENCHANTMENT => 'disenchanted',                                                   SRC_FISHING     => 'fished',
+            SRC_GATHERING      => 'gathered',                                                       SRC_MILLING     => 'milled',
+            SRC_MINING         => 'mined',                                                          SRC_PROSPECTING => 'prospected',
+            SRC_PICKPOCKETING  => 'pickpocketed',                                                   SRC_SALVAGING   => 'salvaged',
+            SRC_SKINNING       => 'skinned'
+        )],
+        'itemCatDesc' => array(
+            ITEM_CLASS_CONSUMABLE => '%s is a %s%s.',                                                                 // name, itemLevel?, itemType
+            ITEM_CLASS_CONTAINER  => '%s是%d槽%s。', // name, nSlots, bagType
+            ITEM_CLASS_WEAPON     => '这%s%s的物品等级是%d。', // quality, weaponType, itemLevel
+            ITEM_CLASS_GEM        => '这是%s级%s%s宝石。', // itemLevel?, quality, color
+            ITEM_CLASS_ARMOR      => '这件%s等级的%s%d物品放置于"%s"物品栏。', // quality, armorType, itemlevel, equipSlot
+            ITEM_CLASS_AMMUNITION => '%s可每秒可应对 %.1f伤害', // name, dps
+            ITEM_CLASS_TRADEGOOD  => '加工中使用了%s。', // name
+            ITEM_CLASS_KEY        => '%s是一把钥匙，将收入您的钥匙环。', // name
+            ITEM_CLASS_GLYPH      => '这是%2$s%1$s文。 拍卖行有售或可由 加工而成。', // glyphType, class
+        )
+    ),
     'main' => array(
         'name'          => "名字",
         'link'          => "链接",
@@ -35,6 +99,7 @@ $lang = array(
         'players'       => "玩家",
         'thePlayer'     => "玩家",
         'quickFacts'    => "相关信息",
+        'comments'      => "评论",
         'screenshots'   => "屏幕截图",
         'videos'        => "视频",
         'side'          => "阵营：",
@@ -1200,6 +1265,7 @@ $lang = array(
         'worth'         => "价值：%s",
         'unkPosition'   => "这个NPC的位置未知。",
         'difficultyPH'  => '这个NPC是不同模式下的占位符，是 <a href="?npc=%1$d">%2$s</a>.',
+        'criteriaOf'    => "[This NPC is the criteria of %s.]",
         'seat'          => "Seat",
         'accessory'     => "附件",
         'accessoryFor'  => "这个NPC是载具的附件",
@@ -1564,7 +1630,7 @@ $lang = array(
                   495 => "嚎风峡湾",                         3537 => "北风苔原",                         3711 => "索拉查盆地",                        4024 => "考达拉",                          4197 => "冬拥湖",
                  4395 => "达拉然",                          4742 => "洛斯加尔登陆点"
             ),
-           -2 => "大陆"
+           -2 => ["大陆"]
         )
     ),
     'icon'  => array(
@@ -1636,10 +1702,10 @@ $lang = array(
         'customRewRate' => "自定义奖励率",
         '_transfer'     => '这个阵营的声望将被转换到<a href="?faction=%d" class="q1">%s</a>，如果你转移到<span class="icon-%s">%s</span>。',
         'cat'           => array(
-            1118 => ["经典旧世", 469 => "联盟", 169 => "热砂港", 67 => "部落", 891 => "联盟部队", 892 => "部落军队"],
-            980  => ["燃烧的远征", 936 => "沙塔斯城"],
-            1097 => ["巫妖王之怒", 1052 => "部落先遣军", 1117 => "索拉查盆地", 1037 => "联盟先遣军"],
-            0    => "其他"
+            1118 => "经典旧世", 469 => "联盟", 169 => "热砂港", 67 => "部落", 891 => "联盟部队", 892 => "部落军队",
+            980  => "燃烧的远征", 936 => "沙塔斯城",
+            1097 => "巫妖王之怒", 1052 => "部落先遣军", 1117 => "索拉查盆地", 1037 => "联盟先遣军",
+            0    => "其他", 949  => "Test Faction 1", 948  => "Test Faction 2"
         )
     ),
     'itemset' => array(
@@ -1776,12 +1842,12 @@ $lang = array(
             'crafted' => '<a href="?items&filter=cr=86;crs=%s;crv=0">手工制作物品</a>'
         ),
         'cat'           => array(
-              7 => "技能",
-            -13 => "雕文",
+              7 => ["技能"],
+            -13 => ["雕文", "战士", "圣骑士", "猎人", "潜行者", "牧师", "死亡骑士", "萨满祭司", "法师", "术士", null, "德鲁伊"],
             -11 => ["精通", 8 => "护甲", 6 => "武器", 10 => "语言"],
-             -4 => "种族特性",
-             -2 => "天赋",
-             -6 => "伙伴",
+             -4 => ["种族特性"],
+             -2 => ["天赋"],
+             -6 => ["伙伴"],
              -5 => ["坐骑", 1=> "陆地坐骑", 2 => "飞行坐骑", 3 => "其它"],
              -3 => array(
                 "宠物能力", 782 => "食尸鬼", 270 => "通用", 653 => "蝙蝠", 210 => "熊", 655 => "猛禽", 211 => "野猪",
@@ -1807,9 +1873,9 @@ $lang = array(
                 197 => ["裁缝", 26798 => "月布裁缝", 26801 => "暗纹裁缝", 26797 => "魔焰裁缝"],
             ),
               9 => ["辅助专业", 185 => "烹饪", 129 => "急救", 356 => "钓鱼", 762 => "骑术"],
-             -8 => "NPC能力",
-             -9 => "GM能力",
-              0 => "未分类"
+             -8 => ["NPC能力"],
+             -9 => ["GM能力"],
+              0 => ["未分类"]
         ),
         'armorSubClass' => array(
             "杂项",                        "布甲",                          "皮甲",                        "锁甲",                           "板甲",
@@ -2335,6 +2401,7 @@ $lang = array(
             ENCHANT_CONDITION_NOT_EQUAL_COMPARE  => "%s宝石和%s宝石的数量不同",
             ENCHANT_CONDITION_NOT_EQUAL_VALUE    => "除了%d颗%s宝石外的任意宝石"
         ),
+        '_gemColors'    => ['红色', '蓝色', '黄色', '紫色', '绿色', '橙色', '多彩', '[simple]', '棱彩'],
         'reqRating'     => array(
             "需要个人竞技场等级和战队竞技场等级达到%d",
             "需要3v3或5v5的个人竞技场等级和战队竞技场等级达到%d|n",

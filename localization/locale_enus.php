@@ -18,6 +18,70 @@ $lang = array(
         'ab'            => ["yr",    "mo",     "wk",    "day",  "hr",    "min",     "sec",     "ms"]
     ),
     'lang' => ['English', null, 'French', 'German', 'Chinese', null, 'Spanish', null, 'Russian'],
+    'meta' => array(
+        'tags'          => array(
+            'generic' => ['World of Warcraft', 'Database', 'Wrath of the Lich King', 'DB', 'WotLK', 'AoWoW', '3.3.5a'],
+            'error'   => ['404', 'File Not Found'],
+            'home'    => ['Talent Calculator', 'Hunter Pet Talent', 'Item Comparison Tool', 'Profiler'],
+            'maps'    => ['Maps', 'Zones', 'Pins'],
+            'compare' => ['Compare', 'Items', 'Item Sets', 'Stat Weights']
+        ),
+        'description' => array(
+            'genList'     => 'A complete searchable and filterable list of all %s in World of Warcraft: Wrath of the Lich King.',
+            'genPage'     => '%s is a World of Warcraft %s.',
+            'error'       => 'It appears that the page you have requested cannot be found. Perhaps a few tweaks to the AO-815 Major Confabulation Engine would help...',
+            'home'        => 'Wrath of the Lich King Database. Featuring tools for character development and information on classes, quests, professions, raids and more!',
+            'changelog'   => 'A changelog of modifications made to the "%s" guide.', // guide title
+            'npc'         => '%s is a %s NPC.',             // name, [level, rank]
+            'itemset'     => 'A %s item set with %d pieces.', // class, nPieces
+            'pet'         => '%s are a family of %s pets in World of Warcraft. They like to eat %s.',
+            'quest'       => 'A%s%s Quest%s.',              // level, zone, type
+            'guild'       => '%s of %s is guild (%s) with %d members.',
+            'arena-team'  => '%s of %s is a %dv%3$d Arena Team.',
+            'profile'     => 'World of Warcraft profile for %s: Level %d %s %s on %s %s.' // name, level, race, class, realm, region
+        ),
+        'inCategory'    => 'In the %s category.',
+        'eventEndsFmt'  => "'Ends on' MMMM %s 'at' hh:mm a.", // %s - special handling to add day ordinals (otherwise: d)
+        'iconUsedBy'    => '%s is an icon used in %s.',
+        'iconUnused'    => '%s is an unused icon.',
+        'setbonus'      => 'Has set bonuses at %s pieces.',
+        'npcFoundIn'    => 'This NPC can be found in %s.',
+        'objFoundIn'    => '%s is a World of Warcraft object that can be found in %s.',
+        'foundInExt'    => "%d additional zones",
+        'petTraitPref'  => '%s',
+        'questReward'   => 'Rewards %s.',
+        'itemSourceMore'=> array(
+            SRC_DROP           => 'It is looted from %s.',                                          SRC_QUEST       => 'It is a quest reward from %s.',
+            SRC_VENDOR         => 'It is sold by %s.', /* item: 43155 */                            SRC_ACHIEVEMENT => 'It is an achievement reward from %s.',
+            SRC_DISENCHANTMENT => 'It is disenchanted from %s.',                                    SRC_FISHING     => 'It is fished from %s.',
+            SRC_GATHERING      => 'It is gathered from %s.',                                        SRC_MILLING     => 'It is milled from %s.',
+            SRC_MINING         => 'It is mined from %s.',                                           SRC_PROSPECTING => 'It is prospected from %s.',
+            SRC_PICKPOCKETING  => 'It is pickpocketed from %s.',                                    SRC_SALVAGING   => 'It is salvaged from %s.',
+            SRC_SKINNING       => 'It is skinned from %s.'
+        ),
+        'itemSource'    => ['It is %s.', array(
+            SRC_CRAFTED        => 'crafted',                                                        SRC_DROP        => 'looted',
+            SRC_PVP            => 'obtained through PvP',                                           SRC_QUEST       => 'a quest reward',
+            SRC_VENDOR         => 'sold by NPCs',                                                   SRC_REDEMPTION  => 'redeemed online',
+            SRC_STARTER        => 'a starter item',                                                 SRC_ACHIEVEMENT => 'an achievement reward',
+            SRC_DISENCHANTMENT => 'disenchanted',                                                   SRC_FISHING     => 'fished',
+            SRC_GATHERING      => 'gathered',                                                       SRC_MILLING     => 'milled',
+            SRC_MINING         => 'mined',                                                          SRC_PROSPECTING => 'prospected',
+            SRC_PICKPOCKETING  => 'pickpocketed',                                                   SRC_SALVAGING   => 'salvaged',
+            SRC_SKINNING       => 'skinned'
+        )],
+        'itemCatDesc' => array(
+            ITEM_CLASS_CONSUMABLE => '%s is a %s%s.',                                                                 // name, itemLevel?, itemType
+            ITEM_CLASS_CONTAINER  => '%s is a %d slots %s.',                                                          // name, nSlots, bagType
+            ITEM_CLASS_WEAPON     => 'This %s %s has an item level of %d.',                                           // quality, weaponType, itemLevel
+            ITEM_CLASS_GEM        => 'This is a %s%s %s gem.',                                                        // itemLevel?, quality, color
+            ITEM_CLASS_ARMOR      => 'This %s %s of item level %d goes in the "%s" slot.',                            // quality, armorType, itemlevel, equipSlot
+            ITEM_CLASS_AMMUNITION => '%s can deal %.1f damage per second.',                                           // name, dps
+            ITEM_CLASS_TRADEGOOD  => '%s is used for crafting.',                                                      // name
+            ITEM_CLASS_KEY        => '%s is a key; it goes in your key-ring.',                                        // name
+            ITEM_CLASS_GLYPH      => 'This is a %s %s glyph. It is sold on the Auction House or crafted by scribes.', // glyphType, class
+        )
+    ),
     'main' => array(
         'name'          => "name",
         'link'          => "Link",
@@ -35,6 +99,7 @@ $lang = array(
         'players'       => "Players",
         'thePlayer'     => "The Player",
         'quickFacts'    => "Quick Facts",
+        'comments'      => "Comments",
         'screenshots'   => "Screenshots",
         'videos'        => "Videos",
         'side'          => "Side: ",
@@ -1200,6 +1265,7 @@ $lang = array(
         'worth'         => "Worth: %s",
         'unkPosition'   => "The location of this NPC is unknown.",
         'difficultyPH'  => 'This NPC is a placeholder for a different mode of <a href="?npc=%1$d">%2$s</a>.',
+        'criteriaOf'    => "This NPC is the criteria of %s.",
         'seat'          => "Seat",
         'accessory'     => "Accessories",
         'accessoryFor'  => "This NPC is an accessory for vehicle",
@@ -1564,7 +1630,7 @@ $lang = array(
                   495 => "Howling Fjord",                 3537 => "Borean Tundra",                 3711 => "Sholazar Basin",                4024 => "Coldarra",                      4197 => "Wintergrasp",
                  4395 => "Dalaran",                       4742 => "Hrothgar's Landing"
             ),
-           -2 => "Uncategorized"
+           -2 => ["Uncategorized"]
         )
     ),
     'icon'  => array(
@@ -1636,10 +1702,10 @@ $lang = array(
         'customRewRate' => "Custom Reward Rate",
         '_transfer'     => 'The reputation with this faction will be converted to <a href="?faction=%d" class="q1">%s</a> if you transfer to <span class="icon-%s">%s</span>.',
         'cat'           => array(
-            1118 => ["Classic", 469 => "Alliance", 169 => "Steamwheedle Cartel", 67 => "Horde", 891 => "Alliance Forces", 892 => "Horde Forces"],
-            980  => ["The Burning Crusade", 936 => "Shattrath City"],
-            1097 => ["Wrath of the Lich King", 1052 => "Horde Expedition", 1117 => "Sholazar Basin", 1037 => "Alliance Vanguard"],
-            0    => "Other"
+            1118 => "Classic",                       469 => "Alliance",                  169 => "Steamwheedle Cartel",        67 => "Horde",                    891 => "Alliance Forces",               892 => "Horde Forces",
+             980 => "The Burning Crusade",           936 => "Shattrath City",
+            1097 => "Wrath of the Lich King",       1052 => "Horde Expedition",         1117 => "Sholazar Basin",           1037 => "Alliance Vanguard",
+               0 => "Other",                         949 => "Test Faction 1",            948 => "Test Faction 2"
         )
     ),
     'itemset' => array(
@@ -1776,12 +1842,12 @@ $lang = array(
             'crafted' => '<a href="?items&filter=cr=86;crs=%s;crv=0">crafted items</a>'
         ),
         'cat'           => array(                           // as per menu in locale_enus.js
-              7 => "Class Skills",                          // classList
-            -13 => "Glyphs",                                // classList
+              7 => ["Class Skills"], // title > chrclass name > skill name
+            -13 => ["Glyphs", "Warrior", "Paladin", "Hunter", "Rogue", "Priest", "Death Knight", "Shaman", "Mage", "Warlock", null, "Druid"],
             -11 => ["Proficiencies", 8 => "Armor", 6 => "Weapon", 10 => "Languages"],
-             -4 => "Racial Traits",
-             -2 => "Talents",                               // classList
-             -6 => "Companions",
+             -4 => ["Racial Traits"],
+             -2 => ["Talents"], // title > chrclass name > skill name
+             -6 => ["Companions"],
              -5 => ["Mounts", 1 => "Ground Mounts", 2 => "Flying Mounts", 3 => "Miscellaneous"],
              -3 => array(
                 "Pet Skills",               782 => "Ghoul",             270 => "Generic",               653 => "Bat",                       210 => "Bear",                  655 => "Bird of Prey",          211 => "Boar",
@@ -1807,9 +1873,9 @@ $lang = array(
                 197 => ["Tailoring", 26798 => "Mooncloth Tailoring", 26801 => "Shadoweave Tailoring", 26797 => "Spellfire Tailoring"],
             ),
               9 => ["Secondary Skills", 185 => "Cooking", 129 => "First Aid", 356 => "Fishing", 762 => "Riding"],
-             -8 => "NPC Abilities",
-             -9 => "GM Abilities",
-              0 => "Uncategorized"
+             -8 => ["NPC Abilities"],
+             -9 => ["GM Abilities"],
+              0 => ["Uncategorized"]
         ),
         'armorSubClass' => array(                           // ItemSubClass.dbc/verboseName
             "Miscellaneous",                        "Cloth Armor",                          "Leather Armor",                        "Mail Armor",                           "Plate Armor",
@@ -2335,6 +2401,7 @@ $lang = array(
             ENCHANT_CONDITION_NOT_EQUAL_COMPARE  => "a different number of %s and %s gems",
             ENCHANT_CONDITION_NOT_EQUAL_VALUE    => "any number but %d %s |4gem:gems;"
         ),
+        '_gemColors'    => ['red', 'blue', 'yellow', 'purple', 'green', 'orange', 'meta', 'simple', 'prismatic'],
         'reqRating'     => array(                           // ITEM_REQ_ARENA_RATING*
             "Requires personal and team arena rating of %d",
             "Requires personal and team arena rating of %d|nin 3v3 or 5v5 brackets",

@@ -105,6 +105,16 @@ class MostcommentsBaseResponse extends TemplateResponse
 
         parent::generate();
     }
+
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        $this->metaTags[] = ['property' => 'og:title', 'content' => $this->h1];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'website'];
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [Lang::main('comments'), ...Lang::meta('tags', 'generic')]]);
+
+        $this->buildBasicMetadata();
+    }
 }
 
 ?>

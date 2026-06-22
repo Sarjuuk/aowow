@@ -142,6 +142,10 @@ class TemplateResponse extends BaseResponse
     public ?Markup $extraText   = null;
     public ?string $extraHTML   = null;
     public  array  $redButtons  = [];                       // see template/redButtons.tpl.php
+    public  array  $metaTags    = array(
+        ['name' => "viewport", 'content' => "initial-scale=0.85"]
+     // ['name' => "google-site-verification", 'content' => "<ownership-code>"]
+    );
 
     // send to template, but it is js stuff
     public  array  $gPageInfo    = [];
@@ -150,6 +154,7 @@ class TemplateResponse extends BaseResponse
     public ?Tabs   $lvTabs       = null;
     public  array  $pageTemplate = [];                      // js PageTemplate object
     public  array  $jsGlobals    = [];                      // ready to be used in template
+    public  array  $ldIntangible = [];                      // seo shit
 
     public function __construct(string $rawParam = '')
     {
@@ -368,6 +373,112 @@ class TemplateResponse extends BaseResponse
     /* Generic Page Content */
     /************************/
 
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        $this->metaTags[] = ['property' => 'og:title', 'content' => implode(' - ', $this->title)];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'website'];
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => implode(', ', [...Lang::meta('tags', 'home'), ...Lang::meta('tags', 'generic')])]);
+
+        $this->buildBasicMetadata(Lang::meta('description', 'home'), useArticle: $useArticle);
+    }
+
+    protected function buildBasicMetadata(string $genDesc = '', string $icon = '', bool $useArticle = true) : void
+    {
+        $this->metaTags[] = ['property' => 'og:site_name', 'content' => Cfg::get('NAME')];
+
+        // use manual db definition over article snippet over auto generated
+        if ($dbDesc = DB::Aowow()->selectCell('SELECT `description` FROM ::seo_descriptions WHERE `page` = %s AND `locale` IN %in ORDER BY `locale` DESC', $this->fullParams, [Lang::getLocale()->value, Locale::EN]))
+            $desc = $dbDesc;
+        else if ($this->article && $useArticle)
+        {
+            $desc = $this->article->fillJSGlobals($this->jsGlobals);
+
+            $desc = preg_replace(['/^\s+|\s+$/', '/\s+/'], ['', ' '], str_replace('\\', '', $desc));
+
+            // finish sentence past 300 chars.
+            $eolChr = Lang::getLocale()->isLogographic() ? '。' : '.';
+            if (mb_strlen($desc) > 300 && ($pos = mb_strpos($desc, $eolChr, 300)))
+                $desc = mb_substr($desc, 0, ++$pos);
+        }
+        else
+            $desc = $genDesc;
+
+        if ($desc)
+        {
+            $this->metaTags[] = ['property' => 'og:description', 'content' => $desc];
+            array_unshift($this->metaTags, ['name' => 'description', 'content' => $desc]);
+        }
+
+        array_unshift($this->metaTags, ['name' => 'language', 'content' => Lang::getLocale()->domain()]);
+
+        $this->metaTags[] = ['property' => 'og:url', 'content' => Template\PageTemplate::buildQuery()];
+
+        // image
+        if ($icon)
+            $this->metaTags[] = ['property' => 'og:image', 'content' => Cfg::get('STATIC_URL').'/images/wow/icons/large/'.$icon.'.jpg'];
+        else
+            $this->metaTags[] = ['property' => 'og:image', 'content' => Cfg::get('STATIC_URL').'/images/logos/home.png'];
+
+        // locale
+        foreach (Locale::cases() as $l)
+        {
+            if (!$l->validate())
+                continue;
+
+            if ($l == Lang::getLocale())
+                $this->metaTags[] = ['property' => 'og:locale', 'content' => $l->hreflang()];
+            else
+                $this->metaTags[] = ['property' => 'og:locale:alternate', 'content' => $l->hreflang()];
+        }
+    }
+
+    protected function buildLdJson() : void
+    {
+        $this->ldIntangible = array(
+            '@context' => 'http://schema.org',
+            '@type'    => 'Intangible',
+            'mainEntityOfPage' => array(
+                '@type' => 'WebPage',
+                '@id'   => Template\PageTemplate::buildQuery()
+            ),
+            'name'      => $this->h1,
+            'url'       => Template\PageTemplate::buildQuery(),
+            'logo'      => Cfg::get('STATIC_URL').'/images/logos/home.png',
+            'publisher' => array(
+                '@type' => 'Organization',
+                'name'  => 'Site Logo',
+                'logo'  => array(
+                    '@type'  => 'ImageObject',
+                    'url'    => Cfg::Get('STATIC_URL').'/images/logos/header.png',
+                    'width'  => 160,
+                    'height' => 68
+                )
+            )
+        );
+
+        // transfer properties
+        if ($_ = array_find($this->metaTags, fn($x) => ($x['name'] ?? '') == 'keywords'))
+            $this->ldIntangible['keywords'] = implode(', ', (array)$_['content']);
+
+        if ($_ = array_find($this->metaTags, fn($x) => ($x['name'] ?? '') == 'description'))
+            $this->ldIntangible['description'] = $_['content'];
+
+        if ($_ = array_find($this->metaTags, fn($x) => ($x['property'] ?? '') == 'og:image'))
+        {
+            $this->ldIntangible['image'] = ['@type' => 'ImageObject', 'url'=> $_['content']];
+
+            if (strstr($_['content'], '/wow/icons/large/')) // generic icons
+                $this->ldIntangible['image'] += ['width' => ICON_SIZE_LARGE, 'height' => ICON_SIZE_LARGE];
+            else if (strstr($_['content'], '/wow/Interface/Spellbook/')) // spell glyphs
+                $this->ldIntangible['image'] += ['width' => 64, 'height' => 64];
+            else                                            // actually calculate image dimensions...
+            {
+                ;                                           // NOP - there shouldn't be such cases
+            }
+        }
+    }
+
     // get announcements and notes for user
     private function addAnnouncements(bool $onlyGenerics = false) : void
     {
@@ -481,10 +592,46 @@ class TemplateResponse extends BaseResponse
             $community['co'] = Util::toJSON(CommunityContent::getComments($this->type, $this->typeId), JSON_UNESCAPED_UNICODE);
 
         if ($this->contribute & CONTRIBUTE_SS)
-            $community['ss'] = Util::toJSON(CommunityContent::getScreenshots($this->type, $this->typeId), JSON_UNESCAPED_UNICODE);
+        {
+            $screenshots = CommunityContent::getScreenshots($this->type, $this->typeId);
+            $community['ss'] = Util::toJSON($screenshots, JSON_UNESCAPED_UNICODE);
+
+            // use stickied screenshot in page meta
+            if ($sticky = array_find($screenshots, fn($x) => $x['sticky'] ?? 0))
+            {
+                // amend keywords tag
+                if ($idx = array_find_key($this->metaTags, fn($x) => $x['name'] == 'keywords'))
+                    $this->metaTags[$idx]['content'][] = Lang::main('screenshots');
+
+                // replace og:image tag
+                if ($idx = array_find_key($this->metaTags, fn($x) => $x['property'] == 'og:image'))
+                    $this->metaTags[$idx]['content'] = Cfg::get('STATIC_URL') . '/uploads/screenshots/normal/'.$sticky['id'].'.jpg';
+
+                if ($this->ldIntangible)
+                {
+                    $this->ldIntangible['keywords'][] = Lang::main('screenshots');
+
+                    $this->ldIntangible['image']['url']    = Cfg::get('STATIC_URL') . '/uploads/screenshots/normal/'.$sticky['id'].'.jpg';
+                    $this->ldIntangible['image']['width']  = $sticky['width'];
+                    $this->ldIntangible['image']['height'] = $sticky['height'];
+                }
+            }
+        }
 
         if ($this->contribute & CONTRIBUTE_VI)
-            $community['vi'] = Util::toJSON(CommunityContent::getVideos($this->type, $this->typeId), JSON_UNESCAPED_UNICODE);
+        {
+            $videos = CommunityContent::getVideos($this->type, $this->typeId);
+            $community['vi'] = Util::toJSON($videos, JSON_UNESCAPED_UNICODE);
+
+            if ($sticky = array_find($videos, fn($x) => $x['sticky'] ?? 0))
+            {
+                if ($idx = array_find_key($this->metaTags, fn($x) => $x['name'] == 'keywords'))
+                    $this->metaTags[$idx]['content'][] = Lang::main('videos');
+
+                if ($this->ldIntangible)
+                    $this->ldIntangible['keywords'][] = Lang::main('videos');
+            }
+        }
 
         unset($_SESSION['error']);
 
@@ -528,6 +675,8 @@ class TemplateResponse extends BaseResponse
         $this->addArticle();
 
         $this->applyGlobals();
+
+        $this->generateMetadata();
     }
 
     // we admit this page exists and an error occured on it
@@ -562,6 +711,12 @@ class TemplateResponse extends BaseResponse
         $this->sumSQLStats();
 
         $this->header[] = ['HTTP/1.0 404 Not Found', true, 404];
+
+        $this->metaTags[] = ['property' => 'og:title', 'content' => Lang::main('errPageTitle')];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'website'];
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => implode(', ', Lang::meta('tags', 'error'))]);
+
+        $this->buildBasicMetadata(Lang::meta('description', 'error'), useArticle: false);
 
         $this->display(true);
         exit;
@@ -600,6 +755,14 @@ class TemplateResponse extends BaseResponse
 
         $this->header[] = ['HTTP/1.0 404 Not Found', true, 404];
 
+        $this->metaTags[] = ['property' => 'og:title', 'content' => Lang::main('errPageTitle')];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'website'];
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => implode(', ', Lang::meta('tags', 'error'))]);
+
+        // TemplateResponse: this got called directly to create a 404 page here-and-now > error
+        // other cases: we are regular page just without result > homeDesc
+        $this->buildBasicMetadata(Lang::meta('description', get_class($this) == self::class ? 'error' : 'home'), useArticle: false);
+
         $this->display(true);
         exit;
     }
@@ -611,6 +774,12 @@ class TemplateResponse extends BaseResponse
 
         $this->header[] = ['HTTP/1.0 503 Service Temporarily Unavailable', true, 503];
         $this->header[] = ['Retry-After: '.(3 * HOUR)];
+
+        $this->metaTags[] = ['property' => 'og:title', 'content' => 'Maintenance'];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'website'];
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => 'Maintenance']);
+
+        $this->buildBasicMetadata(Lang::meta('homeDesc'), useArticle: false);
 
         $this->display(true);
         exit;

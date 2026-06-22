@@ -111,6 +111,22 @@ class ObjectsBaseResponse extends TemplateResponse implements ICache
 
         parent::generate();
     }
+
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        $keywords = [$this->h1];
+        if ($this->category && $this->category[0])          // dnd 'Other' catg
+            array_unshift($keywords, Lang::gameObject('cat', $this->category[0]));
+
+        $this->metaTags[] = ['property' => 'og:title', 'content' => reset($keywords)];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'website'];
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [...$keywords, ...Lang::meta('tags', 'generic')]]);
+
+        $this->buildBasicMetadata(Lang::meta('description', 'genList', [reset($keywords)]));
+
+        $this->buildLdJson();
+    }
 }
 
 ?>

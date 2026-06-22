@@ -178,6 +178,22 @@ class MailBaseResponse extends TemplateResponse implements ICache
 
         parent::generate();
     }
+
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        $this->metaTags[] = ['property' => 'og:title', 'content' => $this->h1];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'article'];
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [$this->h1, Util::ucFirst(Lang::game('mails')), ...Lang::meta('tags', 'generic')]]);
+
+        $desc = Lang::meta('description', 'genPage', [$this->h1, Util::ucFirst(Lang::game('mail'))]);
+        if ($txt = Lang::trimTextClean($this->extraText->fillJSGlobals(), 250))
+            $desc .= ' '.$txt;
+
+        $this->buildBasicMetadata($desc);
+
+        $this->buildLdJson();
+    }
 }
 
 ?>

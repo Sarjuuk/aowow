@@ -2247,6 +2247,8 @@ var g_faction_categories = {
     1117: 'Sholazar Basin',
      169: 'Steamwheedle Cartel',
      980: 'The Burning Crusade',
+     948: 'Test Faction 2',
+     949: 'Test Faction 1',
     1097: 'Wrath of the Lich King'
 };
 

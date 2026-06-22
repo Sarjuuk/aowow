@@ -2531,6 +2531,42 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             if (file_exists('static/images/wow/Interface/Spellbook/'.$_.'.png'))
                 $this->infobox->append('[img src='.Cfg::get('STATIC_URL').'/images/wow/Interface/Spellbook/'.$_.'.png border=0 float=center margin=15]');
     }
+
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        $this->metaTags[] = ['property' => 'og:title', 'content' => $this->h1];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'article'];
+
+        $keywords = [$this->h1, Util::ucFirst(Lang::game('spell'))];
+
+        $c = array_slice($this->breadcrumb, 2);
+        if (isset($c[2]))
+        {
+            if (!in_array($c[0], [7, -2]))
+                $keywords[] = Lang::spell('cat', ...$c);
+            else if ($_ = SkillList::getName($c[2]))
+                $keywords[] = $_;
+        }
+        if (isset($c[1]))
+        {
+            if (!in_array($c[0], [7, -2]))
+                $keywords[] = Lang::spell('cat', $c[0], $c[1]);
+            else
+                $keywords[] = Lang::game('cl', $c[1]);
+        }
+        if (isset($c[0]))
+            $keywords[] = Lang::spell('cat', $c[0], 0);
+
+        $desc  = $this->subject->parseText('description', MAX_LEVEL, SpellList::INTERACTIVE_NONE)[0];
+        $desc .= ($desc ? ' ' : '').Lang::meta('description', 'genPage', [$this->h1, $keywords[2].' '.$keywords[1]]);
+
+        // parsedDescription. This is a Druid Glyph Item. A spell from World of Warcraft: Mists of Pandaria
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [...$keywords, ...Lang::meta('tags', 'generic')]]);
+
+        $this->buildBasicMetadata($desc, $this->subject->getField('iconString'));
+
+        $this->buildLdJson();
+    }
 }
 
 ?>

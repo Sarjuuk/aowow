@@ -945,6 +945,41 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
 
         $this->addScript([SC_JS_STRING, '$(document).ready(function () { mn_staff.push('.Util::toJSON(array_values($menu)).'); });']);
     }
+
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        $this->metaTags[] = ['property' => 'og:title', 'content' => $this->h1];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'article'];
+
+        if ($f = ($this->zoneMusic['music'][0] ?? null))
+        {
+            $this->metaTags[] = ['property' => 'og:audio',      'content' => $f['url']];
+            $this->metaTags[] = ['property' => 'og:audio:type', 'content' => $f['type']];
+        }
+
+        $cat = $this->subject->getField('category');
+
+        $keywords = [$this->h1, Util::ucFirst(Lang::game('zone')), Lang::zone('cat', $cat), Lang::zone('territories', $this->subject->getField('faction'))];
+
+        $n = Lang::zone('territories', $this->subject->getField('faction')).' '.Lang::game('zone');
+        if ($t = $this->subject->getField('type'))
+        {
+            $n = Lang::main('parensFmt', [$n, Lang::zone('instanceTypes', $t)]);
+            $keywords[] = Lang::zone('instanceTypes', $t);
+        }
+
+        $desc  = Lang::meta('description', 'genPage', [$this->h1, $n]);
+        $desc .= ' '.Lang::meta('inCategory', [Lang::zone('cat', $cat)]);
+
+        if ($cat == 2 || $cat == 3)
+            $keywords[] = Lang::game('expansions', $this->subject->getField('expansion'));
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [...$keywords, ...Lang::meta('tags', 'generic')]]);
+
+        $this->buildBasicMetadata($desc);
+
+        $this->buildLdJson();
+    }
 }
 
 ?>

@@ -68,6 +68,20 @@ class GuidesBaseResponse extends TemplateResponse // implements ICache
 
         parent::generate();
     }
+
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        $this->metaTags[] = ['property' => 'og:title', 'content' => $this->h1];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'website'];
+
+        $keywords = [Util::ucFirst(Lang::game('guides'))];
+        if (isset($this->category[0]))
+            $keywords[] = Lang::guide('category', $this->category[0]);
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => $keywords]);
+
+        $this->buildBasicMetadata(Lang::meta('description', 'genList', [$this->h1]));
+    }
 }
 
 ?>

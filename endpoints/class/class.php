@@ -315,6 +315,18 @@ class ClassBaseResponse extends TemplateResponse implements ICache
 
         parent::generate();
     }
+
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        $this->metaTags[] = ['property' => 'og:title', 'content' => $this->h1];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'article'];
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [$this->h1, Util::ucFirst(Lang::game('class')), ...Lang::meta('tags', 'generic')]]);
+
+        $this->buildBasicMetadata(icon: $this->subject->getField('iconString'));
+
+        $this->buildLdJson();
+    }
 }
 
 ?>

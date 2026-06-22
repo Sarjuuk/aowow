@@ -91,6 +91,22 @@ class EventsBaseResponse extends TemplateResponse implements ICache
             if (is_object($listview) && ($listview?->getTemplate() == 'holiday' || $listview?->getTemplate() == 'holidaycal'))
                 WorldEventList::updateListview($listview);
     }
+
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        $keywords = [$this->h1];
+        if ($this->category)
+            array_unshift($keywords, Lang::event('category', $this->category[0]));
+
+        $this->metaTags[] = ['property' => 'og:title', 'content' => implode(' ', $keywords)];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'website'];
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [...$keywords, ...Lang::meta('tags', 'generic')]]);
+
+        $this->buildBasicMetadata(Lang::meta('description', 'genList', [implode(' ', $keywords)]));
+
+        $this->buildLdJson();
+    }
 }
 
 ?>

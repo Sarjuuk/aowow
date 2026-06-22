@@ -116,6 +116,22 @@ class SoundsBaseResponse extends TemplateResponse implements ICache
         // sort for dropdown-menus in filter
         Lang::sort('sound', 'cat');
     }
+
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        $keywords = [$this->h1];
+        if (count($this->breadcrumb) == 3)
+            array_unshift($keywords, Lang::sound('cat', end($this->breadcrumb)));
+
+        $this->metaTags[] = ['property' => 'og:title', 'content' => implode(' ', $keywords)];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'website'];
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [...$keywords, ...Lang::meta('tags', 'generic')]]);
+
+        $this->buildBasicMetadata(Lang::meta('description', 'genList', [implode(' ', $keywords)]));
+
+        $this->buildLdJson();
+    }
 }
 
 ?>

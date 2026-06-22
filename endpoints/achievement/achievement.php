@@ -515,6 +515,31 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
         else
             $markup->addItem($addRow);
     }
+
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        $this->metaTags[] = ['property' => 'og:title', 'content' => $this->h1];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'article'];
+
+        $keywords = [Util::ucFirst(Lang::game('achievement'))];
+
+        $desc = Lang::meta('description', 'genPage', [$this->h1, $keywords[0]]);
+        if ($this->description)
+            $desc .= ' '.$this->description;
+
+        if (count($this->breadcrumb) > 2)
+            for ($i = 2; $i < count($this->breadcrumb); $i++)
+                if ($c = Lang::achievement('cat', $this->breadcrumb[$i]))
+                    array_unshift($keywords, $c);
+
+        $desc .= ' '.Lang::meta('inCategory', [implode(' ', $keywords)]);
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [$this->h1, ...$keywords, ...Lang::meta('tags', 'generic')]]);
+
+        $this->buildBasicMetadata($desc, $this->subject->getField('iconString'));
+
+        $this->buildLdJson();
+    }
 }
 
 ?>

@@ -80,6 +80,11 @@ class Markup implements \JsonSerializable
         return $this->_parseTags();
     }
 
+    public function fillJSGlobals(array $jsgData = []) : string
+    {
+        return self::stripTags($this->__text, $jsgData);
+    }
+
     public function getParent() : string
     {
         return $this->__parent;
@@ -143,11 +148,6 @@ class Markup implements \JsonSerializable
         return $jsGlobals;
     }
 
-    private function _stripTags(array $jsgData = []) : string
-    {
-        return self::stripTags($this->__text, $jsgData);
-    }
-
     public static function stripTags(string $text, array $jsgData = []) : string
     {
         // replace DB Tags
@@ -165,12 +165,7 @@ class Markup implements \JsonSerializable
                     {
                         $sm = explode(',', $submatch[1]);
                         for ($i = 0; $i < count($sm); $i += 2)
-                        {
-                            if (!empty($jsgData[Type::ITEM][1][$sm[$i]]))
-                                $moneys[] = $jsgData[Type::ITEM][1][$sm[$i]]['name'] ?? $jsgData[Type::ITEM][1][$match[2]]['name_' . Lang::getLocale()->json()];
-                            else
-                                $moneys[] = Util::ucFirst(Lang::game('item')).' #'.$sm[$i];
-                        }
+                            $moneys[] = $jsgData[Type::ITEM][1][$sm[$i]]['name'] ?? $jsgData[Type::ITEM][1][$sm[$i]]['name_' . Lang::getLocale()->json()] ?? Util::ucFirst(Lang::game('item')).' #'.$sm[$i];
                     }
                 }
 
@@ -180,24 +175,14 @@ class Markup implements \JsonSerializable
                     {
                         $sm = explode(',', $submatch[1]);
                         for ($i = 0; $i < count($sm); $i += 2)
-                        {
-                            if (!empty($jsgData[Type::CURRENCY][1][$sm[$i]]))
-                                $moneys[] = $jsgData[Type::CURRENCY][1][$sm[$i]]['name'] ?? $jsgData[Type::CURRENCY][1][$match[2]]['name_' . Lang::getLocale()->json()];
-                            else
-                                $moneys[] = Util::ucFirst(Lang::game('curency')).' #'.$sm[$i];
-                        }
+                            $moneys[] = $jsgData[Type::CURRENCY][1][$sm[$i]]['name'] ?? $jsgData[Type::CURRENCY][1][$sm[$i]]['name_' . Lang::getLocale()->json()] ?? Util::ucFirst(Lang::game('curency')).' #'.$sm[$i];
                     }
                 }
 
                 return Lang::concat($moneys);
             }
             if ($type = Type::getIndexFrom(Type::IDX_FILE_STR, $match[1]))
-            {
-                if (!empty($jsgData[$type][1][$match[2]]))
-                    return $jsgData[$type][1][$match[2]]['name'] ?? $jsgData[$type][1][$match[2]]['name_' . Lang::getLocale()->json()];
-                else
-                    return Util::ucFirst(Lang::game($match[1])).' #'.$match[2];
-            }
+                return $jsgData[$type][1][$match[2]]['name'] ?? $jsgData[$type][1][$match[2]]['name_' . Lang::getLocale()->json()] ?? Util::ucFirst(Lang::game($match[1])).' #'.$match[2];
 
             trigger_error('Markup::stripTags() - encountered unhandled db-tag: '.var_export($match));
             return '';

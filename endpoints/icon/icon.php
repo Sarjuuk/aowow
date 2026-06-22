@@ -22,6 +22,7 @@ class IconBaseResponse extends TemplateResponse implements ICache
     public string $icon   = '';
 
     private IconList $subject;
+    private array    $usedBy = [];
 
     public function __construct(string $id)
     {
@@ -97,9 +98,10 @@ class IconBaseResponse extends TemplateResponse implements ICache
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
 
         // used by: spell
-        $ubSpells = new SpellList(array(['iconId', $this->typeId]));
+        $ubSpells = new SpellList(array(['iconId', $this->typeId]), ['calcTotal' => true]);
         if (!$ubSpells->error)
         {
+            $this->usedBy[$ubSpells->getMatches() > 1 ? 'spells' : 'spell'] = $ubSpells->getMatches();
             $this->extendGlobalData($ubSpells->getJSGlobals(GLOBALINFO_RELATED | GLOBALINFO_SELF));
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $ubSpells->getListviewData(),
@@ -108,9 +110,10 @@ class IconBaseResponse extends TemplateResponse implements ICache
         }
 
         // used by: item
-        $ubItems = new ItemList(array(['iconId', $this->typeId]));
+        $ubItems = new ItemList(array(['iconId', $this->typeId]), ['calcTotal' => true]);
         if (!$ubItems->error)
         {
+            $this->usedBy[$ubItems->getMatches() > 1 ? 'items' : 'item'] = $ubItems->getMatches();
             $this->extendGlobalData($ubItems->getJSGlobals());
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $ubItems->getListviewData(),
@@ -119,9 +122,10 @@ class IconBaseResponse extends TemplateResponse implements ICache
         }
 
         // used by: achievement
-        $ubAchievements = new AchievementList(array(['iconId', $this->typeId]));
+        $ubAchievements = new AchievementList(array(['iconId', $this->typeId]), ['calcTotal' => true]);
         if (!$ubAchievements->error)
         {
+            $this->usedBy[$ubAchievements->getMatches() > 1 ? 'achievements' : 'achievement'] = $ubAchievements->getMatches();
             $this->extendGlobalData($ubAchievements->getJSGlobals());
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $ubAchievements->getListviewData(),
@@ -130,9 +134,10 @@ class IconBaseResponse extends TemplateResponse implements ICache
         }
 
         // used by: currency
-        $ubCurrencies = new CurrencyList(array(['iconId', $this->typeId]));
+        $ubCurrencies = new CurrencyList(array(['iconId', $this->typeId]), ['calcTotal' => true]);
         if (!$ubCurrencies->error)
         {
+            $this->usedBy[$ubCurrencies->getMatches() > 1 ? 'currencies' : 'currency'] = $ubCurrencies->getMatches();
             $this->extendGlobalData($ubCurrencies->getJSGlobals());
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $ubCurrencies->getListviewData(),
@@ -141,9 +146,10 @@ class IconBaseResponse extends TemplateResponse implements ICache
         }
 
         // used by: hunter pet
-        $ubPets = new PetList(array(['iconId', $this->typeId]));
+        $ubPets = new PetList(array(['iconId', $this->typeId]), ['calcTotal' => true]);
         if (!$ubPets->error)
         {
+            $this->usedBy[$ubPets->getMatches() > 1 ? 'pets' : 'pet'] = $ubPets->getMatches();
             $this->extendGlobalData($ubPets->getJSGlobals());
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $ubPets->getListviewData(),
@@ -152,6 +158,23 @@ class IconBaseResponse extends TemplateResponse implements ICache
         }
 
         parent::generate();
+    }
+
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        $this->metaTags[] = ['property' => 'og:title', 'content' => $this->h1];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'article'];
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [Util::ucFirst(Lang::game('icons')), ...Lang::meta('tags', 'generic')]]);
+
+        if ($desc = Lang::concat($this->usedBy, callback: fn($v, $k) => $v.' '.Util::ucFirst(Lang::game($k))))
+            $desc = Lang::meta('iconUsedBy', [$this->h1, $desc]);
+        else
+            $desc = Lang::meta('iconUnused', [$this->h1]);
+
+        $this->buildBasicMetadata($desc, $this->subject->getField('name'));
+
+        $this->buildLdJson();
     }
 }
 

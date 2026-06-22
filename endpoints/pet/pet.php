@@ -211,6 +211,29 @@ class PetBaseResponse extends TemplateResponse implements ICache
 
         parent::generate();
     }
+
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        $this->metaTags[] = ['property' => 'og:title', 'content' => $this->h1];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'article'];
+
+        $keywords   = [$this->h1, Util::ucFirst(Lang::game('pet'))];
+        $type       = $this->subject->getField('type');
+        $prefix     = Lang::meta('petTraitPref', [Lang::pet('cat', $type)]);
+        $keywords[] = Lang::pet('cat', $type);
+
+        if ($this->subject->getField('exotic'))
+            $prefix = Lang::pet('exotic').' ' .$prefix;
+
+        $food = array_intersect_key(Lang::pet('food'), $this->subject->getFoodIds());
+        $desc = Lang::meta('description', 'pet', [$this->h1, $prefix, Lang::concat($food)]);
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [...$keywords, ...Lang::meta('tags', 'generic')]]);
+
+        $this->buildBasicMetadata($desc, $this->headIcons[0]);
+
+        $this->buildLdJson();
+    }
 }
 
 ?>

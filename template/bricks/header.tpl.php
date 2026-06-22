@@ -3,11 +3,9 @@
 
     /** @var PageTemplate $this */
 ?>
-
 <!DOCTYPE html>
-<html>
+<html lang="<?=$this->locale->hreflang('-'); ?>">
 <head>
-
 <?php $this->brick('head'); ?>
 </head>
 
@@ -21,7 +19,6 @@
        margin-bottom: 1px !important;
     }
 </style>
-
 <?php endif; ?>
 
 <div class="layout nosidebar" id="layout">

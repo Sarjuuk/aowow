@@ -357,6 +357,35 @@ class FactionBaseResponse extends TemplateResponse implements ICache
 
         parent::generate();
     }
+
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        $this->metaTags[] = ['property' => 'og:title', 'content' => $this->h1];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'article'];
+
+        if ($c2 = $this->subject->getField('cat2'))
+            $catName = Lang::faction('cat', $c2);
+        else
+            $catName = Lang::faction('cat', $this->subject->getField('cat'));
+
+        $tags = [$this->h1, Util::ucFirst(Lang::game('faction'))];
+        $desc = Lang::meta('description', 'genPage', [$this->h1, Util::ucFirst(Lang::game('faction'))]);
+        if ($catName)
+        {
+            $tags[] = $catName;
+            $desc  .= ' '.Lang::meta('inCategory', [$catName]);
+
+            // for keywords but not genDesc
+            if ($c2 = $this->subject->getField('cat2'))
+                $tags[] = Lang::faction('cat', $c2);
+        }
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [...$tags, ...Lang::meta('tags', 'generic')]]);
+
+        $this->buildBasicMetadata($desc);
+
+        $this->buildLdJson();
+    }
 }
 
 ?>

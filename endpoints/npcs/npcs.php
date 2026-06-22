@@ -133,6 +133,26 @@ class NpcsBaseResponse extends TemplateResponse implements ICache
             $this->setOnCacheLoaded([self::class, 'onBeforeDisplay']);
     }
 
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        $keywords = [$this->h1];
+
+        if ($this->category)
+            array_unshift($keywords, Lang::npc('cat', $this->category[0]));
+
+        if (count($this->filter->values['fa']) == 1)
+            array_unshift($keywords, Lang::game('fa', $this->filter->values['fa'][0]));
+
+        $this->metaTags[] = ['property' => 'og:title', 'content' => $this->h1];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'website'];
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [...$keywords, ...Lang::meta('tags', 'generic')]]);
+
+        $this->buildBasicMetadata(Lang::meta('description', 'genList', [implode(' ', array_slice($keywords, -2, 2))]));
+
+        $this->buildLdJson();
+    }
+
     public static function onBeforeDisplay() : void
     {
         // sort for dropdown-menus
