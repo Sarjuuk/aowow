@@ -375,6 +375,17 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
                 $n  = Util::localizedString($tpl, 'name');
                 $sn = Util::localizedString($tpl, 'subname');
 
+                $somNPC = array(
+                    'coords'        => [[$spawn['posX'], $spawn['posY']]],
+                    'level'         => $spawn['floor'],
+                    'name'          => $n,
+                    'type'          => Type::NPC,
+                    'id'            => $tpl['id'],
+                    'reacthorde'    => $tpl['H'] ?: 1,      // no neutral (0) setting
+                    'reactalliance' => $tpl['A'] ?: 1,
+                    'description'   => $sn
+                );
+
                 $flagsMap = array(
                     NPC_FLAG_REPAIRER        => 'repair',
                     NPC_FLAG_AUCTIONEER      => 'auctioneer',
@@ -387,33 +398,20 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
                     NPC_FLAG_STABLE_MASTER   => 'stablemaster',
                     NPC_FLAG_GUILD_MASTER    => 'guildmaster',
                     NPC_FLAG_SPIRIT_HEALER |
-                    NPC_FLAG_SPIRIT_GUIDE    => 'spirithealer',
-                    0                        => ''          // set 'unused' if no match
+                    NPC_FLAG_SPIRIT_GUIDE    => 'spirithealer'
                 );
 
+                foreach ($flagsMap as $flag => $what)
+                    if ($tpl['npcflag'] & $flag)
+                        $addToSOM($what, $n, $somNPC);
+
                 if ($creatureSpawns->isBoss())
-                    $what = 'boss';
+                    $addToSOM('boss', $n, $somNPC);
                 else if ($tpl['rank'] == NPC_RANK_RARE_ELITE || $tpl['rank'] == NPC_RANK_RARE)
-                    $what = 'rare';
-                else
-                    foreach ($flagsMap as $flag => $what)
-                        if ($tpl['npcflag'] & $flag)
-                            break;
+                    $addToSOM('rare', $n, $somNPC);
 
-                if ($what == 'flightmaster')
+                if ($tpl['npcflag'] & NPC_FLAG_FLIGHT_MASTER)
                     $flightNodes[$tpl['id']] = [$spawn['posX'], $spawn['posY']];
-
-                if ($what)
-                    $addToSOM($what, $n, array(
-                        'coords'        => [[$spawn['posX'], $spawn['posY']]],
-                        'level'         => $spawn['floor'],
-                        'name'          => $n,
-                        'type'          => Type::NPC,
-                        'id'            => $tpl['id'],
-                        'reacthorde'    => $tpl['H'] ?: 1,      // no neutral (0) setting
-                        'reactalliance' => $tpl['A'] ?: 1,
-                        'description'   => $sn
-                    ));
 
                 if ($tpl['startsQuests'])
                 {
@@ -475,7 +473,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
                 if (!$tpl)
                     continue;
 
-                $n = Util::localizedString($tpl, 'name', true, true);
+                $n = Util::localizedString($tpl, 'name');
                 $addToSOM('areatrigger', $n, array(
                     'coords'        => [[$spawn['posX'], $spawn['posY']]],
                     'level'         => $spawn['floor'],
