@@ -340,8 +340,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             LEFT JOIN dbc_itemdisplayinfo idi ON idi.`id` = i.`displayId`
             LEFT JOIN dbc_itemgroupsounds igs ON igs.`id` = idi.`groupSoundId`
             LEFT JOIN dbc_material m          ON   m.`id` = i.`material`
-            SET       i.`spellVisualId`    = IFNULL(idi.`spellVisualId`,   0),
-                      i.`pickUpSoundId`    = IFNULL(igs.`pickUpSoundId`,   0),
+            SET       i.`pickUpSoundId`    = IFNULL(igs.`pickUpSoundId`,   0),
                       i.`dropDownSoundId`  = IFNULL(igs.`dropDownSoundId`, 0),
                       i.`sheatheSoundId`   = IFNULL(m.`sheatheSoundId`,    0),
                       i.`unsheatheSoundId` = IFNULL(m.`unsheatheSoundId`,  0)'

@@ -176,6 +176,8 @@ var fi_filters = {
         { id: 91,  name: 'tool',                    type: 'totemcategory' },
         { id: 155, name: 'usableinarenas',          type: 'yn' },
         { id: 156, name: 'usablewhenshapeshifted',  type: 'yn' },
+        { id: 200, name: 'itemvisual',              type: 'itemvisuals-any+none' },  // aowow - custom
+    //  { id: 201, name: 'spellvisual',             type: 'str-small' }, // aowow - custom
 
         { id: 112, name: 'sepcommunity' },
         { id: 130, name: 'hascomments',         type: 'yn' },
@@ -525,6 +527,7 @@ var fi_filters = {
         { id: 3,   name: 'requiresprof',        type: 'profession' },
         { id: 4,   name: 'reqskillrank',        type: 'num' },
         { id: 5,   name: 'hascondition',        type: 'yn' },
+        { id: 200, name: 'itemvisual',          type: 'itemvisuals-any+none' },  // aowow - custom
 
         { id: 19,  name: 'sepbasestats' },
         { id: 21,  name: 'agi',                 type: 'num' },

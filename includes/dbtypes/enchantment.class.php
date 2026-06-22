@@ -21,6 +21,7 @@ class EnchantmentList extends DBTypeList
     protected string $queryBase = 'SELECT ie.*, ie.id AS ARRAY_KEY FROM ::itemenchantment ie';
     protected array  $queryOpts = array(                    // 502 => Type::ENCHANTMENT
                         'ie' => [['is']],
+                        'iv' => ['j' => ['::itemvisuals `iv` ON `ie`.`itemVisualId` = `iv`.`id`']],
                         'is' => ['j' => ['::item_stats `is`  ON `is`.`type` = 502 AND `is`.`typeId` = `ie`.`id`', true], 's' => ', `is`.*'],
                     );
 
@@ -168,7 +169,8 @@ class EnchantmentListFilter extends Filter
 {
     protected string $type  = 'enchantments';
     protected static array $enums = array(
-        3 => parent::ENUM_PROFESSION                        // requiresprof
+        3   => parent::ENUM_PROFESSION,                     // requiresprof
+        200 => parent::ENUM_ITEM_VISUAL                     // itemvisual
     );
 
     protected static array $genericFilter = array(
@@ -230,16 +232,17 @@ class EnchantmentListFilter extends Filter
         116 => [parent::CR_NUMERIC, 'is.mana',            NUM_CAST_INT,         true], // mana
         117 => [parent::CR_NUMERIC, 'is.exprtng',         NUM_CAST_INT,         true], // exprtng
         119 => [parent::CR_NUMERIC, 'is.hitrtng',         NUM_CAST_INT,         true], // hitrtng
-        123 => [parent::CR_NUMERIC, 'is.splpwr',          NUM_CAST_INT,         true]  // splpwr
+        123 => [parent::CR_NUMERIC, 'is.splpwr',          NUM_CAST_INT,         true], // splpwr
+        200 => [parent::CR_CALLBACK,'cbHasItemVisual',    null,                 null]  // itemvisual (custom)
     );
 
     protected static array $inputFields = array(
-        'cr'  => [parent::V_RANGE, [2, 123],             true ], // criteria ids
-        'crs' => [parent::V_RANGE, [1, 15],              true ], // criteria operators
-        'crv' => [parent::V_REGEX, parent::PATTERN_INT,  true ], // criteria values - only numerals
-        'na'  => [parent::V_NAME,  false,                false], // name - only printable chars, no delimiter
-        'ma'  => [parent::V_EQUAL, 1,                    false], // match any / all filter
-        'ty'  => [parent::V_RANGE, [1, 8],               true ]  // types
+        'cr'  => [parent::V_LIST,  [[2, 123], 200],                             true ], // criteria ids
+        'crs' => [parent::V_LIST,  [[1, 215], self::ENUM_ANY, self::ENUM_NONE], true ], // criteria operators
+        'crv' => [parent::V_REGEX, parent::PATTERN_INT,                         true ], // criteria values - only numerals
+        'na'  => [parent::V_NAME,  false,                                       false], // name - only printable chars, no delimiter
+        'ma'  => [parent::V_EQUAL, 1,                                           false], // match any / all filter
+        'ty'  => [parent::V_RANGE, [1, 8],                                      true ]  // types
     );
 
     protected function createSQLForValues() : array
@@ -257,6 +260,21 @@ class EnchantmentListFilter extends Filter
             $parts[] = [DB::OR, ['type1', $_v['ty']], ['type2', $_v['ty']], ['type3', $_v['ty']]];
 
         return $parts;
+    }
+
+    protected function cbHasItemVisual(int $cr, int $crs, string $crv) : ?array
+    {
+        if (!Util::checkNumeric($crs, NUM_CAST_INT))
+            return null;
+
+        if (in_array($crs, self::$enums[$cr]))
+            return [DB::OR, ['iv.visualEffectId1', $crs], ['iv.visualEffectId2', $crs], ['iv.visualEffectId3', $crs], ['iv.visualEffectId4', $crs], ['iv.visualEffectId5', $crs]];
+        else if ($crs == parent::ENUM_ANY)
+            return ['itemVisualId', 0, '!'];
+        else if ($crs == parent::ENUM_NONE)
+            return ['itemVisualId', 0];
+
+        return null;
     }
 }
 

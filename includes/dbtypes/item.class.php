@@ -33,6 +33,7 @@ class ItemList extends DBTypeList
                         'is'  => ['j' => ['::item_stats `is`  ON `is`.`type` = 3 AND `is`.`typeId` = `i`.`id`', true], 's' => ', `is`.*'],
                         's'   => ['j' => ['::spell      `s`   ON `s`.`effect1CreateItemId` = `i`.`id`', true], 'g' => 'i.`id`'],
                         'e'   => ['j' => ['::events     `e`   ON `e`.`id` = `i`.`eventId`', true], 's' => ', e.`holidayId`'],
+                        'iv'  => ['j' => ['::itemvisuals `iv` ON `iv`.`id` = `i`.`itemVisualId`']],
                         'src' => ['j' => ['::source     `src` ON `src`.`type` = 3 AND `src`.`typeId` = `i`.`id`', true], 's' => ', `moreType`, `moreTypeId`, `moreZoneId`, `moreMask`, `src1`, `src2`, `src3`, `src4`, `src5`, `src6`, `src7`, `src8`, `src9`, `src10`, `src11`, `src12`, `src13`, `src14`, `src15`, `src16`, `src17`, `src18`, `src19`, `src20`, `src21`, `src22`, `src23`, `src24`']
                     );
 
@@ -1818,7 +1819,8 @@ class ItemListFilter extends Filter
             10 => SRC_EVENT,
             11 => SRC_ACHIEVEMENT,
             12 => SRC_FISHING
-        )
+        ),
+        200 => parent::ENUM_ITEM_VISUAL
     );
 
     protected static array $genericFilter = array(
@@ -1978,6 +1980,8 @@ class ItemListFilter extends Filter
         172 => [parent::CR_CALLBACK,  'cbObtainedBy',           SRC_ACHIEVEMENT,         null              ], // rewardedbyachievement [yn]
         176 => [parent::CR_STAFFFLAG, 'flags'                                                              ], // flags
         177 => [parent::CR_STAFFFLAG, 'flagsExtra'                                                         ], // flags2
+        200 => [parent::CR_CALLBACK,  'cbHasItemVisual',        null,                    null              ]  // itemvisual [enum] (custom)
+     // 201 => [parent::CR_CALLBACK,  'cbHasSpellVisual',       null,                    null              ]  // spellvisual [str] (custom) - unused for now, looks like it's really only shooting/throwing animations for ranged weapons
     );
 
     protected static array $inputFields   = array(
@@ -1985,7 +1989,7 @@ class ItemListFilter extends Filter
         'wtv'   => [parent::V_RANGE,    [1, 999],                                                            true ], // weight values
         'jc'    => [parent::V_LIST,     [1],                                                                 false], // use jewelcrafter gems for weight calculation
         'gm'    => [parent::V_LIST,     [2, 3, 4],                                                           false], // gem rarity for weight calculation
-        'cr'    => [parent::V_RANGE,    [1, 177],                                                            true ], // criteria ids
+        'cr'    => [parent::V_LIST,     [[1, 177], 200],                                                     true ], // criteria ids
         'crs'   => [parent::V_LIST,     [parent::ENUM_NONE, parent::ENUM_ANY, [0, 99999]],                   true ], // criteria operators
         'crv'   => [parent::V_REGEX,    parent::PATTERN_CRV,                                                 true ], // criteria values - only printable chars, no delimiters
         'upg'   => [parent::V_REGEX,    '/[^\d:]/ui',                                                        true ], // upgrade item ids
@@ -2454,6 +2458,21 @@ class ItemListFilter extends Filter
     {
         if ($this->int2Bool($crs))
             return ['src.src'.$field, null, $crs ? '!' : null];
+
+        return null;
+    }
+
+    protected function cbHasItemVisual(int $cr, int $crs, string $crv) : ?array
+    {
+        if (!Util::checkNumeric($crs, NUM_CAST_INT))
+            return null;
+
+        if (in_array($crs, self::$enums[$cr]))              // limit to weapons, as other items have visuals assigned, that will not be displayed by client
+            return [DB::AND, ['class', ITEM_CLASS_WEAPON], [DB::OR, ['iv.visualEffectId1', $crs], ['iv.visualEffectId2', $crs], ['iv.visualEffectId3', $crs], ['iv.visualEffectId4', $crs], ['iv.visualEffectId5', $crs]]];
+        else if ($crs == parent::ENUM_ANY)
+            return [DB::AND, ['class', ITEM_CLASS_WEAPON], ['itemVisualId', 0, '!']];
+        else if ($crs == parent::ENUM_NONE)
+            return [DB::AND, ['class', ITEM_CLASS_WEAPON], ['itemVisualId', 0]];
 
         return null;
     }

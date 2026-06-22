@@ -90,6 +90,12 @@ abstract class Filter
     protected const ENUM_CLASSS        = array( null,     1,     2,     3,     4,     5,     6,     7,     8,     9,  null,    11,  true, false);
     protected const ENUM_RACE          = array( null,     1,     2,     3,     4,     5,     6,     7,     8,  null,    10,    11,  true, false);
     protected const ENUM_PROFESSION    = array( null,   171,   164,   185,   333,   202,   129,   755,   165,   186,   197,  true, false,   356,   182,   773);
+    protected const ENUM_ITEM_VISUAL   = array(             // ItemVisualEffect.dbc/ids pointing to sensible models
+                                                            // Enchantment
+                                                   1,     2,     3,    42,    45,    46,    47,    48,    50,    51,    52,    62,    81,   101,   121,   122,   123,   124,   125,   126,
+                                                 127,   141,   142,   143,   144,   145,   146,   147,   148,   182,   183,   184,   185,   186,   187,   193,   194,
+                                                            // Spell
+                                                 158,   177,   195,   207);
 
     public bool  $error        = false;
     public bool  $shouldReload = false;                     // erroneous params have been corrected. Build GET string and reload

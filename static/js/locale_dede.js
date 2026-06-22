@@ -3974,7 +3974,18 @@ var LANG = {
                             [21,'0x00100000'],                      [22,'0x00200000'],                      [23,'0x00400000'],                      [24,'0x00800000'],                      [25,'0x01000000'],
                             [26,'0x02000000'],                      [27,'0x04000000'],                      [28,'0x08000000'],                      [29,'0x10000000'],                      [30,'0x20000000'],
                             [31,'0x40000000'],                      [32,'0x80000000']
-                       ]
+                        ],
+        itemvisuals:    [                                   // aowow - custom
+                            [2,   'Blaues Leuchten (schwach)'],     [62,  'Blaues Leuchten (mittel)'],      [1,   'Blaues Leuchten (stark)'],       [3,   'Blaue Flamme (schwach)'],        [50,  'Rotes Leuchten (schwach)'],
+                            [121, 'Rotes Leuchten (stark)'],        [45,  'Rote Flamme (schwach)'],         [48,  'Gelbes Leuchten (schwach)'],     [122, 'Gelbes Leuchten (stark)'],       [147, 'Gelbe Flamme (schwach)'],
+                            [123, 'Weißes Leuchten (schwach)'],     [124, 'Weißes Leuchten (stark)'],       [144, 'Weiße Flamme (schwach)'],        [125, 'Grünes Leuchten (schwach)'],     [126, 'Grünes Leuchten (stark)'],
+                            [145, 'Grüne Flamme (schwach)'],        [127, 'Violettes Leuchten (schwach)'],  [141, 'Violettes Leuchten (stark)'],    [146, 'Violette Flamme (schwach)'],     [142, 'Schwarzes Leuchten (schwach)'],
+                            [143, 'Schwarzes Leuchten (stark)'],    [148, 'Schwarze Flamme (schwach)'],     [42,  'Schädelkugeln'],                 [46,  'Gift'],                          [47,  'Funkeln'],
+                            [51,  'Schamane Feuer'],                [52,  'Schamane Frost'],                [81,  'Schamane Fels'],                 [101, 'Schamane Wind'],                 [182, 'Mungo Leuchten (stark)'],
+                            [183, 'Unbändigkeit Leuchten (stark)'], [184, 'Seelenfrost Leuchten (stark)'],  [185, 'Sonnenfeuer Leuchten (stark)'],  [186, 'Meister des Kampfes Leuchten (stark)'], [187, 'Zaubersog Leuchten (stark)'],
+                            [193, 'Scharfrichter Leuchten (stark)'],[194, 'Zersetzen Leuchten (stark)'],    [158, 'Fire Blue PreCast Uber Hand'],   [177, 'Holy Precast Low Hand'],         [195, 'IcyEnchant (stark)'],
+                            [207, 'Gefrorene Runenwaffe (Zustand)']
+                        ]
     },
 
     fiitems: {
@@ -4066,6 +4077,8 @@ var LANG = {
         rewardedbyquestin:       "Belohnung einer Quest in...",
         soldbynpc:               "Verkauft von NPC #...",
         soldbyvendor:            "Verkauft von einem Händler",
+        itemvisual:              "Visueller Effekt",        // aowow - custom
+        spellvisual:             "Visueller Zaubereffekt #...", // aowow - custom
 
         sepcommunity:            "Community",
         hascomments:             "Verfügt über Kommentare",
@@ -4413,6 +4426,7 @@ var LANG = {
         id:             "ID",
         hascondition:   "Benötigt Edelsteinkombination",
         requiresprof:   "Benötigt einen Beruf",
+        itemvisual:     "Visueller Effekt",                 // aowow - custom
 
         sepcommunity:   "Community",
         hascomments:    "Has comments",

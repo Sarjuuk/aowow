@@ -41,6 +41,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                       0 AS iconId,
                       displayid,
                       0 AS spellVisualId,
+                      0 AS itemVisualId,
                       Quality,
                       Flags,                  FlagsExtra,
                       BuyCount,               BuyPrice,               SellPrice,
@@ -145,8 +146,14 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         // merge with gemProperties
         DB::Aowow()->qry('UPDATE ::items i, dbc_gemproperties gp SET i.gemEnchantmentId = gp.enchantmentId, i.gemColorMask = gp.colorMask WHERE i.gemColorMask = gp.id');
 
-        // get modelString
-        DB::Aowow()->qry('UPDATE ::items i, dbc_itemdisplayinfo idi SET i.model = IF(idi.leftModelName = "", idi.rightModelName, idi.leftModelName) WHERE i.displayId = idi.id');
+        // merge itemdisplayinfo info
+        DB::Aowow()->qry(
+           'UPDATE ::items i, dbc_itemdisplayinfo idi
+            SET    i.`model` = IF(idi.`leftModelName` = "", idi.`rightModelName`, idi.`leftModelName`),
+                   i.`spellVisualId` = GREATEST(IFNULL(idi.`spellVisualId`, 0), 0),
+                   i.`itemVisualId`  = GREATEST(IFNULL(idi.`itemVisualId`,  0), 0)
+            WHERE  i.`displayId` = idi.`id`'
+        );
 
         // get iconId
         DB::Aowow()->qry('UPDATE ::items i, dbc_itemdisplayinfo idi, ::icons ic SET i.iconId = ic.id WHERE i.displayId = idi.id AND LOWER(idi.inventoryIcon1) = ic.name_source');
