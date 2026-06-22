@@ -1,3 +1,5 @@
+// is rolled into tooltips in modern version
+
 if (typeof $WH == "undefined") { // Local
     var $WH = {};
 }
@@ -241,7 +243,32 @@ $WH.isset = function (a) {
     return typeof window[a] != "undefined";
 };
 
-if (!$WH.isset('console')) {
+$WH.error = function (e)
+{
+    console.error.apply(console.error, Array.prototype.slice.call(arguments));
+    if (!e)
+    {
+        console.error("The error message was empty, and thus will not be logged.");
+        return;
+    }
+    if ($WH.Track)
+        $WH.Track.nonInteractiveEvent.apply($WH.Track, ["Error"].concat(Array.prototype.slice.call(arguments)));
+};
+$WH.info = function (e)
+{
+    console.info.apply(console.info, Array.prototype.slice.call(arguments));
+};
+$WH.log = function (e)
+{
+    console.log.apply(console.log, Array.prototype.slice.call(arguments));
+};
+$WH.warn = function (e)
+{
+    console.warn.apply(console.warn, Array.prototype.slice.call(arguments));
+};
+
+if (!$WH.isset('console'))
+{
     console = { log: function() {} };
 }
 

@@ -24,6 +24,8 @@ class ArenateamBaseResponse extends TemplateResponse
 
     public int $type = Type::ARENA_TEAM;
 
+    private ?LocalArenaTeamList $subject = null;
+
     public function __construct(string $idOrProfile)
     {
         parent::__construct($idOrProfile);
@@ -83,15 +85,15 @@ class ArenateamBaseResponse extends TemplateResponse
             return;
         }
 
-        $subject = new LocalArenaTeamList(array(['at.id', $this->typeId]));
-        if ($subject->error)
+        $this->subject = new LocalArenaTeamList(array(['at.id', $this->typeId]));
+        if ($this->subject->error)
             $this->notFound();
 
         // arena team accessed by id
         if (!$this->subjectName)
-            $this->forward($subject->getProfileUrl());
+            $this->forward($this->subject->getProfileUrl());
 
-        $this->h1 = Lang::profiler('arenaRoster', [$subject->getField('name')]);
+        $this->h1 = Lang::profiler('arenaRoster', [$this->subject->getField('name')]);
 
 
         /*************/
@@ -107,7 +109,7 @@ class ArenateamBaseResponse extends TemplateResponse
 
         array_unshift(
             $this->title,
-            $subject->getField('name').' ('.$this->realm.' - '.Lang::profiler('regions', $this->region).')',
+            $this->subject->getField('name').' ('.$this->realm.' - '.Lang::profiler('regions', $this->region).')',
             Util::ucFirst(Lang::profiler('profiler'))
         );
 
@@ -142,6 +144,26 @@ class ArenateamBaseResponse extends TemplateResponse
     private function notFound() : never
     {
         parent::generateNotFound(Lang::game('arenateam'), Lang::profiler('notFound', 'arenateam'));
+    }
+
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        if (!$this->subject || $this->subject->error)
+        {
+            parent::generateMetadata($useArticle);
+            return;
+        }
+
+        $name  = $this->subject->getField('name');
+        $realm = $this->subject->getField('realmName');
+        $size  = $this->subject->getField('type');
+
+        $this->metaTags[] = ['property' => 'og:title', 'content' => Lang::game('arenateam') . Lang::main('colon') . $name];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'article'];
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [$name, Util::ucFirst(Lang::game('arenateam')), 'Profiler', ...Lang::meta('tags', 'generic')]]);
+
+        $this->buildBasicMetadata(Lang::meta('description', 'arena-team', [$name, $realm, $size]));
     }
 }
 

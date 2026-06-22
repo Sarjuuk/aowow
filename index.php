@@ -34,6 +34,10 @@ foreach ($query as $page => $param)
     break;                                                  // only use first k/v-pair to determine page
 }
 
+// remove wh seo (type=typeId/urlized-name)
+if (Type::getIndexFrom(Type::IDX_FILE_STR, $pageCall) && strpos('/', $pageParam))
+    $pageParam = explode('/', $pageParam)[0];
+
 // todo: find better solution to this routing. Delegate from XyzBaseResponse?
 [$classMod, $file] = match (true)
 {

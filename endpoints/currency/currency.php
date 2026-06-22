@@ -261,6 +261,29 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
 
         parent::generate();
     }
+
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        $this->metaTags[] = ['property' => 'og:title', 'content' => $this->h1];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'article'];
+
+        if (!($desc = $this->subject->getField('description', true)))
+            $desc = Lang::meta('description', 'genPage', [$this->h1, Util::ucFirst(Lang::game('currency'))]);
+
+        $keywords = [$this->h1, Util::ucFirst(Lang::game('currency'))];
+
+        if ($catName = Lang::currency('cat', $this->subject->getField('category')))
+        {
+            $desc .= ' '.Lang::meta('inCategory', [$catName . ' ' . Util::ucFirst(Lang::game('currencies'))]);
+            $keywords[] = $catName;
+        }
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [...$keywords, ...Lang::meta('tags', 'generic')]]);
+
+        $this->buildBasicMetadata($desc, $this->subject->getField('iconString'));
+
+        $this->buildLdJson();
+    }
 }
 
 ?>

@@ -2549,6 +2549,22 @@ CREATE TABLE `aowow_screenshots` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `aowow_seo_descriptions`
+--
+
+DROP TABLE IF EXISTS `aowow_seo_descriptions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `aowow_seo_descriptions` (
+  `page` varchar(255) NOT NULL,
+  `locale` tinyint(3) NOT NULL,
+  `description` text NOT NULL,
+  `comment` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`page`,`locale`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `aowow_setup_custom_data`
 --
 

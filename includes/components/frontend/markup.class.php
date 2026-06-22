@@ -191,6 +191,11 @@ class Markup implements \JsonSerializable
         return $this->_parseTags();
     }
 
+    public function fillJSGlobals(array $jsgData = []) : string
+    {
+        return self::stripTags($this->__text, $jsgData);
+    }
+
     public function getParent() : string
     {
         return $this->__parent;
@@ -230,11 +235,6 @@ class Markup implements \JsonSerializable
         }
 
         return $jsgStubs;
-    }
-
-    private function _stripTags(array $jsgData = []) : string
-    {
-        return self::stripTags($this->__text, $jsgData);
     }
 
     public static function stripTags(string $text, array $jsgData = []) : string

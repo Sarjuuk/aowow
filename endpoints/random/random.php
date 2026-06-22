@@ -43,6 +43,8 @@ class RandomBaseResponse extends TextResponse
      // //]]></script>
      // JS;
     }
+
+    // set generic meta tags if converted to TemplateResponse
 }
 
 ?>

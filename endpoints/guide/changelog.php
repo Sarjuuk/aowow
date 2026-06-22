@@ -19,6 +19,8 @@ class GuideChangelogResponse extends TemplateResponse
         'id'  => ['filter' => FILTER_VALIDATE_INT]
     );
 
+    private GuideList $subject;
+
     protected function generate() : void
     {
         // main container should be tagged: <div class="text guide-changelog">
@@ -26,21 +28,24 @@ class GuideChangelogResponse extends TemplateResponse
         if (!$this->assertGET('id'))
             $this->generateNotFound(Lang::game('guide'), Lang::guide('notFound'));
 
-        $guide = new GuideList(array(['id', $this->_get['id']]));
-        if ($guide->error)
+        $this->subject = new GuideList(array(['id', $this->_get['id']]));
+        if ($this->subject->error)
             $this->generateNotFound(Lang::game('guide'), Lang::guide('notFound'));
 
-        if (!$guide->canBeViewed() && !$guide->userCanView())
-            $this->forward('?guides='.$guide->getField('category'));
-
-        $this->h1 = Lang::guide('clTitle', [$this->_get['id'], $guide->getField('title')]);
-        if (!$this->h1)
-            $this->h1 = $guide->getField('name');
-
-        $this->gPageInfo += ['name' => $guide->getField('name')];
+        if (!$this->subject->canBeViewed() && !$this->subject->userCanView())
+            $this->forward('?guides='.$this->subject->getField('category'));
 
 
-        $this->breadcrumb[] = $guide->getField('category');
+        $this->h1 = Lang::guide('clTitle', [$this->subject->id, $this->subject->getField('title') ?: $this->subject->getField('name')]);
+
+
+        array_unshift($this->title, strip_tags($this->h1), Lang::game('guide'));
+
+
+        $this->gPageInfo += ['name' => $this->subject->getField('name')];
+
+
+        $this->breadcrumb[] = $this->subject->getField('category');
 
 
         parent::generate();
@@ -81,24 +86,47 @@ class GuideChangelogResponse extends TemplateResponse
         $inp  = fn($rev) => User::isInGroup(U_GROUP_STAFF) && false ? ($rev !== null ? '<input name="a" value="'.$rev.'" type="radio"/><input name="b" value="'.$rev.'" type="radio"/><b>' : '<b style="margin-left:38px;">') : '';
         $now  = new DateTime();
 
+        $status = function(int $status) : string
+        {
+            $wrap = match($status)
+            {
+                GuideMgr::STATUS_APPROVED,
+                GuideMgr::STATUS_REVIEW    => '<b class="q2">%s</b>',
+                // other cases?
+                default => '<b>%s</b>'
+            };
+
+            return sprintf($wrap, Lang::guide('clStatusSet', [Lang::guide('status', $status)]));
+        };
+
         $logEntries = DB::Aowow()->selectAssoc('SELECT a.`username` AS `name`, gcl.`date`, gcl.`status`, gcl.`msg`, gcl.`rev` FROM ::guides_changelog gcl JOIN ::account a ON a.`id` = gcl.`userId` WHERE gcl.`id` = %i ORDER BY gcl.`date` DESC', $this->_get['id']);
         foreach ($logEntries as $log)
         {
             if ($log['status'] != GuideMgr::STATUS_NONE)
-                $buff .= '<li class="guide-changelog-status-change">'.$inp($log['rev']).'<b>'.Lang::guide('clStatusSet', [Lang::guide('status', $log['status'])]).'</b>'.$now->formatDate($log['date'], true)."</li>\n";
+                $buff .= '<li class="guide-changelog-status-change">'.$inp($log['rev']).$status($log['status']).$now->formatDate($log['date'], true).'</li>'.PHP_EOL;
             else if ($log['msg'])
-                $buff .= '<li>'.$inp($log['rev']).'<b>'.$now->formatDate($log['date'], true).Lang::main('colon').'</b>'.$log['msg'].' <i class="q0">'.Lang::main('byUser', [$log['name'], 'style="text-decoration:underline"'])."</i></li>\n";
+                $buff .= '<li>'.$inp($log['rev']).'<b>'.$now->formatDate($log['date'], true).Lang::main('colon').'</b>'.$log['msg'].' <i class="q0">'.Lang::main('byUser', [$log['name'], 'style="text-decoration:underline"']).'</i></li>'.PHP_EOL;
             else
-                $buff .= '<li class="guide-changelog-minor-edit">'.$inp($log['rev']).'<b>'.$now->formatDate($log['date'], true).Lang::main('colon').'</b><i>'.Lang::guide('clMinorEdit').'</i> <i class="q0">'.Lang::main('byUser', [$log['name'], 'style="text-decoration:underline"'])."</i></li>\n";
+                $buff .= '<li class="guide-changelog-minor-edit">'.$inp($log['rev']).'<b>'.$now->formatDate($log['date'], true).Lang::main('colon').'</b><i class="q3">'.Lang::guide('clMinorEdit').'</i> <i class="q0">'.Lang::main('byUser', [$log['name'], 'style="text-decoration:underline"']).'</i></li>'.PHP_EOL;
         }
 
         // append creation
-        $buff .= '<li class="guide-changelog-created">'.$inp(0).'<b>'.Lang::guide('clCreated').'</b>'.$now->formatDate($guide->getField('date'), true)."</li>\n</ul>\n";
+        $buff .= '<li class="guide-changelog-created">'.$inp(0).'<b>'.Lang::guide('clCreated').'</b>'.$now->formatDate($this->subject->getField('date'), true).'</li>'.PHP_EOL.'</ul>'.PHP_EOL;
 
         if (User::isInGroup(U_GROUP_STAFF) && false)
             $buff .= '<input type="button" value="Compare" onclick="alert(\'NYI\');" style="margin-left: 40px;"/>';
 
         $this->extraHTML = $buff;
+    }
+
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        $this->metaTags[] = ['property' => 'og:title', 'content' => implode(' - ', $this->title)];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'website'];
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => implode(', ', [...Lang::meta('tags', 'home'), ...Lang::meta('tags', 'generic')])]);
+
+        $this->buildBasicMetadata(Lang::meta('description', 'changelog', [$this->subject->getField('title')]));
     }
 }
 

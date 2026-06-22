@@ -20,6 +20,7 @@ class Lang
     private static array $privileges;
     private static array $smartAI;
     private static array $unit;
+    private static array $meta;
 
     // types
     private static array $achievement;

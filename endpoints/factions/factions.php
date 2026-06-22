@@ -22,6 +22,7 @@ class FactionsBaseResponse extends TemplateResponse implements ICache
         1118 => [469, 891, 67, 892, 169],
         980  => [936],
         1097 => [1037, 1052, 1117],
+        949  => [948],
         0    => true
     );
 
@@ -42,18 +43,14 @@ class FactionsBaseResponse extends TemplateResponse implements ICache
         /**************/
 
         array_unshift($this->title, $this->h1);
-        if ($this->category)
+        switch (count($this->category))
         {
-            switch (count($this->category))
-            {
-                case 1:
-                    $t = Lang::faction('cat', $this->category[0]);
-                    array_unshift($this->title, is_array($t) ? $t[0] : $t);
-                    break;
-                case 2:
-                    array_unshift($this->title, Lang::faction('cat', $this->category[0], $this->category[1]));
-                    break;
-            }
+            case 1:
+                array_unshift($this->title, Lang::faction('cat', $this->category[0]));
+                break;
+            case 2:
+                array_unshift($this->title, Lang::faction('cat', $this->category[1]));
+                break;
         }
 
 
@@ -98,6 +95,26 @@ class FactionsBaseResponse extends TemplateResponse implements ICache
         $this->lvTabs->addListviewTab(new Listview(['data' => $data], FactionList::$brickFile));
 
         parent::generate();
+    }
+
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        $tags = $desc = [];
+        foreach ($this->category as $c)
+        {
+            array_unshift($tags, Lang::faction('cat', $c));
+            $desc[0] = Lang::faction('cat', $c);
+        }
+        $desc[] = $this->h1;
+
+        $this->metaTags[] = ['property' => 'og:title', 'content' => implode(' ', $desc)];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'website'];
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [...$tags, $this->h1, ...Lang::meta('tags', 'generic')]]);
+
+        $this->buildBasicMetadata(Lang::meta('description', 'genList', [implode(' ', $desc)]));
+
+        $this->buildLdJson();
     }
 }
 

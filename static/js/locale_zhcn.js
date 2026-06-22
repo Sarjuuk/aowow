@@ -2246,7 +2246,9 @@ var g_faction_categories = {
     1117: '索拉查盆地',
      169: '热砂港',
      980: '燃烧的远征',
-    1097: '巫妖王之怒'
+    1097: '巫妖王之怒',
+     948: 'Test Faction 2',
+     949: 'Test Faction 1'
 };
 
 var g_achievement_categories = {

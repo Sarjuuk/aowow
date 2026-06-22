@@ -2194,6 +2194,8 @@ var g_faction_categories = {
      169: 'Cartel Gentepression',
     1118: 'Classique',
     1052: 'Expédition de la Horde',
+     948: 'Faction de test 2',
+     949: 'Faction de test 1',
      891: 'Forces de l\'Alliance',
      892: 'Forces de la Horde',
       67: 'Horde',

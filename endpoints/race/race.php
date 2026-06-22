@@ -291,6 +291,22 @@ class RaceBaseResponse extends TemplateResponse implements ICache
 
         parent::generate();
     }
+
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        $this->metaTags[] = ['property' => 'og:title', 'content' => $this->h1];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'article'];
+
+        $keywords = [$this->h1, Util::ucFirst(Lang::game('race'))];
+        if ($_ = $this->subject->getField('side'))
+            $keywords[] = Lang::game('si', $_);
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [...$keywords, ...Lang::meta('tags', 'generic')]]);
+
+        $this->buildBasicMetadata(icon: reset($this->headIcons) ?: '');
+
+        $this->buildLdJson();
+    }
 }
 
 ?>

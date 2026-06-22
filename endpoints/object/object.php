@@ -25,7 +25,8 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
     private array $difficulties = [];
     private int   $mapType      = 0;
 
-    private GameObjectList $subject;
+    private  GameObjectList $subject;
+    private ?string         $metaReqSkill = null;
 
     public function __construct(string $id)
     {
@@ -132,14 +133,17 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         switch ($this->subject->getField('typeCat'))
         {
             case -3:                                        // Herbalism
+                $this->metaReqSkill =
                 $infobox[] = Lang::game('requires', [Lang::main('parensFmt', [Lang::spell('lockType', 2), $this->subject->getField('reqSkill')])]);
                 $infobox[] = Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill(SKILL_HERBALISM, $this->subject->getField('reqSkill')));
                 break;
             case -4:                                        // Mining
+                $this->metaReqSkill =
                 $infobox[] = Lang::game('requires', [Lang::main('parensFmt', [Lang::spell('lockType', 3), $this->subject->getField('reqSkill')])]);
                 $infobox[] = Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill(SKILL_MINING, $this->subject->getField('reqSkill')));
                 break;
             case -5:                                        // Lockpicking
+                $this->metaReqSkill =
                 $infobox[] = Lang::game('requires', [Lang::main('parensFmt', [Lang::spell('lockType', 1), $this->subject->getField('reqSkill')])]);
                 $infobox[] = Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill(SKILL_LOCKPICKING, $this->subject->getField('reqSkill')));
                 break;
@@ -643,6 +647,55 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         }
 
         parent::generate();
+    }
+
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        $this->metaTags[] = ['property' => 'og:title', 'content' => $this->h1];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'article'];
+
+        $keywords = [$this->h1, Util::ucFirst(Lang::game('object'))];
+
+        $desc = '';
+        if ($zSpawns = $this->subject->getSpawns(SPAWNINFO_ZONES))
+        {
+            if ($names = DB::Aowow()->selectAssoc('SELECT `id` AS ARRAY_KEY, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8` FROM ::zones WHERE `id` IN %in', ($main = array_splice($zSpawns, 0, 3))))
+            {
+                $zones = [];
+                foreach ($main as $m)                       // keep sort from zSpawns
+                    if (isset($names[$m]))
+                        $zones[] = Util::localizedString($names[$m], 'name', true);
+
+                if ($zSpawns)
+                    $zones[] = Lang::meta('foundInExt', [count($zSpawns)]);
+
+                $desc = Lang::meta('objFoundIn', [$this->h1, Lang::concat($zones)]);
+            }
+        }
+
+        if (!$desc)
+        {
+            $desc  = Lang::meta('description', 'genPage', $keywords);
+            $desc .= ' '.Lang::gameObject('unkPosition');
+        }
+
+        if ($this->metaReqSkill)
+            $desc .= ' '.$this->metaReqSkill.'.';
+
+        if ($_ = $this->subject->getField('typeCat'))
+        {
+            if ($_ = Lang::gameObject('cat', $_))
+            {
+                $keywords[] = $_;
+                $desc .= ' '.Lang::meta('inCategory', [$_]);
+            }
+        }
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [...$keywords, ...Lang::meta('tags', 'generic')]]);
+
+        $this->buildBasicMetadata($desc);
+
+        $this->buildLdJson();
     }
 }
 

@@ -29,12 +29,25 @@ class UnratedcommentsBaseResponse extends TemplateResponse
         /* Main Content */
         /****************/
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
-
-        $data = CommunityContent::getCommentPreviews(['unrated' => true, 'comments' => true], resultLimit: Listview::DEFAULT_SIZE);
-        $this->lvTabs->addListviewTab(new Listview(['data' => $data], 'commentpreview'));
+        if ($data = CommunityContent::getCommentPreviews(['unrated' => true, 'comments' => true], resultLimit: Listview::DEFAULT_SIZE))
+        {
+            $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
+            $this->lvTabs->addListviewTab(new Listview(['data' => $data], 'commentpreview'));
+        }
+        else
+            $this->extraHTML = 'No comments were found.';
 
         parent::generate();
+    }
+
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        $this->metaTags[] = ['property' => 'og:title', 'content' => $this->h1];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'website'];
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [Lang::main('comments'), ...Lang::meta('tags', 'generic')]]);
+
+        $this->buildBasicMetadata();
     }
 }
 

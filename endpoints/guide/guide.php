@@ -209,6 +209,31 @@ class GuideBaseResponse extends TemplateResponse implements ICache
         }
     }
 
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        $this->metaTags[] = ['property' => 'og:title', 'content' => strip_tags($this->h1)];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'article'];
+
+        $keywords = array(
+            Lang::typeName(Type::GUIDE),
+            Lang::guide('editor', 'category').Lang::main('colon').Lang::guide('category', $this->subject->getField('category'))
+        );
+
+        if ($this->subject->getField('category') == 1)
+        {
+            if ($cl = $this->subject->getField('classId'))
+                $keywords[] = Lang::game('cl', $cl);
+            if ($cl && ($s = $this->subject->getField('specId')) >=0)
+                $keywords[] = Lang::game('classSpecs', $cl, $s).' '.Lang::game('cl', $cl);
+        }
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => $keywords]);
+
+        $this->buildBasicMetadata($this->subject->getField('description'), useArticle: false);
+
+        $this->buildLdJson();
+    }
+
     public static function infoboxHook(Template\PageTemplate &$pt, ?InfoboxMarkup &$infobox) : void
     {
         if ($pt->guideStatus != GuideMgr::STATUS_APPROVED)

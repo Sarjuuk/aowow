@@ -611,6 +611,43 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
         Lang::sort('game', 'ra');
         Lang::sort('game', 'cl');
     }
+
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        $keywords = [$this->h1];
+
+        if (count($this->category) == 3)
+        {
+            if ($this->category[0] == ITEM_CLASS_GLYPH)
+            {
+                $keywords[] = Lang::game('gl', $this->category[2]);
+                $keywords[] = Lang::item('cat', $this->category[0], 1, $this->category[1]);
+            }
+            else
+            {
+                $keywords[] = Lang::item('cat', $this->category[0], 1, $this->category[1], 1, $this->category[2]);
+                $keywords[] = Lang::item('cat', $this->category[0], 1, $this->category[1], 0);
+            }
+
+            $keywords[] = Lang::item('cat', $this->category[0], 0);
+        }
+        else if (count($this->category) == 2)
+        {
+            $keywords[] = current((array)Lang::item('cat', $this->category[0], 1, $this->category[1]));
+            $keywords[] = Lang::item('cat', $this->category[0], 0);
+        }
+        else if (count($this->category) == 1)
+            $keywords[] = current((array)Lang::item('cat', $this->category[0]));
+
+        $this->metaTags[] = ['property' => 'og:title', 'content' => $this->title[0]];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'website'];
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [...$keywords, ...Lang::meta('tags', 'generic')]]);
+
+        $this->buildBasicMetadata(Lang::meta('description', 'genList', [$this->title[0]]));
+
+        $this->buildLdJson();
+    }
 }
 
 ?>

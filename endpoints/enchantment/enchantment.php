@@ -315,6 +315,30 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
 
         return $type;
     }
+
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        $this->metaTags[] = ['property' => 'og:title', 'content' => $this->h1];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'article'];
+
+        $tags = [Util::ucFirst(Lang::game('enchantments'))];
+        if ($c = $this->getDistinctType())
+            array_unshift($tags, Lang::enchantment('types', $c));
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [$this->h1, ...$tags, ...Lang::meta('tags', 'generic')]]);
+
+        $desc = Lang::meta('description', 'genPage', [$this->h1, Util::ucFirst(Lang::game('enchantment'))]);
+
+        if ($this->activation)
+            $desc .= ' '.trim(str_replace('<br />', '. ', strip_tags($this->activation, '<br>')));
+
+        if (count($tags) == 2)
+            $desc .= ' '.Lang::meta('inCategory', [implode(' ', $tags)]);
+
+        $this->buildBasicMetadata($desc);
+
+        $this->buildLdJson();
+    }
 }
 
 ?>

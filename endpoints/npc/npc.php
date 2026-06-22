@@ -28,8 +28,9 @@ class NpcBaseResponse extends TemplateResponse implements ICache
     public  string $subname     = '';
 
     private  CreatureList $subject;
-    private ?CreatureList $altNPCs  = null;
-    private  array        $soundIds = [];
+    private ?CreatureList $altNPCs    = null;
+    private  array        $soundIds   = [];
+    private  array        $criteriaOf = [];
 
     public function __construct(string $id)
     {
@@ -178,7 +179,12 @@ class NpcBaseResponse extends TemplateResponse implements ICache
 
         // Tameable
         if ($fa = $this->subject->getTameable())
-            $infobox[] = Lang::npc('tameable', ['[url=pet='.$fa.']'.Lang::game('fa', $fa).'[/url]']);
+        {
+            if ($_ = Lang::exist('game', 'fa', $fa))
+                $infobox[] = Lang::npc('tameable', ['[url=pet='.$fa.']'.$_.'[/url]']);
+            else
+                $infobox[] = Lang::npc('tameable', [Lang::npc('petFamily') . '#' . $fa]);
+        }
 
         // Wealth
         if ($_ = intVal(($this->subject->getField('minGold') + $this->subject->getField('maxGold')) / 2))
@@ -795,8 +801,14 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         {
             $this->extendGlobalData($crtOf->getJSGlobals());
 
+            $data = $crtOf->getListviewData();
+
+            // store achievement names for SEO
+            foreach ($data as $d)
+                $this->criteriaOf[] = Util::localizedString($d, 'name');
+
             $this->lvTabs->addListviewTab(new Listview(array(
-                'data' => $crtOf->getListviewData(),
+                'data' => $data,
                 'name' => '$LANG.tab_criteriaof',
                 'id'   => 'criteria-of'
             ), AchievementList::$brickFile));
@@ -1136,6 +1148,67 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                     $stats[$k] = isset($modes[$k]) ? sprintf($hint, implode('[/tr][tr]', $modes[$k]), $v, $k) : $v;
 
         return $stats;
+    }
+
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        $this->metaTags[] = ['property' => 'og:title', 'content' => $this->h1];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'article'];
+
+        $keywords = [$this->h1, Util::ucFirst(Lang::game('npc'))];
+
+        if ($t = $this->subject->getField('type'))
+            if ($t != 10 && ($k = Lang::npc('cat', $t)))    // not 'uncategorized'
+                $keywords[] = $k;
+
+        if ($fa = $this->subject->getTameable())
+            if (Lang::exist('game', 'fa', $fa))             // note: there are quite a few npcs with random familyIds
+                $keywords[] = Lang::game('fa', $fa);
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [...$keywords, ...Lang::meta('tags', 'generic')]]);
+
+        if ($this->subject->isBoss())
+            $prefix = Lang::npc('rank', NPC_RANK_BOSS);
+        else
+        {
+            $prefix = Lang::npc('level', 0, [Util::createNumRange($this->subject->getField('minLevel'), $this->subject->getField('maxLevel'))]);
+
+            if ($_ = $this->subject->getField('rank'))      //  != NPC_RANK_NORMAL
+                $prefix .= (Lang::getLocale() == Locale::RU ? ', ' : ' ').Lang::npc('rank', $_);
+        }
+
+        $desc = Lang::meta('description', 'npc', [$this->subject->getField('name', true), $prefix]);
+
+        // position
+        if ($zSpawns = $this->subject->getSpawns(SPAWNINFO_ZONES))
+        {
+            if ($names = DB::Aowow()->selectAssoc('SELECT `id` AS ARRAY_KEY, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8` FROM ::zones WHERE `id` IN %in', ($main = array_splice($zSpawns, 0, 3))))
+            {
+                $zones = [];
+                foreach ($main as $m)                       // keep sort from zSpawns
+                    if (isset($names[$m]))
+                        $zones[] = Util::localizedString($names[$m], 'name', true);
+
+                if ($zSpawns)
+                    $zones[] = Lang::meta('foundInExt', [count($zSpawns)]);
+
+                $desc .= ' '.Lang::meta('npcFoundIn', [Lang::concat($zones)]);
+            }
+        }
+        else
+            $desc .= ' '.Lang::npc('unkPosition');
+
+        // achivement criteria
+        if ($this->criteriaOf)
+            $desc .= ' '.Lang::npc('criteriaOf', [Lang::concat($this->criteriaOf)]);
+
+        // category
+        if ($this->subject->getField('type') != 10)         // not 'uncategorized'
+            $desc .= ' '.Lang::meta('inCategory', [end($keywords)]);
+
+        $this->buildBasicMetadata($desc);
+
+        $this->buildLdJson();
     }
 }
 

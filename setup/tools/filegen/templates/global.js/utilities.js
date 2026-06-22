@@ -86,6 +86,25 @@ function g_urlize(str, allowLocales, profile)
     return str;
 }
 
+$WH.ensureUrlProtocol = function(url, protocol)
+{
+    if (typeof url !== 'string')
+    {
+        $WH.error('Supplied URL was not a string.', url);
+        url = '';
+    }
+
+    if (protocol)
+    {
+        if (!protocol.match(/:$/))
+            protocol += ':';
+
+        return url.replace(/^https?:/, protocol).replace(/^(\/[^\/])/, protocol + '//' + location.host + '$1').replace(/^(\/\/)/, protocol + '$1');
+    }
+    else
+        return url.replace(/^(\/[^\/])/, location.protocol + '//' + location.host + '$1').replace(/^(\/\/)/, location.protocol + '$1');
+};
+
 function g_isDateValid(date)
 {
     var match = /^(20[0-2]\d)-([01]\d)-([0-3]\d) ([0-2]\d):([0-5]\d):([0-5]\d)$/.exec(date);

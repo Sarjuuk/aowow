@@ -56,6 +56,18 @@ class EmotesBaseResponse extends TemplateResponse implements ICache
 
         parent::generate();
     }
+
+    protected function generateMetadata(bool $useArticle = true) : void
+    {
+        $this->metaTags[] = ['property' => 'og:title', 'content' => $this->h1];
+        $this->metaTags[] = ['property' => 'og:type',  'content' => 'website'];
+
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [$this->h1, ...Lang::meta('tags', 'generic')]]);
+
+        $this->buildBasicMetadata(Lang::meta('description', 'genList', [$this->h1]));
+
+        $this->buildLdJson();
+    }
 }
 
 ?>
