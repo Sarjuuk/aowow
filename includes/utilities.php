@@ -27,6 +27,19 @@ if (version_compare(PHP_VERSION, '8.4.0') < 0)
     }
 }
 
+// PHP 8.6 polyfill
+if (version_compare(PHP_VERSION, '8.6.0') < 0)
+{
+    function clamp(int|float $value, int|float $min, int|float $max) : int|float
+    {
+        if ($value > $max)
+            return $max;
+        if ($value < $min)
+            return $min;
+        return $value;
+    }
+}
+
 class SimpleXML extends \SimpleXMLElement
 {
     public function addCData(string $cData) : \SimpleXMLElement

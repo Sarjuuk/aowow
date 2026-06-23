@@ -846,15 +846,231 @@ class SpellList extends DBTypeList
         return $effMask;
     }
 
+
+    /**********************/
+    /* SpellText renderer */
+    /**********************/
+
+    // oooo..kaaayy.. parsing text in 6 or 7 easy steps
+    public function parseText(string $property = 'description', int $level = MAX_LEVEL, ?int $interactive = null) : array
+    {
+        /*
+            documentation .. sort of .. updated with https://docs.google.com/spreadsheets/d/1B8clv9zgnXij_spRhRArj7MdRotl0QpD3AjcQ-CCPFA
+            generally everything is case insensitive (unless stated otherwise)
+
+            precedence:
+                ${}.x - formulas; .x is optional; x:[0-9] .. max-precision of a floatpoint-result; default: 0
+                ()    - regular use for function-like calls
+                $<>   - variables
+                $?[]  - conditionals ... like $?condition[true][false];
+
+            operations:
+                $abs(a)            -
+                $ceil(a)           -
+                $floor(a)          -
+                $min(a, b)         -
+                $max(a, b)         -
+                $gt(a, b)          - a > b
+                $lt(a, b)          - a < b
+                $gte(a, b)         - a >= b
+                $lte(a, b)         - a <= b
+                $eq(a, b)          - a == b
+                $cond(a, b, c)     - a ? b : c
+                $clamp(a, low, hi) -
+
+            variables: (rounding... >5 up?)
+                $str        - Strength Attribute
+                $agi        - Agility Attribute
+                $sta        - Stamina Attribute
+                $int        - Intellect Attribute
+                $spi        - Spirit Attribute
+                $m|M[1-3]   - BasePoints + (m:1 / M:DieSides) (updated with spell mods)
+                $a[1-3]     - Spell_C_GetSpellRadius
+                $d          - Spell_C_GetSpellDuration; appended timeShorthand; interpret "0" as "until canceled"
+                $c          - Spell_C_GetManaCost
+                $p          - Spell_C_GetManaCostPerSecond
+                $x[1-3]     - m_effectChainTargets; (aka MaxAffectedTargets)
+                $t[1-3]     - m_effectAuraPeriod
+                $h          - m_procChance
+                $n          - m_procCharges
+                $b[1-3]     - m_effectPointsPerCombo
+                $u          - m_cumulativeAura; (aka StackAmount)
+                $v          - m_maxTargetLevel
+                $e[1-3]     - m_effectAmplitude; (aka EffectValueMultiplier)
+                $i          - m_maxTargets; (aka MaxAffectedTargets)
+                $f[1-3]     - m_effectChainAmplitude; (aka DamageMultiplier)
+                $q[1-3]     - m_effectMiscValue
+                $ap / $AP   - atkpwr (base / total) (UNIT_FIELD_ATTACK_POWER / += UNIT_FIELD_ATTACK_POWER_MODS[0] + UNIT_FIELD_ATTACK_POWER_MODS[1] * (UNIT_FIELD_ATTACK_POWER_MULTIPLIER + 1.0))
+                $rap / $RAP - rngatkpwr (base / total) (UNIT_FIELD_RANGED_ATTACK_POWER / += UNIT_FIELD_RANGED_ATTACK_POWER_MODS[0] + UNIT_FIELD_RANGED_ATTACK_POWER_MODS[1] * (UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER + 1.0))
+                $mwb / $MWB - raw equipped mainhand weapon damage (min / max)
+                $owb / $OWB - raw equipped offhand weapon damage (min / max)
+                $rwb / $RWB - raw equipped ranged weapon damage (min / max)
+                $mw / $MW   - effective mainhand weapon damage (min / max) (as per UNIT_FIELD_*)
+                $ow / $OW   - effective offhand weapon damage (min / max) (as per UNIT_FIELD_*)
+                $rw / $RW   - effective ranged weapon damage (min / max) (as per UNIT_FIELD_*)
+                $ar         - armor value
+                $mws        - effective mainhand weapon swing time (as per UNIT_FIELD_*)
+                $ows        - effective offhand weapon swing time (as per UNIT_FIELD_*)
+                $rws        - effective ranged weapon swing time (as per UNIT_FIELD_*)
+                $pl         - PlayerLevel (UNIT_FIELD_LEVEL)
+                $hnd        - CGUnit_C__IsTwoHanded ? 2.0 : 1.0;
+                $sp         - GetModDamageDonePos
+                $sph        - > Holy
+                $spfi       - > Fire
+                $spn        - > Nature
+                $spfr       - > Frost
+                $sps        - > Shadow
+                $spa        - > Arcane
+                $bh         - Bonus Healing
+                $ph         - GetModDamageDonePct PHYSICAL + HOLY (as float; tested as broken?)
+                $pfi        - > + FIRE (as float; tested as broken?)
+                $pn         - > + NATURE (as float; tested as broken?)
+                $pfr        - > + FROST (as float; tested as broken?)
+                $ps         - > + SHADOW (as float; tested as broken?)
+                $pa         - > + ARCANE (as float; tested as broken?)
+                $pbh        - %-HealingBonus (as float; tested as broken?)
+                $pbhd       - %-Healing Done (as float; tested as broken?)
+                $bc[1-3]    - m_effectBonusCoefficient; (aka BonusMultiplier)
+
+            replacements
+                $g          - QuestParserGenderConditional $Gmale:female;
+                $l          - SpellParserPluralConditional LastValue-Switch; last value as condition $ltrue:false;
+                $o[1-3]     - TotalAmount (for periodic auras)
+                $s[1-3]     - BasePoints + DieSides (static value); (display as Range, if applicable?)
+                $r[1-3]     - SpellRange (hostile)
+                $z          - GetHomebindAreaId
+
+            not mentioned in google sheet but still present
+                $PlayerName - <caster name>
+
+            deviations from standard procedures
+                division    - example: $/10;2687s1 => $2687s1/10
+                            - also:    $61829/5;s1 => $61829s1/5
+        */
+
+        // required by meta tag generator: page wants interactive elements, but meta tags shouldn't contain interactive strings. Both are sourced from the same spell instance
+        if (is_int($interactive))
+            $this->interactive = $interactive;
+
+        $this->charLevel = $level;
+
+        // step -1: already handled?
+        if (isset($this->parsedText[$this->id][$property][Lang::getLocale()->value][$this->charLevel][$this->interactive]))
+            return $this->parsedText[$this->id][$property][Lang::getLocale()->value][$this->charLevel][$this->interactive];
+
+        // step 0: get text
+        $data = $this->getField($property, true);
+        if (empty($data) || $data == "[]")                  // empty tooltip shouldn't be displayed anyway
+            return ['', [], false];
+
+        // step 1: if the text is supplemented with text-variables, get and replace them
+        if ($this->prepareDescriptionVariables())
+            foreach ($this->spellVars[$this->id] as $k => $sv)
+                $data = str_replace('$<'.$k.'>', $sv, $data);
+
+        // step 2: resolving conditions
+        // aura- or spell-conditions cant be resolved for our purposes, so force them to false for now (todo (low): strg+f "know" in aowowPower.js ^.^)
+
+        $relSpells = [];
+        $data = $this->handleConditions($data, $relSpells, true);
+
+        // step 3: unpack formulas ${ .. }.X
+        $data = $this->handleFormulas($data, true);
+
+        // step 4: find and eliminate regular variables
+        $data = $this->handleVariables($data, true);
+
+        // step 5: variable-dependent variable-text
+        // special case $lONE:ELSE[:ELSE2]; or $|ONE:ELSE[:ELSE2];
+        while (preg_match('/([\d\.]+)([^\d]*)(\$[l|]:*)([^:]*):([^;]*);/i', $data, $m))
+        {
+            $plurals = explode(':', $m[5]);
+            $replace = '';
+
+            if (count($plurals) == 2)                       // special case: ruRU
+            {
+                switch (substr($m[1], -1))                  // check last digit of number
+                {
+                    case 1:
+                        // but not 11 (teen number)
+                        if (!in_array($m[1], [11]))
+                        {
+                            $replace = $m[4];
+                            break;
+                        }
+                    case 2:
+                    case 3:
+                    case 4:
+                        // but not 12, 13, 14 (teen number) [11 is passthrough]
+                        if (!in_array($m[1], [11, 12, 13, 14]))
+                        {
+                            $replace = $plurals[0];
+                            break;
+                        }
+                        break;
+                    default:
+                        $replace = $plurals[1];
+                }
+
+            }
+            else
+                $replace = ($m[1] == 1 ? $m[4] : $plurals[0]);
+
+            $data = str_ireplace($m[1].$m[2].$m[3].$m[4].':'.$m[5].';', $m[1].$m[2].$replace, $data);
+        }
+
+        // step 6: HTMLize
+        // colors
+        $data = preg_replace('/\|cff([a-f0-9]{6})(.+?)\|r/i', '<span style="color: #$1;">$2</span>', $data);
+
+        // line endings
+        $data = strtr($data, ["\r" => '', "\n" => '<br />']);
+
+        // cache result
+        $this->parsedText[$this->id][$property][Lang::getLocale()->value][$this->charLevel][$this->interactive] = [$data, $relSpells, $this->scaling[$this->id]];
+
+        return [$data, $relSpells, $this->scaling[$this->id]];
+    }
+
     private function dfnText(string $tooltip, string $text) : string
     {
-        if ($this->interactive < self::INTERACTIVE_FULL)
+        if ($this->interactive < self::INTERACTIVE_EMBEDDED)
             return $text;
 
         return sprintf(Util::$dfnString, $tooltip, $text);
     }
 
-    // description-, buff-parsing component
+    private function prepareDescriptionVariables() : bool
+    {
+        if ($this->curTpl['spellDescriptionVariableId'] <= 0)
+            return false;
+
+        if (!empty($this->spellVars[$this->id]))
+            return true;
+
+        $spellVars = DB::Aowow()->SelectCell('SELECT `vars` FROM ::spellvariables WHERE `id` = %i', $this->curTpl['spellDescriptionVariableId']);
+        foreach (explode("\n", $spellVars) as $sv)
+            if (preg_match('/\$(\w*\d*)=(.*)/i', trim($sv), $m))
+                $this->spellVars[$this->id][$m[1]] = $m[2];
+
+            // replace self-references
+            do
+            {
+                $finished = true;
+                foreach ($this->spellVars[$this->id] as $k => $sv)
+                {
+                    if (!preg_match('/\$<(\w*\d*)>/i', $sv, $m))
+                        continue;
+
+                    $this->spellVars[$this->id][$k] = str_replace('$<'.$m[1].'>', '${'.$this->spellVars[$this->id][$m[1]].'}', $sv);
+                    $finished = false;
+                }
+            }
+            while (!$finished);
+
+            return true;
+    }
+
     private function resolveEvaluation(string $formula) : string
     {
         // see Traits in javascript locales
@@ -876,34 +1092,48 @@ class SpellList extends DBTypeList
         $str   = $STR   = $this->dfnText('LANG.traits.str[0]',       Lang::spell('traitShort', 'str'));
         $agi   = $AGI   = $this->dfnText('LANG.traits.agi[0]',       Lang::spell('traitShort', 'agi'));
         $int   = $INT   = $this->dfnText('LANG.traits.int[0]',       Lang::spell('traitShort', 'int'));
+        $ar    = $AR    = $this->dfnText('LANG.traits.armor[0]',     Lang::item('cat', ITEM_CLASS_ARMOR, 0));
 
-        // only 'ron test spell', guess its %-dmg mod; no idea what bc2 might be
-        $pa    = '<$PctArcane>';                            // %arcane
-        $pfi   = '<$PctFire>';                              // %fire
-        $pfr   = '<$PctFrost>';                             // %frost
-        $ph    = '<$PctHoly>';                              // %holy
-        $pn    = '<$PctNature>';                            // %nature
-        $ps    = '<$PctShadow>';                            // %shadow
-        $pbh   = '<$PctHeal>';                              // %heal
-        $pbhd  = '<$PctHealDone>';                          // %heal done
-        $bc2   = '<$bc2>';                                  // bc2
+        $ph    = $PH    = $this->dfnText('Pct Holy Damage',            'PH');
+        $pfi   = $PFI   = $this->dfnText('Pct Fire Damage',            'PFI');
+        $pn    = $PN    = $this->dfnText('Pct Nature Damage',          'PN');
+        $pfr   = $PFR   = $this->dfnText('Pct Frost Damage',           'PFR');
+        $ps    = $PS    = $this->dfnText('Pct Shadow Damage',          'PS');
+        $pa    = $PA    = $this->dfnText('Pct Arcane Damage',          'PA');
+        $pbh   = $PBH   = $this->dfnText('LANG.traits.splheal[0]',     'PBH');
+        $pbhd  = $PBHD  = $this->dfnText('Pct Healing Done',           'PBHD');
 
         $HND   = $hnd   = $this->dfnText('[Hands required by weapon]', 'HND'); // todo (med): localize this one
         $MWS   = $mws   = $this->dfnText('LANG.traits.mlespeed[0]',    'MWS');
-        $mw             = $this->dfnText('LANG.traits.dmgmin1[0]',     'mw');
-        $MW             = $this->dfnText('LANG.traits.dmgmax1[0]',     'MW');
+        $OWS   = $ows   = $this->dfnText('LANG.traits.mlespeed[0]',    'OWS'); // todo (med): denote offhand
+        $RWS   = $rws   = $this->dfnText('LANG.traits.rgdspeed[0]',    'RWS');
+        // final character dmg
+        $mw             = $this->dfnText('LANG.traits.mledmgmin[0]',   'mw');
+        $MW             = $this->dfnText('LANG.traits.mledmgmax[0]',   'MW');
+        $ow             = $this->dfnText('LANG.traits.mledmgmin[0]',   'ow'); // todo (med): denote offhand
+        $OW             = $this->dfnText('LANG.traits.mledmgmax[0]',   'OW'); // todo (med): denote offhand
+        $rw             = $this->dfnText('LANG.traits.rgddmgmin[0]',   'rw');
+        $RW             = $this->dfnText('LANG.traits.rgddmgmax[0]',   'RW');
+        // raw weapon dmg
         $mwb            = $this->dfnText('LANG.traits.mledmgmin[0]',   'mwb');
         $MWB            = $this->dfnText('LANG.traits.mledmgmax[0]',   'MWB');
+        $owb            = $this->dfnText('LANG.traits.mledmgmin[0]',   'owb'); // todo (med): denote offhand
+        $OWB            = $this->dfnText('LANG.traits.mledmgmax[0]',   'OWB'); // todo (med): denote offhand
         $rwb            = $this->dfnText('LANG.traits.rgddmgmin[0]',   'rwb');
         $RWB            = $this->dfnText('LANG.traits.rgddmgmax[0]',   'RWB');
 
-        $cond  = $COND  = fn($a, $b, $c) => $a ? $b : $c;
-        $eq    = $EQ    = fn($a, $b)     => $a == $b;
-        $gt    = $GT    = fn($a, $b)     => $a > $b;
-        $gte   = $GTE   = fn($a, $b)     => $a >= $b;
+        $abs   = $ABS   = fn($a)         => abs($a);
+        $ceil  = $CEIL  = fn($a)         => ceil($a);
         $floor = $FLOOR = fn($a)         => floor($a);
-        $max   = $MAX   = fn($a, $b)     => max($a, $b);
         $min   = $MIN   = fn($a, $b)     => min($a, $b);
+        $max   = $MAX   = fn($a, $b)     => max($a, $b);
+        $gt    = $GT    = fn($a, $b)     => $a > $b;
+        $lt    = $LT    = fn($a, $b)     => $a < $b;
+        $gte   = $GTE   = fn($a, $b)     => $a >= $b;
+        $lte   = $LTE   = fn($a, $b)     => $a <= $b;
+        $eq    = $EQ    = fn($a, $b)     => $a == $b;
+        $cond  = $COND  = fn($a, $b, $c) => $a ? $b : $c;
+        $clamp = $CLAMP = fn($a, $b, $c) => clamp($a, $b, $c);
 
         if (preg_match_all('/\$\w+\b/i', $formula, $vars))
         {
@@ -932,14 +1162,20 @@ class SpellList extends DBTypeList
             if (!$evalable)
             {
                 // can't eval constructs because of strings present. replace constructs with strings
-                $cond  = $COND  = $this->dfnText('COND(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>, <span class=\'q1\'>c</span>)<br /> <span class=\'q1\'>a</span> ? <span class=\'q1\'>b</span> : <span class=\'q1\'>c</span>', 'COND');
-                $eq    = $EQ    = $this->dfnText('EQ(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)<br /> <span class=\'q1\'>a</span> == <span class=\'q1\'>b</span>', 'EQ');
-                $gt    = $GT    = $this->dfnText('GT(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)<br /> <span class=\'q1\'>a</span> > <span class=\'q1\'>b</span>', 'GT');
-                $gte   = $GTE   = $this->dfnText('GTE(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)<br /> <span class=\'q1\'>a</span> >= <span class=\'q1\'>b</span>', 'GTE');
+                $abs   = $ABS   = $this->dfnText('ABS(<span class=\'q1\'>a</span>)', 'ABS');
+                $ceil  = $CEIL  = $this->dfnText('CEIL(<span class=\'q1\'>a</span>)', 'CEIL');
                 $floor = $FLOOR = $this->dfnText('FLOOR(<span class=\'q1\'>a</span>)', 'FLOOR');
                 $min   = $MIN   = $this->dfnText('MIN(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)', 'MIN');
                 $max   = $MAX   = $this->dfnText('MAX(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)', 'MAX');
-                $pl    = $PL    = $this->dfnText('LANG.level', 'PL');
+                $cond  = $COND  = $this->dfnText('COND(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>, <span class=\'q1\'>c</span>)<br /> <span class=\'q1\'>a</span> ? <span class=\'q1\'>b</span> : <span class=\'q1\'>c</span>', 'COND');
+                $gt    = $GT    = $this->dfnText('GT(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)<br /> <span class=\'q1\'>a</span> > <span class=\'q1\'>b</span>', 'GT');
+                $lt    = $LT    = $this->dfnText('LT(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)<br /> <span class=\'q1\'>a</span> < <span class=\'q1\'>b</span>', 'LT');
+                $gte   = $GTE   = $this->dfnText('GTE(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)<br /> <span class=\'q1\'>a</span> >= <span class=\'q1\'>b</span>', 'GTE');
+                $lte   = $LTE   = $this->dfnText('LTE(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)<br /> <span class=\'q1\'>a</span> <= <span class=\'q1\'>b</span>', 'LTE');
+                $eq    = $EQ    = $this->dfnText('EQ(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)<br /> <span class=\'q1\'>a</span> == <span class=\'q1\'>b</span>', 'EQ');
+                $cond  = $COND  = $this->dfnText('COND(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>, <span class=\'q1\'>c</span>)<br /> <span class=\'q1\'>a</span> ? <span class=\'q1\'>b</span> : <span class=\'q1\'>c</span>', 'COND');
+                $clamp = $CLAMP = $this->dfnText('CLAMP(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>, <span class=\'q1\'>c</span>)', 'CLAMP');
+             // $pl    = $PL    = $this->dfnText('LANG.level', 'PL');
 
                 // space out operators for better readability
                 $formula = preg_replace('/(\+|-|\*|\/)/', ' \1 ', $formula);
@@ -967,58 +1203,51 @@ class SpellList extends DBTypeList
         return $formula;
     }
 
-    // description-, buff-parsing component
     // a variables structure is pretty .. flexile. match in steps
-    private function matchVariableString(string $varString, ?int &$len = 0) : array
+    private function matchVariableString(string $varString, ?int &$len = 0) : ?array
     {
-        $varParts = array(
-            'op'     => null,
-            'oparg'  => null,
-            'lookup' => null,
-            'var'    => null,
-            'effIdx' => null,
-            'switch' => null
-        );
+        $op     = null;
+        $oparg  = null;
+        $lookup = null;
+        $var    = null;
+        $effIdx = null;
+        $switch = null;
 
         // last value or gender -switch                 $[lg]ifText:elseText;
-        if (preg_match('/^([lg])([^:]*:[^;]*);/i', $varString, $m))
+        if (preg_match('/^([lg])([^:]*:[^;]*);/i', $varString, $m, PREG_UNMATCHED_AS_NULL))
         {
-            $len                = strlen($m[0]);
-            $varParts['var']    = $m[1];
-            $varParts['switch'] = explode(':', $m[2]);
+            $len    = strlen($m[0]);
+            $var    = $m[1];
+            $switch = explode(':', $m[2]);
         }
         // basic variable ref (most common case)        $(refSpell)?(var)(effIdx)?
-        else if (preg_match('/^(\d*)([a-z])([123]?)\b/i', $varString, $m))
+        else if (preg_match('/^(\d+)?([a-z]|bc)([123])?\b/i', $varString, $m, PREG_UNMATCHED_AS_NULL))
         {
-            $len                = strlen($m[0]);
-            $varParts['lookup'] = $m[1];
-            $varParts['var']    = $m[2];
-            $varParts['effIdx'] = $m[3];
+            $len    = strlen($m[0]);
+            $lookup = $m[1];
+            $var    = $m[2];
+            $effIdx = $m[3];
         }
         // variable ref /w formula                      $( (op) (oparg); )? (refSpell) ( (var) (effIdx) )   OR   $(refSpell) ( (op) (oparg); )? ( (var) (effIdx) )
-        else if (preg_match('/^(([\+\-\*\/])(\d+);)?(\d*)(([\+\-\*\/])(\d+);)?([a-z])([123]?)\b/i', $varString, $m))
+        else if (preg_match('/^(([\+\-\*\/])(\d+);)?(\d+)?(([\+\-\*\/])(\d+);)?([a-z]|bc)([123])?\b/i', $varString, $m, PREG_UNMATCHED_AS_NULL))
         {
-            $len                = strlen($m[0]);
-            $varParts['lookup'] = $m[4];
-            $varParts['var']    = $m[8];
-            $varParts['effIdx'] = $m[9];
-            $varParts['op']     = $m[6] ?: $m[2];
-            $varParts['oparg']  = $m[7] ?: $m[3];
+            $len    = strlen($m[0]);
+            $lookup = $m[4];
+            $var    = $m[8];
+            $effIdx = $m[9];
+            $op     = $m[6] ?: $m[2];
+            $oparg  = $m[7] ?: $m[3];
         }
         // something .. else?
         else
-            return [];
+            return null;
 
-        return $varParts;
+        return [$op, $oparg, $lookup, $var, $effIdx, $switch];
     }
 
-    // description-, buff-parsing component
-    private function resolveVariableString(array $varParts) : array
+    private function resolveVariableString(?string $op, ?string $oparg, ?int $lookup, ?string $var, ?int $effIdx, ?array $switch) : array
     {
         $signs  = ['+', '-', '/', '*', '%', '^'];
-
-        foreach ($varParts as $k => $v)
-            $$k = $v;
 
         // returns
         $minPoints    = null;
@@ -1030,8 +1259,7 @@ class SpellList extends DBTypeList
         if (!$var)
             return [null, null, null, null, null];
 
-        if (!$effIdx)                                       // if EffectIdx is omitted, assume EffectIdx: 1
-            $effIdx = 1;
+        $effIdx ??= 1;                                      // if EffectIdx is omitted, assume EffectIdx: 1
 
         // cache at least some lookups.. should be moved to single spellList :/
         if ($lookup && $lookup != $this->id && !isset($this->refSpells[$lookup]))
@@ -1043,18 +1271,67 @@ class SpellList extends DBTypeList
 
         switch ($var)
         {
+            case 'z':                                       // homeAreaId
+                $fmtStringMin = Lang::spell('home');
+                break;
+            case 'g':                                       // boolean choice with casters gender as condition $gX:Y;
+            case 'G':
+                $fmtStringMin = '&lt;'.$switch[0].'/'.$switch[1].'&gt;';
+                break;
+            // resolve later by backtracking
+            case 'l':                                       // boolean choice with last value as condition $lX:Y;
+            case 'L':
+                $fmtStringMin = '$l'.$switch[0].':'.$switch[1].';';
+                break;
+            // simple cases
             case 'a':                                       // EffectRadiusMin
             case 'A':                                       // EffectRadiusMax
-                $base = $srcSpell->getField('effect'.$effIdx.'RadiusMax');
-
-                if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    eval("\$base = $base $op $oparg;");
-
-                $minPoints = $base;
-                break;
+                $base ??= $srcSpell->getField('effect'.$effIdx.'RadiusMax');
             case 'b':                                       // PointsPerComboPoint
             case 'B':
-                $base = $srcSpell->getField('effect'.$effIdx.'PointsPerComboPoint');
+                $base ??= $srcSpell->getField('effect'.$effIdx.'PointsPerComboPoint');
+            case 'c':                                       // powerCost
+            case 'C':
+                $base ??= $srcSpell->getField('powerCost');
+            case 'e':                                       // EffectValueMultiplier
+            case 'E':
+                $base ??= $srcSpell->getField('effect'.$effIdx.'ValueMultiplier');
+            case 'f':                                       // EffectDamageMultiplier
+            case 'F':
+                $base ??= $srcSpell->getField('effect'.$effIdx.'DamageMultiplier');
+            case 'h':                                       // ProcChance
+            case 'H':
+                $base ??= $srcSpell->getField('procChance');
+            case 'i':                                       // MaxAffectedTargets
+            case 'I':
+                $base ??= $srcSpell->getField('maxAffectedTargets');
+            case 'n':                                       // ProcCharges
+            case 'N':
+                $base ??= $srcSpell->getField('procCharges');
+            case 'p':                                       // powerCostPercent
+            case 'P':
+                $base ??= $srcSpell->getField('powerCostPercent');
+            case 'q':                                       // EffectMiscValue
+            case 'Q':
+                $base ??= $srcSpell->getField('effect'.$effIdx.'MiscValue');
+            case 'r':                                       // SpellRange
+            case 'R':
+                $base ??= $srcSpell->getField('rangeMaxHostile');
+            case 't':                                       // Periode
+            case 'T':
+                $base ??= $srcSpell->getField('effect'.$effIdx.'Periode') / 1000;
+            case 'u':                                       // StackCount
+            case 'U':
+                $base ??= $srcSpell->getField('stackAmount');
+            case 'v':                                       // MaxTargetLevel
+            case 'V':
+                $base ??= $srcSpell->getField('MaxTargetLevel');
+            case 'x':                                       // ChainTargetCount
+            case 'X':
+                $base ??= $srcSpell->getField('effect'.$effIdx.'ChainTarget');
+            case 'bc':                                      // BonusMultiplier
+            case 'BC':
+                $base ??= $srcSpell->getField('effect'.$effIdx.'BonusMultiplier');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
@@ -1065,57 +1342,12 @@ class SpellList extends DBTypeList
             case 'D':                                       // todo (med): min/max?; /w unit?
                 $base = $srcSpell->getField('duration');
 
-                $fmtStringMin = Lang::formatTime($srcSpell->getField('duration'), 'spell', 'duration');
+                $fmtStringMin = Lang::formatTime($base, 'spell', 'duration');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                $minPoints = $base < 0 ? 0 : $base;
-                break;
-            case 'e':                                       // EffectValueMultiplier
-            case 'E':
-                $base = $srcSpell->getField('effect'.$effIdx.'ValueMultiplier');
-
-                if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    eval("\$base = $base $op $oparg;");
-
-                $minPoints = $base;
-                break;
-            case 'f':                                       // EffectDamageMultiplier
-            case 'F':
-                $base = $srcSpell->getField('effect'.$effIdx.'DamageMultiplier');
-
-                if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    eval("\$base = $base $op $oparg;");
-
-                $minPoints = $base;
-                break;
-            case 'g':                                       // boolean choice with casters gender as condition $gX:Y;
-            case 'G':
-                $fmtStringMin = '&lt;'.$switch[0].'/'.$switch[1].'&gt;';
-                break;
-            case 'h':                                       // ProcChance
-            case 'H':
-                $base = $srcSpell->getField('procChance');
-
-                if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    eval("\$base = $base $op $oparg;");
-
-                $minPoints = $base;
-                break;
-            case 'i':                                       // MaxAffectedTargets
-            case 'I':
-                $base = $srcSpell->getField('maxAffectedTargets');
-
-                if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    eval("\$base = $base $op $oparg;");
-
-                $minPoints = $base;
-                break;
-            case 'l':                                       // boolean choice with last value as condition $lX:Y;
-            case 'L':
-                // resolve later by backtracking
-                $fmtStringMin = '$l'.$switch[0].':'.$switch[1].';';
+                $minPoints = max(0, $base);
                 break;
             case 'm':                                       // BasePoints (minValue)
             case 'M':                                       // BasePoints (maxValue)
@@ -1152,15 +1384,6 @@ class SpellList extends DBTypeList
                 */
                 $minPoints = ctype_lower($var) ? $min : $max;
                 break;
-            case 'n':                                       // ProcCharges
-            case 'N':
-                $base = $srcSpell->getField('procCharges');
-
-                if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    eval("\$base = $base $op $oparg;");
-
-                $minPoints = $base;
-                break;
             case 'o':                                       // TotalAmount for periodic auras (with variance)
             case 'O':
                 $periode  = $srcSpell->getField('effect'.$effIdx.'Periode');
@@ -1195,24 +1418,6 @@ class SpellList extends DBTypeList
                 $minPoints = $min;
                 $maxPoints = $max;
                 break;
-            case 'q':                                       // EffectMiscValue
-            case 'Q':
-                $base = $srcSpell->getField('effect'.$effIdx.'MiscValue');
-
-                if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    eval("\$base = $base $op $oparg;");
-
-                $minPoints = $base;
-                break;
-            case 'r':                                       // SpellRange
-            case 'R':
-                $base = $srcSpell->getField('rangeMaxHostile');
-
-                if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    eval("\$base = $base $op $oparg;");
-
-                $minPoints = $base;
-                break;
             case 's':                                       // BasePoints (with variance)
             case 'S':
                 [$min, $max, $modStrMin, $modStrMax] = $srcSpell->calculateAmountForCurrent($effIdx);
@@ -1246,45 +1451,6 @@ class SpellList extends DBTypeList
                 $minPoints = $min;
                 $maxPoints = $max;
                 break;
-            case 't':                                       // Periode
-            case 'T':
-                $base = $srcSpell->getField('effect'.$effIdx.'Periode') / 1000;
-
-                if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    eval("\$base = $base $op $oparg;");
-
-                $minPoints = $base;
-                break;
-            case 'u':                                       // StackCount
-            case 'U':
-                $base = $srcSpell->getField('stackAmount');
-
-                if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    eval("\$base = $base $op $oparg;");
-
-                $minPoints = $base;
-                break;
-            case 'v':                                       // MaxTargetLevel
-            case 'V':
-                $base = $srcSpell->getField('MaxTargetLevel');
-
-                if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    eval("\$base = $base $op $oparg;");
-
-                $minPoints = $base;
-                break;
-            case 'x':                                       // ChainTargetCount
-            case 'X':
-                $base = $srcSpell->getField('effect'.$effIdx.'ChainTarget');
-
-                if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    eval("\$base = $base $op $oparg;");
-
-                $minPoints = $base;
-                break;
-            case 'z':                                       // HomeZone
-                $fmtStringMin = Lang::spell('home');
-                break;
         }
 
         // handle excessively precise floats
@@ -1296,7 +1462,6 @@ class SpellList extends DBTypeList
         return [$minPoints, $maxPoints, $fmtStringMin, $fmtStringMax, $statId];
     }
 
-    // description-, buff-parsing component
     private function resolveFormulaString(string $formula, int $precision = 0) : array
     {
         $fSuffix = '%s';
@@ -1370,10 +1535,10 @@ class SpellList extends DBTypeList
             $pos += $len;
 
             // we are resolving a formula -> omit ranges
-            [$minPoints, , $fmtStringMin, , $statId] = $this->resolveVariableString($varParts);
+            [$minPoints, , $fmtStringMin, , $statId] = $this->resolveVariableString(...$varParts);
 
             // time within formula -> rebase to seconds and omit timeUnit
-            if (strtolower($varParts['var']) == 'd')
+            if (strtolower($varParts[3]) == 'd')            // old $varParts['var']
             {
                $minPoints /= 1000;
                unset($fmtStringMin);
@@ -1398,207 +1563,6 @@ class SpellList extends DBTypeList
         $return = is_numeric($evaled) ? round($evaled, $precision) : $evaled;
 
         return [$return, $fSuffix, $fStat];
-    }
-
-    // should probably used only once to create ::spell. come to think of it, it yields the same results every time.. it absolutely has to!
-    // although it seems to be pretty fast, even on those pesky test-spells with extra complex tooltips (Ron Test Spell X))
-    public function parseText(string $type = 'description', int $level = MAX_LEVEL) : array
-    {
-        // oooo..kaaayy.. parsing text in 6 or 7 easy steps
-        // we don't use the internal iterator here. This func has to be called for the individual template.
-        // otherwise it will get a bit messy, when we iterate, while we iterate *yo dawg!*
-
-        /*
-            documentation .. sort of
-            bracket use
-                ${}.x - formulas; .x is optional; x:[0-9] .. max-precision of a floatpoint-result; default: 0
-                $[]   - conditionals ... like $?condition[true][false]; alternative $?!(cond1|cond2)[true]$?cond3[elseTrue][false]; ?a40120: has aura 40120; ?s40120: knows spell 40120(%s)
-                $<>   - variables
-                ()    - regular use for function-like calls
-
-            variables in use .. caseSensitive
-
-            game variables (optionally replace with textVars)
-                $PlayerName - Cpt. Obvious
-                $PL / $pl   - PlayerLevel
-                $STR        - Strength Attribute (not seen)
-                $AGI        - Agility Attribute (not seen)
-                $STA        - Stamina Attribute (not seen)
-                $INT        - Intellect Attribute (not seen)
-                $SPI        - Spirit Attribute
-                $AP         - Atkpwr
-                $RAP        - RngAtkPwr
-                $HND        - hands used by weapon (1H, 2H) => (1, 2)
-                $MWS        - MainhandWeaponSpeed
-                $mw / $MW   - MainhandWeaponDamage Min/Max
-                $rwb / $RWB - RangedWeapon..Bonus? Min/Max
-                $sp         - Spellpower
-                $spa        - Spellpower Arcane
-                $spfi       - Spellpower Fire
-                $spfr       - Spellpower Frost
-                $sph        - Spellpower Holy
-                $spn        - Spellpower Nature
-                $sps        - Spellpower Shadow
-                $bh         - Bonus Healing
-                $pa         - %-ArcaneDmg (as float)         // V seems broken
-                $pfi        - %-FireDmg (as float)
-                $pfr        - %-FrostDmg (as float)
-                $ph         - %-HolyDmg (as float)
-                $pn         - %-NatureDmg (as float)
-                $ps         - %-ShadowDmg (as float)
-                $pbh        - %-HealingBonus (as float)
-                $pbhd       - %-Healing Done (as float)      // all above seem broken
-                $bc2        - baseCritChance? always 3.25 (unsure)
-
-            spell variables (the stuff we can actually parse) rounding... >5 up?
-                $a          - SpellRadius; per EffectIdx
-                $b          - PointsPerComboPoint; per EffectIdx
-                $d / $D     - SpellDuration; appended timeShorthand; d/D maybe base/max duration?; interpret "0" as "until canceled"
-                $e          - EffectValueMultiplier; per EffectIdx
-                $f / $F     - EffectDamageMultiplier; per EffectIdx
-                $g / $G     - Gender-Switch $Gmale:female;
-                $h / $H     - ProcChance
-                $i          - MaxAffectedTargets
-                $l          - LastValue-Switch; last value as condition $Ltrue:false;
-                $m / $M     - BasePoints; per EffectIdx; m/M +1/+effectDieSides
-                $n          - ProcCharges
-                $o          - TotalAmount (for periodic auras); per EffectIdx
-                $q          - EffectMiscValue; per EffectIdx
-                $r          - SpellRange (hostile)
-                $s / $S     - BasePoints; per EffectIdx; as Range, if applicable
-                $t / $T     - EffectPeriode; per EffectIdx
-                $u          - StackAmount
-                $v          - MaxTargetLevel
-                $x          - MaxAffectedTargets
-                $z          - no place like <Home>
-
-            deviations from standard procedures
-                division    - example: $/10;2687s1 => $2687s1/10
-                            - also:    $61829/5;s1 => $61829s1/5
-
-            functions in use .. caseInsensitive
-                $cond(a, b, c) - like SQL, if A is met use B otherwise use C
-                $eq(a, b)      - a == b
-                $floor(a)      - floor()
-                $gt(a, b)      - a > b
-                $gte(a, b)     - a >= b
-                $min(a, b)     - min()
-                $max(a, b)     - max()
-        */
-
-        $this->charLevel   = $level;
-
-        // step -1: already handled?
-        if (isset($this->parsedText[$this->id][$type][Lang::getLocale()->value][$this->charLevel][$this->interactive]))
-            return $this->parsedText[$this->id][$type][Lang::getLocale()->value][$this->charLevel][$this->interactive];
-
-        // step 0: get text
-        $data = $this->getField($type, true);
-        if (empty($data) || $data == "[]")                  // empty tooltip shouldn't be displayed anyway
-            return ['', [], false];
-
-        // step 1: if the text is supplemented with text-variables, get and replace them
-        if ($this->curTpl['spellDescriptionVariableId'] > 0)
-        {
-            if (empty($this->spellVars[$this->id]))
-            {
-                $spellVars = DB::Aowow()->SelectCell('SELECT `vars` FROM ::spellvariables WHERE `id` = %i', $this->curTpl['spellDescriptionVariableId']);
-                $spellVars = explode("\n", $spellVars);
-                foreach ($spellVars as $sv)
-                    if (preg_match('/\$(\w*\d*)=(.*)/i', trim($sv), $matches))
-                        $this->spellVars[$this->id][$matches[1]] = $matches[2];
-            }
-
-            // replace self-references
-            $reset = true;
-            while ($reset)
-            {
-                $reset = false;
-                foreach ($this->spellVars[$this->id] as $k => $sv)
-                {
-                    if (preg_match('/\$<(\w*\d*)>/i', $sv, $matches))
-                    {
-                        $this->spellVars[$this->id][$k] = str_replace('$<'.$matches[1].'>', '${'.$this->spellVars[$this->id][$matches[1]].'}', $sv);
-                        $reset = true;
-                    }
-                }
-            }
-
-            // finally, replace SpellDescVars
-            foreach ($this->spellVars[$this->id] as $k => $sv)
-                $data = str_replace('$<'.$k.'>', $sv, $data);
-        }
-
-        // step 2: resolving conditions
-        // aura- or spell-conditions cant be resolved for our purposes, so force them to false for now (todo (low): strg+f "know" in aowowPower.js ^.^)
-
-        /* sequences
-           a) simple    - $?cond[A][B]                      // simple case of b)
-           b) elseif    - $?cond[A]?cond[B]..[C]            // can probably be repeated as often as you wanted
-           c) recursive - $?cond[A][$?cond[B][..]]          // can probably be stacked as deep as you wanted
-
-           only case a) can be used for KNOW-parameter
-       */
-
-        $relSpells = [];
-        $data = $this->handleConditions($data, $relSpells, true);
-
-        // step 3: unpack formulas ${ .. }.X
-        $data = $this->handleFormulas($data, true);
-
-        // step 4: find and eliminate regular variables
-        $data = $this->handleVariables($data, true);
-
-        // step 5: variable-dependent variable-text
-        // special case $lONE:ELSE[:ELSE2]; or $|ONE:ELSE[:ELSE2];
-        while (preg_match('/([\d\.]+)([^\d]*)(\$[l|]:*)([^:]*):([^;]*);/i', $data, $m))
-        {
-            $plurals = explode(':', $m[5]);
-            $replace = '';
-
-            if (count($plurals) == 2)                       // special case: ruRU
-            {
-                switch (substr($m[1], -1))                  // check last digit of number
-                {
-                    case 1:
-                        // but not 11 (teen number)
-                        if (!in_array($m[1], [11]))
-                        {
-                            $replace = $m[4];
-                            break;
-                        }
-                    case 2:
-                    case 3:
-                    case 4:
-                        // but not 12, 13, 14 (teen number) [11 is passthrough]
-                        if (!in_array($m[1], [11, 12, 13, 14]))
-                        {
-                            $replace = $plurals[0];
-                            break;
-                        }
-                        break;
-                    default:
-                        $replace = $plurals[1];
-                }
-
-            }
-            else
-                $replace = ($m[1] == 1 ? $m[4] : $plurals[0]);
-
-            $data = str_ireplace($m[1].$m[2].$m[3].$m[4].':'.$m[5].';', $m[1].$m[2].$replace, $data);
-        }
-
-        // step 6: HTMLize
-        // colors
-        $data = preg_replace('/\|cff([a-f0-9]{6})(.+?)\|r/i', '<span style="color: #$1;">$2</span>', $data);
-
-        // line endings
-        $data = strtr($data, ["\r" => '', "\n" => '<br />']);
-
-        // cache result
-        $this->parsedText[$this->id][$type][Lang::getLocale()->value][$this->charLevel][$this->interactive] = [$data, $relSpells, $this->scaling[$this->id]];
-
-        return [$data, $relSpells, $this->scaling[$this->id]];
     }
 
     private function handleFormulas(string $data, bool $topLevel = false) : string
@@ -1676,7 +1640,7 @@ class SpellList extends DBTypeList
 
             $pos += $len;
 
-            [$minPoints, $maxPoints, $fmtStringMin, $fmtStringMax, $statId] = $this->resolveVariableString($varParts);
+            [$minPoints, $maxPoints, $fmtStringMin, $fmtStringMax, $statId] = $this->resolveVariableString(...$varParts);
             $resolved = is_numeric($minPoints) ? abs($minPoints) : $minPoints;
             if (isset($fmtStringMin))
             {
@@ -1703,6 +1667,19 @@ class SpellList extends DBTypeList
 
     private function handleConditions(string $data, array &$relSpells, bool $topLevel = false) : string
     {
+        /*
+         * a) simple    - $?cond[A][B]                      // simple case of b)
+         * b) elseif    - $?cond[A]?cond[B]..[C]            // can probably be repeated as often as you wanted
+         * c) recursive - $?cond[A][$?cond[B][..]]          // can probably be stacked as deep as you wanted
+         * d) bonkers   - $?!(cond1&!(cond2|cond3))[true]$?cond4[elseTrue][false];
+         *
+         * conditionals are /[as]\d+/i where:
+         *  a: CGUnit_C::HasAuraBySpellId
+         *  s: CGUnit_C::IsSpellKnown
+         *
+         * only case a) is currently used for KNOW-parameter
+         */
+
         while (($condStartPos = strpos($data, '$?')) !== false)
         {
             $condBrktCnt = 0;
@@ -2228,8 +2205,8 @@ class SpellList extends DBTypeList
 
             if ($addMask & GLOBALINFO_EXTRA)
             {
-                $buff = $this->renderBuff(MAX_LEVEL, true, $buffSpells);
-                $tTip = $this->renderTooltip(MAX_LEVEL, true, $spells);
+                $buff = $this->renderBuff(MAX_LEVEL, buffSpells: $buffSpells);
+                $tTip = $this->renderTooltip(MAX_LEVEL, ttSpells: $spells);
 
                 foreach ($spells as $relId => $_)
                     if (empty($data[Type::SPELL][$relId]))

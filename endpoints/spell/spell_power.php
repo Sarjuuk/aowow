@@ -38,8 +38,8 @@ class SpellPowerResponse extends TextResponse implements ICache
             $this->cacheType = CACHE_TYPE_NONE;
         else
         {
-            $tooltip = $spell->renderTooltip(ttSpells: $ttSpells);
-            $buff    = $spell->renderBuff(buffSpells: $bfSpells);
+            $tooltip = $spell->renderTooltip(interactive: SpellList::INTERACTIVE_NONE, ttSpells: $ttSpells);
+            $buff    = $spell->renderBuff(interactive: SpellList::INTERACTIVE_NONE, buffSpells: $bfSpells);
 
             $opts = array(
                 'name'       => $spell->getField('name', true),
