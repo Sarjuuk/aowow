@@ -1796,18 +1796,18 @@ $lang = array(
              -9 => "GM Abilities",
               0 => "Uncategorized"
         ),
-        'armorSubClass' => array(                           // ItemSubClass.dbc/2
+        'armorSubClass' => array(                           // ItemSubClass.dbc/verboseName
             "Miscellaneous",                        "Cloth Armor",                          "Leather Armor",                        "Mail Armor",                           "Plate Armor",
             null,                                   "Shields",                              "Librams",                              "Idols",                                "Totems",
             "Sigils"
         ),
-        'weaponSubClass' => array(                          // ItemSubClass.dbc/4; ordered by content first, then alphabeticaly
+        'weaponSubClass' => array(                          // ItemSubClass.dbc/verboseName; ordered by content first, then alphabeticaly
             15 => "Daggers",                        13 => "Fist Weapons",                    0 => "One-Handed Axes",                 4 => "One-Handed Maces",                7 => "One-Handed Swords",
              6 => "Polearms",                       10 => "Staves",                          1 => "Two-Handed Axes",                 5 => "Two-Handed Maces",                8 => "Two-Handed Swords",
              2 => "Bows",                           18 => "Crossbows",                       3 => "Guns",                           16 => "Thrown",                         19 => "Wands",
             20 => "Fishing Poles",                  14 => "Miscellaneous"
         ),
-        'subClassMasks' => array(
+        'subClassMasks' => array(                           // as per ItemSubClassMask.dbc
             0x02A5F3 => "Melee Weapon",             0x0060 => "Shield",                     0x04000C => "Ranged Weapon",            0xA091 => "One-Handed Melee Weapon"
         ),
         'traitShort'    => array(
@@ -2226,7 +2226,7 @@ $lang = array(
         'ratingString'  => '<!--rtg%%%1$d-->%2$s&nbsp;@&nbsp;L<!--lvl-->%3$d',
         'heroic'        => "Heroic",                        // ITEM_HEROIC
         'startQuest'    => "This Item Begins a Quest",      // ITEM_STARTS_QUEST
-        'bagSlotString' => "%d Slot %s",                    // CONTAINER_SLOTS
+        'containerSlots'=> "%d Slot %s",                    // CONTAINER_SLOTS
         'fap'           => "Feral Attack Power",
         'durability'    => "Durability %d / %d",            // DURABILITY_TEMPLATE
         'realTime'      => "real time",
@@ -2275,6 +2275,7 @@ $lang = array(
         'unique'        => ["Unique",          "Unique (%d)", "Unique: %s (%d)"         ],   // ITEM_UNIQUE, ITEM_UNIQUE_MULTIPLE, ITEM_LIMIT_CATEGORY
         'uniqueEquipped'=> ["Unique-Equipped", null,          "Unique-Equipped: %s (%d)"],   // ITEM_UNIQUE_EQUIPPABLE, null, ITEM_LIMIT_CATEGORY_MULTIPLE
         'speed'         => "Speed",                         // SPEED
+        'glyphType'     => [null, "Major Glyph", "Minor Glyph"], // [MINOR_GLYPH, MAJOR_GLYPH]
         'dps'           => "(%.1f damage per second)",      // DPS_TEMPLATE
         'vendorLoc'     => "Vendor Locations",
         'purchasedIn'   => "This item can be purchased in",
@@ -2331,11 +2332,6 @@ $lang = array(
             "Binds to account",                         "Binds when picked up",                                 "Binds when equipped",
             "Binds when used",                          "Quest Item",                                           "Quest Item"
         ),
-        "bagFamily"     => array(                           // ItemSubClass.dbc/1
-            "Bag",                  "Quiver",           "Ammo Pouch",           "Soul Bag",                     "Leatherworking Bag",
-            "Inscription Bag",      "Herb Bag",         "Enchanting Bag",       "Engineering Bag",              null, /*Key*/
-            "Gem Bag",              "Mining Bag"
-        ),
         'inventoryType' => array(                           // INVTYPE_*
             null,                   "Head",             "Neck",                 "Shoulder",                     "Shirt",
             "Chest",                "Waist",            "Legs",                 "Feet",                         "Wrist",
@@ -2344,22 +2340,25 @@ $lang = array(
             null, /*Robe*/          "Main Hand",        "Off Hand",             "Held In Off-Hand",             "Projectile",
             "Thrown",               null, /*Ranged2*/   "Quiver",               "Relic"
         ),
-        'armorSubClass' => array(                           // ItemSubClass.dbc/2
-            "Miscellaneous",        "Cloth",            "Leather",              "Mail",                         "Plate",
-            null,                   "Shield",           "Libram",               "Idol",                         "Totem",
-            "Sigil"
+        'subClass'      => array(                           // ItemSubClass.dbc/name
+            ITEM_CLASS_CONSUMABLE => ["Consumable", "Potion", "Elixir", "Flask", "Scroll", "Food & Drink", "Item Enhancement", "Bandage", "Other"],
+            ITEM_CLASS_CONTAINER  => ["Bag", "Soul Bag", "Herb Bag", "Enchanting Bag", "Engineering Bag", "Gem Bag", "Mining Bag", "Leatherworking Bag", "Inscription Bag"],
+            ITEM_CLASS_WEAPON     => ["Axe", "Axe", "Bow", "Gun", "Mace", "Mace", "Polearm", "Sword", "Sword", "Obsolete", "Staff", "Exotic", "Exotic", "Fist Weapon", "Miscellaneous", "Dagger", "Thrown", "Spear", "Crossbow", "Wand", "Fishing Pole"],
+            ITEM_CLASS_GEM        => ["Red", "Blue", "Yellow", "Purple", "Green", "Orange", "Meta", "Simple", "Prismatic"],
+            ITEM_CLASS_ARMOR      => ["Miscellaneous", "Cloth", "Leather", "Mail", "Plate", "Buckler(OBSOLETE)", "Shield", "Libram", "Idol", "Totem", "Sigil"],
+            ITEM_CLASS_REAGENT    => ["Reagent"],
+            ITEM_CLASS_AMMUNITION => ["Wand(OBSOLETE)", "Bolt(OBSOLETE)", "Arrow", "Bullet", "Thrown(OBSOLETE)"],
+            ITEM_CLASS_TRADEGOOD  => ["Trade Goods", "Parts", "Explosives", "Devices", "Jewelcrafting", "Cloth", "Leather", "Metal & Stone", "Meat", "Herb", "Elemental", "Other", "Enchanting", "Materials", "Armor Enchantment", "Weapon Enchantment"],
+            ITEM_CLASS_GENERIC    => ["Generic(OBSOLETE)"],
+            ITEM_CLASS_RECIPE     => ["Book", "Leatherworking", "Tailoring", "Engineering", "Blacksmithing", "Cooking", "Alchemy", "First Aid", "Enchanting", "Fishing", "Jewelcrafting", "Inscription"],
+            ITEM_CLASS_MONEY      => ["Money(OBSOLETE)"],
+            ITEM_CLASS_QUIVER     => ["Quiver(OBSOLETE)", "Quiver(OBSOLETE)", "Quiver", "Ammo Pouch"],
+            ITEM_CLASS_QUEST      => ["Quest"],
+            ITEM_CLASS_KEY        => ["Key", "Lockpick"],
+            ITEM_CLASS_PERMANENT  => ["Permanent"],
+            ITEM_CLASS_MISC       => ["Junk", "Reagent", "Pet", "Holiday", "Other", "Mount"],
+            ITEM_CLASS_GLYPH      => [null, "Warrior", "Paladin", "Hunter", "Rogue", "Priest", "Death Knight", "Shaman", "Mage", "Warlock", null, "Druid"]
         ),
-        'weaponSubClass'=> array(                           // ItemSubClass.dbc/4
-            "Axe",                  "Axe",              "Bow",                  "Gun",                          "Mace",
-            "Mace",                 "Polearm",          "Sword",                "Sword",                        null,
-            "Staff",                null,               null,                   "Fist Weapon",                  "Miscellaneous",
-            "Dagger",               "Thrown",           null,                   "Crossbow",                     "Wand",
-            "Fishing Pole"
-        ),
-        'projectileSubClass' => array(                      // ItemSubClass.dbc/6
-            null,                   null,               "Arrow",                "Bullet",                        null
-        ),
-        'elixirType'    => [null, "Battle", "Guardian"],
         'cat'           => array(                           // ordered by content first, then alphabeticaly; item menu from locale_enus.js
              2 => array("Weapons", []),                     // filled with self::$spell['weaponSubClass'] on load
              4 => array("Armor", array(

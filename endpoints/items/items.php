@@ -599,7 +599,7 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
 
         foreach ($slotData as $k => $str)                   // "Off Hand" => "Shield"
             if ($str && (!$slotMask || ($slotMask & (1 << $k))))
-                $this->slotList[$k] = $k == INVTYPE_SHIELD ? Lang::item('armorSubClass', 6) : $str;
+                $this->slotList[$k] = $k == INVTYPE_SHIELD ? Lang::item('subClass', ITEM_CLASS_ARMOR, ITEM_SUBCLASS_SHIELD) : $str;
     }
 
     protected static function onBeforeDisplay() : void

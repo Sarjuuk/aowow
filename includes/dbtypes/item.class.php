@@ -622,33 +622,26 @@ class ItemList extends DBTypeList
         if ($this->curTpl['startQuest'])
             $x .= '<br /><a class="q1" href="?quest='.$this->curTpl['startQuest'].'">'.Lang::item('startQuest').'</a>';
 
-        // containerType (slotCount)
-        if ($this->curTpl['slots'] > 0)
-        {
-            $fam = $this->curTpl['bagFamily'] ? log($this->curTpl['bagFamily'], 2) + 1 : 0;
-            $x .= '<br />'.Lang::item('bagSlotString', [$this->curTpl['slots'], Lang::item('bagFamily', $fam)]);
-        }
+        // class + subclass
+        $itemclass = [];
+        if ($_slot)                                         // yes, slot can occur on random items and is then also displayed
+            $itemclass[] = Lang::item('inventoryType', $_slot);
 
-        if (in_array($_class, [ITEM_CLASS_ARMOR, ITEM_CLASS_WEAPON, ITEM_CLASS_AMMUNITION]))
-        {
-            $x .= '<table width="100%"><tr>';
+        // subclass (should be based solely on (ItemSubclass.dbc/displayFlags & 0x1) == 0, but functionally results in this block)
+        if ($_class == ITEM_CLASS_ARMOR && !in_array($_subClass, [ITEM_SUBCLASS_MISC_ARMOR, ITEM_SUBCLASS_BUCKLER]))
+            $itemclass[] = '<!--asc'.$_subClass.'-->'.Lang::item('subClass', $_class, $_subClass);
+        else if (($_class == ITEM_CLASS_CONTAINER || $_class == ITEM_CLASS_QUIVER) && $this->curTpl['slots'] > 0) // invType ins not displayed for containers for some reason
+            $itemclass[0] = Lang::item('containerSlots', [$this->curTpl['slots'], Lang::item('subClass', $_class, $_subClass)]);
+        else if (($_class == ITEM_CLASS_WEAPON     && !in_array($_subClass, [ITEM_SUBCLASS_OBSOLETE, ITEM_SUBCLASS_1H_EXOTIC, ITEM_SUBCLASS_2H_EXOTIC, ITEM_SUBCLASS_MISC_WEAPON])) ||
+                 ($_class == ITEM_CLASS_AMMUNITION && !in_array($_subClass, [0])) || // wand (obsolete)
+                 ($_class == ITEM_CLASS_QUIVER     && !in_array($_subClass, [0, 1]))) // quiver (obsolete) + quiver (obsolete)
+              /* ($_class == ITEM_CLASS_GLYPH)) flags demand subclass is shown but in-game they are missing..? */
+            $itemclass[] = Lang::item('subClass', $_class, $_subClass);
 
-            // Class
-            if ($_slot)
-                $x .= '<td>'.Lang::item('inventoryType', $_slot).'</td>';
-
-            // Subclass
-            if ($_class == ITEM_CLASS_ARMOR && $_subClass > 0)
-                $x .= '<th><!--asc'.$_subClass.'-->'.Lang::item('armorSubClass', $_subClass).'</th>';
-            else if ($_class == ITEM_CLASS_WEAPON)
-                $x .= '<th>'.Lang::item('weaponSubClass', $_subClass).'</th>';
-            else if ($_class == ITEM_CLASS_AMMUNITION)
-                $x .= '<th>'.Lang::item('projectileSubClass', $_subClass).'</th>';
-
-            $x .= '</tr></table>';
-        }
-        else if ($_slot && $_class != ITEM_CLASS_CONTAINER) // yes, slot can occur on random items and is then also displayed <_< .. excluding Bags >_>
-            $x .= '<br />'.Lang::item('inventoryType', $_slot).'<br />';
+        if (count($itemclass) == 2)
+            $x .= '<table width="100%"><tr><td>'.$itemclass[0].'</td><th>'.$itemclass[1].'</th></tr></table>';
+        else if (count($itemclass) == 1)
+            $x .= '<br />'.$itemclass[0].'<br />';
         else
             $x .= '<br />';
 
@@ -867,6 +860,10 @@ class ItemList extends DBTypeList
 
             $x .= Lang::formatTime(abs($dur) * 1000, 'item', 'duration').$rt."<br />";
         }
+
+        // glyph type
+        if ($_class == ITEM_CLASS_GLYPH && ($gt = $this->curTpl['subSubClass']))
+            $x .= '<span class="q9">'.Lang::item('glyphType', $gt).'</span><br />';
 
         // required classes
         $jsg = [];
@@ -1163,11 +1160,14 @@ class ItemList extends DBTypeList
         // charges
         for ($i = 1; $i < 6; $i++)
         {
-            if (in_array($this->curTpl['spellTrigger'.$i], [SPELL_TRIGGER_USE, SPELL_TRIGGER_SOULSTONE, SPELL_TRIGGER_USE_NODELAY, SPELL_TRIGGER_LEARN]) && $this->curTpl['spellCharges'.$i])
-            {
-                $xMisc[] = '<span class="q1">'.Lang::item('charges', [abs($this->curTpl['spellCharges'.$i])]).'</span>';
-                break;
-            }
+            if (!in_array($this->curTpl['spellTrigger'.$i], [SPELL_TRIGGER_USE, SPELL_TRIGGER_SOULSTONE, SPELL_TRIGGER_USE_NODELAY, SPELL_TRIGGER_LEARN]))
+                continue;
+
+            if (($ch = abs($this->curTpl['spellCharges'.$i])) <= 1)
+                continue;
+
+            $xMisc[] = '<span class="q1">'.Lang::item('charges', [$ch]).'</span>';
+            break;
         }
 
         // list required reagents

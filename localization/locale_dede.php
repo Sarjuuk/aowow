@@ -2226,7 +2226,7 @@ $lang = array(
         'ratingString'  => '<!--rtg%%%1$d-->%2$s&nbsp;@&nbsp;Lvl<!--lvl-->%3$d',
         'heroic'        => "Heroisch",
         'startQuest'    => "Dieser Gegenstand startet eine Quest",
-        'bagSlotString' => '%1$d Platz %2$s',
+        'containerSlots'=> '%1$d Platz %2$s',
         'fap'           => "Angriffskraft in Tiergestalt",
         'durability'    => 'Haltbarkeit %1$d / %2$d',
         'realTime'      => "Realzeit",
@@ -2275,6 +2275,7 @@ $lang = array(
         'unique'        => ["Einzigartig",          "Limitiert (%d)", "Einzigartig: %s (%d)"         ],
         'uniqueEquipped'=> ["Einzigartig anlegbar", null,             "Einzigartig angelegt: %s (%d)"],
         'speed'         => "Tempo",
+        'glyphType'     => [null, "Erhebliche Glyphe", "Geringe Glyphe"],
         'dps'           => "(%.1f Schaden pro Sekunde)",
         'vendorLoc'     => "Händlerstandpunkte",
         'purchasedIn'   => "Dieser Gegenstand kann gekauft werden in",
@@ -2344,22 +2345,25 @@ $lang = array(
             null, /*Robe*/          "Waffenhand",       "Schildhand",           "In der Schildhand geführt",    "Projektil",
             "Wurfwaffe",            null, /*Ranged2*/   "Köcher",               "Relikt"
         ),
-        'armorSubClass' => array(
-            "Sonstiges",            "Stoff",            "Leder",                "Schwere Rüstung",              "Platte",
-            null,                   "Schild",           "Buchband",             "Götze",                        "Totem",
-            "Sigel"
+        'subClass'      => array(
+            ITEM_CLASS_CONSUMABLE => ["Verbrauchbar", "Trank", "Elixier", "Fläschchen", "Rolle", "Speis & Trank", "Gegenstandsverbesserung", "Verband", "Sonstige"],
+            ITEM_CLASS_CONTAINER  => ["Behälter", "Seelentasche", "Kräutertasche", "Verzauberertasche", "Ingenieurstasche", "Edelsteintasche", "Bergbautasche", "Lederertasche", "Schreibertasche"],
+            ITEM_CLASS_WEAPON     => ["Axt", "Axt", "Bogen", "Schusswaffe", "Streitkolben", "Streitkolben", "Stangenwaffe", "Schwert", "Schwert", "Überflüssig", "Stab", "Exotika", "Exotika", "Faustwaffe", "Verschiedenes", "Dolch", "Wurfwaffe", "Speer", "Armbrust", "Zauberstab", "Angelrute"],
+            ITEM_CLASS_GEM        => ["Rot", "Blau", "Gelb", "Violett", "Grün", "Orange", "Meta", "Einfach", "Prismatisch"],
+            ITEM_CLASS_ARMOR      => ["Verschiedenes", "Stoff", "Leder", "Schwere Rüstung", "Platte", "Rundschild(OBSOLETE)", "Schild", "Buchbände", "Götze", "Totems", "Siegel"],
+            ITEM_CLASS_REAGENT    => ["Reagenz"],
+            ITEM_CLASS_AMMUNITION => ["Zauberstab(OBSOLETE)", "Bolzen(OBSOLETE)", "Pfeil", "Kugel", "Wurfwaffen (ÜBERFLÜSSIG)"],
+            ITEM_CLASS_TRADEGOOD  => ["Handwerkswaren", "Teile", "Sprengstoff", "Geräte", "Juwelenschleifen", "Stoff", "Leder", "Metall & Stein", "Fleisch", "Kräuter", "Elementar", "Sonstige", "Verzauberkunst", "Materialien", "Rüstungsverzauberung", "Waffenverzauberung"],
+            ITEM_CLASS_GENERIC    => ["Generic(OBSOLETE)"],
+            ITEM_CLASS_RECIPE     => ["Buch", "Lederverarbeitung", "Schneiderei", "Ingenieurskunst", "Schmiedekunst", "Kochkunst", "Alchemie", "Erste Hilfe", "Verzauberkunst", "Angeln", "Juwelenschleifen", "Inschrift"],
+            ITEM_CLASS_MONEY      => ["Money(OBSOLETE)"],
+            ITEM_CLASS_QUIVER     => ["Quiver(OBSOLETE)", "Quiver(OBSOLETE)", "Köcher", "Munitionsbeutel"],
+            ITEM_CLASS_QUEST      => ["Quest"],
+            ITEM_CLASS_KEY        => ["Schlüssel", "Nachschlüssel"],
+            ITEM_CLASS_PERMANENT  => ["Dauerhaft"],
+            ITEM_CLASS_MISC       => ["Plunder", "Reagenz", "Haustier", "Festtag", "Sonstige", "Reittier"],
+            ITEM_CLASS_GLYPH      => [null, "Krieger", "Paladin", "Jäger", "Schurke", "Priester", "Todesritter", "Schamane", "Magier", "Hexenmeister", null, "Druide"]
         ),
-        'weaponSubClass' => array(
-            "Axt",                  "Axt",              "Bogen",                "Schusswaffe",                  "Streitkolben",
-            "Streitkolben",         "Stangenwaffe",     "Schwert",              "Schwert",                      null,
-            "Stab",                 null,               null,                   "Faustwaffe",                   "Diverse",
-            "Dolche",               "Wurfwaffe",        null,                   "Armbrust",                     "Zauberstab",
-            "Angelrute"
-        ),
-        'projectileSubClass' => array(
-            null,                   null,               "Pfeil",                "Kugel",                         null
-        ),
-        'elixirType'    => [null, "Kampf", "Wächter"],
         'cat'           => array(
              2 => array("Waffen", []),                      // filled with self::$spell['weaponSubClass'] on load
              4 => array("Rüstung", array(
