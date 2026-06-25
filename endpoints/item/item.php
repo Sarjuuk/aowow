@@ -349,7 +349,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
             BUTTON_WOWHEAD => true,
             BUTTON_VIEW3D  => $this->subject->isDisplayable() ? ['displayId' => $_displayId, 'slot' => $_slot, 'type' => Type::ITEM, 'typeId' => $this->typeId] : false,
             BUTTON_COMPARE => $canBeWeighted,
-            BUTTON_EQUIP   => in_array($_class, [ITEM_CLASS_WEAPON, ITEM_CLASS_ARMOR]),
+            BUTTON_EQUIP   => in_array($_class, [ITEM_CLASS_WEAPON, ITEM_CLASS_ARMOR]) && User::getCharacters(),
             BUTTON_UPGRADE => $canBeWeighted ? ['class' => $_class, 'slot' => $_slot] : false,
             BUTTON_LINKS   => array(
                 'linkColor' => 'ff'.Game::$rarityColorStings[$this->subject->getField('quality')],

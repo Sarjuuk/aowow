@@ -21,7 +21,7 @@ if ($this->gPageInfo):
     echo '                var g_pageInfo = '.$this->json('gPageInfo', varRef: true).';'.PHP_EOL;
 
     // set by ItemBaseEndpoint
-    if ($this->user::isLoggedIn() && !empty($this->redButtons[BUTTON_EQUIP])):
+    if (!empty($this->redButtons[BUTTON_EQUIP])):
         echo "                \$(document).ready(function() { pr_addEquipButton('equip-pinned-button', ".$this->typeId."); });".PHP_EOL;
     endif;
 endif;
