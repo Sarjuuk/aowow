@@ -1795,8 +1795,6 @@ class SpellList extends DBTypeList
 
     public function renderBuff(int $level = MAX_LEVEL, int $interactive = self::INTERACTIVE_EMBEDDED, ?array &$buffSpells = []) : ?string
     {
-        $buffSpells = [];
-
         if (!$this->curTpl)
             return null;
 
@@ -1822,10 +1820,9 @@ class SpellList extends DBTypeList
         $x .= '<table><tr><td>';
 
         // parse Buff-Text
-        [$buffTT, $buffSp, ] = $this->parseText('buff');
+        [$buffTT, $buffSpells, ] = $this->parseText('buff');
 
-        foreach ($buffSp as $bs)
-            $buffSpells[] = UIText::format($bs, Lang::FMT_HTML);
+        array_walk_recursive($buffSpells, fn(&$x) => $x = UIText::format($x, Lang::FMT_HTML));
 
         $x .= $buffTT.'<br />';
 
@@ -1845,8 +1842,6 @@ class SpellList extends DBTypeList
 
     public function renderTooltip(int $level = MAX_LEVEL, int $interactive = self::INTERACTIVE_EMBEDDED, ?array &$ttSpells = []) : ?string
     {
-        $ttSpells = [];
-
         if (!$this->curTpl)
             return null;
 
@@ -1862,10 +1857,9 @@ class SpellList extends DBTypeList
         $cost  = $this->createPowerCostForCurrent();
         $range = $this->createRangesForCurrent();
 
-        [$desc, $spells, ] = $this->parseText('description');
+        [$desc, $ttSpells, ] = $this->parseText('description');
 
-        foreach ($spells as $s)
-            $ttSpells[] = UIText::format($s, Lang::FMT_HTML);
+        array_walk_recursive($ttSpells, fn(&$x) => $x = UIText::format($x, Lang::FMT_HTML));
 
         // get reagents
         $reagents = $this->getReagentsForCurrent();
@@ -2205,6 +2199,8 @@ class SpellList extends DBTypeList
 
             if ($addMask & GLOBALINFO_EXTRA)
             {
+                $spells = $buffSpells = [];
+
                 $buff = $this->renderBuff(MAX_LEVEL, buffSpells: $buffSpells);
                 $tTip = $this->renderTooltip(MAX_LEVEL, ttSpells: $spells);
 
