@@ -866,7 +866,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 'name' => '$LANG.tab_triggeredby'
             ), SpellList::$brickFile));
 
-            $this->extendGlobalData($trigger->getJSGlobals(GLOBALINFO_SELF));
+            $this->extendGlobalData($trigger->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
         }
 
         // tab: used by - creature
