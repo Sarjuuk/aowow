@@ -167,13 +167,19 @@ class ClassBaseResponse extends TemplateResponse implements ICache
             ]
         );
 
+        $skillIds  = [];
         $genSpells = new SpellList($conditions);
         if (!$genSpells->error)
         {
             $this->extendGlobalData($genSpells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
+            $data = $genSpells->getListviewData();
+            foreach ($data as $d)
+                if ($d['cat'] == -11)
+                    $skillIds = array_merge($skillIds, $d['skill']);
+
             $this->lvTabs->addListviewTab(new Listview(array(
-                'data'            => $genSpells->getListviewData(),
+                'data'            => $data,
                 'id'              => 'spells',
                 'name'            => '$LANG.tab_spells',
                 'visibleCols'     => ['level', 'schools', 'type', 'classes'],
@@ -184,10 +190,42 @@ class ClassBaseResponse extends TemplateResponse implements ICache
             ), SpellList::$brickFile));
         }
 
+        // tab: races
+        $races = new CharRaceList(array(['classMask', $cl->toMask(), '&']));
+        if (!$races->error)
+            $this->lvTabs->addListviewTab(new Listview(['data' => $races->getListviewData()], CharRaceList::$brickFile));
+
+        // tab: skills
+        if ($skillIds)
+        {
+            $skills = new SkillList(array(['id', $skillIds]));
+            if (!$skills->error)
+                $this->lvTabs->addListviewTab(new Listview(['data' => $skills->getListviewData()], SkillList::$brickFile));
+        }
+
+        // tab: trainers
+        $conditions = array(
+            ['npcflag', NPC_FLAG_TRAINER | NPC_FLAG_CLASS_TRAINER, '&'],
+            ['trainerType', 0],                             // trains class spells
+            ['trainerRequirement', $this->typeId]
+        );
+
+        $trainer = new CreatureList($conditions);
+        if (!$trainer->error)
+        {
+            $this->addDataLoader('zones');
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data' => $trainer->getListviewData(),
+                'id'   => 'trainers',
+                'name' => '$LANG.tab_trainers'
+            ), CreatureList::$brickFile));
+        }
+
         // tab: items (grouped)
         $conditions = array(
             ['requiredClass', $cl->toMask(), '&'],
-            ['itemset', 0]
+            ['itemset', 0],
+            [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0]
         );
 
         $items = new ItemList($conditions);
@@ -212,23 +250,6 @@ class ClassBaseResponse extends TemplateResponse implements ICache
             ), ItemList::$brickFile));
         }
 
-        // tab: quests
-        $conditions = array(
-            ['reqClassMask', $cl->toMask(), '&'],
-            [['reqClassMask', ChrClass::MASK_ALL, '&'], ChrClass::MASK_ALL, '!']
-        );
-
-        $quests = new QuestList($conditions);
-        if (!$quests->error)
-        {
-            $this->extendGlobalData($quests->getJSGlobals());
-
-            $this->lvTabs->addListviewTab(new Listview(array(
-                'data' => $quests->getListviewData(),
-                'sort' => ['reqlevel', 'name']
-            ), QuestList::$brickFile));
-        }
-
         // tab: itemsets
         $sets = new ItemsetList(array(['classMask', $cl->toMask(), '&']));
         if (!$sets->error)
@@ -243,28 +264,23 @@ class ClassBaseResponse extends TemplateResponse implements ICache
             ), ItemsetList::$brickFile));
         }
 
-        // tab: trainers
+        // tab: quests
         $conditions = array(
-            ['npcflag', NPC_FLAG_TRAINER | NPC_FLAG_CLASS_TRAINER, '&'],
-            ['trainerType', 0],                             // trains class spells
-            ['trainerRequirement', $this->typeId]
+            ['reqClassMask', $cl->toMask(), '&'],
+            [['reqClassMask', ChrClass::MASK_ALL, '&'], ChrClass::MASK_ALL, '!'],
+            [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0]
         );
 
-        $trainer = new CreatureList($conditions);
-        if (!$trainer->error)
+        $quests = new QuestList($conditions);
+        if (!$quests->error)
         {
-            $this->addDataLoader('zones');
-            $this->lvTabs->addListviewTab(new Listview(array(
-                'data' => $trainer->getListviewData(),
-                'id'   => 'trainers',
-                'name' => '$LANG.tab_trainers'
-            ), CreatureList::$brickFile));
-        }
+            $this->extendGlobalData($quests->getJSGlobals());
 
-        // tab: races
-        $races = new CharRaceList(array(['classMask', $cl->toMask(), '&']));
-        if (!$races->error)
-            $this->lvTabs->addListviewTab(new Listview(['data' => $races->getListviewData()], CharRaceList::$brickFile));
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data' => $quests->getListviewData(),
+                'sort' => ['reqlevel', 'name']
+            ), QuestList::$brickFile));
+        }
 
         // tab: criteria-of
         $conditions = array(
