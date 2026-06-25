@@ -18,7 +18,7 @@ class SkillsBaseResponse extends TemplateResponse implements ICache
     protected ?int    $activeTab  = parent::TAB_DATABASE;
     protected  array  $breadcrumb = [0, 14];
 
-    protected  array  $validCats  = [-6, -5, -4, 6, 7, 8, 9, 10, 11];
+    protected  array  $validCats  = [-6, -5, -4, 6, 7, 8, 9, 10, 11, 12];
 
     public function __construct(string $rawParam)
     {

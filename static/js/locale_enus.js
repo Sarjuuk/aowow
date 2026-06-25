@@ -2015,7 +2015,8 @@ var g_skill_categories = {
        8: 'Armor Proficiencies',
        9: 'Secondary Skills',
       10: 'Languages',
-      11: 'Professions'
+      11: 'Professions',
+      12: 'Not Displayed'
 };
 
 var g_zones = {

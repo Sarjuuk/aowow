@@ -1967,7 +1967,8 @@ var g_skill_categories = {
        8: 'Rüstungssachverstand',
        9: 'Nebenberufe',
       10: 'Sprachen',
-      11: 'Berufe'
+      11: 'Berufe',
+      12: 'Nicht angezeigt'
 };
 
 var g_zones = {

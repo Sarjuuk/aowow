@@ -1569,7 +1569,7 @@ $lang = array(
         'notFound'      => "Diese Fertigkeit existiert nicht.",
         'cat'           => array(
             -6 => "Haustiere",          -5 => "Reittiere",          -4 => "Völkerfertigkeiten", 5 => "Attribute",           6 => "Waffenfertigkeiten",  7 => "Klassenfertigkeiten", 8 => "Rüstungssachverstand",
-             9 => "Nebenberufe",        10 => "Sprachen",           11 => "Berufe"
+             9 => "Nebenberufe",        10 => "Sprachen",           11 => "Berufe",            12 => "Nicht angezeigt"
         )
     ),
     'currency' => array(

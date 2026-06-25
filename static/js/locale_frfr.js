@@ -1967,7 +1967,8 @@ var g_skill_categories = {
        8: 'Armures utilisables',
        9: 'Compétences secondaires',
       10: 'Langues',
-      11: 'Métiers'
+      11: 'Métiers',
+      12: 'Non affiché'
 };
 
 var g_zones = {

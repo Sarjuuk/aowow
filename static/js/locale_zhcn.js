@@ -2015,6 +2015,7 @@ var g_skill_categories = {
        9: "辅助技能",
       10: "语言",
       11: "专业",
+      12: '不显示'
 };
 
 var g_zones = {

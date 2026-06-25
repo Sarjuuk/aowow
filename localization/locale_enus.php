@@ -1569,7 +1569,7 @@ $lang = array(
         'notFound'      => "This skill doesn't exist.",
         'cat'           => array(
             -6 => "Companions",         -5 => "Mounts",             -4 => "Racial Traits",      5 => "Attributes",          6 => "Weapon Skills",       7 => "Class Skills",        8 => "Armor Proficiencies",
-             9 => "Secondary Skills",   10 => "Languages",          11 => "Professions"
+             9 => "Secondary Skills",   10 => "Languages",          11 => "Professions",       12 => "Not Displayed"
         )
     ),
     'currency' => array(

@@ -1569,7 +1569,7 @@ $lang = array(
         'notFound'      => "Esta habilidad no existe.",
         'cat'           => array(
             -6 => "Compañeros",         -5 => "Monturas",           -4 => "Habilidades de raza", 5 => "Atributos",          6 => "Habilidades con armas", 7 => "Habilidades de clase", 8 => "Armaduras disponibles",
-             9 => "Habilidades secundarias", 10 => "Idiomas",       11 => "Profesiones"
+             9 => "Habilidades secundarias", 10 => "Idiomas",       11 => "Profesiones",        12 => "No se muestra"
         )
     ),
     'currency' => array(
