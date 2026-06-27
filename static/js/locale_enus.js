@@ -3507,7 +3507,7 @@ var LANG = {
           6: ["Spell",       "spell",        "Spells",       "spells"],
           7: ["Zone",        "zone",         "Zones",        "zones"],
           8: ["Faction",     "faction",      "Factions",     "factions"],
-          9: ["Pet",         "pet",          "Pets",         "pets"],
+          9: ["Hunter Pet",  "hunter pet",   "Hunter Pets",  "hunter pets"],
          10: ["Achievement", "achievement",  "Achievements", "achievements"],
          11: ["Title",       "title",        "Titles",       "titles"],
          12: ["World Event", "world event",  "World Events", "world events"],

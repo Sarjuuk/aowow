@@ -3458,7 +3458,7 @@ var LANG = {
           6: ["Hechizo",             "hechizo",              "Hechizos",             "hechizos"],
           7: ["Zona",                "zona",                 "Zonas",                "zonas"],
           8: ["Facción",             "facción",              "Facciones",            "facciones"],
-          9: ["Mascota",             "mascota",              "Mascotas",             "mascotas"],
+          9: ["Mascota de cazador",  "mascota de cazador",   "Mascotas de cazador",  "mascotas de cazador"],
          10: ["Logro",               "logro",                "Logros",               "logros"],
          11: ["Título",              "título",               "Títulos",              "títulos"],
          12: ["Suceso mundial",      "evento del mundo",     "Eventos del mundo",    "eventos del mundo"],
