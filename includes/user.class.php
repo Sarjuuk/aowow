@@ -735,13 +735,13 @@ class User
 
         $completion = [];
 
-        $x = DB::Aowow()->selectAssoc('SELECT `id` AS ARRAY_KEY, `questId` AS ARRAY_KEY2, `questId` FROM ::profiler_completion_quests WHERE `id` IN %in', $ids);
+        $x = DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, `questId` AS ARRAY_KEY2, `questId` FROM ::profiler_completion_quests WHERE `id` IN %in', $ids);
         $completion[Type::QUEST] = $x ? array_map(array_values(...), $x) : [];
 
-        $x = DB::Aowow()->selectAssoc('SELECT `id` AS ARRAY_KEY, `achievementId` AS ARRAY_KEY2, `achievementId` FROM ::profiler_completion_achievements WHERE `id` IN %in', $ids);
+        $x = DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, `achievementId` AS ARRAY_KEY2, `achievementId` FROM ::profiler_completion_achievements WHERE `id` IN %in', $ids);
         $completion[Type::ACHIEVEMENT] = $x ? array_map(array_values(...), $x) : [];
 
-        $x = DB::Aowow()->selectAssoc('SELECT `id` AS ARRAY_KEY, `titleId` AS ARRAY_KEY2, `titleId` FROM ::profiler_completion_titles WHERE `id` IN %in', $ids);
+        $x = DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, `titleId` AS ARRAY_KEY2, `titleId` FROM ::profiler_completion_titles WHERE `id` IN %in', $ids);
         $completion[Type::TITLE] = $x ? array_map(array_values(...), $x) : [];
 
         $completion[Type::ITEM] = [];
