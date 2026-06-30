@@ -524,8 +524,8 @@ class ItemList extends DBTypeList
         $_reqLvl       = $this->curTpl['requiredLevel'];
         $_quality      = $this->curTpl['quality'];
         $_flags        = $this->curTpl['flags'];
-        $_class        = $this->curTpl['class'];
-        $_subClass     = $this->curTpl['subClass'];
+        $_class        = $this->curTpl['classBak'];         // we are trying to render an in-game tooltip look alike
+        $_subClass     = $this->curTpl['subClassBak'];      // so use original class/subclass data
         $_slot         = $this->curTpl['slot'];
         $causesScaling = false;
 
@@ -2116,8 +2116,8 @@ class ItemListFilter extends Filter
                 [
                     DB::OR,
                     ['class', [ITEM_CLASS_WEAPON, ITEM_CLASS_ARMOR], '!'],
-                    [DB::AND, ['class', ITEM_CLASS_WEAPON], ['subclassbak', $this->ubFilter[$_v['ub']][ITEM_CLASS_WEAPON]]],
-                    [DB::AND, ['class', ITEM_CLASS_ARMOR],  ['subclassbak', $this->ubFilter[$_v['ub']][ITEM_CLASS_ARMOR]]]
+                    [DB::AND, ['class', ITEM_CLASS_WEAPON], ['subClassBak', $this->ubFilter[$_v['ub']][ITEM_CLASS_WEAPON]]],
+                    [DB::AND, ['class', ITEM_CLASS_ARMOR],  ['subClassBak', $this->ubFilter[$_v['ub']][ITEM_CLASS_ARMOR]]]
                 ]
             );
         }
