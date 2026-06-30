@@ -170,6 +170,14 @@ class CreatureList extends DBTypeList
         return $this->curTpl['skinLootId'] && ($this->curTpl['typeFlags'] & NPC_TYPEFLAG_SKIN_WITH_ENGINEERING);
     }
 
+    public function getTameable() : ?int
+    {
+        if (!($this->curTpl['typeFlags'] & NPC_TYPEFLAG_TAMEABLE) || $this->curTpl['type'] != 1)
+            return null;
+
+        return $this->curTpl['family'] ?: null;
+    }
+
     public function getListviewData(int $addInfoMask = 0x0) : array
     {
         /* looks like this data differs per occasion

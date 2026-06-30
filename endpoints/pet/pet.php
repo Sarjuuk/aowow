@@ -116,7 +116,7 @@ class PetBaseResponse extends TemplateResponse implements ICache
             ['ct.typeFlags', NPC_TYPEFLAG_TAMEABLE, '&'],
             ['ct.family', $this->typeId],                   // displayed petType
             [
-                DB::OR,                                       // at least neutral to at least one faction
+                DB::OR,                                     // at least neutral to at least one faction
                 ['ft.A', 1, '<'],
                 ['ft.H', 1, '<']
             ]

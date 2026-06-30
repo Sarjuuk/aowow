@@ -177,9 +177,8 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         $infobox[] = Util::ucFirst(Lang::game('faction')).Lang::main('colon').'[faction='.$this->subject->getField('factionId').']';
 
         // Tameable
-        if ($_typeFlags & NPC_TYPEFLAG_TAMEABLE)
-            if ($_ = $this->subject->getField('family'))
-                $infobox[] = Lang::npc('tameable', ['[url=pet='.$_.']'.Lang::game('fa', $_).'[/url]']);
+        if ($fa = $this->subject->getTameable())
+            $infobox[] = Lang::npc('tameable', ['[url=pet='.$fa.']'.Lang::game('fa', $fa).'[/url]']);
 
         // Wealth
         if ($_ = intVal(($this->subject->getField('minGold') + $this->subject->getField('maxGold')) / 2))
@@ -386,14 +385,14 @@ class NpcBaseResponse extends TemplateResponse implements ICache
             $conditions[] = ['id', array_keys($spellClick)];
         }
 
-        // Pet-Abilities
-        if (($_typeFlags & NPC_TYPEFLAG_TAMEABLE) && ($_ = $this->subject->getField('family')))
+        // tab: pet abilities
+        if ($fa = $this->subject->getTameable())
         {
             $skill = 0;
             $mask  = 0x0;
             foreach (Game::$skillLineMask[-1] as $idx => [$familyId, $skillLineId])
             {
-                if ($familyId != $_)
+                if ($familyId != $fa)
                     continue;
 
                 $skill = $skillLineId;
@@ -800,6 +799,24 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                 'name' => '$LANG.tab_criteriaof',
                 'id'   => 'criteria-of'
             ), AchievementList::$brickFile));
+        }
+
+        // tab: same model as
+        if ($this->subject->getTameable() && ($model = $this->subject->getField('modelId')))
+        {
+            $sameModel = new CreatureList(array(['modelId', $model], ['id', $this->typeId, '!']));
+            if (!$sameModel->error)
+            {
+                $this->extendGlobalData($sameModel->getJSGlobals());
+
+                $this->addDataLoader('zones');
+                $this->lvTabs->addListviewTab(new Listview(array(
+                    'data'        => $sameModel->getListviewData(NPCINFO_TAMEABLE),
+                    'name'        => '$LANG.tab_samemodelas',
+                    'id'          => 'same-model-as',
+                    'visibleCols' => ['skin']
+                ), CreatureList::$brickFile));
+            }
         }
 
         // tab: passengers
