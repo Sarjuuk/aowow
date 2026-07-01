@@ -27,6 +27,7 @@ class ItemsetBaseResponse extends TemplateResponse implements ICache
     public  array   $pieces      = [];
     public  array   $spells      = [];
     public ?Summary $summary     = null;
+    public ?string  $expansion   = null;
 
     private ItemsetList $subject;
 
@@ -97,6 +98,10 @@ class ItemsetBaseResponse extends TemplateResponse implements ICache
         if ($min = $this->subject->getField('minLevel'))
             $infobox[] = Lang::game('level').Lang::main('colon').Util::createNumRange($min, $this->subject->getField('maxLevel'), ' - ');
 
+        // side if any
+        if ($_ = $this->subject->getField('side'))
+            $infobox[] = Lang::main('side').'[span class=icon-'.($_ == SIDE_ALLIANCE ? 'alliance' : 'horde').']'.Lang::game('si', $_).'[/span]';
+
         // class
         $jsg = [];
         if ($cl = Lang::getClassString($this->subject->getField('classMask'), $jsg, Lang::FMT_MARKUP))
@@ -107,8 +112,8 @@ class ItemsetBaseResponse extends TemplateResponse implements ICache
         }
 
         // required level
-        if ($lvl = $this->subject->getField('reqLevel'))
-            $infobox[] = Lang::game('reqLevel', [$lvl]);
+        if ($min = $this->subject->getField('minReqLevel'))
+            $infobox[] = Lang::game('reqLevel', [Util::createNumRange($min, $this->subject->getField('maxReqLevel'), ' - ')]);
 
         // type
         if ($_ty)
@@ -173,7 +178,7 @@ class ItemsetBaseResponse extends TemplateResponse implements ICache
                 'id'       => 'itemset',
                 'parent'   => 'summary-generic',
                 'groups'   => array_map(fn ($x) => [[$x]], $compare),
-                'level'    => $this->subject->getField('reqLevel')
+                'level'    => $this->subject->getField('maxReqLevel')
             ));
 
         // required skill
@@ -186,7 +191,7 @@ class ItemsetBaseResponse extends TemplateResponse implements ICache
         $this->description = $_ta ? Lang::itemset('_desc', [$this->h1, Lang::itemset('notes', $_ta), $_cnt]) : Lang::itemset('_descTagless', [$this->h1, $_cnt]);
         $this->unavailable = !!($this->subject->getField('cuFlags') & CUSTOM_UNAVAILABLE);
         $this->spells      = $this->subject->getBonuses();
-    //  $this->expansion   = $this->subject->getField('expansion'); NYI - todo: add col to table
+        $this->expansion   = Util::$expansionString[$this->subject->getField('expansion')];
         $this->redButtons  = array(
             BUTTON_WOWHEAD => $this->typeId > 0,            // bool only
             BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId],

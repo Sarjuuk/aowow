@@ -25,7 +25,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
     protected $worldDependency    = ['item_template', 'game_event'];
     protected $setupAfter         = [['spell'], []];
 
-    private $setToHoliday = array (
+    private array $setToHoliday = array (
         761 => 141,                                         // Winterveil
         762 => 372,                                         // Brewfest
         785 => 341,                                         // Midsummer
@@ -34,7 +34,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
     // tags where refId == virtualId
     // in pve sets are not recycled beyond the contentGroup
-    private $tagsById = array(
+    private array $tagsById = array(
         // "Dungeon Set 1"
         1  => [181, 182, 183, 184, 185, 186, 187, 188, 189],
         // "Dungeon Set 2"
@@ -82,7 +82,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
     );
 
     // in pvp we hope nobody fucked with the item level
-    private $tagsByItemlevel = array(
+    private array $tagsByItemlevel = array(
         123 => 17,                                          // "Arena Season 1 Set"
         136 => 19,                                          // "Arena Season 2 Set"
         146 => 20,                                          // "Arena Season 3 Set"
@@ -175,14 +175,20 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         $iLvl = array_column($items, 'ItemLevel');
         $data['minLevel'] = min($iLvl);
         $data['maxLevel'] = max($iLvl);
-        $data['npieces']  = count($items);
 
-        $data['reqLevel'] = max(array_column($items, 'RequiredLevel'));
-        $data['quality']  = max(array_column($items, 'Quality'));
-        $data['heroic']   = max(array_column($items, 'heroic'));
+        $reqLvl = array_column($items, 'RequiredLevel');
+        $data['minReqLevel'] = min($reqLvl);
+        $data['maxReqLevel'] = max($reqLvl);
 
+        $data['npieces']      = count($items);
+        $data['quality']      = max(array_column($items, 'Quality'));
+        $data['heroic']       = max(array_column($items, 'heroic'));
         $data['type']         = $this->getSetType($items);
         $data['contentGroup'] = reset($items)['note'];
+
+        // unsure where to get data from. probably collect manually..
+        $data['expansion'] = 0;
+        $data['side']      = SIDE_NONE;
     }
 
     public function generate() : bool
@@ -320,4 +326,5 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         return true;
     }
 });
+
 ?>

@@ -146,7 +146,7 @@ class ItemsetList extends DBTypeList
         foreach ($spells as &$s)
         {
             if ($setSpells->getEntry($s[1]))
-                $s[2] = $setSpells->parseText('description', $this->getField('reqLevel') ?: MAX_LEVEL)[0];
+                $s[2] = $setSpells->parseText('description', $this->getField('maxReqLevel') ?: MAX_LEVEL)[0];
             else
                 $s[2] = Lang::spell('unkAura', [$s[1]]);
         }
@@ -220,11 +220,11 @@ class ItemsetListFilter extends Filter
 
         // reqLevel min [int]
         if ($_v['minrl'])
-            $parts[] = ['reqLevel', $_v['minrl'], '>='];
+            $parts[] = ['minReqLevel', $_v['minrl'], '>='];
 
         // reqLevel max [int]
         if ($_v['maxrl'])
-            $parts[] = ['reqLevel', $_v['maxrl'], '<='];
+            $parts[] = ['maxReqLevel', $_v['maxrl'], '<='];
 
         // class [enum]
         if ($_v['cl'])
