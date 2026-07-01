@@ -72,7 +72,7 @@ class Lang
 
         // *cough* .. reuse-hacks (because copy-pastaing text for 5 locales sucks)
         self::$item['cat'][2][1] = self::$spell['weaponSubClass'];
-        self::$item['cat'][2][1][14] .= ' ('.self::$item['cat'][2][0].')';
+        self::$item['cat'][2][1][14] = self::main('parensFmt', [self::$item['cat'][2][1][14], self::$item['cat'][2][0]]);
         self::$main['moreTitles']['privilege'] = self::$privileges['_privileges'];
 
         self::$locale = $loc;
@@ -130,15 +130,17 @@ class Lang
         reset($args);
 
         if (count($args) < 2)
-            return $callback(current($args), key($args));
+            return $args ? $callback(current($args), key($args)) : '';
 
         do
         {
             $item = $callback(current($args), key($args));
             $arg  = next($args);
 
-            if ($arg !== false || $concat == self::CONCAT_NONE)
-                $buff .= ', '.$item;
+            if (!$buff)
+                $buff .= $item;
+            else if ($arg !== false || $concat == self::CONCAT_NONE)
+                $buff .= self::main('comma').$item;
             else if ($concat == self::CONCAT_AND)
                 $buff .= self::main('and').$item;
             else
@@ -146,7 +148,7 @@ class Lang
         }
         while ($arg !== false);
 
-        return substr($buff, 2);
+        return $buff;
     }
 
     // truncate string after X chars. If X is inside a word truncate behind it.
@@ -309,7 +311,7 @@ class Lang
                             $name = SkillList::getName($prop);
 
                         if ($rank > 0)
-                            $name .= ' ('.$rank.')';
+                            $name = self::main('parensFmt', [$name, $rank]);
                     }
                     // Lockpicking
                     else if ($prop == 4)
@@ -326,7 +328,7 @@ class Lang
                     else if (User::isInGroup(U_GROUP_STAFF))
                     {
                         if ($rank > 0)
-                            $name .= ' ('.$rank.')';
+                            $name = self::main('parensFmt', [$name, $rank]);
                     }
                     else
                         continue 2;
@@ -399,7 +401,7 @@ class Lang
         else if (!$tmp && $class == ITEM_CLASS_WEAPON)
             return self::spell('cat', -11, 6);
         else
-            return implode(', ', $tmp);
+            return implode(self::main('comma'), $tmp);
     }
 
     public static function getStances(int $stanceMask) : string
@@ -419,7 +421,7 @@ class Lang
             $i++;
         }
 
-        return implode(', ', $tmp);
+        return implode(self::main('comma'), $tmp);
     }
 
     public static function getMagicSchools(int $schoolMask, bool $short = false) : string
@@ -432,7 +434,7 @@ class Lang
             return self::main('all');
 
         if ($short && $schoolMask == SPELL_MAGIC_SCHOOLS)
-            return self::main('all').' ('.self::game('dt', 1).')';
+            return self::main('parensFmt', [self::main('all'), self::game('dt', 1)]);;
 
         while ($schoolMask)
         {
@@ -444,7 +446,7 @@ class Lang
             $i++;
         }
 
-        return implode(', ', $tmp);
+        return implode(self::main('comma'), $tmp);
     }
 
     public static function getClassString(int $classMask, array &$ids = [], int $fmt = self::FMT_HTML) : string
@@ -468,7 +470,7 @@ class Lang
 
         $ids = array_keys($tmp);
 
-        return implode(', ', $tmp);
+        return implode(self::main('comma'), $tmp);
     }
 
     public static function getRaceString(int $raceMask, array &$ids = [], int $fmt = self::FMT_HTML) : string
@@ -498,7 +500,7 @@ class Lang
 
         $ids = array_keys($tmp);
 
-        return implode(', ', $tmp);
+        return implode(self::main('comma'), $tmp);
     }
 
     public static function formatSkillBreakpoints(array $bp, int $fmt = self::FMT_MARKUP) : string
@@ -567,7 +569,7 @@ class Lang
                 $total *= $mult[$i];
         }
 
-        return implode(', ', $result);
+        return implode(self::main('comma'), $result);
     }
 
     private static function vspf(null|array|string $var, array $args = []) : null|array|string

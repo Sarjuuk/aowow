@@ -132,7 +132,9 @@ $lang = array(
         'ignoredTerms'  => "以下词语在搜索中已被忽略：%s",
 
         // formating
-        'colon'         => '：',
+        'colon'         => "：",
+        'comma'         => "、",
+        'parensFmt'     => "%s（%s）",
         'dateFmtShort'  => "Y/m/d",
         'dateFmtLong'   => "Y/m/d \a\\t g:i A",
         'dateFmtIntl'   => "y年M月d日",
@@ -384,7 +386,7 @@ $lang = array(
         'reqSkillLevel' => "需要技能等级：",
         'school'        => "类型",
         'type'          => "类型：",
-        'valueDelim'    => "到",
+        'valueDelim'    => "—",
         'target'        => "<目标>",
 
         'pvp'           => "PvP",
@@ -1217,6 +1219,12 @@ $lang = array(
         'mechanicimmune'=> '[Not affected by mechanic]：%s',
         '_extraFlags'   => '[Extra Flags]：',
         'versions'      => '[Difficulty Versions]：',
+        'level'         => array(
+            "等级 %s",
+            "等级 %s %s",
+            "等级 %s %s（%s）",
+            "等级 %s（%s）"
+        ),
         'cat'           => array(
             "未分类", '野兽', '龙类', '恶魔', '元素生物', '巨人', '亡灵',
             '人型生物', '小动物', '机械', '未指定', '图腾', '非战斗宠物', '气体云雾'
@@ -1709,6 +1717,7 @@ $lang = array(
         'apMod'         => "（攻强 mod：%.3g）",
         'spMod'         => "（法力 mod：%.3g）",
         'instantPhys'   => "瞬发",
+        'pointsSpread'  => "%d到%d",
         'castTime' => array(
             "瞬发法术",
             "%.3g秒施法时间",

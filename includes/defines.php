@@ -614,6 +614,21 @@ define('FACTION_FLAG_RIVAL',            0x40);
 define('FACTION_FLAG_SPECIAL',          0x80);
 
 // Creature
+define('NPC_TYPE_NONE',          0);
+define('NPC_TYPE_BEAST',         1);
+define('NPC_TYPE_DRAGONKIN',     2);
+define('NPC_TYPE_DEMON',         3);
+define('NPC_TYPE_ELEMENTAL',     4);
+define('NPC_TYPE_GIANT',         5);
+define('NPC_TYPE_UNDEAD',        6);
+define('NPC_TYPE_HUMANOID',      7);
+define('NPC_TYPE_CRITTER',       8);
+define('NPC_TYPE_MECHANICAL',    9);
+define('NPC_TYPE_NOT_SPECIFIED', 10);
+define('NPC_TYPE_TOTEM',         11);
+define('NPC_TYPE_NONCOMBAT_PET', 12);
+define('NPC_TYPE_GAS_CLOUD',     13);
+
 define('NPC_TYPEFLAG_TAMEABLE',                          0x00000001);
 define('NPC_TYPEFLAG_VISIBLE_TO_GHOSTS',                 0x00000002);
 define('NPC_TYPEFLAG_BOSS_MOB',                          0x00000004);

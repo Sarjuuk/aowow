@@ -392,7 +392,7 @@ abstract class Util
         }
     }
 
-    public static function createNumRange(int $min, int $max, string $delim = '', ?callable $fn = null) : string
+    public static function createNumRange(int $min, int $max, ?string $delim = null, ?callable $fn = null) : string
     {
         if (!$min && !$max)
             return '';
@@ -401,7 +401,7 @@ abstract class Util
         $_min = $fn($min);
         $_max = $fn($max);
 
-        return $max > $min ? $_min . ($delim ?: Lang::game('valueDelim')) . $_max : $_min;
+        return $max > $min ? $_min . ($delim ?? Lang::game('valueDelim')) . $_max : $_min;
     }
 
     public static function validateLogin(?string $val) : string

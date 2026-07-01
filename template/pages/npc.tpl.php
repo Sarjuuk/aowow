@@ -93,7 +93,7 @@ if ($this->reputation):
 
         foreach ($data as [$id, $qty, $name, $cap]):
             echo '<li><div'.($qty[0] < 0 ? ' class="reputation-negative-amount"' : '').'><span>'.($qty[1] ?: $qty[0]).'</span> '.Lang::npc('repWith') .
-                ' <a href="?faction='.$id.'">'.$name.'</a>'.($cap && $qty[0] > 0 ? '&nbsp;('.Lang::npc('stopsAt', [$cap]).')' : '').'</div></li>';
+                ' <a href="?faction='.$id.'">'.$name.'</a>'.($cap && $qty[0] > 0 ? Lang::main('parensFmt', ['', Lang::npc('stopsAt', [$cap])]) : '').'</div></li>';
         endforeach;
 
         echo '</ul>';

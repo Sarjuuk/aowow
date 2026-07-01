@@ -1456,7 +1456,7 @@ class SpellList extends DBTypeList
         // handle excessively precise floats
         if (is_float($minPoints))
             $minPoints = round($minPoints, 2);
-        if (isset($maxPoints) && is_float($maxPoints))
+        if (is_float($maxPoints))
             $maxPoints = round($maxPoints, 2);
 
         return [$minPoints, $maxPoints, $fmtStringMin, $fmtStringMax, $statId];
@@ -1651,13 +1651,9 @@ class SpellList extends DBTypeList
             }
 
             if (isset($maxPoints) && $minPoints != $maxPoints && !isset($statId))
-            {
-                $_ = is_numeric($maxPoints) ? abs($maxPoints) : $maxPoints;
-                $resolved .= Lang::game('valueDelim');
-                $resolved .= isset($fmtStringMax) ? sprintf($fmtStringMax, $_) : $_;
-            }
-
-            $str .= $resolved;
+                $str .= Lang::spell('pointsSpread', [$resolved, sprintf($fmtStringMax ?? '%s', abs($maxPoints))]);
+            else
+                $str .= $resolved;
         }
         $str .= substr($data, $pos);
         $str = str_replace('#', '$', $str);                 // reset marker
@@ -1866,9 +1862,9 @@ class SpellList extends DBTypeList
         foreach ($reagents as $k => $r)
         {
             if ($item = $this->relItems->getEntry($r[0]))
-                $reagents[$k] += [2 => new LocString($item), 3 => true];
+                $reagents[$k][2] = '<a href="?item='.$r[0].'">'.new LocString($item).'</a>';
             else
-                $reagents[$k] += [2 => 'Item #'.$r[0], 3 => false];
+                $reagents[$k][2] = 'Item #'.$r[0];
         }
 
         $reagents = array_reverse($reagents);
@@ -1957,10 +1953,7 @@ class SpellList extends DBTypeList
                 else
                     $_ .= $tool['name'];
 
-                if (!empty($tools))
-                    $_ .= ', ';
-                else
-                    $_ .= '<br />';
+                $_ .= empty($tools) ? '<br />' : Lang::main('comma');
             }
 
             $xTmp[] = $_.'</div>';
@@ -1968,15 +1961,9 @@ class SpellList extends DBTypeList
 
         if ($reagents)
         {
-            $_ = Lang::spell('reagents').':<br/><div class="indent q1">';
-            while ([$iId, $qty, $text, $exists] = array_pop($reagents))
-            {
-                $_ .= $exists ? '<a href="?item='.$iId.'">'.$text.'</a>' : $text;
-                if ($qty > 1)
-                    $_ .= ' ('.$qty.')';
-
-                $_ .= empty($reagents) ? '<br />' : ', ';
-            }
+            $_  = Lang::spell('reagents').':<br/><div class="indent q1">';
+            $_ .= Lang::concat($reagents, Lang::CONCAT_NONE, fn($x) => $x[1] > 1 ? Lang::main('parensFmt', [$x[2], $x[1]]) : $x[2]); // [itemId, qty, text]
+            $_ .= '<br />';
 
             $xTmp[] = $_.'</div>';
         }

@@ -132,7 +132,9 @@ $lang = array(
         'ignoredTerms'  => "Las siguientes palabras fueron ignoradas en tu búsqueda: %s",
 
         // formating
-        'colon'         => ': ',
+        'colon'         => ": ",
+        'comma'         => ", ",
+        'parensFmt'     => "%s (%s)",
         'dateFmtShort'  => "d/m/Y",
         'dateFmtLong'   => "d/m/Y \a \l\a\s g:i A",
         'dateFmtIntl'   => "d 'de' MMMM 'de' y",
@@ -1217,6 +1219,12 @@ $lang = array(
         'mechanicimmune'=> 'No afectado por la mecánica: %s',
         '_extraFlags'   => 'Banderas extra: ',
         'versions'      => 'Versiones de dificultad: ',
+        'level'         => array(
+            "Nivel %s",
+            "Nivel %s %s",
+            "Nivel %s %s (%s)",
+            "Nivel %s (%s)"
+        ),
         'cat'           => array(
             "Sin categoría",            "Bestia",                   "Dragonante",               "Demonio",                  "Elemental",                "Gigante",                  "No-muerto",                "Humanoide",
             "Alimaña",                  "Mecánico",                 "Sin especificar",          "Tótem",                    "Mascota mansa",            "Nube de gas"
@@ -1709,6 +1717,7 @@ $lang = array(
         'apMod'         => " (Mod AP: %.3g)",
         'spMod'         => " (Mod SP: %.3g)",
         'instantPhys'   => "Instantáneo",
+        'pointsSpread'  => "%d-%d",
         'castTime' => array(
             "Hechizo instantáneo",
             "%.3g s para lanzar",

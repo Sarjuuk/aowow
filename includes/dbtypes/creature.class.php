@@ -56,26 +56,29 @@ class CreatureList extends DBTypeList
             return null;
 
         $level = '??';
-        $type  = $this->curTpl['type'];
-        $row3  = [Lang::game('level')];
-        $fam   = $this->curTpl['family'];
-
         if (!($this->curTpl['typeFlags'] & NPC_TYPEFLAG_BOSS_MOB))
-        {
-            $level = $this->curTpl['minLevel'];
-            if ($level != $this->curTpl['maxLevel'])
-                $level .= ' - '.$this->curTpl['maxLevel'];
-        }
+            $level = Util::createNumRange($this->curTpl['minLevel'], $this->curTpl['maxLevel']);
+
+        // the client omits type for friendly targets and type 'Not Specified'
+        $type = $this->curTpl['type'];
+        if (($this->curTpl['A'] == 1 && $this->curTpl['H'] == 1) || $type == NPC_TYPE_NOT_SPECIFIED)
+            $type = NPC_TYPE_NONE;
+
+        // 'rank' is also only ever displayed as 'Elite' or 'Boss'
+        $rank = $this->curTpl['rank'];
+        if ($rank == NPC_RANK_RARE_ELITE)
+            $rank = NPC_RANK_ELITE;
+        else if ($rank == NPC_RANK_RARE)
+            $rank = NPC_RANK_NORMAL;
+
+        if ($rank && !$type)
+            $row3 = Lang::npc('level', 3, [$level, Lang::npc('rank', $rank)]); // TOOLTIP_UNIT_LEVEL_TYPE
+        else if ($rank && $type)
+            $row3 = Lang::npc('level', 2, [$level, Lang::game('ct', $type), Lang::npc('rank', $rank)]); // TOOLTIP_UNIT_LEVEL_CLASS_TYPE
+        else if (!$rank && $type)
+            $row3 = Lang::npc('level', 1, [$level, Lang::game('ct', $type)]); // TOOLTIP_UNIT_LEVEL_CLASS
         else
-            $level = '??';
-
-        $row3[] = $level;
-
-        if ($type)
-            $row3[] = Lang::game('ct', $type);
-
-        if ($_ = Lang::npc('rank', $this->curTpl['rank']))
-            $row3[] = '('.$_.')';
+            $row3 = Lang::npc('level', 0, [$level]); // TOOLTIP_UNIT_LEVEL
 
         $x  = '<table>';
         $x .= '<tr><td><b class="q">'.Util::htmlEscape($this->getField('name', true)).'</b></td></tr>';
@@ -83,12 +86,12 @@ class CreatureList extends DBTypeList
         if ($sn = $this->getField('subname', true))
             $x .= '<tr><td>'.Util::htmlEscape($sn).'</td></tr>';
 
-        $x .= '<tr><td>'.implode(' ', $row3).'</td></tr>';
+        $x .= '<tr><td>'.$row3.'</td></tr>';
 
-        if ($type == 1 && $fam)                             // 1: Beast
+        if ($this->curTpl['type'] == NPC_TYPE_BEAST && ($fam = $this->curTpl['family']))
             $x .= '<tr><td>'.Lang::game('fa', $fam).'</td></tr>';
 
-        $fac = new FactionList(array([['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0], ['id', (int)$this->getField('factionId')]));
+        $fac = new FactionList(array([['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0], ['id', $this->getField('factionId')]));
         if (!$fac->error)
             $x .= '<tr><td>'.$fac->getField('name', true).'</td></tr>';
 

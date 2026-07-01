@@ -80,7 +80,7 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
 
             $foo = Lang::game('requires', ['&nbsp;[skill='.$_.']']);
             if ($_ = $this->subject->getField('skillLevel'))
-                $foo .= ' ('.$_.')';
+                $foo .= Lang::main('parensFmt', ['', $_]);
 
             $infobox[] = $foo;
         }

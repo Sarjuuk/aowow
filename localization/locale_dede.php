@@ -132,7 +132,9 @@ $lang = array(
         'ignoredTerms'  => "Die folgenden Wörter wurden in Eurer Suche ignoriert: %s",
 
         // formating
-        'colon'         => ': ',
+        'colon'         => ": ",
+        'comma'         => ", ",
+        'parensFmt'     => "%s (%s)",
         'dateFmtShort'  => "d.m.Y",
         'dateFmtLong'   => "d.m.Y \u\m H:i",
         'dateFmtIntl'   => "d. MMMM y",
@@ -1217,6 +1219,12 @@ $lang = array(
         'mechanicimmune'=> 'Nicht anfällig für Mechanik: %s',
         '_extraFlags'   => 'Extra Flags: ',
         'versions'      => 'Schwierigkeitsgrade: ',
+        'level'         => array(
+            'Stufe %s',
+            'Stufe %s - %s',
+            'Stufe %s - %s (%s)',
+            'Stufe %1$s (%2$s)'
+        ),
         'cat'           => array(
             "Nicht kategorisiert",      "Wildtiere",                "Drachkin",                 "Dämonen",                  "Elementare",               "Riesen",                   "Untote",                   "Humanoide",
             "Tiere",                    "Mechanisch",               "Nicht spezifiziert",       "Totems",                   "Haustiere",                "Gaswolken"
@@ -1708,6 +1716,7 @@ $lang = array(
         'linkedWith'    => "Verknüpft mit",
         'apMod'         => " (AP mod: %.3g)",
         'spMod'         => " (ZM mod: %.3g)",
+        'pointsSpread'  => '1$d bis %2$d',
         'instantPhys'   => "Sofort",
         'castTime' => array(
             "Spontanzauber",

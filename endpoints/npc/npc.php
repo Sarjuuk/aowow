@@ -282,7 +282,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         }
 
         if ($stats = $this->getCreatureStats($mapType, $_altIds))
-            $infobox[] = Lang::npc('stats').($_altIds ? ' ('.Lang::game('modes', $mapType, 0).')' : '').Lang::main('colon').'[ul][li]'.implode('[/li][li]', $stats).'[/li][/ul]';
+            $infobox[] = ($_altIds ? Lang::main('parensFmt', [Lang::npc('stats'), Lang::game('modes', $mapType, 0)]) : Lang::npc('stats')).Lang::main('colon').'[ul][li]'.implode('[/li][li]', $stats).'[/li][/ul]';
 
         if ($infobox)
         {
@@ -1062,7 +1062,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         // Melee Damage
         $melee = $this->subject->getBaseStats('melee');
         if ($_ = $this->subject->getField('dmgSchool'))     // magic damage
-            $stats['melee'] = Lang::npc('melee').Lang::nf($melee[0]).' - '.Lang::nf($melee[1]).' ('.Lang::game('sc', $_).')';
+            $stats['melee'] = Lang::npc('melee').Lang::nf($melee[0]).' - '.Lang::nf($melee[1]).Lang::main('parensFmt', ['', Lang::game('sc', $_)]);
         else                                                // phys. damage
             $stats['melee'] = Lang::npc('melee').Lang::nf($melee[0]).' - '.Lang::nf($melee[1]);
 
@@ -1117,7 +1117,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
             // Melee Damage
             $melee = $this->altNPCs->getBaseStats('melee');
             if ($_ = $this->altNPCs->getField('dmgSchool')) // magic damage
-                $modes['melee'][] = sprintf($modeRow, $m, Lang::nf($melee[0]).' - '.Lang::nf($melee[1]).' ('.Lang::game('sc', $_).')');
+                $modes['melee'][] = sprintf($modeRow, $m, Lang::nf($melee[0]).' - '.Lang::nf($melee[1]).Lang::main('parensFmt', ['', Lang::game('sc', $_)]));
             else                                            // phys. damage
                 $modes['melee'][] = sprintf($modeRow, $m, Lang::nf($melee[0]).' - '.Lang::nf($melee[1]));
 

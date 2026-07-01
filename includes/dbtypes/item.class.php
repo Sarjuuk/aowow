@@ -854,11 +854,12 @@ class ItemList extends DBTypeList
         // max duration
         if ($dur = $this->curTpl['duration'])
         {
-            $rt = '';
             if ($this->curTpl['flagsCustom'] & 0x1)
-                $rt = $interactive ? ' ('.sprintf(Util::$dfnString, 'LANG.tooltip_realduration', Lang::item('realTime')).')' : ' ('.Lang::item('realTime').')';
+                $rt = Lang::main('parensFmt', [Lang::formatTime(abs($dur) * 1000, 'item', 'duration'), $interactive ? sprintf(Util::$dfnString, 'LANG.tooltip_realduration', Lang::item('realTime')) : Lang::item('realTime')]);
+            else
+                $rt = Lang::formatTime(abs($dur) * 1000, 'item', 'duration');
 
-            $x .= Lang::formatTime(abs($dur) * 1000, 'item', 'duration').$rt."<br />";
+            $x .= $rt.'<br />';
         }
 
         // glyph type
@@ -911,9 +912,9 @@ class ItemList extends DBTypeList
         {
             $_ = '<a class="q1" href="?skill='.$reqSkill.'">'.SkillList::getName($reqSkill).'</a>';
             if ($this->curTpl['requiredSkillRank'] > 0)
-                $_ .= ' ('.$this->curTpl['requiredSkillRank'].')';
+                $_ = Lang::main('parensFmt', [$_, $this->curTpl['requiredSkillRank']]);
 
-            $x .= sprintf(Lang::game('requires'), $_).'<br />';
+            $x .= Lang::game('requires', [$_]).'<br />';
         }
 
         // required spell
@@ -1046,10 +1047,10 @@ class ItemList extends DBTypeList
 
                 if ($skId = $itemset->getField('skillId'))  // bonus requires skill to activate
                 {
-                    $xSet .= '<br />'.sprintf(Lang::game('requires'), '<a href="?skills='.$skId.'" class="q1">'.SkillList::getName($skId).'</a>');
+                    $xSet .= '<br />'.Lang::game('requires', ['<a href="?skills='.$skId.'" class="q1">'.SkillList::getName($skId).'</a>']);
 
                     if ($_ = $itemset->getField('skillLevel'))
-                        $xSet .= ' ('.$_.')';
+                        $xSet = Lang::main('parensFmt', [$xSet, $_]);
 
                     $xSet .= '<br />';
                 }
@@ -1134,9 +1135,9 @@ class ItemList extends DBTypeList
                         $reqReag  = [];
 
                         foreach ($reagents->iterate() as $__)
-                            $reqReag[] = '<a href="?item='.$reagents->id.'">'.$reagents->getField('name', true).'</a> ('.$reagentItems[$reagents->id].')';
+                            $reqReag[] = Lang::main('parensFmt', ['<a href="?item='.$reagents->id.'">'.$reagents->getField('name', true).'</a>', $reagentItems[$reagents->id]]);
 
-                        $xCraft .= '<div class="q1 whtt-reagents"><br />'.Lang::game('requires2').' '.implode(', ', $reqReag).'</div>';
+                        $xCraft .= '<div class="q1 whtt-reagents"><br />'.Lang::game('requires2').' '.implode(Lang::main('comma'), $reqReag).'</div>';
                     }
                 }
             }

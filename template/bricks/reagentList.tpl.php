@@ -203,7 +203,7 @@ foreach ($reagents as $k => ['path' => $path, 'level' => $level, 'final' => $fin
         echo '<div class="iconlist-tree disclosure-off" onclick="iconlist_showhide(this);" style="padding-left: 0; cursor: pointer; width: 15px; float: left" id="spn.reagent-list-generic.'.$path.'">&nbsp;</div>';
     endif;
 
-    echo '<span class="'.$icon->quality.'">'.($icon->href ? '<a href="?'.$typeStr.'='.$icon->typeId.'">'.$icon->text.'</a>' : $icon->text).'</span>'.($icon->num > 1 ? '&nbsp;('.$icon->num.')' : '').'</td></tr>'.PHP_EOL;
+    echo '<span class="'.$icon->quality.'">'.($icon->href ? '<a href="?'.$typeStr.'='.$icon->typeId.'">'.$icon->text.'</a>' : $icon->text).'</span>'.($icon->num > 1 ? Lang::main('parensFmt', ['', $icon->num]) : '').'</td></tr>'.PHP_EOL;
 endforeach;
 ?>
 

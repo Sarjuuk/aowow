@@ -133,6 +133,8 @@ $lang = array(
 
         // formating
         'colon'         => ": ",
+        'comma'         => ", ",
+        'parensFmt'     => "%s (%s)",
         'dateFmtShort'  => "Y-m-d",
         'dateFmtLong'   => "Y-m-d в g:i A",
         'dateFmtIntl'   => "d MMMM y г.",
@@ -1217,6 +1219,12 @@ $lang = array(
         'mechanicimmune'=> '[Not affected by mechanic]: %s',
         '_extraFlags'   => '[Extra Flags]: ',
         'versions'      => '[Difficulty Versions]: ',
+        'level'         => array(
+            'Уровень %s',
+            '%2$s %1$s-го уровня',
+            '%2$s %1$s-го уровня (%3$s)',
+            'Уровень %s (%s)'
+        ),
         'cat'           => array(
             "Разное",                   "Животные",                 "Дракон",                   "Демоны",                   "Элементали",               "Великаны",                 "Нежить",                   "Гуманоиды",
             "Существа",                 "Механизмы",                "Не указано",               "Тотемы",                   "Спутники",                 "Облака газа"
@@ -1709,6 +1717,7 @@ $lang = array(
         'apMod'         => " (Мод.-р АП:%.3g)",
         'spMod'         => " (Мод.-р СП:%.3g)",
         'instantPhys'   => "Мгновенное действие",
+        'pointsSpread'  => "%d - %d",
         'castTime' => array(
             "Мгновенное действие",
             "Применение: %.3g сек.",

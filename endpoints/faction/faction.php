@@ -173,10 +173,10 @@ class FactionBaseResponse extends TemplateResponse implements ICache
                 $head = match ($k)
                 {
                     'quest_rate'            => Lang::game('quests'),
-                    'quest_daily_rate'      => Lang::game('quests').' ('.Lang::quest('daily').')',
-                    'quest_weekly_rate'     => Lang::game('quests').' ('.Lang::quest('weekly').')',
-                    'quest_monthly_rate'    => Lang::game('quests').' ('.Lang::quest('monthly').')',
-                    'quest_repeatable_rate' => Lang::game('quests').' ('.Lang::quest('repeatable').')',
+                    'quest_daily_rate'      => Lang::main('parensFmt', [Lang::game('quests'), Lang::quest('daily')]),
+                    'quest_weekly_rate'     => Lang::main('parensFmt', [Lang::game('quests'), Lang::quest('weekly')]),
+                    'quest_monthly_rate'    => Lang::main('parensFmt', [Lang::game('quests'), Lang::quest('monthly')]),
+                    'quest_repeatable_rate' => Lang::main('parensFmt', [Lang::game('quests'), Lang::quest('repeatable')]),
                     'creature_rate'         => Lang::game('npcs'),
                     'spell_rate'            => Lang::game('spells')
                 };

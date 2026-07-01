@@ -1654,7 +1654,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             $_nameEffect = $_nameAura = $_nameMV = $_nameMVB = $_markup = '';
             $_icon = $_perfItem = $_footer = [];
 
-            $_footer['value'] = [0, 0];
+            $_footer['value'] = [0, 0, null];
             $valueFmt = '%s';
 
             // Icons:
@@ -1743,7 +1743,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
             // cases where we dont want 'Value' to be displayed [min, max, staffTT]
             if (!in_array($i, $itemIdx) && !in_array($effAura, [SPELL_AURA_MOD_TAUNT, SPELL_AURA_MOD_STUN, SPELL_AURA_MOD_SHAPESHIFT, SPELL_AURA_MECHANIC_IMMUNITY]) && !in_array($effId, [SPELL_EFFECT_PLAY_MUSIC]) && ($effBP + $effDS) != 0)
-                $_footer['value'] = [$effBP + ($effDS ? 1 : 0), $effBP + $effDS];
+                $_footer['value'] = [$effBP + ($effDS ? 1 : 0), $effBP + $effDS, null];
 
             if ($this->subject->getField('effect'.$i.'RadiusMax') > 0)
                 $_footer['radius'] = Lang::spell('_radius').$this->subject->getField('effect'.$i.'RadiusMax').' '.Lang::spell('_distUnit');
@@ -1902,7 +1902,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
                     // apply custom reward rated
                     if ($cuRate = DB::World()->selectCell('SELECT `spell_rate` FROM reputation_reward_rate WHERE `spell_rate` <> 1 AND `faction` = %i', $effMV))
-                        $_footer['value'][2] = sprintf(Util::$dfnString, Lang::faction('customRewRate'), ' ('.(($cuRate < 1 ? '-' : '+').intVal(($cuRate - 1) * $_footer['value'][0])).')');
+                        $_footer['value'][2] = sprintf(Util::$dfnString, Lang::faction('customRewRate'), Lang::main('parensFmt', ['', sprintf('%+d', ($cuRate - 1) * $_footer['value'][0])]));
                     break;
                 case SPELL_EFFECT_SEND_TAXI:
                     $_ = DB::Aowow()->selectRow(
@@ -2250,15 +2250,20 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
             if ($_footer['value'][1])
             {
-                $buffer = Lang::spell('_value').Lang::main('colon').sprintf($valueFmt, $_footer['value'][0]);
-                if ($_footer['value'][0] != $_footer['value'][1])
-                    $buffer .= Lang::game('valueDelim').sprintf($valueFmt, $_footer['value'][1]);
+                [$min, $max, $staffTT] = $_footer['value'];
+
+                $buffer = Lang::spell('_value').Lang::main('colon');
+                if ($min && $max && $min != $max)
+                    $buffer .= Lang::spell('pointsSpread', [sprintf($valueFmt, $min), sprintf($valueFmt, $max)]);
+                else
+                    $buffer .= sprintf($valueFmt, $min ?: $max);
+
                 if ($effRPPL != 0)
                     $buffer .= Lang::spell('costPerLevel', [sprintf($valueFmt, $effRPPL)]);
                 if ($effPPCP != 0)
                     $buffer .= Lang::spell('pointsPerCP', [sprintf($valueFmt, $effPPCP)]);
-                if (isset($_footer['value'][2]))
-                    $buffer .= $_footer['value'][2];
+                if ($staffTT)
+                    $buffer .= $staffTT;
 
                 if (in_array($effId, SpellList::EFFECTS_SCALING_DAMAGE))
                 {
@@ -2285,15 +2290,11 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             if ($_nameAura)
                 $_header .= Lang::main('colon').$_nameAura;
 
-            if (strlen($_nameMV))
-                $_header .= ' ('.$_nameMV.')';
-            else if ($effMV)
-                $_header .= ' ('.$effMV.')';
+            if ($_nameMV || $effMV)
+                $_header = Lang::main('parensFmt', [$_header, $_nameMV ?: $effMV]);
 
-            if (strlen($_nameMVB))
-                $_header .= ' ['.$_nameMVB.']';
-            else if ($effMVB)
-                $_header .= ' ['.$effMVB.']';
+            if ($_nameMVB || $effMVB)
+                $_header .=  ' ['.($_nameMVB ?: $effMVB).']';
 
             $effects[$i] = array(
                 'icon'        => $_icon,
@@ -2464,7 +2465,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
                 $bar = Lang::game('requires', ['&nbsp;[skill='.$_[0].']']);
                 if ($_ = $this->subject->getField('learnedAt'))
-                    $bar .= ' ('.$_.')';
+                    $bar = Lang::main('parensFmt', [$bar, $_]);
 
                 $infobox[] = $bar;
             }

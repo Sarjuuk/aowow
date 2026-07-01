@@ -96,7 +96,7 @@ class ItemsetBaseResponse extends TemplateResponse implements ICache
 
         // itemLevel
         if ($min = $this->subject->getField('minLevel'))
-            $infobox[] = Lang::game('level').Lang::main('colon').Util::createNumRange($min, $this->subject->getField('maxLevel'), ' - ');
+            $infobox[] = Lang::game('level').Lang::main('colon').Util::createNumRange($min, $this->subject->getField('maxLevel'));
 
         // side if any
         if ($_ = $this->subject->getField('side'))
@@ -113,7 +113,7 @@ class ItemsetBaseResponse extends TemplateResponse implements ICache
 
         // required level
         if ($min = $this->subject->getField('minReqLevel'))
-            $infobox[] = Lang::game('reqLevel', [Util::createNumRange($min, $this->subject->getField('maxReqLevel'), ' - ')]);
+            $infobox[] = Lang::game('reqLevel', [Util::createNumRange($min, $this->subject->getField('maxReqLevel'))]);
 
         // type
         if ($_ty)

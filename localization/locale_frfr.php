@@ -132,7 +132,9 @@ $lang = array(
         'ignoredTerms'  => "Les mots suivants ont été ignorés dans votre recherches : %s",
 
         // formating
-        'colon'         => ' : ',
+        'colon'         => " : ",
+        'comma'         => ", ",
+        'parensFmt'     => "%s (%s)",
         'dateFmtShort'  => "Y-m-d",
         'dateFmtLong'   => "Y-m-d à g:i A",
         'dateFmtIntl'   => "d MMMM y",
@@ -1217,6 +1219,12 @@ $lang = array(
         'mechanicimmune'=> '[Not affected by mechanic] : %s',
         '_extraFlags'   => '[Extra Flags] : ',
         'versions'      => '[Difficulty Versions] : ',
+        'level'         => array(
+            'Niveau %s',
+            '%2$s niveau %1$s',
+            '%2$s niveau %1$s (%3$s)',
+            'Niveau %s (%s)'
+        ),
         'cat'           => array(
             "Non classés",              "Bêtes",                    "Draconien",                "Démons",                   "Élémentaires",             "Géants",                   "Mort-vivant",              "Humanoïdes",
             "Bestioles",                "Mécaniques",               "Non spécifié",             "Totems",                   "Familier pacifique",       "Nuages de gaz"
@@ -1709,6 +1717,7 @@ $lang = array(
         'apMod'         => " (Mod. AP : %.2f)",
         'spMod'         => " (Mod. SP : %.2f)",
         'instantPhys'   => "Instantané",
+        'pointsSpread'  => "%d à %d",
         'castTime' => array(
             "Incantation immédiate",
             "%.3g sec. d'incantation",

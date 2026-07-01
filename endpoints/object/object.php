@@ -132,15 +132,15 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         switch ($this->subject->getField('typeCat'))
         {
             case -3:                                        // Herbalism
-                $infobox[] = Lang::game('requires', [Lang::spell('lockType', 2).' ('.$this->subject->getField('reqSkill').')']);
+                $infobox[] = Lang::game('requires', [Lang::main('parensFmt', [Lang::spell('lockType', 2), $this->subject->getField('reqSkill')])]);
                 $infobox[] = Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill(SKILL_HERBALISM, $this->subject->getField('reqSkill')));
                 break;
             case -4:                                        // Mining
-                $infobox[] = Lang::game('requires', [Lang::spell('lockType', 3).' ('.$this->subject->getField('reqSkill').')']);
+                $infobox[] = Lang::game('requires', [Lang::main('parensFmt', [Lang::spell('lockType', 3), $this->subject->getField('reqSkill')])]);
                 $infobox[] = Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill(SKILL_MINING, $this->subject->getField('reqSkill')));
                 break;
             case -5:                                        // Lockpicking
-                $infobox[] = Lang::game('requires', [Lang::spell('lockType', 1).' ('.$this->subject->getField('reqSkill').')']);
+                $infobox[] = Lang::game('requires', [Lang::main('parensFmt', [Lang::spell('lockType', 1), $this->subject->getField('reqSkill')])]);
                 $infobox[] = Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill(SKILL_LOCKPICKING, $this->subject->getField('reqSkill')));
                 break;
             default:                                        // requires key .. maybe

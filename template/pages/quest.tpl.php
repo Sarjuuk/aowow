@@ -56,7 +56,7 @@ if ($this->end || $this->objectiveList):
             echo '                    <tr><th><p style="height: 26px; width: 30px;">&nbsp;</p></th><td>'.$objective.'</td></tr>'.PHP_EOL;
         elseif (is_array($objective)):                      // proxy npc data
             ['id' => $id, 'text' => $text, 'qty' => $qty, 'proxy' => $proxies] = $objective;
-            echo '                    <tr><th><p style="height: 26px">&nbsp;</p></th><td><a href="javascript:;" onclick="g_disclose($WH.ge(\'npcgroup-'.$id.'\'), this)" class="disclosure-off">'.$text.'</a>'.($qty ? '&nbsp;('.$qty.')' : '').'<div id="npcgroup-'.$id.'" style="display: none">'.PHP_EOL;
+            echo '                    <tr><th><p style="height: 26px">&nbsp;</p></th><td><a href="javascript:;" onclick="g_disclose($WH.ge(\'npcgroup-'.$id.'\'), this)" class="disclosure-off">'.$text.'</a>'.($qty ? Lang::main('parensFmt', ['', $qty]) : '').'<div id="npcgroup-'.$id.'" style="display: none">'.PHP_EOL;
             foreach ($proxies as $block):
                 echo '                        <div style="float: left"><table class="iconlist">'.PHP_EOL;
                 foreach ($block as $pId => $pName):

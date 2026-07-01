@@ -189,9 +189,9 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         if ($_ = $this->subject->getField('reqSkillId'))
         {
             $this->extendGlobalIds(Type::SKILL, $_);
-            $sk =  '[skill='.$_.']';
+            $sk = '[skill='.$_.']';
             if ($_ = $this->subject->getField('reqSkillPoints'))
-                $sk .= ' ('.$_.')';
+                $sk = Lang::main('parensFmt', [$sk, $_]);
 
             $infobox[] = Lang::quest('profession').$sk;
         }

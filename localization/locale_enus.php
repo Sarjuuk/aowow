@@ -132,7 +132,9 @@ $lang = array(
         'ignoredTerms'  => "The following words were ignored in your search: %s",
 
         // formating
-        'colon'         => ': ',
+        'colon'         => ": ",
+        'comma'         => ", ",
+        'parensFmt'     => "%s (%s)",
         'dateFmtShort'  => "Y/m/d",
         'dateFmtLong'   => "Y/m/d \a\\t g:i A",
         'dateFmtIntl'   => "MMMM d, y",
@@ -384,7 +386,7 @@ $lang = array(
         'reqSkillLevel' => "Required skill level: ",
         'school'        => "School",
         'type'          => "Type: ",
-        'valueDelim'    => " to ",
+        'valueDelim'    => " - ",
         'target'        => "<target>",
 
         'pvp'           => "PvP",                           // PVP
@@ -1217,6 +1219,12 @@ $lang = array(
         'mechanicimmune'=> 'Not affected by mechanic: %s',
         '_extraFlags'   => 'Extra Flags: ',
         'versions'      => 'Difficulty Versions: ',
+        'level'         => array(                           // type is creature rank; class is creature type
+            "Level %s",                                     // TOOLTIP_UNIT_LEVEL
+            "Level %s %s",                                  // TOOLTIP_UNIT_LEVEL_CLASS
+            "Level %s %s (%s)",                             // TOOLTIP_UNIT_LEVEL_CLASS_TYPE
+            "Level %s (%s)"                                 // TOOLTIP_UNIT_LEVEL_TYPE
+        ),
         'cat'           => array(
             "Uncategorized",            "Beasts",                   "Dragonkins",               "Demons",                   "Elementals",               "Giants",                   "Undead",                   "Humanoids",
             "Critters",                 "Mechanicals",              "Not specified",            "Totems",                   "Non-combat Pets",          "Gas Clouds"
@@ -1708,6 +1716,7 @@ $lang = array(
         'linkedWith'    => "Linked with",
         'apMod'         => " (AP mod: %.3g)",
         'spMod'         => " (SP mod: %.3g)",
+        'pointsSpread'  => "%d to %d",                      // INT_SPELL_POINTS_SPREAD_TEMPLATE
         'instantPhys'   => "Instant",                       // SPELL_CAST_TIME_INSTANT_NO_MANA
         'castTime' => array(
             "Instant cast",                                 // SPELL_CAST_TIME_INSTANT
