@@ -28,7 +28,7 @@ Also, this project is not meant to be used for commercial purposes of any kind!
   + [GNU Multiple Precision](https://www.php.net/manual/en/book.gmp.php) (When using TrinityCore as auth source)
 + MySQL ≥ 5.7.0 OR MariaDB ≥ 10.6.4 OR similar
 + [Composer](https://getcomposer.org/download/)
-+ [TDB 335.25101](https://github.com/TrinityCore/TrinityCore/releases/tag/TDB335.25101) including updates up to [TrinityCore/TrinityCore@f3b691d](https://github.com/TrinityCore/TrinityCore/commit/f3b691dcb085014ec3f0e2c60ab94fc9c00e8aa8) (no other other providers are supported at this time)
++ [TDB 335.25101](https://github.com/TrinityCore/TrinityCore/releases/tag/TDB335.25101) including updates up to [TrinityCore/TrinityCore@8300a6d](https://github.com/TrinityCore/TrinityCore/commit/8300a6d8463aa862ae154392558c1f11dc2fce5d) (no other other providers are supported at this time)
 + WIN: php.exe needs to be added to the `PATH` system variable, if it isn't already. 
 + Tools require cmake: Please refer to the individual repositories for detailed information
   + [MPQExtractor](https://github.com/Sarjuuk/MPQExtractor) / [FFmpeg](https://ffmpeg.org/download.html) / (optional: [BLPConverter](https://github.com/Sarjuuk/BLPConverter))
