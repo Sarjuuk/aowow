@@ -609,15 +609,10 @@ abstract class Filter
             return null;
 
         // if the fulltext token contains invalid chars, should it be sub-tokenized (current behavior) or should the chars just be stripped
-        if ($tok = explode(' ', preg_replace(self::PATTERN_FT, ' ', $str)))
-        {
-            $ft = array_filter($tok, $lenTest);
+        $tok   = explode(' ', preg_replace(self::PATTERN_FT, ' ', $str));
+        $tok[] = implode('', $tok);
 
-            if (count($tok) > 1)
-                $ft[] = implode('', $tok);
-        }
-
-        $ft ??= [];
+        $ft = array_filter(array_unique($tok), $lenTest);
 
         return [$str, $ft, $neg];
     }
