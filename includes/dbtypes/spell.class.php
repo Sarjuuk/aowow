@@ -2875,7 +2875,7 @@ class SpellListFilter extends Filter
     // prompted for sec, stored as msec
     protected function cbSecToMsec(int $cr, int $crs, string $crv, string $field) : ?array
     {
-        if (!Util::checkNumeric($crv, NUM_CAST_INT) || !$this->int2Op($crs))
+        if (!Util::checkNumeric($crv, NUM_CAST_FLOAT) || !$this->int2Op($crs))
             return null;
 
         return [$field, $crv * 1000, $crs];
