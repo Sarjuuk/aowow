@@ -226,7 +226,9 @@ abstract class Filter
             if ($v === '' || $v === null || $v === [])
                 continue;
 
-            $get[$k] = $k.'='.(is_array($v) ? implode(':', $v) : $v);
+            $v = array_map(urlencode(...), (array)$v);
+
+            $get[$k] = $k.'='.implode(':', $v);
         }
 
         // no criteria were set, so no merge occured .. append
