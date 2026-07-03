@@ -160,7 +160,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
         }
 
         if ($series)
-            $this->series = [[array_values($series), null]];
+            $this->series = [[array_values($series), null, false]];
 
 
         /****************/
