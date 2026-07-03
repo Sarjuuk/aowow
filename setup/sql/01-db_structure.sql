@@ -962,8 +962,8 @@ DROP TABLE IF EXISTS `aowow_guides`;
 CREATE TABLE `aowow_guides` (
   `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
   `category` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `classId` tinyint(3) unsigned DEFAULT NULL,
-  `specId` tinyint(4) DEFAULT NULL,
+  `classId` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `specId` tinyint(3) NOT NULL DEFAULT -1,
   `title` varchar(100) NOT NULL DEFAULT '' COMMENT 'title for menus + lists',
   `name` varchar(100) NOT NULL DEFAULT '' COMMENT 'title for the page tiself',
   `description` varchar(200) NOT NULL DEFAULT '',

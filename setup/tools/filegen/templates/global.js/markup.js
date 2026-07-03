@@ -439,7 +439,7 @@ var Markup = {
             extraColors: {
                 deathknight: 'c6', dk: 'c6', druid: 'c11', hunter: 'c3', mage: 'c8', paladin: 'c2', priest: 'c5', rogue: 'c4', shaman: 'c7', warlock: 'c9', warrior: 'c1', poor: 'q0', common: 'q1', uncommon: 'q2', rare: 'q3', epic: 'q4', legendary: 'q5', artifact: 'q6', heirloom: 'q7',
                 'meta-gem': 'gem1', 'red-gem': 'gem2', 'yellow-gem': 'gem4', 'orange-gem': 'gem6', 'blue-gem': 'gem8', 'purple-gem': 'gem10', 'green-gem': 'gem12', 'prismatic-gem': 'gem14',
-                yell: 's1', say: 's2', whsiper: 's3', emote: 's4',
+                yell: 's1', say: 's2', whisper: 's3', emote: 's4',
                 hated: 'rep0', hostile: 'rep1', unfriendly: 'rep2', neutral: 'rep3', friendly: 'rep4', honored: 'rep5', revered: 'rep6', exalted: 'rep7'
             },
             toHtml: function(attr)

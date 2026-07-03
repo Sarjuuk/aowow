@@ -287,7 +287,7 @@ endif;
                 </div>
                 <div class="guide-submission-changelog">
                     <h2 class="heading-size-4"><?=Lang::guide('editor', 'changelog');?></h2>
-                    <textarea name="changelog" id="changelog" onclick="leavePage()" onkeydown="updatePreview(false, this)" onkeyup="updatePreview(false, this)" onchange="updatePreview(false, this)" rows="6" cols="40" style="min-height:52px; width:95%" placeholder="<?=Lang::guide('editor', 'changelogTip');?>" required></textarea>
+                    <textarea name="changelog" id="changelog" onclick="leavePage()" onkeydown="updatePreview(false, this)" onkeyup="updatePreview(false, this)" onchange="updatePreview(false, this)" rows="6" cols="40" style="min-height:52px; width:95%" placeholder="<?=Lang::guide('editor', 'changelogTip');?>"<?=($this->user::isInGroup(U_GROUP_EDITOR | U_GROUP_MODERATOR)) ? '' : ' required';?>></textarea>
                     <script>g_enhanceTextarea('#changelog');</script>
                     <button type="submit" name="save" class="guide-submission-changelog-save"><?=Lang::guide('editor', 'save');?></button>
                     <button type="submit" name="submit" class="guide-submission-changelog-submit"><?=Lang::guide('editor', 'submit');?></button>
