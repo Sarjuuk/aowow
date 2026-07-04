@@ -218,7 +218,7 @@ abstract class Filter
         $values = array_merge($this->values, $overrideVals);
 
         foreach ($rmvCr as $cr)
-            if (($i = array_find_key($values['cr'], $cr)) !== null)
+            if (($i = array_search($cr, $values['cr'])) !== false)
                 unset($values['cr'][$i], $values['crs'][$i], $values['crv'][$i]);
 
         foreach ($addCr as [$cr, $crs, $crv])
