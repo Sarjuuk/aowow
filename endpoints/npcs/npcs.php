@@ -96,7 +96,10 @@ class NpcsBaseResponse extends TemplateResponse implements ICache
 
         $this->redButtons[BUTTON_WOWHEAD] = true;
         if ($fiQuery = $this->filter->buildGETParam())
+        {
             $this->wowheadLink .= '&filter='.$fiQuery;
+            $this->fiMenuExtension = $fiQuery;
+        }
 
         // beast subtypes are selected via filter
         $tabData = ['data' => []];

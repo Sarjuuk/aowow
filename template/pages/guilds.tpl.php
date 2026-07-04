@@ -16,7 +16,7 @@
 <?php
     $this->brick('announcement');
 
-    $this->brick('pageTemplate', ['fiQuery' => $this->filter->query, 'fiMenuItem' => array_slice($this->pageTemplate['breadcrumb'], 0, 3)]);
+    $this->brick('pageTemplate', ['fiQuery' => $this->fiMenuExtension, 'fiMenuItem' => array_slice($this->pageTemplate['breadcrumb'], 0, 3)]);
 
     # pr_setRegionRealm($WH.ge('fi').firstChild, realm, region) - never have \n\s before <form>, it will become firstChild (a text node)
 ?>

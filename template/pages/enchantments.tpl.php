@@ -16,7 +16,7 @@
 <?php
     $this->brick('announcement');
 
-    $this->brick('pageTemplate', ['fiQuery' => $this->filter->query, 'fiMenuItem' => [101]]);
+    $this->brick('pageTemplate', ['fiQuery' => $this->fiMenuExtension, 'fiMenuItem' => [101]]);
 ?>
 
             <div id="fi" style="display: <?=($this->filter->query ? 'block' : 'none'); ?>;">

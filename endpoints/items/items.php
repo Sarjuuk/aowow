@@ -430,7 +430,7 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
                         break;
                     case ItemListFilter::GROUP_BY_SOURCE:
                         if ($_ = [null, 3, 4, 5, 6, 7, 9, 10, 11][$group])
-                            $tabData['note'] = '$$WH.sprintf(LANG.lvnote_viewmoresource, \''.$catg.'\', \''.$this->filter->buildGETParam($override, ['cr' => 128, 'crs' => $_, 'crv' => 0]).'\')';
+                            $tabData['note'] = '$$WH.sprintf(LANG.lvnote_viewmoresource, \''.$catg.'\', \''.$this->filter->buildGETParam($override, [[128, $_, 0]]).'\')';
 
                         break;
                 }
@@ -466,7 +466,10 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
 
         $this->redButtons[BUTTON_WOWHEAD] = true;
         if ($fiQuery = $this->filter->buildGETParam())
+        {
             $this->wowheadLink .= '&filter='.$fiQuery;
+            $this->fiMenuExtension = $fiQuery;
+        }
 
         parent::generate();
 

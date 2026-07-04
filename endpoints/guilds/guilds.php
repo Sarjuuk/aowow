@@ -92,6 +92,9 @@ class GuildsBaseResponse extends TemplateResponse implements IProfilerList
         /* Main Content */
         /****************/
 
+        if ($fiQuery = $this->filter->buildGETParam())
+            $this->fiMenuExtension = $fiQuery;
+
         $conditions = array(
             Listview::DEFAULT_SIZE,
             ['c.deleteInfos_Account', null],

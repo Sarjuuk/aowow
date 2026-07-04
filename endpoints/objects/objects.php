@@ -84,7 +84,10 @@ class ObjectsBaseResponse extends TemplateResponse implements ICache
 
         $this->redButtons[BUTTON_WOWHEAD] = true;
         if ($fiQuery = $this->filter->buildGETParam())
+        {
             $this->wowheadLink .= '&filter='.$fiQuery;
+            $this->fiMenuExtension = $fiQuery;
+        }
 
         $tabData = ['data' => []];
         $objects = new GameObjectList($conditions, ['extraOpts' => $this->filter->extraOpts, 'calcTotal' => true]);

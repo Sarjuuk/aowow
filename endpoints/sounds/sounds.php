@@ -86,6 +86,7 @@ class SoundsBaseResponse extends TemplateResponse implements ICache
         );
         if ($fiQuery = $this->filter->buildGETParam())
             $this->wowheadLink .= '&filter='.$fiQuery;
+         // note: do not propagate filter to menu. Its just for categories
 
         $tabData = [];
         $sounds  = new SoundList($conditions, ['calcTotal' => true]);

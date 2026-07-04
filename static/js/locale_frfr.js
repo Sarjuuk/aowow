@@ -4437,7 +4437,8 @@ var LANG = {
 
     fiareatrigger: {
         sepgeneral: "Général",
-        id:         "ID"
+        id:         "ID",
+        foundin:    "Se trouve dans..."
     },
     // end aowow custom
 

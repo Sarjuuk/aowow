@@ -79,7 +79,10 @@ class ItemsetsBaseResponse extends TemplateResponse implements ICache
 
         $this->redButtons[BUTTON_WOWHEAD] = true;
         if ($fiQuery = $this->filter->buildGETParam())
+        {
             $this->wowheadLink .= '&filter='.$fiQuery;
+            $this->fiMenuExtension = $fiQuery;
+        }
 
         $itemsets = new ItemsetList($conditions, ['calcTotal' => true]);
         $this->extendGlobalData($itemsets->getJSGlobals());

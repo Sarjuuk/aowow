@@ -598,8 +598,9 @@ var fi_filters = {
     ],
 
     areatrigger: [
-        { id: 1, name: 'sepgeneral'             },
-        { id: 2, name: 'id',        type: 'num' }
+        { id: 1, name: 'sepgeneral'              },
+        { id: 2, name: 'id',        type: 'num'  },
+        { id: 3, name: 'foundin',   type: 'zone' }
     ]
 
     // end aowow custom

@@ -120,7 +120,10 @@ class QuestsBaseResponse extends TemplateResponse implements ICache
 
         $this->redButtons[BUTTON_WOWHEAD] = true;
         if ($fiQuery = $this->filter->buildGETParam())
+        {
             $this->wowheadLink .= '&filter='.$fiQuery;
+            $this->fiMenuExtension = $fiQuery;
+        }
 
         $quests = new QuestList($conditions, ['extraOpts' => $this->filter->extraOpts, 'calcTotal' => true]);
 

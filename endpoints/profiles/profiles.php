@@ -96,6 +96,9 @@ class ProfilesBaseResponse extends TemplateResponse implements IProfilerList
         /* Main Content */
         /****************/
 
+        if ($fiQuery = $this->filter->buildGETParam())
+            $this->fiMenuExtension = $fiQuery;
+
         $conditions = [Listview::DEFAULT_SIZE];
         if ($_ = $this->filter->getConditions())
             $conditions[] = $_;

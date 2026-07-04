@@ -90,6 +90,7 @@ class IconsBaseResponse extends TemplateResponse implements ICache
         $this->redButtons[BUTTON_WOWHEAD] = true;
         if ($fiQuery = $this->filter->buildGETParam())
             $this->wowheadLink .= '&filter='.$fiQuery;
+         // note: do not propagate filter to menu. Its just for categories
 
         $icons = new IconList($conditions, ['calcTotal' => true]);
 

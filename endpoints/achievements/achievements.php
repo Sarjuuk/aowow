@@ -114,7 +114,10 @@ class AchievementsBaseResponse extends TemplateResponse implements ICache
         $this->wowheadLink = sprintf(WOWHEAD_LINK, Lang::getLocale()->domain(), $this->pageName, $link);
 
         if ($fiQuery = $this->filter->buildGETParam())
-            $this->wowheadLink .= '&filter='.$fiQuery;
+        {
+            $this->wowheadLink    .= '&filter='.$fiQuery;
+            $this->fiMenuExtension = $fiQuery;
+        }
 
         $acvList = new AchievementList($conditions, ['calcTotal' => true]);
         if (!$acvList->getMatches() && $this->category)

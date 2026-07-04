@@ -212,32 +212,25 @@ abstract class Filter
     /* get prepared values */
     /***********************/
 
-    public function buildGETParam(array $override = [], array $addCr = []) : string
+    public function buildGETParam(array $overrideVals = [], array $addCr = [], array $rmvCr = []) : string
     {
         $get = [];
-        foreach (array_merge($this->values, $override) as $k => $v)
+        $values = array_merge($this->values, $overrideVals);
+
+        foreach ($rmvCr as $cr)
+            if (($i = array_find_key($values['cr'], $cr)) !== null)
+                unset($values['cr'][$i], $values['crs'][$i], $values['crv'][$i]);
+
+        foreach ($addCr as [$cr, $crs, $crv])
         {
-            if (isset($addCr[$k]))
-            {
-                $v = $v ? array_merge((array)$v, (array)$addCr[$k]) : $addCr[$k];
-                unset($addCr[$k]);
-            }
-
-            if ($v === '' || $v === null || $v === [])
-                continue;
-
-            $v = array_map(urlencode(...), (array)$v);
-
-            $get[$k] = $k.'='.implode(':', $v);
+            $values['cr'][]  = $cr;
+            $values['crs'][] = $crs;
+            $values['crv'][] = $crv;
         }
 
-        // no criteria were set, so no merge occured .. append
-        if ($addCr)
-        {
-            $get['cr']  = 'cr='.$addCr['cr'];
-            $get['crs'] = 'crs='.$addCr['crs'];
-            $get['crv'] = 'crv='.$addCr['crv'];
-        }
+        foreach ($values as $k => $v)
+            if ($v || $v === 0 || $v === 0.0)               // IMPORTANT! 0s ARE VALID! (and yes, 0 !== 0.0)
+                $get[$k] = $k.'='.implode(':', array_map(urlencode(...), (array)$v));
 
         return implode(';', $get);
     }

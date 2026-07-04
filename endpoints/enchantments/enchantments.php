@@ -83,6 +83,9 @@ class EnchantmentsBaseResponse extends TemplateResponse implements ICache
 
         $this->redButtons[BUTTON_WOWHEAD] = false;
 
+        if ($fiQuery = $this->filter->buildGETParam(['ty' => null]))
+            $this->fiMenuExtension = $fiQuery;
+
         $tabData = array(
             'data' => [],
             'name' => Util::ucFirst(Lang::game('enchantments'))

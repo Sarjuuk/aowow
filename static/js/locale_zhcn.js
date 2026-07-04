@@ -4478,7 +4478,8 @@ var LANG = {
 
     fiareatrigger: {
         sepgeneral: "一般",
-        id:         "ID"
+        id:         "ID",
+        foundin:    "发现于…"
     },
     // end aowow custom
 

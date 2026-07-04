@@ -31,8 +31,9 @@ trait TrDetailPage
 
 trait TrListPage
 {
-    public  string $subCat = '';
-    public ?Filter $filter = null;
+    public  string $subCat          = '';
+    public ?Filter $filter          = null;
+    public ?string $fiMenuExtension = null;
 
     public function getCacheKeyComponents() : array
     {
