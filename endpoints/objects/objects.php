@@ -23,7 +23,7 @@ class ObjectsBaseResponse extends TemplateResponse implements ICache
     protected  array  $expectedGET = array(
         'filter' => ['filter' => FILTER_VALIDATE_REGEXP, 'options' => ['regexp' => Filter::PATTERN_PARAM]]
     );
-    protected  array  $validCats   = [-2, -3, -4, -5, -6, 0, 3, 6, 9, 25];
+    protected  array  $validCats   = [-2, -3, -4, -5, -6, -9, 0, 3, 6, 9, 19, 25];
 
     public bool $petFamPanel = false;
 

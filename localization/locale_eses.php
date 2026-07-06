@@ -1154,8 +1154,14 @@ $lang = array(
         'id'            => "ID de Entidad: ",
         'notFound'      => "Esta entidad no existe.",
         'unnamed'       => "[Unnamed object] #%d",
-        'cat'           => [0 => "Otros", 3 => "Contenedores", 6 => "Trampas", 9 => "Libros", 25 => "Bancos de peces", -5 => "Cofres", -3 => "Hierbas", -4 => "Venas de minerales", -2 => "Misiones", -6 => "Herramientas"],
-        'type'          => [              3 => "Contenedore",  6 => "",        9 => "Libro",  25 => "",                -5 => "Cofre",  -3 => "Hierba",  -4 => "Filóne de mineral",  -2 => "Misión",   -6 => ""],
+        'cat'           => array(
+             0 => "Otros", 3 => "Contenedores", 6 => "Trampas", 9 => "Libros", 19 => "Buzones de correo", 25 => "Bancos de peces",
+            -5 => "Cofres", -3 => "Hierbas", -4 => "Venas de minerales", -2 => "Misiones", -6 => "Herramientas", -9 => "Objetos interactivos"
+        ),
+        'type'          => array(                           // used for tooltip
+             3 => "Contenedore",  6 => "", 9 => "Libro", 19 => "", 25 => "",
+            -5 => "Cofre", -3 => "Hierba", -4 => "Filóne de mineral", -2 => "Misión", -6 => "", -9 => ""
+        ),
         'unkPosition'   => "No se conoce la ubicación de esta entidad.",
         'npcLootPH'     => 'El <b>%s</b> contiene el botín de la pelea contra <a href="?npc=%d">%s</a>. Aparece al morir.',
         'key'           => "Llave",

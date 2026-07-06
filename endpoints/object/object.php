@@ -527,7 +527,6 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                     'sort'            => ['-percent', 'name'],
                     'extraCols'       => array_unique($extraCols),
                     'hiddenCols'      => $hiddenCols ?: null,
-                    'sort'            => ['-percent', 'name'],
                     '_totalCount'     => 10000,
                     'computeDataFunc' => '$Listview.funcBox.initLootTable',
                     'onAfterCreate'   => '$Listview.funcBox.addModeIndicator',

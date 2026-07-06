@@ -317,17 +317,21 @@ var mn_npcs = [
     [12,"Familier pacifique"],
     [13,"Nuage de gaz"]
 ];
+
 var mn_objects = [
-    [9,"Livres"],
-    [3,"Conteneurs"],
-    [-5,"Coffres"],
-    [25,"Bancs de poissons"],
-    [-3,"Herbes"],
-    [-4,"Filons de minerai"],
-    [-2,"Quête"],
-    [-6,"Outils"],
-    [6,"Pièges"]
+    [25, "Bancs de poissons"],
+    [19, "Boîtes aux lettres"],
+    [-5, "Coffres"],
+    [ 3, "Conteneurs"],
+    [-4, "Filons de minerai"],
+    [-3, "Herbes"],
+    [ 9, "Livres"],
+    [-9, "Objets interactifs"],
+    [-6, "Outils"],
+    [ 6, "Pièges"],
+    [-2, "Quêtes"]
 ];
+
 var mn_quests = [
     [,"Continents"],
     [0, "Royaumes de l'est", , [
@@ -1464,12 +1468,14 @@ var g_object_types = {
        9: 'Livre',
        3: 'Conteneur',
        6: 'Piège',
-    "-5": 'Coffre',
+      19: 'Boîte aux lettres',
       25: 'Banc de poissons',
-    "-3": 'Herbe',
-    "-4": 'Filon de minerai',
-    "-2": 'Quête',
-    "-6": 'Outil'
+    '-2': 'Quête',
+    '-3': 'Herbe',
+    '-4': 'Filon de minerai',
+    '-5': 'Coffre',
+    '-6': 'Outil',
+    '-9': 'Interactif'
 };
 
 var g_reputation_standings = {

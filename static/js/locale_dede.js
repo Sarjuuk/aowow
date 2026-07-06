@@ -317,17 +317,21 @@ var mn_npcs = [
     [12,"Haustier"],
     [13,"Gaswolke"]
 ];
+
 var mn_objects = [
-    [9,"Bücher"],
-    [3,"Behälter"],
-    [-5,"Truhen"],
-    [25,"Fischschwärme"],
-    [-3,"Kräuter"],
-    [-4,"Erzadern"],
-    [-2,"Quest"],
-    [-6,"Werkzeuge"],
-    [6,"Fallen"]
+    [ 3, "Behälter"],
+    [19, "Briefkästen"],
+    [ 9, "Bücher"],
+    [-4, "Erzadern"],
+    [ 6, "Fallen"]
+    [25, "Fischschwärme"],
+    [-9, "Interaktive Objekte"],
+    [-3, "Kräuter"],
+    [-2, "Quests"],
+    [-5, "Truhen"],
+    [-6, "Werkzeuge"],
 ];
+
 var mn_quests = [
     [,"Kontinent"],
     [0, "Östliche Königreiche", , [
@@ -1461,15 +1465,17 @@ var g_pet_foods = {
 
 var g_object_types = {
        0: 'Anderes',
-       9: 'Buch',
        3: 'Behälter',
        6: 'Falle',
-    "-5": 'Truhe',
+       9: 'Buch',
+      19: 'Briefkasten',
       25: 'Fischschwarm',
-    "-3": 'Kraut',
-    "-4": 'Erzvorkommen',
-    "-2": 'Quest',
-    "-6": 'Werkzeug'
+    '-2': 'Quest',
+    '-3': 'Kraut',
+    '-4': 'Erzvorkommen',
+    '-5': 'Truhe',
+    '-6': 'Werkzeug',
+    '-9': 'Interaktiv'
 };
 
 var g_reputation_standings = {

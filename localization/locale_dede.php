@@ -1154,8 +1154,14 @@ $lang = array(
         'id'            => "Objekt-ID: ",
         'notFound'      => "Dieses Objekt existiert nicht.",
         'unnamed'       => "Unbenanntes Objekt #%d",
-        'cat'           => [0 => "Anderes", 3 => "Behälter", 6 => "Fallen", 9 => "Bücher", 25 => "Fischschwärme", -5 => "Truhen", -3 => "Kräuter", -4 => "Erzadern",     -2 => "Quest", -6 => "Werkzeuge"],
-        'type'          => [                3 => "Behälter", 6 => "",       9 => "Buch",   25 => "",              -5 => "Truhe",  -3 => "Kraut",   -4 => "Erzvorkommen", -2 => "Quest", -6 => ""],
+        'cat'           => array(
+             0 => "Anderes", 3 => "Behälter", 6 => "Fallen", 9 => "Bücher", 19 => "Briefkästen", 25 => "Fischschwärme",
+            -5 => "Truhen", -3 => "Kräuter", -4 => "Erzadern", -2 => "Quests", -6 => "Werkzeuge", -9 => "Interaktive Objekte"
+        ),
+        'type'          => array(                           // used for tooltip
+             3 => "Behälter", 6 => "", 9 => "Buch",  19 => "", 25 => "",
+            -5 => "Truhe", -3 => "Kraut", -4 => "Erzvorkommen", -2 => "Quest", -6 => "", -9 => ""
+        ),
         'unkPosition'   => "Der Standort dieses Objekts ist nicht bekannt.",
         'npcLootPH'     => 'Der Behälter <b>%s</b> beinhaltet die Beute vom Kampf gegen <a href="?npc=%d">%s</a>. Er erscheint nach seinem Tod.',
         'key'           => "Schlüssel",

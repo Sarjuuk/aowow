@@ -317,17 +317,21 @@ var mn_npcs = [
     [12,"Non-combat Pet"],
     [13,"Gas Cloud"]
 ];
+
 var mn_objects = [
-    [9,"Books"],
-    [3,"Containers"],
-    [-5,"Chests"],
-    [25,"Fishing Pools"],
-    [-3,"Herbs"],
-    [-4,"Mineral Veins"],
-    [-2,"Quest"],
-    [-6,"Tools"],
-    [6,"Traps"]
+    [ 9, "Books"],
+    [-5, "Chests"],
+    [ 3, "Containers"],
+    [25, "Fishing Pools"],
+    [-3, "Herbs"],
+    [-9, "Interactive Objects"],
+    [19, "Mailboxes"],
+    [-4, "Mineral Veins"],
+    [-2, "Quests"],
+    [-6, "Tools"],
+    [ 6, "Traps"]
 ];
+
 var mn_quests = [
     [,"Continents"],
     [0, "Eastern Kingdoms", , [
@@ -1508,15 +1512,17 @@ var g_pet_foods = {
 
 var g_object_types = {
        0: 'Other',
-       9: 'Book',
        3: 'Container',
+       9: 'Book',
        6: 'Trap',
-    "-5": 'Chest',
+      19: 'Mailbox',
       25: 'Fishing Pool',
-    "-3": 'Herb',
-    "-4": 'Mineral Vein',
-    "-2": 'Quest',
-    "-6": 'Tool'
+    '-2': 'Quest',
+    '-3': 'Herb',
+    '-4': 'Mineral Vein',
+    '-5': 'Chest',
+    '-6': 'Tool',
+    '-9': 'Interactive'
 };
 
 var g_reputation_standings = {

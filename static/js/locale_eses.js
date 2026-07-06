@@ -317,17 +317,21 @@ var mn_npcs = [
     [12,"Mascota mansa"],
     [13,"Nube de gas"]
 ];
+
 var mn_objects = [
-    [9,"Libros"],
-    [3,"Contenedores"],
-    [-5,"Cofres"],
-    [25,"Bancos de peces"],
-    [-3,"Hierbas"],
-    [-4,"Venas de minerales"],
-    [-2,"Misión"],
-    [-6,"Herramientas"],
-    [6,"Trampas"]
+    [25, "Bancos de peces"],
+    [19, "Buzones de correo"],
+    [-5, "Cofres"],
+    [ 3, "Contenedores"],
+    [-6, "Herramientas"],
+    [-3, "Hierbas"],
+    [ 9, "Libros"],
+    [-2, "Misiones"],
+    [-9, "Objetos interactivos"],
+    [ 6, "Trampas"],
+    [-4, "Venas de minerales"]
 ];
+
 var mn_quests = [
     [,"Continentes"],
     [0, "Reinos del Este", , [
@@ -1461,15 +1465,17 @@ var g_pet_foods = {
 
 var g_object_types = {
        0: 'Otros',
-       9: 'Libro',
        3: 'Contenedore',
        6: 'Trampa',
-    "-5": 'Cofre',
+       9: 'Libro',
+      19: 'Buzón de correo',
       25: 'Banco de peces',
-    "-3": 'Hierba',
-    "-4": 'Filóne de mineral',
-    "-2": 'Misión',
-    "-6": 'Herramienta'
+    '-2': 'Misión',
+    '-3': 'Hierba',
+    '-4': 'Filóne de mineral',
+    '-5': 'Cofre',
+    '-6': 'Herramienta',
+    '-9': 'Interactivo'
 };
 
 var g_reputation_standings = {

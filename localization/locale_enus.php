@@ -1154,8 +1154,14 @@ $lang = array(
         'id'            => "Object ID: ",
         'notFound'      => "This object doesn't exist.",
         'unnamed'       => "Unnamed object #%d",
-        'cat'           => [0 => "Other", 3 => "Containers", 6 => "Traps", 9 => "Books", 25 => "Fishing Pools", -5 => "Chests", -3 => "Herbs", -4 => "Mineral Veins", -2 => "Quest", -6 => "Tools"],
-        'type'          => [              3 => "Container",  6 => "",      9 => "Book",  25 => "",              -5 => "Chest",  -3 => "Herb",  -4 => "Mineral Vein",  -2 => "Quest", -6 => ""],         // used for tooltip
+        'cat'           => array(
+             0 => "Other", 3 => "Containers", 6 => "Traps", 9 => "Books", 19 => "Mailboxes", 25 => "Fishing Pools",
+            -5 => "Chests", -3 => "Herbs", -4 => "Mineral Veins", -2 => "Quests", -6 => "Tools", -9 => "Interactive Objects"
+        ),
+        'type'          => array(                           // used for tooltip
+             3 => "Container", 6 => "", 9 => "Book",  19 => "", 25 => "",
+            -5 => "Chest", -3 => "Herb", -4 => "Mineral Vein", -2 => "Quest", -6 => "", -9 => ""
+        ),
         'unkPosition'   => "The location of this object is unknown.",
         'npcLootPH'     => 'The <b>%s</b> contains the loot from the fight against <a href="?npc=%d">%s</a>. It spawns after this NPC dies.',
         'key'           => "Key",
