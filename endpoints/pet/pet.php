@@ -136,13 +136,7 @@ class PetBaseResponse extends TemplateResponse implements ICache
         $this->lvTabs->addListviewTab(new Listview(['data' => $tng->getListviewData(NPCINFO_MODEL)], 'model'));
 
         // tab: diet
-        $list = [];
-        $mask = $this->subject->getField('foodMask');
-        for ($i = 1; $i < 9; $i++)
-            if ($mask & (1 << ($i - 1)))
-                $list[] = $i;
-
-        $food = new ItemList(array(['i.subClass', [ITEM_SUBCLASS_FOOD, ITEM_SUBCLASS_MISC_CONSUMABLE]], ['i.FoodType', $list]));
+        $food = new ItemList(array(['i.subClass', [ITEM_SUBCLASS_FOOD, ITEM_SUBCLASS_MISC_CONSUMABLE]], ['i.FoodType', $this->subject->getFoodIds()]));
         $this->extendGlobalData($food->getJSGlobals());
 
         $this->lvTabs->addListviewTab(new Listview(array(

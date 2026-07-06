@@ -1624,7 +1624,7 @@ $lang = array(
         'notFound'      => "Cette famille de familiers n'existe pas.",
         'exotic'        => "Exotique",
         'cat'           => ["Férocité", "Tenacité", "Ruse"],
-        'food'          => ["Viande", "Poisson", "Fromage", "Pain", "Champignon", "Fruit", "Viande crue", "Poisson cru"]
+        'food'          => [null, "Viande", "Poisson", "Fromage", "Pain", "Champignon", "Fruit", "Viande crue", "Poisson cru"]
     ),
     'faction' => array(
         'id'            => "ID Faction : ",

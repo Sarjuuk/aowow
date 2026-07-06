@@ -1624,7 +1624,7 @@ $lang = array(
         'notFound'      => "Diese Tierart existiert nicht.",
         'exotic'        => "Exotisch",
         'cat'           => ["Wildheit", "Hartnäckigkeit", "Gerissenheit"],
-        'food'          => ["Fleisch", "Fisch", "Käse", "Brot", "Fungus", "Obst", "Rohes Fleisch", "Roher Fisch"]
+        'food'          => [null, "Fleisch", "Fisch", "Käse", "Brot", "Fungus", "Obst", "Rohes Fleisch", "Roher Fisch"]
     ),
     'faction' => array(
         'id'            => "Fraktions-ID: ",

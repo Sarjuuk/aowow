@@ -147,12 +147,6 @@ class SoundBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: Items
-        $subClasses = [];
-        if ($subClassMask = DB::Aowow()->selectCell('SELECT `subClassMask` FROM ::items_sounds WHERE `soundId` = %i', $this->typeId))
-            for ($i = 0; $i <= 20; $i++)
-                if ($subClassMask & (1 << $i))
-                    $subClasses[] = $i;
-
         $where = array(
             ['`pickUpSoundId` = %i', $this->typeId],
             ['`dropDownSoundId` = %i', $this->typeId],
@@ -161,7 +155,9 @@ class SoundBaseResponse extends TemplateResponse implements ICache
         );
         if ($displayIds)
             $where[] = ['`spellVisualId` IN %in', $displayIds];
-        if ($subClasses)
+
+        $subClassMask = DB::Aowow()->selectCell('SELECT `subClassMask` FROM ::items_sounds WHERE `soundId` = %i', $this->typeId);
+        if ($subClasses = Util::mask2bits($subClassMask ?: 0))
             $where[] = [DB::AND, [['IF (`soundOverrideSubclass` > 0, `soundOverrideSubclass`, `subclass`) IN %in', $subClasses], ['`class` = %i', ITEM_CLASS_WEAPON]]];
 
         if ($itemIds = DB::Aowow()->selectCol('SELECT `id` FROM ::items WHERE %or', $where))

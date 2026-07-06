@@ -809,11 +809,9 @@ class ItemList extends DBTypeList
             if (!$this->curTpl['socketColor'.$j])
                 continue;
 
-            for ($i = 0; $i < 4; $i++)
-                if (($this->curTpl['socketColor'.$j] & (1 << $i)))
-                    $colorId = $i;
+            $colorId = current(Util::mask2bits($this->curTpl['socketColor'.$j]));
+            $pop     = array_pop($enhance['g']);
 
-            $pop       = array_pop($enhance['g']);
             $col       = $pop ? 1 : 0;
             $hasMatch &= $pop ? (($gems[$pop]['colorMask'] & (1 << $colorId)) ? 1 : 0) : 0;
             $icon      = $pop ? sprintf('style="background-image: url(%s/images/wow/icons/tiny/%s.gif)"', Cfg::get('STATIC_URL'), strtolower($gems[$pop]['iconString'])) : null;
@@ -1393,15 +1391,8 @@ class ItemList extends DBTypeList
         if ($dps <= 54.8)
             return 0.0;
 
-        $subClasses = [ITEM_SUBCLASS_MISC_WEAPON];
-        $weaponTypeMask = DB::Aowow()->selectCell('SELECT `weaponTypeMask` FROM ::classes WHERE `id` = %i', ChrClass::DRUID->value);
-        if ($weaponTypeMask)
-            for ($i = 0; $i < 21; $i++)
-                if ($weaponTypeMask & (1 << $i))
-                    $subClasses[] = $i;
-
         // cannot be used by druids
-        if (!in_array($this->curTpl['subClass'], $subClasses))
+        if (!DB::Aowow()->selectCell('SELECT (`weaponTypeMask` | %i) & %i FROM ::classes WHERE `id` = %i', 1 << ITEM_SUBCLASS_MISC_WEAPON, 1 << $this->curTpl['subClass'], ChrClass::DRUID->value))
             return 0.0;
 
         return round(($dps - 54.8) * 14);
@@ -1479,12 +1470,11 @@ class ItemList extends DBTypeList
             default => 0x0
         };
 
-        $field = null;
-        for ($i = 0; $i < count(Util::$ssdMaskFields); $i++)
-            if ($mask & (1 << $i))
-                $field = Util::$ssdMaskFields[$i];
+        if ($bits = Util::mask2bits($mask))
+            if ($field = Util::$ssdMaskFields[current($bits)])
+                return DB::Aowow()->selectCell('SELECT %n FROM ::scalingstatvalues WHERE `id` = %i', $field, $this->ssd[$this->id]['maxLevel']);
 
-        return $field ? DB::Aowow()->selectCell('SELECT %n FROM ::scalingstatvalues WHERE `id` = %i', $field, $this->ssd[$this->id]['maxLevel']) : 0;
+        return 0;
     }
 
     private function initScalingStats() : void
@@ -1511,7 +1501,7 @@ class ItemList extends DBTypeList
 
         // armor: only replace if set
         if ($ssvArmor = $this->getSSDMod('armor'))
-            $this->templates[$this->id]['armor'] = $ssvArmor;
+            $this->templates[$this->id]['tplArmor'] = $ssvArmor;
 
         // if set dpsMod in ScalingStatValue use it for min/max damage
         // mle: 20% range / rgd: 30% range
@@ -2055,18 +2045,10 @@ class ItemListFilter extends Filter
         {
             $classes = DB::Aowow()->selectAssoc('SELECT `id` AS ARRAY_KEY, `weaponTypeMask` AS "0", `armorTypeMask` AS "1" FROM ::classes');
             foreach ($classes as $cId => [$weaponTypeMask, $armorTypeMask])
-            {
-                // preselect misc subclasses
-                $this->ubFilter[$cId] = [ITEM_CLASS_WEAPON => [ITEM_SUBCLASS_MISC_WEAPON], ITEM_CLASS_ARMOR => [ITEM_SUBCLASS_MISC_ARMOR]];
-
-                for ($i = 0; $i < 21; $i++)
-                    if ($weaponTypeMask & (1 << $i))
-                        $this->ubFilter[$cId][ITEM_CLASS_WEAPON][] = $i;
-
-                for ($i = 0; $i < 11; $i++)
-                    if ($armorTypeMask & (1 << $i))
-                        $this->ubFilter[$cId][ITEM_CLASS_ARMOR][] = $i;
-            }
+                $this->ubFilter[$cId] = array(              // preselect misc subclasses
+                    ITEM_CLASS_WEAPON => Util::mask2bits($weaponTypeMask) + [ITEM_SUBCLASS_MISC_WEAPON => ITEM_SUBCLASS_MISC_WEAPON],
+                    ITEM_CLASS_ARMOR  => Util::mask2bits($armorTypeMask)  + [ITEM_SUBCLASS_MISC_ARMOR  => ITEM_SUBCLASS_MISC_ARMOR]
+                );
         }
 
         return parent::getConditions();

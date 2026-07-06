@@ -1589,14 +1589,9 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 $invType |=  (1 << INVTYPE_RANGED);
             }
 
-            $_ = [];
-            $strs = Lang::item('inventoryType');
-            foreach ($strs as $k => $str)
-                if ($invType & 1 << $k && $str)
-                    $_[] = $str;
-
-            $tip  .= '<br />'.Lang::item('slot').Lang::main('colon').Util::asHex($invType);
-            $text .= ' '.Lang::spell('_inSlot').implode(', ', $_);
+            $tip .= '<br />'.Lang::item('slot').Lang::main('colon').Util::asHex($invType);
+            if ($_ = array_filter(array_intersect_key(Lang::item('inventoryType'), Util::mask2bits($invType))))
+                $text .= ' '.Lang::spell('_inSlot').implode(', ', $_);
         }
 
         $this->items = $this->fmtStaffTip($text, $tip);
@@ -2028,13 +2023,8 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                                 $_nameMV = $this->fmtStaffTip($_, 'MiscValue: '.$effMV);
                             break;
                         case SPELL_AURA_MECHANIC_IMMUNITY_MASK:
-                            $_ = [];
-                            foreach (Lang::game('me') as $k => $str)
-                                if ($k && ($effMV & (1 << $k - 1)))
-                                    $_[] = $str;
-
-                            if ($_ = implode(', ', $_))
-                                $_nameMV = $this->fmtStaffTip($_, 'MiscValue: '.Util::asHex($effMV));
+                            if ($_ = array_intersect_key(Lang::game('me'), Util::mask2bits($effMV, 1)))
+                                $_nameMV = $this->fmtStaffTip(implode(', ', $_), 'MiscValue: '.Util::asHex($effMV));
                             break;
                         case SPELL_AURA_MOD_SPELL_DAMAGE_OF_STAT_PERCENT:
                         case SPELL_AURA_MOD_RESISTANCE_OF_STAT_PERCENT:
@@ -2117,13 +2107,8 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                                 break 2;
                             }
 
-                            $_ = [];
-                            foreach (Lang::spell('combatRating') as $k => $str)
-                                if ((1 << $k) & $effMV)
-                                    $_[] = $str;
-
-                            if ($_ = implode(', ', $_))
-                                $_nameMV = $this->fmtStaffTip($_, 'MiscValue: '.Util::asHex($effMV));
+                            if ($_ = array_intersect_key(Lang::spell('combatRating'), Util::mask2bits($effMV)))
+                                $_nameMV = $this->fmtStaffTip(implode(', ', $_), 'MiscValue: '.Util::asHex($effMV));
                             break;
                         case SPELL_AURA_MOD_DAMAGE_DONE_VERSUS:
                             $valueFmt = '%s%%';
@@ -2131,13 +2116,8 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                         case SPELL_AURA_MOD_MELEE_ATTACK_POWER_VERSUS:
                         case SPELL_AURA_MOD_RANGED_ATTACK_POWER_VERSUS:
                         case SPELL_AURA_MOD_FLAT_SPELL_DAMAGE_VERSUS:
-                            $_ = [];
-                            foreach (Lang::game('ct') as $k => $str)
-                                if ($k && ($effMV & (1 << $k - 1)))
-                                    $_[] = $str;
-
-                            if ($_ = implode(', ', $_))
-                                $_nameMV = $this->fmtStaffTip($_, 'MiscValue: '.Util::asHex($effMV));
+                            if ($_ = array_intersect_key(Lang::game('ct'), Util::mask2bits($effMV, 1)))
+                                $_nameMV = $this->fmtStaffTip(implode(', ', $_), 'MiscValue: '.Util::asHex($effMV));
                             break;
                         case SPELL_AURA_CONVERT_RUNE:
                             $from = $effMV;

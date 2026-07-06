@@ -947,16 +947,9 @@ abstract class Util
     public static function mask2bits(int $bitmask, int $offset = 0) : array
     {
         $bits = [];
-        $i    = 0;
-        while ($bitmask)
-        {
-            if ($bitmask & (1 << $i))
-            {
-                $bitmask &= ~(1 << $i);
-                $bits[] = ($i + $offset);
-            }
-            $i++;
-        }
+        for ($i = 0; $bitmask; ++$i, $bitmask >>= 1)
+            if ($bitmask & 1)
+                $bits[$i + $offset] = $i + $offset;
 
         return $bits;
     }

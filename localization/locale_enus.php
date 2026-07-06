@@ -1624,7 +1624,7 @@ $lang = array(
         'notFound'      => "This pet family doesn't exist.",
         'exotic'        => "Exotic",
         'cat'           => ["Ferocity", "Tenacity", "Cunning"],
-        'food'          => ["Meat", "Fish", "Cheese", "Bread", "Fungus", "Fruit", "Raw Meat", "Raw Fish"] // ItemPetFood.dbc
+        'food'          => [null, "Meat", "Fish", "Cheese", "Bread", "Fungus", "Fruit", "Raw Meat", "Raw Fish"] // ItemPetFood.dbc
     ),
     'faction' => array(
         'id'            => "Faction ID: ",

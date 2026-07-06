@@ -250,12 +250,13 @@ class NpcBaseResponse extends TemplateResponse implements ICache
             // Mechanic immune
             if ($immuneMask = $this->subject->getField('mechanicImmuneMask'))
             {
-                $buff = [];
-                for ($i = 0; $i < 31; $i++)
-                    if ($immuneMask & (1 << $i))
-                        $buff[] = (!fMod(count($buff), 3) ? "\n" : '').'[url=?spells&filter=me='.($i + 1).']'.Lang::game('me', $i + 1).'[/url]';
+                $mechanics = array_intersect_key(Lang::game('me'), Util::mask2bits($immuneMask, 1));
 
-                $infobox[] = Lang::npc('mechanicimmune', [implode(', ', $buff)]);
+                array_walk($mechanics, fn(&$v, $k) => $v = '[url=?spells&filter=me='.$k.']'.$v.'[/url]');
+
+                $mechanics = array_map(fn($x) => implode(', ', $x), array_chunk($mechanics, 3));
+
+                $infobox[] = Lang::npc('mechanicimmune', ['[br]'.implode(',[br]', $mechanics)]);
             }
 
             // extra flags

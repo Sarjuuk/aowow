@@ -57,11 +57,7 @@ class UserBaseResponse extends TemplateResponse
         /* Infobox */
         /***********/
 
-        $infobox = $contrib = $groups = [];
-
-        foreach (Lang::account('groups') as $idx => $grp)
-            if ($idx >= 0 && $this->user['userGroups'] & (1 << $idx))
-                $groups[] = (!fMod(count($groups) + 1, 3) ? '[br]' : '').$grp;
+        $infobox = $contrib = [];
 
         if (User::isInGroup(U_GROUP_STAFF))
         {
@@ -73,7 +69,7 @@ class UserBaseResponse extends TemplateResponse
             $infobox[] = Lang::user('joinDate') . '[tooltip name=joinDate]'. date('l, G:i:s', $this->user['joinDate']). '[/tooltip][span class=tip tooltip=joinDate]'.(new DateTime())->formatDate($this->user['joinDate']). '[/span]';
         if ($this->user['prevLogin'])
             $infobox[] = Lang::user('lastLogin') . '[tooltip name=lastLogin]'.date('l, G:i:s', $this->user['prevLogin']).'[/tooltip][span class=tip tooltip=lastLogin]'.(new DateTime())->formatDate($this->user['prevLogin']).'[/span]';
-        if ($groups)
+        if ($groups = array_intersect_key(Lang::account('groups'), Util::mask2bits($this->user['userGroups'])))
             $infobox[] = Lang::user('userGroups') . implode(', ', $groups);
 
         $infobox[] = Lang::user('consecVisits'). $this->user['consecutiveVisits'];

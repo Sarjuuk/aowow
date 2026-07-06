@@ -390,11 +390,8 @@ class Lang
         if ($class == ITEM_CLASS_MISC)                      // yeah hardcoded.. sue me!
             return self::spell('cat', -5, 0);
 
-        $tmp  = [];
         $strs = self::spell($class == ITEM_CLASS_ARMOR ? 'armorSubClass' : 'weaponSubClass');
-        foreach ($strs as $k => $str)
-            if ($mask & (1 << $k) && $str)
-                $tmp[] = $str;
+        $tmp  = array_intersect_key($strs, Util::mask2bits($mask));
 
         if (!$tmp && $class == ITEM_CLASS_ARMOR)
             return self::spell('cat', -11, 8);
@@ -408,27 +405,12 @@ class Lang
     {
         $stanceMask &= 0xFF37F6FF;                          // clamp to available stances/forms..
 
-        $tmp = [];
-        $i   = 1;
-
-        while ($stanceMask)
-        {
-            if ($stanceMask & (1 << ($i - 1)))
-            {
-                $tmp[] = self::game('st', $i);
-                $stanceMask &= ~(1 << ($i - 1));
-            }
-            $i++;
-        }
-
-        return implode(self::main('comma'), $tmp);
+        return implode(self::main('comma'), array_intersect_key(self::game('st'), Util::mask2bits($stanceMask, 1)));
     }
 
     public static function getMagicSchools(int $schoolMask, bool $short = false) : string
     {
         $schoolMask &= SPELL_ALL_SCHOOLS;                   // clamp to available schools..
-        $tmp = [];
-        $i   = 0;
 
         if ($short && $schoolMask == SPELL_ALL_SCHOOLS)
             return self::main('all');
@@ -436,17 +418,7 @@ class Lang
         if ($short && $schoolMask == SPELL_MAGIC_SCHOOLS)
             return self::main('parensFmt', [self::main('all'), self::game('dt', 1)]);;
 
-        while ($schoolMask)
-        {
-            if ($schoolMask & (1 << $i))
-            {
-                $tmp[] = self::game('sc', $i);
-                $schoolMask &= ~(1 << $i);
-            }
-            $i++;
-        }
-
-        return implode(self::main('comma'), $tmp);
+        return implode(self::main('comma'), array_intersect_key(self::game('sc'), Util::mask2bits($schoolMask)));
     }
 
     public static function getClassString(int $classMask, array &$ids = [], int $fmt = self::FMT_HTML) : string

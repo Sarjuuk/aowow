@@ -1624,7 +1624,7 @@ $lang = array(
         'notFound'      => "Esta familia de mascotas no existe.",
         'exotic'        => "Exótica",
         'cat'           => ["Ferocidad", "Tenacidad", "Astucia"],
-        'food'          => ["Carne", "Pescado", "Queso", "Pan", "Hongo", "Fruta", "Carne cruda", "Pescado crudo"]
+        'food'          => [null, "Carne", "Pescado", "Queso", "Pan", "Hongo", "Fruta", "Carne cruda", "Pescado crudo"]
     ),
     'faction' => array(
         'id'            => "ID de Facción: ",

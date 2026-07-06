@@ -708,14 +708,8 @@ trait spawnHelper
                 if ($s['spawnMask'] == 15)
                     $info[3] = Lang::game('mode').Lang::game('modes', 0, -1);
                 else if ($s['spawnMask'])
-                {
-                    $_ = [];
-                    for ($i = 0; $i < 4; $i++)
-                        if ($s['spawnMask'] & 1 << $i)
-                            $_[] = Lang::game('modes', $s['mapType'], $i);
-
-                    $info[4] = Lang::game('mode').implode(', ', $_);
-                }
+                    if ($_ = array_intersect_key(Lang::game('modes', $s['mapType']), Util::mask2bits($s['spawnMask'])))
+                        $info[4] = Lang::game('mode').implode(', ', $_);
 
                 if ($s['ScriptName'])
                     $info[5] = 'ScriptName'.Lang::main('colon').$s['ScriptName'];

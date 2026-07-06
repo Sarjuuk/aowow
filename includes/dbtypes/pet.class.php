@@ -71,6 +71,11 @@ class PetList extends DBTypeList
     }
 
     public function renderTooltip() : ?string { return null; }
+
+    public function getFoodIds() : array
+    {
+        return Util::mask2bits($this->curTpl['foodMask'], 1);
+    }
 }
 
 ?>
