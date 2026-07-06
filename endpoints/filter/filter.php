@@ -35,10 +35,10 @@ class FilterBaseResponse extends TextResponse
             // category is a string for profiler (region.realm) but not passed through here
             foreach (explode('.', $catg) as $c)
             {
-                if (preg_match('/\D/', $c))
+                if (preg_match('/^-?\d+$/', $c))
+                    $this->catg[] = intval($c);
+                else
                     break;
-
-                $this->catg[] = intval($c);
             }
         }
 
