@@ -67,7 +67,7 @@ class GuideList extends DBTypeList
             $this->article[$a['rev']] = $a['article'];
             if ($this->article[$a['rev']])
             {
-                Markup::parseTags($this->article[$a['rev']], $this->jsGlobals);
+                Util::mergeJsGlobals($this->jsGlobals, Markup::parseTags($this->article[$a['rev']]));
                 return $this->article[$a['rev']];
             }
             else

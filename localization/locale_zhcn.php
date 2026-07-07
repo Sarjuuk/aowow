@@ -389,9 +389,14 @@ $lang = array(
         'valueDelim'    => "—",
         'target'        => "<目标>",
 
+        'copper'        => "%d铜币",
+        'silver'        => "%d银币",
+        'gold'          => "%d金币",
+
         'pvp'           => "PvP",
         'honorPoints'   => "荣誉点数",
         'arenaPoints'   => "竞技场点数",
+        'acvmtPoints'   => "成就点数",
         'heroClass'     => "英雄职业",
         'resource'      => "资源：",
         'resources'     => "资源：",

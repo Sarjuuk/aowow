@@ -197,7 +197,7 @@ class CommunityContent
 
             foreach ($results as $r)
             {
-                Markup::parseTags($r['body'], self::$jsGlobals);
+                Util::mergeJsGlobals(self::$jsGlobals, Markup::parseTags($r['body']));
 
                 $reply = array(
                     'commentid'    => $commentId,
@@ -245,7 +245,7 @@ class CommunityContent
         $i = 0;
         foreach ($results as $r)
         {
-            Markup::parseTags($r['body'], self::$jsGlobals);
+            Util::mergeJsGlobals(self::$jsGlobals, Markup::parseTags($r['body']));
 
             self::$jsGlobals[Type::USER][$r['userId']] = $r['userId'];
 
@@ -270,7 +270,7 @@ class CommunityContent
                 $c['responseroles'] = $r['responseRoles'];
                 $c['responseuser']  = $r['responseUser'];
 
-                Markup::parseTags($r['responseBody'], self::$jsGlobals);
+                Util::mergeJsGlobals(self::$jsGlobals, Markup::parseTags($r['responseBody']));
             }
 
             if ($r['editCount'])                            // lastEdit

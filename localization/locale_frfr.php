@@ -389,9 +389,14 @@ $lang = array(
         'valueDelim'    => " - ",
         'target'        => "<cible>",
 
+        'copper'        => "%d Cuivre",                     // COPPER_AMOUNT
+        'silver'        => "%d Argent",                     // SILVER_AMOUNT
+        'gold'          => "%d Or",                         // GOLD_AMOUNT
+
         'pvp'           => "JcJ",
         'honorPoints'   => "Points d'honneur",
         'arenaPoints'   => "Points d'arène",
+        'acvmtPoints'   => "Points de hauts faits",
         'heroClass'     => "Classe de héros",
         'resource'      => "Ressource : ",
         'resources'     => "Ressources : ",

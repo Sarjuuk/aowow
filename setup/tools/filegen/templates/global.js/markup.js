@@ -309,32 +309,6 @@ var Markup = {
                 return str.replace(/<(b|big|strong)\b[\s\S]*?>([\s\S]*?)<\/\1>/gi, '[b]$2[/b]');
             }
         },
-        blip:
-        {
-            empty: true,
-            attr:
-            {
-                unnamed: { req: true, valid: /\S+/ }
-            },
-            allowedClass: MARKUP_CLASS_STAFF,
-            toHtml: function(attr)
-            {
-                var url = 'http://blip.tv/play/' + attr.unnamed;
-                var width = 600;
-                var height = 368;
-
-                var html = '';
-                // object tag causing issues in chrome?
-                /*html += '<object width="' + width + '" height="' + height + '"' + Markup._addGlobalAttributes(attr) + '><param name="movie" value="' + url + '">';
-                html += '<param name="allowfullscreen" value="true"></param>';
-                html += '<param name="allowscriptaccess" value="always"></param>';
-                html += '<param name="wmode" value="opaque"></param>';*/
-                html += '<embed width="' + width + '" height="' + height + '" src="' + url + '" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" wmode="opaque"></embed>';
-                //html += '</object>';
-
-                return html;
-            }
-        },
         br:
         {
             empty: true,
