@@ -54,7 +54,7 @@ class User
 
         if (isset($_SESSION['locale']) && $_SESSION['locale'] instanceof Locale)
             self::$preferedLoc = $_SESSION['locale']->validate() ?? Locale::getFallback();
-        else if (!empty($_SERVER["HTTP_ACCEPT_LANGUAGE"]) && ($loc = Locale::tryFromHttpAcceptLanguage($_SERVER["HTTP_ACCEPT_LANGUAGE"])))
+        else if ($loc = Locale::tryFromHttpAcceptLanguage())
             self::$preferedLoc = $loc;
         else
             self::$preferedLoc = Locale::getFallback();

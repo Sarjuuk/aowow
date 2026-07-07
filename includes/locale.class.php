@@ -103,18 +103,18 @@ enum Locale : int
     {
         return match ($this)
         {
-            self::EN => ['en', 'en-au', 'en-bz', 'en-ca', 'en-ie', 'en-jm', 'en-nz', 'en-ph', 'en-za', 'en-tt', 'en-gb', 'en-us', 'en-zw'],
-            self::KR => ['ko', 'ko-kp', 'ko-kr'],
-            self::FR => ['fr', 'fr-be', 'fr-ca', 'fr-fr', 'fr-lu', 'fr-mc', 'fr-ch'],
-            self::DE => ['de', 'de-at', 'de-de', 'de-li', 'de-lu', 'de-ch'],
-            self::CN => ['zh', 'zh-hk', 'zh-cn', 'zh-sg'],
-            self::TW => ['tw', 'zh-tw'],
-            self::ES => ['es', 'es-ar', 'es-bo', 'es-cl', 'es-co', 'es-cr', 'es-do', 'es-ec', 'es-sv', 'es-gt', 'es-hn', 'es-ni', 'es-pa', 'es-py', 'es-pe', 'es-pr', 'es-es', 'es-uy', 'es-ve'],
-            self::MX => ['mx', 'es-mx'],
-            self::RU => ['ru', 'ru-mo'],
-            self::JP => ['ja'],
-            self::PT => ['pt', 'pt-br'],
-            self::IT => ['it', 'it-ch']
+            self::EN => ['en-gb', 'en-au', 'en-bz', 'en-ca', 'en-ie', 'en-jm', 'en-nz', 'en-ph', 'en-za', 'en-tt', 'en-us', 'en-zw', 'en'],
+            self::KR => ['ko-kr', 'ko-kp', 'ko'],
+            self::FR => ['fr-fr', 'fr-be', 'fr-ca', 'fr-lu', 'fr-mc', 'fr-ch', 'fr'],
+            self::DE => ['de-de', 'de-at', 'de-li', 'de-lu', 'de-ch', 'de'],
+            self::CN => ['zh-cn', 'zh-hk', 'zh-sg', 'zh'],
+            self::TW => ['zh-tw', 'tw'],
+            self::ES => ['es-es', 'es-ar', 'es-bo', 'es-cl', 'es-co', 'es-cr', 'es-do', 'es-ec', 'es-sv', 'es-gt', 'es-hn', 'es-ni', 'es-pa', 'es-py', 'es-pe', 'es-pr', 'es-uy', 'es-ve', 'es'],
+            self::MX => ['es-mx', 'mx'],
+            self::RU => ['ru-ru', 'ru-mo', 'ru'],
+            self::JP => ['ja-jp', 'ja'],
+            self::PT => ['pt-br', 'pt'],
+            self::IT => ['it-ch', 'it']
         };
     }
 
@@ -142,24 +142,23 @@ enum Locale : int
         return null;
     }
 
-    public static function tryFromHttpAcceptLanguage(string $httpAccept) : ?self
+    public static function tryFromHttpAcceptLanguage() : ?self
     {
-        if (!$httpAccept)
+        if (!($httpAccept = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? ''))
             return null;
 
         $available = [];
 
         // e.g.: de,de-DE;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6
-        foreach (explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']) as $loc)
+        foreach (explode(',', $httpAccept) as $loc)
             if (preg_match('/([a-z\-]+)(?:\s*;\s*q\s*=\s*([\.\d]+))?/ui', $loc, $m, PREG_UNMATCHED_AS_NULL))
                 $available[Util::lower($m[1])] = floatVal($m[2] ?? 1); // no quality set: assume 100%
 
         arsort($available, SORT_NUMERIC);                   // highest quality on top
 
-        foreach ($available as $code => $_)
-            foreach (self::cases() as $l)
-                if ($l->validate() && in_array($code, $l->httpCode()))
-                    return $l;
+        foreach (self::cases() as $l)
+            if ($l->validate() && array_intersect($available, $l->httpCode()))
+                return $l;
 
         return null;
     }
