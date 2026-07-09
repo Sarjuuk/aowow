@@ -182,10 +182,10 @@ class ItemsetBaseResponse extends TemplateResponse implements ICache
             ));
 
         // required skill
-        if ($_sk)
+        if ($_sk && ($skill = DB::Aowow()->selectRow('SELECT `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8` FROM ::skillline WHERE `id` = %i', $_sk)))
         {
-            $spellLink = sprintf('<a href="?spells=11.%s">%s</a> (%s)', $_sk, Lang::spell('cat', 11, $_sk, 0), $this->subject->getField('skillLevel'));
-            $this->bonusExt = ' &ndash; <small><b>'.Lang::game('requires', [$spellLink]).'</b></small>';
+            $spellLink = sprintf('<a href="?spells=11.%s">%s</a>', $_sk, Util::localizedString($skill, 'name', true));
+            $this->bonusExt = ' &ndash; <small><b>'.Lang::game('requires', [Lang::main('parensFmt', [$spellLink, $this->subject->getField('skillLevel')])]).'</b></small>';
         }
 
         $this->description = $_ta ? Lang::itemset('_desc', [$this->h1, Lang::itemset('notes', $_ta), $_cnt]) : Lang::itemset('_descTagless', [$this->h1, $_cnt]);
