@@ -785,13 +785,15 @@ trait spawnHelper
 
     private function createZoneSpawns() : void              // [zoneId1, zoneId2, ..]             for locations-column in listview
     {
-        $res = DB::Aowow()->selectCol("SELECT `typeId` AS ARRAY_KEY, GROUP_CONCAT(DISTINCT `areaId`) FROM ::spawns WHERE `type` = %i AND `typeId` IN %in AND `posX` > 0 AND `posY` > 0 GROUP BY `typeId`", self::$type, $this->getfoundIDs());
+        $res = DB::Aowow()->selectCol(
+           'SELECT `typeId` AS ARRAY_KEY, GROUP_CONCAT(`areaId` ORDER BY `n` DESC)
+            FROM (SELECT `typeId`, `areaId`, COUNT(1) AS "n" FROM ::spawns WHERE `type` = %i AND `typeId` IN %in AND `posX` > 0 AND `posY` > 0 GROUP BY `typeId`, `areaId`) x
+            GROUP BY `typeId`',
+            self::$type, $this->getfoundIDs()
+        ) ?: [];
+
         foreach ($res as &$r)
-        {
             $r = explode(',', $r);
-            if (count($r) > 3)
-                array_splice($r, 3, count($r), -1);
-        }
 
         $this->spawnResult[SPAWNINFO_ZONES] = $res;
     }
@@ -850,7 +852,7 @@ trait spawnHelper
                 if (empty($this->spawnResult[SPAWNINFO_ZONES]))
                     $this->createZoneSpawns();
 
-                return !empty($this->spawnResult[SPAWNINFO_ZONES][$this->id]) ? $this->spawnResult[SPAWNINFO_ZONES][$this->id] : [];
+                return $this->spawnResult[SPAWNINFO_ZONES][$this->id] ?? [];
             case SPAWNINFO_QUEST:
                 if (empty($this->spawnResult[SPAWNINFO_QUEST]))
                     $this->createQuestSpawns();

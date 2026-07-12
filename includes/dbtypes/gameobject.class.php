@@ -70,11 +70,15 @@ class GameObjectList extends DBTypeList
         $data = [];
         foreach ($this->iterate() as $__)
         {
+            if ($location = $this->getSpawns(SPAWNINFO_ZONES))
+                if (count($location) > 3)
+                    array_splice($location, 3, replacement: -1);
+
             $data[$this->id] = array(
                 'id'       => $this->id,
                 'name'     => UIText::unescapeUISequences($this->getField('name', true), Lang::FMT_RAW),
                 'type'     => $this->getField('typeCat'),
-                'location' => $this->getSpawns(SPAWNINFO_ZONES)
+                'location' => $location
             );
 
             if (!empty($this->curTpl['reqSkill']))

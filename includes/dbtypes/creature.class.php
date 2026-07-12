@@ -233,6 +233,10 @@ class CreatureList extends DBTypeList
             }
             else
             {
+                if ($location = $this->getSpawns(SPAWNINFO_ZONES))
+                    if (count($location) > 3)
+                        array_splice($location, 3, replacement: -1);
+
                 $data[$this->id] = array(
                     'family'         => $this->curTpl['family'],
                     'minlevel'       => $this->curTpl['minLevel'],
@@ -240,7 +244,7 @@ class CreatureList extends DBTypeList
                     'id'             => $this->id,
                     'boss'           => $this->isBoss() ? 1 : 0,
                     'classification' => $this->curTpl['rank'],
-                    'location'       => $this->getSpawns(SPAWNINFO_ZONES),
+                    'location'       => $location,
                     'name'           => $this->getField('name', true),
                     'type'           => $this->curTpl['type'],
                     'react'          => [$this->curTpl['A'], $this->curTpl['H']],
