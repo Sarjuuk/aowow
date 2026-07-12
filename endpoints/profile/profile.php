@@ -25,9 +25,6 @@ class ProfileBaseResponse extends TemplateResponse
         [SC_CSS_FILE, 'css/talentcalc.css'],
         [SC_CSS_FILE, 'css/Profiler.css']
     );
-    protected array $expectedGET      = array(
-        'new' => ['filter' => FILTER_CALLBACK, 'options' => [self::class, 'checkEmptySet']]
-    );
 
     public int  $type     = Type::PROFILE;
     public bool $gDataKey = true;
@@ -39,13 +36,8 @@ class ProfileBaseResponse extends TemplateResponse
         if (!Cfg::get('PROFILER_ENABLE'))
             $this->generateError();
 
-        // neither param nor &new > error
-        if (!$idOrProfile && !$this->_get['new'])
+        if (!$idOrProfile)
             $this->generateError();
-
-        // display empty/new profile editor > ok
-        if (!$idOrProfile && $this->_get['new'])
-            return;
 
         $this->getSubjectFromUrl($idOrProfile);
 

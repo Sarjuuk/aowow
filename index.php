@@ -34,6 +34,7 @@ foreach ($query as $page => $param)
     break;                                                  // only use first k/v-pair to determine page
 }
 
+// todo: find better solution to this routing. Delegate from XyzBaseResponse?
 [$classMod, $file] = match (true)
 {
     // is search ajax
@@ -47,6 +48,8 @@ foreach ($query as $page => $param)
     isset($_GET['rss'])                           => ['Rss',      $pageCall . '_rss'     ],
     // is sounds playlist
     isset($_GET['playlist'])                      => ['Playlist', $pageCall . '_playlist'],
+    // is new profile
+    isset($_GET['new'])                           => ['New',      $pageCall . '_new'     ],
     // pageParam can be sub page
     (bool)preg_match('/^[a-z\-]+$/i', $pageParam) => [Util::ucFirst(strtr($pageParam, ['-' => ''])), Util::lower($pageParam)],
     // no pageParam or PageParam is param for BasePage

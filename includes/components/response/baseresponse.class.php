@@ -460,7 +460,7 @@ abstract class BaseResponse
 
     protected static array $sql = [];                       // debug: sql stats container
 
-    protected array $expectedPOST   = [];                   // fill with variables you that are going to be used; eg:
+    protected array $expectedPOST   = [];                   // fill with variables that are expected; eg:
     protected array $expectedGET    = [];                   // 'id' => ['filter' => FILTER_CALLBACK, 'options' => [self::class, 'checkIdList']]
     protected array $expectedCOOKIE = [];
 
@@ -503,7 +503,7 @@ abstract class BaseResponse
     {
         // php bug? If INPUT_X is empty, filter_input_array returns null/fails
         // only really relevant for INPUT_POST
-        // manuall set everything null in this case
+        // manually set everything null in this case
 
         if ($this->expectedPOST)
         {
