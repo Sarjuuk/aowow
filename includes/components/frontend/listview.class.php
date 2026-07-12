@@ -154,6 +154,11 @@ class Listview implements \JsonSerializable
         return $this->id;
     }
 
+    public function getName() : string
+    {
+        return $this->name;
+    }
+
     public function setTabs(string $tabVar) : void
     {
         if ($tabVar[0] !== '$')                             // expects a jsVar, which we denote with a prefixed $

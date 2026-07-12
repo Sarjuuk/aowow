@@ -73,6 +73,16 @@ class Tabs implements \JsonSerializable, \Countable
         return count($this->__tabs) > 1 || $this->__forceTabs;
     }
 
+    public function find(?string $id = null, ?string $name = null) : null|array|Listview
+    {
+        if ($id && !is_null($k = array_find_key($this->__tabs, fn($x) => (is_array($x) ? $x['name'] : $x->getId()) === $id)))
+            return $this->__tabs[$k];
+        if ($name && !is_null($k = array_find_key($this->__tabs, fn($x) => mb_strpos(is_array($x) ? $x['name'] : $x->getName(), $name) !== false)))
+            return $this->__tabs[$k];
+
+        return null;
+    }
+
 
     /***********************/
     /* enable deep cloning */
