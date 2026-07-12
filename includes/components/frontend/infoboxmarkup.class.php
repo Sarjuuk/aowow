@@ -41,12 +41,12 @@ class InfoboxMarkup extends Markup
         return parent::__toString();
     }
 
-    public function getJsGlobals() : array
+    public function getJSGlobals() : array
     {
         if ($_ = $this->prepare())
             $this->replace($_);
 
-        return parent::getJsGlobals();
+        return parent::getJSGlobals();
     }
 
     private function prepare() : string

@@ -60,7 +60,7 @@ class NpcsBaseResponse extends TemplateResponse implements ICache
         if ($this->category)
         {
             $conditions[] = ['type', $this->category[0]];
-            $this->petFamPanel = $this->category[0] == 1;
+            $this->petFamPanel = $this->category[0] == NPC_TYPE_BEAST;
         }
 
         $fiForm    = $this->filter->values;
@@ -129,7 +129,8 @@ class NpcsBaseResponse extends TemplateResponse implements ICache
 
         parent::generate();
 
-        $this->setOnCacheLoaded([self::class, 'onBeforeDisplay']);
+        if ($this->petFamPanel)
+            $this->setOnCacheLoaded([self::class, 'onBeforeDisplay']);
     }
 
     public static function onBeforeDisplay() : void

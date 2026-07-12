@@ -2326,9 +2326,14 @@ $lang = array(
         ),
         'gemRequires'   => "需要 ",
         'gemConditions' => array(
-            ENCHANT_CONDITION_LESS_VALUE   => "少于%d颗%s宝石",
-            ENCHANT_CONDITION_MORE_COMPARE => "%s宝石的数量多于%s宝石",
-            ENCHANT_CONDITION_MORE_VALUE   => "至少%d颗%s宝石"
+            ENCHANT_CONDITION_LESS_VALUE         => "少于%d颗%s宝石",
+            ENCHANT_CONDITION_MORE_COMPARE       => "%s宝石的数量多于%s宝石",
+            ENCHANT_CONDITION_MORE_VALUE         => "至少%d颗%s宝石",
+            ENCHANT_CONDITION_EQUAL_COMPARE      => "等量%s宝石和%s宝石",
+            ENCHANT_CONDITION_EQUAL_VALUE        => "%d颗%s宝石",
+            ENCHANT_CONDITION_MORE_EQUAL_COMPARE => "%s宝石的数量不少于%s宝石",
+            ENCHANT_CONDITION_NOT_EQUAL_COMPARE  => "%s宝石和%s宝石的数量不同",
+            ENCHANT_CONDITION_NOT_EQUAL_VALUE    => "除了%d颗%s宝石外的任意宝石"
         ),
         'reqRating'     => array(
             "需要个人竞技场等级和战队竞技场等级达到%d",

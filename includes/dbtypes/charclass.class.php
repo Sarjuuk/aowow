@@ -18,11 +18,11 @@ class CharClassList extends DBTypeList
                         'ic' => ['j' => ['::icons ic ON ic.`id` = c.`iconId`', true], 's' => ', ic.`name` AS "iconString"']
                     );
 
-    public function __construct($conditions = [], array $miscData = [])
+    public function __construct(array $conditions = [], array $miscData = [])
     {
         parent::__construct($conditions, $miscData);
 
-        foreach ($this->iterate() as $k => &$_curTpl)
+        foreach ($this->iterate() as &$_curTpl)
             $_curTpl['skills'] = explode(' ', $_curTpl['skills']);
     }
 

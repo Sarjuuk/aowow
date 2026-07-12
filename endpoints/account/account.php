@@ -42,7 +42,7 @@ class AccountBaseResponse extends TemplateResponse
 
     public ?array    $bans;
 
-    public function __construct($rawParam)
+    public function __construct(string $rawParam)
     {
         if (!User::isLoggedIn())
             $this->forwardToSignIn('account');

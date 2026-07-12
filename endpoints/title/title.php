@@ -45,7 +45,7 @@ class TitleBaseResponse extends TemplateResponse implements ICache
             'name'   => $this->h1
         );
 
-        $_title = Util::ucFirst(trim(strtr($this->subject->getField('male', true), ['%s' => '', ',' => ''])));
+        $_title = Util::ucFirst($this->subject->getField('name'));
 
 
         /*************/
@@ -192,7 +192,7 @@ class TitleBaseResponse extends TemplateResponse implements ICache
         $cnd->getByCondition(Type::TITLE, $this->typeId)->prepare();
         if ($tab = $cnd->toListviewTab('condition-for', '$LANG.tab_condition_for'))
         {
-            $this->extendGlobalData($cnd->getJsGlobals());
+            $this->extendGlobalData($cnd->getJSGlobals());
             $this->lvTabs->addDataTab(...$tab);
         }
 

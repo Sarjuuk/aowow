@@ -288,7 +288,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         if ($infobox)
         {
             $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0');
-            $this->extendGlobalData($this->infobox->getJsGlobals());
+            $this->extendGlobalData($this->infobox->getJSGlobals());
         }
 
 
@@ -437,7 +437,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                 $cnd = new Conditions();
                 $cnd->getBySource(Conditions::SRC_VEHICLE_SPELL, group: $this->typeId)->prepare();
                 if ($cnd->toListviewColumn($controled, $extraCols, $this->typeId, 'id'))
-                    $this->extendGlobalData($cnd->getJsGlobals());
+                    $this->extendGlobalData($cnd->getJSGlobals());
 
                 if ($normal)
                     $this->lvTabs->addListviewTab(new Listview(array(
@@ -556,7 +556,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                     }
 
                     if ($cnd->toListviewColumn($data, $extraCols))
-                        $this->extendGlobalData($cnd->getJsGlobals());
+                        $this->extendGlobalData($cnd->getJSGlobals());
 
                     $this->lvTabs->addListviewTab(new Listview(array(
                         'data'        => $data,
@@ -599,7 +599,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                 $cnd = new Conditions();
                 if ($cnd->getBySource(Conditions::SRC_NPC_VENDOR, group: $this->typeId)->prepare())
                 {
-                    $this->extendGlobalData($cnd->getJsGlobals());
+                    $this->extendGlobalData($cnd->getJSGlobals());
                     $cnd->toListviewColumn($lvData, $extraCols, $this->typeId, 'id');
                 }
 
@@ -887,7 +887,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
             ->prepare();
         if ($tab = $cnd->toListviewTab())
         {
-            $this->extendGlobalData($cnd->getJsGlobals());
+            $this->extendGlobalData($cnd->getJSGlobals());
             $this->lvTabs->addDataTab(...$tab);
         }
 

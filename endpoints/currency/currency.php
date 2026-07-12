@@ -30,7 +30,6 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
         $this->contribute = Type::getClassAttrib($this->type, 'contribute') ?? CONTRIBUTE_NONE;
     }
 
-
     protected function generate() : void
     {
         $this->subject = new CurrencyList(array(['id', $this->typeId]));

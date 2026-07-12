@@ -2326,9 +2326,14 @@ $lang = array(
         ),
         'gemRequires'   => "Requiere ",                     // ENCHANT_CONDITION_REQUIRES
         'gemConditions' => array(                           // ENCHANT_CONDITION_*
-            ENCHANT_CONDITION_LESS_VALUE   => "menos de %d |4gema:gemas; %s",
-            ENCHANT_CONDITION_MORE_COMPARE => "más gemas %s que gemas %s",
-            ENCHANT_CONDITION_MORE_VALUE   => "al menos %d |4gema:gemas; %s"
+            ENCHANT_CONDITION_LESS_VALUE         => "menos de %d |4gema:gemas; %s",
+            ENCHANT_CONDITION_MORE_COMPARE       => "más gemas %s que gemas %s",
+            ENCHANT_CONDITION_MORE_VALUE         => "al menos %d |4gema:gemas; %s",
+            ENCHANT_CONDITION_EQUAL_COMPARE      => "un número igual de gemas %s y %s",
+            ENCHANT_CONDITION_EQUAL_VALUE        => "exactamente %d |4gema:gemas; %s",
+            ENCHANT_CONDITION_MORE_EQUAL_COMPARE => "al menos tantas gemas %s que %s",
+            ENCHANT_CONDITION_NOT_EQUAL_COMPARE  => "un número diferente de gemas %s y %s",
+            ENCHANT_CONDITION_NOT_EQUAL_VALUE    => "cualquier número excepto %d %s |4gema:gemas;"
         ),
         'reqRating'     => array(                           // ITEM_REQ_ARENA_RATING*
             "Requiere un índice de arena personal y de equipo de %d",

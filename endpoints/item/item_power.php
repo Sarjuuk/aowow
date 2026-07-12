@@ -24,7 +24,7 @@ class ItemPowerResponse extends TextResponse implements ICache
         'sock'   => ['filter' => FILTER_CALLBACK, 'options' => [self::class, 'checkEmptySet']  ]
     );
 
-    public function __construct($param)
+    public function __construct(string $param)
     {
         parent::__construct($param);
 

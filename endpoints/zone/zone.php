@@ -822,7 +822,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
                 }
 
                 if ($cnd->toListviewColumn($lvSpells, $extraCols))
-                    $this->extendGlobalData($cnd->getJsGlobals());
+                    $this->extendGlobalData($cnd->getJSGlobals());
 
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data'       => $lvSpells,
@@ -922,7 +922,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
         $cnd->getByCondition(Type::ZONE, $this->typeId)->prepare();
         if ($tab = $cnd->toListviewTab('condition-for', '$LANG.tab_condition_for'))
         {
-            $this->extendGlobalData($cnd->getJsGlobals());
+            $this->extendGlobalData($cnd->getJSGlobals());
             $this->lvTabs->addDataTab(...$tab);
         }
     }

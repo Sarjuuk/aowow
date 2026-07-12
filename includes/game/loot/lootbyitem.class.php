@@ -172,7 +172,7 @@ class LootByItem extends Loot
             $cnd = new Conditions();
             if ($cnd->getBySource(Conditions::SRC_REFERENCE_LOOT_TEMPLATE, entry: $this->entry))
                 if ($cnd->toListviewColumn($newRefs, $x, $this->entry))
-                    $this->storejsGlobals($cnd->getJsGlobals());
+                    $this->storejsGlobals($cnd->getJSGlobals());
         }
         */
 

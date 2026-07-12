@@ -278,6 +278,7 @@ class SpellsBaseResponse extends TemplateResponse implements ICache
 
                     if (isset($this->category[1]))
                     {
+                        $url = '';
                         switch ($this->category[1])         // Spells can be used by multiple specs
                         {
                             case 409:                       // TalentTab - Tenacity
@@ -366,9 +367,18 @@ class SpellsBaseResponse extends TemplateResponse implements ICache
 
                     break;
                 case 9:                                     // Secondary Skills
+                case 11:                                    // Professions
                     array_push($visibleCols, 'source');
 
-                    $conditions[] = ['s.typeCat', 9];
+                    $conditions[] = ['s.typeCat', $this->category[0]];
+
+                    if (isset($this->category[2]))          // only set on "Professions"
+                    {
+                        if ($this->category[2] == 9787)     // general weaponsmithing
+                            $conditions[] = ['s.reqSpellId', [9787, 17039, 17040, 17041]];
+                        else
+                            $conditions[] = ['s.reqSpellId', $this->category[2]];
+                    }
 
                     if (isset($this->category[1]))
                     {
@@ -378,49 +388,8 @@ class SpellsBaseResponse extends TemplateResponse implements ICache
                             [DB::AND, ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $this->category[1]]]
                         ];
 
-                        if (!empty(self::SHORT_FILTER[$this->category[1]]))
+                        if ([$crafted, $relItems] = (self::SHORT_FILTER[$this->category[1]] ?? null))
                         {
-                            [$crafted, $relItems] = self::SHORT_FILTER[$this->category[1]];
-                            $txt = '';
-                            if ($crafted && $relItems)
-                                $txt = Lang::spell('relItems', 'crafted', [$crafted]) . Lang::spell('relItems', 'link') . Lang::spell('relItems', 'recipes', [$relItems]);
-                            else if ($crafted)
-                                $txt = Lang::spell('relItems', 'crafted', [$crafted]);
-                            else if ($relItems)
-                                $txt = Lang::spell('relItems', 'recipes', [$relItems]);
-
-                            $note = Lang::spell('cat', $this->category[0], $this->category[1]);
-                            if (is_array($note))
-                                $note = $note[0];
-
-                            $tabData['note'] = Lang::spell('relItems', 'base', [$txt, $note]);
-                            $tabData['sort'] = ['skill', 'name'];
-                        }
-                    }
-
-                    break;
-                case 11:                                    // Professions
-                    array_push($visibleCols, 'source');
-
-                    $conditions[] = ['s.typeCat', 11];
-
-                    if (isset($this->category[2]))
-                    {
-                        if ($this->category[2] == 9787)     // general weaponsmithing
-                            $conditions[] = ['s.reqSpellId', [9787, 17039, 17040, 17041]];
-                        else
-                            $conditions[] = ['s.reqSpellId', $this->category[2]];
-                    }
-                    else if (isset($this->category[1]))
-                        $conditions[] = ['s.skillLine1', $this->category[1]];
-
-                    if (isset($this->category[1]))
-                    {
-                        $conditions[] = ['s.skillLine1', $this->category[1]];
-
-                        if (!empty(self::SHORT_FILTER[$this->category[1]]))
-                        {
-                            [$crafted, $relItems] = self::SHORT_FILTER[$this->category[1]];
                             $txt = '';
                             if ($crafted && $relItems)
                                 $txt = Lang::spell('relItems', 'crafted', [$crafted]) . Lang::spell('relItems', 'link') . Lang::spell('relItems', 'recipes', [$relItems]);

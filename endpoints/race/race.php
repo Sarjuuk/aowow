@@ -285,7 +285,7 @@ class RaceBaseResponse extends TemplateResponse implements ICache
         $cnd->getByCondition(Type::CHR_RACE, $this->typeId)->prepare();
         if ($tab = $cnd->toListviewTab('condition-for', '$LANG.tab_condition_for'))
         {
-            $this->extendGlobalData($cnd->getJsGlobals());
+            $this->extendGlobalData($cnd->getJSGlobals());
             $this->lvTabs->addDataTab(...$tab);
         }
 

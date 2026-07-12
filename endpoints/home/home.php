@@ -32,7 +32,7 @@ class HomeBaseResponse extends TemplateResponse
         if ($_ = DB::Aowow()->selectRow('SELECT * FROM ::home_oneliner WHERE `active` = 1 ORDER BY RAND() LIMIT 1'))
             $this->oneliner = new Markup(new LocString($_, 'text'), [], 'home-oneliner');
 
-        if ($_ = $this->oneliner?->getJsGlobals())
+        if ($_ = $this->oneliner?->getJSGlobals())
             $this->extendGlobalData($_);
 
         // load featuredBox (user web server time)
@@ -51,7 +51,7 @@ class HomeBaseResponse extends TemplateResponse
                 'overlays' => []
             );
 
-            if ($_ = $this->featuredBox['markup']->getJsGlobals())
+            if ($_ = $this->featuredBox['markup']->getJSGlobals())
                 $this->extendGlobalData($_);
 
             // load overlay links

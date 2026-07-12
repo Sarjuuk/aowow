@@ -274,8 +274,8 @@ class SkillBaseResponse extends TemplateResponse implements ICache
             if ($this->typeId != 769)               // Internal
                 $tabData['note'] = match ($_cat)
                 {
-                    -4, 7   => sprintf(Util::$filterResultString, '?spells=-4'),
-                     7      => sprintf(Util::$filterResultString, '?spells='.$_cat.'.'.ChrClass::fromMask($reqClass)[0].'.'.$this->typeId),  // doesn't matter what spell; reqClass should be identical for all Class Spells
+                    -4      => sprintf(Util::$filterResultString, '?spells=-4'),
+                     7      => sprintf(Util::$filterResultString, '?spells=7.'.ChrClass::fromMask($reqClass)[0].'.'.$this->typeId), // doesn't matter what spell; reqClass should be identical for all Class Spells
                      9, 11  => sprintf(Util::$filterResultString, '?spells='.$_cat.'.'.$this->typeId),
                     default => null
                 };
@@ -365,7 +365,7 @@ class SkillBaseResponse extends TemplateResponse implements ICache
         $cnd->getByCondition(Type::SKILL, $this->typeId)->prepare();
         if ($tab = $cnd->toListviewTab('condition-for', '$LANG.tab_condition_for'))
         {
-            $this->extendGlobalData($cnd->getJsGlobals());
+            $this->extendGlobalData($cnd->getJSGlobals());
             $this->lvTabs->addDataTab(...$tab);
         }
     }

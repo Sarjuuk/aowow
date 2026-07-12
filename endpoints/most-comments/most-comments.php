@@ -15,7 +15,7 @@ class MostcommentsBaseResponse extends TemplateResponse
 
     protected  array  $validCats  = [1, 7, 30];
 
-    public function __construct($rawParam)
+    public function __construct(string $rawParam)
     {
         $this->getCategoryFromUrl($rawParam);
 

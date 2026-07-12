@@ -312,5 +312,4 @@ class SoundBaseResponse extends TemplateResponse implements ICache
     }
 }
 
-
 ?>

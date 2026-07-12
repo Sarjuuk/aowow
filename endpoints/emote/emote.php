@@ -179,7 +179,7 @@ class EmoteBaseResponse extends TemplateResponse implements ICache
         $acv = new AchievementList($condition);
         if (!$acv->error)
         {
-            $this->extendGlobalData($acv->getJsGlobals());
+            $this->extendGlobalData($acv->getJSGlobals());
             $this->lvTabs->addListviewTab(new Listview(['data' => $acv->getListviewData()], AchievementList::$brickFile));
         }
 

@@ -403,7 +403,7 @@ class Conditions
         return '[condition]' . json_encode($this->result, JSON_NUMERIC_CHECK) . '[/condition]';
     }
 
-    public function getJsGlobals() : array
+    public function getJSGlobals() : array
     {
         return $this->jsGlobals;
     }

@@ -20,7 +20,7 @@ class AchievementPowerResponse extends TextResponse implements ICache
         'domain' => ['filter' => FILTER_CALLBACK, 'options' => [Locale::class, 'tryFromDomain']]
     );
 
-    public function __construct($id)
+    public function __construct(string $id)
     {
         parent::__construct($id);
 

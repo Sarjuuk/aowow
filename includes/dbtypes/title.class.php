@@ -48,15 +48,14 @@ class TitleList extends DBTypeList
             // shorthand for more generic access; required by CommunityContent to determine subject
             foreach (Locale::cases() as $loc)
                 if ($loc->validate())
-                    $_curTpl['name'] = new LocString($_curTpl, 'male', fn($x) => trim(str_replace('%s', '', $x)));
-                //  $_curTpl['name_loc'.$loc->value] = trim(str_replace('%s', '', $_curTpl['male_loc'.$loc->value]));
+                    $_curTpl['name'] = new LocString($_curTpl, 'male', fn($x) => trim(strtr($x, ['%s' => '', ',' => ''])));
         }
     }
 
     public static function getName(int $id) : ?LocString
     {
         if ($n = DB::Aowow()->SelectRow('SELECT `male_loc0`, `male_loc2`, `male_loc3`, `male_loc4`, `male_loc6`, `male_loc8` FROM %n WHERE `id` = %i', self::$dataTable, $id))
-            return new LocString($n, 'male', fn($x) => trim(str_replace('%s', '', $x)));
+            return new LocString($n, 'male', fn($x) => trim(strtr($x, ['%s' => '', ',' => ''])));
         return null;
     }
 

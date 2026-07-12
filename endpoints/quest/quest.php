@@ -1010,7 +1010,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
 
         if ($tab = $cnd->toListviewTab())
         {
-            $this->extendGlobalData($cnd->getJsGlobals());
+            $this->extendGlobalData($cnd->getJSGlobals());
             $this->lvTabs->addDataTab(...$tab);
         }
 

@@ -429,7 +429,7 @@ class TemplateResponse extends BaseResponse
             $article = DB::Aowow()->selectRow('SELECT `article`, `locale`, `editAccess` FROM ::articles WHERE `url` = %s AND `locale` IN %in ORDER BY `locale` DESC, `rev` DESC LIMIT 1',
                 $this->gPageInfo['articleUrl'], [Lang::getLocale()->value, Locale::EN->value]);
         if (!$article && !empty($this->type) && isset($this->typeId))
-            $article = DB::Aowow()->selectRow('SELECT `article`, `locale`, `editAccess` FROM ::articles WHERE `type` = %i AND `typeId` = %i AND `locale` IN (%i) ORDER BY `locale` DESC, `rev` DESC LIMIT 1',
+            $article = DB::Aowow()->selectRow('SELECT `article`, `locale`, `editAccess` FROM ::articles WHERE `type` = %i AND `typeId` = %i AND `locale` IN %in ORDER BY `locale` DESC, `rev` DESC LIMIT 1',
                 $this->type, $this->typeId, [Lang::getLocale()->value, Locale::EN->value]);
 
         if (!$article)
@@ -458,7 +458,7 @@ class TemplateResponse extends BaseResponse
 
         $this->article = new Markup($text, $opts);
 
-        if ($jsg = $this->article->getJsGlobals())
+        if ($jsg = $this->article->getJSGlobals())
             $this->extendGlobalData($jsg);
 
         $this->gPageInfo['editAccess'] = $article['editAccess'];
@@ -698,7 +698,6 @@ class TemplateResponse extends BaseResponse
 
         return false;
     }
-
 }
 
 ?>

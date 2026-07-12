@@ -7,45 +7,44 @@ if (!defined('AOWOW_REVISION'))
 
 class Lang
 {
-    private static $timeUnits;
-    private static $lang;
-    private static $main;
-    private static $account;
-    private static $user;
-    private static $game;
-    private static $maps;
-    private static $profiler;
-    private static $screenshot;
-    private static $video;
-    private static $privileges;
-    private static $smartAI;
-    private static $unit;
+    private static array $timeUnits;
+    private static array $lang;
+    private static array $main;
+    private static array $account;
+    private static array $user;
+    private static array $game;
+    private static array $maps;
+    private static array $profiler;
+    private static array $screenshot;
+    private static array $video;
+    private static array $privileges;
+    private static array $smartAI;
+    private static array $unit;
 
     // types
-    private static $achievement;
-    private static $areatrigger;
-    private static $chrClass;
-    private static $currency;
-    private static $event;
-    private static $faction;
-    private static $gameObject;
-    private static $icon;
-    private static $item;
-    private static $itemset;
-    private static $mail;
-    private static $npc;
-    private static $pet;
-    private static $quest;
-    private static $race;
-    private static $skill;
-    private static $sound;
-    private static $spell;
-    private static $title;
-    private static $zone;
-    private static $guide;
-
-    private static $emote;
-    private static $enchantment;
+    private static array $achievement;
+    private static array $areatrigger;
+    private static array $chrClass;
+    private static array $currency;
+    private static array $event;
+    private static array $faction;
+    private static array $gameObject;
+    private static array $icon;
+    private static array $item;
+    private static array $itemset;
+    private static array $mail;
+    private static array $npc;
+    private static array $pet;
+    private static array $quest;
+    private static array $race;
+    private static array $skill;
+    private static array $sound;
+    private static array $spell;
+    private static array $title;
+    private static array $zone;
+    private static array $guide;
+    private static array $emote;
+    private static array $enchantment;
 
     private static ?Locale $locale = null;
 
@@ -151,7 +150,13 @@ class Lang
         return $buff;
     }
 
-    // truncate string after X chars. If X is inside a word truncate behind it.
+    /**
+     * truncate string after $len chars. If $len is inside a word truncate behind it.
+     *
+     * @param   string  $text
+     * @param   int     $len    minimum string length
+     * @return  string          the truncated string + ellipsis (…)
+     */
     public static function trimTextClean(string $text, int $len = 100) : string
     {
         // remove line breaks
@@ -176,7 +181,14 @@ class Lang
         return implode(' ', $b).'…';
     }
 
-    // add line breaks to string after X chars. If X is inside a word break behind it.
+    /**
+     * strip existing line breaks and add new line breaks every $len chars. If $len is inside a word break behind it.
+     *
+     * @param   string  $text
+     * @param   int     $len    minimum line length
+     * @param   int     $fmt    [RAW: \n, HTML: \<br />, MARKUP: [br]]
+     * @return  string          the newly chunked string
+     */
     public static function breakTextClean(string $text, int $len = 30, int $fmt = self::FMT_HTML) : string
     {
         // remove line breaks

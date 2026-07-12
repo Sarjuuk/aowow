@@ -806,7 +806,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                 }
 
                 if ($cnd->toListviewColumn($sbData, $extraCols, 'id', $this->typeId))
-                    $this->extendGlobalData($cnd->getJsGlobals());
+                    $this->extendGlobalData($cnd->getJSGlobals());
 
                 $this->addDataLoader('zones');
                 $this->lvTabs->addListviewTab(new Listview(array(
@@ -1048,7 +1048,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         $cnd->getByCondition(Type::ITEM, $this->typeId)->prepare();
         if ($tab = $cnd->toListviewTab('condition-for', '$LANG.tab_condition_for'))
         {
-            $this->extendGlobalData($cnd->getJsGlobals());
+            $this->extendGlobalData($cnd->getJSGlobals());
             $this->lvTabs->addDataTab(...$tab);
         }
 

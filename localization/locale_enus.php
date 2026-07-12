@@ -2325,10 +2325,15 @@ $lang = array(
             "meta",                 "red",              "yellow",               "blue"
         ),
         'gemRequires'   => "Requires ",                     // ENCHANT_CONDITION_REQUIRES
-        'gemConditions' => array(                           // ENCHANT_CONDITION_* in GlobalStrings.lua
-            ENCHANT_CONDITION_LESS_VALUE   => "less than %d %s |4gem:gems;",
-            ENCHANT_CONDITION_MORE_COMPARE => "more %s gems than %s gems",
-            ENCHANT_CONDITION_MORE_VALUE   => "at least %d %s |4gem:gems;"
+        'gemConditions' => array(                           // ENCHANT_CONDITION_*
+            ENCHANT_CONDITION_LESS_VALUE         => "less than %d %s |4gem:gems;",
+            ENCHANT_CONDITION_MORE_COMPARE       => "more %s gems than %s gems",
+            ENCHANT_CONDITION_MORE_VALUE         => "at least %d %s |4gem:gems;",
+            ENCHANT_CONDITION_EQUAL_COMPARE      => "an equal number of %s and %s gems",
+            ENCHANT_CONDITION_EQUAL_VALUE        => "exactly %d %s |4gem:gems;",
+            ENCHANT_CONDITION_MORE_EQUAL_COMPARE => "at least as many %s gems as %s gems",
+            ENCHANT_CONDITION_NOT_EQUAL_COMPARE  => "a different number of %s and %s gems",
+            ENCHANT_CONDITION_NOT_EQUAL_VALUE    => "any number but %d %s |4gem:gems;"
         ),
         'reqRating'     => array(                           // ITEM_REQ_ARENA_RATING*
             "Requires personal and team arena rating of %d",

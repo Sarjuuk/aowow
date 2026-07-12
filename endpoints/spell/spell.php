@@ -989,7 +989,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 }
 
                 if ($cnd->toListviewColumn($resultLv, $extraCols))
-                    $this->extendGlobalData($cnd->getJsGlobals());
+                    $this->extendGlobalData($cnd->getJSGlobals());
 
                 $tabData = ['data' => $resultLv];
 
@@ -1073,7 +1073,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                     $lvData = $tbTrainer->getListviewData();
                     $extraCols = [];
                     if ($cnd->toListviewColumn($lvData, $extraCols))
-                        $this->extendGlobalData($cnd->getJsGlobals());
+                        $this->extendGlobalData($cnd->getJSGlobals());
 
                     $tabData = array(
                         'data' => $lvData,
@@ -1264,7 +1264,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             ->prepare();
         if ($tab = $cnd->toListviewTab())
         {
-            $this->extendGlobalData($cnd->getJsGlobals());
+            $this->extendGlobalData($cnd->getJSGlobals());
             $this->lvTabs->addDataTab(...$tab);
         }
 

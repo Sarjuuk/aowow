@@ -287,7 +287,7 @@ var MapViewer = new function()
             tempParent = $WH.ce('div');
             tempParent.id = 'fewuiojfdksl';
             $WH.ae(document.body, tempParent);
-            var map = new Mapper({ parent: tempParent.id }, true);
+            var map = new Mapper({ parent: tempParent.id }, true); // aowow - set noScroll: true
             map.setLink(opt.link, true);
             map.toggleZoom();
         }

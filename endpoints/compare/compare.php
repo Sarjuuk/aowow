@@ -34,7 +34,7 @@ class CompareBaseResponse extends TemplateResponse
 
     private string $compareString = '';
 
-    public function __construct($rawParam)
+    public function __construct(string $rawParam)
     {
         parent::__construct($rawParam);
 

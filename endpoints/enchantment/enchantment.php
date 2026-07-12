@@ -171,7 +171,7 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
         $gemList = new ItemList(array(['gemEnchantmentId', $this->typeId]));
         if (!$gemList->error)
         {
-            $this->extendGlobalData($gemList->getJsGlobals());
+            $this->extendGlobalData($gemList->getJSGlobals());
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $gemList->getListviewData(),
                 'name' => '$LANG.tab_usedby + \' \' + LANG.gems',
@@ -183,7 +183,7 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
         $socketsList = new ItemList(array(['socketBonus', $this->typeId]));
         if (!$socketsList->error)
         {
-            $this->extendGlobalData($socketsList->getJsGlobals());
+            $this->extendGlobalData($socketsList->getJSGlobals());
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $socketsList->getListviewData(),
                 'name' => '$LANG.tab_socketbonus',
@@ -203,7 +203,7 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
         if (!$spellList->error)
         {
             $spellData = $spellList->getListviewData();
-            $this->extendGlobalData($spellList->getJsGlobals());
+            $this->extendGlobalData($spellList->getJSGlobals());
 
             $spellIds = $spellList->getFoundIDs();
             $conditions = array(
@@ -304,13 +304,13 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
         $type = 0;
         for ($i = 1; $i < 4; $i++)
         {
-            if ($_ = $this->subject->getField('type'.$i))
-            {
-                if ($type && $type != $_)                   // already set
-                    return 0;
-                else
-                    $type = $_;
-            }
+            if (!($_ = $this->subject->getField('type'.$i)))
+                continue;
+
+            if ($type && $type != $_)                       // already set
+                return 0;
+
+            $type = $_;
         }
 
         return $type;

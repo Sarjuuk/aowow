@@ -108,7 +108,7 @@ class AreatriggerBaseResponse extends TemplateResponse implements ICache
         $cnd->getBySource(Conditions::SRC_AREATRIGGER_CLIENT, entry: $this->typeId)->prepare();
         if ($tab = $cnd->toListviewTab())
         {
-            $this->extendGlobalData($cnd->getJsGlobals());
+            $this->extendGlobalData($cnd->getJSGlobals());
             $this->lvTabs->addDataTab(...$tab);
         }
 

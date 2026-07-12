@@ -259,7 +259,4 @@ class ItemsetBaseResponse extends TemplateResponse implements ICache
     }
 }
 
-
-
-
 ?>

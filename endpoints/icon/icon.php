@@ -100,7 +100,7 @@ class IconBaseResponse extends TemplateResponse implements ICache
         $ubSpells = new SpellList(array(['iconId', $this->typeId]));
         if (!$ubSpells->error)
         {
-            $this->extendGlobalData($ubSpells->getJsGlobals(GLOBALINFO_RELATED | GLOBALINFO_SELF));
+            $this->extendGlobalData($ubSpells->getJSGlobals(GLOBALINFO_RELATED | GLOBALINFO_SELF));
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $ubSpells->getListviewData(),
                 'id'   => 'used-by-spell'
@@ -111,7 +111,7 @@ class IconBaseResponse extends TemplateResponse implements ICache
         $ubItems = new ItemList(array(['iconId', $this->typeId]));
         if (!$ubItems->error)
         {
-            $this->extendGlobalData($ubItems->getJsGlobals());
+            $this->extendGlobalData($ubItems->getJSGlobals());
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $ubItems->getListviewData(),
                 'id'   => 'used-by-item'
@@ -122,7 +122,7 @@ class IconBaseResponse extends TemplateResponse implements ICache
         $ubAchievements = new AchievementList(array(['iconId', $this->typeId]));
         if (!$ubAchievements->error)
         {
-            $this->extendGlobalData($ubAchievements->getJsGlobals());
+            $this->extendGlobalData($ubAchievements->getJSGlobals());
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $ubAchievements->getListviewData(),
                 'id'   => 'used-by-achievement'
@@ -133,7 +133,7 @@ class IconBaseResponse extends TemplateResponse implements ICache
         $ubCurrencies = new CurrencyList(array(['iconId', $this->typeId]));
         if (!$ubCurrencies->error)
         {
-            $this->extendGlobalData($ubCurrencies->getJsGlobals());
+            $this->extendGlobalData($ubCurrencies->getJSGlobals());
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $ubCurrencies->getListviewData(),
                 'id'   => 'used-by-currency'
@@ -144,7 +144,7 @@ class IconBaseResponse extends TemplateResponse implements ICache
         $ubPets = new PetList(array(['iconId', $this->typeId]));
         if (!$ubPets->error)
         {
-            $this->extendGlobalData($ubPets->getJsGlobals());
+            $this->extendGlobalData($ubPets->getJSGlobals());
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $ubPets->getListviewData(),
                 'id'   => 'used-by-pet'

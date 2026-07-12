@@ -351,7 +351,7 @@ class FactionBaseResponse extends TemplateResponse implements ICache
         $cnd->getByCondition(Type::FACTION, $this->typeId)->prepare();
         if ($tab = $cnd->toListviewTab('condition-for', '$LANG.tab_condition_for'))
         {
-            $this->extendGlobalData($cnd->getJsGlobals());
+            $this->extendGlobalData($cnd->getJSGlobals());
             $this->lvTabs->addDataTab(...$tab);
         }
 

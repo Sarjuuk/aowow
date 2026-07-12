@@ -137,6 +137,7 @@ class EventBaseResponse extends TemplateResponse implements ICache
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
 
         // tab: npcs
+        $creatures = null;
         if ($npcIds = DB::World()->selectCol('SELECT `id` AS ARRAY_KEY, IF(ec.`eventEntry` > 0, 1, 0) AS "added" FROM creature c, game_event_creature ec WHERE ec.`guid` = c.`guid` AND ABS(ec.`eventEntry`) = %i', $this->typeId))
         {
             $creatures = new CreatureList(array(['id', array_keys($npcIds)]));
@@ -255,7 +256,7 @@ class EventBaseResponse extends TemplateResponse implements ICache
         }
 
         // items from creature
-        if ($npcIds && !$creatures->error)
+        if ($creatures && !$creatures->error)
         {
             // vendor
             $cIds = $creatures->getFoundIDs();
@@ -324,7 +325,7 @@ class EventBaseResponse extends TemplateResponse implements ICache
         $cnd->getByCondition(Type::WORLDEVENT, $this->typeId)->prepare();
         if ($tab = $cnd->toListviewTab('condition-for', '$LANG.tab_condition_for'))
         {
-            $this->extendGlobalData($cnd->getJsGlobals());
+            $this->extendGlobalData($cnd->getJSGlobals());
             $this->lvTabs->addDataTab(...$tab);
         }
 

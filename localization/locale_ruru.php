@@ -2327,9 +2327,14 @@ $lang = array(
         ),
         'gemRequires'   => "Требуется ",                    // ENCHANT_CONDITION_REQUIRES
         'gemConditions' => array(                           // ENCHANT_CONDITION_*
-            ENCHANT_CONDITION_LESS_VALUE   => "меньше, чем %d |4камень:камня:камней; |3-1(%s) цвета",
-            ENCHANT_CONDITION_MORE_COMPARE => "больше |3-7(%s), чем |3-7(%s) камней",
-            ENCHANT_CONDITION_MORE_VALUE   => "хотя бы %d |4камень:камня:камней; |3-1(%s) цвета"
+            ENCHANT_CONDITION_LESS_VALUE         => "меньше, чем %d |4камень:камня:камней; |3-1(%s) цвета",
+            ENCHANT_CONDITION_MORE_COMPARE       => "больше |3-7(%s), чем |3-7(%s) камней",
+            ENCHANT_CONDITION_MORE_VALUE         => "хотя бы %d |4камень:камня:камней; |3-1(%s) цвета",
+            ENCHANT_CONDITION_EQUAL_COMPARE      => "равное количество |3-7(%s) и |3-7(%s) камней",
+            ENCHANT_CONDITION_EQUAL_VALUE        => "ровно %d |4камень:камня:камней; |3-1(%s) цвета",
+            ENCHANT_CONDITION_MORE_EQUAL_COMPARE => "по меньшей мере столько же |3-7(%s), сколько и |3-7(%s) камней",
+            ENCHANT_CONDITION_NOT_EQUAL_COMPARE  => "разное количество |3-7(%s) и |3-7(%s) камней",
+            ENCHANT_CONDITION_NOT_EQUAL_VALUE    => "любое количество камней, из которых %d |3-1(%s) цвета."
         ),
         'reqRating'     => array(                           // ITEM_REQ_ARENA_RATING*
             "Требуется личный и командный рейтинг на арене не ниже %d",

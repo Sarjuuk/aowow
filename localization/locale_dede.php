@@ -2325,10 +2325,15 @@ $lang = array(
             "Meta",                 "Rot",              "Gelb",                 "Blau"
         ),
         'gemRequires'   => "Benötigt ",                     // ENCHANT_CONDITION_REQUIRES
-        'gemConditions' => array(                           // ENCHANT_CONDITION_* in GlobalStrings.lua; 2 not in use (use as PH)
-            ENCHANT_CONDITION_LESS_VALUE   => "weniger als %d |4Edelstein:Edelsteine; der Kategorie %s",
-            ENCHANT_CONDITION_MORE_COMPARE => "mehr Edelsteine der Kategorie %s als Edelsteine der Kategorie %s",
-            ENCHANT_CONDITION_MORE_VALUE   => "mindestens %d |4Edelstein:Edelsteine; der Kategorie %s"
+        'gemConditions' => array(                           // ENCHANT_CONDITION_*
+            ENCHANT_CONDITION_LESS_VALUE         => "weniger als %d |4Edelstein:Edelsteine; der Kategorie %s",
+            ENCHANT_CONDITION_MORE_COMPARE       => "mehr Edelsteine der Kategorie %s als Edelsteine der Kategorie %s",
+            ENCHANT_CONDITION_MORE_VALUE         => "mindestens %d |4Edelstein:Edelsteine; der Kategorie %s",
+            ENCHANT_CONDITION_EQUAL_COMPARE      => "die gleiche Anzahl Edelsteine der Kategorien %s und %s",
+            ENCHANT_CONDITION_EQUAL_VALUE        => "genau %d |4Edelstein:Edelsteine; der Kategorie %s",
+            ENCHANT_CONDITION_MORE_EQUAL_COMPARE => "mindestens so viele Edelsteine der Kategorie %s wie der Kategorie %s",
+            ENCHANT_CONDITION_NOT_EQUAL_COMPARE  => "eine unterschiedliche Anzahl Edelsteine der Kategorien %s und %s",
+            ENCHANT_CONDITION_NOT_EQUAL_VALUE    => "nicht genau %d |4Edelstein:Edelsteine; der Kategorie %s"
         ),
         'reqRating'     => array(                           // ITEM_REQ_ARENA_RATING*
             "Benötigt eine persönliche Arenawertung und Teamwertung von %d.",

@@ -1098,14 +1098,14 @@ define('ENCHANTMENT_TYPE_USE_SPELL',        7);
 define('ENCHANTMENT_TYPE_PRISMATIC_SOCKET', 8);
 
 // SpellItemEnchantmentCondition operators - only 2, 3, 5 in use
-// define('ENCHANT_CONDITION_EQUAL_COMPARE',      ?);
-// define('ENCHANT_CONDITION_EQUAL_VALUE',        ?);
-define('ENCHANT_CONDITION_LESS_VALUE',            2);
-define('ENCHANT_CONDITION_MORE_COMPARE',          3);
-// define('ENCHANT_CONDITION_MORE_EQUAL_COMPARE', %s);
-define('ENCHANT_CONDITION_MORE_VALUE',            5);
-// define('ENCHANT_CONDITION_NOT_EQUAL_COMPARE',  ?);
-// define('ENCHANT_CONDITION_NOT_EQUAL_VALUE',    ?);
+define('ENCHANT_CONDITION_EQUAL_COMPARE',      -9990);
+define('ENCHANT_CONDITION_EQUAL_VALUE',        -9991);
+define('ENCHANT_CONDITION_LESS_VALUE',             2);
+define('ENCHANT_CONDITION_MORE_COMPARE',           3);
+define('ENCHANT_CONDITION_MORE_EQUAL_COMPARE', -9992);
+define('ENCHANT_CONDITION_MORE_VALUE',             5);
+define('ENCHANT_CONDITION_NOT_EQUAL_COMPARE',  -9993);
+define('ENCHANT_CONDITION_NOT_EQUAL_VALUE',    -9994);
 
 // Spell Effects and Auras
 define('SPELL_EFFECT_NONE',                             0);

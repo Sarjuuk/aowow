@@ -145,8 +145,8 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                 break;
             default:                                        // requires key .. maybe
             {
+                $ids = $l = [];
                 $locks = Lang::getLocks($this->subject->getField('lockId'), $ids, true, Lang::FMT_MARKUP);
-                $l = [];
 
                 foreach ($ids as $type => $typeIds)
                     $this->extendGlobalIds($type, ...$typeIds);
@@ -638,7 +638,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         $cnd->getByCondition(Type::OBJECT, $this->typeId)->prepare();
         if ($tab = $cnd->toListviewTab('condition-for', '$LANG.tab_condition_for'))
         {
-            $this->extendGlobalData($cnd->getJsGlobals());
+            $this->extendGlobalData($cnd->getJSGlobals());
             $this->lvTabs->addDataTab(...$tab);
         }
 

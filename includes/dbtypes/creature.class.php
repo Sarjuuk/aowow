@@ -175,7 +175,7 @@ class CreatureList extends DBTypeList
 
     public function getTameable() : ?int
     {
-        if (!($this->curTpl['typeFlags'] & NPC_TYPEFLAG_TAMEABLE) || $this->curTpl['type'] != 1)
+        if (!($this->curTpl['typeFlags'] & NPC_TYPEFLAG_TAMEABLE) || $this->curTpl['type'] != NPC_TYPE_BEAST)
             return null;
 
         return $this->curTpl['family'] ?: null;

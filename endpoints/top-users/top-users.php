@@ -82,7 +82,6 @@ class TopusersBaseResponse extends TemplateResponse
             $this->lvTabs->addListviewTab(new Listview(array(
                 'hiddenCols'  => ['achievements', 'posts', 'uploads', 'reports'],
                 'visibleCols' => ['created'],
-                'name'        => '$LANG.lastweek_stc',
                 'name'        => $tabName,
                 'id'          => $tabId,
                 'data'        => $data

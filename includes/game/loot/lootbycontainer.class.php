@@ -143,7 +143,7 @@ class LootByContainer extends Loot
 
         if ($cnd->getBySource(Conditions::lootTableToConditionSource($tableName), group: $lootId)->prepare())
         {
-            $this->storeJSGlobals($cnd->getJsGlobals());
+            $this->storeJSGlobals($cnd->getJSGlobals());
             $cnd->toListviewColumn($loot, $this->extraCols, $lootId, 'content');
         }
 

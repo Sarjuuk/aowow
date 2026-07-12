@@ -75,7 +75,7 @@ class Markup implements \JsonSerializable
             $this->__parent = $parent;
     }
 
-    public function getJsGlobals() : array
+    public function getJSGlobals() : array
     {
         return $this->_parseTags();
     }

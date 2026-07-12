@@ -46,7 +46,7 @@ class MailsBaseResponse extends TemplateResponse implements ICache
         if (!$mails->error)
             $tabData['data'] = $mails->getListviewData();
 
-        $this->extendGlobalData($mails->getJsGlobals());
+        $this->extendGlobalData($mails->getJSGlobals());
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
 

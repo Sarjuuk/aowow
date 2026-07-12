@@ -14,7 +14,7 @@ class MostcommentsRssResponse extends TextResponse
 
     private   array  $validCats   = [1, 7, 30];
 
-    public function __construct($rawParam)
+    public function __construct(string $rawParam)
     {
         parent::__construct($rawParam);
 

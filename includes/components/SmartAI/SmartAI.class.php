@@ -680,7 +680,7 @@ class SmartAI
             if ($this->itr['condition']->prepare())
             {
                 $visibleCols |= (1 << 5);
-                Util::mergeJsGlobals($this->jsGlobals, $this->itr['condition']->getJsGlobals());
+                Util::mergeJsGlobals($this->jsGlobals, $this->itr['condition']->getJSGlobals());
             }
 
             $this->result[] = array(
