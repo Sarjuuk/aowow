@@ -157,20 +157,6 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         }
 
 
-        /*******************/
-        /* Reagent Listing */
-        /*******************/
-
-        $this->createReagentList();
-
-
-        /******************/
-        /* Required Items */
-        /******************/
-
-        $this->createRequiredItems();
-
-
         /*************************/
         /* Required Tools/Totems */
         /*************************/
@@ -186,20 +172,6 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 url: !isset($tool['itemId']) ? '?items&filter=cr=91;crs='.$tool['id'].';crv=0' : '',
                 element: 'iconlist-icon'
             );
-
-
-        /**********************/
-        /* Spell Effect Block */
-        /**********************/
-
-        $this->createEffects();
-
-
-        /**************************************************/
-        /* Spell Attributes listing and SpellFilter links */
-        /**************************************************/
-
-        $this->createAttributesList();
 
 
         /*************************/
@@ -228,12 +200,17 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         /* Main Content */
         /****************/
 
+        $this->createReagentList();         // Reagent Listing
+        $this->createRequiredItems();       // Required Items
+        $this->createEffects();             // Spell Effect Block
+        $this->createAttributesList();      // Spell Attributes listing and SpellFilter links
+        $this->createSpellSchool();         // Schools cell and filter link
+
         $this->powerCost = $this->subject->createPowerCostForCurrent();
         $this->castTime  = $this->subject->createCastTimeForCurrent(false, false);
         $this->level     = $this->subject->getField('spellLevel');
         $this->rangeName = $this->subject->getField('rangeText', true);
         $this->gcd       = DateTime::formatTimeElapsedFloat($this->subject->getField('startRecoveryTime'));
-        $this->school    = $this->fmtStaffTip(Lang::getMagicSchools($this->subject->getField('schoolMask')), Util::asHex($this->subject->getField('schoolMask')));
         $this->dispel    = $this->subject->getField('dispelType') ? Lang::game('dt', $this->subject->getField('dispelType')) : null;
         $this->mechanic  = $this->subject->getField('mechanic') ? Lang::game('me', $this->subject->getField('mechanic')) : null;
         $this->tooltip   = array(
@@ -254,20 +231,20 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             default => ''                                   // n/a
         };
 
-        $this->range = $this->subject->getField('rangeMaxHostile');
-        if ($_ = $this->subject->getField('rangeMinHostile'))
-            $this->range = $_.' - '.$this->range;
+        $min = $this->subject->getField('rangeMinHostile');
+        $max = $this->subject->getField('rangeMaxHostile');
+        $this->range = '<a href="?spells&filter=cr=117:118;crs=3:3;crv='.$max.':'.$min.'">'.(Util::createNumRange($min ?: $max, $max) ?: 0).Lang::spell('_distUnit').'</a>';
 
         if (!($this->subject->getField('attributes2') & SPELL_ATTR2_NOT_NEED_SHAPESHIFT))
             $this->stances = Lang::getStances($this->subject->getField('stanceMask'));
 
         if (($_ = $this->subject->getField('recoveryTime')) && $_ > 0)
-            $this->cooldown = DateTime::formatTimeElapsedFloat($_);
+            $this->cooldown = '<a href="?spells&filter=cr=200;crs=3;crv='.($_ / 1000).'">'.DateTime::formatTimeElapsedFloat($_).'</a>';
         else if (($_ = $this->subject->getField('recoveryCategory')) && $_ > 0)
             $this->cooldown = DateTime::formatTimeElapsedFloat($_);
 
         if (($_ = $this->subject->getField('duration')) && $_ > 0)
-            $this->duration = DateTime::formatTimeElapsedFloat($_);
+            $this->duration = '<a href="?spells&filter=cr=201;crs=3;crv='.($_ / 1000).'">'.DateTime::formatTimeElapsedFloat($_).'</a>';
 
         $auraState = array(
             $this->subject->getField('casterAuraSpell'),
@@ -2314,6 +2291,17 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         }
 
         $this->attributes = $list;
+    }
+
+    private function createSpellSchool() : void
+    {
+        $schools = $this->subject->getField('schoolMask');
+        if (!($text = Lang::getMagicSchools($schools)))
+            return;
+
+        $sc = implode(':', Util::mask2bits($schools));
+
+        $this->school = $this->fmtStaffTip('<a href="?spells&filter=sc='.$sc.'">'.$text.'</a>', Util::asHex($schools));
     }
 
     private function createNumRange(int $bp, int $ds, int $mult = 1) : string
