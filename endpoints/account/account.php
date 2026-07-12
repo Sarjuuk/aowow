@@ -114,10 +114,7 @@ class AccountBaseResponse extends TemplateResponse
         $this->curName  = User::$username;
         $this->renameCD = DateTime::formatTimeElapsedFloat(Cfg::get('ACC_RENAME_DECAY') * 1000);
         if ($user['renameCooldown'] > time())
-        {
-            $locCode = substr_replace(Lang::getLocale()->json(), '_', 2, 0); // ._.
-            $this->activeCD = (new \IntlDateFormatter($locCode, pattern: Lang::main('dateFmtIntl')))->format($user['renameCooldown']);
-        }
+            $this->activeCD = \IntlDateFormatter::create(Lang::getLocale()->hreflang(), pattern: Lang::main('dateFmtIntl'))?->format($user['renameCooldown']);
 
         /* COMMUNITY */
 

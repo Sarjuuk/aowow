@@ -118,6 +118,11 @@ enum Locale : int
         };
     }
 
+    public function hreflang(string $dash = '_') : string
+    {
+        return substr($this->httpCode()[0], 0, 2) . $dash . strtoupper(substr($this->httpCode()[0], -2));
+    }
+
     public function isLogographic() : bool
     {
         return $this == Locale::CN || $this == Locale::TW || $this == Locale::KR;
