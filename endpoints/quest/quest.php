@@ -1240,17 +1240,18 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                 continue;
 
             $rep = array(
-                'qty'  => [$qty, 0],
+                'qty'  => [$qty, ''],
                 'id'   => $fac,
                 'name' => FactionList::getName($fac)
             );
 
+            $extra = 0;
             if ($cuRates = DB::World()->selectRow('SELECT * FROM reputation_reward_rate WHERE `faction` = %i', $fac))
             {
                 if ($this->subject->isRepeatable())
-                    $rep['qty'][1] = $rep['qty'][0] * ($cuRates['quest_repeatable_rate'] - 1);
+                    $extra = $qty * ($cuRates['quest_repeatable_rate'] - 1);
                 else
-                    $rep['qty'][1] = $rep['qty'][0] * match ($this->subject->isDaily())
+                    $extra = $qty * match ($this->subject->isDaily())
                     {
                         1       => $cuRates['quest_daily_rate'] - 1,
                         2       => $cuRates['quest_weekly_rate'] - 1,
@@ -1258,11 +1259,10 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                         default => $cuRates['quest_rate'] - 1
                     };
             }
+            $rep['qty'][0] += $extra;
 
-            if (User::isInGroup(U_GROUP_STAFF))
-                $rep['qty'][1]  = $rep['qty'][0] . ($rep['qty'][1] ? $this->fmtStaffTip(($rep['qty'][1] > 0 ? '+' : '').$rep['qty'][1], Lang::faction('customRewRate')) : '');
-            else
-                $rep['qty'][1] += $rep['qty'][0];
+            if (User::isInGroup(U_GROUP_STAFF) && $extra)
+                $rep['qty'][1] = $qty . $this->fmtStaffTip(sprintf('%+d', $extra), Lang::faction('customRewRate'));
 
             $repGains[] = $rep;
         }

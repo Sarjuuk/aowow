@@ -179,8 +179,8 @@ if ([$xp, $rep, $title, $tp, $honor, $arena] = $this->gains):
     endif;
 
     if ($rep):
-        foreach ($rep as $r):
-            echo '                        <li><div>'.sprintf($r['qty'][0] < 0 ? '<b class="q10">%s</b>' : '%s', $r['qty'][1]).' '.Lang::npc('repWith').' <a href="?faction='.$r['id'].'">'.$r['name'].'</a></div></li>'.PHP_EOL;
+        foreach ($rep as ['qty' => [$qty, $qtyStr], 'id' => $id, 'name' => $name]):
+            echo '                        <li><div>'.sprintf($qty < 0 ? '<b class="q10">%s</b>' : '%s', $qtyStr ?: $qty).' '.Lang::npc('repWith').' <a href="?faction='.$id.'">'.$name.'</a></div></li>'.PHP_EOL;
         endforeach;
     endif;
 
