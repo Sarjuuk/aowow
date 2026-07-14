@@ -134,7 +134,7 @@ class GuildBaseResponse extends TemplateResponse
         // tab: members
         $member = new LocalProfileList(array(['p.guild', $this->typeId]));
         $this->lvTabs->addListviewTab(new Listview(array(
-            'data'        => $member->getListviewData(PROFILEINFO_CHARACTER | PROFILEINFO_GUILD),
+            'data'        => $member->getListviewData(LISTVIEWINFO_CHARACTER | LISTVIEWINFO_GUILD),
             'sort'        => [-15],
             'visibleCols' => ['race', 'classs', 'level', 'talents', 'gearscore', 'achievementpoints', 'guildrank'],
             'hiddenCols'  => ['guild', 'location']

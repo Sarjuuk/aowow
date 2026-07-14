@@ -2057,11 +2057,15 @@ class SpellList extends DBTypeList
         return $gry > 1 ? [$org, $ylw, $grn, $gry] : [];
     }
 
+    /**
+     * @param int $addInfoMask
+     * * `0x0080 - LISTVIEWINFO_MODEL`:
+     */
     public function getListviewData(int $addInfoMask = 0x0) : array
     {
         $data = [];
 
-        if ($addInfoMask & ITEMINFO_MODEL)
+        if ($addInfoMask & LISTVIEWINFO_MODEL)
             $modelInfo = $this->getModelInfo();
 
         foreach ($this->iterate() as $__)
@@ -2131,7 +2135,7 @@ class SpellList extends DBTypeList
             if ($mask = $this->curTpl['reqRaceMask'])
                 $data[$this->id]['reqrace'] = $mask;
 
-            if ($addInfoMask & ITEMINFO_MODEL)
+            if ($addInfoMask & LISTVIEWINFO_MODEL)
             {
                 // may have multiple models set, in this case i've no idea what should be picked
                 for ($i = 1; $i < 4; $i++)

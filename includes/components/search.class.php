@@ -500,7 +500,7 @@ class Search
 
         $items = new ItemList($cnd, $miscData);
 
-        $data = $items->getListviewData($this->moduleMask & self::TYPE_JSON ? (ITEMINFO_SUBITEMS | ITEMINFO_JSON) : 0);
+        $data = $items->getListviewData($this->moduleMask & self::TYPE_JSON ? (LISTVIEWINFO_SUBITEMS | LISTVIEWINFO_ITEMEXTRA) : 0);
         if (!$data)
             return [];
 

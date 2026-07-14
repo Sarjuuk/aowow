@@ -130,9 +130,9 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
 
         $xCols = $this->filter->fiExtraCols;
 
-        $infoMask = ITEMINFO_JSON;
+        $infoMask = LISTVIEWINFO_ITEMEXTRA;
         if (array_intersect([63, 64, 125], $xCols))         // 63:buyPrice; 64:sellPrice; 125:reqarenartng
-            $infoMask |= ITEMINFO_VENDOR;
+            $infoMask |= LISTVIEWINFO_VENDOR;
 
         if ($xCols)
             $this->sharedLV['extraCols'] = '$fi_getExtraCols(fi_extraCols, '.($fiForm['gm'] ?? 0).', '.(array_intersect([63], $xCols) ? 1 : 0).')';
@@ -350,7 +350,7 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
             if ($this->filter->getSetCriteria(92) && is_array($this->sharedLV['extraCols']))
             {
                 $this->sharedLV['extraCols']['cost'] = '$Listview.extraCols.cost';
-                $data = $items->getListviewData($infoMask | ITEMINFO_VENDOR);
+                $data = $items->getListviewData($infoMask | LISTVIEWINFO_VENDOR);
             }
             else
                 $data = $items->getListviewData($infoMask);
@@ -506,7 +506,7 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
         if (!$anyColor->error)
         {
             $this->extendGlobalData($anyColor->getJSGlobals());
-            $this->gemScores[0] = array_values($anyColor->getListviewData(ITEMINFO_GEM));
+            $this->gemScores[0] = array_values($anyColor->getListviewData(LISTVIEWINFO_GEMS));
         }
 
         for ($i = 0; $i < 4; $i++)
@@ -517,7 +517,7 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
             if (!$byColor->error)
             {
                 $this->extendGlobalData($byColor->getJSGlobals());
-                $this->gemScores[$mask] = array_values($byColor->getListviewData(ITEMINFO_GEM));
+                $this->gemScores[$mask] = array_values($byColor->getListviewData(LISTVIEWINFO_GEMS));
             }
         }
     }

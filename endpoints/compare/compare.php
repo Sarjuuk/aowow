@@ -77,7 +77,7 @@ class CompareBaseResponse extends TemplateResponse
             }
 
             $iList = new ItemList(array(['i.id', $items]));
-            $data  = $iList->getListviewData(ITEMINFO_SUBITEMS | ITEMINFO_JSON);
+            $data  = $iList->getListviewData(LISTVIEWINFO_SUBITEMS | LISTVIEWINFO_ITEMEXTRA);
 
             foreach ($iList->iterate() as $itemId => $__)
             {

@@ -180,7 +180,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             Lang::load($loc);
 
             $buff = "var _ = g_spells;\n";
-            foreach ($mountz->getListviewData(ITEMINFO_MODEL) as $id => $data)
+            foreach ($mountz->getListviewData(LISTVIEWINFO_MODEL) as $id => $data)
             {
                 // two cases where the spell is unrestricted but the castitem has class restriction (too lazy to formulate ruleset)
                 if ($id == 66906)                       // Argent Charger
@@ -221,7 +221,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             Lang::load($loc);
 
             $buff = "var _ = g_spells;\n";
-            foreach ($companionz->getListviewData(ITEMINFO_MODEL) as $id => $data)
+            foreach ($companionz->getListviewData(LISTVIEWINFO_MODEL) as $id => $data)
             {
                 if (!in_array($id, $legit))
                     continue;
@@ -341,7 +341,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
             $sumPoints = 0;
             $buff      = "var _ = g_achievements;\n";
-            foreach ($achievez->getListviewData(ACHIEVEMENTINFO_PROFILE) as $id => $data)
+            foreach ($achievez->getListviewData(LISTVIEWINFO_DATASET) as $id => $data)
             {
                 if ($data['side'] & SIDE_ALLIANCE)          // both sides have the same point total
                     $sumPoints += $data['points'];

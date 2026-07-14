@@ -244,7 +244,7 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
             if (!$boughtBy->error)
             {
                 $tabData = array(
-                    'data'      => $boughtBy->getListviewData(ITEMINFO_VENDOR, [Type::CURRENCY => $this->typeId]),
+                    'data'      => $boughtBy->getListviewData(LISTVIEWINFO_VENDOR, [Type::CURRENCY => $this->typeId]),
                     'name'      => '$LANG.tab_currencyfor',
                     'id'        => 'currency-for',
                     'extraCols' => ["\$Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", '$Listview.extraCols.cost']

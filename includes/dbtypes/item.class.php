@@ -279,30 +279,30 @@ class ItemList extends DBTypeList
         return $result;
     }
 
+    /**
+     * @param int $addInfoMask
+     * * `0x0001 - LISTVIEWINFO_ITEMEXTRA`: jsonStats (including spells) and subitems parsed
+     * * `0x0002 - LISTVIEWINFO_SUBITEMS`: searched by comparison
+     * * `0x0004 - LISTVIEWINFO_VENDOR`: costs-obj, when displayed as vendor
+     * * `0x0008 - LISTVIEWINFO_GEMS`: gem infos and score
+     * * `0x0010 - LISTVIEWINFO_MODEL`: sameModelAs-Tab
+     */
     public function getListviewData(int $addInfoMask = 0x0, ?array $miscData = null) : array
     {
-        /*
-        * ITEMINFO_JSON     (0x01): jsonStats (including spells) and subitems parsed
-        * ITEMINFO_SUBITEMS (0x02): searched by comparison
-        * ITEMINFO_VENDOR   (0x04): costs-obj, when displayed as vendor
-        * ITEMINFO_GEM      (0x10): gem infos and score
-        * ITEMINFO_MODEL    (0x20): sameModelAs-Tab
-        */
-
         $data = [];
 
         // random item is random
-        if ($addInfoMask & ITEMINFO_SUBITEMS)
+        if ($addInfoMask & LISTVIEWINFO_SUBITEMS)
             $this->initSubItems();
 
-        if ($addInfoMask & ITEMINFO_JSON)
+        if ($addInfoMask & LISTVIEWINFO_ITEMEXTRA)
         {
             $this->extendJsonStats();
             Util::arraySumByKey($data, $this->jsonStats);
         }
 
         $extCosts = [];
-        if ($addInfoMask & ITEMINFO_VENDOR)
+        if ($addInfoMask & LISTVIEWINFO_VENDOR)
             $extCosts = $this->getExtendedCost($miscData);
 
         $extCostOther = [];
@@ -324,7 +324,7 @@ class ItemList extends DBTypeList
                 }
             }
 
-            if ($addInfoMask & ITEMINFO_JSON)
+            if ($addInfoMask & LISTVIEWINFO_ITEMEXTRA)
             {
                 if ($_ = intVal(($this->curTpl['minMoneyLoot'] + $this->curTpl['maxMoneyLoot']) / 2))
                     $data[$this->id]['avgmoney'] = $_;
@@ -333,17 +333,17 @@ class ItemList extends DBTypeList
                     $data[$this->id]['repaircost'] = $_;
             }
 
-            if ($addInfoMask & (ITEMINFO_JSON | ITEMINFO_GEM))
+            if ($addInfoMask & (LISTVIEWINFO_ITEMEXTRA | LISTVIEWINFO_GEMS))
                 if (isset($this->curTpl['score']))
                     $data[$this->id]['score'] = $this->curTpl['score'];
 
-            if ($addInfoMask & ITEMINFO_GEM)
+            if ($addInfoMask & LISTVIEWINFO_GEMS)
             {
                 $data[$this->id]['uniqEquip']   = ($this->curTpl['flags'] & ITEM_FLAG_UNIQUEEQUIPPED) ? 1 : 0;
                 $data[$this->id]['socketLevel'] = 0;        // not used with wotlk
             }
 
-            if ($addInfoMask & ITEMINFO_VENDOR)
+            if ($addInfoMask & LISTVIEWINFO_VENDOR)
             {
                 // just use the first results
                 // todo (med): dont use first vendor; search for the right one
@@ -436,7 +436,7 @@ class ItemList extends DBTypeList
             if ($this->curTpl['flags'] & ITEM_FLAG_HEROIC)
                 $data[$this->id]['heroic'] = true;
 
-            if ($addInfoMask & ITEMINFO_MODEL)
+            if ($addInfoMask & LISTVIEWINFO_MODEL)
                 if ($_ = $this->getField('displayId'))
                     $data[$this->id]['displayid'] = $_;
 

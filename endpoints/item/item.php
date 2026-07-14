@@ -849,7 +849,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                 $filter = $iCur->error ? [Type::ITEM => $this->typeId] : [Type::CURRENCY => $iCur->id];
 
                 $tabData = array(
-                    'data'      => $boughtBy->getListviewData(ITEMINFO_VENDOR, $filter),
+                    'data'      => $boughtBy->getListviewData(LISTVIEWINFO_VENDOR, $filter),
                     'name'      => '$LANG.tab_currencyfor',
                     'id'        => 'currency-for',
                     'extraCols' => ["\$Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", '$Listview.extraCols.cost']
@@ -950,7 +950,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                 $this->extendGlobalData($sameModel->getJSGlobals(GLOBALINFO_SELF));
 
                 $this->lvTabs->addListviewTab(new Listview(array(
-                    'data'            => $sameModel->getListviewData(ITEMINFO_MODEL),
+                    'data'            => $sameModel->getListviewData(LISTVIEWINFO_MODEL),
                     'name'            => '$LANG.tab_samemodelas',
                     'id'              => 'same-model-as',
                     'genericlinktype' => 'item'

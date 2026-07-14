@@ -148,7 +148,7 @@ class ItemsetBaseResponse extends TemplateResponse implements ICache
             $cnd = ['i.id', array_keys($this->subject->pieceToSet)];
 
         $iList = new ItemList(array($cnd));
-        $data  = $iList->getListviewData(ITEMINFO_SUBITEMS | ITEMINFO_JSON);
+        $data  = $iList->getListviewData(LISTVIEWINFO_SUBITEMS | LISTVIEWINFO_ITEMEXTRA);
         foreach ($iList->iterate() as $itemId => $__)
         {
             if (empty($data[$itemId]))

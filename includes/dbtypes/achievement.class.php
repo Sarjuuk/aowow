@@ -102,6 +102,10 @@ class AchievementList extends DBTypeList
         return $data;
     }
 
+    /**
+     * @param int $addInfoMask
+     * * `0x0080 - LISTVIEWINFO_DATASET`: included icon (otherwise fetched from jsGlobals)
+     */
     public function getListviewData(int $addInfoMask = 0x0) : array
     {
         $data = [];
@@ -118,7 +122,7 @@ class AchievementList extends DBTypeList
                 'parentcat'   => $this->curTpl['parentCat'],
             );
 
-            if ($addInfoMask & ACHIEVEMENTINFO_PROFILE)
+            if ($addInfoMask & LISTVIEWINFO_DATASET)
                 $data[$this->id]['icon'] = $this->curTpl['iconString'];
 
             // going out on a limb here: type = 1 if in level 3 of statistics tree, so, IF (statistic AND parentCat NOT statistic (1)) i guess

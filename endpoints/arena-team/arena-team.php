@@ -132,7 +132,7 @@ class ArenateamBaseResponse extends TemplateResponse
         // tab: members
         $member = new LocalProfileList(array(['atm.arenaTeamId', $this->typeId]));
         $this->lvTabs->addListviewTab(new Listview(array(
-            'data'        => $member->getListviewData(PROFILEINFO_CHARACTER | PROFILEINFO_ARENA),
+            'data'        => $member->getListviewData(LISTVIEWINFO_CHARACTER | LISTVIEWINFO_ARENA),
             'sort'        => [-15],
             'visibleCols' => ['race', 'classs', 'level', 'talents', 'gearscore', 'rating', 'wins', 'losses'],
             'hiddenCols'  => ['guild', 'location']

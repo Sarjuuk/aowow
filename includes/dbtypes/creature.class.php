@@ -181,19 +181,17 @@ class CreatureList extends DBTypeList
         return $this->curTpl['family'] ?: null;
     }
 
+    /**
+     * * `0x0010 - LISTVIEWINFO_MODEL`:
+     * * `0x0020 - LISTVIEWINFO_TAMEABLE`: include texture
+     * * `0x0040 - LISTVIEWINFO_REPUTATION`: include repreward
+     */
     public function getListviewData(int $addInfoMask = 0x0) : array
     {
-        /* looks like this data differs per occasion
-        *
-        * NPCINFO_TAMEABLE (0x1): include texture & react
-        * NPCINFO_MODEL    (0x2):
-        * NPCINFO_REP      (0x4): include repreward
-        */
-
         $data   = [];
         $rewRep = [];
 
-        if ($addInfoMask & NPCINFO_REP && $this->getFoundIDs())
+        if ($addInfoMask & LISTVIEWINFO_REPUTATION && $this->getFoundIDs())
         {
             $rewRep = DB::World()->selectCol(
                'SELECT `creature_id` AS ARRAY_KEY, `RewOnKillRepFaction1` AS ARRAY_KEY2, `RewOnKillRepValue1` FROM creature_onkill_reputation WHERE `creature_id` IN %in AND `RewOnKillRepFaction1` > 0 UNION
@@ -206,7 +204,7 @@ class CreatureList extends DBTypeList
 
         foreach ($this->iterate() as $__)
         {
-            if ($addInfoMask & NPCINFO_MODEL)
+            if ($addInfoMask & LISTVIEWINFO_MODEL)
             {
                 $texStr = strtolower($this->curTpl['textureString']);
 
@@ -257,10 +255,10 @@ class CreatureList extends DBTypeList
                 if ($_ = $this->getField('subname', true))
                     $data[$this->id]['tag'] = $_;
 
-                if ($addInfoMask & NPCINFO_TAMEABLE)        // only first skin of first model ... we're omitting potentially 11 skins here .. but the lv accepts only one .. w/e
+                if ($addInfoMask & LISTVIEWINFO_TAMEABLE)   // only first skin of first model ... we're omitting potentially 11 skins here .. but the lv accepts only one .. w/e
                     $data[$this->id]['skin'] = $this->curTpl['textureString'];
 
-                if ($addInfoMask & NPCINFO_REP)
+                if ($addInfoMask & NPCILISTVIEWINFO_REPUTATIONNFO_REP)
                 {
                     $data[$this->id]['reprewards'] = [];
                     if ($rewRep[$this->id])

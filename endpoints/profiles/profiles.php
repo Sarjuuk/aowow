@@ -149,13 +149,13 @@ class ProfilesBaseResponse extends TemplateResponse implements IProfilerList
                 if (count($r = $this->filter->getSetCriteria(9, 12, 15, 18)) == 1)
                     $roster = ($r[0] - 6) / 3;              // 1, 2, 3, or 4
 
-            $addInfoMask = PROFILEINFO_CHARACTER;
+            $addInfoMask = LISTVIEWINFO_CHARACTER;
 
             // team rating filters
             if ($this->filter->getSetCriteria(13, 16, 19))
             {
                 $lvVisibleCols[] = 'rating';
-                $addInfoMask |= PROFILEINFO_ARENA;
+                $addInfoMask |= LISTVIEWINFO_ARENA;
             }
 
             // init roster-listview
@@ -170,7 +170,7 @@ class ProfilesBaseResponse extends TemplateResponse implements IProfilerList
             {
                 $lvVisibleCols[] = 'rating';
 
-                $addInfoMask |= PROFILEINFO_ARENA;
+                $addInfoMask |= LISTVIEWINFO_ARENA;
                 $this->roster = Lang::profiler('arenaRoster', [$profiles->getField('arenateam')]);
             }
 

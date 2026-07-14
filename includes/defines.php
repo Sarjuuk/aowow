@@ -186,30 +186,27 @@ define('BUTTON_GUIDE_EDIT',                12);
 define('BUTTON_GUIDE_LOG',                 13);
 
 // conditional information in template
-define('GLOBALINFO_SELF',                   0x1);           // id, name, icon
-define('GLOBALINFO_RELATED',                0x2);           // spells used by pet, classes/races required by spell, ect
-define('GLOBALINFO_REWARDS',                0x4);           // items rewarded by achievement/quest, ect
-define('GLOBALINFO_EXTRA',                  0x8);           // items / spells .. sends extra tooltip info to template for js-manipulation
-define('GLOBALINFO_ANY',                    0xF);
+define('GLOBALINFO_SELF',                   0x01);          // id, name, icon
+define('GLOBALINFO_RELATED',                0x02);          // spells used by pet, classes/races required by spell, ect
+define('GLOBALINFO_REWARDS',                0x04);          // items rewarded by achievement/quest, ect
+define('GLOBALINFO_EXTRA',                  0x08);          // items / spells .. sends extra tooltip info to template for js-manipulation
+define('GLOBALINFO_PROFILE',                0x10);          // filter for mixed profile lists (due to fetch by owner or similar)
+define('GLOBALINFO_CHARACTER',              0x20);          // filter for mixed profile lists (due to fetch by owner or similar)
+define('GLOBALINFO_ANY',                    0xFF);
 
-define('ITEMINFO_JSON',                     0x01);
-define('ITEMINFO_SUBITEMS',                 0x02);
-define('ITEMINFO_VENDOR',                   0x04);
-// define('ITEMINFO_LOOT',                  0x08);          // get these infos from dedicatd loot function [count, stack, pctstack, modes]
-define('ITEMINFO_GEM',                      0x10);
-define('ITEMINFO_MODEL',                    0x20);
-
-define('NPCINFO_TAMEABLE',                  0x1);
-define('NPCINFO_MODEL',                     0x2);
-define('NPCINFO_REP',                       0x4);
-
-define('ACHIEVEMENTINFO_PROFILE',           0x1);
-
-define('PROFILEINFO_PROFILE',               0x1);
-define('PROFILEINFO_CHARACTER',             0x2);
-define('PROFILEINFO_GUILD',                 0x10);          // like &roster
-define('PROFILEINFO_ARENA',                 0x20);
-define('PROFILEINFO_USER',                  0x40);
+define('LISTVIEWINFO_ITEMEXTRA',            0x0001);        // old: ITEMINFO_JSON
+define('LISTVIEWINFO_SUBITEMS',             0x0002);        // old: ITEMINFO_SUBITEMS
+define('LISTVIEWINFO_VENDOR',               0x0004);        // old: ITEMINFO_VENDOR
+define('LISTVIEWINFO_GEMS',                 0x0008);        // old: ITEMINFO_GEM
+define('LISTVIEWINFO_MODEL',                0x0010);        // old: ITEMINFO_MODEL | NPCINFO_MODEL | implicit SPELLINFO_MODEL
+define('LISTVIEWINFO_TAMEABLE',             0x0020);        // old: NPCINFO_TAMEABLE
+define('LISTVIEWINFO_REPUTATION',           0x0040);        // old: NPCINFO_REP
+define('LISTVIEWINFO_DATASET',              0x0080);        // old: ACHIEVEMENTINFO_PROFILE
+define('LISTVIEWINFO_PROFILE',              0x0100);        // old: PROFILEINFO_PROFILE
+define('LISTVIEWINFO_CHARACTER',            0x0200);        // old: PROFILEINFO_CHARACTER
+define('LISTVIEWINFO_GUILD',                0x0400);        // old: PROFILEINFO_GUILD  like &roster
+define('LISTVIEWINFO_ARENA',                0x0800);        // old: PROFILEINFO_ARENA
+define('LISTVIEWINFO_USER',                 0x1000);        // old: PROFILEINFO_USER
 
 define('SPAWNINFO_ZONES',                   1);             // not a mask, mutually exclusive
 define('SPAWNINFO_SHORT',                   2);

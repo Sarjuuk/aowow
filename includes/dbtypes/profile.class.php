@@ -12,6 +12,13 @@ class ProfileList extends DBTypeList
 
     public static int $contribute = CONTRIBUTE_NONE;
 
+    /**
+     * @param int $addInfoMask
+     * * `0x0100 - LISTVIEWINFO_PROFILE`: only include custom profiles
+     * * `0x0200 - LISTVIEWINFO_CHARACTER`: only include genuine characters
+     * * `0x0800 - LISTVIEWINFO_ARENA`: additional arena stats
+     * * `0x1000 - LISTVIEWINFO_USER`: incuded published state
+     */
     public function getListviewData(int $addInfoMask = 0, array $reqCols = []) : array
     {
         $data = [];
@@ -20,10 +27,10 @@ class ProfileList extends DBTypeList
             if (!$this->isVisibleToUser())
                 continue;
 
-            if (($addInfoMask & PROFILEINFO_PROFILE) && !$this->isCustom())
+            if (($addInfoMask & LISTVIEWINFO_PROFILE) && !$this->isCustom())
                 continue;
 
-            if (($addInfoMask & PROFILEINFO_CHARACTER) && $this->isCustom())
+            if (($addInfoMask & LISTVIEWINFO_CHARACTER) && $this->isCustom())
                 continue;
 
             $data[$this->id] = array(
@@ -48,14 +55,14 @@ class ProfileList extends DBTypeList
                 'gearscore'         => $this->getField('gearscore')
             );
 
-            if ($addInfoMask & PROFILEINFO_USER)
+            if ($addInfoMask & LISTVIEWINFO_USER)
                 $data[$this->id]['published'] = (int)!!($this->getField('cuFlags') & PROFILER_CU_PUBLISHED);
 
             // for the lv this determins if the link is profile=<id> or profile=<region>.<realm>.<name>
             if (!$this->isCustom())
                 $data[$this->id]['region']    = Profiler::urlize($this->getField('region'));
 
-            if ($addInfoMask & PROFILEINFO_ARENA)
+            if ($addInfoMask & LISTVIEWINFO_ARENA)
             {
                 $data[$this->id]['rating']  = $this->getField('rating');
                 $data[$this->id]['captain'] = $this->getField('captain');
@@ -67,7 +74,7 @@ class ProfileList extends DBTypeList
             foreach ($reqCols as $col)
                 $data[$this->id][$col] = $this->getField($col);
 
-            if ($addInfoMask & PROFILEINFO_PROFILE)
+            if ($addInfoMask & LISTVIEWINFO_PROFILE)
             {
                 if ($_ = $this->getField('description'))
                     $data[$this->id]['description'] = $_;
@@ -76,7 +83,7 @@ class ProfileList extends DBTypeList
                     $data[$this->id]['icon'] = $_;
             }
 
-            if ($addInfoMask & PROFILEINFO_CHARACTER)
+            if ($addInfoMask & LISTVIEWINFO_CHARACTER)
                 if ($_ = $this->getField('renameItr'))
                     $data[$this->id]['renameItr'] = $_;
 
@@ -124,7 +131,7 @@ class ProfileList extends DBTypeList
 
         foreach ($this->iterate() as $id => $__)
         {
-            if (($addMask & PROFILEINFO_PROFILE) && $this->isCustom())
+            if (($addMask & GLOBALINFO_PROFILE) && $this->isCustom())
             {
                 $profile = array(
                     'id'     => $this->getField('id'),
@@ -143,7 +150,7 @@ class ProfileList extends DBTypeList
                 continue;
             }
 
-            if ($addMask & PROFILEINFO_CHARACTER && !$this->isCustom())
+            if ($addMask & GLOBALINFO_CHARACTER && !$this->isCustom())
             {
                 if (!isset($realms[$this->getField('realm')]))
                     continue;

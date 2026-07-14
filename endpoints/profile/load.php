@@ -199,7 +199,7 @@ class ProfileLoadResponse extends TextResponse
             $phItems = new ItemList(array(['id', $this->_get['items']], ['slot', INVTYPE_NON_EQUIP, '!']));
             if (!$phItems->error)
             {
-                $data  = $phItems->getListviewData(ITEMINFO_JSON | ITEMINFO_SUBITEMS);
+                $data  = $phItems->getListviewData(LISTVIEWINFO_ITEMEXTRA | LISTVIEWINFO_SUBITEMS);
                 foreach ($phItems->iterate() as $iId => $__)
                 {
                     $sl = $phItems->getField('slot');
@@ -229,7 +229,7 @@ class ProfileLoadResponse extends TextResponse
             $itemz = new ItemList(array(['id', array_column($items, 'item')]));
             if (!$itemz->error)
             {
-                $data = $itemz->getListviewData(ITEMINFO_JSON | ITEMINFO_SUBITEMS);
+                $data = $itemz->getListviewData(LISTVIEWINFO_ITEMEXTRA | LISTVIEWINFO_SUBITEMS);
 
                 foreach ($items as $i)
                 {

@@ -638,7 +638,7 @@ class User
         if (!self::loadProfiles())
             return [];
 
-        return self::$profiles->getJSGlobals(PROFILEINFO_CHARACTER);
+        return self::$profiles->getJSGlobals(LISTVIEWINFO_CHARACTER);
     }
 
     public static function getProfiles() : array
@@ -646,7 +646,7 @@ class User
         if (!self::loadProfiles())
             return [];
 
-        return self::$profiles->getJSGlobals(PROFILEINFO_PROFILE);
+        return self::$profiles->getJSGlobals(LISTVIEWINFO_PROFILE);
     }
 
     public static function getPinnedCharacter() : array

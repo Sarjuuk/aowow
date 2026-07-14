@@ -106,7 +106,7 @@ class NpcsBaseResponse extends TemplateResponse implements ICache
         $npcs    = new CreatureList($conditions, ['extraOpts' => $this->filter->extraOpts, 'calcTotal' => true]);
         if (!$npcs->error)
         {
-            $tabData['data'] = $npcs->getListviewData($fiRepCols ? NPCINFO_REP : 0x0);
+            $tabData['data'] = $npcs->getListviewData($fiRepCols ? LISTVIEWINFO_REPUTATION : 0x0);
             if ($fiRepCols)                                 // never use pretty-print
                 $tabData['extraCols'] = '$fi_getReputationCols('.Util::toJSON($fiRepCols, JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE).')';
             else if ($this->filter->fiExtraCols)

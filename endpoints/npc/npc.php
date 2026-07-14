@@ -585,7 +585,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                 $colAddIn  = '';
                 $extraCols = ["\$Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", '$Listview.extraCols.cost'];
 
-                $lvData = $soldItems->getListviewData(ITEMINFO_VENDOR, [Type::NPC => [$this->typeId]]);
+                $lvData = $soldItems->getListviewData(LISTVIEWINFO_VENDOR, [Type::NPC => [$this->typeId]]);
 
                 if (array_column($lvData, 'condition'))
                     $extraCols[] = '$Listview.extraCols.condition';
@@ -812,7 +812,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
 
                 $this->addDataLoader('zones');
                 $this->lvTabs->addListviewTab(new Listview(array(
-                    'data'        => $sameModel->getListviewData(NPCINFO_TAMEABLE),
+                    'data'        => $sameModel->getListviewData(LISTVIEWINFO_TAMEABLE),
                     'name'        => '$LANG.tab_samemodelas',
                     'id'          => 'same-model-as',
                     'visibleCols' => ['skin']

@@ -238,7 +238,7 @@ class UserBaseResponse extends TemplateResponse
             {
                 $this->addDataLoader('weight-presets');
 
-                if ($prof = $profiles->getListviewData(PROFILEINFO_PROFILE | PROFILEINFO_USER))
+                if ($prof = $profiles->getListviewData(LISTVIEWINFO_PROFILE | LISTVIEWINFO_USER))
                     $this->profilesLvData = array_values($prof);
             }
 
@@ -251,7 +251,7 @@ class UserBaseResponse extends TemplateResponse
             {
                 $this->addDataLoader('weight-presets');
 
-                if ($chars = $characters->getListviewData(PROFILEINFO_CHARACTER | PROFILEINFO_USER))
+                if ($chars = $characters->getListviewData(LISTVIEWINFO_CHARACTER | LISTVIEWINFO_USER))
                     $this->charactersLvData = array_values($chars);
             }
 

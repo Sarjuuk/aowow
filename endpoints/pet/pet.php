@@ -125,7 +125,7 @@ class PetBaseResponse extends TemplateResponse implements ICache
 
         $this->addDataLoader('zones');
         $this->lvTabs->addListviewTab(new Listview(array(
-            'data'        => $tng->getListviewData(NPCINFO_TAMEABLE),
+            'data'        => $tng->getListviewData(LISTVIEWINFO_TAMEABLE),
             'name'        => '$LANG.tab_tameable',
             'hiddenCols'  => ['type'],
             'visibleCols' => ['skin'],
@@ -133,7 +133,7 @@ class PetBaseResponse extends TemplateResponse implements ICache
             'id'          => 'tameable'
         ), CreatureList::$brickFile));
 
-        $this->lvTabs->addListviewTab(new Listview(['data' => $tng->getListviewData(NPCINFO_MODEL)], 'model'));
+        $this->lvTabs->addListviewTab(new Listview(['data' => $tng->getListviewData(LISTVIEWINFO_MODEL)], 'model'));
 
         // tab: diet
         $food = new ItemList(array(['i.subClass', [ITEM_SUBCLASS_FOOD, ITEM_SUBCLASS_MISC_CONSUMABLE]], ['i.FoodType', $this->subject->getFoodIds()]));
