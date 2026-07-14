@@ -465,14 +465,7 @@ abstract class DBTypeList
     public static function makeLink(int $id, int $fmt = Lang::FMT_HTML, string $cssClass = '') : string
     {
         if ($n = static::getName($id))
-        {
-            return match ($fmt)
-            {
-                Lang::FMT_HTML   => '<a href="?'.Type::getFileString(static::$type).'='.$id.'"'.($cssClass ? ' class="'.$cssClass.'"' : '').'>'.$n.'</a>',
-                Lang::FMT_MARKUP => '[url=?'.Type::getFileString(static::$type).'='.$id.']'.$n.'[/url]',
-                default          => $n
-            };
-        }
+            return Lang::makeLink(static::$type, $id, $n, $fmt, $cssClass);
 
         return '';
     }

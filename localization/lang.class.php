@@ -506,6 +506,17 @@ class Lang
         return trim($tmp);
     }
 
+    public static function makeLink(int $type, int $typeId, string $name, int $fmt = self::FMT_HTML, string $cssClass = '') : string
+    {
+        return match ($fmt)
+        {
+            self::FMT_HTML   => '<a href="?'.Type::getFileString($type).'='.$typeId.'"'.($cssClass ? ' class="'.$cssClass.'"' : '').'>'.$name.'</a>',
+            self::FMT_MARKUP => '[url=?'.Type::getFileString($type).'='.$typeId.($cssClass ? ' class='.$cssClass : '').']'.$name.'[/url]',
+            self::FMT_RAW    => $name,
+            default          => $name
+        };
+    }
+
     public static function nf(float $number, int $decimals = 0, bool $no1k = false) : string
     {
         return number_format($number, $decimals, self::main('nfSeparators', 1), $no1k ? '' : self::main('nfSeparators', 0));
@@ -513,6 +524,9 @@ class Lang
 
     public static function typeName(int $type) : string
     {
+        if (!Type::exists($type))
+            return '';
+
         return Util::ucFirst(self::game(Type::getFileString($type)));
     }
 
