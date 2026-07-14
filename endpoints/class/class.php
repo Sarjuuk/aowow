@@ -210,7 +210,7 @@ class ClassBaseResponse extends TemplateResponse implements ICache
             ['trainerRequirement', $this->typeId]
         );
 
-        $trainer = new CreatureList($conditions);
+        $trainer = new CreatureSet($conditions);
         if (!$trainer->error)
         {
             $this->addDataLoader('zones');
@@ -218,7 +218,7 @@ class ClassBaseResponse extends TemplateResponse implements ICache
                 'data' => $trainer->getListviewData(),
                 'id'   => 'trainers',
                 'name' => '$LANG.tab_trainers'
-            ), CreatureList::$brickFile));
+            ), Creature::$brickFile));
         }
 
         // tab: items (grouped)

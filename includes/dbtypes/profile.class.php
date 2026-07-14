@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 
 class ProfileList extends DBTypeList
 {
-    use profilerHelper, listviewHelper;
+    use TrProfilerHelper;
 
     public static int $contribute = CONTRIBUTE_NONE;
 

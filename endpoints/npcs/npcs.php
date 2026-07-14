@@ -36,7 +36,7 @@ class NpcsBaseResponse extends TemplateResponse implements ICache
         if ($this->category)
             $this->subCat = '='.implode('.', $this->category);
 
-        $this->filter = new CreatureListFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
+        $this->filter = new CreatureFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
         if ($this->filter->shouldReload)
         {
             $_SESSION['error']['fi'] = $this->filter::class;
@@ -103,7 +103,7 @@ class NpcsBaseResponse extends TemplateResponse implements ICache
 
         // beast subtypes are selected via filter
         $tabData = ['data' => []];
-        $npcs    = new CreatureList($conditions, ['extraOpts' => $this->filter->extraOpts, 'calcTotal' => true]);
+        $npcs    = new CreatureSet($conditions, ['extraOpts' => $this->filter->extraOpts, 'calcTotal' => true]);
         if (!$npcs->error)
         {
             $tabData['data'] = $npcs->getListviewData($fiRepCols ? LISTVIEWINFO_REPUTATION : 0x0);
@@ -125,7 +125,7 @@ class NpcsBaseResponse extends TemplateResponse implements ICache
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
 
-        $this->lvTabs->addListviewTab(new Listview($tabData, CreatureList::$brickFile));
+        $this->lvTabs->addListviewTab(new Listview($tabData, Creature::$brickFile));
 
         parent::generate();
 

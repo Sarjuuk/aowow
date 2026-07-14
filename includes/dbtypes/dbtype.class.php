@@ -301,7 +301,7 @@ trait TrSpawnHelper
                 $tt['footer'] = $footer;
 
             if ($tt && $this->getEntry($s['typeId']))
-                $opts['tooltip'] = [$this->name => $tt];
+                $opts['tooltip'] = [(string)$this->name => $tt];
             else if ($hasLabel && $this->getEntry($s['typeId']))
                 $opts['label'] = $this->name;
 

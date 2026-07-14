@@ -33,12 +33,12 @@ class NpcPowerResponse extends TextResponse implements ICache
 
     protected function generate() : void
     {
-        $creature = new CreatureList(array(['id', $this->typeId]));
+        $creature = new Creature($this->typeId);
         if ($creature->error)
             $this->cacheType = CACHE_TYPE_NONE;
         else
             $opts = array(
-                'name'    => $creature->getField('name', true),
+                'name'    => $creature->name,
                 'tooltip' => $creature->renderTooltip(),
                 'map'     => $creature->getSpawns(SPAWNINFO_SHORT)
             );
