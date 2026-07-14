@@ -252,7 +252,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
                 case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE:
                     $killSuffix = Lang::achievement('slain');
                 case ACHIEVEMENT_CRITERIA_TYPE_KILLED_BY_CREATURE:
-                    $crtIcon = new IconElement(Type::NPC, $obj, $crtName ?: CreatureList::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon', extraText: $crtName ? null : $killSuffix);
+                    $crtIcon = new IconElement(Type::NPC, $obj, $crtName ?: Creature::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon', extraText: $crtName ? null : $killSuffix);
                     break;
                 // link to area (by map)
                 case ACHIEVEMENT_CRITERIA_TYPE_WIN_BG:
@@ -342,7 +342,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
                 switch ($xType)
                 {
                     case ACHIEVEMENT_CRITERIA_DATA_TYPE_T_CREATURE:
-                        $extraData[] = CreatureList::makeLink($xData['value1']);
+                        $extraData[] = Creature::makeLink($xData['value1']);
                         break;
                     case ACHIEVEMENT_CRITERIA_DATA_TYPE_T_PLAYER_CLASS_RACE:
                     case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_PLAYER_CLASS_RACE:

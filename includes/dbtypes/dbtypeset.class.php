@@ -11,7 +11,7 @@ abstract class DBTypeSet
     protected array  $sets     = [];
     protected DBType $curEntry;
 
-    public static int        $type;
+    public static int        $dbType;
     public static int        $contribute = CONTRIBUTE_ANY;
     public static string     $dataTable;
     public        string|int $id         = 0;               // sooo .. everything is int, except profiler related stuff, whose keys are <realmId>:<subjectGUID>

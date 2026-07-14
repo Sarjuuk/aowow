@@ -214,7 +214,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                 $buff .= Lang::main('colon').'[ul]';
 
             if ($minTime > 1)                               // sign shenannigans reverse the display order
-                $buff .= '[li]'.Lang::game('duration').Lang::main('colon').Util::createNumRange(-$maxTime, -$minTime, fn: fn($x) => DateTime::formatTimeElapsed(-$x * 1000)).'[/li]';
+                $buff .= '[li]'.Lang::game('duration').Lang::main('colon').Util::createNumRange(-$maxTime, -$minTime, callback: fn($x) => DateTime::formatTimeElapsed(-$x * 1000)).'[/li]';
 
             if ($minPlayer)
                 $buff .= '[li]'.Lang::main('players').Lang::main('colon').Util::createNumRange($minPlayer, $maxPlayer).'[/li]';

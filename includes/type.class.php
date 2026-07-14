@@ -92,7 +92,7 @@ abstract class Type
     public const IDX_FLAGS    = 3;
 
     private static array $data = array(
-        self::NPC         => [CreatureList::class,    'npc',         'g_npcs',               self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
+        self::NPC         => [Creature::class,    'npc',         'g_npcs',               self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
         self::OBJECT      => [GameObjectList::class,  'object',      'g_objects',            self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
         self::ITEM        => [ItemList::class,        'item',        'g_items',              self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
         self::ITEMSET     => [ItemsetList::class,     'itemset',     'g_itemsets',           self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
@@ -144,23 +144,19 @@ abstract class Type
     }
 
     // DELETEME - tmp achievement test backwards compat
-    public static function newList(int $type, array $conditions = []) : ?DBTypeList
+    public static function newList(int $type, array $conditions = []) // : ?DBTypeList
     {
         if (!self::exists($type))
             return null;
 
-        $n = self::$data[$type][self::IDX_OBJECT];
-        $n .= match($type)
+        try
         {
-            Type::ACHIEVEMENT,
-            Type::AREATRIGGER,
-            Type::ARENA_TEAM,
-            Type::CHR_RACE,
-            Type::CHR_CLASS => 'List',
-            default => ''
-        };
-
-        return new ($n)($conditions);
+            return new (self::$data[$type][self::IDX_OBJECT].'Set')($conditions);
+        }
+        catch (\Exception $e)
+        {
+            return new (self::$data[$type][self::IDX_OBJECT])($conditions);
+        }
     }
 
     public static function newFilter(string $fileStr, array|string $data, array $opts = []) : ?Filter

@@ -22,7 +22,7 @@ trait SmartHelper
     private function numRange(int $min, int $max, bool $isTime) : string
     {
         if ($isTime)
-            return Util::createNumRange($min, $max, ' &ndash; ', fn($x) => DateTime::formatTimeElapsedFloat($x));
+            return Util::createNumRange($min, $max, ' &ndash; ', DateTime::formatTimeElapsedFloat(...));
 
         return Util::createNumRange($min, $max, ' &ndash; ') ?: 0;
     }

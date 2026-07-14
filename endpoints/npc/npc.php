@@ -27,9 +27,9 @@ class NpcBaseResponse extends TemplateResponse implements ICache
     public  array  $reputation  = [];
     public  string $subname     = '';
 
-    private  CreatureList $subject;
-    private ?CreatureList $altNPCs  = null;
-    private  array        $soundIds = [];
+    private  Creature    $subject;
+    private ?CreatureSet $altNPCs  = null;
+    private  array       $soundIds = [];
 
     public function __construct(string $id)
     {
@@ -41,20 +41,20 @@ class NpcBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new CreatureList(array(['id', $this->typeId]));
+        $this->subject = new Creature($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('npc'), Lang::npc('notFound'));
 
-        $this->h1      = Util::htmlEscape($this->subject->getField('name', true));
-        $this->subname = $this->subject->getField('subname', true);
+        $this->h1      = Util::htmlEscape($this->subject->name);
+        $this->subname = $this->subject->subname;
 
         $this->gPageInfo += array(
             'type'   => $this->type,
             'typeId' => $this->typeId,
-            'name'   => $this->subject->getField('name', true)
+            'name'   => $this->subject->name
         );
 
-        $_typeFlags  = $this->subject->getField('typeFlags');
+        $_typeFlags  = $this->subject->typeFlags;
         $_altIds     = [];
 
 
@@ -62,8 +62,8 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         /* Menu Path */
         /*************/
 
-        $this->breadcrumb[] = $this->subject->getField('type');
-        if ($_ = $this->subject->getField('family'))
+        $this->breadcrumb[] = $this->subject->type;
+        if ($_ = $this->subject->family)
             $this->breadcrumb[] = $_;
 
 
@@ -71,30 +71,23 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         /* Page Title */
         /**************/
 
-        array_unshift($this->title, $this->subject->getField('name', true), mb_strtoupper(Lang::game('npc')));
+        array_unshift($this->title, $this->subject->name, mb_strtoupper(Lang::game('npc')));
 
 
         /***********************/
         /* Difficulty versions */
         /***********************/
 
-        if ($this->subject->getField('cuFlags') & NPC_CU_DIFFICULTY_DUMMY)
-            $this->placeholder = [$this->subject->getField('parentId'), $this->subject->getField('parent', true)];
-        else
-        {
-            for ($i = 1; $i < 4; $i++)
-                if ($_ = $this->subject->getField('difficultyEntry'.$i))
-                    $_altIds[$_] = $i;
-
-            if ($_altIds)
-                $this->altNPCs = new CreatureList(array(['id', array_keys($_altIds)]));
-        }
+        if ($this->subject->cuFlags & NPC_CU_DIFFICULTY_DUMMY)
+            $this->placeholder = [$this->subject->parentId, $this->subject->parent];
+        else if ($_altIds = array_filter($this->subject->difficultyEntries))
+            $this->altNPCs = new CreatureSet(array(['id', array_keys($_altIds)]));
 
         if ($_ = DB::World()->selectCol('SELECT DISTINCT `entry` FROM vehicle_template_accessory WHERE `accessory_entry` = %i', $this->typeId))
         {
-            $vehicles = new CreatureList(array(['id', $_]));
-            foreach ($vehicles->iterate() as $id => $__)
-                $this->accessory[] = [$id, $vehicles->getField('name', true)];
+            $vehicles = new CreatureSet(array(['id', $_]));
+            foreach ($vehicles->iterate() as $id => $entry)
+                $this->accessory[] = [$id, $entry->name];
         }
 
 
@@ -130,7 +123,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         /* Infobox */
         /***********/
 
-        $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
+        $infobox = Lang::getInfoBoxForFlags($this->subject->cuFlags);
 
         // Event (ignore events, where the object only gets removed)
         if ($_ = DB::World()->selectCol('SELECT DISTINCT ge.`eventEntry` FROM game_event ge, game_event_creature gec, creature c WHERE ge.`eventEntry` = gec.`eventEntry` AND c.`guid` = gec.`guid` AND c.`id` = %i', $this->typeId))
@@ -144,10 +137,10 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         }
 
         // Level
-        if ($this->subject->getField('rank') != NPC_RANK_BOSS)
+        if ($this->subject->rank != NPC_RANK_BOSS)
         {
-            $level  = $this->subject->getField('minLevel');
-            $maxLvl = $this->subject->getField('maxLevel');
+            $level  = $this->subject->minLevel;
+            $maxLvl = $this->subject->maxLevel;
             if ($level < $maxLvl)
                 $level .= ' - '.$maxLvl;
         }
@@ -157,7 +150,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         $infobox[] = Lang::game('level').Lang::main('colon').$level;
 
         // Classification
-        if ($_ = $this->subject->getField('rank'))          //  != NPC_RANK_NORMAL
+        if ($_ = $this->subject->rank)                      //  != NPC_RANK_NORMAL
         {
             $str = $this->subject->isBoss() ? '[span class=icon-boss]'.Lang::npc('rank', $_).'[/span]' : Lang::npc('rank', $_);
             $infobox[] = Lang::npc('classification', [$str]);
@@ -170,26 +163,26 @@ class NpcBaseResponse extends TemplateResponse implements ICache
             -1      => 'q10',                               // q10 red
             default => 'q'                                  // q   yellow
         };
-        $infobox[] = Lang::npc('react', ['[color='.$color($this->subject->getField('A')).']A[/color] [color='.$color($this->subject->getField('H')).']H[/color]']);
+        $infobox[] = Lang::npc('react', ['[color='.$color($this->subject->A).']A[/color] [color='.$color($this->subject->H).']H[/color]']);
 
         // Faction
-        $this->extendGlobalIds(Type::FACTION, $this->subject->getField('factionId'));
-        $infobox[] = Util::ucFirst(Lang::game('faction')).Lang::main('colon').'[faction='.$this->subject->getField('factionId').']';
+        $this->extendGlobalIds(Type::FACTION, $this->subject->factionId);
+        $infobox[] = Util::ucFirst(Lang::game('faction')).Lang::main('colon').'[faction='.$this->subject->factionId.']';
 
         // Tameable
         if ($fa = $this->subject->getTameable())
             $infobox[] = Lang::npc('tameable', ['[url=pet='.$fa.']'.Lang::game('fa', $fa).'[/url]']);
 
         // Wealth
-        if ($_ = intVal(($this->subject->getField('minGold') + $this->subject->getField('maxGold')) / 2))
+        if ($_ = intVal(($this->subject->minGold + $this->subject->maxGold) / 2))
             $infobox[] = Lang::npc('worth', ['[tooltip=tooltip_avgmoneydropped][money='.$_.'][/tooltip]']);
 
         // is Vehicle
-        if ($this->subject->getField('vehicleId'))
+        if ($this->subject->vehicleId)
             $infobox[] = Lang::npc('vehicle');
 
         // is visible as ghost (redundant to extraFlags)
-        if ($this->subject->getField('npcflag') & (NPC_FLAG_SPIRIT_HEALER | NPC_FLAG_SPIRIT_GUIDE))
+        if ($this->subject->npcflag & (NPC_FLAG_SPIRIT_HEALER | NPC_FLAG_SPIRIT_GUIDE))
             $infobox[] = Lang::npc('extraFlags', CREATURE_FLAG_EXTRA_GHOST_VISIBILITY);
 
         // id
@@ -197,7 +190,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
 
         // original name
         if (Lang::getLocale() != Locale::EN)
-            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.$this->subject->getField('name_loc0').'[/copy][/li]';
+            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.($this->subject->name)(Locale::EN).'[/copy][/li]';
 
         if (User::isInGroup(U_GROUP_EMPLOYEE))
         {
@@ -205,7 +198,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
 
             // AI
             $scripts = null;
-            if ($_ = $this->subject->getField('ScriptOrAI'))
+            if ($_ = $this->subject->ScriptOrAI)
                 $scripts = match($_)
                 {
                     'NullAI',    'AggressorAI',
@@ -231,7 +224,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
 
             // StringId
             $stringIDs = null;
-            if ($_ = $this->subject->getField('StringId'))
+            if ($_ = $this->subject->StringId)
                 $stringIDs = 'StringID'.Lang::main('colon').$_;
 
             if ($moreStrings = array_filter(array_column($spawnData, 2, 0)))
@@ -248,7 +241,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                 $infobox[] = $stringIDs;
 
             // Mechanic immune
-            if ($immuneMask = $this->subject->getField('mechanicImmuneMask'))
+            if ($immuneMask = $this->subject->mechanicImmuneMask)
             {
                 $mechanics = array_intersect_key(Lang::game('me'), Util::mask2bits($immuneMask, 1));
 
@@ -260,7 +253,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
             }
 
             // extra flags
-            if ($flagsExtra = $this->subject->getField('flagsExtra'))
+            if ($flagsExtra = $this->subject->flagsExtra)
             {
                 $buff = [];
                 foreach (Lang::npc('extraFlags') as $idx => $str)
@@ -312,7 +305,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
 
         // smart AI
         $sai = null;
-        if ($this->subject->getField('ScriptOrAI') == 'SmartAI')
+        if ($this->subject->ScriptOrAI == 'SmartAI')
         {
             $sai = new SmartAI(SmartAI::SRC_TYPE_CREATURE, $this->typeId);
             if (!$sai->prepare())                           // no smartAI found .. check per guid
@@ -345,7 +338,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
             BUTTON_VIEW3D  => ['type' => Type::NPC, 'typeId' => $this->typeId, 'displayId' => $this->subject->getRandomModelId()]
         );
 
-        if ($this->subject->getField('humanoid'))
+        if ($this->subject->humanoid)
             $this->redButtons[BUTTON_VIEW3D]['humanoid'] = 1;
 
 
@@ -356,17 +349,12 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
 
         // tab: abilities / tab_controlledabilities (dep: VehicleId)
-        $tplSpells  = [];
         $genSpells  = [];
         $spellClick = [];
         $conditions = [DB::OR];
 
-        for ($i = 1; $i < 9; $i++)
-            if ($_ = $this->subject->getField('spell'.$i))
-                $tplSpells[] = $_;
-
-        if ($tplSpells)
-            $conditions[] = ['id', $tplSpells];
+        if ($_ = array_filter($this->subject->spells))
+            $conditions[] = ['id', $_];
 
         if ($smartSpells = SmartAI::getSpellCastsForOwner($this->typeId, SmartAI::SRC_TYPE_CREATURE))
             $genSpells = $smartSpells;
@@ -429,7 +417,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                     if (in_array($id, $genSpells))
                     {
                         $normal[$id] = $values;
-                        if (!in_array($id, $tplSpells))
+                        if (!in_array($id, $this->subject->spells))
                             unset($controled[$id]);
                     }
                 }
@@ -480,7 +468,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         $sb = SmartAI::getOwnerOfNPCSummon($this->typeId);
         if (!empty($sb[Type::NPC]))
         {
-            $sbNPC = new CreatureList(array(['id', $sb[Type::NPC]]));
+            $sbNPC = new CreatureSet(array(['id', $sb[Type::NPC]]));
             if (!$sbNPC->error)
             {
                 $this->extendGlobalData($sbNPC->getJSGlobals());
@@ -490,7 +478,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                     'data' => $sbNPC->getListviewData(),
                     'name' => '$LANG.tab_summonedby',
                     'id'   => 'summoned-by-npc'
-                ), CreatureList::$brickFile));
+                ), Creature::$brickFile));
             }
         }
 
@@ -512,7 +500,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: teaches
-        if ($this->subject->getField('npcflag') & NPC_FLAG_TRAINER)
+        if ($this->subject->npcflag & NPC_FLAG_TRAINER)
         {
             $teachQuery =
                'SELECT ts.`SpellId` AS ARRAY_KEY, ts.`MoneyCost` AS "cost", ts.`ReqSkillLine` AS "reqSkillId", ts.`ReqSkillRank` AS "reqSkillValue", ts.`ReqLevel` AS "reqLevel", ts.`ReqAbility1` AS "reqSpellId1", ts.`reqAbility2` AS "reqSpellId2"
@@ -625,10 +613,10 @@ class NpcBaseResponse extends TemplateResponse implements ICache
             $skinTab = ['$LANG.tab_skinning',    'skinning',    SKILL_SKINNING];
 
         $sourceFor = array(
-            0 => [Loot::CREATURE,   [4 => $this->subject->getField('lootId')],           '$LANG.tab_drops',         'drops',         [                          ], ''],
-            1 => [Loot::GAMEOBJECT, [],                                                  '$LANG.tab_drops',         'drops-object',  [                          ], ''],
-            2 => [Loot::PICKPOCKET, [4 => $this->subject->getField('pickpocketLootId')], '$LANG.tab_pickpocketing', 'pickpocketing', ['side', 'slot', 'reqlevel'], ''],
-            3 => [Loot::SKINNING,   [4 => $this->subject->getField('skinLootId')],       $skinTab[0],               $skinTab[1],     ['side', 'slot', 'reqlevel'], '']
+            0 => [Loot::CREATURE,   [4 => $this->subject->lootId],           '$LANG.tab_drops',         'drops',         [                          ], ''],
+            1 => [Loot::GAMEOBJECT, [],                                      '$LANG.tab_drops',         'drops-object',  [                          ], ''],
+            2 => [Loot::PICKPOCKET, [4 => $this->subject->pickpocketLootId], '$LANG.tab_pickpocketing', 'pickpocketing', ['side', 'slot', 'reqlevel'], ''],
+            3 => [Loot::SKINNING,   [4 => $this->subject->skinLootId],       $skinTab[0],               $skinTab[1],     ['side', 'slot', 'reqlevel'], '']
         );
 
         /* loot tabs to sub tabs
@@ -671,7 +659,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                 $sourceFor[3][1] = [8 => $sourceFor[3][1][4]];
             }
 
-            foreach ($this->altNPCs->iterate() as $id => $__)
+            foreach ($this->altNPCs->iterate() as $id => $altEntry)
             {
                 foreach (DB::Aowow()->selectAssoc('SELECT l.`difficulty` AS ARRAY_KEY, o.`id`, o.`lootId`, o.`name_loc0`, o.`name_loc2`, o.`name_loc3`, o.`name_loc4`, o.`name_loc6`, o.`name_loc8` FROM ::loot_link l JOIN ::objects o ON o.`id` = l.`objectId` WHERE l.`npcId` = %i ORDER BY `difficulty` ASC', $id) as $difficulty => $lgo)
                 {
@@ -679,11 +667,11 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                     $sourceFor[1][5] = $sourceFor[1][5] ?: '$$WH.sprintf(LANG.lvnote_npcobjectsource, '.$lgo['id'].', "'.Util::localizedString($lgo, 'name').'")';
                 }
 
-                if ($lootId = $this->altNPCs->getField('lootId'))
+                if ($lootId = $altEntry->lootId)
                     $sourceFor[0][1][$getBit($mapType, $_altIds[$id] + 1)] = $lootId;
-                if ($lootId = $this->altNPCs->getField('pickpocketLootId'))
+                if ($lootId = $altEntry->pickpocketLootId)
                     $sourceFor[2][1][$getBit($mapType, $_altIds[$id] + 1)] = $lootId;
-                if ($lootId = $this->altNPCs->getField('skinLootId'))
+                if ($lootId = $altEntry->skinLootId)
                     $sourceFor[3][1][$getBit($mapType, $_altIds[$id] + 1)] = $lootId;
             }
         }
@@ -717,7 +705,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                 if ($note)
                     $tabData['note'] = $note;
                 else if ($lootTpl == Loot::SKINNING)
-                    $tabData['note'] = '<b>'.Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill($skinTab[2], $this->subject->getField('maxLevel') * 5), Lang::FMT_HTML).'</b>';
+                    $tabData['note'] = '<b>'.Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill($skinTab[2], $this->subject->maxLevel * 5), Lang::FMT_HTML).'</b>';
 
                 $this->lvTabs->addListviewTab(new Listview($tabData, ItemList::$brickFile));
             }
@@ -763,10 +751,9 @@ class NpcBaseResponse extends TemplateResponse implements ICache
             [DB::AND, ['reqNpcOrGo3', [$this->typeId]], ['reqNpcOrGoCount3', 0, '>']],
             [DB::AND, ['reqNpcOrGo4', [$this->typeId]], ['reqNpcOrGoCount4', 0, '>']]
         );
-        foreach ([1, 2] as $i)
-            if (($_ = $this->subject->getField('KillCredit'.$i)) > 0)
-                for ($j = 1; $j < 5; $j++)
-                    $conditions[$j][1][1][] = $_;
+        foreach (array_filter($this->subject->killCredit) as $kc)
+            for ($j = 1; $j < 5; $j++)
+                $conditions[$j][1][1][] = $kc;
 
         $objectiveOf = new QuestList($conditions);
         if (!$objectiveOf->error)
@@ -790,7 +777,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         if ($extraCrt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` = %i AND `value1` = %i', ACHIEVEMENT_CRITERIA_DATA_TYPE_T_CREATURE, $this->typeId))
             $conditions = [DB::OR, $conditions, ['ac.id', $extraCrt]];
 
-        $crtOf = new AchievementList($conditions);
+        $crtOf = new AchievementSet($conditions);
         if (!$crtOf->error)
         {
             $this->extendGlobalData($crtOf->getJSGlobals());
@@ -799,7 +786,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                 'data' => $crtOf->getListviewData(),
                 'name' => '$LANG.tab_criteriaof',
                 'id'   => 'criteria-of'
-            ), AchievementList::$brickFile));
+            ), Achievement::$brickFile));
         }
 
         // tab: same model as
@@ -823,7 +810,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         // tab: passengers
         if ($_ = DB::World()->selectCol('SELECT `accessory_entry` AS ARRAY_KEY, GROUP_CONCAT(`seat_id` SEPARATOR ", ") FROM vehicle_template_accessory WHERE `entry` = %i GROUP BY `accessory_entry`', $this->typeId))
         {
-            $passengers = new CreatureList(array(['id', array_keys($_)]));
+            $passengers = new CreatureSet(array(['id', array_keys($_)]));
             if (!$passengers->error)
             {
                 $data = $passengers->getListviewData();
@@ -844,7 +831,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                     $tabData['extraCols'] = ["\$Listview.funcBox.createSimpleCol('seat', '".Lang::npc('seat')."', '10%', 'seat')"];
 
                 $this->addDataLoader('zones');
-                $this->lvTabs->addListviewTab(new Listview($tabData, CreatureList::$brickFile));
+                $this->lvTabs->addListviewTab(new Listview($tabData, Creature::$brickFile));
             }
         }
 
@@ -857,7 +844,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         $this->soundIds = array_merge($this->soundIds, SmartAI::getSoundsPlayedForOwner($this->typeId, SmartAI::SRC_TYPE_CREATURE));
 
         // up to 4 possible displayIds .. for the love of things betwixt, just use the first!
-        $activitySounds = DB::Aowow()->selectRow('SELECT * FROM ::creature_sounds WHERE `id` = %i', $this->subject->getField('displayId1'));
+        $activitySounds = DB::Aowow()->selectRow('SELECT * FROM ::creature_sounds WHERE `id` = %i', $this->subject->displayIds[0]);
         array_shift($activitySounds);                       // remove id-column
         $this->soundIds = array_merge($this->soundIds, array_values($activitySounds));
 
@@ -1009,7 +996,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
 
     private function getQuotes() : ?array
     {
-        [$quotes, $nQuotes, $soundIds] = Game::getQuotesForCreature($this->typeId, true, $this->subject->getField('name', true));
+        [$quotes, $nQuotes, $soundIds] = Game::getQuotesForCreature($this->typeId, true, (string)$this->subject->name);
 
         if ($soundIds)
             $this->soundIds = array_merge($this->soundIds, $soundIds);
@@ -1024,31 +1011,24 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         $hint    = '[tooltip name=%3$s][table cellspacing=10][tr]%1s[/tr][/table][/tooltip][span class=tip tooltip=%3$s]%2s[/span]';
         $modeRow = '[tr][td]%s&nbsp;&nbsp;[/td][td]%s[/td][/tr]';
         // Health
-        $health = $this->subject->getBaseStats('health');
-        $stats['health'] = Util::ucFirst(Lang::spell('powerTypes', -2)).Lang::main('colon').($health[0] < $health[1] ? Lang::nf($health[0]).' - '.Lang::nf($health[1]) : Lang::nf($health[0]));
+        $stats['health'] = Util::ucFirst(Lang::spell('powerTypes', -2)).Lang::main('colon').Util::createNumRange($this->subject->healthMin, $this->subject->healthMax, ' - ', Lang::nf(...));
 
         // Mana (may be 0)
-        $mana = $this->subject->getBaseStats('power');
-        $stats['mana'] = $mana[0] ? Lang::spell('powerTypes', 0).Lang::main('colon').($mana[0] < $mana[1] ? Lang::nf($mana[0]).' - '.Lang::nf($mana[1]) : Lang::nf($mana[0])) : '';
+        $stats['mana'] = $this->subject->manaMin ? Lang::spell('powerTypes', 0).Lang::main('colon').Util::createNumRange($this->subject->manaMin, $this->subject->manaMax, ' - ', Lang::nf(...)) : '';
 
         // Armor
-        $armor = $this->subject->getBaseStats('armor');
-        $stats['armor'] = Lang::npc('armor').($armor[0] < $armor[1] ? Lang::nf($armor[0]).' - '.Lang::nf($armor[1]) : Lang::nf($armor[0]));
+        $stats['armor'] = Lang::npc('armor').Util::createNumRange($this->subject->armorMin, $this->subject->armorMax, ' - ', Lang::nf(...));
 
         // Resistances
-        $resNames = [null, 'hol', 'fir', 'nat', 'fro', 'sha', 'arc'];
+        $resNames = ['hol', 'fir', 'nat', 'fro', 'sha', 'arc'];
         $tmpRes   = [];
-        $res      = $this->subject->getBaseStats('resistance'); // $sc => $amt
         $stats['resistance'] = '';
         foreach ($resNames as $idx => $sc)
         {
-            if (!$sc)
-                continue;
-
-            if ((1 << $idx) & $this->subject->getField('schoolImmuneMask'))
+            if ((1 << ($idx + 1)) & $this->subject->schoolImmuneMask)
                 $tmpRes[] = '[tooltip=tooltip_immune][span class="tip moneyschool'.$sc.'"]∞[/span][/tooltip]';
-            else if ($res[$idx])
-                $tmpRes[] = '[span class="moneyschool'.$sc.'"]'.$res[$idx].'[/span]';
+            else if ($this->subject->resistances[$idx])
+                $tmpRes[] = '[span class="moneyschool'.$sc.'"]'.$this->subject->resistances[$idx].'[/span]';
         }
 
         if ($tmpRes)
@@ -1061,37 +1041,36 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         }
 
         // Melee Damage
-        $melee = $this->subject->getBaseStats('melee');
-        if ($_ = $this->subject->getField('dmgSchool'))     // magic damage
-            $stats['melee'] = Lang::npc('melee').Lang::nf($melee[0]).' - '.Lang::nf($melee[1]).Lang::main('parensFmt', ['', Lang::game('sc', $_)]);
-        else                                                // phys. damage
-            $stats['melee'] = Lang::npc('melee').Lang::nf($melee[0]).' - '.Lang::nf($melee[1]);
+        [$mleMin, $mleMax] = $this->subject->calcMeleeDamage();
+        $stats['melee'] = Lang::npc('melee').Util::createNumRange($mleMin, $mleMax, ' - ', Lang::nf(...));
+        if ($_ = $this->subject->dmgSchool)                 // magic damage
+            $stats['melee'] = Lang::main('parensFmt', [$stats['melee'], Lang::game('sc', $_)]);
 
         // Ranged Damage
-        $ranged = $this->subject->getBaseStats('ranged');
-        $stats['ranged'] = Lang::npc('ranged').Lang::nf($ranged[0]).' - '.Lang::nf($ranged[1]);
+        [$rngMin, $rngMax] = $this->subject->calcRangedDamage();
+        $stats['ranged'] = Lang::npc('ranged').Util::createNumRange($rngMin, $rngMax, ' - ', Lang::nf(...));
 
-        foreach ($altIds as $id => $mode)
+        foreach ($this?->altNPCs?->iterate() ?? [] as $id => $altEntry)
         {
-            if (!$this->altNPCs->getEntry($id))
-                continue;
+            $m = Lang::game('modes', $mapType, $altIds[$id]);
 
-            $m = Lang::game('modes', $mapType, $mode);
+            // // Mana (may be 0)
+            // $stats['mana'] = $this->subject->manaMin ? Lang::spell('powerTypes', 0).Lang::main('colon').Util::createNumRange($this->subject->manaMin, $this->subject->manaMax, ' - ', Lang::nf(...)) : '';
+
+            // // Armor
+            // $stats['armor'] = Lang::npc('armor').Util::createNumRange($this->subject->armorMin, $this->subject->armorMax, ' - ', Lang::nf(...));
 
             // Health
-            $health = $this->altNPCs->getBaseStats('health');
-            $modes['health'][] = sprintf($modeRow, $m, $health[0] < $health[1] ? Lang::nf($health[0]).' - '.Lang::nf($health[1]) : Lang::nf($health[0]));
+            $modes['health'][] = sprintf($modeRow, $m, Util::createNumRange($altEntry->healthMin, $altEntry->healthMax, ' - ', Lang::nf(...)));
 
             // Mana (may be 0)
-            $mana = $this->altNPCs->getBaseStats('power');
-            $modes['mana'][] = $mana[0] ? sprintf($modeRow, $m, $mana[0] < $mana[1] ? Lang::nf($mana[0]).' - '.Lang::nf($mana[1]) : Lang::nf($mana[0])) : null;
+            $modes['mana'][] = $altEntry->manaMin ? sprintf($modeRow, $m, Util::createNumRange($altEntry->manaMin, $altEntry->manaMax, ' - ', Lang::nf(...))) : null;
 
             // Armor
-            $armor = $this->altNPCs->getBaseStats('armor');
-            $modes['armor'][] = sprintf($modeRow, $m, $armor[0] < $armor[1] ? Lang::nf($armor[0]).' - '.Lang::nf($armor[1]) : Lang::nf($armor[0]));
+            $modes['armor'][] = sprintf($modeRow, $m, Util::createNumRange($altEntry->armorMin, $altEntry->armorMax, ' - ', Lang::nf(...)));
 
             // Resistances
-            if (array_filter($this->altNPCs->getBaseStats('resistance')))
+            if (array_filter($altEntry->resistances))
             {
                 if (!isset($modes['resistance']))           // init table head
                     $modes['resistance'][] = '[td][/td][td][span class="moneyschoolhol" style="margin: 0px 5px"][/span][/td][td][span class="moneyschoolfir" style="margin: 0px 5px"][/span][/td][td][span class="moneyschoolnat" style="margin: 0px 5px"][/span][/td][td][span class="moneyschoolfro" style="margin: 0px 5px"][/span][/td][td][span class="moneyschoolsha" style="margin: 0px 5px"][/span][/td][td][span class="moneyschoolarc" style="margin: 0px 5px"][/span][/td]';
@@ -1100,31 +1079,27 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                     $stats['resistance'] = Lang::npc('resistances').'…';
 
                 $tmpRes = '';
-                $res    = $this->altNPCs->getBaseStats('resistance');
                 foreach ($resNames as $idx => $sc)
                 {
-                    if (!$sc)
-                        continue;
-
-                    if ((1 << $idx) & $this->altNPCs->getField('schoolImmuneMask'))
+                    if ((1 << $idx) & $altEntry->schoolImmuneMask)
                         $tmpRes .= '[td][span style="margin: 0px 5px"]∞[/span][/td]';
-                    else if ($res[$idx])
-                        $tmpRes .= '[td][span style="margin: 0px 5px"]'.$res[$idx].'[/span][/td]';
+                    else if ($altEntry->resistances[$idx])
+                        $tmpRes .= '[td][span style="margin: 0px 5px"]'.$altEntry->resistances[$idx].'[/span][/td]';
                 }
 
                 $modes['resistance'][] = '[td]'.$m.'&nbsp;&nbsp;&nbsp;&nbsp;[/td]'.$tmpRes;
             }
 
             // Melee Damage
-            $melee = $this->altNPCs->getBaseStats('melee');
-            if ($_ = $this->altNPCs->getField('dmgSchool')) // magic damage
-                $modes['melee'][] = sprintf($modeRow, $m, Lang::nf($melee[0]).' - '.Lang::nf($melee[1]).Lang::main('parensFmt', ['', Lang::game('sc', $_)]));
+            [$mleMin, $mleMax] = $altEntry->calcMeleeDamage();
+            if ($_ = $altEntry->dmgSchool)                  // magic damage
+                $modes['melee'][] = sprintf($modeRow, $m, Util::createNumRange($mleMin, $mleMax, ' - ', Lang::nf(...)).Lang::main('parensFmt', ['', Lang::game('sc', $_)]));
             else                                            // phys. damage
-                $modes['melee'][] = sprintf($modeRow, $m, Lang::nf($melee[0]).' - '.Lang::nf($melee[1]));
+                $modes['melee'][] = sprintf($modeRow, $m, Util::createNumRange($mleMin, $mleMax, ' - ', Lang::nf(...)));
 
             // Ranged Damage
-            $ranged = $this->altNPCs->getBaseStats('ranged');
-            $modes['ranged'][] = sprintf($modeRow, $m, Lang::nf($ranged[0]).' - '.Lang::nf($ranged[1]));
+            [$rngMin, $rngMax] = $altEntry->calcRangedDamage();
+            $modes['ranged'][] = sprintf($modeRow, $m, Util::createNumRange($rngMin, $rngMax, ' - ', Lang::nf(...)));
         }
 
         // todo: resistances can be present/missing in either $stats or $modes
