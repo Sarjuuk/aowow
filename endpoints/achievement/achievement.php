@@ -31,7 +31,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
     public  int    $type        = Type::ACHIEVEMENT;
     public  int    $typeId      = 0;
     public  int    $reqCrtQty   = 0;
-    public ?array  $mail        = null;
+    public ?Mail   $mail        = null;
     public  string $description = '';
     public  array  $criteria    = [];
     public ?array  $rewards     = null;
@@ -461,34 +461,35 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
 
     private function createMail() : bool
     {
-        if ($_ = $this->subject->getField('mailTemplate'))
-        {
-            $letter = DB::Aowow()->selectRow('SELECT * FROM ::mails WHERE `id` = %i', $_);
-            if (!$letter)
-                return false;
+        $acvEntry = $this->subject->getEntry($this->typeId);
+        $mtId     = $this->subject->getField('mailTemplate');
 
-            $this->mail = array(
-                'attachments' => [],
-                'subject'     => UIText::format(Util::localizedString($letter, 'subject', true), Lang::FMT_HTML),
-                'text'        => UIText::format(Util::localizedString($letter, 'text', true), Lang::FMT_HTML),
-                'header'      => [$_, null, null]
-            );
-        }
-        else if ($_ = UIText::format($this->subject->getField('text', true, true), Lang::FMT_HTML))
-        {
-            $this->mail = array(
-                'attachments' => [],
-                'subject'     => UIText::format($this->subject->getField('subject', true, true), Lang::FMT_HTML),
-                'text'        => $_,
-                'header'      => [-$this->typeId, null, null]
-            );
-        }
+        // try mail template before letter from world.achievement_reward
+        if ($mtId && ($_ = DB::Aowow()->selectRow('SELECT * FROM ::mails WHERE `id` = %i', $mtId)))
+            $letter = $_;
+        else if ($this->subject->getField('sender'))
+            $letter = $acvEntry;
         else
             return false;
 
-        if ($senderId = $this->subject->getField('sender'))
-            if ($senderName = CreatureList::getName($senderId))
-                $this->mail['header'][1] = Lang::mail('mailBy', [$senderId, $senderName]);
+        $subject = new LocString($letter, 'subject', fn($x) => UIText::format($x, Lang::FMT_HTML));
+        $text    = new LocString($letter, 'text',    fn($x) => UIText::format($x, Lang::FMT_HTML));
+
+        if ($text->isEmpty())
+            return false;
+
+        $this->mail = new Mail(
+            $mtId ?: -$this->typeId,
+            $subject,
+            $text,
+            $this->subject->getField('sender') ?: null
+        );
+
+        /*
+            we don't display mail attachements as:
+            a) items from world.achievement_reward would have to be added here in a roundabout way
+            b) displaying items from a) and mail loot would be redundant with the rewards paragraph
+        */
 
         return true;
     }

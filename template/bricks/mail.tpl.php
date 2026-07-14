@@ -1,47 +1,19 @@
 <?php
     namespace Aowow\Template;
 
-    use \Aowow\Lang;
-
     /** @var PageTemplate $this */
 
-if (['header' => $header, 'subject' => $subject, 'text' => $text, 'attachments' => $attachments] = $this->mail):
     $offset ??= 0;                                          // in case we have multiple icons on the page (prominently quest-rewards)
-
-    echo '                        <h3>'.Lang::mail('mailDelivery', $header).'</h3>'.PHP_EOL;
-
-    if ($subject):
-        echo '                        <div class="book"><div class="page">'.$subject.'</div></div>'.PHP_EOL;
-    endif;
-
-    if ($text):
-        echo '                        <div class="book" style="float:left; margin-bottom:26px;"><div class="page">'.$text.'</div></div>'.PHP_EOL;
-    endif;
-
-    if ($attachments):
 ?>
-
-                <table class="icontab icontab-box" style="padding-left:10px;">
-
+                <h3><?=$this->mail->renderHeader(); ?></h3>
 <?php
-        foreach ($attachments as $icon):
-            echo $icon->renderContainer(20, $offset, true);
-        endforeach;
+    if (!$this->mail->subject->isEmpty()):
 ?>
-
-                </table>
-
-                <script type="text/javascript">//<![CDATA[
-
-<?php
-        foreach ($attachments as $icon):
-            echo $icon->renderJS(20);
-        endforeach;
-?>
-
-                //]]></script>
-
+                <div class="book"><div class="page"><?=$this->mail->subject; ?></div></div>
 <?php
     endif;
-endif;
+?>
+                <div class="book" style="float:left; margin-bottom:26px;"><div class="page"><?=$this->mail->body; ?></div></div>
+<?php
+    echo $this->mail->renderAttachments(16, $offset);
 ?>

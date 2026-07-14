@@ -23,7 +23,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
     public  int         $typeId        = 0;
     public  array       $objectiveList = [];
     public ?IconElement $providedItem  = null;
-    public  array       $mail          = [];
+    public ?Mail        $mail          = null;
     public ?array       $gains         = null;              // why array|null ? because destructuring an array with less elements than expected is an error, destructuring null just returns false
     public ?array       $rewards       = null;              // so  " if ([$spells, $items, $choice, $money] = $this->rewards): " will either work or cleanly branch to else
     public  string      $objectives    = '';
@@ -1164,25 +1164,13 @@ class QuestBaseResponse extends TemplateResponse implements ICache
 
     private function createMail(array $startEnd) : bool
     {
-        $rmtId = $this->subject->getField('rewardMailTemplateId');
-        if (!$rmtId)
+        if (!($rmtId = $this->subject->getField('rewardMailTemplateId')))
             return false;
 
-        $delay  = $this->subject->getField('rewardMailDelay');
-        $letter = DB::Aowow()->selectRow('SELECT * FROM ::mails WHERE `id` = %i', $rmtId);
+        if (!($letter = DB::Aowow()->selectRow('SELECT * FROM ::mails WHERE `id` = %i', $rmtId)))
+            return false;
 
-        $this->mail = array(
-            'attachments' => [],
-            'text'        => $letter ? UIText::format(Util::localizedString($letter, 'text'), Lang::FMT_HTML) : null,
-            'subject'     => $letter ? UIText::format(Util::localizedString($letter, 'subject'), Lang::FMT_HTML) : null,
-            'header'      => array(
-                $rmtId,
-                null,
-                $delay  ? Lang::mail('mailIn', [DateTime::formatTimeElapsed($delay * 1000)]) : null,
-            )
-        );
-
-        $senderTypeId = 0;
+        $senderTypeId = null;
         if ($_= DB::World()->selectCell('SELECT `RewardMailSenderEntry` FROM quest_mail_sender WHERE `QuestId` = %i', $this->typeId))
             $senderTypeId = $_;
         else
@@ -1190,8 +1178,13 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                 if (($se['method'] & 0x2) && $se['type'] == Type::NPC)
                     $senderTypeId = $se['typeId'];
 
-        if ($ti = CreatureList::getName($senderTypeId))
-            $this->mail['header'][1] = Lang::mail('mailBy', [$senderTypeId, $ti]);
+        $this->mail = new Mail(
+            $rmtId,
+            new LocString($letter, 'subject', fn($x) => UIText::format($x, Lang::FMT_HTML)),
+            new LocString($letter, 'text', fn($x) => UIText::format($x, Lang::FMT_HTML)),
+            $senderTypeId,
+            $this->subject->getField('rewardMailDelay') ?: null // * 1000 ?
+        );
 
         // while mail attachemnts are handled as loot, it has no variance. Always 100% chance, always one item.
         $mailLoot = new LootByContainer();
@@ -1199,7 +1192,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         {
             $this->extendGlobalData($mailLoot->jsGlobals);
             foreach ($mailLoot->getResult() as $loot)
-                $this->mail['attachments'][] = new IconElement(Type::ITEM, $loot['id'], substr($loot['name'], 1), $loot['stack'][0], quality: 7 - $loot['name'][0]);
+                $this->mail->attachItem($loot['id'], substr($loot['name'], 1), $loot['stack'][0], quality: 7 - $loot['name'][0]);
         }
 
         return true;
