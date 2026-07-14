@@ -337,25 +337,26 @@ class Game
         if (!$gemCnd)
             return '';
 
+        $fiColors = array(
+            2 => '0:3:5',                                   // red
+            3 => '2:4:5',                                   // yellow
+            4 => '1:3:4'                                    // blue
+        );
+
+        $__makeLink = fn($str, $col) => $interactive ? sprintf('<a class="tip" href="?items=3&filter=ty=%2s">%1s</a>', $str, $fiColors[$col] ?? '') : $str;
+
         $x = '';
         for ($i = 1; $i < 6; $i++)
         {
             if (!$gemCnd['color'.$i])
                 continue;
 
-            $fiColors = function (int $idx)
-            {
-                return match ($idx)
-                {
-                    2 => '0:3:5',                           // red
-                    3 => '2:4:5',                           // yellow
-                    4 => '1:3:4',                           // blue
-                    default => ''                           // uhhh....
-                };
-            };
+            $bLink = $cLink = '';
 
-            $bLink = $gemCnd['color'.$i]    ? ($interactive ? '<a class="tip" href="?items=3&filter=ty='.$fiColors($gemCnd['color'.$i]).'">'.   Lang::item('gemColors', $gemCnd['color'.$i] - 1).'</a>'    : Lang::item('gemColors', $gemCnd['color'.$i] - 1))    : '';
-            $cLink = $gemCnd['cmpColor'.$i] ? ($interactive ? '<a class="tip" href="?items=3&filter=ty='.$fiColors($gemCnd['cmpColor'.$i]).'">'.Lang::item('gemColors', $gemCnd['cmpColor'.$i] - 1).'</a>' : Lang::item('gemColors', $gemCnd['cmpColor'.$i] - 1)) : '';
+            if ($gemCnd['color'.$i])
+                $bLink = $__makeLink(Lang::item('gemColors', $gemCnd['color'.$i] - 1), $gemCnd['color'.$i]);
+            if ($gemCnd['cmpColor'.$i])
+                $cLink = $__makeLink(Lang::item('gemColors', $gemCnd['cmpColor'.$i] - 1), $gemCnd['cmpColor'.$i]);
 
             switch ($gemCnd['comparator'.$i])
             {
