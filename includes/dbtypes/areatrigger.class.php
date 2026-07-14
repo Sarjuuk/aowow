@@ -32,8 +32,8 @@ class AreaTriggerList extends DBTypeList
 
     public static function getName(int $id) : ?LocString
     {
-        if ($n = DB::Aowow()->SelectRow('SELECT `name` AS "name_loc0" FROM %n WHERE `id` = %i', self::$dataTable, $id))
-            return new LocString($n, callback: fn($x) => $x ?: Lang::areatrigger('unnamed', [$id]));
+        if ($n = DB::Aowow()->selectRow('SELECT IF(`name`, `name`, %s) AS "name_loc0" FROM %n WHERE `id` = %i', Lang::areatrigger('unnamed', [$id]), self::$dataTable, $id))
+            return new LocString($n);
         return null;
     }
 

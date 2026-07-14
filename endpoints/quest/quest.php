@@ -1180,8 +1180,8 @@ class QuestBaseResponse extends TemplateResponse implements ICache
 
         $this->mail = new Mail(
             $rmtId,
-            new LocString($letter, 'subject', fn($x) => UIText::format($x, Lang::FMT_HTML)),
-            new LocString($letter, 'text', fn($x) => UIText::format($x, Lang::FMT_HTML)),
+            new LocString($letter, 'subject', UIText::formatHtml(...)),
+            new LocString($letter, 'text',    UIText::formatHtml(...)),
             $senderTypeId,
             $this->subject->getField('rewardMailDelay') ?: null // * 1000 ?
         );

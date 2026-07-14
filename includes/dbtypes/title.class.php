@@ -48,15 +48,8 @@ class TitleList extends DBTypeList
             // shorthand for more generic access; required by CommunityContent to determine subject
             foreach (Locale::cases() as $loc)
                 if ($loc->validate())
-                    $_curTpl['name'] = new LocString($_curTpl, 'male', fn($x) => trim(strtr($x, ['%s' => '', ',' => ''])));
+                    $_curTpl['name'] = new LocString($_curTpl, 'male', self::trim(...));
         }
-    }
-
-    public static function getName(int $id) : ?LocString
-    {
-        if ($n = DB::Aowow()->SelectRow('SELECT `male_loc0`, `male_loc2`, `male_loc3`, `male_loc4`, `male_loc6`, `male_loc8` FROM %n WHERE `id` = %i', self::$dataTable, $id))
-            return new LocString($n, 'male', fn($x) => trim(strtr($x, ['%s' => '', ',' => ''])));
-        return null;
     }
 
     public function getListviewData() : array
@@ -173,6 +166,23 @@ class TitleList extends DBTypeList
             $faction = 0;
         else if ($faction != 1)                             // Alliance
             $faction = -1;                                  // Both
+    }
+
+    public static function getName(int $id) : ?LocString
+    {
+        if ($n = DB::Aowow()->SelectRow('SELECT `male_loc0`, `male_loc2`, `male_loc3`, `male_loc4`, `male_loc6`, `male_loc8` FROM %n WHERE `id` = %i', self::$dataTable, $id))
+            return new LocString($n, 'male', self::trim(...));
+        return null;
+    }
+
+    /**
+     * removes name placeholder and separating comma from title
+     * @param string    $title  full title string from dbc
+     * @return string the pruned title
+     */
+    public static function trim(string $title) : string
+    {
+        return trim(strtr($title, ['%s' => '', ',' => '']));
     }
 }
 

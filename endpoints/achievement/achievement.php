@@ -472,8 +472,8 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
         else
             return false;
 
-        $subject = new LocString($letter, 'subject', fn($x) => UIText::format($x, Lang::FMT_HTML));
-        $text    = new LocString($letter, 'text',    fn($x) => UIText::format($x, Lang::FMT_HTML));
+        $subject = new LocString($letter, 'subject', UIText::formatHtml(...));
+        $text    = new LocString($letter, 'text',    UIText::formatHtml(...));
 
         if ($text->isEmpty())
             return false;
