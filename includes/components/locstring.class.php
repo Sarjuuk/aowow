@@ -10,23 +10,42 @@ class LocString implements \JsonSerializable
 {
     private \WeakMap $store;
 
-    public function __construct(array $data, string $key = 'name', ?callable $callback = null)
+    public function __construct(array &$data, string $key = 'name', ?callable $callback = null, bool $pruneFromSrc = false)
     {
         $this->store = new \WeakMap();
 
         $callback ??= fn($x) => $x;
 
-        if (!array_filter($data, fn($v, $k) => $v && strstr($k, $key.'_loc'), ARRAY_FILTER_USE_BOTH))
-            trigger_error('LocString - is entrirely empty', E_USER_WARNING);
+        if (!array_filter($data, fn($k) => strstr($k, $key.'_loc'), ARRAY_FILTER_USE_KEY))
+            trigger_error('LocString::__construct - data has no localized strings for key '.$key, E_USER_WARNING);
 
         foreach (Locale::cases() as $l)
+        {
             if ($l->validate())
                 $this->store[$l] = (string)$callback($data[$key.'_loc'.$l->value] ?? '');
+
+            if ($pruneFromSrc)
+                unset($data[$key.'_loc'.$l->value]);
+        }
+    }
+
+    public function isEmpty() : bool
+    {
+        foreach (Locale::cases() as $l)
+            if (!empty($this->store[$l]))
+                return false;
+
+        return true;
     }
 
     public function jsonSerialize() : string
     {
         return $this->__toString();
+    }
+
+    public function __invoke(Locale $l) : string
+    {
+        return $this->store[$l->value] ?? '';
     }
 
     public function __toString() : string
@@ -35,10 +54,10 @@ class LocString implements \JsonSerializable
             return $str;
 
         foreach (Locale::cases() as $l)                // desired loc not set, use any other
-            if (isset($this->store[$l]))
+            if (!empty($this->store[$l]))
                 return Cfg::get('DEBUG') ? '['.$this->store[$l].']' : $this->store[$l];
 
-        return Cfg::get('DEBUG') ? '[LOCSTRING]' : '';
+        return '';
     }
 
     public function __serialize(): array
