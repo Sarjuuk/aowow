@@ -242,7 +242,7 @@ class Creature extends DBType
         return $x;
     }
 
-    public function getRandomModelId() : int
+    public function getRandomDisplayId() : int
     {
         // dwarf?? [null, 30754, 30753, 30755, 30736]
         // totems use hardcoded models, tauren model is base

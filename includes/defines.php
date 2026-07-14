@@ -301,6 +301,7 @@ define('SRC_PICKPOCKETING',  21);
 define('SRC_SALVAGING',      22);
 define('SRC_SKINNING',       23);
 // define('SRC_INGAME_STORE',   24);                        // not in 3.3.5
+define('MAX_SOURCES',        25);
 
 define('SRC_SUB_PVP_ARENA', 1);
 define('SRC_SUB_PVP_BG',    2);

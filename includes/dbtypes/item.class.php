@@ -440,7 +440,8 @@ class ItemList extends DBTypeList
                 if ($_ = $this->getField('displayId'))
                     $data[$this->id]['displayid'] = $_;
 
-            if ($this->getSources($s, $sm))
+            assert(false, 'TODO: prebuild sourcemore');
+            if ([$s, $sm] = $this->getSources())
             {
                 $data[$this->id]['source'] = $s;
                 if ($sm)
@@ -1729,6 +1730,19 @@ class ItemList extends DBTypeList
                 unset($json[$k]);
 
         $this->json[$json['id']] = $json;
+    }
+
+    public static function getName(int $id, ?int &$quality = null) : ?LocString
+    {
+        if (!$id)
+            return null;
+
+        if ($n = DB::Aowow()->SelectRow('SELECT `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8`, `quality` FROM %n WHERE `id` = %i', static::$dataTable, $id))
+        {
+            $quality = $n['quality'];
+            return new LocString($n);
+        }
+        return null;
     }
 }
 

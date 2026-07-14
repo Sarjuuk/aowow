@@ -433,7 +433,7 @@ class StatsContainer implements \Countable
             $mVal = $spell['effect'.$i.'MiscValue'];
             $amt  = $spell['effect'.$i.'BasePoints'] + $spell['effect'.$i.'DieSides'];
 
-            if (in_array($eff, SpellList::EFFECTS_ENCHANTMENT) && ($relE = $this->relE($mVal)))
+            if (in_array($eff, SpellEntry::EFFECTS_ENCHANTMENT) && ($relE = $this->relE($mVal)))
                 $this->fromEnchantment($relE);
             else if ($aura == SPELL_AURA_PERIODIC_TRIGGER_SPELL && ($ts = $spell['effect'.$i.'TriggerSpell']))
             {

@@ -119,7 +119,7 @@ abstract class DBTypeSet
 
         $ids = DB::Aowow()->selectCol('SELECT `id` FROM %n', $m[1], '%if', User::isInGroup(U_GROUP_EMPLOYEE), 'WHERE (`cuFlags` & %i) = 0 %endif', CUSTOM_EXCLUDE_FOR_LISTVIEW) ?? [0];
 
-        return array_rand($ids);
+        return $ids[rand(0, count($ids))];
     }
 
     public function getFoundIds() : array

@@ -170,7 +170,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 $this->addExclusion(Type::SPELL, $mount, $skillEx);
 
         foreach ($mountz->iterate() as $id => $_)
-            if (!$mountz->getSources())
+            if (!$mountz->hasAnySource())
                 $this->addExclusion(Type::SPELL, $id, PR_EXCLUDE_GROUP_UNAVAILABLE);
 
         foreach (CLISetup::$locales as $loc)
@@ -211,7 +211,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
         $legit      = DB::Aowow()->selectCol('SELECT `spellId2` FROM ::items WHERE `class` = %i AND `subClass` = %i AND `spellId1` IN %in AND `spellId2` IN %in', ITEM_CLASS_MISC, 2, LEARN_SPELLS, $companionz->getFoundIDs());
 
         foreach ($companionz->iterate() as $id => $_)
-            if (!$companionz->getSources())
+            if (!$companionz->hasAnySource())
                 $this->addExclusion(Type::SPELL, $id, PR_EXCLUDE_GROUP_UNAVAILABLE);
 
         foreach (CLISetup::$locales as $loc)
@@ -284,7 +284,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             $created = '';
             foreach ($recipez->iterate() as $id => $_)
             {
-                if (!$recipez->getSources())
+                if (!$recipez->hasAnySource())
                     $this->addExclusion(Type::SPELL, $id, PR_EXCLUDE_GROUP_UNAVAILABLE);
 
                 foreach ($recipez->canCreateItem() as $idx)

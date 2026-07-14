@@ -13,8 +13,8 @@ interface ITooltip
 
 interface ISource
 {
-    public function getRawSource (int $src) : array;
-    public function getSources (?array &$s = [], ?array &$sm = []) : bool;
+    public function getRawSource(int $src) : array;
+    public function getSources() : ?array;
     public function getSourceData(/* int $id = 0 */) : array;
     public function hasAnySource() : bool;
 }
@@ -26,61 +26,83 @@ interface ISource
     'bd':   BossDrop [0; 1] [Creature / GO]
     'dd':   DungeonDifficulty [-2: DungeonHC; -1: DungeonNM; 1: Raid10NM; 2:Raid25NM; 3:Raid10HM; 4: Raid25HM; 99: filler trash] [Creature / GO]
      'q':   cssQuality [Items]
-     'z':   zone [set when all happens in here]
+     'z':   zone [set when everything happens in one zone]
      'p':   PvP [pvpSourceId]
-     's':   Type::TITLE: side; Type::SPELL: skillId (yeah, double use. Ain't life just grand)
+     's':   Type::TITLE: side; Type::SPELL: skillId (yeah, conflicting use cases. Ain't life just grand.)
      'c':   category [Spells / Quests]
     'c2':   subCat [Quests]
   'icon':   iconString
 */
 trait TrSourceHelper
 {
-    protected  array $sources    = [];
-    protected ?array $sourceMore = null;
+    public readonly  array $sources;
+    public readonly ?int   $moreType;
+    public readonly ?int   $moreTypeId;
+    public readonly ?int   $moreZoneId;
+    public readonly ?int   $moreMask;                       // srcFlags
 
-    // set when constructing implementing class
-    protected ?int   $moreType   = null;
-    protected ?int   $moreTypeId = null;
-    protected ?int   $moreZoneId = null;
-    protected ?int   $srcFlags   = null;                    // from moreMask
+    // the result for js
+    private ?array $source     = null;
+    private ?array $sourceMore = null;
+
+    private function initSources(array $initData) : void
+    {
+        $src = [];
+        for ($i = SRC_CRAFTED; $i < MAX_SOURCES; $i++)
+            $src[$i][] = $initData['src'.$i] ?: null;
+
+        $this->sources = $src;
+    }
 
     public function getRawSource(int $src) : array
     {
-        return $this->sources[$this->id][$src] ?? [];
+        return $this->sources[$src] ?? [];
     }
 
-    public function getSources(?array &$s = [], ?array &$sm = []) : bool
+    public function hasAnySource() : bool
     {
-        $s = $sm = [];
-        if (empty($this->sources[$this->id]))
-            return false;
+        return !!array_filter($this->sources);
+    }
+
+    public function prepareSourceMore(?DBType $src = null) : void
+    {
+        if (!$this->sourceMore !== null || !($this instanceof DBType))
+            return;
+
+        // not provided by external bulk operation
+        if (!$src && $this->moreType && $this->moreTypeId)
+            $src = Type::newType($this->moreType, $this->moreTypeId);
+
+        if ($src && $src instanceof ISource && $src->id == $this->id)
+            $this->sourceMore = $src->getSourceData();
+        else
+            $this->sourceMore = [];
+    }
+
+    public function getSources() : ?array
+    {
+        if (empty($this->sources))
+            return null;
 
         if ($this->sourceMore === null)
-        {
-            $buff = [];
-            $this->sourceMore = [];
+            $this->prepareSourceMore();
 
-            foreach ($this->iterate() as $_)
-                if ($this->moreType && $this->moreTypeId)
-                    $buff[$this->moreType][] = $this->moreTypeId;
+        $s  = array_keys($this->sources);
+        $sm = [];
 
-            foreach ($buff as $type => $ids)
-                $this->sourceMore[$type] = Type::newSet($type, [['id', $ids]]);
-        }
+        if ($_ = $this->sourceMore)
+            $sm = $_;
 
-        $s = array_keys($this->sources[$this->id]);
-        if ($this->moreType && $this->moreTypeId && ($srcData = $this->sourceMore[$this->moreType]->getSourceData($this->moreTypeId)))
-            $sm = $srcData; // [$this->moreTypeId];
-        else if (!empty($this->sources[$this->id][SRC_PVP]))
-            $sm['p'] = $this->sources[$this->id][SRC_PVP][0];
+        if ($p = $this->sources[SRC_PVP])
+            $sm['p'] = $p[0];
 
         if ($z = $this->moreZoneId)
             $sm['z'] = $z;
 
-        if ($this->srcFlags & SRC_FLAG_BOSSDROP)
+        if ($this->moreMask & SRC_FLAG_BOSSDROP)
             $sm['bd'] = 1;
 
-        if (isset($this->sources[$this->id][SRC_DROP][0]))
+        if ($this->sources[SRC_DROP])
         {
             /*
                 mode        srcFlag     log2    dd Flag
@@ -89,39 +111,19 @@ trait TrSourceHelper
                 10H         0b0100      2       0b011
                 25H         0b1000      3       0b100
             */
-            if ($this->srcFlags & SRC_FLAG_COMMON)
+            if ($this->moreMask & SRC_FLAG_COMMON)
                 $sm['dd'] = 99;
-            else if ($this->srcFlags & SRC_FLAG_DUNGEON_DROP)
-                $sm['dd'] = $this->sources[$this->id][SRC_DROP][0] * -1;
-            else if ($this->srcFlags & SRC_FLAG_RAID_DROP)
+            else if ($this->moreMask & SRC_FLAG_DUNGEON_DROP)
+                $sm['dd'] = $this->sources[SRC_DROP][0] * -1;
+            else if ($this->moreMask & SRC_FLAG_RAID_DROP)
             {
-                $dd = log($this->sources[$this->id][SRC_DROP][0], 2);
-                if ($dd == intVal($dd))                             // only one bit set
+                $dd = log($this->sources[SRC_DROP][0], 2);
+                if ($dd == intVal($dd))                     // only one bit set
                     $sm['dd'] = $dd + 1;
             }
         }
 
-        if ($sm)
-            $sm = [$sm];
-
-        return true;
-    }
-
-    public function hasAnySource() : bool
-    {
-        if (!isset($this->sources))
-            return false;
-
-        foreach ($this->sources as $src)
-        {
-            if (!is_array($src))
-                continue;
-
-            if (!empty($src))
-                return true;
-        }
-
-        return false;
+        return [$s, $sm ? [$sm] : []];
     }
 }
 
@@ -518,6 +520,9 @@ abstract class DBType
 
     public static function getName(int $id) : ?LocString
     {
+        if (!$id)
+            return null;
+
         if ($n = DB::Aowow()->SelectRow('SELECT `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8` FROM %n WHERE `id` = %i', static::$dataTable, $id))
             return new LocString($n);
         return null;
@@ -535,9 +540,6 @@ abstract class DBType
 
     /** should return data for a single listview row */
     abstract public function getListviewRow(int $addInfoMask = 0x0) : array;
-
-    // from trait; why is this here?
-    // abstract public function getSourceData() : array;
 }
 
 ?>

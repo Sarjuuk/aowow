@@ -33,19 +33,19 @@ class SpellPowerResponse extends TextResponse implements ICache
 
     protected function generate() : void
     {
-        $spell = new SpellList([['id', $this->typeId]]);
+        $spell = new Spell($this->typeId);
         if ($spell->error)
             $this->cacheType = CACHE_TYPE_NONE;
         else
         {
             $spells = $buffSpells = [];
 
-            $tooltip = $spell->renderTooltip(interactive: SpellList::INTERACTIVE_NONE, ttSpells: $spells);
-            $buff    = $spell->renderBuff(interactive: SpellList::INTERACTIVE_NONE, buffSpells: $buffSpells);
+            $tooltip = $spell->renderTooltip(interactive: Spell::INTERACTIVE_NONE, ttSpells: $spells);
+            $buff    = $spell->renderBuff(interactive: Spell::INTERACTIVE_NONE, buffSpells: $buffSpells);
 
             $opts = array(
-                'name'       => $spell->getField('name', true),
-                'icon'       => $spell->getField('iconString'),
+                'name'       => $spell->name,
+                'icon'       => $spell->icon,
                 'tooltip'    => $tooltip,
                 'spells'     => $spells,
                 'buff'       => $buff,

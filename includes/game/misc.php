@@ -154,12 +154,12 @@ class Game
         switch (gettype($spell))
         {
             case 'object':
-                if (get_class($spell) != SpellList::class)
+                if (get_class($spell) != Spell::class)
                     return [];
 
                 $lookup[] = $spell->id;
                 foreach ($spell->canTeachSpell() as $idx)
-                    $extraIds[] = $spell->getField('effect'.$idx.'TriggerSpell');
+                    $extraIds[] = $spell->effectTriggerSpell[$idx];
 
                 break;
             case 'integer':
