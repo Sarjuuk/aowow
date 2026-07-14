@@ -100,7 +100,7 @@ class SpellsBaseResponse extends TemplateResponse implements ICache
         if ($this->category)
             $this->subCat = '='.implode('.', $this->category);
 
-        $this->filter = new SpellListFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
+        $this->filter = new SpellFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
         if ($this->filter->shouldReload)
         {
             $_SESSION['error']['fi'] = $this->filter::class;
@@ -295,7 +295,8 @@ class SpellsBaseResponse extends TemplateResponse implements ICache
                                 break;
                         }
 
-                        $tabData['note'] = '$$WH.sprintf(LANG.lvnote_pettalents, "'.$url.'")';
+                        if ($url)
+                            $tabData['note'] = '$$WH.sprintf(LANG.lvnote_pettalents, "'.$url.'")';
                     }
 
                     $tabData['_petTalents'] = 1;
@@ -310,9 +311,9 @@ class SpellsBaseResponse extends TemplateResponse implements ICache
                     if (isset($this->category[1]))
                     {
                         if ($this->category[1] == 6)        // todo (med): we know Weapon(6) includes spell Shoot(3018), that has a mask; but really, ANY proficiency or petSkill should be in that mask so there is no need to differenciate
-                            $conditions[] = [DB::OR, ['s.skillLine1', SpellList::$skillLines[$this->category[1]]], ['s.skillLine1', -3]];
+                            $conditions[] = [DB::OR, ['s.skillLine1', Spell::SKILLLINE_CATEGORY[$this->category[1]]], ['s.skillLine1', -3]];
                         else
-                            $conditions[] = ['s.skillLine1', SpellList::$skillLines[$this->category[1]]];
+                            $conditions[] = ['s.skillLine1', Spell::SKILLLINE_CATEGORY[$this->category[1]]];
                     }
 
                     break;
@@ -421,7 +422,7 @@ class SpellsBaseResponse extends TemplateResponse implements ICache
             }
         }
 
-        $spells = new SpellList($conditions, ['calcTotal' => true]);
+        $spells = new SpellSet($conditions, ['calcTotal' => true]);
 
         $this->extendGlobalData($spells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
@@ -430,16 +431,16 @@ class SpellsBaseResponse extends TemplateResponse implements ICache
         // add speed-data for mounts
         if ($this->category && $this->category[0] == -5)
         {
-            foreach ($spells->iterate() as $spellId => $__)
+            foreach ($spells->iterate() as $spellId => $entry)
             {
                 $lvData[$spellId]['speed'] = 0;
 
-                if (in_array($spells->getField('effect2AuraId'), [SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED, SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED, SPELL_AURA_MOD_INCREASE_SWIM_SPEED]))
-                    $lvData[$spellId]['speed'] = $spells->getField('effect2BasePoints') + 1;
-                if (in_array($spells->getField('effect3AuraId'), [SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED, SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED, SPELL_AURA_MOD_INCREASE_SWIM_SPEED]))
-                    $lvData[$spellId]['speed'] = max($lvData[$spellId]['speed'], $spells->getField('effect3BasePoints') + 1);
+                if (in_array($entry->effectAuraId[1], [SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED, SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED, SPELL_AURA_MOD_INCREASE_SWIM_SPEED]))
+                    $lvData[$spellId]['speed'] = $entry->effectBasePoints[1] + 1;
+                if (in_array($entry->effectAuraId[2], [SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED, SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED, SPELL_AURA_MOD_INCREASE_SWIM_SPEED]))
+                    $lvData[$spellId]['speed'] = max($lvData[$spellId]['speed'], $entry->effectBasePoints[2] + 1);
 
-                if (!$lvData[$spellId]['speed'] && ($spells->getField('effect2AuraId') == SPELL_AURA_DUMMY || $spells->getField('effect3AuraId') == SPELL_AURA_DUMMY))
+                if (!$lvData[$spellId]['speed'] && ($entry->effectAuraId[1] == SPELL_AURA_DUMMY || $entry->effectAuraId[2] == SPELL_AURA_DUMMY))
                     $lvData[$spellId]['speed'] = '?';
                 else
                     $lvData[$spellId]['speed'] = '+'.$lvData[$spellId]['speed'].'%';
@@ -482,7 +483,7 @@ class SpellsBaseResponse extends TemplateResponse implements ICache
             $tabData['hiddenCols'] = array_unique($hiddenCols);
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
-        $this->lvTabs->addListviewTab(new Listview($tabData, SpellList::$brickFile));
+        $this->lvTabs->addListviewTab(new Listview($tabData, Spell::$brickFile));
 
         parent::generate();
 

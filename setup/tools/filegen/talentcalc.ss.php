@@ -156,7 +156,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                             $talent['j'][] = $mod;
 
                     if ($talents[$talentIdx]['talentSpell'])
-                        $talent['t'][] = $this->tSpells->getTalentHeadForCurrent();
+                        $talent['t'][] = $this->tSpells->getTalentHead();
                 }
 
                 foreach ($petCategories as $k => $v)

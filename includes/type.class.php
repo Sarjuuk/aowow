@@ -97,7 +97,7 @@ abstract class Type
         self::ITEM        => [ItemList::class,        'item',        'g_items',              self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
         self::ITEMSET     => [ItemsetList::class,     'itemset',     'g_itemsets',           self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
         self::QUEST       => [QuestList::class,       'quest',       'g_quests',             self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
-        self::SPELL       => [SpellList::class,       'spell',       'g_spells',             self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
+        self::SPELL       => [Spell::class,       'spell',       'g_spells',             self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
         self::ZONE        => [ZoneList::class,        'zone',        'g_gatheredzones',      self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE],
         self::FACTION     => [Faction::class,     'faction',     'g_factions',           self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE],
         self::PET         => [PetList::class,         'pet',         'g_pets',               self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
@@ -117,7 +117,7 @@ abstract class Type
         self::ARENA_TEAM  => [ArenaTeam::class,   'arena-team',  '',                     self::FLAG_FILTRABLE], // x
         self::USER        => [UserList::class,        'user',        'g_users',              self::FLAG_NONE],      // x
         self::EMOTE       => [Emote::class,       'emote',       'g_emotes',             self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE],
-        self::ENCHANTMENT => [EnchantmentList::class, 'enchantment', 'g_enchantments',       self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
+        self::ENCHANTMENT => [Enchantment::class, 'enchantment', 'g_enchantments',       self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
         self::AREATRIGGER => [Areatrigger::class, 'areatrigger', '',                     self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
         self::MAIL        => [MailList::class,        'mail',        '',                     self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE]
     );
@@ -127,7 +127,7 @@ abstract class Type
     /* Field Operations */
     /********************/
 
-    public static function newType(int $type, array $initData) : ?DBType
+    public static function newType(int $type, int|array $initData) : ?DBType
     {
         if (!self::exists($type))
             return null;

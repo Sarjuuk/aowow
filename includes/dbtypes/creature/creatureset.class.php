@@ -21,6 +21,14 @@ class CreatureSet extends DBTypeSet
     }
 
     /**
+     * @return Creature creature template
+     */
+    public function getEntry(int|string $id) : Creature
+    {
+        return parent::getEntry($id);
+    }
+
+    /**
      * @param int $addInfoMask
      * * `0x0010 - LISTVIEWINFO_MODEL`:
      * * `0x0020 - LISTVIEWINFO_TAMEABLE`: include texture
@@ -58,13 +66,12 @@ class CreatureSet extends DBTypeSet
             }
             else
             {
-                $data[$id] = $entry->getListviewRow();
+                $data[$id] = $entry->getListviewRow($addInfoMask);
 
                 if ($addInfoMask & LISTVIEWINFO_REPUTATION)
                     foreach ($rewRep[$this->id] ?? [] as $fac => $val)
                         $data[$id]['reprewards'][] = [$fac, $val];
             }
-
         }
 
         ksort($data);

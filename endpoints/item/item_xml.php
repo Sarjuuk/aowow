@@ -173,7 +173,7 @@ class ItemXmlResponse extends TextResponse implements ICache
                     $splNode->addAttribute('minCount', $spellSource->getField('effect'.$idx.'BasePoints') + 1);
                     $splNode->addAttribute('maxCount', $spellSource->getField('effect'.$idx.'BasePoints') + $spellSource->getField('effect'.$idx.'DieSides'));
 
-                    foreach ($spellSource->getReagentsForCurrent() as $rId => $qty)
+                    foreach ($spellSource->getReagents() as $rId => $qty)
                     {
                         if ($reagent = $spellSource->relItems->getEntry($rId))
                         {
