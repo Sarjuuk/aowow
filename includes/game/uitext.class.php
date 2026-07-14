@@ -33,6 +33,16 @@ final class UIText
     }
 
     /**
+     * shorthand of UIText::format($txt, Lang::FMT_MARKUP) for use as LocString formatter
+     * @param string    $text   text to format
+     * @return string formatted text
+     */
+    public static function formatMarkup(string $text) : string
+    {
+        return self::format($text, Lang::FMT_MARKUP);
+    }
+
+    /**
      * format game text for display in browser
      *
      * @param string    $text   text to format

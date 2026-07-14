@@ -20,7 +20,7 @@ class EmoteBaseResponse extends TemplateResponse implements ICache
     public int $type   = Type::EMOTE;
     public int $typeId = 0;
 
-    private EmoteList $subject;
+    private Emote $subject;
 
     public function __construct(string $id)
     {
@@ -37,11 +37,11 @@ class EmoteBaseResponse extends TemplateResponse implements ICache
 
     protected function generate() : void
     {
-        $this->subject = new EmoteList(array(['id', $this->typeId]));
+        $this->subject = new Emote($this->typeId);
         if ($this->subject->error)
             $this->generateNotFound(Lang::game('emote'), Lang::emote('notFound'));
 
-        $this->h1 = Util::ucFirst($this->subject->getField('cmd'));
+        $this->h1 = Util::ucFirst($this->subject->cmd);
 
         $this->gPageInfo += array(
             'type'   => $this->type,
@@ -61,30 +61,30 @@ class EmoteBaseResponse extends TemplateResponse implements ICache
         /* Infobox */
         /***********/
 
-        $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
+        $infobox = Lang::getInfoBoxForFlags($this->subject->cuFlags);
 
         // has Animation
-        if ($this->subject->getField('isAnimated') && !$this->subject->getField('stateParam'))
+        if ($this->subject->isAnimated && !$this->subject->stateParam)
         {
             $infobox[] = Lang::emote('isAnimated');
 
             // anim state
-            $state = Lang::emote('state', $this->subject->getField('state'));
-            if ($this->subject->getField('state') == 1)
-                $state .= Lang::main('colon').Lang::unit('bytes1', 0, $this->subject->getField('stateParam'));
+            $state = Lang::emote('state', $this->subject->state);
+            if ($this->subject->state == 1)
+                $state .= Lang::main('colon').Lang::unit('bytes1', 0, $this->subject->stateParam);
             $infobox[] = $state;
         }
 
         if (User::isInGroup(U_GROUP_STAFF | U_GROUP_TESTER))
         {
             // player emote: point to internal data
-            if ($_ = $this->subject->getField('parentEmote'))
+            if ($_ = $this->subject->parentEmote)
             {
                 $this->extendGlobalIds(Type::EMOTE, $_);
                 $infobox[] = '[emote='.$_.']';
             }
 
-            if ($flags = $this->subject->getField('flags'))
+            if ($flags = $this->subject->flags)
             {
                 $box = Lang::game('flags').Lang::main('colon').'[ul]';
                 foreach (Lang::emote('flags') as $bit => $str)
@@ -107,7 +107,7 @@ class EmoteBaseResponse extends TemplateResponse implements ICache
 
         $text = '';
 
-        if ($this->subject->getField('cuFlags') & EMOTE_CU_MISSING_CMD)
+        if ($this->subject->cuFlags & EMOTE_CU_MISSING_CMD)
             $text .= Lang::emote('noCommand').'[br][br]';
         else if ($aliasses = DB::Aowow()->selectCol('SELECT `command` FROM ::emotes_aliasses WHERE `id` = %i AND `locales` & %i', $this->typeId, 1 << Lang::getLocale()->value))
         {
@@ -119,16 +119,16 @@ class EmoteBaseResponse extends TemplateResponse implements ICache
         }
 
         $target = $noTarget = [];
-        if ($_ = $this->subject->getField('extToExt', true))
-            $target[] = $this->prepare($_);
-        if ($_ = $this->subject->getField('extToMe', true))
-            $target[] = $this->prepare($_);
-        if ($_ = $this->subject->getField('meToExt', true))
-            $target[] = $this->prepare($_);
-        if ($_ = $this->subject->getField('extToNone', true))
-            $noTarget[] = $this->prepare($_);
-        if ($_ = $this->subject->getField('meToNone', true))
-            $noTarget[] = $this->prepare($_);
+        if (!$this->subject->extToExt->isEmpty())
+            $target[] = $this->prepare('extToExt');
+        if (!$this->subject->extToMe->isEmpty())
+            $target[] = $this->prepare('extToMe');
+        if (!$this->subject->meToExt->isEmpty())
+            $target[] = $this->prepare('meToExt');
+        if (!$this->subject->extToNone->isEmpty())
+            $noTarget[] = $this->prepare('extToNone');
+        if (!$this->subject->meToNone->isEmpty())
+            $noTarget[] = $this->prepare('meToNone');
 
         if (!$target && !$noTarget)
             $text .= '[div][i class=q0]'.Lang::emote('noText').'[/i][/div]';
@@ -150,7 +150,7 @@ class EmoteBaseResponse extends TemplateResponse implements ICache
         }
 
         // event sound
-        if ($_ = $this->subject->getField('soundId'))
+        if ($_ = $this->subject->soundId)
         {
             $this->extendGlobalIds(Type::SOUND, $_);
             $text .= '[h3]'.Lang::emote('eventSound').'[/h3][sound='.$_.']';
@@ -176,18 +176,18 @@ class EmoteBaseResponse extends TemplateResponse implements ICache
             ['ac.type', ACHIEVEMENT_CRITERIA_TYPE_DO_EMOTE],
             ['ac.value1', $this->typeId],
         );
-        $acv = new AchievementList($condition);
+        $acv = new AchievementSet($condition);
         if (!$acv->error)
         {
             $this->extendGlobalData($acv->getJSGlobals());
-            $this->lvTabs->addListviewTab(new Listview(['data' => $acv->getListviewData()], AchievementList::$brickFile));
+            $this->lvTabs->addListviewTab(new Listview(['data' => $acv->getListviewData()], Achievement::$brickFile));
         }
 
         // tab: sound
         $ems = DB::Aowow()->selectAssoc(
            'SELECT   `soundId` AS ARRAY_KEY, BIT_OR(1 << (`raceId` - 1)) AS "raceMask", BIT_OR(1 << (`gender` - 1)) AS "gender"
             FROM     ::emotes_sounds
-            WHERE    %if', $this->typeId < 0, '-`emoteId` = %i OR', $this->subject->getField('parentEmote'), '%end `emoteId` = %i
+            WHERE    %if', $this->typeId < 0, '-`emoteId` = %i OR', $this->subject->parentEmote, '%end `emoteId` = %i
             GROUP BY `soundId`',
             $this->typeId,
         );
@@ -218,8 +218,7 @@ class EmoteBaseResponse extends TemplateResponse implements ICache
 
     private function prepare(string $emote) : string
     {
-        $emote = UIText::format($emote, Lang::FMT_MARKUP);
-        return preg_replace('/%\d?\$?s/', '<'.Util::ucFirst(Lang::main('name')).'>', $emote);
+        return preg_replace('/%\d?\$?s/', '<'.Util::ucFirst(Lang::main('name')).'>', $this->subject?->$emote);
     }
 }
 
