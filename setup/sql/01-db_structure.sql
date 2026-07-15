@@ -2561,7 +2561,7 @@ DROP TABLE IF EXISTS `aowow_shapeshiftforms`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_shapeshiftforms` (
-  `Id` tinyint(3) unsigned NOT NULL,
+  `id` tinyint(3) unsigned NOT NULL,
   `flags` smallint(5) unsigned NOT NULL,
   `creatureType` tinyint(4) NOT NULL,
   `displayIdA` smallint(5) unsigned NOT NULL,
@@ -2575,7 +2575,7 @@ CREATE TABLE `aowow_shapeshiftforms` (
   `spellId7` mediumint(8) unsigned NOT NULL,
   `spellId8` mediumint(8) unsigned NOT NULL,
   `comment` varchar(30) DEFAULT NULL,
-  PRIMARY KEY (`Id`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -2587,7 +2587,7 @@ DROP TABLE IF EXISTS `aowow_skillline`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_skillline` (
-  `Id` smallint(5) unsigned NOT NULL,
+  `id` smallint(5) unsigned NOT NULL,
   `typeCat` tinyint(4) NOT NULL,
   `cuFlags` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'see defines.php for flags',
   `categoryId` tinyint(4) NOT NULL,
@@ -2608,7 +2608,7 @@ CREATE TABLE `aowow_skillline` (
   `professionMask` smallint(5) unsigned NOT NULL,
   `recipeSubClass` tinyint(3) unsigned NOT NULL,
   `specializations` varchar(30) NOT NULL COMMENT 'space-separated spellIds',
-  PRIMARY KEY (`Id`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

@@ -123,7 +123,7 @@ class ZonesBaseResponse extends TemplateResponse implements ICache
                        tp.`startNodeId` AS "startId", tn1.`mapX` AS "startPosX", tn1.`mapY` AS "startPosY",
                        tp.`endNodeId`   AS "endId",   tn2.`mapX` AS "endPosX",   tn2.`mapY` AS "endPosY"
                 FROM   ::taxipath tp, ::taxinodes tn1, ::taxinodes tn2
-                WHERE  tn1.`Id` = tp.`endNodeId` AND tn2.`Id` = tp.`startNodeId` AND
+                WHERE  tn1.`id` = tp.`endNodeId` AND tn2.`id` = tp.`startNodeId` AND
                        tn1.`type` <> 0 AND tn2.`type` <> 0 AND
                        (tp.`startNodeId` IN %in OR tp.`EndNodeId` IN %in)',
                 array_keys($nodes), array_keys($nodes)

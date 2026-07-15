@@ -116,7 +116,7 @@ class TitleList extends DBTypeList
         if (!empty($sources[SRC_ACHIEVEMENT]))
             $sources[SRC_ACHIEVEMENT] = (new AchievementList(array(['id', $sources[SRC_ACHIEVEMENT]])))->getSourceData();
 
-        foreach ($this->sources as $Id => $src)
+        foreach ($this->sources as $id => $src)
         {
             $tmp = [];
 
@@ -146,9 +146,9 @@ class TitleList extends DBTypeList
 
             // other source (only one item possible, so no iteration needed)
             if (isset($src[SRC_CUSTOM_STRING]))
-                $tmp[SRC_CUSTOM_STRING] = [Lang::game('pvpSources', $Id)];
+                $tmp[SRC_CUSTOM_STRING] = [Lang::game('pvpSources', $id)];
 
-            $this->templates[$Id]['source'] = $tmp;
+            $this->templates[$id]['source'] = $tmp;
         }
     }
 
