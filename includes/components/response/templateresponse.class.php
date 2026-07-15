@@ -318,8 +318,8 @@ class TemplateResponse extends BaseResponse
         if ($extra)
         {
             $namedExtra = [];
-            foreach ($extra as $typeId => $data)
-                foreach ($data as $k => $v)
+            foreach ($extra as $typeId => $extraData)
+                foreach ($extraData as $k => $v)
                     $namedExtra[$typeId][$k.'_'.Lang::getLocale()->json()] = $v;
 
             $this->jsGlobals[$type][2] = $namedExtra;
@@ -463,9 +463,6 @@ class TemplateResponse extends BaseResponse
             $this->extendGlobalData($jsg);
 
         $this->gPageInfo['editAccess'] = $article['editAccess'];
-
-        if (method_exists($this, 'postArticle'))        // e.g. update variables in article
-            $this->postArticle($this->article['text']);
     }
 
     private function addCommunityContent() : void
