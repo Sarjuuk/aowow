@@ -83,7 +83,7 @@ class ArenateamBaseResponse extends TemplateResponse
             return;
         }
 
-        $subject = new LocalArenateamList(array(['at.id', $this->typeId]));
+        $subject = new LocalArenateamEntry($this->typeId);
         if ($subject->error)
             $this->notFound();
 
@@ -91,14 +91,15 @@ class ArenateamBaseResponse extends TemplateResponse
         if (!$this->subjectName)
             $this->forward($subject->getProfileUrl());
 
-        $this->h1 = Lang::profiler('arenaRoster', [$subject->getField('name')]);
+        $this->h1 = Lang::profiler('arenaRoster', [$subject->name]);
 
 
         /*************/
         /* Menu Path */
         /*************/
 
-        $this->followBreadcrumbPath();
+        if ($path = $this->followBreadcrumbPath())
+            array_push($this->breadcrumb, ...$path);
 
 
         /**************/
@@ -107,7 +108,7 @@ class ArenateamBaseResponse extends TemplateResponse
 
         array_unshift(
             $this->title,
-            $subject->getField('name').' ('.$this->realm.' - '.Lang::profiler('regions', $this->region).')',
+            $subject->name.' ('.$this->realm.' - '.Lang::profiler('regions', $this->region).')',
             Util::ucFirst(Lang::profiler('profiler'))
         );
 
@@ -130,7 +131,7 @@ class ArenateamBaseResponse extends TemplateResponse
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated');
 
         // tab: members
-        $member = new LocalProfileList(array(['atm.arenaTeamId', $this->typeId]));
+        $member = new LocalProfileContainer(array(['atm.arenaTeamId', $this->typeId]));
         $this->lvTabs->addListviewTab(new Listview(array(
             'data'        => $member->getListviewData(LISTVIEWINFO_CHARACTER | LISTVIEWINFO_ARENA),
             'sort'        => [-15],

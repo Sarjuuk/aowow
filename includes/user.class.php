@@ -21,11 +21,11 @@ class User
     public static ?string $agent      = null;
     public static  Locale $preferedLoc;
 
-    private static  int              $reputation    = 0;
-    private static  string           $dataKey       = '';
-    private static  int              $excludeGroups = 1;
-    private static  int              $avatarborder  = 2;    // 2 is default / reputation colored
-    private static ?LocalProfileList $profiles      = null;
+    private static  int                   $reputation    = 0;
+    private static  string                $dataKey       = '';
+    private static  int                   $excludeGroups = 1;
+    private static  int                   $avatarborder  = 2;    // 2 is default / reputation colored
+    private static ?LocalProfileContainer $profiles      = null;
 
     public static function init()
     {
@@ -659,13 +659,13 @@ class User
 
         $realms = Profiler::getRealms();
 
-        foreach (self::$profiles->iterate() as $id => $_)
-            if (self::$profiles->getField('cuFlags') & PROFILER_CU_PINNED)
-                if (isset($realms[self::$profiles->getField('realm')]))
+        foreach (self::$profiles->iterate() as $id => $profile)
+            if ($profile->cuFlags & PROFILER_CU_PINNED)
+                if (isset($realms[$profile->realmId]))
                     return [
                         $id,
-                        self::$profiles->getField('name'),
-                        self::$profiles->getField('region') . '.' . Profiler::urlize($realms[self::$profiles->getField('realm')]['name'], true) . '.' . Profiler::urlize(self::$profiles->getField('name'), true, true)
+                        $profile->name,
+                        $profile->region . '.' . Profiler::urlize($realms[$profile->realmId]['name'], true) . '.' . Profiler::urlize($profile->name, true, true)
                     ];
 
         return [];
@@ -729,8 +729,8 @@ class User
             return [];
 
         $ids = [];
-        foreach (self::$profiles->iterate() as $_)
-            if (!self::$profiles->isCustom())
+        foreach (self::$profiles->iterate() as $profile)
+            if (!$profile->isCustom())
                 $ids[] = self::$profiles->id;
 
         if (!$ids)
@@ -780,25 +780,28 @@ class User
 
     private static function loadProfiles() : bool
     {
-        // if (!Cfg::get('PROFILER_ENABLE'))
+        if (!Cfg::get('PROFILER_ENABLE'))
             return false;
 
         if (!self::isLoggedIn())
             return false;
 
+        trigger_error('User::loadProfiles - need a way to merge cuFlags');
+        return false;
+
         if (self::$profiles === null)
         {
-            $ap = DB::Aowow()->selectCol('SELECT `profileId` AS ARRAY_KEY, extraFlags FROM ::account_profiles WHERE `accountId` = %i', self::$id);
+            $ap = DB::Aowow()->selectCol('SELECT `profileId` AS ARRAY_KEY, `extraFlags` FROM ::account_profiles WHERE `accountId` = %i', self::$id);
 
             // the old approach [DB::OR, ['user', self::$id], ['ap.accountId', self::$id]] caused keys to not get used
             $conditions = $ap ? [[DB::OR, ['user', self::$id], ['id', array_keys($ap)]]] : [['user', self::$id]];
             if (!self::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
                 $conditions[] = ['deleted', 0];
 
-            self::$profiles = (new LocalProfileList($conditions));
+            self::$profiles = (new LocalProfileContainer($conditions));
 
-            foreach (self::$profiles->iterate() as &$itr)
-                $itr['cuFlags'] |= $ap[$itr['id']] ?? 0;
+            foreach (self::$profiles->iterate() as $id => &$entry)
+                $entry->cuFlags |= $ap[$id] ?? 0;
         }
 
         return !!self::$profiles->getFoundIDs();

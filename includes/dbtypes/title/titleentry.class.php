@@ -101,10 +101,15 @@ class TitleEntry extends DBTypeEntry
         return sprintf($this->${$gender == GENDER_FEMALE ? 'female' : 'male'}, '<span class="q0">&lt;'.Util::ucFirst(Lang::main('name')).'&gt;</span>');
     }
 
-    public static function getName(int $id) : ?LocString
+    public static function getName(int $id, int $gender = GENDER_MALE) : ?LocString
     {
-        if ($n = DB::Aowow()->SelectRow('SELECT `male_loc0`, `male_loc2`, `male_loc3`, `male_loc4`, `male_loc6`, `male_loc8` FROM %n WHERE `id` = %i', self::$dataTable, $id))
-            return new LocString($n, 'male', self::trim(...));
+        $fields = [];
+        foreach (Locale::cases() as $loc)
+            if ($loc->validate())
+                $fields[] = ($gender ? 'female_loc' : 'male_loc') . $loc->value;
+
+        if ($n = DB::Aowow()->selectRow('SELECT %n FROM %n WHERE `id` = %i', $fields, self::$dataTable, $id))
+            return new LocString($n, $gender ? 'female' : 'male', self::trim(...));
         return null;
     }
 

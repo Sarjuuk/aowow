@@ -73,7 +73,8 @@ class GuildsBaseResponse extends TemplateResponse implements IProfilerList
         /* Menu Path */
         /*************/
 
-        $this->followBreadcrumbPath();
+        if ($path = $this->followBreadcrumbPath())
+            array_push($this->breadcrumb, ...$path);
 
 
         /**************/
@@ -124,7 +125,7 @@ class GuildsBaseResponse extends TemplateResponse implements IProfilerList
         if ($this->region)
             $miscParams['rg'] = $this->region;
 
-        $guilds = new RemoteGuildList($conditions, $miscParams);
+        $guilds = new RemoteGuildContainer($conditions, $miscParams);
         if (!$guilds->error)
         {
             $guilds->initializeLocalEntries();

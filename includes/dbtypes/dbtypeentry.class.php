@@ -190,32 +190,48 @@ trait TrSpawns
     }
 }
 
+interface IProfiler
+{
+    public function packId(int $realmId, int $realmGUID) : int;
+    public function unpackId(int $packedId) : array;
+    public static function getRealmDBs(?array $fi) : array;
+}
+
 trait TrProfilerHelper
 {
     public static $brickFile = 'profile';                   // profile is multipurpose
 
-    private int $subjectGUID = 0;
-    private int $realmId     = 0;
-    private int $realmGUID   = 0;
+    public readonly int    $subjectGUID;
+    public readonly int    $realmId;
+    public readonly int    $realmGUID;
+    public readonly string $realmName;
+
+    public readonly string $region;
+ // public readonly string $battlegroup;
 
     // sooo subjectGUID cant' be used as $id, because it's not unique across realms <realmId>:<subjectGUID>
     // so we pack them .. assumes PHP_INT_SIZE == 8 / an x64 system
-    public function packId() : int
+    public function packId(int $realmId, int $realmGUID) : int
     {
-        return ($this->realmId & 0xFFFF) << 40 | ($this->realmGUID & 0xFFFFFFFFFF);
+        // return ($this->realmId & 0xFFFF) << 40 | ($this->realmGUID & 0xFFFFFFFFFF);
+        return ($realmId & 0xFFFF) << 40 | ($realmGUID & 0xFFFFFFFFFF);
     }
 
-    public function unpackId(int $packedId) : void
+    public function unpackId(int $packedId) : array
     {
-        $this->realmId   = ($packedId >> 40) & 0xFFFF;
-        $this->realmGUID =  $packedId        & 0xFFFFFFFFFF;
+        // $this->realmId   = ($packedId >> 40) & 0xFFFF;
+        // $this->realmGUID =  $packedId        & 0xFFFFFFFFFF;
+        return [
+            ($packedId >> 40) & 0xFFFF,
+             $packedId        & 0xFFFFFFFFFF
+        ];
     }
 
     public static function getRealmDBs(?array $fi) : array
     {
         $dbNames = [];
 
-        foreach(Profiler::getRealms() as $idx => $r)
+        foreach (Profiler::getRealms() as $idx => $r)
         {
             if (!empty($fi['sv']) && Profiler::urlize($r['name']) != Profiler::urlize($fi['sv']) && intVal($fi['sv']) != $idx)
                 continue;
@@ -249,12 +265,13 @@ abstract class DBTypeEntry
 
     public function __construct(
                   int|array $initData,
-        protected array     $extraOpts = []
+        protected array     $extraOpts = [],
+                  array     $targetDBs = ['Aowow']
     )
     {
         if (is_int($initData))
         {
-            $dbQuery = new DBQuery(static::QUERY_BASE, static::QUERY_OPTS, $this->extraOpts);
+            $dbQuery = new DBQuery($targetDBs, static::QUERY_BASE, static::QUERY_OPTS, $this->extraOpts);
             if (!$dbQuery->build([['id', $initData]]))
                 return;
 

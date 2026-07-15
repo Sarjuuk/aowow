@@ -386,17 +386,21 @@ trait TrProfiler
         }
     }
 
-    private function followBreadcrumbPath() : void
+    private function followBreadcrumbPath() : array
     {
+        $path = [];
+
         if ($this->region)
         {
-            $this->breadcrumb[] = $this->region;
+            $path[] = $this->region;
 
             if ($this->realm)
-                $this->breadcrumb[] = Profiler::urlize($this->realm, true);
-            // else
-                // $this->breadcrumb[] = Profiler::urlize(Cfg::get('BATTLEGROUP'));
+                $path[] = Profiler::urlize($this->realm, true);
+         // else
+             // $path[] = Profiler::urlize(Cfg::get('BATTLEGROUP'));
         }
+
+        return $path;
     }
 }
 
