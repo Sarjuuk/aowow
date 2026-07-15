@@ -168,18 +168,15 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
         }
 
         // Attunement Quest/Achievements & Keys
-        if ($attmnt = $this->subject->attunes)
+        foreach ($this->subject->attunements as $type => $ids)
         {
-            foreach ($attmnt as $type => $ids)
+            $this->extendGlobalIds($type, ...array_map('abs', $ids));
+            foreach ($ids as $id)
             {
-                $this->extendGlobalIds($type, ...array_map('abs', $ids));
-                foreach ($ids as $id)
-                {
-                    if ($type == Type::ITEM)
-                        $infobox[] = Lang::zone('key', (int)($id < 0)).'[item='.abs($id).']';
-                    else
-                        $infobox[] = Lang::zone('attunement', (int)($id < 0)).'['.Type::getFileString($type).'='.abs($id).']';
-                }
+                if ($type == Type::ITEM)
+                    $infobox[] = Lang::zone('key', (int)($id < 0)).'[item='.abs($id).']';
+                else
+                    $infobox[] = Lang::zone('attunement', (int)($id < 0)).'['.Type::getFileString($type).'='.abs($id).']';
             }
         }
 
@@ -317,21 +314,12 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
                         continue;
 
                     // store data for misc tabs
-                    foreach ($started->getListviewData() as $id => $data)
-                    {
-                        if ($started->questSortId > 0 && !in_array($started->questSortId, $relQuestZOS))
-                            continue;
-
-                        if (!empty($started->rewards[$id][Type::ITEM]))
-                            $rewardsLV = array_merge($rewardsLV, array_keys($started->rewards[$id][Type::ITEM]));
-
-                        if (!empty($started->choices[$id][Type::ITEM]))
-                            $rewardsLV = array_merge($rewardsLV, array_keys($started->choices[$id][Type::ITEM]));
-
-                        $questsLV[$id] = $data;
-                    }
+                    $questsLV += array_filter($started->getListviewData(), fn($x) => $x['category'] < 0 || in_array($x['category'], $relQuestZOS));
 
                     $this->extendGlobalData($started->getJSGlobals());
+
+                    foreach ($started->iterate() as $questEntry)
+                        $rewardsLV = array_merge($rewardsLV, $questEntry->getRewardChoiceItems(), $questEntry->getRewardItems());
 
                     if (($objEntry->A != -1) && ($_ = $started->getSOMData(SIDE_ALLIANCE)))
                         $addToSOM('alliancequests', $objEntry->name, array(
@@ -408,21 +396,12 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
                         continue;
 
                     // store data for misc tabs
-                    foreach ($started->getListviewData() as $id => $data)
-                    {
-                        if ($started->questSortId > 0 && !in_array($started->questSortId, $relQuestZOS))
-                            continue;
-
-                        if (!empty($started->rewards[$id][Type::ITEM]))
-                            $rewardsLV = array_merge($rewardsLV, array_keys($started->rewards[$id][Type::ITEM]));
-
-                        if (!empty($started->choices[$id][Type::ITEM]))
-                            $rewardsLV = array_merge($rewardsLV, array_keys($started->choices[$id][Type::ITEM]));
-
-                        $questsLV[$id] = $data;
-                    }
+                    $questsLV += array_filter($started->getListviewData(), fn($x) => $x['category'] < 0 || in_array($x['category'], $relQuestZOS));
 
                     $this->extendGlobalData($started->getJSGlobals());
+
+                    foreach ($started->iterate() as $questEntry)
+                        $rewardsLV = array_merge($rewardsLV, $questEntry->getRewardChoiceItems(), $questEntry->getRewardItems());
 
                     if (($npcEntry->A != -1) && ($_ = $started->getSOMData(SIDE_ALLIANCE)))
                         $addToSOM('alliancequests', $npcEntry->name, array(
@@ -540,7 +519,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
             );
         }
 
-        $this->expansion  = Util::$expansionString[$this->subject->getField('expansion')];
+        $this->expansion  = Util::$expansionString[$this->subject->expansion];
         $this->redButtons = array(
             BUTTON_WOWHEAD => true,
             BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId]
@@ -554,7 +533,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
 
         // tab: drops
-        if (in_array($this->subject->getField('category'), [MAP_TYPE_DUNGEON, MAP_TYPE_RAID]))
+        if (in_array($this->subject->category, [MAP_TYPE_DUNGEON, MAP_TYPE_RAID]))
         {
             // Issue 1 - if the bosses drop items that are also sold by vendors moreZoneId will be 0 as vendor location and boss location are likely in conflict with each other
             // Issue 2 - if the boss/chest isn't spawned the loot will not show up
@@ -562,8 +541,8 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
             $data    = $items->getListviewData();
             $subTabs = false;
 
-            $items->prepareSourceMore();
-            assert(false, 'uhhh...');
+            // $items->prepareSourceMore();
+            trigger_error('need to fix item prep sourcemore', E_USER_WARING);
 
             foreach ($items->iterate() as $id => $itemEntry)
             {
@@ -634,17 +613,12 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
         $quests = new QuestContainer(array(['questSortId', $this->typeId]));
         if (!$quests->error)
         {
+            $questsLV += $quests->getListviewData();
+
             $this->extendGlobalData($quests->getJSGlobals());
-            foreach ($quests->getListviewData() as $id => $data)
-            {
-                if (!empty($quests->rewards[$id][Type::ITEM]))
-                    $rewardsLV = array_merge($rewardsLV, array_keys($quests->rewards[$id][Type::ITEM]));
 
-                if (!empty($quests->choices[$id][Type::ITEM]))
-                    $rewardsLV = array_merge($rewardsLV, array_keys($quests->choices[$id][Type::ITEM]));
-
-                $questsLV[$id] = $data;
-            }
+            foreach ($quests->iterate() as $questEntry)
+                $rewardsLV = array_merge($rewardsLV, $questEntry->getRewardChoiceItems(), $questEntry->getRewardItems());
         }
 
         // tab: quests [including data collected by SOM-routine]
@@ -658,9 +632,9 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
                     continue;
 
                 if (!is_null(ItemFilter::getCriteriaIndex(126, $this->typeId)))
-                    $tabData['note'] = '$$WH.sprintf(LANG.lvnote_zonequests, '.$parent.', '.$this->typeId.',"'.$this->subject->getField('name', true).'", '.$this->typeId.')';
+                    $tabData['note'] = '$$WH.sprintf(LANG.lvnote_zonequests, '.$parent.', '.$this->typeId.',"'.$this->subject->name.'", '.$this->typeId.')';
                 else
-                    $tabData['note'] = '$$WH.sprintf(LANG.lvnote_questsind, '.$parent.', '.$this->typeId.',"'.$this->subject->getField('name', true).'")';
+                    $tabData['note'] = '$$WH.sprintf(LANG.lvnote_questsind, '.$parent.', '.$this->typeId.',"'.$this->subject->name.'")';
                 break;
             }
 
@@ -728,7 +702,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
         if ($extraCrt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` = %i AND `value1` = %i', ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AREA, $this->typeId))
             $conditions[] = ['ac.id', $extraCrt];
 
-        if ($this->subject->getField('category') != MAP_TYPE_ZONE)
+        if ($this->subject->category != MAP_TYPE_ZONE)
         {
             $conditions[] = array (
                 DB::AND,
@@ -736,10 +710,10 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
                              ACHIEVEMENT_CRITERIA_TYPE_PLAY_ARENA,  ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND,
                              ACHIEVEMENT_CRITERIA_TYPE_DEATH_AT_MAP]
                 ],
-                ['ac.value1', $this->subject->getField('mapId')]
+                ['ac.value1', $this->subject->mapId]
             );
 
-            if ($extraCrt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` = %i AND `value1` = %i', ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_ID, $this->subject->getField('mapId')))
+            if ($extraCrt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` = %i AND `value1` = %i', ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_ID, $this->subject->mapId))
                 $conditions[] = ['ac.id', $extraCrt];
 
         }
