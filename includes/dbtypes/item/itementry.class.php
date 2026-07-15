@@ -935,12 +935,13 @@ class ItemEntry extends DBTypeEntry
                 // handle special cases where:
                 // > itemset has items of different qualities (handled by not limiting for quality in the initial query)
                 // > itemset is virtual and multiple instances have the same itemLevel but not quality (filter below)
-                foreach ($itemset->iterate() as $id => $entry)
+                $itemsetEntry = null;
+                foreach ($itemset->iterate() as $id => $itemsetEntry)
                 {
-                    if ($entry->quality != $this->quality)
+                    if ($itemsetEntry->quality != $this->quality)
                         continue;
 
-                    $entry->pieceToSet = array_filter($entry->pieceToSet, fn($x) => $id == $x);
+                    $itemsetEntry->pieceToSet = array_filter($itemsetEntry->pieceToSet, fn($x) => $id == $x);
                     break;
                 }
 
@@ -949,19 +950,19 @@ class ItemEntry extends DBTypeEntry
                     FROM     ::items a, ::items b
                     WHERE    a.`slotBak` = b.`slotBak` AND a.`itemset` = b.`itemset` AND b.`id` IN %in
                     GROUP BY b.`id`',
-                    array_keys($itemset->pieceToSet)
+                    array_keys($itemsetEntry->pieceToSet)
                 );
 
                 foreach ($pieces as $k => &$p)
                     $p = '<span><!--si'.$p['equiv'].'--><a href="?item='.$k.'">'.Util::localizedString($p, 'name').'</a></span>';
 
-                $xSet = '<br /><span class="q">'.Lang::item('setName', ['<a href="?itemset='.$itemset->id.'" class="q">'.$itemset->getField('name', true).'</a>', 0, count($pieces)]).'</span>';
+                $xSet = '<br /><span class="q">'.Lang::item('setName', ['<a href="?itemset='.$itemsetEntry->id.'" class="q">'.$itemsetEntry->name.'</a>', 0, count($pieces)]).'</span>';
 
-                if ($skId = $itemset->getField('skillId'))  // bonus requires skill to activate
+                if ($skId = $itemsetEntry->skillId)  // bonus requires skill to activate
                 {
                     $xSet .= '<br />'.Lang::game('requires', ['<a href="?skills='.$skId.'" class="q1">'.SkillEntry::getName($skId).'</a>']);
 
-                    if ($_ = $itemset->getField('skillLevel'))
+                    if ($_ = $itemsetEntry->skillLevel)
                         $xSet = Lang::main('parensFmt', [$xSet, $_]);
 
                     $xSet .= '<br />';
@@ -971,44 +972,34 @@ class ItemEntry extends DBTypeEntry
                 $xSet .= '<div class="q0 indent">'.implode('<br />', $pieces).'</div><br />';
 
                 // get bonuses
-                $setSpellsAndIdx = [];
-                for ($j = 1; $j <= 8; $j++)
-                    if ($_ = $itemset->getField('spell'.$j))
-                        $setSpellsAndIdx[$_] = $j;
-
                 $setSpells = [];
-                if ($setSpellsAndIdx)
+                if ($setSpells = array_filter($itemsetEntry->spells))
                 {
-                    $boni = new SpellContainer(array(['s.id', array_keys($setSpellsAndIdx)]));
-                    foreach ($boni->iterate() as $spellEntry)
+                    $boni = new SpellContainer(array(['s.id', $setSpells]));
+                    foreach ($setSpells as $idx => $spellId)
                     {
-                        [$parsed, $_, $scaling] = $spellEntry->renderText('description', $_reqLvl > 1 ? $_reqLvl : MAX_LEVEL);
+                        if (!($spellEntry = $boni->getEntry($spellId)))
+                            continue;
+
+                        [$parsed, , $scaling] = $spellEntry->renderText('description', $_reqLvl > 1 ? $_reqLvl : MAX_LEVEL);
                         if ($scaling && $interactive)
                             $causesScaling = true;
 
                         $setSpells[] = array(
                             'tooltip' => $parsed,
-                            'entry'   => $itemset->getField('spell'.$setSpellsAndIdx[$spellEntry->id]),
-                            'bonus'   => $itemset->getField('bonus'.$setSpellsAndIdx[$spellEntry->id])
+                            'entry'   => $spellId,
+                            'bonus'   => $itemsetEntry->boni[$idx]
                         );
                     }
                 }
 
                 // sort and list bonuses
+                uasort($setSpells, fn(array $a, array $b) => $a['bonus'] <=> $b['bonus']);
                 $xSet .= '<span class="q0">';
-                for ($i = 0; $i < count($setSpells); $i++)
+                foreach ($setSpells as $i => ['tooltip' => $desc, 'entry' => $id, 'bonus' => $bonus])
                 {
-                    for ($j = $i; $j < count($setSpells); $j++)
-                    {
-                        if ($setSpells[$j]['bonus'] >= $setSpells[$i]['bonus'])
-                            continue;
-
-                        $tmp = $setSpells[$i];
-                        $setSpells[$i] = $setSpells[$j];
-                        $setSpells[$j] = $tmp;
-                    }
-                    $xSet .= '<span>'.Lang::item('setBonus', [$setSpells[$i]['bonus'], '<a href="?spell='.$setSpells[$i]['entry'].'">'.$setSpells[$i]['tooltip'].'</a>']).'</span>';
-                    if ($i < count($setSpells) - 1)
+                    $xSet .= '<span>'.Lang::item('setBonus', [$bonus, '<a href="?spell='.$id.'">'.$desc.'</a>']).'</span>';
+                    if (++$i < count($setSpells))
                         $xSet .= '<br />';
                 }
                 $xSet .= '</span>';
@@ -1488,6 +1479,28 @@ class ItemEntry extends DBTypeEntry
             $out .= ' '.Util::localizedString($this->randEnchantEntry, 'name');
 
         return $out;
+    }
+
+    public function getVendorData(int $targetItem = 0) : array
+    {
+        trigger_error('getVendorData() compatibility placeholder! REPLACE ME!');
+        return [];
+    }
+
+    public function extendJsonStats() : void
+    {
+        trigger_error('extendJsonStats() compatibility placeholder! REPLACE ME!');
+    }
+
+    public function getExtendedCost(?array $filter = [], int $targetItem = 0, ?array &$reqRating = null) : array
+    {
+        trigger_error('getExtendedCost() compatibility placeholder! REPLACE ME!');
+        return [];
+    }
+
+    public function initSubItems() : void
+    {
+        trigger_error('initSubItems() compatibility placeholder! REPLACE ME!');
     }
 
     public static function getName(int $id, ?int &$quality = null) : ?LocString

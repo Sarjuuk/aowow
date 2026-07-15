@@ -141,7 +141,7 @@ class MailBaseResponse extends TemplateResponse implements ICache
             $attachment = new ItemEntry($this->subject->attachment);
             if (!$attachment->error)
             {
-                $this->extendGlobalData($attachment->getJSGlobals());
+                $this->extendGlobalData($attachment->getJSGlobal());
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data' => [$attachment->getListviewRow()],
                     'name' => Lang::mail('attachment'),
@@ -156,7 +156,7 @@ class MailBaseResponse extends TemplateResponse implements ICache
             $ubAchievements = new AchievementEntry($this->typeId < 0 ? -$this->typeId : $acvId);
             if (!$ubAchievements->error)
             {
-                $this->extendGlobalData($ubAchievements->getJSGlobals());
+                $this->extendGlobalData($ubAchievements->getJSGlobal());
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data' => [$ubAchievements->getListviewRow()],
                     'id'   => 'used-by-achievement'
