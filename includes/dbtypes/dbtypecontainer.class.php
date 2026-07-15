@@ -8,8 +8,7 @@ if (!defined('AOWOW_REVISION'))
 
 abstract class DBTypeContainer
 {
-    protected array       $sets     = [];
-    protected DBTypeEntry $curEntry;
+    protected array $sets = [];
 
     public static int        $dbType;
     public static int        $contribute = CONTRIBUTE_ANY;
@@ -20,7 +19,7 @@ abstract class DBTypeContainer
     private array $itrStack    = [];
     private int   $resultTotal = 0;
 
-    public function __construct(?array $conditions = [], array $miscData = [])
+    public function __construct(?array $conditions = [], array $miscData = [], array $targetDBs = ['Aowow'])
     {
         $query    = Type::getClassConst(static::$dbType, 'QUERY_BASE');
         $baseOpts = Type::getClassConst(static::$dbType, 'QUERY_OPTS');
@@ -34,21 +33,19 @@ abstract class DBTypeContainer
             return;
         }
 
-        $dbQuery = new DBQuery($query, $baseOpts, $miscData['extraOpts'] ?? [], $miscData['calcTotal'] ?? false);
+        $dbQuery = new DBQuery($targetDBs, $query, $baseOpts, $miscData['extraOpts'] ?? [], $miscData['calcTotal'] ?? false);
         if (!$dbQuery->build($conditions))
             return;
 
-        foreach ($dbQuery->fetch() as $id => $data)
-            $this->sets[$id] = Type::newEntry(static::$dbType, (array)$data);
+        foreach ($dbQuery->fetch() as $data)
+            if (($entry = Type::newEntry(static::$dbType, (array)$data)) && !$entry->error)
+                $this->import($entry);
 
         $this->error = empty($this->sets);
 
         // store found count if requested
         if (!empty($miscData['calcTotal']))
             $this->resultTotal = $dbQuery->getMatches();
-
-        // push first result for use
-        $this->reset();
     }
 
     /**
@@ -68,55 +65,38 @@ abstract class DBTypeContainer
 
         foreach ($this->sets as $id => $__)
         {
-            $this->id       = $id;
-            $this->curEntry = &$this->sets[$id];            // do not use $tpl from each(), as we want to be referenceable
-
-            yield $id => $this->curEntry;
-
-            unset($this->curEntry);                         // kill reference or it will 'bleed' into the next iteration
+            $this->id = $id;
+            yield $id => $this->sets[$id];
         }
 
-        // fforward to old index
+        // fforward array pointer to old index
         $this->reset();
-        $oldIdx = array_pop($this->itrStack);
-        do
-        {
-            if (key($this->sets) != $oldIdx)
-                continue;
-
-            $this->id       = key($this->sets);
-            $this->curEntry = current($this->sets);
+        $lastIdx = array_pop($this->itrStack);
+        while (($k = key($this->sets)) !== null && $k != $lastIdx)
             next($this->sets);
-            break;
-        }
-        while (next($this->sets));
+
+        $this->id = $k;                                     // if $k is ever null, just eat the exception and report it
     }
 
     protected function reset() : void
     {
-        unset($this->curEntry);                               // kill reference or strange stuff will happen
         if (!$this->sets)
             return;
 
-        $this->curEntry = reset($this->sets);
-        $this->id     = key($this->sets);
+        $this->id = key($this->sets);
     }
 
     // read-access to sets
     public function getEntry(null|string|int $key = null) : ?DBTypeEntry
     {
         if (is_null($key))
-            return $this->curEntry;
+            return $this->sets[$this->id] ?? null;
 
-        if (isset($this->sets[$key]))
-        {
-            unset($this->curEntry);                         // kill reference or strange stuff will happen
-            $this->curEntry = $this->sets[$key];
-            $this->id     = $key;
-            return $this->sets[$key];
-        }
+        if (!isset($this->sets[$key]))
+            return null;
 
-        return null;
+        $this->id = $key;
+        return $this->sets[$key];
     }
 
     public function getRandomId() : int
@@ -246,7 +226,8 @@ abstract class DBTypeContainer
         $data = [];
 
         foreach ($this->iterate() as $id => $entry)
-            $data[$id] = $entry->getListviewRow($addInfoMask);
+            if ($row = $entry->getListviewRow($addInfoMask))
+                $data[$id] = $row;
 
         return $data;
     }

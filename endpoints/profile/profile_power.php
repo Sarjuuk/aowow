@@ -48,36 +48,28 @@ class ProfilePowerResponse extends TextResponse implements ICache
 
     protected function generate() : void
     {
-        $profile = new LocalProfileList(array(['id', $this->typeId]));
+        $profile = new LocalProfileEntry($this->typeId);
         if ($profile->error || !$profile->isVisibleToUser())
             $this->cacheType = CACHE_TYPE_NONE;
         else
         {
-            $n = $profile->getField('name');
-            $r = $profile->getField('race');
-            $c = $profile->getField('class');
-            $g = $profile->getField('gender');
-            $l = $profile->getField('level');
-
+            $name = $profile->name;
             if (!$this->subjectName)                        // implicit isCustom
-                $n .= Lang::profiler('customProfile');
+                $name .= Lang::profiler('customProfile');
             else if ($profile->title)
-                if ($title = (new TitleEntry($profile->title))?->${$g ? 'female' : 'male'})
-                    $n = sprintf($title, $n);
+                if ($title = (new TitleEntry($profile->title))?->${$profile->gender ? 'female' : 'male'})
+                    $name = sprintf($title, $name);
 
             $opts = array(
-                'name'    => $n,
+                'name'    => $name,
                 'tooltip' => $profile->renderTooltip(),
-                'icon'    => '$$WH.g_getProfileIcon('.$r.', '.$c.', '.$g.', '.$l.', \''.$profile->getIcon().'\')'
+                'icon'    => '$$WH.g_getProfileIcon('.$profile->race.', '.$profile->class.', '.$profile->gender.', '.$profile->level.', \''.$profile->getIcon().'\')'
             );
         }
 
-        if ($_ = $profile->getField('renameItr'))
-            $ri = '-'.$_;
-
         // the 'id' must be exactly as the js requested it or the tooltip won't register
         if ($this->subjectName)
-            $id = urlencode($this->rawParam) . ($ri ?? '');
+            $id = urlencode($this->rawParam);
         else
             $id = $this->typeId;
 

@@ -15,15 +15,14 @@ class DBQuery
     private int    $resultTotal = 0;
 
     public function __construct(
+        private array  $queryDBs,
         private string $queryBase,
         private array  $queryOpts,
                 array  $extraOpts = [],
-                bool   $calcTotal = false,
-        private array  $dbNames   = ['Aowow']
+                bool   $calcTotal = false
     )
     {
         $this->calcTotal = $calcTotal;
-        // dbNames?
 
         if (!$extraOpts)
             $this->extendQueryOpts($extraOpts);
@@ -114,10 +113,6 @@ class DBQuery
             if (!in_array($k, $this->prefixes))
                 unset($this->queryOpts[$k]);
 
-        // prepare usage of guids if using multiple realms (which have non-zoro indizes)
-        if (key($this->dbNames) != 0)
-            $this->queryBase = preg_replace('/\s([^\s]+)\sAS\sARRAY_KEY/i', ' CONCAT("DB_IDX", ":", \1) AS ARRAY_KEY', $this->queryBase);
-
         // insert additional selected fields
         if ($s = array_column($this->queryOpts, 's'))
             $this->queryBase = str_replace('ARRAY_KEY', 'ARRAY_KEY '.implode('', $s), $this->queryBase);
@@ -166,7 +161,7 @@ class DBQuery
             return;
 
         // this is purely because of multiple realms per server
-        foreach ($this->dbNames as $dbIdx => $n)
+        foreach ($this->queryDBs as $dbIdx => $n)
         {
             try                                             // does not go through the compatibility layer as we need to be able to fetch individual rows here
             {

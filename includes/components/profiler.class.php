@@ -30,7 +30,7 @@ class Profiler
        'dev' => [1, 26, 27, 28, 30]                         // Development, Test Server, Test Server - tournament, QA Server, Test Server 2
     );
 
-    private static array $realms  = [];
+    private static ?array $realms = null;
 
     public static array $slot2InvType = array(
         1  => [INVTYPE_HEAD],                               // head
@@ -201,56 +201,64 @@ class Profiler
 
     public static function getRealms() : array
     {
-        if (!DB::isConnectable(DB_AUTH) || self::$realms)
-            return self::$realms;
-
-        $realms = DB::Auth()->selectAssoc(
-           'SELECT `id` AS ARRAY_KEY,
-                   `name`,
-                   CASE WHEN `timezone` BETWEEN  2 AND  5 THEN "us" # US, Oceanic, Latin America, Americas-Tournament
-                        WHEN `timezone` BETWEEN  6 AND  7 THEN "kr" # KR, KR-Tournament
-                        WHEN `timezone` BETWEEN  8 AND 13 THEN "eu" # GB, DE, FR, ES, RU, EU-Tournament
-                        WHEN `timezone` BETWEEN 14 AND 15 THEN "tw" # TW, TW-Tournament
-                        WHEN `timezone` BETWEEN 16 AND 25 THEN "cn" # CN, CN1-8, CN-Tournament
-                        ELSE "dev" END AS "region",                 # 1: Dev, 26: Test, 27: Test Tournament, 28: QA, 30: Test2, 31+: misc
-                   `allowedSecurityLevel` AS "access"
-            FROM   `realmlist`
-            WHERE  `gamebuild` = %i',
-            WOW_BUILD
-        );
-
-        if (!$realms)
+        if (!DB::isConnectable(DB_AUTH))
             return [];
 
-        foreach ($realms as $rId => $rData)
-        {
-            // realm in db but no connection info set
-            if (!DB::isConnectable(DB_CHARACTERS . $rId))
-                continue;
+        return self::$realms ??= function() {
+            $realms = DB::Auth()->selectAssoc(
+               'SELECT `id` AS ARRAY_KEY,
+                       `name`,
+                       CASE WHEN `timezone` BETWEEN  2 AND  5 THEN "us" # US, Oceanic, Latin America, Americas-Tournament
+                            WHEN `timezone` BETWEEN  6 AND  7 THEN "kr" # KR, KR-Tournament
+                            WHEN `timezone` BETWEEN  8 AND 13 THEN "eu" # GB, DE, FR, ES, RU, EU-Tournament
+                            WHEN `timezone` BETWEEN 14 AND 15 THEN "tw" # TW, TW-Tournament
+                            WHEN `timezone` BETWEEN 16 AND 25 THEN "cn" # CN, CN1-8, CN-Tournament
+                            ELSE "dev" END AS "region",                 # 1: Dev, 26: Test, 27: Test Tournament, 28: QA, 30: Test2, 31+: misc
+                       `allowedSecurityLevel` AS "access"
+                FROM   `realmlist`
+                WHERE  `gamebuild` = %i',
+                WOW_BUILD
+            );
 
-            // filter by access level
-            if ($rData['access'] == SEC_ADMINISTRATOR   && (CLI || User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN)))
-                $rData['access'] = U_GROUP_DEV | U_GROUP_ADMIN;
-            else if ($rData['access'] == SEC_GAMEMASTER && (CLI || User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN | U_GROUP_MOD)))
-                $rData['access'] = U_GROUP_DEV | U_GROUP_ADMIN | U_GROUP_MOD;
-            else if ($rData['access'] == SEC_MODERATOR  && (CLI || User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN | U_GROUP_MOD | U_GROUP_BUREAU)))
-                $rData['access'] = U_GROUP_DEV | U_GROUP_ADMIN | U_GROUP_MOD | U_GROUP_BUREAU;
-            else if ($rData['access'] > SEC_PLAYER && !CLI)
-                continue;
+            if (!$realms)
+                return [];
 
-            // filter dev realms
-            if ($rData['region'] === 'dev')
+            foreach ($realms as $rId => $rData)
             {
-                if (CLI || User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN))
-                    $rData['access'] = U_GROUP_DEV | U_GROUP_ADMIN;
-                else
+                // realm in db but no connection info set
+                if (!DB::isConnectable(DB_CHARACTERS . $rId))
+                {
+                    unset($realms[$rId]);
                     continue;
+                }
+
+                // filter dev realms
+                if ($rData['region'] === 'dev')
+                {
+                    if (CLI || User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN))
+                        $realms[$rId]['access'] = U_GROUP_DEV | U_GROUP_ADMIN;
+                    else
+                        unset($realms[$rId]);
+
+                    continue;
+                }
+
+                // filter by access level
+                if ($rData['access'] == SEC_ADMINISTRATOR   && (CLI || User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN)))
+                    $realms[$rId]['access'] = U_GROUP_DEV | U_GROUP_ADMIN;
+                else if ($rData['access'] == SEC_GAMEMASTER && (CLI || User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN | U_GROUP_MOD)))
+                    $realms[$rId]['access'] = U_GROUP_DEV | U_GROUP_ADMIN | U_GROUP_MOD;
+                else if ($rData['access'] == SEC_MODERATOR  && (CLI || User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN | U_GROUP_MOD | U_GROUP_BUREAU)))
+                    $realms[$rId]['access'] = U_GROUP_DEV | U_GROUP_ADMIN | U_GROUP_MOD | U_GROUP_BUREAU;
+                else if ($rData['access'] > SEC_PLAYER && !CLI)
+                {
+                    unset($realms[$rId]);
+                    continue;
+                }
             }
 
-            self::$realms[$rId] = $rData;
-        }
-
-        return self::$realms;
+            return $realms;
+        };
     }
 
     public static function getRegions() : array
@@ -960,7 +968,7 @@ class Profiler
         );
 
         // this here should all happen within ProfileList
-        $members = new RemoteProfileList($conditions, ['sv' => $realmId]);
+        $members = new RemoteProfileContainer($conditions, ['sv' => $realmId]);
         if ($members->error)
             return self::FETCH_RESULT_ERR_NO_MEMBERS;
 
@@ -1031,19 +1039,16 @@ class Profiler
             [['extra_flags', self::CHAR_GMFLAGS, '&'], 0]   // not a staff char
         );
 
-        $mProfiles = new RemoteProfileList($conditions, ['sv' => $realmId]);
+        $mProfiles = new RemoteProfileContainer($conditions, ['sv' => $realmId]);
         if ($mProfiles->error)
             return self::FETCH_RESULT_ERR_NO_MEMBERS;
 
         $mProfiles->initializeLocalEntries();
-        foreach ($mProfiles->iterate() as $__)
+        foreach ($mProfiles->iterate() as $entry)
         {
-
-            $mGuid = $mProfiles->getField('guid');
-
-            $members[$mGuid]['arenaTeamId'] = $teamId;
-            $members[$mGuid]['captain']     = (int)($mGuid == $captain);
-            $members[$mGuid]['profileId']   = $mProfiles->getField('id');
+            $members[$entry->realmGUID]['arenaTeamId'] = $teamId;
+            $members[$entry->realmGUID]['captain']     = (int)($entry->realmGUID == $captain);
+            $members[$entry->realmGUID]['profileId']   = $entry->id;
         }
 
         // delete members from other teams of the same type...

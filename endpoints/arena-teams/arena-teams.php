@@ -73,7 +73,8 @@ class ArenateamsBaseResponse extends TemplateResponse implements IProfilerList
         /* Menu Path */
         /*************/
 
-        $this->followBreadcrumbPath();
+        if ($path = $this->followBreadcrumbPath())
+            array_push($this->breadcrumb, ...$path);
 
 
         /**************/
@@ -126,7 +127,7 @@ class ArenateamsBaseResponse extends TemplateResponse implements IProfilerList
         if ($this->region)
             $miscParams['rg'] = $this->region;
 
-        $teams = new RemoteArenateamList($conditions, $miscParams);
+        $teams = new RemoteArenateamContainer($conditions, $miscParams);
         if (!$teams->error)
         {
             $teams->initializeLocalEntries();

@@ -122,7 +122,7 @@ class ProfileBaseResponse extends TemplateResponse
 
         if ($this->typeId)
         {
-            $subject = new LocalProfileList(array(['id', $this->typeId]));
+            $subject = new LocalProfileEntry($this->typeId);
             if ($subject->error)
                 $this->notFound();
 

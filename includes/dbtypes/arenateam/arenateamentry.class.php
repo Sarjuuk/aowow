@@ -6,61 +6,73 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class ArenateamEntry extends DBTypeEntry
+abstract class ArenateamEntry extends DBTypeEntry implements IProfiler
 {
     use TrProfilerHelper;
 
+    public readonly string $name;
+    public readonly int    $faction;
+    public readonly int    $type;
+    public readonly int    $rank;
+    public readonly int    $seasonWins;
+    public readonly int    $seasonGames;
+    public readonly int    $rating;
+    /** @var array{int, int, bool}[] $members [charGUID => [name, classId, isCaptain], ...] */
+    public readonly array  $members;
+
     public static int $contribute = CONTRIBUTE_NONE;
+    public static int $dbType     = Type::ARENA_TEAM;
 
-    public function getListviewData() : array
+ // unsure if required or not .. values are placeholder
+ // public static string $brickFile = 'arenateam';
+ // public static string $dataTable = '::arenateam';
+
+    public function getListviewRow(int $addInfoMask = 0x0) : array
     {
-        $data = [];
-        foreach ($this->iterate() as $__)
-        {
-            $data[$this->id] = array(
-                'name'              => $this->curTpl['name'],
-                'realm'             => Profiler::urlize($this->curTpl['realmName'], true),
-                'realmname'         => $this->curTpl['realmName'],
-             // 'battlegroup'       => Profiler::urlize($this->curTpl['battlegroup']),  // was renamed to subregion somewhere around cata release
-             // 'battlegroupname'   => $this->curTpl['battlegroup'],
-                'region'            => Profiler::urlize($this->curTpl['region']),
-                'faction'           => $this->curTpl['faction'],
-                'size'              => $this->curTpl['type'],
-                'rank'              => $this->curTpl['rank'],
-                'wins'              => $this->curTpl['seasonWins'],
-                'games'             => $this->curTpl['seasonGames'],
-                'rating'            => $this->curTpl['rating'],
-                'members'           => $this->curTpl['members']
-            );
-        }
-
-        return $data;
+        return array(
+            'name'              => $this->name,
+            'realm'             => Profiler::urlize($this->realmName, true),
+            'realmname'         => $this->realmName,
+         // 'battlegroup'       => Profiler::urlize($this->battlegroup), // was renamed to subregion somewhere around cata release
+         // 'battlegroupname'   => $this->battlegroup,
+            'region'            => Profiler::urlize($this->region),
+            'faction'           => $this->faction,
+            'size'              => $this->type,
+            'rank'              => $this->rank,
+            'wins'              => $this->seasonWins,
+            'games'             => $this->seasonGames,
+            'rating'            => $this->rating,
+            'members'           => $this->members
+        );
     }
 
-    // plz dont..
-    public static function getName(int|string $id) : ?LocString { return null; }
-
     public function renderTooltip() : ?string { return null; }
-    public function getJSGlobals(int $addMask = 0) : array { return []; }
+    public function getJSGlobal(int $addMask = 0) : array { return []; }
+
+    public function getProfileUrl() : string
+    {
+        return '?arena-team=' . $this->region . '.' . Profiler::urlize($this->realmName, true) . '.' . Profiler::urlize($this->name);
+    }
+
+    public static function getName(int|string $id) : ?LocString { return null; }
 }
 
 
-class RemoteArenateam extends ArenateamEntry
+class RemoteArenateamEntry extends ArenateamEntry
 {
-    protected string $queryBase = 'SELECT `at`.*, `at`.`arenaTeamId` AS ARRAY_KEY FROM arena_team at';
-    protected array  $queryOpts = array(
-                    'at'  => [['atm', 'c'], 'g' => 'ARRAY_KEY', 'o' => 'rating DESC'],
-                    'atm' => ['j' => 'arena_team_member atm ON atm.`arenaTeamId` = at.`arenaTeamId`'],
-                    'c'   => ['j' => 'characters c ON c.`guid` = atm.`guid` AND c.`deleteInfos_Account` IS NULL AND c.`level` <= 80 AND (c.`extra_flags` & '.Profiler::CHAR_GMFLAGS.') = 0', 's' => ', BIT_OR(IF(c.`race` IN (1, 3, 4, 7, 11), 1, 2)) - 1 AS "faction"']
-                );
+    public const /* string */ QUERY_BASE = 'SELECT `at`.*, `at`.`arenaTeamId` AS ARRAY_KEY FROM arena_team at';
+    public const /* array  */ QUERY_OPTS = array(
+        'at'  => [['atm', 'c'], 'g' => 'ARRAY_KEY', 'o' => 'rating DESC'],
+        'atm' => ['j' => 'arena_team_member atm ON atm.`arenaTeamId` = at.`arenaTeamId`'],
+        'c'   => ['j' => 'characters c ON c.`guid` = atm.`guid` AND c.`deleteInfos_Account` IS NULL AND c.`level` <= 80 AND (c.`extra_flags` & '.Profiler::CHAR_GMFLAGS.') = 0', 's' => ', BIT_OR(IF(c.`race` IN (1, 3, 4, 7, 11), 1, 2)) - 1 AS "faction"']
+    );
 
-    private array $members   = [];
     private array $rankOrder = [];
 
     public function __construct(array $conditions = [], array $miscData = [])
     {
         // select DB by realm
-        if (!$this->getRealmDBs($miscData))
+        if (!$dbNames = self::getRealmDBs($miscData))
         {
             trigger_error('RemoteArenateamList::__construct - cannot access any realm.', E_USER_WARNING);
             return;
@@ -97,7 +109,7 @@ class RemoteArenateam extends ArenateamEntry
             }
             else
             {
-                trigger_error('arena team #'.$guid.' belongs to nonexistent realm #'.$r, E_USER_WARNING);
+                trigger_error('arena team #'.$guid.' belongs to nonexistent realm #'.$r[0], E_USER_WARNING);
                 unset($this->templates[$guid]);
                 continue;
             }
@@ -105,7 +117,7 @@ class RemoteArenateam extends ArenateamEntry
             // empty name
             if (!$curTpl['name'])
             {
-                trigger_error('arena team #'.$guid.' on realm #'.$r.' has empty name.', E_USER_WARNING);
+                trigger_error('arena team #'.$guid.' on realm #'.$r[0].' has empty name.', E_USER_WARNING);
                 unset($this->templates[$guid]);
                 continue;
             }
@@ -159,97 +171,23 @@ class RemoteArenateam extends ArenateamEntry
             $limit--;
         }
     }
-
-    public function initializeLocalEntries() : void
-    {
-        if (!$this->templates)
-            return;
-
-        $profiles = [];
-        // init members for tooltips
-        foreach ($this->members as $realmId => $teams)
-        {
-            $gladiators = [];
-            foreach ($teams as $team)
-                $gladiators = array_merge($gladiators, array_keys($team));
-
-            $profiles[$realmId] = new RemoteProfileList(array(['c.guid', $gladiators]), ['sv' => $realmId]);
-
-            if (!$profiles[$realmId]->error)
-                $profiles[$realmId]->initializeLocalEntries();
-        }
-
-        $data = [];
-        foreach ($this->iterate() as $guid => $__)
-        {
-            $data['realm'][$guid]     = $this->getField('realm');
-            $data['realmGUID'][$guid] = $this->getField('arenaTeamId');
-            $data['name'][$guid]      = $this->getField('name');
-            $data['nameUrl'][$guid]   = Profiler::urlize($this->getField('name'));
-            $data['type'][$guid]      = $this->getField('type');
-            $data['rating'][$guid]    = $this->getField('rating');
-            $data['stub'][$guid]      = 1;
-        }
-
-        // basic arena team data
-        DB::Aowow()->qry('INSERT INTO ::profiler_arena_team %m ON DUPLICATE KEY UPDATE `id` = `id`', $data);
-
-        // merge back local ids
-        $localIds = DB::Aowow()->selectCol('SELECT CONCAT(`realm`, ":", `realmGUID`) AS ARRAY_KEY, `id` FROM ::profiler_arena_team WHERE `realm` IN %in AND `realmGUID` IN %in',
-            $data['realm'], $data['realmGUID']
-        );
-
-        foreach ($this->iterate() as $guid => &$_curTpl)
-            if (isset($localIds[$guid]))
-                $_curTpl['id'] = $localIds[$guid];
-
-
-        // profiler_arena_team_member requires profiles and arena teams to be filled
-        foreach ($this->members as $realmId => $teams)
-        {
-            if (empty($profiles[$realmId]))
-                continue;
-
-            $memberData = [];
-            foreach ($teams as $teamId => $team)
-            {
-                $clearMembers = [];
-                foreach ($team as $memberId => $member)
-                {
-                    $clearMembers[] = $profiles[$realmId]->getEntry($realmId.':'.$memberId)['id'];
-
-                    $memberData['arenaTeamId'][] = $localIds[$realmId.':'.$teamId];
-                    $memberData['profileId'][]   = $profiles[$realmId]->getEntry($realmId.':'.$memberId)['id'];
-                    $memberData['captain'][]     = $member[2];
-                }
-
-                // Delete members from other teams of the same type
-                DB::Aowow()->qry(
-                   'DELETE atm
-                    FROM   ::profiler_arena_team_member atm
-                    JOIN   ::profiler_arena_team at ON atm.`arenaTeamId` = at.`id` AND at.`type` = %i
-                    WHERE  atm.`profileId` IN %in',
-                    $data['type'][$realmId.':'.$teamId] ?? 0,
-                    $clearMembers
-                );
-            }
-
-            DB::Aowow()->qry('INSERT INTO ::profiler_arena_team_member %m ON DUPLICATE KEY UPDATE `profileId` = `profileId`', $memberData);
-        }
-    }
 }
 
 
-class LocalArenateam extends ArenateamEntry
+class LocalArenateamEntry extends ArenateamEntry
 {
-    protected string $queryBase = 'SELECT at.*, at.id AS ARRAY_KEY FROM ::profiler_arena_team at';
-    protected array  $queryOpts = array(
-                    'at'  => [['atm', 'c'], 'g' => 'ARRAY_KEY', 'o' => 'rating DESC'],
-                    'atm' => ['j' => '::profiler_arena_team_member atm ON atm.`arenaTeamId` = at.`id`'],
-                    'c'   => ['j' => '::profiler_profiles c ON c.`id` = atm.`profileId`', 's' => ', BIT_OR(IF(c.`race` IN (1, 3, 4, 7, 11), 1, 2)) - 1 AS "faction"']
-                );
+    public const /* string */ QUERY_BASE = 'SELECT at.*, at.id AS ARRAY_KEY FROM ::profiler_arena_team at';
+    public const /* array  */ QUERY_OPTS = array(
+        'at'  => [['atm', 'c'], 'g' => 'ARRAY_KEY', 'o' => 'rating DESC'],
+        'atm' => ['j' => '::profiler_arena_team_member atm ON atm.`arenaTeamId` = at.`id`'],
+        'c'   => ['j' => '::profiler_profiles c ON c.`id` = atm.`profileId`', 's' => ', BIT_OR(IF(c.`race` IN (1, 3, 4, 7, 11), 1, 2)) - 1 AS "faction"']
+    );
 
-    public function __construct(array $conditions = [], array $miscData = [])
+    public function __construct(
+                  int|array $initData,
+        protected array     $extraOpts = [],
+                  array     $targetDBs = ['Aowow']
+    )
     {
         $realms = Profiler::getRealms();
 
@@ -280,7 +218,7 @@ class LocalArenateam extends ArenateamEntry
             return;
 
         // post processing
-        $members = DB::Aowow()->selectAssoc(
+        $this->members = DB::Aowow()->selectAssoc(
            'SELECT `arenaTeamId` AS ARRAY_KEY, p.`id` AS ARRAY_KEY2, p.`name` AS "0", p.`class` AS "1", atm.`captain` AS "2"
             FROM   ::profiler_arena_team_member atm
             JOIN   ::profiler_profiles p ON p.`id` = atm.`profileId`
@@ -302,19 +240,8 @@ class LocalArenateam extends ArenateamEntry
             // battlegroup
             $curTpl['battlegroup'] = Cfg::get('BATTLEGROUP');
 
-            $curTpl['members'] = array_values($members[$id]);
+            $curTpl['members'] = array_values($this->members[$id]);
         }
-    }
-
-    public function getProfileUrl() : string
-    {
-        $url = '?arena-team=';
-
-        return $url.implode('.', array(
-            $this->getField('region'),
-            Profiler::urlize($this->getField('realmName'), true),
-            Profiler::urlize($this->getField('name'))
-        ));
     }
 }
 

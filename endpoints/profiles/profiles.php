@@ -133,9 +133,9 @@ class ProfilesBaseResponse extends TemplateResponse implements IProfilerList
             $miscParams['extraOpts'] = $_;
 
         if ($this->filter->useLocalList)
-            $profiles = new LocalProfileList($conditions, $miscParams);
+            $profiles = new LocalProfileContainer($conditions, $miscParams);
         else
-            $profiles = new RemoteProfileList($conditions, $miscParams);
+            $profiles = new RemoteProfileContainer($conditions, $miscParams);
 
         if (!$profiles->error)
         {
@@ -159,19 +159,19 @@ class ProfilesBaseResponse extends TemplateResponse implements IProfilerList
             }
 
             // init roster-listview
-            if ($roster == 1 && !$profiles->hasDiffFields('guild') && $profiles->getField('guild'))
+            if ($roster == 1 && !$profiles->hasDiffFields('guild') && $profiles->getEntry()->guild)
             {
                 $lvVisibleCols[] = 'guildrank';
                 $lvHiddenCols[]  = 'guild';
 
-                $this->roster = Lang::profiler('guildRoster', [$profiles->getField('guildname')]);
+                $this->roster = Lang::profiler('guildRoster', [$profiles->getEntry()->guildname]);
             }
-            else if ($roster && !$profiles->hasDiffFields('arenateam') && $profiles->getField('arenateam'))
+            else if ($roster && !$profiles->hasDiffFields('arenateam') && $profiles->getEntry()->arenateam)
             {
                 $lvVisibleCols[] = 'rating';
 
                 $addInfoMask |= LISTVIEWINFO_ARENA;
-                $this->roster = Lang::profiler('arenaRoster', [$profiles->getField('arenateam')]);
+                $this->roster = Lang::profiler('arenaRoster', [$profiles->getEntry()->arenateam]);
             }
 
             $lvData = $profiles->getListviewData($addInfoMask, $fiExtraCols);
