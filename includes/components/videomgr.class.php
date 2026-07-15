@@ -42,7 +42,7 @@ class VideoMgr
         return fclose($tmpFile);
     }
 
-    public static function loadSuggestion(?\stdClass &$videoInfo, int $destType, int $destTypeId, ?string $uid) : bool
+    public static function loadSuggestion(\stdClass &$videoInfo, int $destType, int $destTypeId, ?string $uid) : bool
     {
         self::$tmpFile = sprintf(self::PATH_TEMP, User::$username.'-'.$destType.'-'.$destTypeId.'-'.$uid);
 

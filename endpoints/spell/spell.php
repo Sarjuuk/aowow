@@ -314,7 +314,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
         for ($i = 0; $i < 3; $i++)
         {
-            if (!in_array($this->subject->effectAuraId[$i], Spell::MOD_AURAS))
+            if (!in_array($this->subject->effectAuraId[$i], SpellEntry::MOD_AURAS))
                 continue;
 
             $m1 = $this->subject->effectSpellClassMaskA[$i];
@@ -401,7 +401,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             for ($i = 1; $i < 4; $i++)
                 $sub[] = array(
                     DB::AND,
-                    ['s.effect'.$i.'AuraId', Spell::MOD_AURAS],
+                    ['s.effect'.$i.'AuraId', SpellEntry::MOD_AURAS],
                     [
                         DB::OR,
                         ['s.effect'.$i.'SpellClassMaskA', $m1, '&'],
@@ -975,9 +975,13 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: teaches
-        if ($ids = Game::getTaughtSpells($this->subject))
+        $lookup = array_merge(
+            array_intersect_key($this->subject->effectTriggerSpell, $this->subject->canTeachSpell()),
+            Game::getTaughtSpells($this->subject->id)
+        );
+        if ($lookup)
         {
-            $teaches = new SpellContainer(array(['id', $ids]));
+            $teaches = new SpellContainer(array(['id', $lookup]));
             if (!$teaches->error)
             {
                 $this->extendGlobalData($teaches->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));

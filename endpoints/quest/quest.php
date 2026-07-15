@@ -327,7 +327,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                 if ($provided)
                     $providedRequired = true;
 
-                if (!$olItemData->getEntry($itemId))
+                if (!($itemEntry = $olItemData->getEntry($itemId)))
                 {
                     $this->objectiveList[] = new IconElement(0, 0, Util::ucFirst(Lang::game('item')).' #'.$itemId, $qty > 1 ? $qty : '', size: IconElement::SIZE_SMALL, extraText: $provided ? Lang::quest('provided') : null);
                     continue;
@@ -336,9 +336,9 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                 $this->objectiveList[] = new IconElement(
                     Type::ITEM,
                     $itemId,
-                    UIText::unescapeUISequences($olItemData->json[$itemId]['name'], Lang::FMT_HTML),
+                    UIText::unescapeUISequences($itemEntry->json['name'], Lang::FMT_HTML),
                     num: $qty > 1 ? $qty : '',
-                    quality: 7 - $olItemData->json[$itemId]['quality'],
+                    quality: 7 - $itemEntry->json['quality'],
                     size: IconElement::SIZE_SMALL,
                     element: 'iconlist-icon',
                     extraText: $provided ? Lang::quest('provided') : null
@@ -348,15 +348,15 @@ class QuestBaseResponse extends TemplateResponse implements ICache
             // if providd item is not required by quest, list it below other requirements
             if (!$providedRequired && $olItems[0][0])
             {
-                if (!$olItemData->getEntry($olItems[0][0]))
+                if (!($itemEntry = $olItemData->getEntry($olItems[0][0])))
                     $this->providedItem = new IconElement(0, 0, Util::ucFirst(Lang::game('item')).' #'.$itemId, $olItems[0][1] > 1 ? $olItems[0][1] : '');
                 else
                     $this->providedItem = new IconElement(
                         Type::ITEM,
                         $olItems[0][0],
-                        UIText::unescapeUISequences($olItemData->json[$olItems[0][0]]['name'], Lang::FMT_HTML),
+                        UIText::unescapeUISequences($itemEntry->json['name'], Lang::FMT_HTML),
                         num: $olItems[0][1] > 1 ? $olItems[0][1] : '',
-                        quality: 7 - $olItemData->json[$olItems[0][0]]['quality'],
+                        quality: 7 - $itemEntry->json['quality'],
                         size: IconElement::SIZE_SMALL,
                         element: 'iconlist-icon'
                     );

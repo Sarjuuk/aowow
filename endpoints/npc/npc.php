@@ -790,9 +790,9 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: same model as
-        if ($this->subject->getTameable() && ($model = $this->subject->getField('modelId')))
+        if ($this->subject->getTameable() && ($model = $this->subject->modelId))
         {
-            $sameModel = new CreatureList(array(['modelId', $model], ['id', $this->typeId, '!']));
+            $sameModel = new CreatureContainer(array(['modelId', $model], ['id', $this->typeId, '!']));
             if (!$sameModel->error)
             {
                 $this->extendGlobalData($sameModel->getJSGlobals());
@@ -803,7 +803,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                     'name'        => '$LANG.tab_samemodelas',
                     'id'          => 'same-model-as',
                     'visibleCols' => ['skin']
-                ), CreatureList::$brickFile));
+                ), CreatureEntry::$brickFile));
             }
         }
 

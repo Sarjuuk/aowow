@@ -311,9 +311,9 @@ class SpellsBaseResponse extends TemplateResponse implements ICache
                     if (isset($this->category[1]))
                     {
                         if ($this->category[1] == 6)        // todo (med): we know Weapon(6) includes spell Shoot(3018), that has a mask; but really, ANY proficiency or petSkill should be in that mask so there is no need to differenciate
-                            $conditions[] = [DB::OR, ['s.skillLine1', Spell::SKILLLINE_CATEGORY[$this->category[1]]], ['s.skillLine1', -3]];
+                            $conditions[] = [DB::OR, ['s.skillLine1', SpellEntry::SKILLLINE_CATEGORY[$this->category[1]]], ['s.skillLine1', -3]];
                         else
-                            $conditions[] = ['s.skillLine1', Spell::SKILLLINE_CATEGORY[$this->category[1]]];
+                            $conditions[] = ['s.skillLine1', SpellEntry::SKILLLINE_CATEGORY[$this->category[1]]];
                     }
 
                     break;

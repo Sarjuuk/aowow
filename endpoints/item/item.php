@@ -866,10 +866,9 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         {
             $indirectSpells = new SpellContainer(array(['id', $indirect]));
             foreach ($indirectSpells->iterate() as $spellEntry)
-                foreach ($spellEntry->canTeachSpell() as $idx)
-                    $ids[] = $spellEntry->effectTriggerSpell[$idx];
+                $ids = array_merge($ids, array_intersect_key($spellEntry->effectTriggerSpell, $spellEntry->canTeachSpell()));
 
-            $ids = array_merge($ids, Game::getTaughtSpells($indirect));
+            $ids = array_merge($ids, Game::getTaughtSpells(...$indirect));
         }
 
         if ($ids)

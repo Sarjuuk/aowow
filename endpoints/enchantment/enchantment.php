@@ -238,11 +238,11 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
 
                     foreach ($ubItems->iterate() as $itemEntry)
                     {
-                        if (array_search($sId, $itemEntry->spellId) !== false)
-                        {
-                            unset($spellData[$sId]);
-                            break;
-                        }
+                        if (!in_array($sId, array_column($itemEntry->spells, 0)))
+                            continue;
+
+                        unset($spellData[$sId]);
+                        break;
                     }
                 }
             }

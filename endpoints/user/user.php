@@ -233,7 +233,7 @@ class UserBaseResponse extends TemplateResponse
             if (!User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
                 $conditions[] = ['deleted', 0];
 
-            $profiles = new LocalProfileList($conditions);
+            $profiles = new LocalProfileContainer($conditions);
             if (!$profiles->error)
             {
                 $this->addDataLoader('weight-presets');
@@ -246,7 +246,7 @@ class UserBaseResponse extends TemplateResponse
             if (User::$id != $this->user['id'] && !User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
                 $conditions[] = ['ap.extraFlags', PROFILER_CU_PUBLISHED, '&'];
 
-            $characters = new LocalProfileList($conditions);
+            $characters = new LocalProfileContainer($conditions);
             if (!$characters->error)
             {
                 $this->addDataLoader('weight-presets');

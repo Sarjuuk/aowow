@@ -461,7 +461,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         // tab: related quests
         if ($this->subject->reqQuest)
         {
-            $relQuest = new Quest($this->subject->reqQuest);
+            $relQuest = new QuestEntry($this->subject->reqQuest);
             if (!$relQuest->error)
             {
                 $this->extendGlobalData($relQuest->getJSGlobal());
