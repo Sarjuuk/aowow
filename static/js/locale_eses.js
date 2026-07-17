@@ -2459,6 +2459,14 @@ var g_quest_states = {
     6: 'recompensado',
 };
 
+var g_group_status = {
+    0: 'solo',
+    1: 'in a party',
+    2: 'in a non-raid party',
+    3: 'in a raid group',
+    4: 'solo or in a non-raid party'
+};
+
 var g_condition_sources = {
      0: [['player', null],       ''],
      1: [['player', null],       'Si se cumplen las condiciones, [item=$2] puede ser soltado por [npc=$1].'],
@@ -2539,7 +2547,8 @@ var g_conditions = {
     48: 'El Jugador $Nha: no ha; recolectado $3 para el objetivo #$2 de [quest=$1]',
     49: 'La dificultad actual del mapa es #$1',
     50: 'El Jugador $C$1$Npuede:no puede; ser:es$N: no es;; un Maestro de Juego',
-    58: 'El StringID de esta entidad es$N: no es; $4'
+    58: 'El StringID de esta entidad es$N: no es; $4',
+    60: 'El Jugador $Nestá: no está; $1'
 };
 
 /* end aowow custom */

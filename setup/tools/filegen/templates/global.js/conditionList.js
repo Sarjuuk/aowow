@@ -189,6 +189,10 @@ var ConditionList = new function() {
 
                 param[1] = _makeList(entry[2], quest_states, '$2');
                 break;
+
+            case 60:
+                param[0] = g_group_status[entry[1]] ?? 'UNK GROUP STATUS';
+                break;
         }
 
         str = g_conditions[strIdx];

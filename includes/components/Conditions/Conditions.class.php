@@ -121,6 +121,7 @@ class Conditions
 //  public const PRIVATE_OBJECT           = 57;             // ❌ reserved for TC master
     public const STRING_ID                = 58;             // go or npc has StringId   NULL,           NULL,           NULL
 //  public const LABEL                    = 59;             // ❌ reserved for TC master
+    public const GROUP_STATUS             = 60;             // player in (raid) group   group status,   NULL,           NULL
 
     private const IDX_SRC_GROUP = 0;
     private const IDX_SRC_ENTRY = 1;
@@ -212,7 +213,8 @@ class Conditions
         self::QUEST_OBJECTIVE_PROGRESS => [Type::QUEST,       true, true, null],
         self::DIFFICULTY_ID            => [true,              null, null, null],
         self::GAMEMASTER               => [true,              null, null, null],
-        self::STRING_ID                => [true,              null, null, null]
+        self::STRING_ID                => [true,              null, null, null],
+        self::GROUP_STATUS             => [true,              null, null, null]
     );
 
     private $jsGlobals   = [];

@@ -2506,6 +2506,14 @@ var g_quest_states = {
     6: 'been rewarded',
 };
 
+var g_group_status = {
+    0: 'solo',
+    1: 'in a party',
+    2: 'in a non-raid party',
+    3: 'in a raid group',
+    4: 'solo or in a non-raid party'
+};
+
 var g_condition_sources = {
      0: [['player', null],       ''],
      1: [['player', null],       'If the conditions are met, [item=$2] can be dropped by [npc=$1].'],
@@ -2586,7 +2594,8 @@ var g_conditions = {
     48: 'The Player has$N: not; collected $3 towards objective #$2 of [quest=$1]',
     49: 'The current map difficulty is #$1',
     50: 'The Player $C$1$Ncan:can\'t; be:is$N: not;; a Gamemaster',
-    58: 'The StringID of this entity is$N: not; $4'
+    58: 'The StringID of this entity is$N: not; $4',
+    60: 'The Player is$N: not; $1'
 };
 
 /* end aowow custom */

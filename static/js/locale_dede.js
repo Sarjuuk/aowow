@@ -2459,6 +2459,14 @@ var g_quest_states = {
     6: 'Belohnungen erhalten',
 };
 
+var g_group_status = {
+    0: 'solo',
+    1: 'in einer Gruppe',
+    2: 'in einer nicht-Raid Gruppe',
+    3: 'in einer Raid-Gruppe',
+    4: 'solo oder in einer nicht-Raid Gruppe'
+};
+
 var g_condition_sources = {
      0: [['Spieler', null],       ''],
      1: [['Spieler', null],       'Wenn die Bedingung erfüllt ist kann [item=$2] aus [npc=$1] geplündert werden.'],
@@ -2539,7 +2547,8 @@ var g_conditions = {
     48: 'Der Questfortschritt für Ziel #$2 von [quest=$1] ist$N: nicht; $3',
     49: 'Der aktuelle Schwierigkeitsgrad für diese Instanz ist #$1',
     50: 'Der Spieler $C$1kann$N: nicht; Gamemaster sein:ist $Nein:kein; Gamemaster;',
-    58: 'Die StringID dieser Entität ist$N: nicht; $4'
+    58: 'Die StringID dieser Entität ist$N: nicht; $4',
+    60: 'Der Spieler ist$N: nicht; $1'
 };
 
 /* end aowow custom */
