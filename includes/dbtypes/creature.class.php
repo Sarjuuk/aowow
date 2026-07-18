@@ -258,7 +258,7 @@ class CreatureList extends DBTypeList
                 if ($addInfoMask & LISTVIEWINFO_TAMEABLE)   // only first skin of first model ... we're omitting potentially 11 skins here .. but the lv accepts only one .. w/e
                     $data[$this->id]['skin'] = $this->curTpl['textureString'];
 
-                if ($addInfoMask & NPCILISTVIEWINFO_REPUTATIONNFO_REP)
+                if ($addInfoMask & LISTVIEWINFO_REPUTATION)
                 {
                     $data[$this->id]['reprewards'] = [];
                     if ($rewRep[$this->id])
