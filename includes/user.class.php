@@ -786,22 +786,16 @@ class User
         if (!self::isLoggedIn())
             return false;
 
-        trigger_error('User::loadProfiles - need a way to merge cuFlags');
-        return false;
-
         if (self::$profiles === null)
         {
-            $ap = DB::Aowow()->selectCol('SELECT `profileId` AS ARRAY_KEY, `extraFlags` FROM ::account_profiles WHERE `accountId` = %i', self::$id);
+            $cuFlags = DB::Aowow()->selectCol('SELECT `profileId` AS ARRAY_KEY, `extraFlags` FROM ::account_profiles WHERE `accountId` = %i', self::$id);
 
             // the old approach [DB::OR, ['user', self::$id], ['ap.accountId', self::$id]] caused keys to not get used
-            $conditions = $ap ? [[DB::OR, ['user', self::$id], ['id', array_keys($ap)]]] : [['user', self::$id]];
+            $conditions = $cuFlags ? [[DB::OR, ['user', self::$id], ['id', array_keys($cuFlags)]]] : [['user', self::$id]];
             if (!self::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
                 $conditions[] = ['deleted', 0];
 
-            self::$profiles = (new LocalProfileContainer($conditions));
-
-            foreach (self::$profiles->iterate() as $id => &$entry)
-                $entry->cuFlags |= $ap[$id] ?? 0;
+            self::$profiles = (new LocalProfileContainer($conditions, ['cuFlags', $cuFlags]));
         }
 
         return !!self::$profiles->getFoundIDs();
