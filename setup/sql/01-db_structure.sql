@@ -1476,10 +1476,8 @@ CREATE TABLE `aowow_items` (
   `unsheatheSoundId` smallint(5) unsigned NOT NULL DEFAULT 0,
   `flagsCustom` int(10) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
-  KEY `items_index` (`class`),
   KEY `idx_model` (`displayId`),
   KEY `idx_faction` (`requiredFaction`),
-  KEY `iconId` (`iconId`),
   KEY `idx_spell1` (`spellId1`),
   KEY `idx_spell2` (`spellId2`),
   KEY `idx_spell3` (`spellId3`),
@@ -1497,7 +1495,10 @@ CREATE TABLE `aowow_items` (
   KEY `idx_name4` (`name_loc4`),
   KEY `idx_name6` (`name_loc6`),
   KEY `idx_name8` (`name_loc8`),
-  KEY `idx_itemset` (`itemset`)
+  KEY `idx_itemset` (`itemset`),
+  KEY `idx_icon` (`iconId`),
+  KEY `idx_class` (`class`),
+  KEY `idx_subclass` (`subClass`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -2360,7 +2361,18 @@ CREATE TABLE `aowow_quests` (
   KEY `idx_requirement2` (`reqNpcOrGo2`),
   KEY `idx_requirement3` (`reqNpcOrGo3`),
   KEY `idx_requirement4` (`reqNpcOrGo4`),
-  KEY `idx_event` (`eventId`)
+  KEY `idx_event` (`eventId`),
+  KEY `idx_reqitem1` (`reqItemId1`),
+  KEY `idx_reqitem2` (`reqItemId2`),
+  KEY `idx_reqitem3` (`reqItemId3`),
+  KEY `idx_reqitem4` (`reqItemId4`),
+  KEY `idx_reqitem5` (`reqItemId5`),
+  KEY `idx_reqitem6` (`reqItemId6`),
+  KEY `idx_sourceitem` (`sourceItemId`),
+  KEY `idx_reqsourceitem1` (`reqSourceItemId1`),
+  KEY `idx_reqsourceitem2` (`reqSourceItemId2`),
+  KEY `idx_reqsourceitem3` (`reqSourceItemId3`),
+  KEY `idx_reqsourceitem4` (`reqSourceItemId4`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -2939,7 +2951,6 @@ CREATE TABLE `aowow_spell` (
   `spellDescriptionVariableId` smallint(6) NOT NULL,
   `trainingCost` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `category` (`typeCat`),
   KEY `spell` (`id`) USING BTREE,
   KEY `iconId` (`iconId`),
   KEY `reagent1` (`reagent1`),
@@ -2961,19 +2972,22 @@ CREATE TABLE `aowow_spell` (
   KEY `effect3AuraId` (`effect3AuraId`),
   KEY `idx_skill1` (`skillLine1`),
   KEY `idx_skill2` (`skillLine2OrMask`),
-  KEY `idx_name0` (`name_loc0`),
-  KEY `idx_name2` (`name_loc2`),
-  KEY `idx_name3` (`name_loc3`),
-  KEY `idx_name4` (`name_loc4`),
-  KEY `idx_name6` (`name_loc6`),
-  KEY `idx_name8` (`name_loc8`),
   KEY `idx_spellfamily` (`spellFamilyId`),
   KEY `idx_miscvalue1` (`effect1MiscValue`),
   KEY `idx_miscvalue2` (`effect2MiscValue`),
   KEY `idx_miscvalue3` (`effect3MiscValue`),
   KEY `idx_triggerspell1` (`effect1TriggerSpell`),
   KEY `idx_triggerspell2` (`effect2TriggerSpell`),
-  KEY `idx_triggerspell3` (`effect3TriggerSpell`)
+  KEY `idx_triggerspell3` (`effect3TriggerSpell`),
+  KEY `idx_name0` (`name_loc0`),
+  KEY `idx_name2` (`name_loc2`),
+  KEY `idx_name3` (`name_loc3`),
+  KEY `idx_name6` (`name_loc6`),
+  KEY `idx_name8` (`name_loc8`),
+  KEY `idx_typecat` (`typeCat`),
+  KEY `idx_category` (`category`),
+  KEY `idx_toolcategory1` (`toolCategory1`),
+  KEY `idx_toolcategory2` (`toolCategory2`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
