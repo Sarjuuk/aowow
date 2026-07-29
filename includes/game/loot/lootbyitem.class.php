@@ -28,7 +28,7 @@ class LootByItem extends Loot
     public const /* int */ ACHIEVEMENT_REWARD = 17;
 
     private array  $chanceMods    = [];
-    private array  $listviewTabs  = array(                  // order here determines tab order on page
+    private array  $listviewTabs  = array(
     //  [fileName, tabData, tabName, tabId, extraCols, hiddenCols, visibleCols]
         self::NPC_DROPPED        => [Type::NPC,         [], '$LANG.tab_droppedby',        'dropped-by',              [], [], []],
         self::QUEST_REWARD       => [Type::QUEST,       [], '$LANG.tab_rewardfrom',       'reward-from-quest',       [], [], []],

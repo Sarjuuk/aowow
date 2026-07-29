@@ -555,7 +555,7 @@ class ItemEntry extends DBTypeEntry
         if ($this->maxCount == 1)
             $x .= '<br />'.Lang::item('unique', 0);
         // not for currency tokens
-        else if ($this->maxCount && $this->bagFamily != 8192)
+        else if ($this->maxCount && $this->bagFamily != 0x2000)
             $x .= '<br />'.Lang::item('unique', 1, [$this->maxCount]);
         else if ($_flags & ITEM_FLAG_UNIQUEEQUIPPED)
             $x .= '<br />'.Lang::item('uniqueEquipped', 0);
