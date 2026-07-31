@@ -716,8 +716,8 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
     private function tabContains(string $lootTemplate, int $lootId, string $tabName, string $tabId, array $extraCols, array $hiddenCols = []) : ?Listview
     {
-        $lootTab = new LootByContainer();
-        if (!$lootTab->getByContainer($lootTemplate, [$lootId]))
+        $lootTab = new LootByContainer($lootTemplate, $lootId);
+        if (!$lootTab->formatListview())
             return null;
 
         $this->extendGlobalData($lootTab->jsGlobals);
@@ -743,16 +743,13 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         if ($this->subject->getField('spellTrigger1') !== SPELL_TRIGGER_USE || !($s = $this->subject->getField('spellId1')))
             return null;
 
-        if (!($spellLoot = new LootByContainer())->getByContainer(Loot::SPELL, [$s]))
+        if (!($spellLoot = new LootByContainer(Loot::SPELL, $s))->formatListview())
             return null;
 
         $this->extendGlobalData($spellLoot->jsGlobals);
 
-        foreach ($this->lvTabs->iterate() as $k => $tab)
+        if (($tab = $this->lvTabs->find(id: 'contains')) instanceof Listview)
         {
-            if ($tab->getId() != 'contains')
-                continue;
-
             $tab->appendData($spellLoot->getResult());
             return null;
         }

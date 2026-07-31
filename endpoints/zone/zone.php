@@ -767,8 +767,8 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: fishing
-        $fish = new LootByContainer();
-        if ($fish->getByContainer(Loot::FISHING, [$this->typeId]))
+        $fish = new LootByContainer(Loot::FISHING, $this->typeId);
+        if ($fish->formatListview())
         {
             $this->extendGlobalData($fish->jsGlobals);
             $xCols = array_merge(['$Listview.extraCols.percent'], $fish->extraCols);

@@ -667,8 +667,8 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
         // tab: contains
         // spell_loot_template
-        $spellLoot = new LootByContainer();
-        if ($spellLoot->getByContainer(Loot::SPELL, [$this->typeId]))
+        $spellLoot = new LootByContainer(Loot::SPELL, $this->typeId);
+        if ($spellLoot->formatListview())
         {
             $this->extendGlobalData($spellLoot->jsGlobals);
 

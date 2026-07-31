@@ -499,8 +499,8 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
             else
                 $lootEntries = [4 => $_];
 
-            $goLoot = new LootByContainer();
-            if ($goLoot->getByContainer(Loot::GAMEOBJECT, $lootEntries))
+            $goLoot = new LootByContainer(Loot::GAMEOBJECT, ...$lootEntries);
+            if ($goLoot->formatListview($lootEntries))
             {
                 $extraCols  = $goLoot->extraCols;
                 array_push($extraCols, '$Listview.extraCols.count', '$Listview.extraCols.percent');

@@ -1187,13 +1187,11 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         );
 
         // while mail attachemnts are handled as loot, it has no variance. Always 100% chance, always one item.
-        $mailLoot = new LootByContainer();
-        if ($mailLoot->getByContainer(Loot::MAIL, [$rmtId]))
-        {
-            $this->extendGlobalData($mailLoot->jsGlobals);
-            foreach ($mailLoot->getResult() as $loot)
-                $this->mail->attachItem($loot['id'], substr($loot['name'], 1), $loot['stack'][0], quality: 7 - $loot['name'][0]);
-        }
+        $mailLoot = new LootByContainer(Loot::MAIL, $rmtId);
+        foreach ($mailLoot->formatListview() as $loot)
+            $this->mail->attachItem($loot['id'], substr($loot['name'], 1), $loot['stack'][0], quality: 7 - $loot['name'][0]);
+
+        $this->extendGlobalData($mailLoot->jsGlobals);
 
         return true;
     }

@@ -43,16 +43,23 @@ abstract class Loot
      *
      * @param   int    $min min amount
      * @param   int    $max max amount
+     * @param   float  $fraction manually set %pct of the max stack result
      * @return ?string stack info or null on error
      */
-    protected static function buildStack(int $min, int $max) : ?string
+    protected static function buildStack(int $min, int $max, float $fraction = 0) : ?string
     {
         if (!$min || !$max || $max <= $min)
             return null;
 
         $stack = [];
         for ($i = $min; $i <= $max; $i++)
-            $stack[$i] = round(100 / (1 + $max - $min), 3);
+            $stack[$i] = round(100 / max(1, (($fraction ? 0 : 1) + $max - $min)), 3);
+
+        if ($fraction)
+        {
+            $k = array_key_last($stack);
+            $stack[$k] = $fraction;
+        }
 
         // do not replace with Util::toJSON !
         return json_encode($stack, JSON_NUMERIC_CHECK);
