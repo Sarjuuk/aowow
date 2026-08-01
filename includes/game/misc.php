@@ -288,6 +288,15 @@ class Game
         return [$quotes, $nQuotes, $soundIds];
     }
 
+    public static function skinningSkillForCreatureLevel(int $level) : int
+    {
+        if ($level < 10)
+            return 0;
+        if ($level < 20)
+            return ($level - 10) * 10;
+        return $level * 5;
+    }
+
     public static function getBreakpointsForSkill(int $skillId, int $reqLevel) : array
     {
         if ($skillId == SKILL_FISHING)
@@ -301,13 +310,8 @@ class Game
         switch ($skillId)
         {
             case SKILL_SKINNING:
-                $reqLevel /= 5;                             // we pass creature level * 5 (so, skill value), but formula depends on actual creature level
-                if ($reqLevel < 10)
-                    $reqLevel = 0;
-                else if ($reqLevel < 20)
-                    $reqLevel = ($reqLevel - 10) * 10;
-                else
-                    $reqLevel *= 5;
+                // we pass creature level * 5 (so, skill value) to getBreakpointsForSkill(), but formula depends on actual creature level
+                $reqLevel = self::skinningSkillForCreatureLevel($reqLevel / 5);
             case SKILL_HERBALISM:
             case SKILL_LOCKPICKING:
             case SKILL_JEWELCRAFTING:

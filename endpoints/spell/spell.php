@@ -109,7 +109,8 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         /* Menu Path */
         /*************/
 
-        $this->generatePath();
+        if ($path = $this->followBreadcrumbPath())
+            array_push($this->breadcrumb, ...$path);
 
 
         /**************/
@@ -123,7 +124,21 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         /* Infobox */
         /***********/
 
-        $this->createInfobox();
+        $hasCompletion = in_array($this->subject->getField('typeCat'), [-5, -6]) && !($this->subject->getField('cuFlags') & CUSTOM_EXCLUDE_FOR_LISTVIEW);
+        if ($infobox = $this->createInfobox($hasCompletion))
+        {
+            $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0', $hasCompletion);
+
+            // append glyph symbol if available
+            $glyphId = 0;
+            for ($i = 1; $i < 4; $i++)
+                if ($this->subject->getField('effect'.$i.'Id') == SPELL_EFFECT_APPLY_GLYPH)
+                    $glyphId = $this->subject->getField('effect'.$i.'MiscValue');
+
+            if ($_ = DB::Aowow()->selectCell('SELECT ic.`name` FROM ::glyphproperties gp JOIN ::icons ic ON gp.`iconId` = ic.`id` WHERE %if', $glyphId, 'gp.`id` = %i OR', $glyphId, '%end gp.`spellId` = %i', $this->typeId))
+                if (file_exists('static/images/wow/Interface/Spellbook/'.$_.'.png'))
+                    $this->infobox->append('[img src='.Cfg::get('STATIC_URL').'/images/wow/Interface/Spellbook/'.$_.'.png border=0 float=center margin=15]');
+        }
 
 
         /***************/
@@ -178,7 +193,6 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         /* Factionchange pendant */
         /*************************/
 
-        // factionchange-equivalent
         if ($pendant = DB::World()->selectCell('SELECT IF(`horde_id` = %i, `alliance_id`, -`horde_id`) FROM player_factionchange_spells WHERE `alliance_id` = %i OR `horde_id` = %i', $this->typeId, $this->typeId, $this->typeId))
         {
             $altSpell = new SpellList(array(['id', abs($pendant)]));
@@ -276,35 +290,152 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
         $ubSAI = SmartAI::getOwnerOfSpellCast($this->typeId);
 
-        // tab: abilities [of shapeshift form]
+        // unlocks
+        [$tabUnlocksObject, $tabUnlocksItem] = $this->tabUnlocks();
+
+        $tabItemGathering = match($this->subject->getField('effect1Id'))
+        {
+            SPELL_EFFECT_DISENCHANT  => $this->tabDisenchantedFrom(),
+            SPELL_EFFECT_PROSPECTING => $this->tabProspectedFrom(),
+            SPELL_EFFECT_MILLING     => $this->tabMilledFrom(),
+            default                  => null
+        };
+
+        if ($tab = $this->tabGatheredFromObject())          // items created via: herbalism, mining
+            $this->lvTabs->addListviewTab($tab);
+
+        if ($tab = $this->tabGatheredFromNpc())             // items created via: herbalism, mining, dismantling, skinning
+            $this->lvTabs->addListviewTab($tab);
+
+        if ($tabItemGathering)                              // items created via: prospecting, milling, disenchanting
+            $this->lvTabs->addListviewTab($tabItemGathering);
+
+        if ($tab = $this->tabControlledAbilities())         // ... of shapeshift form
+            $this->lvTabs->addListviewTab($tab);
+
+        if ($tab = $this->tabModifies())                    // also updates $this->effects[effIdx][modifies]
+            $this->lvTabs->addListviewTab($tab);
+
+        if ($tab = $this->tabModifiedBy())                  //
+            $this->lvTabs->addListviewTab($tab);
+
+        if ($tab = $this->tabSharedCooldown())              //
+            $this->lvTabs->addListviewTab($tab);
+
+        if ($tab = $this->tabContains())                    // custom: spell_loot_template
+            $this->lvTabs->addListviewTab($tab);
+
+        if ($tab = $this->tabBonusLoot())                   // custom?
+            $this->lvTabs->addListviewTab($tab);
+
+        if ($tab = $this->tabGlyphs())                      //
+            $this->lvTabs->addListviewTab($tab);
+
+        if ($tab = $this->tabUsedBySpell())                 //
+            $this->lvTabs->addListviewTab($tab);
+
+        if ($tab = $this->tabUsedByItemset())               //
+            $this->lvTabs->addListviewTab($tab);
+
+        if ($tab = $this->tabUsedByItem())                  //
+            $this->lvTabs->addListviewTab($tab);
+
+        if ($tab = $this->tabUsedByNpc($ubSAI))             //
+            $this->lvTabs->addListviewTab($tab);
+
+        if ($tab = $this->tabUsedByObject($ubSAI))          //
+            $this->lvTabs->addListviewTab($tab);
+
+        if ($tab = $this->tabUsedByAreatrigger($ubSAI))     //
+            $this->lvTabs->addListviewTab($tab);
+
+        if ($tab = $this->tabZone())                        // custom: implicit used-by-zone
+            $this->lvTabs->addListviewTab($tab);
+
+        if ($tab = $this->tabEnchantments())                // custom: implicit used-by-enchantment
+            $this->lvTabs->addListviewTab($tab);
+
+        if ($tab = $this->tabCriteriaOf())                  //
+            $this->lvTabs->addListviewTab($tab);
+
+        foreach ($this->tabExclusiveWith() as $tab)         // custom
+            $this->lvTabs->addListviewTab($tab);
+
+        if ($tab = $this->tabLinkedWith())                  // custom
+            $this->lvTabs->addListviewTab($tab);
+
+        if ($tab = $this->tabTriggeredBy())                 //
+            $this->lvTabs->addListviewTab($tab);
+
+        if ($tab = $this->tabTeachesSpell())                //
+            $this->lvTabs->addListviewTab($tab);
+
+        if ($tab = $this->tabTaughtByNpc())                 // is taught-by-trainers?
+            $this->lvTabs->addListviewTab($tab);
+
+        if ($tab = $this->tabTaughtBySpell())               //
+            $this->lvTabs->addListviewTab($tab);
+
+        if ($tab = $this->tabTaughtByItem())                //
+            $this->lvTabs->addListviewTab($tab);
+
+        if ($tab = $this->tabRewardFromQuest())             // depends on: tabTaughtBySpell(); is taught-by-quest?
+            $this->lvTabs->addListviewTab($tab);
+
+     // if ($tab = $this->tabTaughtByPet())                 // obsolete with WotLK .. you used to tame beasts to learn their spells
+     //     $this->lvTabs->addListviewTab($tab);
+
+        if ($tabUnlocksObject)
+            $this->lvTabs->addListviewTab($tabUnlocksObject);
+
+        if ($tabUnlocksItem)
+            $this->lvTabs->addListviewTab($tabUnlocksItem);
+
+        if ($tab = $this->tabSeeAlso())                     // taught-by-npc < see-also > sounds
+            $this->lvTabs->addListviewTab($tab);
+
+        if ($tab = $this->tabSounds())                      // see-also < sounds > <end>
+            $this->lvTabs->addListviewTab($tab);
+
+        if ($tab = $this->tabConditionFor())
+            $this->lvTabs->addDataTab(...$tab);
+
+
+        parent::generate();
+    }
+
+
+    /***********************/
+    /* Related Tab Builder */
+    /***********************/
+
+    private function tabControlledAbilities() : ?Listview
+    {
         $formSpells = [];
         for ($i = 1; $i < 4; $i++)
             if ($this->subject->getField('effect'.$i.'AuraId') == SPELL_AURA_MOD_SHAPESHIFT)
                 if ($_ = DB::Aowow()->selectRow('SELECT `spellId1`, `spellId2`, `spellId3`, `spellId4`, `spellId5`, `spellId6`, `spellId7`, `spellId8` FROM ::shapeshiftforms WHERE `id` = %i', $this->subject->getField('effect'.$i.'MiscValue')))
                     $formSpells = array_merge($formSpells, $_);
 
-        if ($formSpells)
-        {
-            $abilities = new SpellList(array(['id', $formSpells]));
-            if (!$abilities->error)
-            {
-                $tabData = array(
-                    'data'        => $abilities->getListviewData(),
-                    'id'          => 'controlledabilities',
-                    'name'        => '$LANG.tab_controlledabilities',
-                    'visibleCols' => ['level'],
-                );
+        if (!$formSpells)
+            return null;
 
-                if (!$abilities->hasSetFields('skillLines'))
-                    $tabData['hiddenCols'] = ['skill'];
+        if (($abilities = new SpellList(array(['id', $formSpells])))->error)
+            return null;
 
-                $this->lvTabs->addListviewTab(new Listview($tabData, SpellList::$brickFile));
+        $this->extendGlobalData($abilities->getJSGlobals(GLOBALINFO_SELF));
 
-                $this->extendGlobalData($abilities->getJSGlobals(GLOBALINFO_SELF));
-            }
-        }
+        return new Listview(array(
+            'data'        => $abilities->getListviewData(),
+            'id'          => 'controlledabilities',
+            'name'        => '$LANG.tab_controlledabilities',
+            'visibleCols' => ['level'],
+            'hiddenCols'  => $abilities->hasSetFields('skillLines') ? null : ['skill']
+        ), SpellList::$brickFile);
+    }
 
-        // tab: [$this] modifies
+    private function tabModifies() : ?Listview
+    {
         $sub = [];
         $conditions = [
             ['s.typeCat', [-9], '!'],                       // GM (-9); also include uncategorized (0), NPC-Spell (-8)?; NPC includes totems, lightwell and others :/
@@ -372,22 +503,20 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             unset($classSpells, $miscSpells);
         }
 
-        if ($modifiesData)
-        {
-            $tabData = array(
-                'data'        => $modifiesData,
-                'id'          => 'modifies',
-                'name'        => '$LANG.tab_modifies',
-                'visibleCols' => ['level'],
-            );
+        if (!$modifiesData)
+            return null;
 
-            if ($hideSkillCol)
-                $tabData['hiddenCols'] = ['skill'];
+        return new Listview(array(
+            'data'        => $modifiesData,
+            'id'          => 'modifies',
+            'name'        => '$LANG.tab_modifies',
+            'visibleCols' => ['level'],
+            'hiddenCols'  => $hideSkillCol ? ['skill'] : null
+        ), SpellList::$brickFile);
+    }
 
-            $this->lvTabs->addListviewTab(new Listview($tabData, SpellList::$brickFile));
-        }
-
-        // tab: [$this is] modified by
+    private function tabModifiedBy() :?Listview
+    {
         $sub = [DB::OR];
         $conditions = [
             ['s.typeCat', [-9], '!'],                       // GM (-9); also include uncategorized (0), NPC-Spell (-8)?; NPC includes totems, lightwell and others :/
@@ -416,171 +545,196 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             );
         }
 
-        if (count($sub) > 1)
-        {
-            $modsSpell = new SpellList($conditions);
-            if (!$modsSpell->error)
-            {
-                $tabData = array(
-                    'data'        => $modsSpell->getListviewData(),
-                    'id'          => 'modified-by',
-                    'name'        => '$LANG.tab_modifiedby',
-                    'visibleCols' => ['level'],
-                );
+        if ($sub == [DB::OR])
+            return null;
 
-                if (!$modsSpell->hasSetFields('skillLines'))
-                    $tabData['hiddenCols'] = ['skill'];
+        if (($modsSpell = new SpellList($conditions))->error)
+            return null;
 
-                $this->lvTabs->addListviewTab(new Listview($tabData, SpellList::$brickFile));
+        $this->extendGlobalData($modsSpell->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
-                $this->extendGlobalData($modsSpell->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
-            }
-        }
+        return new Listview(array(
+            'data'        => $modsSpell->getListviewData(),
+            'id'          => 'modified-by',
+            'name'        => '$LANG.tab_modifiedby',
+            'visibleCols' => ['level'],
+            'hiddenCols'  => $modsSpell->hasSetFields('skillLines') ? null : ['skill']
+        ), SpellList::$brickFile);
+    }
 
-        // tab: see also
+    private function tabSharedCooldown() : ?Listview
+    {
+        if (!$this->subject->getField('recoveryCategory'))
+            return null;
+
         $conditions = array(
-            ['s.schoolMask', $this->subject->getField('schoolMask')],
-            ['s.effect1Id', $this->subject->getField('effect1Id')],
-            ['s.effect2Id', $this->subject->getField('effect2Id')],
-            ['s.effect3Id', $this->subject->getField('effect3Id')],
-            ['s.id', $this->typeId, '!'],
-            ['s.name_loc'.Lang::getLocale()->value, $this->subject->getField('name', true)]
+            ['id', $this->typeId, '!'],
+            ['category', $this->subject->getField('category')],
+            ['recoveryCategory', 0, '>'],
         );
 
-        if ($this->difficulties)
-            $conditions = [DB::OR, [DB::AND, ...$conditions], [DB::AND, ['s.id', $this->difficulties], ['s.id', $this->typeId, '!']]];
+        // limit shared cooldowns to same player class for regulat users
+        if (!User::isInGroup(U_GROUP_STAFF) && $this->subject->getField('spellFamilyId'))
+            $conditions[] = ['spellFamilyId', $this->subject->getField('spellFamilyId')];
 
-        $saSpells = new SpellList($conditions);
-        if (!$saSpells->error)
+        if (($cdSpells = new SpellList($conditions))->error)
+            return null;
+
+        $this->extendGlobalData($cdSpells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
+
+        return new Listview(array(
+            'data' => $cdSpells->getListviewData(),
+            'name' => '$LANG.tab_sharedcooldown',
+            'id'   => 'shared-cooldown'
+        ), SpellList::$brickFile);
+    }
+
+    private function tabContains() : ?Listview
+    {
+        $spellLoot = new LootByContainer(Loot::SPELL, $this->typeId);
+        if (!$spellLoot->formatListview())
+            return null;
+
+        $this->extendGlobalData($spellLoot->jsGlobals);
+
+        return new Listview(array(
+            'data'            => $spellLoot->getResult(),
+            'name'            => '$LANG.tab_contains',
+            'id'              => 'contains',
+            'hiddenCols'      => ['side', 'slot', 'source', 'reqlevel'],
+            'extraCols'       => array_unique([...$spellLoot->extraCols, '$Listview.extraCols.percent']),
+            'computeDataFunc' => '$Listview.funcBox.initLootTable'
+        ), ItemList::$brickFile);
+    }
+
+    private function tabBonusLoot() : ?Listview
+    {
+        if (!($extraItemData = DB::World()->selectAssoc('SELECT `spellId` AS ARRAY_KEY, `additionalCreateChance` AS "0", `additionalMaxNum` AS "1" FROM skill_extra_item_template WHERE `requiredSpecialization` = %i', $this->typeId)))
+            return null;
+
+        if (($extraSpells = new SpellList(array(['id', array_keys($extraItemData)])))->error)
+            return null;
+
+        function buildPctStack(float $baseChance, int $maxStack, int $baseCount = 1) : string
         {
-            $data = $saSpells->getListviewData();
-            if ($this->difficulties)
+            // note: pctStack does not contain absolute values but chances relative to the overall drop chance
+            // e.g.: dropChance is 17% then [1 => 50, 2 => 25, 3 => 25] displays > Stack of 1: 8%; Stack of 2: 4%; Stack of 3: 4%
+            $maxStack = $maxStack ?: 1;
+            $pctStack = [];
+            for ($i = 1; $i <= $maxStack; $i++)
             {
-                $saE = ['$Listview.extraCols.mode'];
+                $pctStack[$i] = (($baseChance ** $i) * 100) / $baseChance;
 
-                foreach ($data as $id => &$d)
-                {
-                    if (($modeBit = array_search($id, $this->difficulties)) !== false)
-                    {
-                        if ($this->mapType)
-                            $d['modes'] = ['mode' => 1 << ($modeBit + 3)];
-                        else
-                            $d['modes'] = ['mode' => 2 - $modeBit];
-                    }
-                    else
-                        $d['modes'] = ['mode' => 0];
-                }
+                // remove chance from previous stacks
+                if ($i > 1)
+                    $pctStack[$i-1] -= $pctStack[$i];
             }
 
-            $tabData = array(
-                'data'        => $data,
-                'id'          => 'see-also',
-                'name'        => '$LANG.tab_seealso',
-                'visibleCols' => ['level'],
-            );
+            // cleanup rounding errors
+            $pctStack = array_map(fn($x) => round($x, 3), $pctStack);
 
-            if (!$saSpells->hasSetFields('skillLines'))
-                $tabData['hiddenCols'] = ['skill'];
+            // cleanup tiny fractions
+            $pctStack = array_filter($pctStack, fn($x) => ($x * $baseChance) >= 0.01);
 
-            if (isset($saE))
-                $tabData['extraCols'] = $saE;
+            if ($baseCount > 1)
+                $pctStack = array_combine(array_map(fn($x) => $x * $baseCount, array_keys($pctStack)), $pctStack);
 
-            $this->lvTabs->addListviewTab(new Listview($tabData, SpellList::$brickFile));
-
-            $this->extendGlobalData($saSpells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
+            return json_encode($pctStack, JSON_NUMERIC_CHECK);  // do not replace with Util::toJSON !
         }
 
-        // tab: shared cooldown
-        if ($this->subject->getField('recoveryCategory'))
+        $this->extendGlobalData($extraSpells->getJSGlobals(GLOBALINFO_RELATED));
+        $lvItems = $extraSpells->getListviewData();
+
+        foreach ($lvItems as $iId => $data)
         {
-            $conditions = array(
-                ['id', $this->typeId, '!'],
-                ['category', $this->subject->getField('category')],
-                ['recoveryCategory', 0, '>'],
-            );
+            [$chance, $maxItr] = $extraItemData[$iId];
 
-            // limit shared cooldowns to same player class for regulat users
-            if (!User::isInGroup(U_GROUP_STAFF) && $this->subject->getField('spellFamilyId'))
-                $conditions[] = ['spellFamilyId', $this->subject->getField('spellFamilyId')];
-
-            $cdSpells = new SpellList($conditions);
-            if (!$cdSpells->error)
-            {
-                $this->lvTabs->addListviewTab(new Listview(array(
-                    'data' => $cdSpells->getListviewData(),
-                    'name' => '$LANG.tab_sharedcooldown',
-                    'id'   => 'shared-cooldown'
-                ), SpellList::$brickFile));
-
-                $this->extendGlobalData($cdSpells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
-            }
+            $lvItems[$iId]['count']       = 1;              // expected by js or the pct-col becomes unsortable
+            $lvItems[$iId]['percent']     = $chance;
+            $lvItems[$iId]['pctstack']    = buildPctStack($chance / 100, $maxItr, $data['creates'][1]);
+            $lvItems[$iId]['creates'][2] *= $maxItr;
         }
 
-        // tab: glyphs
-        if ($gpIds = DB::Aowow()->selectCol('SELECT `id` FROM ::glyphproperties WHERE `spellId` = %i', $this->typeId))
-        {
-            $conditions = array(
-                DB::OR,
-                [DB::AND, ['effect1Id', SPELL_EFFECT_APPLY_GLYPH], ['effect1MiscValue', $gpIds]],
-                [DB::AND, ['effect2Id', SPELL_EFFECT_APPLY_GLYPH], ['effect2MiscValue', $gpIds]],
-                [DB::AND, ['effect3Id', SPELL_EFFECT_APPLY_GLYPH], ['effect3MiscValue', $gpIds]]
-            );
-            $glyphSpells = new SpellList($conditions);
-            if (!$glyphSpells->error)
-            {
-                $this->lvTabs->addListviewTab(new Listview(array(
-                    'data'        => $glyphSpells->getListviewData(),
-                    'visibleCols' => ['singleclass', 'glyphtype'],
-                    'id'          => 'glyphs',
-                    'name'        => '$LANG.tab_glyphs'
-                ), SpellList::$brickFile));
+        return new Listview(array(
+            'data'       => $lvItems,
+            'name'       => '$LANG.tab_bonusloot',
+            'id'         => 'bonusloot',
+            'hiddenCols' => ['side', 'reqlevel'],
+            'extraCols'  => ['$Listview.extraCols.percent']
+        ), SpellList::$brickFile);
+    }
 
-                $this->extendGlobalData($glyphSpells->getJSGlobals(GLOBALINFO_SELF));
-            }
-        }
+    private function tabGlyphs() : ?Listview
+    {
+        if (!($gpIds = DB::Aowow()->selectCol('SELECT `id` FROM ::glyphproperties WHERE `spellId` = %i', $this->typeId)))
+            return null;
 
-        // tab: used by - spell
-        if ($so = DB::Aowow()->selectCell('SELECT `id` FROM ::spelloverride WHERE `spellId1` = %i OR `spellId2` = %i OR `spellId3` = %i OR `spellId4` = %i OR `spellId5` = %i', $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId))
-        {
-            $conditions = array(
-                DB::OR,
-                [DB::AND, ['effect1AuraId', SPELL_AURA_OVERRIDE_SPELLS], ['effect1MiscValue', $so]],
-                [DB::AND, ['effect2AuraId', SPELL_AURA_OVERRIDE_SPELLS], ['effect2MiscValue', $so]],
-                [DB::AND, ['effect3AuraId', SPELL_AURA_OVERRIDE_SPELLS], ['effect3MiscValue', $so]]
-            );
-            $ubSpells = new SpellList($conditions);
-            if (!$ubSpells->error)
-            {
-                $this->lvTabs->addListviewTab(new Listview(array(
-                    'data' => $ubSpells->getListviewData(),
-                    'id'   => 'used-by-spell',
-                    'name' => '$LANG.tab_usedby'
-                ), SpellList::$brickFile));
+        $conditions = array(
+            DB::OR,
+            [DB::AND, ['effect1Id', SPELL_EFFECT_APPLY_GLYPH], ['effect1MiscValue', $gpIds]],
+            [DB::AND, ['effect2Id', SPELL_EFFECT_APPLY_GLYPH], ['effect2MiscValue', $gpIds]],
+            [DB::AND, ['effect3Id', SPELL_EFFECT_APPLY_GLYPH], ['effect3MiscValue', $gpIds]]
+        );
 
-                $this->extendGlobalData($ubSpells->getJSGlobals(GLOBALINFO_SELF));
-            }
-        }
+        if (($glyphSpells = new SpellList($conditions))->error)
+            return null;
 
-        // tab: used by - itemset
+        $this->extendGlobalData($glyphSpells->getJSGlobals(GLOBALINFO_SELF));
+
+        return new Listview(array(
+            'data'        => $glyphSpells->getListviewData(),
+            'visibleCols' => ['singleclass', 'glyphtype'],
+            'id'          => 'glyphs',
+            'name'        => '$LANG.tab_glyphs'
+        ), SpellList::$brickFile);
+    }
+
+    private function tabUsedBySpell() : ?Listview
+    {
+        if (!($so = DB::Aowow()->selectCell('SELECT `id` FROM ::spelloverride WHERE `spellId1` = %i OR `spellId2` = %i OR `spellId3` = %i OR `spellId4` = %i OR `spellId5` = %i', $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId)))
+            return null;
+
+        $conditions = array(
+            DB::OR,
+            [DB::AND, ['effect1AuraId', SPELL_AURA_OVERRIDE_SPELLS], ['effect1MiscValue', $so]],
+            [DB::AND, ['effect2AuraId', SPELL_AURA_OVERRIDE_SPELLS], ['effect2MiscValue', $so]],
+            [DB::AND, ['effect3AuraId', SPELL_AURA_OVERRIDE_SPELLS], ['effect3MiscValue', $so]]
+        );
+
+        if (($ubSpells = new SpellList($conditions))->error)
+            return null;
+
+        $this->extendGlobalData($ubSpells->getJSGlobals(GLOBALINFO_SELF));
+
+        return new Listview(array(
+            'data' => $ubSpells->getListviewData(),
+            'id'   => 'used-by-spell',
+            'name' => '$LANG.tab_usedby'
+        ), SpellList::$brickFile);
+    }
+
+    private function tabUsedByItemset() : ?Listview
+    {
         $conditions = array(
             DB::OR,
             ['spell1', $this->typeId], ['spell2', $this->typeId], ['spell3', $this->typeId], ['spell4', $this->typeId],
             ['spell5', $this->typeId], ['spell6', $this->typeId], ['spell7', $this->typeId], ['spell8', $this->typeId]
         );
 
-        $ubSets = new ItemsetList($conditions);
-        if (!$ubSets->error)
-        {
-            $this->lvTabs->addListviewTab(new Listview(array(
-                'data' => $ubSets->getListviewData(),
-                'id'   => 'used-by-itemset',
-                'name' => '$LANG.tab_usedby'
-            ), ItemsetList::$brickFile));
+        if (($ubSets = new ItemsetList($conditions))->error)
+            return null;
 
-            $this->extendGlobalData($ubSets->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
-        }
+        $this->extendGlobalData($ubSets->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
-        // tab: used by - item
+        return new Listview(array(
+            'data' => $ubSets->getListviewData(),
+            'id'   => 'used-by-itemset',
+            'name' => '$LANG.tab_usedby'
+        ), ItemsetList::$brickFile);
+    }
+
+    private function tabUsedByItem() : ?Listview
+    {
         $conditions = array(
             DB::OR,
             [DB::AND, ['spellTrigger1', SPELL_TRIGGER_LEARN, '!'], ['spellId1', $this->typeId]],
@@ -590,263 +744,20 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             [DB::AND, ['spellTrigger5', SPELL_TRIGGER_LEARN, '!'], ['spellId5', $this->typeId]]
         );
 
-        $ubItems = new ItemList($conditions);
-        if (!$ubItems->error)
-        {
-            $this->lvTabs->addListviewTab(new Listview(array(
-                'data' => $ubItems->getListviewData(),
-                'id'   => 'used-by-item',
-                'name' => '$LANG.tab_usedby'
-            ), ItemList::$brickFile));
+        if (($ubItems = new ItemList($conditions))->error)
+            return null;
 
-            $this->extendGlobalData($ubItems->getJSGlobals(GLOBALINFO_SELF));
-        }
+        $this->extendGlobalData($ubItems->getJSGlobals(GLOBALINFO_SELF));
 
-        // tab: used by - object
-        $conditions = array(
-            DB::OR,
-            ['onUseSpell', $this->typeId], ['onSuccessSpell', $this->typeId],
-            ['auraSpell',  $this->typeId], ['triggeredSpell', $this->typeId]
-        );
-        if (!empty($ubSAI[Type::OBJECT]))
-            $conditions[] = ['id', $ubSAI[Type::OBJECT]];
+        return new Listview(array(
+            'data' => $ubItems->getListviewData(),
+            'id'   => 'used-by-item',
+            'name' => '$LANG.tab_usedby'
+        ), ItemList::$brickFile);
+    }
 
-        $ubObjects = new GameObjectList($conditions);
-        if (!$ubObjects->error)
-        {
-            $this->addDataLoader('zones');
-            $this->lvTabs->addListviewTab(new Listview(array(
-                'data' => $ubObjects->getListviewData(),
-                'id'   => 'used-by-object',
-                'name' => '$LANG.tab_usedby'
-            ), GameObjectList::$brickFile));
-
-            $this->extendGlobalData($ubObjects->getJSGlobals());
-        }
-
-        // tab: used by - areatrigger
-        if (User::isInGroup(U_GROUP_EMPLOYEE))
-        {
-            if (!empty($ubSAI[Type::AREATRIGGER]))
-            {
-                $ubTriggers = new AreaTriggerList(array(['id', $ubSAI[Type::AREATRIGGER]]));
-                if (!$ubTriggers->error)
-                {
-                    $this->lvTabs->addListviewTab(new Listview(array(
-                        'data' => $ubTriggers->getListviewData(),
-                        'id'   => 'used-by-areatrigger',
-                        'name' => '$LANG.tab_usedby'
-                    ), AreaTriggerList::$brickFile, 'areatrigger'));
-                }
-            }
-        }
-
-        // tab: criteria of
-        $conditions = array(
-            DB::AND,
-            ['ac.type', [ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL,
-                         ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2,     ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL]
-            ],
-            ['ac.value1', $this->typeId]
-        );
-
-        if ($extraCrt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` IN %in AND `value1` = %i', [ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AURA, ACHIEVEMENT_CRITERIA_DATA_TYPE_T_AURA], $this->typeId))
-            $conditions = [DB::OR, $conditions, ['ac.id', $extraCrt]];
-
-        $coAchievemnts = new AchievementList($conditions);
-        if (!$coAchievemnts->error)
-        {
-            $this->lvTabs->addListviewTab(new Listview(array(
-                'data' => $coAchievemnts->getListviewData(),
-                'id'   => 'criteria-of',
-                'name' => '$LANG.tab_criteriaof'
-            ), AchievementList::$brickFile));
-
-            $this->extendGlobalData($coAchievemnts->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
-        }
-
-        // tab: contains
-        // spell_loot_template
-        $spellLoot = new LootByContainer(Loot::SPELL, $this->typeId);
-        if ($spellLoot->formatListview())
-        {
-            $this->extendGlobalData($spellLoot->jsGlobals);
-
-            $extraCols   = $spellLoot->extraCols;
-            $extraCols[] = '$Listview.extraCols.percent';
-
-            $this->lvTabs->addListviewTab(new Listview(array(
-                'data'            => $spellLoot->getResult(),
-                'name'            => '$LANG.tab_contains',
-                'id'              => 'contains',
-                'hiddenCols'      => ['side', 'slot', 'source', 'reqlevel'],
-                'extraCols'       => array_unique($extraCols),
-                'computeDataFunc' => '$Listview.funcBox.initLootTable'
-            ), ItemList::$brickFile));
-        }
-
-        // tab: bonus loot
-        if ($extraItemData = DB::World()->selectAssoc('SELECT `spellId` AS ARRAY_KEY, `additionalCreateChance` AS "0", `additionalMaxNum` AS "1" FROM skill_extra_item_template WHERE `requiredSpecialization` = %i', $this->typeId))
-        {
-            $extraSpells = new SpellList(array(['id', array_keys($extraItemData)]));
-            if (!$extraSpells->error)
-            {
-                $this->extendGlobalData($extraSpells->getJSGlobals(GLOBALINFO_RELATED));
-                $lvItems = $extraSpells->getListviewData();
-
-                foreach ($lvItems as $iId => $data)
-                {
-                    [$chance, $maxItr] = $extraItemData[$iId];
-
-                    $lvItems[$iId]['count']       = 1;      // expected by js or the pct-col becomes unsortable
-                    $lvItems[$iId]['percent']     = $chance;
-                    $lvItems[$iId]['pctstack']    = $this->buildPctStack($chance / 100, $maxItr, $data['creates'][1]);
-                    $lvItems[$iId]['creates'][2] *= $maxItr;
-                }
-
-                $this->lvTabs->addListviewTab(new Listview(array(
-                    'data'       => $lvItems,
-                    'name'       => '$LANG.tab_bonusloot',
-                    'id'         => 'bonusloot',
-                    'hiddenCols' => ['side', 'reqlevel'],
-                    'extraCols'  => ['$Listview.extraCols.percent']
-                ), SpellList::$brickFile));
-            }
-        }
-
-        // tab: exclusive with
-        if ($this->firstRank && DB::World()->selectCell('SELECT 1 FROM spell_group WHERE `spell_id` = %i', $this->firstRank))
-        {
-            $groups = DB::World()->selectCol('SELECT `id` AS ARRAY_KEY, `spell_id` AS ARRAY_KEY2, `spell_id` FROM spell_group');
-            // unpack recursion
-            foreach ($groups as $i => $group)
-            {
-                foreach ($group as $j => $g)
-                {
-                    if ($g > 0)
-                        continue;
-
-                    foreach ($groups[-$g] ?? [] as $new)
-                        $groups[$i][] = $new;
-
-                    unset($group[$j]);
-                }
-            }
-
-            // find ourselves
-            if ($filtered = array_filter($groups, fn($x) => in_array($this->firstRank, $x)))
-            {
-                // get rule set
-                $rules = DB::World()->selectCol('SELECT `group_id` AS ARRAY_KEY, `stack_rule` FROM spell_group_stack_rules WHERE `group_id` IN %in', array_keys($filtered));
-
-                // only use groups that have rules set
-                if ($filtered = array_intersect_key($filtered, $rules))
-                {
-                    $cnd = [DB::OR];
-                    foreach ($filtered as $gr)
-                        $cnd[] = ['s.id', $gr];
-
-                    $stacks = new SpellList($cnd);
-                    if (!$stacks->error)
-                    {
-                        $lvData = $stacks->getListviewData();
-                        $this->extendGlobalData($stacks->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
-                        if (!$stacks->hasSetFields('skillLines'))
-                            $sH = ['skill'];
-
-                        foreach ($filtered as $gId => $spellIds)
-                        {
-                            $data = [];
-                            foreach ($spellIds as $id)
-                                if (isset($lvData[$id]) && $id != $this->firstRank)
-                                    $data[] = array_merge($lvData[$id], ['stackRule' => $rules[$gId]]);
-
-                            if (!$data)
-                                continue;
-
-                            $tabData = array(
-                                'data'        => $data,
-                                'id'          => 'spell-group-stack-'.$gId,
-                                'name'        => Lang::spell('stackGroup'),
-                                'visibleCols' => ['stackRules']
-                            );
-
-                            if (isset($sH))
-                                $tabData['hiddenCols'] = $sH;
-
-                            $this->lvTabs->addListviewTab(new Listview($tabData, SpellList::$brickFile));
-                        }
-                    }
-                }
-            }
-        }
-
-        // tab: linked with
-        $rows = DB::World()->selectAssoc(
-           'SELECT  `spell_trigger` AS "trigger", `spell_effect` AS "effect", `type`, IF(ABS(`spell_effect`) = %i, ABS(`spell_trigger`), ABS(`spell_effect`)) AS "related"
-            FROM    spell_linked_spell
-            WHERE   ABS(`spell_effect`) = %i OR ABS(`spell_trigger`) = %i',
-            $this->typeId, $this->typeId, $this->typeId
-        );
-
-        $related = [];
-        foreach ($rows as $row)
-            $related[] = $row['related'];
-
-        if ($related)
-            $linked = new SpellList(array(['s.id', $related]));
-
-        if (isset($linked) && !$linked->error)
-        {
-            $lv   = $linked->getListviewData();
-            $data = [];
-
-            foreach ($rows as $r)
-            {
-                foreach ($lv as $dk => $d)
-                {
-                    if ($r['related'] != $dk)
-                        continue;
-
-                    $lv[$dk]['linked'] = [$r['trigger'], $r['effect'], $r['type']];
-                    $data[] = $lv[$dk];
-                    break;
-                }
-            }
-
-            $this->lvTabs->addListviewTab(new Listview(array(
-                'data'        => $data,
-                'id'          => 'spell-link',
-                'name'        => Lang::spell('linkedWith'),
-                'hiddenCols'  => ['skill', 'name'],
-                'visibleCols' => ['linkedTrigger', 'linkedEffect']
-            ), SpellList::$brickFile));
-
-            $this->extendGlobalData($linked->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
-        }
-
-
-        // tab: triggered by
-        $conditions = array(
-            DB::OR,
-            [DB::AND, [DB::OR, ['effect1Id', SpellList::EFFECTS_TRIGGER], ['effect1AuraId', SpellList::AURAS_TRIGGER]], ['effect1TriggerSpell', $this->typeId]],
-            [DB::AND, [DB::OR, ['effect2Id', SpellList::EFFECTS_TRIGGER], ['effect2AuraId', SpellList::AURAS_TRIGGER]], ['effect2TriggerSpell', $this->typeId]],
-            [DB::AND, [DB::OR, ['effect3Id', SpellList::EFFECTS_TRIGGER], ['effect3AuraId', SpellList::AURAS_TRIGGER]], ['effect3TriggerSpell', $this->typeId]],
-        );
-
-        $trigger = new SpellList($conditions);
-        if (!$trigger->error)
-        {
-            $this->lvTabs->addListviewTab(new Listview(array(
-                'data' => $trigger->getListviewData(),
-                'id'   => 'triggered-by',
-                'name' => '$LANG.tab_triggeredby'
-            ), SpellList::$brickFile));
-
-            $this->extendGlobalData($trigger->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
-        }
-
-        // tab: used by - creature
+    private function tabUsedByNpc(array $ubSAI) : ?Listview
+    {
         $conditions = array(
             DB::OR,
             ['spell1', $this->typeId], ['spell2', $this->typeId], ['spell3', $this->typeId], ['spell4', $this->typeId],
@@ -861,213 +772,423 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         if ($spellClick = DB::World()->selectCol('SELECT `npc_entry` FROM npc_spellclick_spells WHERE `spell_id` = %i', $this->typeId))
             $conditions[] = ['id', $spellClick];
 
-        $ubCreature = new CreatureList($conditions);
-        if (!$ubCreature->error)
-        {
-            $this->addDataLoader('zones');
-            $this->lvTabs->addListviewTab(new Listview(array(
-                'data' => $ubCreature->getListviewData(),
-                'id'   => 'used-by-npc',
-                'name' => '$LANG.tab_usedby'
-            ), CreatureList::$brickFile));
+        if (($ubCreature = new CreatureList($conditions))->error)
+            return null;
 
-            $this->extendGlobalData($ubCreature->getJSGlobals(GLOBALINFO_SELF));
-        }
+        $this->addDataLoader('zones');
+        $this->extendGlobalData($ubCreature->getJSGlobals(GLOBALINFO_SELF));
 
-        // tab: zone
-        if ($areaSpells = DB::World()->selectAssoc('SELECT `area` AS ARRAY_KEY, `aura_spell` AS "0", `quest_start` AS "1", `quest_end` AS "2", `quest_start_status` AS "3", `quest_end_status` AS "4", `racemask` AS "5", `gender` AS "6" FROM spell_area WHERE `spell` = %i', $this->typeId))
+        return new Listview(array(
+            'data' => $ubCreature->getListviewData(),
+            'id'   => 'used-by-npc',
+            'name' => '$LANG.tab_usedby'
+        ), CreatureList::$brickFile);
+    }
+
+    private function tabUsedByObject(array $ubSAI) : ?Listview
+    {
+        $conditions = array(
+            DB::OR,
+            ['onUseSpell', $this->typeId], ['onSuccessSpell', $this->typeId],
+            ['auraSpell',  $this->typeId], ['triggeredSpell', $this->typeId]
+        );
+        if (!empty($ubSAI[Type::OBJECT]))
+            $conditions[] = ['id', $ubSAI[Type::OBJECT]];
+
+        if (($ubObjects = new GameObjectList($conditions))->error)
+            return null;
+
+        $this->addDataLoader('zones');
+        $this->extendGlobalData($ubObjects->getJSGlobals());
+
+        return new Listview(array(
+            'data' => $ubObjects->getListviewData(),
+            'id'   => 'used-by-object',
+            'name' => '$LANG.tab_usedby'
+        ), GameObjectList::$brickFile);
+    }
+
+    private function tabUsedByAreatrigger(array $ubSAI) : ?Listview
+    {
+        if (!User::isInGroup(U_GROUP_EMPLOYEE))
+            return null;
+
+        if (empty($ubSAI[Type::AREATRIGGER]))
+            return null;
+
+        if (($ubTriggers = new AreaTriggerList(array(['id', $ubSAI[Type::AREATRIGGER]])))->error)
+            return null;
+
+        return new Listview(array(
+            'data' => $ubTriggers->getListviewData(),
+            'id'   => 'used-by-areatrigger',
+            'name' => '$LANG.tab_usedby'
+        ), AreaTriggerList::$brickFile, 'areatrigger');
+    }
+
+    private function tabZone() : ?Listview
+    {
+        if (!($areaSpells = DB::World()->selectAssoc('SELECT `area` AS ARRAY_KEY, `aura_spell` AS "0", `quest_start` AS "1", `quest_end` AS "2", `quest_start_status` AS "3", `quest_end_status` AS "4", `racemask` AS "5", `gender` AS "6" FROM spell_area WHERE `spell` = %i', $this->typeId)))
+            return null;
+
+        if (($zones = new ZoneList(array(['id', array_keys($areaSpells)])))->error)
+            return null;
+
+        $this->extendGlobalData($zones->getJSGlobals());
+
+        $lvZones   = $zones->getListviewData();
+        $resultLv  = [];
+        $parents   = [];
+        $extraCols = [];
+
+        foreach ($areaSpells as $areaId => $condition)
         {
-            $zones = new ZoneList(array(['id', array_keys($areaSpells)]));
-            if (!$zones->error)
+            if (empty($lvZones[$areaId]))
+                continue;
+
+            $row = $lvZones[$areaId];
+
+            // attach to lv row and evaluate after merging
+            $row['__condition'] = $condition;
+
+            // merge subzones, into one row, if: spell_area data is identical && parentZone is shared
+            if ($p = $zones->getEntry($areaId)['parentArea'])
             {
-                $lvZones = $zones->getListviewData();
-                $this->extendGlobalData($zones->getJSGlobals());
+                $parents[] = $p;
+                $row['__parent'] = $p;
+                $row['subzones'] = [$areaId];
+            }
+            else
+                $row['__parent'] = 0;
 
-                $resultLv  = [];
-                $parents   = [];
-                $extraCols = [];
-                foreach ($areaSpells as $areaId => $condition)
-                {
-                    if (empty($lvZones[$areaId]))
-                        continue;
+            $set = false;
+            foreach ($resultLv as &$v)
+            {
+                if ($v['__parent'] != $row['__parent'] && $v['id'] != $row['__parent'])
+                    continue;
 
-                    $row = $lvZones[$areaId];
+                if ($v['__condition'] != $row['__condition'])
+                    continue;
 
-                    // attach to lv row and evaluate after merging
-                    $row['__condition'] = $condition;
+                if (!$row['__parent'] && $v['id'] != $row['__parent'])
+                    continue;
 
-                    // merge subzones, into one row, if: spell_area data is identical && parentZone is shared
-                    if ($p = $zones->getEntry($areaId)['parentArea'])
-                    {
-                        $parents[] = $p;
-                        $row['__parent'] = $p;
-                        $row['subzones'] = [$areaId];
-                    }
-                    else
-                        $row['__parent'] = 0;
+                $set = true;
+                $v['subzones'][] = $row['id'];
+                break;
+            }
 
-                    $set = false;
-                    foreach ($resultLv as &$v)
-                    {
-                        if ($v['__parent'] != $row['__parent'] && $v['id'] != $row['__parent'])
-                            continue;
-
-                        if ($v['__condition'] != $row['__condition'])
-                            continue;
-
-                        if (!$row['__parent'] && $v['id'] != $row['__parent'])
-                            continue;
-
-                        $set = true;
-                        $v['subzones'][] = $row['id'];
-                        break;
-                    }
-
-                    // add self as potential subzone; IF we are a parentZone without added children, we get filtered in JScript
-                    if (!$set)
-                    {
-                        $row['subzones'] = [$row['id']];
-                        $resultLv[] = $row;
-                    }
-                }
-
-                // overwrite lvData with parent-lvData (condition and subzones are kept)
-                if ($parents)
-                {
-                    $parents = (new ZoneList(array(['id', $parents])))->getListviewData();
-                    foreach ($resultLv as &$_)
-                        if (isset($parents[$_['__parent']]))
-                            $_ = array_merge($_, $parents[$_['__parent']]);
-                }
-
-                $cnd = new Conditions();
-                foreach ($resultLv as $idx => $lv)
-                {
-                    [$auraSpell, $questStart, $questEnd, $questStartState, $questEndState, $raceMask, $gender] = $lv['__condition'];
-
-                    if ($auraSpell)
-                        $cnd->addExternalCondition(Conditions::SRC_NONE, $lv['id'], [$auraSpell > 0 ? Conditions::AURA : -Conditions::AURA, abs($auraSpell)]);
-
-                    if ($questStart)
-                        $cnd->addExternalCondition(Conditions::SRC_NONE, $lv['id'], [Conditions::QUESTSTATE, $questStart, $questStartState]);
-
-                    if ($questEnd && $questEnd != $questStart)
-                        $cnd->addExternalCondition(Conditions::SRC_NONE, $lv['id'], [Conditions::QUESTSTATE, $questEnd, $questEndState]);
-
-                    if ($raceMask)
-                        $cnd->addExternalCondition(Conditions::SRC_NONE, $lv['id'], [Conditions::CHR_RACE, $raceMask]);
-
-                    if ($gender != 2)                       // 2: both
-                        $cnd->addExternalCondition(Conditions::SRC_NONE, $lv['id'], [Conditions::GENDER, $gender]);
-
-                    // remove temp storage from result
-                    unset($resultLv[$idx]['__condition']);
-                    unset($resultLv[$idx]['__parent']);
-                }
-
-                if ($cnd->toListviewColumn($resultLv, $extraCols))
-                    $this->extendGlobalData($cnd->getJSGlobals());
-
-                $tabData = ['data' => $resultLv];
-
-                if ($extraCols)
-                {
-                    $tabData['extraCols']  = $extraCols;
-                    $tabData['hiddenCols'] = ['instancetype'];
-                }
-
-                $this->lvTabs->addListviewTab(new Listview($tabData, ZoneList::$brickFile));
+            // add self as potential subzone; IF we are a parentZone without added children, we get filtered in JScript
+            if (!$set)
+            {
+                $row['subzones'] = [$row['id']];
+                $resultLv[] = $row;
             }
         }
 
-        // tab: teaches
-        if ($ids = Game::getTaughtSpells($this->subject))
+        // overwrite lvData with parent-lvData (condition and subzones are kept)
+        if ($parents)
         {
-            $teaches = new SpellList(array(['id', $ids]));
-            if (!$teaches->error)
+            $parents = (new ZoneList(array(['id', $parents])))->getListviewData();
+            foreach ($resultLv as &$_)
+                if (isset($parents[$_['__parent']]))
+                    $_ = array_merge($_, $parents[$_['__parent']]);
+        }
+
+        $cnd = new Conditions();
+        foreach ($resultLv as $idx => $lv)
+        {
+            [$auraSpell, $questStart, $questEnd, $questStartState, $questEndState, $raceMask, $gender] = $lv['__condition'];
+
+            if ($auraSpell)
+                $cnd->addExternalCondition(Conditions::SRC_NONE, $lv['id'], [$auraSpell > 0 ? Conditions::AURA : -Conditions::AURA, abs($auraSpell)]);
+
+            if ($questStart)
+                $cnd->addExternalCondition(Conditions::SRC_NONE, $lv['id'], [Conditions::QUESTSTATE, $questStart, $questStartState]);
+
+            if ($questEnd && $questEnd != $questStart)
+                $cnd->addExternalCondition(Conditions::SRC_NONE, $lv['id'], [Conditions::QUESTSTATE, $questEnd, $questEndState]);
+
+            if ($raceMask)
+                $cnd->addExternalCondition(Conditions::SRC_NONE, $lv['id'], [Conditions::CHR_RACE, $raceMask]);
+
+            if ($gender != 2)                       // 2: both
+                $cnd->addExternalCondition(Conditions::SRC_NONE, $lv['id'], [Conditions::GENDER, $gender]);
+
+            // remove temp storage from result
+            unset($resultLv[$idx]['__condition']);
+            unset($resultLv[$idx]['__parent']);
+        }
+
+        if ($cnd->toListviewColumn($resultLv, $extraCols))
+            $this->extendGlobalData($cnd->getJSGlobals());
+
+        $tabData = ['data' => $resultLv];
+
+        if ($extraCols)
+        {
+            $tabData['extraCols']  = $extraCols;
+            $tabData['hiddenCols'] = ['instancetype'];
+        }
+
+        return new Listview($tabData, ZoneList::$brickFile);
+    }
+
+    private function tabEnchantments() : ?Listview
+    {
+        $conditions = array(
+            DB::OR,
+            [DB::AND, ['type1', [ENCHANTMENT_TYPE_COMBAT_SPELL, ENCHANTMENT_TYPE_EQUIP_SPELL, ENCHANTMENT_TYPE_USE_SPELL]], ['object1', $this->typeId]],
+            [DB::AND, ['type2', [ENCHANTMENT_TYPE_COMBAT_SPELL, ENCHANTMENT_TYPE_EQUIP_SPELL, ENCHANTMENT_TYPE_USE_SPELL]], ['object2', $this->typeId]],
+            [DB::AND, ['type3', [ENCHANTMENT_TYPE_COMBAT_SPELL, ENCHANTMENT_TYPE_EQUIP_SPELL, ENCHANTMENT_TYPE_USE_SPELL]], ['object3', $this->typeId]]
+        );
+
+        if (($enchList = new EnchantmentList($conditions))->error)
+            return null;
+
+        $this->extendGlobalData($enchList->getJSGlobals());
+
+        return new Listview(array(
+            'data' => $enchList->getListviewData(),
+            'name' => Util::ucFirst(Lang::game('enchantments'))
+        ), EnchantmentList::$brickFile, 'enchantment');
+    }
+
+    private function tabCriteriaOf() : ?Listview
+    {
+        $conditions = array(
+            DB::AND,
+            ['ac.type', [ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL,
+                         ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2,     ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL]
+            ],
+            ['ac.value1', $this->typeId]
+        );
+
+        if ($extraCrt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` IN %in AND `value1` = %i', [ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AURA, ACHIEVEMENT_CRITERIA_DATA_TYPE_T_AURA], $this->typeId))
+            $conditions = [DB::OR, $conditions, ['ac.id', $extraCrt]];
+
+        if (($coAchievemnts = new AchievementList($conditions))->error)
+            return null;
+
+        $this->extendGlobalData($coAchievemnts->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
+
+        return new Listview(array(
+            'data' => $coAchievemnts->getListviewData(),
+            'id'   => 'criteria-of',
+            'name' => '$LANG.tab_criteriaof'
+        ), AchievementList::$brickFile);
+    }
+
+    private function tabExclusiveWith() : array
+    {
+        if (!$this->firstRank || !DB::World()->selectCell('SELECT 1 FROM spell_group WHERE `spell_id` = %i', $this->firstRank))
+            return [];
+
+        // unpack recursion
+        $groups = DB::World()->selectCol('SELECT `id` AS ARRAY_KEY, `spell_id` AS ARRAY_KEY2, `spell_id` FROM spell_group');
+        foreach ($groups as $i => $group)
+        {
+            foreach ($group as $j => $g)
             {
-                $this->extendGlobalData($teaches->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
-                $vis = ['level', 'schools'];
+                if ($g > 0)
+                    continue;
 
-                foreach ($teaches->iterate() as $__)
-                {
-                    if (!$teaches->canCreateItem())
-                        continue;
+                foreach ($groups[-$g] ?? [] as $new)
+                    $groups[$i][] = $new;
 
-                    $vis[] = 'reagents';
-                    break;
-                }
-
-                $tabData = array(
-                    'data'        => $teaches->getListviewData(),
-                    'id'          => 'teaches-spell',
-                    'name'        => '$LANG.tab_teaches',
-                    'visibleCols' => $vis,
-                );
-
-                if (!$teaches->hasSetFields('skillLines'))
-                    $tabData['hiddenCols'] = ['skill'];
-
-                $this->lvTabs->addListviewTab(new Listview($tabData, SpellList::$brickFile));
+                unset($group[$j]);
             }
         }
 
-        // tab: taught by npc
-        if ($this->subject->getRawSource(SRC_TRAINER))
+        // find ourselves
+        if (!($filtered = array_filter($groups, fn($x) => in_array($this->firstRank, $x))))
+            return [];
+
+        // get rule set
+        $rules = DB::World()->selectCol('SELECT `group_id` AS ARRAY_KEY, `stack_rule` FROM spell_group_stack_rules WHERE `group_id` IN %in', array_keys($filtered));
+
+        // only use groups that have rules set
+        if (!($filtered = array_intersect_key($filtered, $rules)))
+            return [];
+
+        if (($stacks = new SpellList(array(['id', array_merge(...$filtered)])))->error)
+            return [];
+
+        $listviews = [];
+        $lvData    = $stacks->getListviewData();
+
+        $this->extendGlobalData($stacks->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
+        if (!$stacks->hasSetFields('skillLines'))
+            $hCols = ['skill'];
+
+        foreach ($filtered as $gId => $spellIds)
         {
-            $trainers = DB::World()->selectAssoc(
-               'SELECT  cdt.`CreatureId` AS ARRAY_KEY, ts.`ReqSkillLine` AS "reqSkillId", ts.`ReqSkillRank` AS "reqSkillValue", ts.`ReqLevel` AS "reqLevel", ts.`ReqAbility1` AS "reqSpellId1", ts.`reqAbility2` AS "reqSpellId2"
-                FROM    creature_default_trainer cdt
-                JOIN    trainer_spell ts ON ts.`TrainerId` = cdt.`TrainerId`
-                WHERE   ts.`SpellId` = %i',
-                $this->typeId
-            );
+            $data = [];
+            foreach ($spellIds as $id)
+                if (isset($lvData[$id]) && $id != $this->firstRank)
+                    $data[] = $lvData[$id] + ['stackRule' => $rules[$gId]];
 
-            if ($trainers)
+            if (!$data)
+                continue;
+
+            $listviews[] = new Listview(array(
+                'data'        => $data,
+                'id'          => 'spell-group-stack-'.$gId,
+                'name'        => Lang::spell('stackGroup'),
+                'visibleCols' => ['stackRules'],
+                'hiddenCols'  => $hCols ?? null
+            ), SpellList::$brickFile);
+        }
+
+        return $listviews;
+    }
+
+    private function tabLinkedWith() : ?Listview
+    {
+        $rows = DB::World()->selectAssoc(
+           'SELECT  `spell_trigger` AS "trigger", `spell_effect` AS "effect", `type`, IF(ABS(`spell_effect`) = %i, ABS(`spell_trigger`), ABS(`spell_effect`)) AS "related"
+            FROM    spell_linked_spell
+            WHERE   ABS(`spell_effect`) = %i OR ABS(`spell_trigger`) = %i',
+            $this->typeId, $this->typeId, $this->typeId
+        );
+
+        $related = [];
+        foreach ($rows as $row)
+            $related[] = $row['related'];
+
+        if (!$related || ($linked = new SpellList(array(['id', $related])))->error)
+            return null;
+
+        $lv   = $linked->getListviewData();
+        $data = [];
+
+        $this->extendGlobalData($linked->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
+
+        foreach ($rows as $r)
+        {
+            foreach ($lv as $k => $d)
             {
-                $tbTrainer = new CreatureList(array(['ct.id', array_keys($trainers)], ['s.guid', null, '!'], ['ct.npcflag', NPC_FLAG_TRAINER, '&']));
-                if (!$tbTrainer->error)
-                {
-                    $this->extendGlobalData($tbTrainer->getJSGlobals());
+                if ($r['related'] != $k)
+                    continue;
 
-                    $cnd   = new Conditions();
-                    $skill = $this->subject->getField('skillLines');
-
-                    foreach ($trainers as $tId => $train)
-                    {
-                        if ($_ = $train['reqLevel'])
-                            $cnd->addExternalCondition(Conditions::SRC_NONE, $tId, [Conditions::LEVEL, $_, Conditions::OP_GT_E]);
-
-                        if ($_ = $train['reqSkillId'])
-                            if (count($skill) == 1 && $_ != $skill[0])
-                                $cnd->addExternalCondition(Conditions::SRC_NONE, $tId, [Conditions::SKILL, $_, $train['reqSkillValue']]);
-
-                        for ($i = 1; $i < 3; $i++)
-                            if ($_ = $train['reqSpellId'.$i])
-                                $cnd->addExternalCondition(Conditions::SRC_NONE, $tId, [Conditions::SPELL, $_]);
-                    }
-
-                    $lvData = $tbTrainer->getListviewData();
-                    $extraCols = [];
-                    if ($cnd->toListviewColumn($lvData, $extraCols))
-                        $this->extendGlobalData($cnd->getJSGlobals());
-
-                    $tabData = array(
-                        'data' => $lvData,
-                        'id'   => 'taught-by-npc',
-                        'name' => '$LANG.tab_taughtby',
-                    );
-
-                    if ($extraCols)
-                        $tabData['extraCols'] = $extraCols;
-
-                    $this->addDataLoader('zones');
-                    $this->lvTabs->addListviewTab(new Listview($tabData, CreatureList::$brickFile));
-                }
+                $data[] = $lv[$k] + ['linked' => [$r['trigger'], $r['effect'], $r['type']]];
+                break;
             }
         }
 
-        // tab: taught by spell
+        return new Listview(array(
+            'data'        => $data,
+            'id'          => 'spell-link',
+            'name'        => Lang::spell('linkedWith'),
+            'hiddenCols'  => ['skill', 'name'],
+            'visibleCols' => ['linkedTrigger', 'linkedEffect']
+        ), SpellList::$brickFile);
+    }
+
+    private function tabTriggeredBy() : ?Listview
+    {
+        $conditions = array(
+            DB::OR,
+            [DB::AND, [DB::OR, ['effect1Id', SpellList::EFFECTS_TRIGGER], ['effect1AuraId', SpellList::AURAS_TRIGGER]], ['effect1TriggerSpell', $this->typeId]],
+            [DB::AND, [DB::OR, ['effect2Id', SpellList::EFFECTS_TRIGGER], ['effect2AuraId', SpellList::AURAS_TRIGGER]], ['effect2TriggerSpell', $this->typeId]],
+            [DB::AND, [DB::OR, ['effect3Id', SpellList::EFFECTS_TRIGGER], ['effect3AuraId', SpellList::AURAS_TRIGGER]], ['effect3TriggerSpell', $this->typeId]],
+        );
+
+        if (($trigger = new SpellList($conditions))->error)
+            return null;
+
+        $this->extendGlobalData($trigger->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
+
+        return new Listview(array(
+            'data' => $trigger->getListviewData(),
+            'id'   => 'triggered-by',
+            'name' => '$LANG.tab_triggeredby'
+        ), SpellList::$brickFile);
+    }
+
+    private function tabTeachesSpell() : ?Listview
+    {
+        if (!($ids = Game::getTaughtSpells($this->subject)))
+            return null;
+
+        if (($teaches = new SpellList(array(['id', $ids])))->error)
+            return null;
+
+        $this->extendGlobalData($teaches->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
+
+        $vis = ['level', 'schools'];
+        foreach ($teaches->iterate() as $__)
+        {
+            if (!$teaches->canCreateItem())
+                continue;
+
+            $vis[] = 'reagents';
+            break;
+        }
+
+        return new Listview(array(
+            'data'        => $teaches->getListviewData(),
+            'id'          => 'teaches-spell',
+            'name'        => '$LANG.tab_teaches',
+            'visibleCols' => $vis,
+            'hiddenCols'  => $teaches->hasSetFields('skillLines') ? null : ['skill']
+        ), SpellList::$brickFile);
+    }
+
+    private function tabTaughtByNpc() : ?Listview
+    {
+        if (!$this->subject->getRawSource(SRC_TRAINER))
+            return null;
+
+        if (!($trainers = DB::World()->selectAssoc(
+           'SELECT  cdt.`CreatureId` AS ARRAY_KEY, ts.`ReqSkillLine` AS "reqSkillId", ts.`ReqSkillRank` AS "reqSkillValue", ts.`ReqLevel` AS "reqLevel", ts.`ReqAbility1` AS "reqSpellId1", ts.`reqAbility2` AS "reqSpellId2"
+            FROM    creature_default_trainer cdt
+            JOIN    trainer_spell ts ON ts.`TrainerId` = cdt.`TrainerId`
+            WHERE   ts.`SpellId` = %i',
+            $this->typeId
+        )))
+            return null;
+
+        if (($tbTrainer = new CreatureList(array(['ct.id', array_keys($trainers)], ['s.guid', null, '!'], ['ct.npcflag', NPC_FLAG_TRAINER, '&'])))->error)
+            return null;
+
+        $this->extendGlobalData($tbTrainer->getJSGlobals());
+
+        $cnd   = new Conditions();
+        $skill = $this->subject->getField('skillLines');
+
+        foreach ($trainers as $tId => $train)
+        {
+            if ($_ = $train['reqLevel'])
+                $cnd->addExternalCondition(Conditions::SRC_NONE, $tId, [Conditions::LEVEL, $_, Conditions::OP_GT_E]);
+
+            if ($_ = $train['reqSkillId'])
+                if (count($skill) == 1 && $_ != $skill[0])
+                    $cnd->addExternalCondition(Conditions::SRC_NONE, $tId, [Conditions::SKILL, $_, $train['reqSkillValue']]);
+
+            for ($i = 1; $i < 3; $i++)
+                if ($_ = $train['reqSpellId'.$i])
+                    $cnd->addExternalCondition(Conditions::SRC_NONE, $tId, [Conditions::SPELL, $_]);
+        }
+
+        $this->addDataLoader('zones');
+
+        $lvData    = $tbTrainer->getListviewData();
+        $extraCols = [];
+
+        if ($cnd->toListviewColumn($lvData, $extraCols))
+            $this->extendGlobalData($cnd->getJSGlobals());
+
+        return new Listview(array(
+            'data'      => $lvData,
+            'id'        => 'taught-by-npc',
+            'name'      => '$LANG.tab_taughtby',
+            'extraCols' => $extraCols ?: null
+        ), CreatureList::$brickFile);
+    }
+
+    private function tabTaughtBySpell() : ?Listview
+    {
         $conditions = array(
             DB::OR,
             [DB::AND, ['effect1Id', SpellList::EFFECTS_TEACH], ['effect1TriggerSpell', $this->typeId]],
@@ -1075,43 +1196,21 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             [DB::AND, ['effect3Id', SpellList::EFFECTS_TEACH], ['effect3TriggerSpell', $this->typeId]],
         );
 
-        $tbSpell = new SpellList($conditions);
-        $tbsData = [];
-        if (!$tbSpell->error)
-        {
-            $tbsData = $tbSpell->getFoundIDs();
-            $this->lvTabs->addListviewTab(new Listview(array(
-                'data' => $tbSpell->getListviewData(),
-                'id'   => 'taught-by-spell',
-                'name' => '$LANG.tab_taughtby'
-            ), SpellList::$brickFile));
+        if (($tbSpell = new SpellList($conditions))->error)
+            return null;
 
-            $this->extendGlobalData($tbSpell->getJSGlobals(GLOBALINFO_SELF));
-        }
+        $this->extendGlobalData($tbSpell->getJSGlobals(GLOBALINFO_SELF));
 
-        // tab: taught by quest
-        $conditions = array(
-            DB::OR,
-            ['sourceSpellId',   $this->typeId],
-            ['rewardSpell',     $this->typeId],
-            ['rewardSpellCast', $this->typeId]
-        );
-        if ($tbsData)
-            array_push($conditions, ['rewardSpell', $tbsData], ['rewardSpellCast', $tbsData]);
+        return new Listview(array(
+            'data' => $tbSpell->getListviewData(),
+            'id'   => 'taught-by-spell',
+            'name' => '$LANG.tab_taughtby'
+        ), SpellList::$brickFile);
+    }
 
-        $tbQuest = new QuestList($conditions);
-        if (!$tbQuest->error)
-        {
-            $this->lvTabs->addListviewTab(new Listview(array(
-                'data' => $tbQuest->getListviewData(),
-                'id'   => 'reward-from-quest',
-                'name' => '$LANG.tab_rewardfrom'
-            ), QuestList::$brickFile));
-
-            $this->extendGlobalData($tbQuest->getJSGlobals());
-        }
-
-        // tab: taught by item (i'd like to precheck $this->subject->sources, but there is no source:item only complicated crap like "drop" and "vendor")
+    private function tabTaughtByItem() : ?Listview
+    {
+        // i'd like to precheck $this->subject->sources, but there is no source:item only complicated crap like "drop" and "vendor"
         $conditions = array(
             DB::OR,
             [DB::AND, ['spellTrigger1', SPELL_TRIGGER_LEARN], ['spellId1', $this->typeId]],
@@ -1121,37 +1220,50 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             [DB::AND, ['spellTrigger5', SPELL_TRIGGER_LEARN], ['spellId5', $this->typeId]],
         );
 
-        $tbItem = new ItemList($conditions);
-        if (!$tbItem->error)
-        {
-            $this->lvTabs->addListviewTab(new Listview(array(
-                'data' => $tbItem->getListviewData(),
-                'id'   => 'taught-by-item',
-                'name' => '$LANG.tab_taughtby'
-            ), ItemList::$brickFile));
+        if (($tbItem = new ItemList($conditions))->error)
+            return null;
 
-            $this->extendGlobalData($tbItem->getJSGlobals(GLOBALINFO_SELF));
-        }
+        $this->extendGlobalData($tbItem->getJSGlobals(GLOBALINFO_SELF));
 
-        // tab: enchantments
+        return new Listview(array(
+            'data' => $tbItem->getListviewData(),
+            'id'   => 'taught-by-item',
+            'name' => '$LANG.tab_taughtby'
+        ), ItemList::$brickFile);
+    }
+
+    private function tabRewardFromQuest() : ?Listview
+    {
         $conditions = array(
             DB::OR,
-            [DB::AND, ['type1', [ENCHANTMENT_TYPE_COMBAT_SPELL, ENCHANTMENT_TYPE_EQUIP_SPELL, ENCHANTMENT_TYPE_USE_SPELL]], ['object1', $this->typeId]],
-            [DB::AND, ['type2', [ENCHANTMENT_TYPE_COMBAT_SPELL, ENCHANTMENT_TYPE_EQUIP_SPELL, ENCHANTMENT_TYPE_USE_SPELL]], ['object2', $this->typeId]],
-            [DB::AND, ['type3', [ENCHANTMENT_TYPE_COMBAT_SPELL, ENCHANTMENT_TYPE_EQUIP_SPELL, ENCHANTMENT_TYPE_USE_SPELL]], ['object3', $this->typeId]]
+            ['sourceSpellId',   $this->typeId],
+            ['rewardSpell',     $this->typeId],
+            ['rewardSpellCast', $this->typeId]
         );
-        $enchList = new EnchantmentList($conditions);
-        if (!$enchList->error)
-        {
-            $this->lvTabs->addListviewTab(new Listview(array(
-                'data' => $enchList->getListviewData(),
-                'name' => Util::ucFirst(Lang::game('enchantments'))
-            ), EnchantmentList::$brickFile, 'enchantment'));
 
-            $this->extendGlobalData($enchList->getJSGlobals());
+        if (($tab = $this->lvTabs->find(id: 'taught-by-spell')) instanceof Listview)
+        {
+            $tbsIds = [];
+            foreach ($tab->iterate() as $row)
+                $tbsIds[] = $row['id'];
+
+            array_push($conditions, ['rewardSpell', $tbsIds], ['rewardSpellCast', $tbsIds]);
         }
 
-        // tab: sounds
+        if (($tbQuest = new QuestList($conditions))->error)
+            return null;
+
+        $this->extendGlobalData($tbQuest->getJSGlobals());
+
+        return new Listview(array(
+            'data' => $tbQuest->getListviewData(),
+            'id'   => 'reward-from-quest',
+            'name' => '$LANG.tab_rewardfrom'
+        ), QuestList::$brickFile);
+    }
+
+    private function tabSounds() : ?Listview
+    {
         $data     = [];
         $seSounds = [];
         for ($i = 1; $i < 4; $i++)                          // sounds from screen effect
@@ -1160,27 +1272,29 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
         $activitySounds = DB::Aowow()->selectRow('SELECT * FROM ::spell_sounds WHERE `id` = %i', $this->subject->getField('spellVisualId'));
         array_shift($activitySounds);                       // remove id-column
-        if ($soundIDs = $activitySounds + $seSounds)
-        {
-            $sounds = new SoundList(array(['id', $soundIDs]));
-            if (!$sounds->error)
-            {
-                $data = $sounds->getListviewData();
-                foreach ($activitySounds as $activity => $id)
-                    if (isset($data[$id]))
-                        $data[$id]['activity'] = $activity; // no index, js wants a string :(
+        if (!($soundIDs = $activitySounds + $seSounds))
+            return null;
 
-                $tabData = ['data' => $data];
-                if ($activitySounds)
-                    $tabData['visibleCols'] = ['activity'];
+        if (($sounds = new SoundList(array(['id', $soundIDs])))->error)
+            return null;
 
-                $this->extendGlobalData($sounds->getJSGlobals(GLOBALINFO_SELF));
-                $this->lvTabs->addListviewTab(new Listview($tabData, SoundList::$brickFile));
-            }
-        }
+        $this->extendGlobalData($sounds->getJSGlobals(GLOBALINFO_SELF));
 
-        // tab: unlocks (object or item)
-        $lockIds = DB::Aowow()->selectCol(
+        $data = $sounds->getListviewData();
+        foreach ($activitySounds as $activity => $id)
+            if (isset($data[$id]))
+                $data[$id]['activity'] = $activity;         // no index, js wants a string :(
+
+        return new Listview(array(
+            'data'        => $data,
+            'visibleCols' => $activitySounds ? ['activity'] : null
+        ), SoundList::$brickFile);
+    }
+
+    private function tabUnlocks() : array
+    {
+        $listviews = [null, null];
+        $lockIds   = DB::Aowow()->selectCol(
            'SELECT `id` FROM ::lock WHERE            (`type1` = %i AND `properties1` = %i) OR
             (`type2` = %i AND `properties2` = %i) OR (`type3` = %i AND `properties3` = %i) OR
             (`type4` = %i AND `properties4` = %i) OR (`type5` = %i AND `properties5` = %i)',
@@ -1200,84 +1314,450 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 LOCK_TYPE_SKILL, $lockId
             );
 
-        if ($lockIds)
+        if (!$lockIds)
+            return [null, null];
+
+        // objects
+        if (!($lockedObj = new GameObjectList(array(['lockId', $lockIds])))->error)
         {
-            // objects
-            $lockedObj = new GameObjectList(array(['lockId', $lockIds]));
-            if (!$lockedObj->error)
-            {
-                $this->addDataLoader('zones');
-                $this->lvTabs->addListviewTab(new Listview(array(
-                    'data'        => $lockedObj->getListviewData(),
-                    'name'        => '$LANG.tab_unlocks',
-                    'id'          => 'unlocks-object',
-                    'visibleCols' => $lockedObj->hasSetFields('reqSkill') ? ['skill'] : null
-                ), GameObjectList::$brickFile));
-            }
+            $this->addDataLoader('zones');
 
-            $lockedItm = new ItemList(array(['lockId', $lockIds]));
-            if (!$lockedItm->error)
-            {
-                $this->extendGlobalData($lockedItm->getJSGlobals(GLOBALINFO_SELF));
+            $listviews[0] = new Listview(array(
+                'data'        => $lockedObj->getListviewData(),
+                'name'        => '$LANG.tab_unlocks',
+                'id'          => 'unlocks-object',
+                'visibleCols' => $lockedObj->hasSetFields('reqSkill') ? ['skill'] : null
+            ), GameObjectList::$brickFile);
+        }
 
-                $this->lvTabs->addListviewTab(new Listview(array(
-                    'data' => $lockedItm->getListviewData(),
-                    'name' => '$LANG.tab_unlocks',
-                    'id'   => 'unlocks-item'
-                ), ItemList::$brickFile));
+        if (!($lockedItm = new ItemList(array(['lockId', $lockIds])))->error)
+        {
+            $this->extendGlobalData($lockedItm->getJSGlobals(GLOBALINFO_SELF));
+
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data' => $lockedItm->getListviewData(),
+                'name' => '$LANG.tab_unlocks',
+                'id'   => 'unlocks-item'
+            ), ItemList::$brickFile));
+        }
+
+        return $listviews;
+    }
+
+    private function tabSeeAlso() : ?Listview
+    {
+        $conditions = array(
+            ['s.schoolMask', $this->subject->getField('schoolMask')],
+            ['s.effect1Id', $this->subject->getField('effect1Id')],
+            ['s.effect2Id', $this->subject->getField('effect2Id')],
+            ['s.effect3Id', $this->subject->getField('effect3Id')],
+            ['s.id', $this->typeId, '!'],
+            ['s.name_loc'.Lang::getLocale()->value, $this->subject->getField('name', true)]
+        );
+
+        if ($this->difficulties)
+            $conditions = [DB::OR, [DB::AND, ...$conditions], [DB::AND, ['s.id', $this->difficulties], ['s.id', $this->typeId, '!']]];
+
+        if (($saSpells = new SpellList($conditions))->error)
+            return null;
+
+        $this->extendGlobalData($saSpells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
+
+        $data = $saSpells->getListviewData();
+
+        if ($this->difficulties)
+        {
+            $saE = ['$Listview.extraCols.mode'];
+
+            foreach ($data as $id => &$d)
+            {
+                if (($modeBit = array_search($id, $this->difficulties)) !== false)
+                {
+                    if ($this->mapType)
+                        $d['modes'] = ['mode' => 1 << ($modeBit + 3)];
+                    else
+                        $d['modes'] = ['mode' => 2 - $modeBit];
+                }
+                else
+                    $d['modes'] = ['mode' => 0];
             }
         }
 
-        // find associated NPC, Item and merge results
-        // taughtbypets (unused..?)
-        // taughtbyquest (usually the spell casted as quest reward teaches something; exclude those seplls from taughtBySpell)
-        // taughtbytrainers
-        // taughtbyitem
+        return new Listview(array(
+            'data'        => $data,
+            'id'          => 'see-also',
+            'name'        => '$LANG.tab_seealso',
+            'visibleCols' => ['level'],
+            'hiddenCols'  => $saSpells->hasSetFields('skillLines') ? null : ['skill'],
+            'extraCols'   => $saE ?? null
+        ), SpellList::$brickFile);
+    }
 
-        // tab: conditions
+    private function tabConditionFor() : ?array
+    {
         $cnd = new Conditions();
         $cnd->getBySource([Conditions::SRC_SPELL_IMPLICIT_TARGET, Conditions::SRC_SPELL, Conditions::SRC_SPELL_CLICK_EVENT, Conditions::SRC_VEHICLE_SPELL, Conditions::SRC_SPELL_PROC], entry: $this->typeId)
             ->getByCondition(Type::SPELL, $this->typeId)
             ->prepare();
-        if ($tab = $cnd->toListviewTab())
-        {
-            $this->extendGlobalData($cnd->getJSGlobals());
-            $this->lvTabs->addDataTab(...$tab);
-        }
 
-        parent::generate();
+        if (!($tab = $cnd->toListviewTab()))
+            return null;
+
+        $this->extendGlobalData($cnd->getJSGlobals());
+        return $tab;
     }
 
-
-    /******************************************/
-    /* SpellLoot recursive dropchance builder */
-    /******************************************/
-
-    private function buildPctStack(float $baseChance, int $maxStack, int $baseCount = 1) : string
+    // hmmm .. largely redundant with tabUnlocks()
+    private function tabGatheredFromObject() : ?Listview
     {
-        // note: pctStack does not contain absolute values but chances relative to the overall drop chance
-        // e.g.: dropChance is 17% then [1 => 50, 2 => 25, 3 => 25] displays > Stack of 1: 8%; Stack of 2: 4%; Stack of 3: 4%
-        $maxStack = $maxStack ?: 1;
-        $pctStack = [];
-        for ($i = 1; $i <= $maxStack; $i++)
-        {
-            $pctStack[$i] = (($baseChance ** $i) * 100) / $baseChance;
+        if ($this->subject->getField('effect1Id') != SPELL_EFFECT_OPEN_LOCK)
+            return null;
 
-            // remove chance from previous stacks
-            if ($i > 1)
-                $pctStack[$i-1] -= $pctStack[$i];
+        if (!([$goCatg, $lvId, $lvName] = match($this->subject->getField('effect1MiscValue'))
+        {
+            LOCK_PROPERTY_HERBALISM => [-3, 'gathered-from-object', '$LANG.tab_gatheredfrom'],
+            LOCK_PROPERTY_MINING    => [-4, 'mined-from-object',    '$LANG.tab_minedfrom'],
+            default                 => null
+        }))
+            return null;
+
+        if (($lootObjects = new GameobjectList(array(['typeCat', $goCatg], ['lootId', 0, '<>'])))->error)
+            return null;
+
+        $lvData  = [];
+        $lootIds = [];
+        foreach ($lootObjects->iterate() as $_)
+            $lootIds[] = $lootObjects->getField('lootId');
+
+        $loot = new LootByContainer(Loot::GAMEOBJECT, ...$lootIds);
+        foreach ($lootObjects->getListviewData() as $id => $lvRow)
+        {
+            $lootObjects->getEntry($id);
+
+            foreach ($loot->getRaw($lootObjects->getField('lootId')) as $lootRow)
+            {
+                if (!$lootRow['content'])
+                    continue;
+
+                $this->extendGlobalIds(Type::ITEM, $lootRow['content']);
+
+                // WH did not group this but TDB has multiples of each gatherable object that clutter the listview
+                if (($k = array_find_key($lvData, fn($x) => $x['count'] == $lootRow['count'] && $x['yield'] == $lootRow['content'] && strstr($x['name'], $lvRow['name']))) !== null)
+                {
+                    unset($lvData[$k]['id']);
+                    if ($lvData[$k]['name'][0] != '<')
+                        $lvData[$k]['name'] = '<' . $lvData[$k]['name'] . '>';
+
+                    continue;
+                }
+
+                $lvData[] = $lvRow + array(
+                    'count'    => $lootRow['count'],
+                    'yield'    => $lootRow['content'],
+                    'reqskill' => $lvRow['skill'] ?? 1
+                );
+            }
         }
 
-        // cleanup rounding errors
-        $pctStack = array_map(fn($x) => round($x, 3), $pctStack);
+        $this->addDataLoader('zones');
 
-        // cleanup tiny fractions
-        $pctStack = array_filter($pctStack, fn($x) => ($x * $baseChance) >= 0.01);
+        return new Listview(array(
+            'data'            => $lvData,
+            'id'              => $lvId,
+            'name'            => $lvName,
+            'hiddenCols'      => ['type', 'location'],
+            'extraCols'       => ['$Listview.extraCols.yield', '$Listview.extraCols.reqskill', '$Listview.extraCols.percent'],
+            'sort'            => ['reqskill', '-percent', 'name'],
+            '_totalCount'     => 10000,
+            'computeDataFunc' => '$Listview.funcBox.initLootTable',
+            'getItemLink'     => "\$function(object) { return object.id ? '?object=' + object.id : '?objects=".$goCatg."&filter=na=' + object.name.slice(1, -1) }"
+        ), GameobjectList::$brickFile);
+    }
 
-        if ($baseCount > 1)
-            $pctStack = array_combine(array_map(fn($x) => $x * $baseCount, array_keys($pctStack)), $pctStack);
+    private function tabGatheredFromNpc() : ?Listview
+    {
+        // manually add tabs from triggered spells that are hard to access to common spells
+        if ($this->subject->getField('effect1Id') == SPELL_EFFECT_OPEN_LOCK)
+        {
+            if (!([$typeFlags, $lvId, $lvName] = match($this->subject->getField('effect1MiscValue'))
+            {
+                LOCK_PROPERTY_HERBALISM => [NPC_TYPEFLAG_SKIN_WITH_HERBALISM, 'gathered-from-npc', '$LANG.tab_gatheredfromnpc'],
+                LOCK_PROPERTY_MINING    => [NPC_TYPEFLAG_SKIN_WITH_MINING,    'mined-from-npc',    '$LANG.tab_minedfromnpc'   ],
+                // there is no engineering equivalent :(
+                default                 => null
+            }))
+                return null;
+        }
+        else if ($this->subject->getField('effect1Id') == SPELL_EFFECT_SKINNING)
+        {
+            if (!([$typeFlags, $lvId, $lvName] = match($this->subject->getField('effect1MiscValue'))
+            {
+                1       => [ NPC_TYPEFLAG_SKIN_WITH_HERBALISM,   'gathered-from-npc', '$LANG.tab_gatheredfromnpc'],
+                2       => [ NPC_TYPEFLAG_SKIN_WITH_MINING,      'mined-from-npc',    '$LANG.tab_minedfromnpc'   ],
+                3       => [ NPC_TYPEFLAG_SKIN_WITH_ENGINEERING, 'salvaged-from',     '$LANG.tab_salvagedfrom'   ],
+                default => null
+            }))
+                return $this->tabSkinnedFrom();             // special handling since skinning is entirely grouped and the rest is not
+        }
+        else
+            return null;
 
-        return json_encode($pctStack, JSON_NUMERIC_CHECK);  // do not replace with Util::toJSON !
+        $lvData  = [];
+        $lootIds = DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, `skinLootId` FROM ::creature WHERE  `skinLootId` <> 0 AND (`cuFlags` & %i) = 0 AND `typeFlags` & %i',
+            NPC_CU_DIFFICULTY_DUMMY,                        // we assume that the skinning loot does not diff between difficulty modes
+            $typeFlags
+        );
+
+        if (!$lootIds || ($creatures = new CreatureList(array(['id', array_keys($lootIds)])))->error)
+            return null;
+
+        $loot  = new LootByContainer(Loot::SKINNING, ...$lootIds);
+
+        if (($items = new ItemList(array(['id', $loot->getItems()])))->error)
+            return null;
+
+        // DND filler trash
+        if ($jsg = array_filter($items->getJSGlobals()[Type::ITEM], fn($x) => $x['quality'] > ITEM_QUALITY_POOR))
+            $this->extendGlobalData([Type::ITEM => $jsg]);
+
+        foreach ($creatures->getListviewData() as $lvRow)
+        {
+            $creatures->getEntry($lvRow['id']);
+
+            foreach ($loot->getRaw($creatures->getField('skinLootId')) as $lootRow)
+            {
+                if (!$lootRow['content'])
+                    continue;
+
+                // implausible, but what do you know...
+                if (!$items->getEntry($lootRow['content']))
+                    continue;
+
+                // skip filler trash
+                if ($items->getField('quality') == ITEM_QUALITY_POOR)
+                    continue;
+
+                $lvData[] = $lvRow + array(
+                    'count'    => $lootRow['count'],
+                    'yield'    => $lootRow['content'],
+                    'reqskill' => Game::skinningSkillForCreatureLevel($lvRow['minlevel'])
+                );
+            }
+        }
+
+        $this->addDataLoader('zones');
+
+        return new Listview(array(
+            'data'            => $lvData,
+            'id'              => $lvId,
+            'name'            => $lvName,
+            'hiddenCols'      => ['type', 'react'],
+            'extraCols'       => ['$Listview.extraCols.yield', '$Listview.extraCols.reqskill', '$Listview.extraCols.percent'],
+            'sort'            => ['reqskill', '-percent', 'name'],
+            '_totalCount'     => 10000,
+            'computeDataFunc' => '$Listview.funcBox.initLootTable',
+        ), CreatureList::$brickFile, 'getNpcListUrl');
+    }
+
+    private function tabSkinnedFrom() : ?Listview
+    {
+        $lvData    = [];
+        $creatures = DB::Aowow()->selectAssoc(              // using CreatureList creates too much overhead as we do not need location info
+           'SELECT `id`, `skinLootId`, `type`, `minLevel`, `maxLevel`
+            FROM   ::creature
+            WHERE  `skinLootId` <> 0 AND (`cuFlags` & %i) = 0 AND `type` <> %i AND (`typeFlags` & %i) = 0',
+            NPC_CU_DIFFICULTY_DUMMY,                        // we assume that the skinning loot does not diff between difficulty modes
+            NPC_TYPE_GAS_CLOUD,                             // gas clouds would be picked up by regular skinning (no relevant typeFlags set)
+            NPC_TYPEFLAG_SPECIALLOOT
+        );
+
+        if (!$creatures)
+            return null;
+
+        $loot = new LootByContainer(Loot::SKINNING, ...array_column($creatures, 'skinLootId'));
+
+        if (($items = new ItemList(array(['id', $loot->getItems()])))->error)
+            return null;
+
+        // DND filler trash
+        if ($jsg = array_filter($items->getJSGlobals()[Type::ITEM], fn($x) => $x['quality'] > ITEM_QUALITY_POOR))
+            $this->extendGlobalData([Type::ITEM => $jsg]);
+
+        foreach ($creatures as $npc)
+        {
+            foreach ($loot->getRaw($npc['skinLootId']) as $lootRow)
+            {
+                if (!$lootRow['content'])
+                    continue;
+
+                // implausible, but what do you know...
+                if (!$items->getEntry($lootRow['content']))
+                    continue;
+
+                // skip filler trash
+                if ($items->getField('quality') == ITEM_QUALITY_POOR)
+                    continue;
+
+                $k = $npc['type'].'-'.$lootRow['content'];
+                $lvData[$k] ??= array(
+                    'type'     => $npc['type'],
+                    'name'     => '<' . Lang::npc('cat', $npc['type']) . '>', // plural forms of Lang::game('ct')
+                    'minlevel' => $npc['minLevel'],
+                    'maxlevel' => $npc['maxLevel'],
+                    'count'    => $lootRow['count'],
+                    'yield'    => $lootRow['content'],
+                    'reqskill' => 0
+                );
+
+                $lvData[$k]['minlevel'] = min($lvData[$k]['minlevel'], $npc['minLevel']);
+                $lvData[$k]['maxlevel'] = max($lvData[$k]['maxlevel'], $npc['maxLevel']);
+                $lvData[$k]['reqskill'] = Game::skinningSkillForCreatureLevel($lvData[$k]['minlevel']);
+                $lvData[$k]['count']    = max($lvData[$k]['count'], $lootRow['count']);
+            }
+        }
+
+        return new Listview(array(
+            'data'            => $lvData,
+            'id'              => 'skinned-from',
+            'name'            => '$LANG.tab_skinnedfrom',
+            'hiddenCols'      => ['type', 'react', 'location'],
+            'extraCols'       => ['$Listview.extraCols.yield', '$Listview.extraCols.reqskill', '$Listview.extraCols.percent'],
+            'sort'            => ['reqskill', '-percent', 'name'],
+            '_totalCount'     => 10000,
+            'computeDataFunc' => '$Listview.funcBox.initLootTable',
+            'getItemLink'     => '$$WH.PageSpell.getNpcListUrl.bind(null, \'cr=10;crs=1;crv=0\')' // WH.Page.Spell.getNpcListUrl.bind(null, '10;1;0')
+        ), CreatureList::$brickFile, 'getNpcListUrl');
+    }
+
+    private function tabDisenchantedFrom() : ?Listview
+    {
+        $lvBase   = ['getItemLink' => "\$function(item) { return '?items&filter=minle=' + item.minlevel + ';maxle=' + item.maxlevel + ';qu=' + item.quality + ';cr=163;crs=' + item.yield + ';crv=0' }"];
+        $lootKey  = 'disenchantId';
+        $skillKey = 'requiredDisenchantSkill';
+        $lootIds  = DB::Aowow()->selectCol(
+            'SELECT   `id` AS ARRAY_KEY, `disenchantId` FROM ::items WHERE `disenchantId` <> 0 AND `requiredDisenchantSkill` > 0 AND `class` IN %in AND `quality` IN %in AND (`cuFlags` & %i) = 0 AND `itemLevel` > 1',
+            [ITEM_CLASS_ARMOR, ITEM_CLASS_WEAPON],
+            [ITEM_QUALITY_UNCOMMON, ITEM_QUALITY_RARE, ITEM_QUALITY_EPIC],
+            CUSTOM_EXCLUDE_FOR_LISTVIEW
+        );
+        $srcItemIds = array_keys($lootIds);
+
+        $mergeFN = function(array &$lvData, int $reqSkill, int $quality, int $count, int $yield, int $minLevel, int $maxLevel) : bool
+        {
+            if (($k = array_find_key($lvData, fn($x) => $x['yield'] == $yield && $x['count'] == $count && $x['quality'] == $quality && $x['reqskill'] == $reqSkill)) === null)
+                return false;
+
+            $lvData[$k]['minlevel'] = min($lvData[$k]['minlevel'], $minLevel);
+            $lvData[$k]['maxlevel'] = max($lvData[$k]['maxlevel'], $maxLevel);
+
+            $lvData[$k]['name'] = (7 - $quality) . '<' . Lang::item('quality', $quality) . ' ' . Lang::game('items') . '>';
+            unset($lvData[$k]['id']);
+
+            return true;
+        };
+
+        return $this->gathererProfessionTabBuilder('disenchanted-from', '$LANG.tab_disenchantedfrom', Loot::DISENCHANT, $lvBase, $lootKey, $skillKey, $mergeFN, $lootIds, $srcItemIds);
+    }
+
+    private function tabMilledFrom() : ?Listview
+    {
+        $lvBase   = ['getItemLink' => "\$function(item) { return item.id ? '?item=' + item.id : '?items&filter=minle=' + item.minlevel + ';maxle=' + item.maxlevel + ';qu=' + item.quality + ';cr=159;crs=1;crv=0' }"];
+        $lootKey  = 'id';
+        $skillKey = 'requiredSkillRank';
+        $lootIds  = DB::World()->selectCol('SELECT DISTINCT `entry` FROM %n', Loot::MILLING);
+        $mergeFN  = function(array &$lvData, int $reqSkill, int $quality, int $count, int $yield, int $minLevel, int $maxLevel) : bool
+        {
+            if (($k = array_find_key($lvData, fn($x) => $x['yield'] == $yield && $x['count'] == $count && $x['quality'] == $quality && $x['reqskill'] == $reqSkill)) === null)
+                return false;
+
+            $lvData[$k]['minlevel'] = min($lvData[$k]['minlevel'], $minLevel);
+            $lvData[$k]['maxlevel'] = max($lvData[$k]['maxlevel'], $maxLevel);
+
+            $lvData[$k]['name'] = (7 - $quality) . '<' . Lang::item('quality', $quality) . ' ' . Lang::game('items') . '>';
+            unset($lvData[$k]['id']);
+
+            return true;
+        };
+
+        return $this->gathererProfessionTabBuilder('milled-from', '$LANG.tab_milledfrom', Loot::MILLING, $lvBase, $lootKey, $skillKey, $mergeFN, $lootIds);
+    }
+
+    private function tabProspectedFrom() : ?Listview
+    {
+        $lootKey  = 'id';
+        $skillKey = 'requiredSkillRank';
+        $lootIds  = DB::World()->selectCol('SELECT DISTINCT `entry` FROM %n', Loot::PROSPECTING);
+        $mergeFN  = function(array &$lvData, int $reqSkill, int $quality, int $count, int $yield, int $minLevel, int $maxLevel) : bool
+        {
+            // there shouldn't be anything to merge
+            if (array_find_key($lvData, fn($x) => $x['yield'] == $yield && $x['count'] == $count && $x['quality'] == $quality && $x['reqskill'] == $reqSkill) === null)
+                return false;
+
+            return true;
+        };
+
+        return $this->gathererProfessionTabBuilder('prospected-from', '$LANG.tab_prospectedfrom', Loot::PROSPECTING, [], $lootKey, $skillKey, $mergeFN, $lootIds);
+    }
+
+    private function gathererProfessionTabBuilder(string $lvId, string $lvName, string $lootTbl, array $lvBase, string $lootKey, string $skillKey, callable $mergeFN, array $lootIds, array $srcItemIds = []) : ?Listview
+    {
+        $srcItems = DB::Aowow()->selectAssoc(
+            'SELECT IF(COUNT(`id`) > 1, NULL, `id`) AS "id", `quality`, MIN(`itemLevel`) AS "minlevel", MAX(`itemLevel`) AS "maxlevel", %n AS "lootId", %n AS "reqskill", `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8` FROM ::items WHERE `id` IN %in GROUP BY %n',
+            $lootKey, $skillKey, $srcItemIds ?: $lootIds,
+            ['lootId', 'quality', 'reqskill']
+        );
+
+        $lvData = [];
+        $loot   = new LootByContainer($lootTbl, ...$lootIds);
+
+        foreach ($srcItems as $item)
+        {
+            foreach ($loot->getRaw($item['lootId']) as $lootRow)
+            {
+                if (!$lootRow['content'])
+                    continue;
+
+                if ($mergeFN($lvData, max(1, $item['reqskill']), $item['quality'], $lootRow['count'], $lootRow['content'], $item['minlevel'], $item['maxlevel']))
+                    continue;
+
+                $this->extendGlobalIds(Type::ITEM, $lootRow['content']);
+
+                $lvRow = array(
+                    'minlevel' => $item['minlevel'],
+                    'maxlevel' => $item['maxlevel'],
+                    'quality'  => $item['quality'],
+                    'count'    => $lootRow['count'],
+                    'yield'    => $lootRow['content'],
+                    'reqskill' => max(1, $item['reqskill'])
+                );
+
+                if ($item['id'])
+                {
+                    $lvRow['id']   = $item['id'];
+                    $lvRow['name'] = (7 - $item['quality']) . UIText::unescapeUISequences(Util::localizedString($item, 'name'), Lang::FMT_RAW);
+                }
+                else
+                    $lvRow['name'] = (7 - $item['quality']) . '<' . Lang::item('quality', $item['quality']) . ' ' . Lang::game('items') . '>';
+
+                $lvData[] = $lvRow;
+            }
+        }
+
+        if (!$lvData)
+            return null;
+
+        $this->extendGlobalIds(Type::ITEM, ...array_column($lvData, 'id'));
+
+        return new Listview($lvBase + array(
+            'data'            => $lvData,
+            'id'              => $lvId,
+            'name'            => $lvName,
+            'hiddenCols'      => ['side', 'slot', 'source', 'type', 'reqlevel'],
+            'extraCols'       => ['$Listview.extraCols.yield', '$Listview.extraCols.reqskill', '$Listview.extraCols.percent'],
+            'sort'            => ['reqskill', 'level', '-percent', 'name'],
+            '_totalCount'     => 10000,
+            'computeDataFunc' => '$Listview.funcBox.initLootTable',
+        ), ItemList::$brickFile);
     }
 
 
@@ -1831,11 +2311,12 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                     }
                     break;
                 case SPELL_EFFECT_SKINNING:
-                    $_ = match ($effMV)
+                    $_ = match ($effMV)                     // reuse spell catgs
                     {
-                        0       => Lang::game('ct', 1).', '.Lang::game('ct', 2), // Skinning > Beast, Dragonkin
-                        1, 2    => Lang::game('ct', 4),                          // Gathering, Mining > Elemental
-                        3       => Lang::game('ct', 9),                          // Dismantling > Mechanic
+                        0       => Lang::spell('cat', 11, 393),    // Skinning
+                        1       => Lang::spell('cat', 11, 182),    // Herbalism
+                        2       => Lang::spell('cat', 11, 186),    // Mining
+                        3       => Lang::spell('cat', 11, 202, 0), // Engineering
                         default => ''
                     };
                     if ($_)
@@ -2309,13 +2790,13 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         return Util::createNumRange($bp + 1, ($bp + $ds) * $mult, '-');
     }
 
-    private function generatePath()
+    private function followBreadcrumbPath()
     {
         $cat = $this->subject->getField('typeCat');
         $cf  = $this->subject->getField('cuFlags');
         $sl  = $this->subject->getField('skillLines');
 
-        $this->breadcrumb[] = $cat;
+        $path = [$cat];
 
         // reconstruct path
         switch ($cat)
@@ -2324,62 +2805,63 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             case   7:
             case -13:
                 if ($cl = $this->subject->getField('reqClassMask'))
-                    $this->breadcrumb[] = ChrClass::fromMask($cl)[0];
+                    $path[] = ChrClass::fromMask($cl)[0];
                 else if ($sf = $this->subject->getField('spellFamilyId'))
                     foreach (ChrClass::cases() as $cl)
                         if ($cl->spellFamily() == $sf)
                         {
-                            $this->breadcrumb[] = $cl->value;
+                            $path[] = $cl->value;
                             break;
                         }
 
                 if ($cat == -13)
-                    $this->breadcrumb[] = ($cf & (SPELL_CU_GLYPH_MAJOR | SPELL_CU_GLYPH_MINOR)) >> 6;
+                    $path[] = ($cf & (SPELL_CU_GLYPH_MAJOR | SPELL_CU_GLYPH_MINOR)) >> 6;
                 else if ($sl)
-                    $this->breadcrumb[] = $sl[0];
+                    $path[] = $sl[0];
 
                 break;
             case   9:
             case  -3:
             case  11:
                 if ($sl)
-                    $this->breadcrumb[] = $sl[0];
+                    $path[] = $sl[0];
 
                 if ($cat == 11)
                     if ($_ = $this->subject->getField('reqSpellId'))
-                        $this->breadcrumb[] = $_;
+                        $path[] = $_;
 
                 break;
             case -11:
                 foreach (SpellList::$skillLines as $line => $skills)
                     if (in_array($sl[0] ?? [], $skills))
-                        $this->breadcrumb[] = $line;
+                        $path[] = $line;
                 break;
             case  -7:                                       // only spells unique in skillLineAbility will always point to the right skillLine :/
                 if ($cf & SPELL_CU_PET_TALENT_TYPE0)
-                    $this->breadcrumb[] = 411;              // Ferocity
+                    $path[] = 411;                          // Ferocity
                 else if ($cf & SPELL_CU_PET_TALENT_TYPE1)
-                    $this->breadcrumb[] = 409;              // Tenacity
+                    $path[] = 409;                          // Tenacity
                 else if ($cf & SPELL_CU_PET_TALENT_TYPE2)
-                    $this->breadcrumb[] = 410;              // Cunning
+                    $path[] = 410;                          // Cunning
                 break;
             case -5:
                 if ($this->subject->getField('effect2AuraId') == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED ||
                     $this->subject->getField('effect3AuraId') == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED)
-                    $this->breadcrumb[] = 2;                // flying (also contains SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED, so checked first)
+                    $path[] = 2;                            // flying (also contains SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED, so checked first)
                 else if ($this->subject->getField('effect2AuraId') == SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED ||
                          $this->subject->getField('effect3AuraId') == SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED)
-                    $this->breadcrumb[] = 1;                // ground
+                    $path[] = 1;                            // ground
                 else
-                    $this->breadcrumb[] = 3;                // misc
+                    $path[] = 3;                            // misc
         }
+
+        return $path;
     }
 
-    private function createInfobox() : void
+    private function createInfobox(bool $hasCompletion) : array
     {
-        $infobox       = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
-        $typeCat       = $this->subject->getField('typeCat');
-        $hasCompletion = in_array($typeCat, [-5, -6]) && !($this->subject->getField('cuFlags') & CUSTOM_EXCLUDE_FOR_LISTVIEW);
+        $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
+        $typeCat = $this->subject->getField('typeCat');
 
         // level
         if (!in_array($typeCat, [-5, -6]))                  // not mount or vanity pet
@@ -2506,18 +2988,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             if ($_ = DB::World()->selectCell('SELECT `ScriptName` FROM spell_script_names WHERE ABS(`spell_id`) = %i', $this->firstRank))
                 $infobox[] = 'Script'.Lang::main('colon').$_;
 
-
-        $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0', $hasCompletion);
-
-        // append glyph symbol if available
-        $glyphId = 0;
-        for ($i = 1; $i < 4; $i++)
-            if ($this->subject->getField('effect'.$i.'Id') == SPELL_EFFECT_APPLY_GLYPH)
-                $glyphId = $this->subject->getField('effect'.$i.'MiscValue');
-
-        if ($_ = DB::Aowow()->selectCell('SELECT ic.`name` FROM ::glyphproperties gp JOIN ::icons ic ON gp.`iconId` = ic.`id` WHERE %if', $glyphId, 'gp.`id` = %i OR', $glyphId, '%end gp.`spellId` = %i', $this->typeId))
-            if (file_exists('static/images/wow/Interface/Spellbook/'.$_.'.png'))
-                $this->infobox->append('[img src='.Cfg::get('STATIC_URL').'/images/wow/Interface/Spellbook/'.$_.'.png border=0 float=center margin=15]');
+        return $infobox;
     }
 }
 

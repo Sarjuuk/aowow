@@ -199,7 +199,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         else if ($tab = $this->tabCreatedBy())              // custom - perfect item specific
             $this->lvTabs->addListviewTab($tab);
 
-        foreach (array_filter($this->tabTaughtBy()) as $tab)// created-by-spell < taught-by-X > reward-from-quest
+        foreach ($this->tabTaughtBy() as $tab)              // created-by-spell < taught-by-X > reward-from-quest
             $this->lvTabs->addListviewTab($tab);            // [item, quest, npc]
 
         if ($tabRewardFromQuest)                            // taught-by-X < reward-from-quest > criteria-of
@@ -791,7 +791,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
     private function tabTaughtBy() : array
     {
-        $listviews = [null, null, null];
+        $listviews = [];
 
         // step 1a - find spells that create this item
         $directSpells = DB::Aowow()->selectCol('SELECT `id` FROM ::spell WHERE %or',
@@ -803,7 +803,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         );
 
         if (!$directSpells)
-            return [null, null, null];
+            return [];
 
         // step 1b - find spells that teach found spells
         $indirectSpells = DB::Aowow()->selectCol('SELECT `id` FROM ::spell WHERE %and',
@@ -960,17 +960,13 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
         $this->extendGlobalData($criteriaOf->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_REWARDS));
 
-        $tabData = array(
+        return new Listview(array(
             'data'        => $criteriaOf->getListviewData(),
             'name'        => '$LANG.tab_criteriaof',
             'id'          => 'criteria-of',
-            'visibleCols' => ['category']
-        );
-
-        if (!$criteriaOf->hasSetFields('reward_loc0'))
-            $tabData['hiddenCols'] = ['rewards'];
-
-        return new Listview($tabData, AchievementList::$brickFile);
+            'visibleCols' => ['category'],
+            'hiddenCols'  => $criteriaOf->hasSetFields('reward_loc0') ? null : ['rewards']
+        ), AchievementList::$brickFile);
     }
 
     private function tabReagentFor() : ?Listview
@@ -982,7 +978,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         );
 
         if (($reagent = new SpellList($conditions))->error)
-        return null;
+            return null;
 
         $this->extendGlobalData($reagent->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
@@ -1182,19 +1178,15 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         else
             $filter = [Type::CURRENCY => $iCur->id];
 
-        $tabData = array(
+        $this->extendGlobalData($boughtBy->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
+
+        return new Listview(array(
             'data'      => $boughtBy->getListviewData(LISTVIEWINFO_VENDOR, $filter),
             'name'      => '$LANG.tab_currencyfor',
             'id'        => 'currency-for',
-            'extraCols' => ["\$Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", '$Listview.extraCols.cost']
-        );
-
-        if ($note)
-            $tabData['note'] = sprintf(Util::$filterResultString, $note);
-
-        $this->extendGlobalData($boughtBy->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
-
-        return new Listview($tabData, ItemList::$brickFile);
+            'extraCols' => ["\$Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", '$Listview.extraCols.cost'],
+            'note'      => $note ? sprintf(Util::$filterResultString, $note) : null
+        ), ItemList::$brickFile);
     }
 
     private function tabTeaches() : ?Listview
