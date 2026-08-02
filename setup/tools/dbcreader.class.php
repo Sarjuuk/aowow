@@ -264,7 +264,7 @@ class DBCReader
                 's'           => '`'.$name.'` TEXT NULL, ',
                 'b'           => '`'.$name.'` TINYINT UNSIGNED NOT NULL, ',
                 'i', 'I', 'n' => '`'.$name.'` INT SIGNED NOT NULL, ',
-                'u', 'U'      => '`'.$name.'` INT SIGNED NOT NULL, ',
+                'u', 'U'      => '`'.$name.'` INT UNSIGNED NOT NULL, ',
                 'S'           => (function ($n) {
                                      $buf = '';
                                      for ($l = 0; $l < strlen($this->macro['LOC']); $l++)
