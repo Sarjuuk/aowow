@@ -199,7 +199,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         else if ($tab = $this->tabCreatedBy())              // custom - perfect item specific
             $this->lvTabs->addListviewTab($tab);
 
-        foreach (array_filter($this->tabTaughtBy()) as $tab)// created-by-spell < taught-by-X > reward-from-quest
+        foreach ($this->tabTaughtBy() as $tab)              // created-by-spell < taught-by-X > reward-from-quest
             $this->lvTabs->addListviewTab($tab);            // [item, quest, npc]
 
         if ($tabRewardFromQuest)                            // taught-by-X < reward-from-quest > criteria-of
@@ -706,8 +706,8 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
     private function tabContains(string $lootTemplate, int $lootId, string $tabName, string $tabId, array $extraCols, array $hiddenCols = []) : ?Listview
     {
-        $lootTab = new LootByContainer();
-        if (!$lootTab->getByContainer($lootTemplate, [$lootId]))
+        $lootTab = new LootByContainer($lootTemplate, $lootId);
+        if (!$lootTab->formatListview())
             return null;
 
         $this->extendGlobalData($lootTab->jsGlobals);
@@ -734,12 +734,12 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         if (!$this->subject->spells || $this->subject->spells[0][1] !== SPELL_TRIGGER_USE || !($s = $this->subject->spells[0][0]))
             return null;
 
-        if (!($spellLoot = new LootByContainer())->getByContainer(Loot::SPELL, [$s]))
+        if (!($spellLoot = new LootByContainer(Loot::SPELL, $s))->formatListview())
             return null;
 
         $this->extendGlobalData($spellLoot->jsGlobals);
 
-        if ($tab = $this->lvTabs->find(id: 'contains'))
+        if (($tab = $this->lvTabs->find(id: 'contains')) instanceof Listview)
         {
             $tab->appendData($spellLoot->getResult());
             return null;
@@ -782,7 +782,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
     private function tabTaughtBy() : array
     {
-        $listviews = [null, null, null];
+        $listviews = [];
 
         // step 1a - find spells that create this item
         $directSpells = DB::Aowow()->selectCol('SELECT `id` FROM ::spell WHERE %or',
@@ -794,7 +794,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         );
 
         if (!$directSpells)
-            return [null, null, null];
+            return [];
 
         // step 1b - find spells that teach found spells
         $indirectSpells = DB::Aowow()->selectCol('SELECT `id` FROM ::spell WHERE %and',
@@ -951,17 +951,13 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
         $this->extendGlobalData($criteriaOf->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_REWARDS));
 
-        $tabData = array(
+        return new Listview(array(
             'data'        => $criteriaOf->getListviewData(),
             'name'        => '$LANG.tab_criteriaof',
             'id'          => 'criteria-of',
-            'visibleCols' => ['category']
-        );
-
-        if (!$criteriaOf->hasSetFields('reward_loc0'))
-            $tabData['hiddenCols'] = ['rewards'];
-
-        return new Listview($tabData, AchievementEntry::$brickFile);
+            'visibleCols' => ['category'],
+            'hiddenCols'  => $criteriaOf->hasSetFields('reward_loc0') ? null : ['rewards']
+        ), AchievementEntry::$brickFile);
     }
 
     private function tabReagentFor() : ?Listview
@@ -973,7 +969,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         );
 
         if (($reagent = new SpellContainer($conditions))->error)
-        return null;
+            return null;
 
         $this->extendGlobalData($reagent->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
@@ -1173,19 +1169,15 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         else
             $filter = [Type::ITEM => $this->typeId];
 
-        $tabData = array(
+        $this->extendGlobalData($boughtBy->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
+
+        return new Listview(array(
             'data'      => $boughtBy->getListviewData(LISTVIEWINFO_VENDOR, $filter),
             'name'      => '$LANG.tab_currencyfor',
             'id'        => 'currency-for',
-            'extraCols' => ["\$Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", '$Listview.extraCols.cost']
-        );
-
-        if ($note)
-            $tabData['note'] = sprintf(Util::$filterResultString, $note);
-
-        $this->extendGlobalData($boughtBy->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
-
-        return new Listview($tabData, ItemEntry::$brickFile);
+            'extraCols' => ["\$Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", '$Listview.extraCols.cost'],
+            'note'      => $note ? sprintf(Util::$filterResultString, $note) : null
+        ), ItemEntry::$brickFile);
     }
 
     private function tabTeaches() : ?Listview

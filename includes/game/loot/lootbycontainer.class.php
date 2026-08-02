@@ -10,10 +10,48 @@ class LootByContainer extends Loot
 {
     public array $extraCols = [];
 
-    private array $knownRefs     = [];                      // known ref loot results (can be reused)
+    private array $knownRefs = [];                          // known ref loot results (can be reused)
+    private array $rawLoot   = [];
+    private array $itemIds   = [];
 
     /**
-     * @return array found loot result
+     * fetch loot for given loot container and resolve references.
+     *
+     * @param  string $table        a known loote template table name
+     * @param  int[]  $lootEntries  array of loot template entries.
+     */
+    public function __construct(string $table, int ...$lootEntries)
+    {
+        foreach (array_unique($lootEntries) as $entry)
+        {
+            if (!$entry)
+                continue;
+
+            if (!($lootRows = $this->resolveTemplate($table, $entry)))
+                continue;
+
+            $this->rawLoot[$entry] = [];
+
+            foreach ($lootRows as $loot)
+            {
+                $this->rawLoot[$entry][] = array(
+                    'count'      => ceil($loot['groupChance'] * $loot['realChanceMod'] * 100),
+                    'group'      => $loot['group'],
+                    'mode'       => $loot['mode'] ?: null,   // dyn loot mode
+                    'parentRef'  => $loot['parentRef'] ?? null,
+                    'reference'  => $loot['reference'] ?? null,
+                    'condition'  => $loot['condition'] ?? null,
+                    'content'    => $loot['content'] ?? null,
+                    'min'        => $loot['min'] ?? null,
+                    'max'        => $loot['max'] ?? null,
+                    'multiplier' => $loot['multiplier'] ?? null,
+                );
+            }
+        }
+    }
+
+    /**
+     * @return array listview formatted loot result
      */
     public function getResult() : array
     {
@@ -21,25 +59,41 @@ class LootByContainer extends Loot
     }
 
     /**
-     * recurse through reference loot while applying modifiers from parent container
-     *
-     * @param string $tableName     a known loot template table name
-     * @param int    $lootId        a loot template entry
-     * @param int    $groupId       [optional] limit result to provided loot group
-     * @param float  $baseChance    [optional] chance multiplier passed down from parent container
-     * @return array [[<array>lootRows], [<int>itemIds]]
+     * @param int $lootId [optional] only for this loot entry
+     * @return array resolved loot templates
      */
-    private function getByContainerRecursive(string $tableName, int $lootId, int $groupId = 0, float $baseChance = 1.0) : array
+    public function getRaw(int $lootId = 0) : array
     {
-        $loot     = [];
-        $rawItems = [];
+        if ($lootId)
+            return $this->rawLoot[$lootId] ?? [];
+        return $this->rawLoot;
+    }
 
+    /**
+     * @return array item ids in loot
+     */
+    public function getItems() : array
+    {
+        return $this->itemIds;
+    }
+
+    /**
+     * recurse through reference loot while applying modifiers from parent template
+     *
+     * @param string        $tableName  a known loot template table name
+     * @param int           $lootId     a loot template entry
+     * @param float         $baseChance [optional] chance multiplier passed down from parent template
+     * @return null|array[]             lootRows
+     */
+    private function resolveTemplate(string $tableName, int $lootId, float $baseChance = 1.0) : ?array
+    {
         if (!$tableName || !$lootId)
-            return [null, null];
+            return null;
 
-        $rows = DB::World()->selectAssoc('SELECT * FROM %n', $tableName, 'WHERE %if', $groupId, '`groupid` = %i AND', $groupId, '%end `entry` = %i', $lootId);
-        if (!$rows)
-            return [null, null];
+        if (!($rows = DB::World()->selectAssoc('SELECT * FROM %n WHERE `entry` = %i', $tableName, $lootId)))
+            return null;
+
+        $loot = [];
 
         $groupChances = [];
         $nGroupEquals = [];
@@ -47,7 +101,6 @@ class LootByContainer extends Loot
         foreach ($rows as $entry)
         {
             $set = array(
-                'quest'         => $entry['QuestRequired'],
                 'group'         => $entry['GroupId'],
                 'parentRef'     => $tableName == self::REFERENCE ? $lootId : 0,
                 'realChanceMod' => $baseChance,
@@ -74,71 +127,55 @@ class LootByContainer extends Loot
 
             if ($entry['Reference'])
             {
-                if (!in_array($entry['Reference'], $this->knownRefs))
-                    $this->knownRefs[$entry['Reference']] = $this->getByContainerRecursive(self::REFERENCE, $entry['Reference'], 0, $entry['Chance'] / 100);
-
-                [$data, $raw] = $this->knownRefs[$entry['Reference']];
-
-                $loot     = array_merge($loot, $data);
-                $rawItems = array_merge($rawItems, $raw);
+                if ($data = ($this->knownRefs[$entry['Reference']] ??= $this->resolveTemplate(self::REFERENCE, $entry['Reference'], $entry['Chance'] / 100)))
+                    $loot = array_merge($loot, $data);
 
                 $set['reference']  = $entry['Reference'];
                 $set['multiplier'] = $entry['MaxCount'];
             }
             else
             {
-                $rawItems[]     = $entry['Item'];
+                $this->itemIds[] = $entry['Item'];
+
                 $set['content'] = $entry['Item'];
                 $set['min']     = $entry['MinCount'];
                 $set['max']     = $entry['MaxCount'];
             }
 
-            if (!isset($groupChances[$entry['GroupId']]))
-            {
-                $groupChances[$entry['GroupId']] = 0;
-                $nGroupEquals[$entry['GroupId']] = 0;
-            }
-
-            if ($set['quest'] || !$set['group'])
+            if ($entry['QuestRequired'] || !$entry['GroupId'])
                 $set['groupChance'] = $entry['Chance'];
-            else if ($entry['GroupId'] && !$entry['Chance'])
+            else // if ($entry['GroupId'])
             {
-                $nGroupEquals[$entry['GroupId']]++;
-                $set['groupChance'] = &$groupChances[$entry['GroupId']];
-            }
-            else if ($entry['GroupId'] && $entry['Chance'])
-            {
-                $set['groupChance'] = $entry['Chance'];
+                $groupChances[$entry['GroupId']] ??= 0;
+                $nGroupEquals[$entry['GroupId']] ??= 0;
 
-                if (!$entry['Reference'])
+                if (!$entry['Chance'])
                 {
-                    if (empty($groupChances[$entry['GroupId']]))
-                        $groupChances[$entry['GroupId']] = 0;
-
-                    $groupChances[$entry['GroupId']] += $entry['Chance'];
+                    $nGroupEquals[$entry['GroupId']]++;
+                    $set['groupChance'] = &$groupChances[$entry['GroupId']];
                 }
-            }
-            else                                            // shouldn't have happened
-            {
-                trigger_error('Unhandled case in calculating chance for item '.$entry['Item'].'!', E_USER_WARNING);
-                continue;
+                else
+                {
+                    $set['groupChance'] = $entry['Chance'];
+
+                    if (!$entry['Reference'])
+                        $groupChances[$entry['GroupId']] += $entry['Chance'];
+                }
             }
 
             $loot[] = $set;
         }
 
-        foreach (array_keys($nGroupEquals) as $k)
+        foreach ($nGroupEquals as $grp => $n)
         {
-            $sum = $groupChances[$k];
-            if (!$sum)
-                $sum = 0;
-            else if ($sum >= 100.01)
+            $sum = $groupChances[$grp];
+            if ($sum >= 100.01)
             {
-                trigger_error('Loot entry '.$lootId.' / group '.$k.' has a total chance of '.number_format($sum, 2).'%. Some items cannot drop!', E_USER_WARNING);
+                trigger_error('Loot entry '.$lootId.' / group '.$grp.' has a total chance of '.number_format($sum, 2).'%. Some items cannot drop!', E_USER_WARNING);
                 $sum = 100;
             }
             // is applied as backReference to items with 0-chance
-            $groupChances[$k] = (100 - $sum) / ($nGroupEquals[$k] ?: 1);
+            $groupChances[$grp] = (100 - $sum) / ($n ?: 1);
         }
 
         if ($cnd->getBySource(Conditions::lootTableToConditionSource($tableName), group: $lootId)->prepare())
@@ -147,40 +184,26 @@ class LootByContainer extends Loot
             $cnd->toListviewColumn($loot, $this->extraCols, $lootId, 'content');
         }
 
-        return [$loot, array_unique($rawItems)];
+        return $loot;
     }
 
     /**
-     * fetch loot for given loot container and optionally merge multiple container while adding mode info.
-     * If difficultyBit is 0, no merge will occur
+     * format loot for listview display and optionally merge multiple container while adding mode info.
      *
-     * @param  string $table        a known loote template table name
-     * @param  array  $lootEntries  array of [difficultyBit => entry].
-     * @return bool   success and found loot
+     * @param  array<int, int>  $difficultyEntries  array of [difficulty bit => loot entry].
+     * @return array                                listview rows
      */
-    public function getByContainer(string $table, array $lootEntries): bool
+    public function formatListview(array $difficultyEntries = []) : array
     {
-        if (!in_array($table, self::TEMPLATES))
-            return false;
+        $items = new ItemContainer(array(['id', $this->itemIds]));
+        $this->storeJSGlobals($items->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
+        $itemRows = $items->getListviewData();
 
-        foreach ($lootEntries as $modeBit => $entry)
+        foreach ($this->rawLoot as $entry => $lootRows)
         {
-            if (!$entry)
-                continue;
-
-            [$lootRows, $itemIds] = $this->getByContainerRecursive($table, $entry);
-            if (!$lootRows)
-                continue;
-
-            $items = new ItemContainer(array(['id', $itemIds]));
-            $this->storeJSGlobals($items->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
-            $itemRows = $items->getListviewData();
-
             // assign listview LV rows to loot rows, not the other way round! The same item may be contained multiple times
             foreach ($lootRows as $loot)
             {
-                $count = ceil($loot['groupChance'] * $loot['realChanceMod'] * 100);
-
                 /* on modes...
                  * modes.mode is the (masked) sum of all modes where this item has been seen
                  * modes.mode &  1 dungeon normal
@@ -194,52 +217,49 @@ class LootByContainer extends Loot
                  * modes[4] is _always_ included and is the sum total over all modes:
                  * ex: modes:{"mode":1,"1":{"count":4408,"outof":16013},"4":{"count":4408,"outof":22531}}
                  */
-                if ($modeBit)
+                $modes = [];
+                if (($modeBit = array_search($entry, $difficultyEntries)) !== false)
                 {
                     $modes = array(                             // emulate 'percent' with precision: 2
                         'mode'   => $modeBit,
-                        $modeBit => ['count' => $count, 'outof' => 10000]
+                        $modeBit => ['count' => $loot['count'], 'outof' => 10000]
                     );
                     if ($modeBit != 4)
                         $modes[4] = $modes[$modeBit];
 
-
-                    // unsure: force display as noteworthy
-                    // if (!empty($loot['content']) && !empty($itemRows[$loot['content']]) && $itemRows[$loot['content']]['name'][0] == 7 - ITEM_QUALITY_POOR)
-                    //     $modes['mode'] = 4;
-                    // else if ($count < 100)                      // chance < 1%
-                    //     $modes['mode'] = 4;
-
-
                     // existing result row; merge modes and move on
                     if (!is_null($k = array_find_key($this->results, function($x) use ($loot) {
                         if (!empty($loot['reference']))
-                            return $x['id'] == $loot['reference'] && $x['mode'] == $loot['mode'] && $x['group'] == $loot['group'] && $x['stack'] == [$loot['multiplier'], $loot['multiplier']];
+                            return $x['id'] == $loot['reference'] && $x['mode'] == $loot['mode'] && ($x['condition'] ?? '') == $loot['condition'] && $x['stack'] == [$loot['multiplier'], $loot['multiplier']];
                         else
-                            return $x['id'] == $loot['content']   && $x['mode'] == $loot['mode'] && $x['group'] == $loot['group'];
+                            return $x['id'] == $loot['content']   && $x['mode'] == $loot['mode'] && ($x['condition'] ?? '') == $loot['condition'];
                     })))
                     {
                         $this->results[$k]['modes']['mode']    |= $modes['mode'];
                         $this->results[$k]['modes'][$modeBit]   = $modes[$modeBit];
                         $this->results[$k]['modes'][4]['count'] = max($modes[4]['count'], $this->results[$k]['modes'][4]['count']);
 
+                        if (!is_int(strpos($this->results[$k]['group'], $loot['group'])))
+                            $this->results[$k]['group'] .= ', '.$loot['group'];
+
                         continue;
                     }
                 }
 
                 $base = array(
-                    'count'     => $count,
-                    'outof'     => 10000,
-                    'group'     => $loot['group'],
-                    'quest'     => $loot['quest'],
-                    'mode'      => $loot['mode'] ?: null,   // dyn loot mode
-                    'modes'     => $modes ?? null,          // difficulties
-                    'reference' => $loot['parentRef'] ?: null,
-                    'condition' => $loot['condition'] ?? null,
-                    'pctstack'  => self::buildStack($loot['min'] ?? 0, $loot['max'] ?? 0)
+                    'count' => $loot['count'],
+                    'outof' => 10000,
+                    'group' => $loot['group']
                 );
 
-                $base = array_filter($base, fn($x) => $x !== null);
+                if ($modes)                                 // difficulties
+                    $base['modes'] = $modes;
+                if ($loot['mode'])                          // dyn loot mode
+                    $base['mode'] = $loot['mode'];
+                if ($loot['parentRef'])
+                    $base['reference'] = $loot['parentRef'];
+                if ($loot['condition'])
+                    $base['condition'] = $loot['condition'];
 
                 if (empty($loot['reference']))              // regular drop
                 {
@@ -251,20 +271,37 @@ class LootByContainer extends Loot
                         if ($base['count'] < 100 && $items->getEntry($loot['content'])->moreMask & SRC_FLAG_COMMON)
                             $extra['commondrop'] = 1;
 
-                        if (!User::isInGroup(U_GROUP_EMPLOYEE))
-                        {
-                            if (!isset($this->results[$loot['content']]))
-                                $this->results[$loot['content']] = array_merge($itemRow, $base, $extra);
-                            else
-                                $this->results[$loot['content']]['count'] += $base['count'];
-                        }
-                        else
+                        // staff or unmergable - separate loot rows
+                        if (User::isInGroup(U_GROUP_EMPLOYEE) || is_null($k = array_find_key($this->results, fn($x) => $x['id'] == $loot['content'] && ($x['condition'] ?? '') == $loot['condition'])))
                             $this->results[] = array_merge($itemRow, $base, $extra);
+                        // merge w/o difficulty modes
+                        else
+                        {
+                            $row = &$this->results[$k];
+                            if (!is_int(strpos($row['group'], $loot['group'])))
+                                $row['group'] .= ', '.$loot['group'];
+
+                            // move excessive % to extra loot
+                            if ($row['count'] + $base['count'] == 20000)
+                            {
+                                $row['stack'][0]++;
+                                $row['stack'][1]++;
+                                $row['count'] = 10000;
+                            }
+                            else if (($row['count'] += ($base['count'] + ($row['fraction'] ?? 0))) > 10000)
+                            {
+                                $row['stack'][1] += intval($row['count'] / 10000);
+                                $row['fraction']  = $row['count'] % 10000;
+                                $row['count']     = 10000;
+                            }
+
+                            unset($row);
+                        }
                     }
                     else
                         trigger_error('Item #'.$loot['content'].' referenced by loot does not exist!', E_USER_WARNING);
                 }
-                else if (User::isInGroup(U_GROUP_EMPLOYEE))     // create dummy for ref-drop
+                else if (User::isInGroup(U_GROUP_EMPLOYEE)) // create dummy for ref-drop
                 {
                     $data = array(
                         'id'         => $loot['reference'],
@@ -280,27 +317,7 @@ class LootByContainer extends Loot
             }
         }
 
-        // move excessive % to extra loot
-        if (!User::isInGroup(U_GROUP_EMPLOYEE))
-        {
-            foreach ($this->results as &$_)
-            {
-                // remember 'count' is always relative to a base of 10000
-                if ($_['count'] <= 10000)
-                    continue;
-
-                while ($_['count'] > 20000)
-                {
-                    $_['stack'][0]++;
-                    $_['stack'][1]++;
-                    $_['count'] -= 10000;
-                }
-
-                $_['stack'][1]++;
-                $_['count'] = 10000;
-            }
-        }
-        else
+        if (User::isInGroup(U_GROUP_EMPLOYEE))
         {
             $fields = [['mode', 'Dyn. Mode'], ['reference', 'Reference']];
             $base   = [];
@@ -326,7 +343,13 @@ class LootByContainer extends Loot
                     $this->extraCols[] = "\$Listview.funcBox.createSimpleCol('".$field."', '".$title."', '7%', '".$field."')";
         }
 
-        return !empty($this->results);
+        foreach ($this->results as &$row)
+        {
+            $row['pctstack'] = self::buildStack($row['stack'][0], $row['stack'][1], ($row['fraction'] ?? 0) / 100);
+            unset($row['fraction']);
+        }
+
+        return $this->results;
     }
 }
 

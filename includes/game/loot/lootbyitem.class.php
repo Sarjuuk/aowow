@@ -313,21 +313,21 @@ class LootByItem extends Loot
 
         $srcData = $npc->getListviewData();
         $this->storeJSGlobals($npc->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
-        [, &$data, , , &$extraCols, ,] = $this->listviewTabs[$tabId];
 
-        foreach ($npc->iterate() as $entry)
+        foreach ($npc->iterate() as $id => $entry)
         {
             if ($tabId == self::NPC_SKINNED)
-            {
-                if ($entry->isMineable())
-                    $tabId = self::NPC_MINED;
-                else if ($entry->isGatherable())
-                    $tabId = self::NPC_GATHERED;
-                else if ($entry->isSalvageable())
-                    $tabId = self::NPC_SALVAGED;
-            }
+                $tabRef = match(true)
+                {
+                    $entry->isMineable()    => self::NPC_MINED,
+                    $entry->isGatherable()  => self::NPC_GATHERED,
+                    $entry->isSalvageable() => self::NPC_SALVAGED,
+                    default                 => self::NPC_SKINNED
+                };
 
-            $data[]      = array_merge($parentData[$entry->parentId] ?? $srcData[$npc->id], $result[$entry->$dbField]);
+            [, &$data, , , &$extraCols, ,] = $this->listviewTabs[$tabRef ?? $tabId];
+
+            $data[]      = array_merge($parentData[$entry->parentId] ?? $srcData[$id], $result[$entry->$dbField]);
             $extraCols[] = '$Listview.extraCols.percent';
         }
 

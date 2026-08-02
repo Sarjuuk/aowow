@@ -1438,7 +1438,7 @@ class SpellEntry extends DBTypeEntry
 
         for ($i = 0; $i < 3; $i++)
             if ($this->effectPeriode[$i] > 0)
-                $effMask |= 1 << ($i - 1);
+                $effMask |= 1 << $i;
 
         return $effMask;
     }

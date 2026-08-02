@@ -678,8 +678,8 @@ class NpcBaseResponse extends TemplateResponse implements ICache
 
         foreach ($sourceFor as [$lootTpl, $lootEntries, $tabName, $tabId, $hiddenCols, $note])
         {
-            $creatureLoot = new LootByContainer();
-            if ($creatureLoot->getByContainer($lootTpl, $lootEntries))
+            $creatureLoot = new LootByContainer($lootTpl, ...$lootEntries);
+            if ($creatureLoot->formatListview($lootEntries))
             {
                 $extraCols   = $creatureLoot->extraCols;
                 array_push($extraCols, '$Listview.extraCols.count', '$Listview.extraCols.percent');
