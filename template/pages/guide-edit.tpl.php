@@ -200,9 +200,7 @@
                     <th><label for="description">
                         <dfn title="<?=Lang::guide('editor', 'descriptionTip');?>"><?=Lang::guide('editor', 'description');?></dfn></label></th>
                     <td colspan="3">
-                        <textarea rows="1" name="description" cols="100" id="description" style="height:69px"
-                                  placeholder="<?=Lang::guide('editor', 'descriptionTip');?>"
-                                  ><?=$this->editDescription;?></textarea>
+                        <textarea rows="1" name="description" cols="100" id="description" style="height:69px"><?=$this->editDescription;?></textarea>
                         <script>g_enhanceTextarea('#description')</script>
                     </td>
                 </tr>

@@ -85,7 +85,7 @@ function __AddToolbar(mode, ta, tbParent, mnParent) {
             ]],
             [4, LANG.reputation, , [
                 [0, g_reputation_standings[0], g_insertTag.bind(null, ta, '[color=hated]',      '[/color]'), null, {className: 'rep-hated'}],
-                [1, g_reputation_standings[2], g_insertTag.bind(null, ta, '[color=hostile]',    '[/color]'), null, {className: 'rep-hostile'}],
+                [1, g_reputation_standings[1], g_insertTag.bind(null, ta, '[color=hostile]',    '[/color]'), null, {className: 'rep-hostile'}],
                 [2, g_reputation_standings[2], g_insertTag.bind(null, ta, '[color=unfriendly]', '[/color]'), null, {className: 'rep-unfriendly'}],
                 [3, g_reputation_standings[3], g_insertTag.bind(null, ta, '[color=neutral]',    '[/color]'), null, {className: 'rep-neutral'}],
                 [4, g_reputation_standings[4], g_insertTag.bind(null, ta, '[color=friendly]',   '[/color]'), null, {className: 'rep-friendly'}],
