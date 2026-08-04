@@ -28,6 +28,9 @@ class GetdescriptionBaseResponse extends TextResponse
         if (!User::canWriteGuide())
             return;
 
+        if (!$this->assertPOST('description'))
+            return;
+
         $this->result = GuideMgr::createDescription($this->_post['description']);
     }
 }
