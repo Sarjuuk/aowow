@@ -406,7 +406,7 @@ class QuestEntry extends DBTypeEntry
             $xReq .= '<br /> - '.Lang::quest('money').Lang::main('colon').Util::formatMoney(abs($_));
 
         if ($xReq)
-            $xReq .= '<br /><br /><span class="q">'.Lang::quest('requirements').Lang::main('colon').'</span>'.$xReq;
+            $xReq = '<br /><br /><span class="q">'.Lang::quest('requirements').Lang::main('colon').'</span>'.$xReq;
 
 
         $tooltip = '';
