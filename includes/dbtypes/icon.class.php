@@ -195,6 +195,16 @@ class IconListFilter extends Filter
         if (!isset($this->iconTotals['all']))
         {
             $this->iconTotals['all'] = [];
+
+            // not filtrable but used nontheless
+            $this->iconTotals[-1] = DB::Aowow()->selectCol('SELECT `iconId` AS ARRAY_KEY, COUNT(*) AS "n" FROM ::holidays GROUP BY `iconId`');
+            $this->iconTotals[-2] = DB::Aowow()->selectCol(
+                'SELECT `iconId` AS ARRAY_KEY, COUNT(*) AS "n" FROM (
+                    SELECT `iconId0` AS "iconId" FROM aowow_races UNION
+                    SELECT `iconId1` AS "iconId" FROM aowow_races
+                ) x GROUP BY `iconId`'
+            );
+
             Util::arraySumByKey($this->iconTotals['all'], ...$this->iconTotals);
         }
 
