@@ -151,6 +151,39 @@ class IconBaseResponse extends TemplateResponse implements ICache
             ), PetList::$brickFile));
         }
 
+        // used by: class
+        $ubClasses = new CharClassList(array(['iconId', $this->typeId]));
+        if (!$ubClasses->error)
+        {
+            $this->extendGlobalData($ubClasses->getJSGlobals());
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data' => $ubClasses->getListviewData(),
+                'id'   => 'used-by-class'
+            ), CharClassList::$brickFile));
+        }
+
+        // used by: races (custom)
+        $ubRaces = new CharRaceList(array(DB::OR, ['iconId0', $this->typeId], ['iconId1', $this->typeId]));
+        if (!$ubRaces->error)
+        {
+            $this->extendGlobalData($ubRaces->getJSGlobals());
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data' => $ubRaces->getListviewData(),
+                'id'   => 'used-by-race'
+            ), CharRaceList::$brickFile));
+        }
+
+        // used by: holiday (custom)
+        $ubEvents = new WorldeventList(array(['h.iconId', $this->typeId]));
+        if (!$ubEvents->error)
+        {
+            $this->extendGlobalData($ubEvents->getJSGlobals());
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data' => $ubEvents->getListviewData(),
+                'id'   => 'used-by-event'
+            ), WorldeventList::$brickFile));
+        }
+
         parent::generate();
     }
 }
