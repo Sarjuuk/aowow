@@ -310,28 +310,25 @@ class QuestList extends DBTypeList
             return null;
 
         $title = UIText::unescapeUISequences(Util::htmlEscape($this->getField('name', true)), Lang::FMT_HTML);
-        $level = $this->curTpl['level'];
-        if ($level < 0)
-            $level = 0;
+        $text  =
+        $level =
+        $xReq  = '';
 
-        $x = '';
-        if ($level)
+        if ($_ = $this->parseText('objectives', false))
+            $text = '<br />'.$_;
+        else if ($_ = $this->parseText('offerReward', false))
+            $text = '<br />'.$_;
+
+
+        if (($lvl = $this->curTpl['level']) > 0)
         {
-            $level = sprintf(Lang::quest('questLevel'), $level);
+            $level = Lang::quest('questLevel', [$lvl]);
 
             if ($this->curTpl['flags'] & QUEST_FLAG_DAILY)  // daily
                 $level .= ' '.Lang::quest('daily');
-
-            $x .= '<table><tr><td><table width="100%"><tr><td><b class="q">'.$title.'</b></td><th><b class="q0">'.$level.'</b></th></tr></table></td></tr></table>';
         }
-        else
-            $x .= '<table><tr><td><b class="q">'.$title.'</b></td></tr></table>';
 
 
-        $x .= '<table><tr><td><br />'.$this->parseText('objectives', false);
-
-
-        $xReq = '';
         for ($i = 1; $i < 5; $i++)
         {
             $ot     = $this->getField('objectiveText'.$i, true);
@@ -347,8 +344,7 @@ class QuestList extends DBTypeList
                 $name = CreatureList::getName($rng);
             else if ($rng < 0)
                 $name = UIText::unescapeUISequences(GameObjectList::getName(-$rng), Lang::FMT_HTML);
-
-            if (!$name)
+            else
                 $name = Util::ucFirst(Lang::game($rng > 0 ? 'npc' : 'object')).' #'.abs($rng);
 
             $xReq .= '<br /> - '.$name.($rngQty > 1 ? ' x '.$rngQty : '');
@@ -370,16 +366,23 @@ class QuestList extends DBTypeList
         if ($et = $this->getField('end', true))
             $xReq .= '<br /> - '.$et;
 
-        if ($_ = $this->getField('rewardOrReqMoney'))
-            if ($_ < 0)
-                $xReq .= '<br /> - '.Lang::quest('money').Lang::main('colon').Util::formatMoney(abs($_));
+        if (($_ = $this->getField('rewardOrReqMoney')) < 0)
+            $xReq .= '<br /> - '.Lang::quest('money').Lang::main('colon').Util::formatMoney(abs($_));
 
         if ($xReq)
-            $x .= '<br /><br /><span class="q">'.Lang::quest('requirements').Lang::main('colon').'</span>'.$xReq;
+            $xReq .= '<br /><br /><span class="q">'.Lang::quest('requirements').Lang::main('colon').'</span>'.$xReq;
 
-        $x .= '</td></tr></table>';
 
-        return $x;
+        $tooltip = '';
+        if ($level)
+            $tooltip .= '<table><tr><td><table width="100%"><tr><td><b class="q">'.$title.'</b></td><th><b class="q0">'.$level.'</b></th></tr></table></td></tr></table>';
+        else
+            $tooltip .= '<table><tr><td><b class="q">'.$title.'</b></td></tr></table>';
+
+        if ($text || $xReq)
+            $tooltip .= '<table><tr><td>'.$text.$xReq.'</td></tr></table>';
+
+        return $tooltip;
     }
 
     public function getJSGlobals(int $addMask = GLOBALINFO_ANY) : array
