@@ -350,25 +350,25 @@ class QuestEntry extends DBTypeEntry
     public function renderTooltip() : ?string
     {
         $title = UIText::unescapeUISequences(Util::htmlEscape($this->name), Lang::FMT_HTML);
+        $text  =
+        $level =
+        $xReq  = '';
 
-        $x = '';
-        if ($level = min(0, $this->level))
+        if ($_ = $this->renderText('objectives', false))
+            $text = '<br />'.$_;
+        else if ($_ = $this->renderText('offerReward', false))
+            $text = '<br />'.$_;
+
+
+        if ($lvl = max(0, $this->level))
         {
-            $level = Lang::quest('questLevel', [$level]);
+            $level = Lang::quest('questLevel', [$lvl]);
 
             if ($this->flags & QUEST_FLAG_DAILY)
                 $level .= ' '.Lang::quest('daily');
-
-            $x .= '<table><tr><td><table width="100%"><tr><td><b class="q">'.$title.'</b></td><th><b class="q0">'.$level.'</b></th></tr></table></td></tr></table>';
         }
-        else
-            $x .= '<table><tr><td><b class="q">'.$title.'</b></td></tr></table>';
 
 
-        $x .= '<table><tr><td><br />'.$this->renderText('objectives', false);
-
-
-        $xReq = '';
         for ($i = 0; $i < 4; $i++)
         {
             $ot  = $this->objectiveText[$i];
@@ -406,11 +406,19 @@ class QuestEntry extends DBTypeEntry
             $xReq .= '<br /> - '.Lang::quest('money').Lang::main('colon').Util::formatMoney(abs($_));
 
         if ($xReq)
-            $x .= '<br /><br /><span class="q">'.Lang::quest('requirements').Lang::main('colon').'</span>'.$xReq;
+            $xReq .= '<br /><br /><span class="q">'.Lang::quest('requirements').Lang::main('colon').'</span>'.$xReq;
 
-        $x .= '</td></tr></table>';
 
-        return $x;
+        $tooltip = '';
+        if ($level)
+            $tooltip .= '<table><tr><td><table width="100%"><tr><td><b class="q">'.$title.'</b></td><th><b class="q0">'.$level.'</b></th></tr></table></td></tr></table>';
+        else
+            $tooltip .= '<table><tr><td><b class="q">'.$title.'</b></td></tr></table>';
+
+        if ($text || $xReq)
+            $tooltip .= '<table><tr><td>'.$text.$xReq.'</td></tr></table>';
+
+        return $tooltip;
     }
 
     public function renderText(string $property = 'objectives', bool $jsEscaped = true) : string
