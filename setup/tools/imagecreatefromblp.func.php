@@ -138,16 +138,17 @@ namespace Aowow;
         $t = unpack("V256", $palette);
         $i = unpack("C*", $data);
 
-        for ($y = 0; $y < $height; $y++)
+        // palette has at most 256 distinct colors: allocate each once instead of once per pixel
+        $cache = [];
+        for ($p = 1; $p <= 256; $p++)
         {
-            for ($x = 0; $x < $width; $x++)
-            {
-                $c = $t[$i[$x + $y * $width+ 1 ] + 1];
-                $c = imagecolorallocatealpha($img, ($c >> 16) & 255, ($c >> 8) & 255, $c & 255, (($c >> 24) & 255) >> 1);
-                imagesetpixel($img, $x, $y, $c);
-                imagecolordeallocate($img, $c);
-            }
+            $c = $t[$p];
+            $cache[$p - 1] = imagecolorallocatealpha($img, ($c >> 16) & 255, ($c >> 8) & 255, $c & 255, (($c >> 24) & 255) >> 1);
         }
+
+        for ($y = 0; $y < $height; $y++)
+            for ($x = 0; $x < $width; $x++)
+                imagesetpixel($img, $x, $y, $cache[$i[$x + $y * $width + 1]]);
 
         return $img;
     }
@@ -277,15 +278,20 @@ namespace Aowow;
 
                 if ($alphaBits > 1)
                 {
+                    // per-pixel alpha means the color/alpha pair can still repeat across the 16 pixels of this
+                    // block: cache allocations by (paletteIdx, alphaIdx) instead of re-allocating every pixel
+                    $c = [];
                     $i = unpack("V", substr($data, $offset + 4, 4))[1];
 
                     for ($y = 0; $y < 4; $y++)
                     {
                         for ($x = 0; $x < 4; $x++, $i >>= 2)
                         {
-                            $color = imagecolorallocatealpha($img, $t[$i & 3]['r'], $t[$i & 3]['g'], $t[$i & 3]['b'], (255 - $alpha[$x + $y * 4]) / 2);
+                            $pIdx = $i & 3;
+                            $aVal = $alpha[$x + $y * 4];
+
+                            $color = $c[$pIdx][$aVal] ??= imagecolorallocatealpha($img, $t[$pIdx]['r'], $t[$pIdx]['g'], $t[$pIdx]['b'], (255 - $aVal) / 2);
                             imagesetpixel($img, $offx + $x, $offy + $y, $color);
-                            imagecolordeallocate($img, $color);
                         }
                     }
                 }
@@ -299,9 +305,6 @@ namespace Aowow;
                     for ($y = 0; $y < 4; $y++)
                         for ($x = 0; $x < 4; $x++, $i >>= 2)
                             imagesetpixel($img, $offx + $x, $offy + $y, $c[$i & 3]);
-
-                    for ($i = 0; $i < 4; $i++)
-                        imagecolordeallocate($img, $c[$i]);
                 }
 
                 $offset += 8;
@@ -320,14 +323,16 @@ namespace Aowow;
 
         $i = unpack("V*", $data);
 
+        // terrain/water textures tend to reuse a small set of colors: cache allocations instead of
+        // re-allocating (and immediately discarding) one per pixel
+        $cache = [];
         for ($y = 0; $y < $height; $y++)
         {
             for ($x = 0; $x < $width; $x++)
             {
-                $c = $i[$x + $y * $width + 1];
-                $c = imagecolorallocate($img, ($c >> 16) & 255, ($c >> 8) & 255, $c & 255);
-                imagesetpixel($img, $x, $y, $c);
-                imagecolordeallocate($img, $c);
+                $c = $i[$x + $y * $width + 1] & 0xFFFFFF;
+                $color = $cache[$c] ??= imagecolorallocate($img, ($c >> 16) & 255, ($c >> 8) & 255, $c & 255);
+                imagesetpixel($img, $x, $y, $color);
             }
         }
 
