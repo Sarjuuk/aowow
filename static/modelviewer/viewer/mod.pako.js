@@ -1,696 +1,1084 @@
-export function pako() {
-    function nn(t) {
-        let e = t.length;
-        for (; --e >= 0; ) t[e] = 0;
-    }
-    const an = 256,
-        on = 286,
-        hn = 30,
-        ln = 15,
-        un = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 0]),
-        cn = new Uint8Array([
-            0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13,
-        ]),
-        dn = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 7]),
-        fn = new Uint8Array([16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15]),
-        gn = new Array(576);
-    nn(gn);
-    const _n = new Array(60);
-    nn(_n);
-    const bn = new Array(512);
-    nn(bn);
-    const mn = new Array(256);
-    nn(mn);
-    const pn = new Array(29);
-    nn(pn);
-    const xn = new Array(hn);
-    function vn(t, e, i, s, r) {
-        (this.static_tree = t),
-            (this.extra_bits = e),
-            (this.extra_base = i),
-            (this.elems = s),
-            (this.max_length = r),
-            (this.has_stree = t && t.length);
-    }
-    let Tn, wn, yn;
-    function An(t, e) {
-        (this.dyn_tree = t), (this.max_code = 0), (this.stat_desc = e);
-    }
-    nn(xn);
-    const En = (t) => (t < 256 ? bn[t] : bn[256 + (t >>> 7)]),
-        Cn = (t, e) => {
-            (t.pending_buf[t.pending++] = 255 & e), (t.pending_buf[t.pending++] = (e >>> 8) & 255);
-        },
-        Mn = (t, e, i) => {
-            t.bi_valid > 16 - i
-                ? ((t.bi_buf |= (e << t.bi_valid) & 65535),
-                  Cn(t, t.bi_buf),
-                  (t.bi_buf = e >> (16 - t.bi_valid)),
-                  (t.bi_valid += i - 16))
-                : ((t.bi_buf |= (e << t.bi_valid) & 65535), (t.bi_valid += i));
-        },
-        kn = (t, e, i) => {
-            Mn(t, i[2 * e], i[2 * e + 1]);
-        },
-        Sn = (t, e) => {
-            let i = 0;
-            do {
-                (i |= 1 & t), (t >>>= 1), (i <<= 1);
-            } while (--e > 0);
-            return i >>> 1;
-        },
-        Fn = (t, e, i) => {
-            const s = new Array(16);
-            let r,
-                n,
-                a = 0;
-            for (r = 1; r <= ln; r++) (a = (a + i[r - 1]) << 1), (s[r] = a);
-            for (n = 0; n <= e; n++) {
-                let e = t[2 * n + 1];
-                0 !== e && (t[2 * n] = Sn(s[e]++, e));
-            }
-        },
-        In = (t) => {
-            let e;
-            for (e = 0; e < on; e++) t.dyn_ltree[2 * e] = 0;
-            for (e = 0; e < hn; e++) t.dyn_dtree[2 * e] = 0;
-            for (e = 0; e < 19; e++) t.bl_tree[2 * e] = 0;
-            (t.dyn_ltree[512] = 1), (t.opt_len = t.static_len = 0), (t.sym_next = t.matches = 0);
-        },
-        Dn = (t) => {
-            t.bi_valid > 8 ? Cn(t, t.bi_buf) : t.bi_valid > 0 && (t.pending_buf[t.pending++] = t.bi_buf),
-                (t.bi_buf = 0),
-                (t.bi_valid = 0);
-        },
-        Rn = (t, e, i, s) => {
-            const r = 2 * e,
-                n = 2 * i;
-            return t[r] < t[n] || (t[r] === t[n] && s[e] <= s[i]);
-        },
-        Un = (t, e, i) => {
-            const s = t.heap[i];
-            let r = i << 1;
-            for (
-                ;
-                r <= t.heap_len &&
-                (r < t.heap_len && Rn(e, t.heap[r + 1], t.heap[r], t.depth) && r++, !Rn(e, s, t.heap[r], t.depth));
+/*
+ * PAKO 2.1.0 https://github.com/nodeca/pako @license (MIT AND Zlib)
+ * https://app.unpkg.com/pako@2.1.0/files/dist/pako.js
+ */
+export function pako()
+{
+  function zero$1(buf) { let len = buf.length; while (--len >= 0) { buf[len] = 0; } }
 
-            )
-                (t.heap[i] = t.heap[r]), (i = r), (r <<= 1);
-            t.heap[i] = s;
-        },
-        Bn = (t, e, i) => {
-            let s,
-                r,
-                n,
-                a,
-                o = 0;
-            if (0 !== t.sym_next)
-                do {
-                    (s = 255 & t.pending_buf[t.sym_buf + o++]),
-                        (s += (255 & t.pending_buf[t.sym_buf + o++]) << 8),
-                        (r = t.pending_buf[t.sym_buf + o++]),
-                        0 === s
-                            ? kn(t, r, e)
-                            : ((n = mn[r]),
-                              kn(t, n + an + 1, e),
-                              (a = un[n]),
-                              0 !== a && ((r -= pn[n]), Mn(t, r, a)),
-                              s--,
-                              (n = En(s)),
-                              kn(t, n, i),
-                              (a = cn[n]),
-                              0 !== a && ((s -= xn[n]), Mn(t, s, a)));
-                } while (o < t.sym_next);
-            kn(t, 256, e);
-        },
-        On = (t, e) => {
-            const i = e.dyn_tree,
-                s = e.stat_desc.static_tree,
-                r = e.stat_desc.has_stree,
-                n = e.stat_desc.elems;
-            let a,
-                o,
-                h,
-                l = -1;
-            for (t.heap_len = 0, t.heap_max = 573, a = 0; a < n; a++)
-                0 !== i[2 * a] ? ((t.heap[++t.heap_len] = l = a), (t.depth[a] = 0)) : (i[2 * a + 1] = 0);
-            for (; t.heap_len < 2; )
-                (h = t.heap[++t.heap_len] = l < 2 ? ++l : 0),
-                    (i[2 * h] = 1),
-                    (t.depth[h] = 0),
-                    t.opt_len--,
-                    r && (t.static_len -= s[2 * h + 1]);
-            for (e.max_code = l, a = t.heap_len >> 1; a >= 1; a--) Un(t, i, a);
-            h = n;
-            do {
-                (a = t.heap[1]),
-                    (t.heap[1] = t.heap[t.heap_len--]),
-                    Un(t, i, 1),
-                    (o = t.heap[1]),
-                    (t.heap[--t.heap_max] = a),
-                    (t.heap[--t.heap_max] = o),
-                    (i[2 * h] = i[2 * a] + i[2 * o]),
-                    (t.depth[h] = (t.depth[a] >= t.depth[o] ? t.depth[a] : t.depth[o]) + 1),
-                    (i[2 * a + 1] = i[2 * o + 1] = h),
-                    (t.heap[1] = h++),
-                    Un(t, i, 1);
-            } while (t.heap_len >= 2);
-            (t.heap[--t.heap_max] = t.heap[1]),
-                ((t, e) => {
-                    const i = e.dyn_tree,
-                        s = e.max_code,
-                        r = e.stat_desc.static_tree,
-                        n = e.stat_desc.has_stree,
-                        a = e.stat_desc.extra_bits,
-                        o = e.stat_desc.extra_base,
-                        h = e.stat_desc.max_length;
-                    let l,
-                        u,
-                        c,
-                        d,
-                        f,
-                        g,
-                        _ = 0;
-                    for (d = 0; d <= ln; d++) t.bl_count[d] = 0;
-                    for (i[2 * t.heap[t.heap_max] + 1] = 0, l = t.heap_max + 1; l < 573; l++)
-                        (u = t.heap[l]),
-                            (d = i[2 * i[2 * u + 1] + 1] + 1),
-                            d > h && ((d = h), _++),
-                            (i[2 * u + 1] = d),
-                            u > s ||
-                                (t.bl_count[d]++,
-                                (f = 0),
-                                u >= o && (f = a[u - o]),
-                                (g = i[2 * u]),
-                                (t.opt_len += g * (d + f)),
-                                n && (t.static_len += g * (r[2 * u + 1] + f)));
-                    if (0 !== _) {
-                        do {
-                            for (d = h - 1; 0 === t.bl_count[d]; ) d--;
-                            t.bl_count[d]--, (t.bl_count[d + 1] += 2), t.bl_count[h]--, (_ -= 2);
-                        } while (_ > 0);
-                        for (d = h; 0 !== d; d--)
-                            for (u = t.bl_count[d]; 0 !== u; )
-                                (c = t.heap[--l]),
-                                    c > s ||
-                                        (i[2 * c + 1] !== d &&
-                                            ((t.opt_len += (d - i[2 * c + 1]) * i[2 * c]), (i[2 * c + 1] = d)),
-                                        u--);
-                    }
-                })(t, e),
-                Fn(i, l, t.bl_count);
-        },
-        Pn = (t, e, i) => {
-            let s,
-                r,
-                n = -1,
-                a = e[1],
-                o = 0,
-                h = 7,
-                l = 4;
-            for (0 === a && ((h = 138), (l = 3)), e[2 * (i + 1) + 1] = 65535, s = 0; s <= i; s++)
-                (r = a),
-                    (a = e[2 * (s + 1) + 1]),
-                    (++o < h && r === a) ||
-                        (o < l
-                            ? (t.bl_tree[2 * r] += o)
-                            : 0 !== r
-                              ? (r !== n && t.bl_tree[2 * r]++, t.bl_tree[32]++)
-                              : o <= 10
-                                ? t.bl_tree[34]++
-                                : t.bl_tree[36]++,
-                        (o = 0),
-                        (n = r),
-                        0 === a ? ((h = 138), (l = 3)) : r === a ? ((h = 6), (l = 3)) : ((h = 7), (l = 4)));
-        },
-        zn = (t, e, i) => {
-            let s,
-                r,
-                n = -1,
-                a = e[1],
-                o = 0,
-                h = 7,
-                l = 4;
-            for (0 === a && ((h = 138), (l = 3)), s = 0; s <= i; s++)
-                if (((r = a), (a = e[2 * (s + 1) + 1]), !(++o < h && r === a))) {
-                    if (o < l)
-                        do {
-                            kn(t, r, t.bl_tree);
-                        } while (0 !== --o);
-                    else
-                        0 !== r
-                            ? (r !== n && (kn(t, r, t.bl_tree), o--), kn(t, 16, t.bl_tree), Mn(t, o - 3, 2))
-                            : o <= 10
-                              ? (kn(t, 17, t.bl_tree), Mn(t, o - 3, 3))
-                              : (kn(t, 18, t.bl_tree), Mn(t, o - 11, 7));
-                    (o = 0),
-                        (n = r),
-                        0 === a ? ((h = 138), (l = 3)) : r === a ? ((h = 6), (l = 3)) : ((h = 7), (l = 4));
-                }
-        };
-    let Hn = false;
-    const Nn = (t, e, i, s) => {
-        Mn(t, 0 + (s ? 1 : 0), 3),
-            Dn(t),
-            Cn(t, i),
-            Cn(t, ~i),
-            i && t.pending_buf.set(t.window.subarray(e, e + i), t.pending),
-            (t.pending += i);
+  const LITERALS$1 = 256,
+        L_CODES$1  = 286,
+        D_CODES$1  = 30,
+        MAX_BITS$1 = 15,
+        extra_lbits  = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 0]),
+        extra_dbits  = new Uint8Array([0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13]),
+        extra_blbits = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 7]),
+        bl_order     = new Uint8Array([16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15]);
+
+    const static_ltree = new Array(576);
+    zero$1(static_ltree);
+
+    const static_dtree = new Array(60);
+    zero$1(static_dtree);
+
+    const _dist_code = new Array(512);
+    zero$1(_dist_code);
+
+    const _length_code = new Array(256);
+    zero$1(_length_code);
+
+    const base_length = new Array(29);
+    zero$1(base_length);
+
+    const base_dist = new Array(D_CODES$1);
+    zero$1(base_dist);
+
+
+    function StaticTreeDesc(static_tree, extra_bits, extra_base, elems, max_length) {
+
+        this.static_tree  = static_tree;
+        this.extra_bits   = extra_bits;
+        this.extra_base   = extra_base;
+        this.elems        = elems;
+        this.max_length   = max_length;
+        this.has_stree    = static_tree && static_tree.length;
+    }
+
+    let static_l_desc, static_d_desc, static_bl_desc;
+
+    function TreeDesc(dyn_tree, stat_desc) {
+        this.dyn_tree = dyn_tree;
+        this.max_code = 0;
+        this.stat_desc = stat_desc;
+    }
+
+    const d_code = (dist) => {
+        return dist < 256 ? _dist_code[dist] : _dist_code[256 + (dist >>> 7)];
     };
-    var Gn = (t) => {
-            Hn ||
-                ((() => {
-                    let t, e, i, s, r;
-                    const n = new Array(16);
-                    for (i = 0, s = 0; s < 28; s++) for (pn[s] = i, t = 0; t < 1 << un[s]; t++) mn[i++] = s;
-                    for (mn[i - 1] = s, r = 0, s = 0; s < 16; s++)
-                        for (xn[s] = r, t = 0; t < 1 << cn[s]; t++) bn[r++] = s;
-                    for (r >>= 7; s < hn; s++) for (xn[s] = r << 7, t = 0; t < 1 << (cn[s] - 7); t++) bn[256 + r++] = s;
-                    for (e = 0; e <= ln; e++) n[e] = 0;
-                    for (t = 0; t <= 143; ) (gn[2 * t + 1] = 8), t++, n[8]++;
-                    for (; t <= 255; ) (gn[2 * t + 1] = 9), t++, n[9]++;
-                    for (; t <= 279; ) (gn[2 * t + 1] = 7), t++, n[7]++;
-                    for (; t <= 287; ) (gn[2 * t + 1] = 8), t++, n[8]++;
-                    for (Fn(gn, 287, n), t = 0; t < hn; t++) (_n[2 * t + 1] = 5), (_n[2 * t] = Sn(t, 5));
-                    (Tn = new vn(gn, un, 257, on, ln)),
-                        (wn = new vn(_n, cn, 0, hn, ln)),
-                        (yn = new vn(new Array(0), dn, 0, 19, 7));
-                })(),
-                (Hn = true)),
-                (t.l_desc = new An(t.dyn_ltree, Tn)),
-                (t.d_desc = new An(t.dyn_dtree, wn)),
-                (t.bl_desc = new An(t.bl_tree, yn)),
-                (t.bi_buf = 0),
-                (t.bi_valid = 0),
-                In(t);
-        },
-        Ln = (t, e, i, s) => {
-            let r,
-                n,
-                a = 0;
-            t.level > 0
-                ? (2 === t.strm.data_type &&
-                      (t.strm.data_type = ((t) => {
-                          let e,
-                              i = 4093624447;
-                          for (e = 0; e <= 31; e++, i >>>= 1) if (1 & i && 0 !== t.dyn_ltree[2 * e]) return 0;
-                          if (0 !== t.dyn_ltree[18] || 0 !== t.dyn_ltree[20] || 0 !== t.dyn_ltree[26]) return 1;
-                          for (e = 32; e < an; e++) if (0 !== t.dyn_ltree[2 * e]) return 1;
-                          return 0;
-                      })(t)),
-                  On(t, t.l_desc),
-                  On(t, t.d_desc),
-                  (a = ((t) => {
-                      let e;
-                      for (
-                          Pn(t, t.dyn_ltree, t.l_desc.max_code),
-                              Pn(t, t.dyn_dtree, t.d_desc.max_code),
-                              On(t, t.bl_desc),
-                              e = 18;
-                          e >= 3 && 0 === t.bl_tree[2 * fn[e] + 1];
-                          e--
-                      );
-                      return (t.opt_len += 3 * (e + 1) + 5 + 5 + 4), e;
-                  })(t)),
-                  (r = (t.opt_len + 3 + 7) >>> 3),
-                  (n = (t.static_len + 3 + 7) >>> 3),
-                  n <= r && (r = n))
-                : (r = n = i + 5),
-                i + 4 <= r && -1 !== e
-                    ? Nn(t, e, i, s)
-                    : 4 === t.strategy || n === r
-                      ? (Mn(t, 2 + (s ? 1 : 0), 3), Bn(t, gn, _n))
-                      : (Mn(t, 4 + (s ? 1 : 0), 3),
-                        ((t, e, i, s) => {
-                            let r;
-                            for (Mn(t, e - 257, 5), Mn(t, i - 1, 5), Mn(t, s - 4, 4), r = 0; r < s; r++)
-                                Mn(t, t.bl_tree[2 * fn[r] + 1], 3);
-                            zn(t, t.dyn_ltree, e - 1), zn(t, t.dyn_dtree, i - 1);
-                        })(t, t.l_desc.max_code + 1, t.d_desc.max_code + 1, a + 1),
-                        Bn(t, t.dyn_ltree, t.dyn_dtree)),
-                In(t),
-                s && Dn(t);
-        },
-        jn = (t, e, i) => (
-            (t.pending_buf[t.sym_buf + t.sym_next++] = e),
-            (t.pending_buf[t.sym_buf + t.sym_next++] = e >> 8),
-            (t.pending_buf[t.sym_buf + t.sym_next++] = i),
-            0 === e
-                ? t.dyn_ltree[2 * i]++
-                : (t.matches++, e--, t.dyn_ltree[2 * (mn[i] + an + 1)]++, t.dyn_dtree[2 * En(e)]++),
-            t.sym_next === t.sym_end
-        ),
-        qn = {
-            _tr_init: Gn,
-            _tr_stored_block: Nn,
-            _tr_flush_block: Ln,
-            _tr_tally: jn,
-            _tr_align: (t) => {
-                Mn(t, 2, 3),
-                    kn(t, 256, gn),
-                    ((t) => {
-                        16 === t.bi_valid
-                            ? (Cn(t, t.bi_buf), (t.bi_buf = 0), (t.bi_valid = 0))
-                            : t.bi_valid >= 8 &&
-                              ((t.pending_buf[t.pending++] = 255 & t.bi_buf), (t.bi_buf >>= 8), (t.bi_valid -= 8));
-                    })(t);
-            },
-        };
-    var Vn = (t, e, i, s) => {
-        let r = 65535 & t,
-            n = (t >>> 16) & 65535,
-            a = 0;
-        for (; 0 !== i; ) {
-            (a = i > 2e3 ? 2e3 : i), (i -= a);
-            do {
-                (r = (r + e[s++]) | 0), (n = (n + r) | 0);
-            } while (--a);
-            (r %= 65521), (n %= 65521);
+
+    const put_short = (s, w) => {
+        s.pending_buf[s.pending++] = (w) & 0xff;
+        s.pending_buf[s.pending++] = (w >>> 8) & 0xff;
+    };
+
+    const send_bits = (s, value, length) => {
+        if (s.bi_valid > (Buf_size - length)) {
+            s.bi_buf |= (value << s.bi_valid) & 0xffff;
+            put_short(s, s.bi_buf);
+            s.bi_buf = value >> (Buf_size - s.bi_valid);
+            s.bi_valid += length - Buf_size;
+        } else {
+            s.bi_buf |= (value << s.bi_valid) & 0xffff;
+            s.bi_valid += length;
         }
-        return r | (n << 16);
     };
-    const Wn = new Uint32Array(
-        (() => {
-            let t,
-                e = [];
-            for (var i = 0; i < 256; i++) {
-                t = i;
-                for (var s = 0; s < 8; s++) t = 1 & t ? 3988292384 ^ (t >>> 1) : t >>> 1;
-                e[i] = t;
+
+    const send_code = (s, c, tree) => {
+        send_bits(s, tree[c * 2], tree[c * 2 + 1]);
+    };
+
+    const bi_reverse = (code, len) => {
+        let res = 0;
+        do {
+            res |= code & 1;
+            code >>>= 1;
+            res <<= 1;
+        } while (--len > 0);
+        return res >>> 1;
+    };
+
+    const bi_flush = (s) => {
+        if (s.bi_valid === 16) {
+            put_short(s, s.bi_buf);
+            s.bi_buf = 0;
+            s.bi_valid = 0;
+        } else if (s.bi_valid >= 8) {
+            s.pending_buf[s.pending++] = s.bi_buf & 0xff;
+            s.bi_buf >>= 8;
+            s.bi_valid -= 8;
+        }
+    };
+
+    const gen_codes = (tree, max_code, bl_count) => {
+        const next_code = new Array(MAX_BITS$1 + 1);
+        let code = 0;
+        let bits;
+        let n;
+
+        for (bits = 1; bits <= MAX_BITS$1; bits++) {
+            code = (code + bl_count[bits - 1]) << 1;
+            next_code[bits] = code;
+        }
+
+        for (n = 0;  n <= max_code; n++) {
+            let len = tree[n * 2 + 1];
+            if (len === 0) { continue; }
+
+            tree[n * 2] = bi_reverse(next_code[len]++, len);
+        }
+    };
+
+    const init_block = (t) => {
+        let e;
+        for (e = 0; e < L_CODES$1; e++) t.dyn_ltree[2 * e] = 0;
+        for (e = 0; e < D_CODES$1; e++) t.dyn_dtree[2 * e] = 0;
+        for (e = 0; e < 19; e++) t.bl_tree[2 * e] = 0;
+        (t.dyn_ltree[512] = 1), (t.opt_len = t.static_len = 0), (t.sym_next = t.matches = 0);
+    };
+
+    const bi_windup = (s) =>
+    {
+        if (s.bi_valid > 8) {
+            put_short(s, s.bi_buf);
+        } else if (s.bi_valid > 0) {
+            s.pending_buf[s.pending++] = s.bi_buf;
+        }
+        s.bi_buf = 0;
+        s.bi_valid = 0;
+    };
+
+    const smaller = (tree, n, m, depth) => {
+        const _n2 = n * 2;
+        const _m2 = m * 2;
+        return (tree[_n2] < tree[_m2] ||
+            (tree[_n2] === tree[_m2] && depth[n] <= depth[m]));
+    };
+
+    const pqdownheap = (s, tree, k) => {
+        const v = s.heap[k];
+        let j = k << 1;
+        while (j <= s.heap_len) {
+            if (j < s.heap_len &&
+                smaller(tree, s.heap[j + 1], s.heap[j], s.depth)) {
+                j++;
             }
-            return e;
-        })()
-    );
-    var Xn = (t, e, i, s) => {
-            const r = Wn,
-                n = s + i;
-            t ^= -1;
-            for (let i = s; i < n; i++) t = (t >>> 8) ^ r[255 & (t ^ e[i])];
-            return -1 ^ t;
-        },
-        Yn = {
-            2: "need dictionary",
-            1: "stream end",
-            0: "",
-            "-1": "file error",
-            "-2": "stream error",
-            "-3": "data error",
-            "-4": "insufficient memory",
-            "-5": "buffer error",
-            "-6": "incompatible version",
-        },
-        Zn = {
-            Z_NO_FLUSH: 0,
-            Z_PARTIAL_FLUSH: 1,
-            Z_SYNC_FLUSH: 2,
-            Z_FULL_FLUSH: 3,
-            Z_FINISH: 4,
-            Z_BLOCK: 5,
-            Z_TREES: 6,
-            Z_OK: 0,
-            Z_STREAM_END: 1,
-            Z_NEED_DICT: 2,
-            Z_ERRNO: -1,
-            Z_STREAM_ERROR: -2,
-            Z_DATA_ERROR: -3,
-            Z_MEM_ERROR: -4,
-            Z_BUF_ERROR: -5,
-            Z_NO_COMPRESSION: 0,
-            Z_BEST_SPEED: 1,
-            Z_BEST_COMPRESSION: 9,
-            Z_DEFAULT_COMPRESSION: -1,
-            Z_FILTERED: 1,
-            Z_HUFFMAN_ONLY: 2,
-            Z_RLE: 3,
-            Z_FIXED: 4,
-            Z_DEFAULT_STRATEGY: 0,
-            Z_BINARY: 0,
-            Z_TEXT: 1,
-            Z_UNKNOWN: 2,
-            Z_DEFLATED: 8,
-        };
-    const { _tr_init: Kn, _tr_stored_block: $n, _tr_flush_block: Jn, _tr_tally: Qn, _tr_align: ta } = qn,
-        {
-            Z_NO_FLUSH: ea,
-            Z_PARTIAL_FLUSH: ia,
-            Z_FULL_FLUSH: sa,
-            Z_FINISH: ra,
-            Z_BLOCK: na,
-            Z_OK: aa,
-            Z_STREAM_END: oa,
-            Z_STREAM_ERROR: ha,
-            Z_DATA_ERROR: la,
-            Z_BUF_ERROR: ua,
-            Z_DEFAULT_COMPRESSION: ca,
-            Z_FILTERED: da,
-            Z_HUFFMAN_ONLY: fa,
-            Z_RLE: ga,
-            Z_FIXED: _a,
-            Z_DEFAULT_STRATEGY: ba,
-            Z_UNKNOWN: ma,
-            Z_DEFLATED: pa,
-        } = Zn,
-        xa = 258,
-        va = 262,
-        Ta = 42,
-        wa = 113,
-        ya = 666,
-        Aa = (t, e) => ((t.msg = Yn[e]), e),
-        Ea = (t) => 2 * t - (t > 4 ? 9 : 0),
-        Ca = (t) => {
-            let e = t.length;
-            for (; --e >= 0; ) t[e] = 0;
-        },
-        Ma = (t) => {
-            let e,
-                i,
-                s,
-                r = t.w_size;
-            (e = t.hash_size), (s = e);
+
+            if (smaller(tree, v, s.heap[j], s.depth)) { break; }
+
+            s.heap[k] = s.heap[j];
+            k = j;
+
+            j <<= 1;
+        }
+        s.heap[k] = v;
+    };
+
+    const compress_block = (s, ltree, dtree) => {
+        let dist;
+        let lc;
+        let sx = 0;
+        let code;
+        let extra;
+
+        if (s.sym_next !== 0) {
             do {
-                (i = t.head[--s]), (t.head[s] = i >= r ? i - r : 0);
-            } while (--e);
-            (e = r), (s = e);
-            do {
-                (i = t.prev[--s]), (t.prev[s] = i >= r ? i - r : 0);
-            } while (--e);
-        };
-    let ka = (t, e, i) => ((e << t.hash_shift) ^ i) & t.hash_mask;
-    const Sa = (t) => {
-            const e = t.state;
-            let i = e.pending;
-            i > t.avail_out && (i = t.avail_out),
-                0 !== i &&
-                    (t.output.set(e.pending_buf.subarray(e.pending_out, e.pending_out + i), t.next_out),
-                    (t.next_out += i),
-                    (e.pending_out += i),
-                    (t.total_out += i),
-                    (t.avail_out -= i),
-                    (e.pending -= i),
-                    0 === e.pending && (e.pending_out = 0));
-        },
-        Fa = (t, e) => {
-            Jn(t, t.block_start >= 0 ? t.block_start : -1, t.strstart - t.block_start, e),
-                (t.block_start = t.strstart),
-                Sa(t.strm);
-        },
-        Ia = (t, e) => {
-            t.pending_buf[t.pending++] = e;
-        },
-        Da = (t, e) => {
-            (t.pending_buf[t.pending++] = (e >>> 8) & 255), (t.pending_buf[t.pending++] = 255 & e);
-        },
-        Ra = (t, e, i, s) => {
-            let r = t.avail_in;
-            return (
-                r > s && (r = s),
-                0 === r
-                    ? 0
-                    : ((t.avail_in -= r),
-                      e.set(t.input.subarray(t.next_in, t.next_in + r), i),
-                      1 === t.state.wrap
-                          ? (t.adler = Vn(t.adler, e, r, i))
-                          : 2 === t.state.wrap && (t.adler = Xn(t.adler, e, r, i)),
-                      (t.next_in += r),
-                      (t.total_in += r),
-                      r)
-            );
-        },
-        Ua = (t, e) => {
-            let i,
-                s,
-                r = t.max_chain_length,
-                n = t.strstart,
-                a = t.prev_length,
-                o = t.nice_match;
-            const h = t.strstart > t.w_size - va ? t.strstart - (t.w_size - va) : 0,
-                l = t.window,
-                u = t.w_mask,
-                c = t.prev,
-                d = t.strstart + xa;
-            let f = l[n + a - 1],
-                g = l[n + a];
-            t.prev_length >= t.good_match && (r >>= 2), o > t.lookahead && (o = t.lookahead);
-            do {
-                if (((i = e), l[i + a] === g && l[i + a - 1] === f && l[i] === l[n] && l[++i] === l[n + 1])) {
-                    (n += 2), i++;
-                    do {} while (
-                        l[++n] === l[++i] &&
-                        l[++n] === l[++i] &&
-                        l[++n] === l[++i] &&
-                        l[++n] === l[++i] &&
-                        l[++n] === l[++i] &&
-                        l[++n] === l[++i] &&
-                        l[++n] === l[++i] &&
-                        l[++n] === l[++i] &&
-                        n < d
-                    );
-                    if (((s = xa - (d - n)), (n = d - xa), s > a)) {
-                        if (((t.match_start = e), (a = s), s >= o)) break;
-                        (f = l[n + a - 1]), (g = l[n + a]);
+                dist = s.pending_buf[s.sym_buf + sx++] & 0xff;
+                dist += (s.pending_buf[s.sym_buf + sx++] & 0xff) << 8;
+                lc = s.pending_buf[s.sym_buf + sx++];
+                if (dist === 0) {
+                    send_code(s, lc, ltree);
+                } else {
+                    code = _length_code[lc];
+                    send_code(s, code + LITERALS$1 + 1, ltree);
+                    extra = extra_lbits[code];
+                    if (extra !== 0) {
+                        lc -= base_length[code];
+                        send_bits(s, lc, extra);
+                    }
+                    dist--;
+                    code = d_code(dist);
+
+                    send_code(s, code, dtree);
+                    extra = extra_dbits[code];
+                    if (extra !== 0) {
+                        dist -= base_dist[code];
+                        send_bits(s, dist, extra);
                     }
                 }
-            } while ((e = c[e & u]) > h && 0 !== --r);
-            return a <= t.lookahead ? a : t.lookahead;
-        },
-        Ba = (t) => {
-            const e = t.w_size;
-            let i, s, r;
-            do {
-                if (
-                    ((s = t.window_size - t.lookahead - t.strstart),
-                    t.strstart >= e + (e - va) &&
-                        (t.window.set(t.window.subarray(e, e + e - s), 0),
-                        (t.match_start -= e),
-                        (t.strstart -= e),
-                        (t.block_start -= e),
-                        t.insert > t.strstart && (t.insert = t.strstart),
-                        Ma(t),
-                        (s += e)),
-                    0 === t.strm.avail_in)
-                )
-                    break;
-                if (
-                    ((i = Ra(t.strm, t.window, t.strstart + t.lookahead, s)),
-                    (t.lookahead += i),
-                    t.lookahead + t.insert >= 3)
-                )
-                    for (
-                        r = t.strstart - t.insert, t.ins_h = t.window[r], t.ins_h = ka(t, t.ins_h, t.window[r + 1]);
-                        t.insert &&
-                        ((t.ins_h = ka(t, t.ins_h, t.window[r + 3 - 1])),
-                        (t.prev[r & t.w_mask] = t.head[t.ins_h]),
-                        (t.head[t.ins_h] = r),
-                        r++,
-                        t.insert--,
-                        !(t.lookahead + t.insert < 3));
 
-                    );
-            } while (t.lookahead < va && 0 !== t.strm.avail_in);
-        },
-        Oa = (t, e) => {
-            let i,
-                s,
-                r,
-                n = t.pending_buf_size - 5 > t.w_size ? t.w_size : t.pending_buf_size - 5,
-                a = 0,
-                o = t.strm.avail_in;
+            } while (sx < s.sym_next);
+        }
+
+        send_code(s, END_BLOCK, ltree);
+    };
+
+    const build_tree = (s, desc) => {
+        const tree     = desc.dyn_tree;
+        const stree    = desc.stat_desc.static_tree;
+        const has_stree = desc.stat_desc.has_stree;
+        const elems    = desc.stat_desc.elems;
+        let n, m;
+        let max_code = -1;
+        let node;
+
+        s.heap_len = 0;
+        s.heap_max = HEAP_SIZE$1;
+
+        for (n = 0; n < elems; n++) {
+            if (tree[n * 2] !== 0) {
+                s.heap[++s.heap_len] = max_code = n;
+                s.depth[n] = 0;
+
+            } else {
+                tree[n * 2 + 1] = 0;
+            }
+        }
+
+        while (s.heap_len < 2) {
+            node = s.heap[++s.heap_len] = (max_code < 2 ? ++max_code : 0);
+            tree[node * 2] = 1;
+            s.depth[node] = 0;
+            s.opt_len--;
+
+            if (has_stree) {
+                s.static_len -= stree[node * 2 + 1];
+            }
+        }
+        desc.max_code = max_code;
+
+        for (n = (s.heap_len >> 1); n >= 1; n--) { pqdownheap(s, tree, n); }
+
+        node = elems;
+        do {
+            n = s.heap[1];
+            s.heap[1] = s.heap[s.heap_len--];
+            pqdownheap(s, tree, 1);
+
+            m = s.heap[1];
+
+            s.heap[--s.heap_max] = n;
+            s.heap[--s.heap_max] = m;
+
+            tree[node * 2] = tree[n * 2] + tree[m * 2];
+            s.depth[node] = (s.depth[n] >= s.depth[m] ? s.depth[n] : s.depth[m]) + 1;
+            tree[n * 2 + 1] = tree[m * 2 + 1] = node;
+
+            s.heap[1] = node++;
+            pqdownheap(s, tree, 1);
+        } while (s.heap_len >= 2);
+
+        s.heap[--s.heap_max] = s.heap[1];
+
+        gen_bitlen(s, desc);
+
+        gen_codes(tree, max_code, s.bl_count);
+    };
+
+    const scan_tree = (s, tree, max_code) => {
+        let n;
+        let prevlen = -1;
+        let curlen;
+
+        let nextlen = tree[0 * 2 + 1];
+
+        let count = 0;
+        let max_count = 7;
+        let min_count = 4;
+
+        if (nextlen === 0) {
+            max_count = 138;
+            min_count = 3;
+        }
+        tree[(max_code + 1) * 2 + 1] = 0xffff;
+
+        for (n = 0; n <= max_code; n++) {
+            curlen = nextlen;
+            nextlen = tree[(n + 1) * 2 + 1];
+
+            if (++count < max_count && curlen === nextlen) {
+                continue;
+
+            } else if (count < min_count) {
+                s.bl_tree[curlen * 2] += count;
+
+            } else if (curlen !== 0) {
+
+                if (curlen !== prevlen) { s.bl_tree[curlen * 2]++; }
+                s.bl_tree[REP_3_6 * 2]++;
+
+            } else if (count <= 10) {
+                s.bl_tree[REPZ_3_10 * 2]++;
+
+            } else {
+                s.bl_tree[REPZ_11_138 * 2]++;
+            }
+
+            count = 0;
+            prevlen = curlen;
+
+            if (nextlen === 0) {
+                max_count = 138;
+                min_count = 3;
+
+            } else if (curlen === nextlen) {
+                max_count = 6;
+                min_count = 3;
+
+            } else {
+                max_count = 7;
+                min_count = 4;
+            }
+        }
+    };
+
+    const send_tree = (s, tree, max_code) => {
+        let n;
+        let prevlen = -1;
+        let curlen;
+
+        let nextlen = tree[0 * 2 + 1];
+
+        let count = 0;
+        let max_count = 7;
+        let min_count = 4;
+
+        if (nextlen === 0) {
+            max_count = 138;
+            min_count = 3;
+        }
+
+        for (n = 0; n <= max_code; n++) {
+            curlen = nextlen;
+            nextlen = tree[(n + 1) * 2 + 1];
+
+            if (++count < max_count && curlen === nextlen) {
+                continue;
+
+            } else if (count < min_count) {
+                do { send_code(s, curlen, s.bl_tree); } while (--count !== 0);
+
+            } else if (curlen !== 0) {
+                if (curlen !== prevlen) {
+                    send_code(s, curlen, s.bl_tree);
+                    count--;
+                }
+
+                send_code(s, REP_3_6, s.bl_tree);
+                send_bits(s, count - 3, 2);
+
+            } else if (count <= 10) {
+                send_code(s, REPZ_3_10, s.bl_tree);
+                send_bits(s, count - 3, 3);
+
+            } else {
+                send_code(s, REPZ_11_138, s.bl_tree);
+                send_bits(s, count - 11, 7);
+            }
+
+            count = 0;
+            prevlen = curlen;
+            if (nextlen === 0) {
+                max_count = 138;
+                min_count = 3;
+
+            } else if (curlen === nextlen) {
+                max_count = 6;
+                min_count = 3;
+
+            } else {
+                max_count = 7;
+                min_count = 4;
+            }
+        }
+    };
+
+    const build_bl_tree = (s) => {
+        let max_blindex;
+
+        scan_tree(s, s.dyn_ltree, s.l_desc.max_code);
+        scan_tree(s, s.dyn_dtree, s.d_desc.max_code);
+
+        build_tree(s, s.bl_desc);
+
+        for (max_blindex = 18; max_blindex >= 3; max_blindex--) {
+            if (s.bl_tree[bl_order[max_blindex] * 2 + 1] !== 0) {
+                break;
+            }
+        }
+
+        s.opt_len += 3 * (max_blindex + 1) + 5 + 5 + 4;
+
+        return max_blindex;
+    };
+
+    const send_all_trees = (s, lcodes, dcodes, blcodes) => {
+        let rank;
+
+        send_bits(s, lcodes  - 257, 5);
+        send_bits(s, dcodes  - 1,   5);
+        send_bits(s, blcodes - 4,   4);
+
+        for (rank = 0; rank < blcodes; rank++)
+            send_bits(s, s.bl_tree[2 * bl_order[rank] + 1], 3);
+
+        send_tree(s, s.dyn_ltree, lcodes - 1);
+        send_tree(s, s.dyn_dtree, dcodes - 1);
+    }
+
+    const detect_data_type = (s) => {
+        let block_mask = 0xf3ffc07f;
+        let n;
+
+        for (n = 0; n <= 31; n++, block_mask >>>= 1) {
+            if ((block_mask & 1) && (s.dyn_ltree[n * 2] !== 0)) {
+                return 0;
+            }
+        }
+
+        if (s.dyn_ltree[9 * 2] !== 0 || s.dyn_ltree[10 * 2] !== 0 ||
+            s.dyn_ltree[13 * 2] !== 0) {
+            return 1;
+        }
+        for (n = 32; n < LITERALS$1; n++) {
+            if (s.dyn_ltree[n * 2] !== 0) {
+                return 1;
+            }
+        }
+
+        return 0;
+    };
+
+    let static_init_done = false;
+
+    const _tr_stored_block$1 = (s, buf, stored_len, last) => {
+        send_bits(s, (STORED_BLOCK << 1) + (last ? 1 : 0), 3);
+        bi_windup(s);
+        put_short(s, stored_len);
+        put_short(s, ~stored_len);
+        if (stored_len) {
+            s.pending_buf.set(s.window.subarray(buf, buf + stored_len), s.pending);
+        }
+        s.pending += stored_len;
+    };
+
+    const tr_static_init = () => {
+        let n;
+        let bits;
+        let length;
+        let code;
+        let dist;
+        const bl_count = new Array(MAX_BITS$1 + 1);
+
+        length = 0;
+        for (code = 0; code < LENGTH_CODES$1 - 1; code++) {
+            base_length[code] = length;
+            for (n = 0; n < (1 << extra_lbits[code]); n++) {
+                _length_code[length++] = code;
+            }
+        }
+
+        _length_code[length - 1] = code;
+
+        dist = 0;
+        for (code = 0; code < 16; code++) {
+            base_dist[code] = dist;
+            for (n = 0; n < (1 << extra_dbits[code]); n++) {
+                _dist_code[dist++] = code;
+            }
+        }
+
+        dist >>= 7;
+        for (; code < D_CODES$1; code++) {
+            base_dist[code] = dist << 7;
+            for (n = 0; n < (1 << (extra_dbits[code] - 7)); n++) {
+                _dist_code[256 + dist++] = code;
+            }
+        }
+
+        for (bits = 0; bits <= MAX_BITS$1; bits++) {
+            bl_count[bits] = 0;
+        }
+
+        n = 0;
+        while (n <= 143) {
+            static_ltree[n * 2 + 1] = 8;
+            n++;
+            bl_count[8]++;
+        }
+        while (n <= 255) {
+            static_ltree[n * 2 + 1] = 9;
+            n++;
+            bl_count[9]++;
+        }
+        while (n <= 279) {
+            static_ltree[n * 2 + 1] = 7;
+            n++;
+            bl_count[7]++;
+        }
+        while (n <= 287) {
+            static_ltree[n * 2 + 1] = 8;
+            n++;
+            bl_count[8]++;
+        }
+
+        gen_codes(static_ltree, L_CODES$1 + 1, bl_count);
+
+        for (n = 0; n < D_CODES$1; n++) {
+            static_dtree[n * 2 + 1] = 5;
+            static_dtree[n * 2] = bi_reverse(n, 5);
+        }
+
+        static_l_desc  = new StaticTreeDesc(static_ltree, extra_lbits,  LITERALS$1 + 1, L_CODES$1,  MAX_BITS$1);
+        static_d_desc  = new StaticTreeDesc(static_dtree, extra_dbits,  0,              D_CODES$1,  MAX_BITS$1);
+        static_bl_desc = new StaticTreeDesc(new Array(0), extra_blbits, 0,              19,         7);
+    };
+
+    const _tr_init$1 = (s) => {
+        if (!static_init_done) {
+            tr_static_init();
+            static_init_done = true;
+        }
+
+        s.l_desc  = new TreeDesc(s.dyn_ltree, static_l_desc);
+        s.d_desc  = new TreeDesc(s.dyn_dtree, static_d_desc);
+        s.bl_desc = new TreeDesc(s.bl_tree,   static_bl_desc);
+
+        s.bi_buf = 0;
+        s.bi_valid = 0;
+
+        init_block(s);
+    };
+
+    const _tr_align$1 = (s) => {
+        send_bits(s, 2, 3);
+        send_code(s, 256, static_ltree);
+        bi_flush(s);
+    };
+
+    const _tr_flush_block$1 = (s, buf, stored_len, last) => {
+        let opt_lenb,
+            static_lenb,
+            max_blindex  = 0;
+
+        if (s.level > 0)
+        {
+            if (s.strm.data_type === 2) {
+                s.strm.data_type = detect_data_type(s);
+            }
+
+            build_tree(s, s.l_desc);
+            build_tree(s, s.d_desc);
+
+            max_blindex  = build_bl_tree(s);
+
+            opt_lenb = (s.opt_len + 3 + 7) >>> 3;
+            static_lenb = (s.static_len + 3 + 7) >>> 3;
+
+            if (static_lenb <= opt_lenb) { opt_lenb = static_lenb; }
+        } else {
+            opt_lenb = static_lenb = stored_len + 5;
+        }
+
+        if (stored_len + 4 <= opt_lenb && buf !== -1) {
+            _tr_stored_block$1(s, buf, stored_len, last);
+        } else if (s.strategy === 4 || static_lenb === opt_lenb) {
+            send_bits(s, 2 + (last ? 1 : 0), 3);
+            compress_block(s, static_ltree, static_dtree);
+        } else {
+            send_bits(s, 4 + (last ? 1 : 0), 3);
+            send_all_trees(s, s.l_desc.max_code + 1, s.d_desc.max_code + 1, max_blindex  + 1);
+            compress_block(s, s.dyn_ltree, s.dyn_dtree);
+        }
+
+        init_block(s);
+
+        if (last) {
+            bi_windup(s);
+        }
+    };
+
+    const _tr_tally$1 = (s, dist, lc) => {
+        s.pending_buf[s.sym_buf + s.sym_next++] = dist;
+        s.pending_buf[s.sym_buf + s.sym_next++] = dist >> 8;
+        s.pending_buf[s.sym_buf + s.sym_next++] = lc;
+        if (dist === 0) {
+            s.dyn_ltree[2 * lc]++;
+        } else {
+            s.matches++, dist--, s.dyn_ltree[2 * (_length_code[lc] + LITERALS$1 + 1)]++;
+            s.dyn_dtree[2 * d_code(dist)]++;
+        }
+
+        return s.sym_next === s.sym_end;
+    };
+
+    const trees = {
+        _tr_init: _tr_init$1,
+        _tr_stored_block: _tr_stored_block$1,
+        _tr_flush_block: _tr_flush_block$1,
+        _tr_tally: _tr_tally$1,
+        _tr_align: _tr_align$1
+    };
+
+    var adler32 = (adler, buf, len, pos) => {
+        let s1 = (adler & 0xffff) | 0,
+            s2 = ((adler >>> 16) & 0xffff) | 0,
+            n = 0;
+        while (len !== 0) {
+            n = len > 2000 ? 2000 : len;
+            len -= n;
             do {
-                if (((i = 65535), (r = (t.bi_valid + 42) >> 3), t.strm.avail_out < r)) break;
-                if (
-                    ((r = t.strm.avail_out - r),
-                    (s = t.strstart - t.block_start),
-                    i > s + t.strm.avail_in && (i = s + t.strm.avail_in),
-                    i > r && (i = r),
-                    i < n && ((0 === i && e !== ra) || e === ea || i !== s + t.strm.avail_in))
-                )
+                s1 = (s1 + buf[pos++]) | 0;
+                s2 = (s2 + s1) | 0;
+            } while (--n);
+
+            s1 %= 65521;
+            s2 %= 65521;
+        }
+
+        return (s1 | (s2 << 16)) | 0;
+    };
+
+    const makeTable = () => {
+        let c,
+            table = [];
+
+        for (var n = 0; n < 256; n++) {
+            c = n;
+            for (var s = 0; s < 8; s++) {
+                c = ((1 & c) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1));
+            }
+            table[n] = c;
+        }
+
+        return table;
+    };
+
+    const crcTable = new Uint32Array(makeTable());
+
+    var crc32 = (crc, buf, len, pos) => {
+        const t = crcTable,
+              end = pos + len;
+
+        crc ^= -1;
+
+        for (let i = pos; i < end; i++) {
+            crc = (crc >>> 8) ^ t[(crc ^ buf[i]) & 0xFF];
+        }
+
+        return -1 ^ crc;
+    };
+
+    var messages = {
+        2:    "need dictionary",
+        1:    "stream end",
+        0:    "",
+        "-1": "file error",
+        "-2": "stream error",
+        "-3": "data error",
+        "-4": "insufficient memory",
+        "-5": "buffer error",
+        "-6": "incompatible version"
+    };
+
+    const constants$2 = {
+        Z_NO_FLUSH:      0,
+        Z_PARTIAL_FLUSH: 1,
+        Z_SYNC_FLUSH:    2,
+        Z_FULL_FLUSH:    3,
+        Z_FINISH:        4,
+        Z_BLOCK:         5,
+        Z_TREES:         6,
+
+        Z_OK:            0,
+        Z_STREAM_END:    1,
+        Z_NEED_DICT:     2,
+        Z_ERRNO:        -1,
+        Z_STREAM_ERROR: -2,
+        Z_DATA_ERROR:   -3,
+        Z_MEM_ERROR:    -4,
+        Z_BUF_ERROR:    -5,
+
+        Z_NO_COMPRESSION:       0,
+        Z_BEST_SPEED:           1,
+        Z_BEST_COMPRESSION:     9,
+        Z_DEFAULT_COMPRESSION: -1,
+
+        Z_FILTERED:             1,
+        Z_HUFFMAN_ONLY:         2,
+        Z_RLE:                  3,
+        Z_FIXED:                4,
+        Z_DEFAULT_STRATEGY:     0,
+
+        Z_BINARY:               0,
+        Z_TEXT:                 1,
+        Z_UNKNOWN:              2,
+
+        Z_DEFLATED:             8,
+    };
+
+    const { _tr_init, _tr_stored_block, _tr_flush_block, _tr_tally, _tr_align } = trees;
+    const {
+        Z_NO_FLUSH: Z_NO_FLUSH$2, Z_PARTIAL_FLUSH: ia, Z_FULL_FLUSH: Z_FULL_FLUSH$1, Z_FINISH: Z_FINISH$3, Z_BLOCK: Z_BLOCK$1,
+        Z_OK: Z_OK$3, Z_STREAM_END: Z_STREAM_END$3, Z_STREAM_ERROR: Z_STREAM_ERROR$2, Z_DATA_ERROR: Z_DATA_ERROR$2, Z_BUF_ERROR: Z_BUF_ERROR$1,
+        Z_DEFAULT_COMPRESSION: Z_DEFAULT_COMPRESSION$1,
+        Z_FILTERED: da, Z_HUFFMAN_ONLY: fa, Z_RLE: ga, Z_FIXED: _a, Z_DEFAULT_STRATEGY: Z_DEFAULT_STRATEGY$1,
+        Z_UNKNOWN: ma,
+        Z_DEFLATED: Z_DEFLATED$2,
+    } = constants$2;
+
+    const MAX_MATCH     = 258,
+          MIN_LOOKAHEAD = 262,
+
+          INIT_STATE   = 42,
+          BUSY_STATE   = 113,
+          FINISH_STATE = 666;
+
+    const err = (strm, errCode) => {
+        strm.msg = messages[errCode];
+        return errCode;
+    };
+
+    const rank = (f) => {
+        return ((f) * 2) - ((f) > 4 ? 9 : 0);
+    };
+
+    const zero = (buf) => {
+        let len = buf.length; while (--len >= 0) { buf[len] = 0; }
+    };
+
+    const slide_hash = (s) => {
+        let n,
+            m,
+            p,
+            wsize = s.w_size;
+
+        n = s.hash_size;
+        p = n;
+
+        do {
+            m = s.head[--p];
+            s.head[p] = (m >= wsize ? m - wsize : 0);
+        } while (--n);
+
+        n = wsize;
+        p = n;
+
+        do {
+            m = s.prev[--p];
+            s.prev[p] = m >= wsize ? m - wsize : 0;
+        } while (--n);
+    };
+
+    let HASH_ZLIB = (s, prev, data) => ((prev << s.hash_shift) ^ data) & s.hash_mask;
+
+    const flush_pending = (strm) => {
+        const s = strm.state;
+        let len = s.pending;
+
+        if (len > strm.avail_out) {
+            len = strm.avail_out;
+        }
+        if (len === 0) { return; }
+
+        strm.output.set(s.pending_buf.subarray(s.pending_out, s.pending_out + len), strm.next_out);
+        strm.next_out  += len;
+        s.pending_out  += len;
+        strm.total_out += len;
+        strm.avail_out -= len;
+        s.pending      -= len;
+        if (s.pending === 0) {
+            s.pending_out = 0;
+        }
+    };
+
+    const flush_block_only = (s, last) => {
+        _tr_flush_block(s, (s.block_start >= 0 ? s.block_start : -1), s.strstart - s.block_start, last);
+        s.block_start = s.strstart;
+        flush_pending(s.strm);
+    },
+
+    const put_byte = (s, b) => {
+        s.pending_buf[s.pending++] = b;
+    };
+
+    const putShortMSB = (s, b) => {
+        s.pending_buf[s.pending++] = (b >>> 8) & 0xFF;
+        s.pending_buf[s.pending++] = 0xFF & b;
+    };
+
+    const read_buf = (strm, buf, start, size) => {
+        let len = strm.avail_in;
+
+        if (len > size) { len = size; }
+        if (len === 0) { return 0; }
+
+        strm.avail_in -= len;
+
+        buf.set(strm.input.subarray(strm.next_in, strm.next_in + len), start);
+        if (strm.state.wrap === 1) {
+            strm.adler = adler32(strm.adler, buf, len, start);
+        }
+        else if (strm.state.wrap === 2) {
+            strm.adler = crc32(strm.adler, buf, len, start);
+        }
+
+        strm.next_in += len;
+        strm.total_in += len;
+
+        return len;
+    };
+
+    const longest_match = (s, cur_match) => {
+        let match,
+            len,
+            chain_length = s.max_chain_length,
+            scan = s.strstart,
+            best_len = s.prev_length,
+            nice_match = s.nice_match;
+        const limit = s.strstart > s.w_size - MIN_LOOKAHEAD ?
+            s.strstart - (s.w_size - MIN_LOOKAHEAD) : 0,
+
+        const _win = s.window;
+
+        const wmast = s.w_mask,
+              prev = s.prev;
+
+        const strend = s.strstart + MAX_MATCH;
+
+        let scan_end1 = _win[scan + best_len - 1],
+            scan_end  = _win[scan + best_len];
+
+        if (s.prev_length >= s.good_match) {
+            chain_length >>= 2;
+        }
+
+        if (nice_match > s.lookahead) { nice_match = s.lookahead; }
+
+        do {
+            match = cur_match;
+            if (_win[match + best_len]     !== scan_end  ||
+                _win[match + best_len - 1] !== scan_end1 ||
+                _win[match]                !== _win[scan] ||
+                _win[++match]              !== _win[scan + 1]) {
+                continue;
+            }
+
+            scan += 2;
+            match++;
+
+            do {} while (_win[++scan] === _win[++match] && _win[++scan] === _win[++match] &&
+                         _win[++scan] === _win[++match] && _win[++scan] === _win[++match] &&
+                         _win[++scan] === _win[++match] && _win[++scan] === _win[++match] &&
+                         _win[++scan] === _win[++match] && _win[++scan] === _win[++match] &&
+                        scan < strend);
+
+            len = MAX_MATCH - (strend - scan);
+            scan = strend - MAX_MATCH;
+
+            if (len > best_len) {
+                s.match_start = cur_match;
+                best_len = len;
+                if (len >= nice_match) {
                     break;
-                (a = e === ra && i === s + t.strm.avail_in ? 1 : 0),
-                    $n(t, 0, 0, a),
-                    (t.pending_buf[t.pending - 4] = i),
-                    (t.pending_buf[t.pending - 3] = i >> 8),
-                    (t.pending_buf[t.pending - 2] = ~i),
-                    (t.pending_buf[t.pending - 1] = ~i >> 8),
-                    Sa(t.strm),
-                    s &&
-                        (s > i && (s = i),
-                        t.strm.output.set(t.window.subarray(t.block_start, t.block_start + s), t.strm.next_out),
-                        (t.strm.next_out += s),
-                        (t.strm.avail_out -= s),
-                        (t.strm.total_out += s),
-                        (t.block_start += s),
-                        (i -= s)),
-                    i &&
-                        (Ra(t.strm, t.strm.output, t.strm.next_out, i),
-                        (t.strm.next_out += i),
-                        (t.strm.avail_out -= i),
-                        (t.strm.total_out += i));
-            } while (0 === a);
-            return (
-                (o -= t.strm.avail_in),
-                o &&
-                    (o >= t.w_size
-                        ? ((t.matches = 2),
-                          t.window.set(t.strm.input.subarray(t.strm.next_in - t.w_size, t.strm.next_in), 0),
-                          (t.strstart = t.w_size),
-                          (t.insert = t.strstart))
-                        : (t.window_size - t.strstart <= o &&
-                              ((t.strstart -= t.w_size),
-                              t.window.set(t.window.subarray(t.w_size, t.w_size + t.strstart), 0),
-                              t.matches < 2 && t.matches++,
-                              t.insert > t.strstart && (t.insert = t.strstart)),
-                          t.window.set(t.strm.input.subarray(t.strm.next_in - o, t.strm.next_in), t.strstart),
-                          (t.strstart += o),
-                          (t.insert += o > t.w_size - t.insert ? t.w_size - t.insert : o)),
-                    (t.block_start = t.strstart)),
-                t.high_water < t.strstart && (t.high_water = t.strstart),
-                a
-                    ? 4
-                    : e !== ea && e !== ra && 0 === t.strm.avail_in && t.strstart === t.block_start
-                      ? 2
-                      : ((r = t.window_size - t.strstart),
-                        t.strm.avail_in > r &&
-                            t.block_start >= t.w_size &&
-                            ((t.block_start -= t.w_size),
-                            (t.strstart -= t.w_size),
-                            t.window.set(t.window.subarray(t.w_size, t.w_size + t.strstart), 0),
-                            t.matches < 2 && t.matches++,
-                            (r += t.w_size),
-                            t.insert > t.strstart && (t.insert = t.strstart)),
-                        r > t.strm.avail_in && (r = t.strm.avail_in),
-                        r &&
-                            (Ra(t.strm, t.window, t.strstart, r),
-                            (t.strstart += r),
-                            (t.insert += r > t.w_size - t.insert ? t.w_size - t.insert : r)),
-                        t.high_water < t.strstart && (t.high_water = t.strstart),
-                        (r = (t.bi_valid + 42) >> 3),
-                        (r = t.pending_buf_size - r > 65535 ? 65535 : t.pending_buf_size - r),
-                        (n = r > t.w_size ? t.w_size : r),
-                        (s = t.strstart - t.block_start),
-                        (s >= n || ((s || e === ra) && e !== ea && 0 === t.strm.avail_in && s <= r)) &&
-                            ((i = s > r ? r : s),
-                            (a = e === ra && 0 === t.strm.avail_in && i === s ? 1 : 0),
-                            $n(t, t.block_start, i, a),
-                            (t.block_start += i),
-                            Sa(t.strm)),
-                        a ? 3 : 1)
-            );
-        },
-        Pa = (t, e) => {
+                }
+                scan_end1 = _win[scan + best_len - 1];
+                scan_end = _win[scan + best_len];
+            }
+        } while ((cur_match = prev[cur_match & wmast]) > limit && --chain_length !== 0);
+
+        if (best_len <= s.lookahead) {
+            return best_len;
+        }
+        return s.lookahead;
+    };
+
+    const fill_window = (s) => {
+        const _w_size = s.w_size;
+        let n, more, str;
+        do {
+            more = s.window_size - s.lookahead - s.strstart;
+
+            if (s.strstart >= _w_size + (_w_size - MIN_LOOKAHEAD)) {
+                s.window.set(s.window.subarray(_w_size, _w_size + _w_size - more), 0);
+                s.match_start -= _w_size;
+                s.strstart -= _w_size;
+                s.block_start -= _w_size;
+                if (s.insert > s.strstart) {
+                    s.insert = s.strstart;
+                }
+                slide_hash(s),
+                more += _w_size;
+            }
+            if (s.strm.avail_in === 0) {
+                break;
+            }
+
+            n = read_buf(s.strm, s.window, s.strstart + s.lookahead, more);
+            s.lookahead += n;
+
+            if (s.lookahead + s.insert >= 3) {
+                str = s.strstart - s.insert;
+                s.ins_h = s.window[str];
+
+                s.ins_h = HASH_ZLIB(s, s.ins_h, s.window[str + 1]);
+
+                while (s.insert) {
+                    s.ins_h = HASH_ZLIB(s, s.ins_h, s.window[str + 3 - 1]);
+
+                    s.prev[str & s.w_mask] = s.head[s.ins_h];
+                    s.head[s.ins_h] = str;
+                    str++;
+                    s.insert--;
+                    if (s.lookahead + s.insert < 3) {
+                        break;
+                    }
+                }
+            }
+        } while (s.lookahead < MIN_LOOKAHEAD && s.strm.avail_in !== 0);
+    };
+
+    const deflate_stored = (t, flush) => {
+        let min_block = t.pending_buf_size - 5 > t.w_size ? t.w_size : t.pending_buf_size - 5;
+
+        let len, left, have, last = 0,
+            used = t.strm.avail_in;
+
+        do {
+            len = 65535;
+            have = (t.bi_valid + 42) >> 3;
+            if (t.strm.avail_out < have) {
+                break;
+            }
+
+            have = t.strm.avail_out - have;
+            left = t.strstart - t.block_start;
+            if (len > left + t.strm.avail_in) {
+                len = left + t.strm.avail_in;
+            }
+            if (len > have) {
+                len = have;
+            }
+
+            if (len < min_block && ((len === 0 && flush !== Z_FINISH$3) ||
+                                flush === Z_NO_FLUSH$2 ||
+                                len !== left + t.strm.avail_in)) {
+                break;
+            }
+
+            last = flush === Z_FINISH$3 && len === left + t.strm.avail_in ? 1 : 0;
+            _tr_stored_block$1(t, 0, 0, last);
+
+            t.pending_buf[t.pending - 4] = len;
+            t.pending_buf[t.pending - 3] = len >> 8;
+            t.pending_buf[t.pending - 2] = ~len;
+            t.pending_buf[t.pending - 1] = ~len >> 8;
+
+            flush_pending(t.strm);
+
+            if (left) {
+                if (left > len) {
+                     left = len;
+                }
+
+                t.strm.output.set(t.window.subarray(t.block_start, t.block_start + left), t.strm.next_out);
+                t.strm.next_out += left;
+                t.strm.avail_out -= left;
+                t.strm.total_out += left;
+                t.block_start += left;
+                len -= left;
+            }
+
+            if (len) {
+                read_buf(t.strm, t.strm.output, t.strm.next_out, len);
+                t.strm.next_out += len;
+                t.strm.avail_out -= len;
+                t.strm.total_out += len;
+            }
+        } while (0 === last);
+
+        used -= t.strm.avail_in;
+        if (used) {
+            if (used >= t.w_size) {
+                t.matches = 2;
+                t.window.set(t.strm.input.subarray(t.strm.next_in - t.w_size, t.strm.next_in), 0);
+                t.strstart = t.w_size;
+                t.insert = t.strstart;
+            }
+            else {
+                if (t.window_size - t.strstart <= used) {
+                    t.strstart -= t.w_size;
+                    t.window.set(t.window.subarray(t.w_size, t.w_size + t.strstart), 0);
+                    if (t.matches < 2) {
+                        t.matches++;
+                    }
+                    if (t.insert > t.strstart) {
+                        t.insert = t.strstart;
+                    }
+                }
+                t.window.set(t.strm.input.subarray(t.strm.next_in - used, t.strm.next_in), t.strstart);
+                t.strstart += used;
+                t.insert += used > t.w_size - t.insert ? t.w_size - t.insert : used;
+            }
+            t.block_start = t.strstart;
+        }
+        if (t.high_water < t.strstart) {
+            t.high_water = t.strstart;
+        }
+        if (last) {
+            return 4;
+        }
+
+        if (flush !== Z_NO_FLUSH$2 && flush !== Z_FINISH$3 && 0 === t.strm.avail_in && t.strstart === t.block_start) {
+            return 2;
+        }
+
+        have = t.window_size - t.strstart;
+        if (t.strm.avail_in > have && t.block_start >= t.w_size) {
+            t.block_start -= t.w_size;
+            t.strstart -= t.w_size;
+            t.window.set(t.window.subarray(t.w_size, t.w_size + t.strstart), 0);
+            if (t.matches < 2) {
+                t.matches++;
+            }
+            have += t.w_size;
+            if (t.insert > t.strstart) {
+                t.insert = t.strstart;
+            }
+        }
+        if (have > t.strm.avail_in) {
+            have = t.strm.avail_in;
+        }
+        if (have) {
+            read_buf(t.strm, t.window, t.strstart, have);
+            t.strstart += have;
+            t.insert += have > t.w_size - t.insert ? t.w_size - t.insert : have;
+        }
+        if (t.high_water < t.strstart) {
+            t.high_water = t.strstart;
+        }
+
+        have = (t.bi_valid + 42) >> 3;
+        have = t.pending_buf_size - have > 65535 ? 65535 : t.pending_buf_size - have;
+        min_block = have > t.w_size ? t.w_size : have;
+        left = t.strstart - t.block_start;
+        if (left >= min_block || ((left || flush === Z_FINISH$3) && flush !== Z_NO_FLUSH$2 && 0 === t.strm.avail_in && left <= have)) {
+            len = left > have ? have : left;
+            last = flush === Z_FINISH$3 && 0 === t.strm.avail_in && len === left ? 1 : 0;
+            _tr_stored_block$1(t, t.block_start, len, last);
+            t.block_start += len;
+            flush_pending(t.strm);
+        }
+
+        return last ? 3 : 1
+    };
+
+    // https://unpkg.com/pako@2.1.0/dist/pako.js
+    // const deflate_fast = (s, flush) => {
+
+    const Pa = (t, e) => {
             let i, s;
             for (;;) {
-                if (t.lookahead < va) {
-                    if ((Ba(t), t.lookahead < va && e === ea)) return 1;
+                if (t.lookahead < MIN_LOOKAHEAD) {
+                    if ((fill_window(t), t.lookahead < MIN_LOOKAHEAD && e === Z_NO_FLUSH$2)) return 1;
                     if (0 === t.lookahead) break;
                 }
                 if (
                     ((i = 0),
                     t.lookahead >= 3 &&
-                        ((t.ins_h = ka(t, t.ins_h, t.window[t.strstart + 3 - 1])),
+                        ((t.ins_h = HASH_ZLIB(t, t.ins_h, t.window[t.strstart + 3 - 1])),
                         (i = t.prev[t.strstart & t.w_mask] = t.head[t.ins_h]),
                         (t.head[t.ins_h] = t.strstart)),
-                    0 !== i && t.strstart - i <= t.w_size - va && (t.match_length = Ua(t, i)),
+                    0 !== i && t.strstart - i <= t.w_size - MIN_LOOKAHEAD && (t.match_length = longest_match(t, i)),
                     t.match_length >= 3)
                 )
                     if (
@@ -701,7 +1089,7 @@ export function pako() {
                         t.match_length--;
                         do {
                             t.strstart++,
-                                (t.ins_h = ka(t, t.ins_h, t.window[t.strstart + 3 - 1])),
+                                (t.ins_h = HASH_ZLIB(t, t.ins_h, t.window[t.strstart + 3 - 1])),
                                 (i = t.prev[t.strstart & t.w_mask] = t.head[t.ins_h]),
                                 (t.head[t.ins_h] = t.strstart);
                         } while (0 !== --t.match_length);
@@ -710,15 +1098,15 @@ export function pako() {
                         (t.strstart += t.match_length),
                             (t.match_length = 0),
                             (t.ins_h = t.window[t.strstart]),
-                            (t.ins_h = ka(t, t.ins_h, t.window[t.strstart + 1]));
+                            (t.ins_h = HASH_ZLIB(t, t.ins_h, t.window[t.strstart + 1]));
                 else (s = Qn(t, 0, t.window[t.strstart])), t.lookahead--, t.strstart++;
-                if (s && (Fa(t, false), 0 === t.strm.avail_out)) return 1;
+                if (s && (flush_block_only(t, false), 0 === t.strm.avail_out)) return 1;
             }
             return (
                 (t.insert = t.strstart < 2 ? t.strstart : 2),
-                e === ra
-                    ? (Fa(t, true), 0 === t.strm.avail_out ? 3 : 4)
-                    : t.sym_next && (Fa(t, false), 0 === t.strm.avail_out)
+                e === Z_FINISH$3
+                    ? (flush_block_only(t, true), 0 === t.strm.avail_out ? 3 : 4)
+                    : t.sym_next && (flush_block_only(t, false), 0 === t.strm.avail_out)
                       ? 1
                       : 2
             );
@@ -726,14 +1114,14 @@ export function pako() {
         za = (t, e) => {
             let i, s, r;
             for (;;) {
-                if (t.lookahead < va) {
-                    if ((Ba(t), t.lookahead < va && e === ea)) return 1;
+                if (t.lookahead < MIN_LOOKAHEAD) {
+                    if ((fill_window(t), t.lookahead < MIN_LOOKAHEAD && e === Z_NO_FLUSH$2)) return 1;
                     if (0 === t.lookahead) break;
                 }
                 if (
                     ((i = 0),
                     t.lookahead >= 3 &&
-                        ((t.ins_h = ka(t, t.ins_h, t.window[t.strstart + 3 - 1])),
+                        ((t.ins_h = HASH_ZLIB(t, t.ins_h, t.window[t.strstart + 3 - 1])),
                         (i = t.prev[t.strstart & t.w_mask] = t.head[t.ins_h]),
                         (t.head[t.ins_h] = t.strstart)),
                     (t.prev_length = t.match_length),
@@ -741,8 +1129,8 @@ export function pako() {
                     (t.match_length = 2),
                     0 !== i &&
                         t.prev_length < t.max_lazy_match &&
-                        t.strstart - i <= t.w_size - va &&
-                        ((t.match_length = Ua(t, i)),
+                        t.strstart - i <= t.w_size - MIN_LOOKAHEAD &&
+                        ((t.match_length = longest_match(t, i)),
                         t.match_length <= 5 &&
                             (t.strategy === da || (3 === t.match_length && t.strstart - t.match_start > 4096)) &&
                             (t.match_length = 2)),
@@ -754,7 +1142,7 @@ export function pako() {
                         (t.prev_length -= 2);
                     do {
                         ++t.strstart <= r &&
-                            ((t.ins_h = ka(t, t.ins_h, t.window[t.strstart + 3 - 1])),
+                            ((t.ins_h = HASH_ZLIB(t, t.ins_h, t.window[t.strstart + 3 - 1])),
                             (i = t.prev[t.strstart & t.w_mask] = t.head[t.ins_h]),
                             (t.head[t.ins_h] = t.strstart));
                     } while (0 !== --t.prev_length);
@@ -762,13 +1150,13 @@ export function pako() {
                         ((t.match_available = 0),
                         (t.match_length = 2),
                         t.strstart++,
-                        s && (Fa(t, false), 0 === t.strm.avail_out))
+                        s && (flush_block_only(t, false), 0 === t.strm.avail_out))
                     )
                         return 1;
                 } else if (t.match_available) {
                     if (
                         ((s = Qn(t, 0, t.window[t.strstart - 1])),
-                        s && Fa(t, false),
+                        s && flush_block_only(t, false),
                         t.strstart++,
                         t.lookahead--,
                         0 === t.strm.avail_out)
@@ -779,9 +1167,9 @@ export function pako() {
             return (
                 t.match_available && ((s = Qn(t, 0, t.window[t.strstart - 1])), (t.match_available = 0)),
                 (t.insert = t.strstart < 2 ? t.strstart : 2),
-                e === ra
-                    ? (Fa(t, true), 0 === t.strm.avail_out ? 3 : 4)
-                    : t.sym_next && (Fa(t, false), 0 === t.strm.avail_out)
+                e === Z_FINISH$3
+                    ? (flush_block_only(t, true), 0 === t.strm.avail_out ? 3 : 4)
+                    : t.sym_next && (flush_block_only(t, false), 0 === t.strm.avail_out)
                       ? 1
                       : 2
             );
@@ -790,7 +1178,7 @@ export function pako() {
         (this.good_length = t), (this.max_lazy = e), (this.nice_length = i), (this.max_chain = s), (this.func = r);
     }
     const Na = [
-        new Ha(0, 0, 0, 0, Oa),
+        new Ha(0, 0, 0, 0, deflate_stored),
         new Ha(4, 4, 8, 4, Pa),
         new Ha(4, 5, 16, 8, Pa),
         new Ha(4, 6, 32, 32, Pa),
@@ -811,7 +1199,7 @@ export function pako() {
             (this.wrap = 0),
             (this.gzhead = null),
             (this.gzindex = 0),
-            (this.method = pa),
+            (this.method = Z_DEFLATED$2),
             (this.last_flush = -1),
             (this.w_size = 0),
             (this.w_bits = 0),
@@ -842,19 +1230,19 @@ export function pako() {
             (this.dyn_ltree = new Uint16Array(1146)),
             (this.dyn_dtree = new Uint16Array(122)),
             (this.bl_tree = new Uint16Array(78)),
-            Ca(this.dyn_ltree),
-            Ca(this.dyn_dtree),
-            Ca(this.bl_tree),
+            zero(this.dyn_ltree),
+            zero(this.dyn_dtree),
+            zero(this.bl_tree),
             (this.l_desc = null),
             (this.d_desc = null),
             (this.bl_desc = null),
             (this.bl_count = new Uint16Array(16)),
             (this.heap = new Uint16Array(573)),
-            Ca(this.heap),
+            zero(this.heap),
             (this.heap_len = 0),
             (this.heap_max = 0),
             (this.depth = new Uint16Array(573)),
-            Ca(this.depth),
+            zero(this.depth),
             (this.sym_buf = 0),
             (this.lit_bufsize = 0),
             (this.sym_next = 0),
@@ -871,39 +1259,39 @@ export function pako() {
             const e = t.state;
             return !e ||
                 e.strm !== t ||
-                (e.status !== Ta &&
+                (e.status !== INIT_STATE &&
                     57 !== e.status &&
                     69 !== e.status &&
                     73 !== e.status &&
                     91 !== e.status &&
                     103 !== e.status &&
-                    e.status !== wa &&
-                    e.status !== ya)
+                    e.status !== BUSY_STATE &&
+                    e.status !== FINISH_STATE)
                 ? 1
                 : 0;
         },
         ja = (t) => {
-            if (La(t)) return Aa(t, ha);
+            if (La(t)) return err(t, Z_STREAM_ERROR$2);
             (t.total_in = t.total_out = 0), (t.data_type = ma);
             const e = t.state;
             return (
                 (e.pending = 0),
                 (e.pending_out = 0),
                 e.wrap < 0 && (e.wrap = -e.wrap),
-                (e.status = 2 === e.wrap ? 57 : e.wrap ? Ta : wa),
+                (e.status = 2 === e.wrap ? 57 : e.wrap ? INIT_STATE : BUSY_STATE),
                 (t.adler = 2 === e.wrap ? 0 : 1),
                 (e.last_flush = -2),
                 Kn(e),
-                aa
+                Z_OK$3
             );
         },
         qa = (t) => {
             const e = ja(t);
             var i;
             return (
-                e === aa &&
+                e === Z_OK$3 &&
                     (((i = t.state).window_size = 2 * i.w_size),
-                    Ca(i.head),
+                    zero(i.head),
                     (i.max_lazy_match = Na[i.level].max_lazy),
                     (i.good_match = Na[i.level].good_length),
                     (i.nice_match = Na[i.level].nice_length),
@@ -919,14 +1307,14 @@ export function pako() {
             );
         },
         Va = (t, e, i, s, r, n) => {
-            if (!t) return ha;
+            if (!t) return Z_STREAM_ERROR$2;
             let a = 1;
             if (
-                (e === ca && (e = 6),
+                (e === Z_DEFAULT_COMPRESSION$1 && (e = 6),
                 s < 0 ? ((a = 0), (s = -s)) : s > 15 && ((a = 2), (s -= 16)),
                 r < 1 ||
                     r > 9 ||
-                    i !== pa ||
+                    i !== Z_DEFLATED$2 ||
                     s < 8 ||
                     s > 15 ||
                     e < 0 ||
@@ -935,13 +1323,13 @@ export function pako() {
                     n > _a ||
                     (8 === s && 1 !== a))
             )
-                return Aa(t, ha);
+                return err(t, Z_STREAM_ERROR$2);
             8 === s && (s = 9);
             const o = new Ga();
             return (
                 (t.state = o),
                 (o.strm = t),
-                (o.status = Ta),
+                (o.status = INIT_STATE),
                 (o.wrap = a),
                 (o.gzhead = null),
                 (o.w_bits = s),
@@ -966,35 +1354,35 @@ export function pako() {
             );
         };
     var Wa = (t, e) => {
-            if (La(t) || e > na || e < 0) return t ? Aa(t, ha) : ha;
+            if (La(t) || e > Z_BLOCK$1 || e < 0) return t ? err(t, Z_STREAM_ERROR$2) : Z_STREAM_ERROR$2;
             const i = t.state;
-            if (!t.output || (0 !== t.avail_in && !t.input) || (i.status === ya && e !== ra))
-                return Aa(t, 0 === t.avail_out ? ua : ha);
+            if (!t.output || (0 !== t.avail_in && !t.input) || (i.status === FINISH_STATE && e !== Z_FINISH$3))
+                return err(t, 0 === t.avail_out ? Z_BUF_ERROR$1 : Z_STREAM_ERROR$2);
             const s = i.last_flush;
             if (((i.last_flush = e), 0 !== i.pending)) {
-                if ((Sa(t), 0 === t.avail_out)) return (i.last_flush = -1), aa;
-            } else if (0 === t.avail_in && Ea(e) <= Ea(s) && e !== ra) return Aa(t, ua);
-            if (i.status === ya && 0 !== t.avail_in) return Aa(t, ua);
-            if ((i.status === Ta && 0 === i.wrap && (i.status = wa), i.status === Ta)) {
-                let e = (pa + ((i.w_bits - 8) << 4)) << 8,
+                if ((flush_pending(t), 0 === t.avail_out)) return (i.last_flush = -1), Z_OK$3;
+            } else if (0 === t.avail_in && rank(e) <= rank(s) && e !== Z_FINISH$3) return err(t, Z_BUF_ERROR$1);
+            if (i.status === FINISH_STATE && 0 !== t.avail_in) return err(t, Z_BUF_ERROR$1);
+            if ((i.status === INIT_STATE && 0 === i.wrap && (i.status = BUSY_STATE), i.status === INIT_STATE)) {
+                let e = (Z_DEFLATED$2 + ((i.w_bits - 8) << 4)) << 8,
                     s = -1;
                 if (
                     ((s = i.strategy >= fa || i.level < 2 ? 0 : i.level < 6 ? 1 : 6 === i.level ? 2 : 3),
                     (e |= s << 6),
                     0 !== i.strstart && (e |= 32),
                     (e += 31 - (e % 31)),
-                    Da(i, e),
-                    0 !== i.strstart && (Da(i, t.adler >>> 16), Da(i, 65535 & t.adler)),
+                    putShortMSB(i, e),
+                    0 !== i.strstart && (putShortMSB(i, t.adler >>> 16), putShortMSB(i, 65535 & t.adler)),
                     (t.adler = 1),
-                    (i.status = wa),
-                    Sa(t),
+                    (i.status = BUSY_STATE),
+                    flush_pending(t),
                     0 !== i.pending)
                 )
-                    return (i.last_flush = -1), aa;
+                    return (i.last_flush = -1), Z_OK$3;
             }
             if (57 === i.status)
-                if (((t.adler = 0), Ia(i, 31), Ia(i, 139), Ia(i, 8), i.gzhead))
-                    Ia(
+                if (((t.adler = 0), put_byte(i, 31), put_byte(i, 139), put_byte(i, 8), i.gzhead))
+                    put_byte(
                         i,
                         (i.gzhead.text ? 1 : 0) +
                             (i.gzhead.hcrc ? 2 : 0) +
@@ -1002,31 +1390,31 @@ export function pako() {
                             (i.gzhead.name ? 8 : 0) +
                             (i.gzhead.comment ? 16 : 0)
                     ),
-                        Ia(i, 255 & i.gzhead.time),
-                        Ia(i, (i.gzhead.time >> 8) & 255),
-                        Ia(i, (i.gzhead.time >> 16) & 255),
-                        Ia(i, (i.gzhead.time >> 24) & 255),
-                        Ia(i, 9 === i.level ? 2 : i.strategy >= fa || i.level < 2 ? 4 : 0),
-                        Ia(i, 255 & i.gzhead.os),
+                        put_byte(i, 255 & i.gzhead.time),
+                        put_byte(i, (i.gzhead.time >> 8) & 255),
+                        put_byte(i, (i.gzhead.time >> 16) & 255),
+                        put_byte(i, (i.gzhead.time >> 24) & 255),
+                        put_byte(i, 9 === i.level ? 2 : i.strategy >= fa || i.level < 2 ? 4 : 0),
+                        put_byte(i, 255 & i.gzhead.os),
                         i.gzhead.extra &&
                             i.gzhead.extra.length &&
-                            (Ia(i, 255 & i.gzhead.extra.length), Ia(i, (i.gzhead.extra.length >> 8) & 255)),
-                        i.gzhead.hcrc && (t.adler = Xn(t.adler, i.pending_buf, i.pending, 0)),
+                            (put_byte(i, 255 & i.gzhead.extra.length), put_byte(i, (i.gzhead.extra.length >> 8) & 255)),
+                        i.gzhead.hcrc && (t.adler = crc32(t.adler, i.pending_buf, i.pending, 0)),
                         (i.gzindex = 0),
                         (i.status = 69);
                 else if (
-                    (Ia(i, 0),
-                    Ia(i, 0),
-                    Ia(i, 0),
-                    Ia(i, 0),
-                    Ia(i, 0),
-                    Ia(i, 9 === i.level ? 2 : i.strategy >= fa || i.level < 2 ? 4 : 0),
-                    Ia(i, 3),
-                    (i.status = wa),
-                    Sa(t),
+                    (put_byte(i, 0),
+                    put_byte(i, 0),
+                    put_byte(i, 0),
+                    put_byte(i, 0),
+                    put_byte(i, 0),
+                    put_byte(i, 9 === i.level ? 2 : i.strategy >= fa || i.level < 2 ? 4 : 0),
+                    put_byte(i, 3),
+                    (i.status = BUSY_STATE),
+                    flush_pending(t),
                     0 !== i.pending)
                 )
-                    return (i.last_flush = -1), aa;
+                    return (i.last_flush = -1), Z_OK$3;
             if (69 === i.status) {
                 if (i.gzhead.extra) {
                     let e = i.pending,
@@ -1036,18 +1424,18 @@ export function pako() {
                         if (
                             (i.pending_buf.set(i.gzhead.extra.subarray(i.gzindex, i.gzindex + r), i.pending),
                             (i.pending = i.pending_buf_size),
-                            i.gzhead.hcrc && i.pending > e && (t.adler = Xn(t.adler, i.pending_buf, i.pending - e, e)),
+                            i.gzhead.hcrc && i.pending > e && (t.adler = crc32(t.adler, i.pending_buf, i.pending - e, e)),
                             (i.gzindex += r),
-                            Sa(t),
+                            flush_pending(t),
                             0 !== i.pending)
                         )
-                            return (i.last_flush = -1), aa;
+                            return (i.last_flush = -1), Z_OK$3;
                         (e = 0), (s -= r);
                     }
                     let r = new Uint8Array(i.gzhead.extra);
                     i.pending_buf.set(r.subarray(i.gzindex, i.gzindex + s), i.pending),
                         (i.pending += s),
-                        i.gzhead.hcrc && i.pending > e && (t.adler = Xn(t.adler, i.pending_buf, i.pending - e, e)),
+                        i.gzhead.hcrc && i.pending > e && (t.adler = crc32(t.adler, i.pending_buf, i.pending - e, e)),
                         (i.gzindex = 0);
                 }
                 i.status = 73;
@@ -1061,17 +1449,17 @@ export function pako() {
                             if (
                                 (i.gzhead.hcrc &&
                                     i.pending > s &&
-                                    (t.adler = Xn(t.adler, i.pending_buf, i.pending - s, s)),
-                                Sa(t),
+                                    (t.adler = crc32(t.adler, i.pending_buf, i.pending - s, s)),
+                                flush_pending(t),
                                 0 !== i.pending)
                             )
-                                return (i.last_flush = -1), aa;
+                                return (i.last_flush = -1), Z_OK$3;
                             s = 0;
                         }
                         (e = i.gzindex < i.gzhead.name.length ? 255 & i.gzhead.name.charCodeAt(i.gzindex++) : 0),
-                            Ia(i, e);
+                            put_byte(i, e);
                     } while (0 !== e);
-                    i.gzhead.hcrc && i.pending > s && (t.adler = Xn(t.adler, i.pending_buf, i.pending - s, s)),
+                    i.gzhead.hcrc && i.pending > s && (t.adler = crc32(t.adler, i.pending_buf, i.pending - s, s)),
                         (i.gzindex = 0);
                 }
                 i.status = 91;
@@ -1085,37 +1473,37 @@ export function pako() {
                             if (
                                 (i.gzhead.hcrc &&
                                     i.pending > s &&
-                                    (t.adler = Xn(t.adler, i.pending_buf, i.pending - s, s)),
-                                Sa(t),
+                                    (t.adler = crc32(t.adler, i.pending_buf, i.pending - s, s)),
+                                flush_pending(t),
                                 0 !== i.pending)
                             )
-                                return (i.last_flush = -1), aa;
+                                return (i.last_flush = -1), Z_OK$3;
                             s = 0;
                         }
                         (e = i.gzindex < i.gzhead.comment.length ? 255 & i.gzhead.comment.charCodeAt(i.gzindex++) : 0),
-                            Ia(i, e);
+                            put_byte(i, e);
                     } while (0 !== e);
-                    i.gzhead.hcrc && i.pending > s && (t.adler = Xn(t.adler, i.pending_buf, i.pending - s, s));
+                    i.gzhead.hcrc && i.pending > s && (t.adler = crc32(t.adler, i.pending_buf, i.pending - s, s));
                 }
                 i.status = 103;
             }
             if (103 === i.status) {
                 if (i.gzhead.hcrc) {
-                    if (i.pending + 2 > i.pending_buf_size && (Sa(t), 0 !== i.pending)) return (i.last_flush = -1), aa;
-                    Ia(i, 255 & t.adler), Ia(i, (t.adler >> 8) & 255), (t.adler = 0);
+                    if (i.pending + 2 > i.pending_buf_size && (flush_pending(t), 0 !== i.pending)) return (i.last_flush = -1), Z_OK$3;
+                    put_byte(i, 255 & t.adler), put_byte(i, (t.adler >> 8) & 255), (t.adler = 0);
                 }
-                if (((i.status = wa), Sa(t), 0 !== i.pending)) return (i.last_flush = -1), aa;
+                if (((i.status = BUSY_STATE), flush_pending(t), 0 !== i.pending)) return (i.last_flush = -1), Z_OK$3;
             }
-            if (0 !== t.avail_in || 0 !== i.lookahead || (e !== ea && i.status !== ya)) {
+            if (0 !== t.avail_in || 0 !== i.lookahead || (e !== Z_NO_FLUSH$2 && i.status !== FINISH_STATE)) {
                 let s =
                     0 === i.level
-                        ? Oa(i, e)
+                        ? deflate_stored(i, e)
                         : i.strategy === fa
                           ? ((t, e) => {
                                 let i;
                                 for (;;) {
-                                    if (0 === t.lookahead && (Ba(t), 0 === t.lookahead)) {
-                                        if (e === ea) return 1;
+                                    if (0 === t.lookahead && (fill_window(t), 0 === t.lookahead)) {
+                                        if (e === Z_NO_FLUSH$2) return 1;
                                         break;
                                     }
                                     if (
@@ -1123,15 +1511,15 @@ export function pako() {
                                         (i = Qn(t, 0, t.window[t.strstart])),
                                         t.lookahead--,
                                         t.strstart++,
-                                        i && (Fa(t, false), 0 === t.strm.avail_out))
+                                        i && (flush_block_only(t, false), 0 === t.strm.avail_out))
                                     )
                                         return 1;
                                 }
                                 return (
                                     (t.insert = 0),
-                                    e === ra
-                                        ? (Fa(t, true), 0 === t.strm.avail_out ? 3 : 4)
-                                        : t.sym_next && (Fa(t, false), 0 === t.strm.avail_out)
+                                    e === Z_FINISH$3
+                                        ? (flush_block_only(t, true), 0 === t.strm.avail_out ? 3 : 4)
+                                        : t.sym_next && (flush_block_only(t, false), 0 === t.strm.avail_out)
                                           ? 1
                                           : 2
                                 );
@@ -1141,8 +1529,8 @@ export function pako() {
                                   let i, s, r, n;
                                   const a = t.window;
                                   for (;;) {
-                                      if (t.lookahead <= xa) {
-                                          if ((Ba(t), t.lookahead <= xa && e === ea)) return 1;
+                                      if (t.lookahead <= MAX_MATCH) {
+                                          if ((fill_window(t), t.lookahead <= MAX_MATCH && e === Z_NO_FLUSH$2)) return 1;
                                           if (0 === t.lookahead) break;
                                       }
                                       if (
@@ -1153,7 +1541,7 @@ export function pako() {
                                               (s = a[r]),
                                               s === a[++r] && s === a[++r] && s === a[++r]))
                                       ) {
-                                          n = t.strstart + xa;
+                                          n = t.strstart + MAX_MATCH;
                                           do {} while (
                                               s === a[++r] &&
                                               s === a[++r] &&
@@ -1165,7 +1553,7 @@ export function pako() {
                                               s === a[++r] &&
                                               r < n
                                           );
-                                          (t.match_length = xa - (n - r)),
+                                          (t.match_length = MAX_MATCH - (n - r)),
                                               t.match_length > t.lookahead && (t.match_length = t.lookahead);
                                       }
                                       if (
@@ -1175,78 +1563,78 @@ export function pako() {
                                                 (t.strstart += t.match_length),
                                                 (t.match_length = 0))
                                               : ((i = Qn(t, 0, t.window[t.strstart])), t.lookahead--, t.strstart++),
-                                          i && (Fa(t, false), 0 === t.strm.avail_out))
+                                          i && (flush_block_only(t, false), 0 === t.strm.avail_out))
                                       )
                                           return 1;
                                   }
                                   return (
                                       (t.insert = 0),
-                                      e === ra
-                                          ? (Fa(t, true), 0 === t.strm.avail_out ? 3 : 4)
-                                          : t.sym_next && (Fa(t, false), 0 === t.strm.avail_out)
+                                      e === Z_FINISH$3
+                                          ? (flush_block_only(t, true), 0 === t.strm.avail_out ? 3 : 4)
+                                          : t.sym_next && (flush_block_only(t, false), 0 === t.strm.avail_out)
                                             ? 1
                                             : 2
                                   );
                               })(i, e)
                             : Na[i.level].func(i, e);
-                if (((3 !== s && 4 !== s) || (i.status = ya), 1 === s || 3 === s))
-                    return 0 === t.avail_out && (i.last_flush = -1), aa;
+                if (((3 !== s && 4 !== s) || (i.status = FINISH_STATE), 1 === s || 3 === s))
+                    return 0 === t.avail_out && (i.last_flush = -1), Z_OK$3;
                 if (
                     2 === s &&
                     (e === ia
                         ? ta(i)
-                        : e !== na &&
+                        : e !== Z_BLOCK$1 &&
                           ($n(i, 0, 0, false),
-                          e === sa &&
-                              (Ca(i.head),
+                          e === Z_FULL_FLUSH$1 &&
+                              (zero(i.head),
                               0 === i.lookahead && ((i.strstart = 0), (i.block_start = 0), (i.insert = 0)))),
-                    Sa(t),
+                    flush_pending(t),
                     0 === t.avail_out)
                 )
-                    return (i.last_flush = -1), aa;
+                    return (i.last_flush = -1), Z_OK$3;
             }
-            return e !== ra
-                ? aa
+            return e !== Z_FINISH$3
+                ? Z_OK$3
                 : i.wrap <= 0
-                  ? oa
+                  ? Z_STREAM_END$3
                   : (2 === i.wrap
-                        ? (Ia(i, 255 & t.adler),
-                          Ia(i, (t.adler >> 8) & 255),
-                          Ia(i, (t.adler >> 16) & 255),
-                          Ia(i, (t.adler >> 24) & 255),
-                          Ia(i, 255 & t.total_in),
-                          Ia(i, (t.total_in >> 8) & 255),
-                          Ia(i, (t.total_in >> 16) & 255),
-                          Ia(i, (t.total_in >> 24) & 255))
-                        : (Da(i, t.adler >>> 16), Da(i, 65535 & t.adler)),
-                    Sa(t),
+                        ? (put_byte(i, 255 & t.adler),
+                          put_byte(i, (t.adler >> 8) & 255),
+                          put_byte(i, (t.adler >> 16) & 255),
+                          put_byte(i, (t.adler >> 24) & 255),
+                          put_byte(i, 255 & t.total_in),
+                          put_byte(i, (t.total_in >> 8) & 255),
+                          put_byte(i, (t.total_in >> 16) & 255),
+                          put_byte(i, (t.total_in >> 24) & 255))
+                        : (putShortMSB(i, t.adler >>> 16), putShortMSB(i, 65535 & t.adler)),
+                    flush_pending(t),
                     i.wrap > 0 && (i.wrap = -i.wrap),
-                    0 !== i.pending ? aa : oa);
+                    0 !== i.pending ? Z_OK$3 : Z_STREAM_END$3);
         },
         Xa = (t, e) => {
             let i = e.length;
-            if (La(t)) return ha;
+            if (La(t)) return Z_STREAM_ERROR$2;
             const s = t.state,
                 r = s.wrap;
-            if (2 === r || (1 === r && s.status !== Ta) || s.lookahead) return ha;
-            if ((1 === r && (t.adler = Vn(t.adler, e, i, 0)), (s.wrap = 0), i >= s.w_size)) {
-                0 === r && (Ca(s.head), (s.strstart = 0), (s.block_start = 0), (s.insert = 0));
+            if (2 === r || (1 === r && s.status !== INIT_STATE) || s.lookahead) return Z_STREAM_ERROR$2;
+            if ((1 === r && (t.adler = adler32(t.adler, e, i, 0)), (s.wrap = 0), i >= s.w_size)) {
+                0 === r && (zero(s.head), (s.strstart = 0), (s.block_start = 0), (s.insert = 0));
                 let t = new Uint8Array(s.w_size);
                 t.set(e.subarray(i - s.w_size, i), 0), (e = t), (i = s.w_size);
             }
             const n = t.avail_in,
                 a = t.next_in,
                 o = t.input;
-            for (t.avail_in = i, t.next_in = 0, t.input = e, Ba(s); s.lookahead >= 3; ) {
+            for (t.avail_in = i, t.next_in = 0, t.input = e, fill_window(s); s.lookahead >= 3; ) {
                 let t = s.strstart,
                     e = s.lookahead - 2;
                 do {
-                    (s.ins_h = ka(s, s.ins_h, s.window[t + 3 - 1])),
+                    (s.ins_h = HASH_ZLIB(s, s.ins_h, s.window[t + 3 - 1])),
                         (s.prev[t & s.w_mask] = s.head[s.ins_h]),
                         (s.head[s.ins_h] = t),
                         t++;
                 } while (--e);
-                (s.strstart = t), (s.lookahead = 2), Ba(s);
+                (s.strstart = t), (s.lookahead = 2), fill_window(s);
             }
             return (
                 (s.strstart += s.lookahead),
@@ -1259,20 +1647,20 @@ export function pako() {
                 (t.input = o),
                 (t.avail_in = n),
                 (s.wrap = r),
-                aa
+                Z_OK$3
             );
         },
         Ya = {
-            deflateInit: (t, e) => Va(t, e, pa, 15, 8, ba),
+            deflateInit: (t, e) => Va(t, e, Z_DEFLATED$2, 15, 8, Z_DEFAULT_STRATEGY$1),
             deflateInit2: Va,
             deflateReset: qa,
             deflateResetKeep: ja,
-            deflateSetHeader: (t, e) => (La(t) || 2 !== t.state.wrap ? ha : ((t.state.gzhead = e), aa)),
+            deflateSetHeader: (t, e) => (La(t) || 2 !== t.state.wrap ? Z_STREAM_ERROR$2 : ((t.state.gzhead = e), Z_OK$3)),
             deflate: Wa,
             deflateEnd: (t) => {
-                if (La(t)) return ha;
+                if (La(t)) return Z_STREAM_ERROR$2;
                 const e = t.state.status;
-                return (t.state = null), e === wa ? Aa(t, la) : aa;
+                return (t.state = null), e === BUSY_STATE ? err(t, Z_DATA_ERROR$2) : Z_OK$3;
             },
             deflateSetDictionary: Xa,
             deflateInfo: "pako deflate (from Nodeca project)",
@@ -1406,7 +1794,7 @@ export function pako() {
             Z_DEFAULT_COMPRESSION: co,
             Z_DEFAULT_STRATEGY: fo,
             Z_DEFLATED: go,
-        } = Zn;
+        } = constants$2;
     function _o(t) {
         this.options = Ka(
             { level: co, method: go, chunkSize: 16384, windowBits: 15, memLevel: 8, strategy: fo },
@@ -1423,7 +1811,7 @@ export function pako() {
             (this.strm = new so()),
             (this.strm.avail_out = 0);
         let i = Ya.deflateInit2(this.strm, e.level, e.method, e.windowBits, e.memLevel, e.strategy);
-        if (i !== lo) throw new Error(Yn[i]);
+        if (i !== lo) throw new Error(messages[i]);
         if ((e.header && Ya.deflateSetHeader(this.strm, e.header), e.dictionary)) {
             let t;
             if (
@@ -1436,13 +1824,13 @@ export function pako() {
                 (i = Ya.deflateSetDictionary(this.strm, t)),
                 i !== lo)
             )
-                throw new Error(Yn[i]);
+                throw new Error(messages[i]);
             this._dict_set = true;
         }
     }
     function bo(t, e) {
         const i = new _o(e);
-        if ((i.push(t, true), i.err)) throw i.msg || Yn[i.err];
+        if ((i.push(t, true), i.err)) throw i.msg || messages[i.err];
         return i.result;
     }
     (_o.prototype.push = function (t, e) {
@@ -1498,7 +1886,7 @@ export function pako() {
         gzip: function (t, e) {
             return ((e = e || {}).gzip = true), bo(t, e);
         },
-        constants: Zn,
+        constants: constants$2,
     };
     const po = 16209;
     var xo = function (t, e) {
@@ -1737,7 +2125,7 @@ export function pako() {
             Z_MEM_ERROR: Uo,
             Z_BUF_ERROR: Bo,
             Z_DEFLATED: Oo,
-        } = Zn,
+        } = constants$2,
         Po = 16180,
         zo = 16190,
         Ho = 16191,
@@ -1928,7 +2316,7 @@ export function pako() {
                                 (i.check = 0),
                                 (E[0] = 255 & l),
                                 (E[1] = (l >>> 8) & 255),
-                                (i.check = Xn(i.check, E, 2, 0)),
+                                (i.check = crc32(i.check, E, 2, 0)),
                                 (l = 0),
                                 (u = 0),
                                 (i.mode = 16181);
@@ -1975,7 +2363,7 @@ export function pako() {
                         i.head && (i.head.text = (l >> 8) & 1),
                             512 & i.flags &&
                                 4 & i.wrap &&
-                                ((E[0] = 255 & l), (E[1] = (l >>> 8) & 255), (i.check = Xn(i.check, E, 2, 0))),
+                                ((E[0] = 255 & l), (E[1] = (l >>> 8) & 255), (i.check = crc32(i.check, E, 2, 0))),
                             (l = 0),
                             (u = 0),
                             (i.mode = 16182);
@@ -1991,7 +2379,7 @@ export function pako() {
                                 (E[1] = (l >>> 8) & 255),
                                 (E[2] = (l >>> 16) & 255),
                                 (E[3] = (l >>> 24) & 255),
-                                (i.check = Xn(i.check, E, 4, 0))),
+                                (i.check = crc32(i.check, E, 4, 0))),
                             (l = 0),
                             (u = 0),
                             (i.mode = 16183);
@@ -2003,7 +2391,7 @@ export function pako() {
                         i.head && ((i.head.xflags = 255 & l), (i.head.os = l >> 8)),
                             512 & i.flags &&
                                 4 & i.wrap &&
-                                ((E[0] = 255 & l), (E[1] = (l >>> 8) & 255), (i.check = Xn(i.check, E, 2, 0))),
+                                ((E[0] = 255 & l), (E[1] = (l >>> 8) & 255), (i.check = crc32(i.check, E, 2, 0))),
                             (l = 0),
                             (u = 0),
                             (i.mode = 16184);
@@ -2017,7 +2405,7 @@ export function pako() {
                                 i.head && (i.head.extra_len = l),
                                 512 & i.flags &&
                                     4 & i.wrap &&
-                                    ((E[0] = 255 & l), (E[1] = (l >>> 8) & 255), (i.check = Xn(i.check, E, 2, 0))),
+                                    ((E[0] = 255 & l), (E[1] = (l >>> 8) & 255), (i.check = crc32(i.check, E, 2, 0))),
                                 (l = 0),
                                 (u = 0);
                         } else i.head && (i.head.extra = null);
@@ -2032,7 +2420,7 @@ export function pako() {
                                     ((w = i.head.extra_len - i.length),
                                     i.head.extra || (i.head.extra = new Uint8Array(i.head.extra_len)),
                                     i.head.extra.set(s.subarray(n, n + f), w)),
-                                512 & i.flags && 4 & i.wrap && (i.check = Xn(i.check, s, f, n)),
+                                512 & i.flags && 4 & i.wrap && (i.check = crc32(i.check, s, f, n)),
                                 (o -= f),
                                 (n += f),
                                 (i.length -= f)),
@@ -2049,7 +2437,7 @@ export function pako() {
                                     i.head && w && i.length < 65536 && (i.head.name += String.fromCharCode(w));
                             } while (w && f < o);
                             if (
-                                (512 & i.flags && 4 & i.wrap && (i.check = Xn(i.check, s, f, n)), (o -= f), (n += f), w)
+                                (512 & i.flags && 4 & i.wrap && (i.check = crc32(i.check, s, f, n)), (o -= f), (n += f), w)
                             )
                                 break t;
                         } else i.head && (i.head.name = null);
@@ -2063,7 +2451,7 @@ export function pako() {
                                     i.head && w && i.length < 65536 && (i.head.comment += String.fromCharCode(w));
                             } while (w && f < o);
                             if (
-                                (512 & i.flags && 4 & i.wrap && (i.check = Xn(i.check, s, f, n)), (o -= f), (n += f), w)
+                                (512 & i.flags && 4 & i.wrap && (i.check = crc32(i.check, s, f, n)), (o -= f), (n += f), w)
                             )
                                 break t;
                         } else i.head && (i.head.comment = null);
@@ -2422,7 +2810,7 @@ export function pako() {
                                 (i.total += d),
                                 4 & i.wrap &&
                                     d &&
-                                    (t.adler = i.check = i.flags ? Xn(i.check, r, d, a - d) : Vn(i.check, r, d, a - d)),
+                                    (t.adler = i.check = i.flags ? crc32(i.check, r, d, a - d) : adler32(i.check, r, d, a - d)),
                                 (d = h),
                                 4 & i.wrap && (i.flags ? l : Wo(l)) !== i.check)
                             ) {
@@ -2473,7 +2861,7 @@ export function pako() {
                 4 & i.wrap &&
                     d &&
                     (t.adler = i.check =
-                        i.flags ? Xn(i.check, r, d, t.next_out - d) : Vn(i.check, r, d, t.next_out - d)),
+                        i.flags ? crc32(i.check, r, d, t.next_out - d) : adler32(i.check, r, d, t.next_out - d)),
                 (t.data_type =
                     i.bits +
                     (i.last ? 64 : 0) +
@@ -2508,7 +2896,7 @@ export function pako() {
                     : ((s = t.state),
                       0 !== s.wrap && s.mode !== zo
                           ? Do
-                          : s.mode === zo && ((r = 1), (r = Vn(r, e, i, 0)), r !== s.check)
+                          : s.mode === zo && ((r = 1), (r = adler32(r, e, i, 0)), r !== s.check)
                             ? Ro
                             : ((n = sh(t, e, i, i)), n ? ((s.mode = 16210), Uo) : ((s.havedict = 1), So)));
             },
@@ -2536,7 +2924,7 @@ export function pako() {
             Z_STREAM_ERROR: fh,
             Z_DATA_ERROR: gh,
             Z_MEM_ERROR: _h,
-        } = Zn;
+        } = constants$2;
     function bh(t) {
         this.options = Ka({ chunkSize: 65536, windowBits: 15, to: "" }, t || {});
         const e = this.options;
@@ -2553,7 +2941,7 @@ export function pako() {
             (this.strm = new so()),
             (this.strm.avail_out = 0);
         let i = nh.inflateInit2(this.strm, e.windowBits);
-        if (i !== uh) throw new Error(Yn[i]);
+        if (i !== uh) throw new Error(messages[i]);
         if (
             ((this.header = new ah()),
             nh.inflateGetHeader(this.strm, this.header),
@@ -2563,11 +2951,11 @@ export function pako() {
                     : "[object ArrayBuffer]" === oh.call(e.dictionary) && (e.dictionary = new Uint8Array(e.dictionary)),
                 e.raw && ((i = nh.inflateSetDictionary(this.strm, e.dictionary)), i !== uh)))
         )
-            throw new Error(Yn[i]);
+            throw new Error(messages[i]);
     }
     function mh(t, e) {
         const i = new bh(e);
-        if ((i.push(t), i.err)) throw i.msg || Yn[i.err];
+        if ((i.push(t), i.err)) throw i.msg || messages[i.err];
         return i.result;
     }
     (bh.prototype.push = function (t, e) {
@@ -2635,7 +3023,7 @@ export function pako() {
             return ((e = e || {}).raw = true), mh(t, e);
         },
         ungzip: mh,
-        constants: Zn,
+        constants: constants$2,
     };
     const { Deflate: xh, deflate: vh, deflateRaw: Th, gzip: wh } = mo,
         { Inflate: yh, inflate: inflate, inflateRaw: Eh, ungzip: Ch } = ph;
