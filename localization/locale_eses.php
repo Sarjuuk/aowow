@@ -23,7 +23,7 @@ $lang = array(
         'link'          => "Enlace",
         'signIn'        => "Iniciar sesión / Registrarse",
         'jsError'       => "Por favor, asegúrese de que ha habilitado javascript.",
-        'language'      => "lengua",
+        'language'      => "Idioma",
         'feedback'      => "Feedback",
         'numSQL'        => "Número de consultas de SQL",
         'timeSQL'       => "El tiempo para las consultas de SQL",
@@ -36,7 +36,7 @@ $lang = array(
         'thePlayer'     => "El Jugador",
         'quickFacts'    => "Notas rápidas",
         'screenshots'   => "Capturas de pantalla",
-        'videos'        => "Videos",
+        'videos'        => "Vídeos",
         'side'          => "Lado: ",
         'related'       => "Información relacionada",
         'contribute'    => "Contribuir",
@@ -301,17 +301,17 @@ $lang = array(
         )
     ),
     'video' => array(
-        'submission'    => "Sugerencia de video",
+        'submission'    => "Sugerencia de vídeo",
         'thanks'        => array(
             'contrib' => "¡Muchísimas gracias por tu aportación!",
             'goBack'  => '<a href="?%s=%d">aquí vuelve</a> a la página de la que viniste.',
-            'note'    => "Nota: Tu video tiene que ser aprobado antes de que pueda aparecer en el sitio. Esto puede tomar hasta 72 horas."
+            'note'    => "Nota: Tu vídeo tiene que ser aprobado antes de que pueda aparecer en el sitio. Esto puede tomar hasta 72 horas."
         ),
         'error'         => array(
-            'isPrivate'   => "El video sugerido es privado.",
-            'noExist'     => "No se encontró ningún video en la URL proporcionada.",
+            'isPrivate'   => "El vídeo sugerido es privado.",
+            'noExist'     => "No se encontró ningún vídeo en la URL proporcionada.",
             'selectVI'    => "Por favor, introduce información válida del vídeo.", // message_novideo
-            'notAllowed'  => "¡No tienes permiso para sugerir videos!",
+            'notAllowed'  => "¡No tienes permiso para sugerir vídeos!",
         )
     ),
     'game' => array(
@@ -364,10 +364,10 @@ $lang = array(
         'emotes'        => "Emociones",
         'enchantment'   => "encantamiento",
         'enchantments'  => "Encantamientos",
-        'areatrigger'   => "areatrigger",
-        'areatriggers'  => "Areatrigger",
-        'mail'          => "mail",
-        'mails'         => "Mails",
+        'areatrigger'   => "disparador de área",
+        'areatriggers'  => "Disparadores de área",
+        'mail'          => "correo",
+        'mails'         => "Correos",
 
         'cooldown'      => "%s de reutilización",
         'difficulty'    => "Dificultad: ",
@@ -438,7 +438,7 @@ $lang = array(
         'sc'            => ["Física", "Sagrado", "Fuego", "Naturaleza", "Escarcha", "Sombras", "Arcano"],
         'dt'            => [null, "Magia", "Maldición", "Enfermedad", "Veneno", "Sigilo", "Invisibilidad", "Magia, Maldición, Enfermedad, Veneno", "Hechizo (PNJ)", "Enfurecer"],
         'cl'            => [null, "Guerrero", "Paladín", "Cazador", "Pícaro", "Sacerdote", "Caballero de la Muerte", "Chamán", "Mago", "Brujo", null, "Druida"],
-        'ra'            => [-2 => "Horda", -1 => "Alianza", null, "Humano", "Orco", "Enano", "Elfo de la noche", "No-muerto", "Tauren", "Gnomo", "Trol  ", null, "Blood Elf", "Elfo de sangre"],
+        'ra'            => [-2 => "Horda", -1 => "Alianza", null, "Humano", "Orco", "Enano", "Elfo de la noche", "No-muerto", "Tauren", "Gnomo", "Trol" , null, "Elfo de sangre", "Draenei"],
         'rep'           => ["Odiado", "Hostil", "Adverso", "Neutral", "Amistoso", "Honorable", "Reverenciado", "Exaltado"],
         'st'            => array(
             "Defecto",                      "Forma felina",                 "Árbol de vida",                "Forma de viaje",               "Forma acuática",               "Forma de oso",
@@ -1160,7 +1160,7 @@ $lang = array(
         ),
         'type'          => array(                           // used for tooltip
              3 => "Contenedore",  6 => "", 9 => "Libro", 19 => "", 25 => "",
-            -5 => "Cofre", -3 => "Hierba", -4 => "Filóne de mineral", -2 => "Misión", -6 => "", -9 => ""
+            -5 => "Cofre", -3 => "Hierba", -4 => "Veta de minería", -2 => "Misión", -6 => "", -9 => ""
         ),
         'unkPosition'   => "No se conoce la ubicación de esta entidad.",
         'npcLootPH'     => 'El <b>%s</b> contiene el botín de la pelea contra <a href="?npc=%d">%s</a>. Aparece al morir.',
@@ -1236,11 +1236,11 @@ $lang = array(
             "Alimaña",                  "Mecánico",                 "Sin especificar",          "Tótem",                    "Mascota mansa",            "Nube de gas"
         ),
         'npcFlags'      => array(
-            NPC_FLAG_GOSSIP         => 'Chismes',
+            NPC_FLAG_GOSSIP         => 'Diálogo',
             NPC_FLAG_QUEST_GIVER    => 'Dador de misiones',
-            NPC_FLAG_TRAINER        => 'Instructor',
-            NPC_FLAG_CLASS_TRAINER  => 'Instructor de clase',
-            NPC_PROFESSION_TRAINER  => 'Instructor de profesión',
+            NPC_FLAG_TRAINER        => 'Entrenador',
+            NPC_FLAG_CLASS_TRAINER  => 'Entrenador de clase',
+            NPC_PROFESSION_TRAINER  => 'Entrenador de profesión',
             NPC_FLAG_VENDOR         => 'Vendedor',
             NPC_FLAG_VENDOR_AMMO    => 'Vendedor de munición',
             NPC_FLAG_VENDOR_FOOD    => 'Vendedor de comida',
@@ -1304,7 +1304,7 @@ $lang = array(
         'criteria'      => "Requisitos",
         'points'        => "Puntos",
         'series'        => "Serie",
-        'criteriaType'  => "Criterium Type ID:",
+        'criteriaType'  => "ID de tipo de criterio:",
         'itemReward'    => "Recibirás",
         'titleReward'   => 'Deberías obtener el título "<a href="?title=%d">%s</a>"',
         'slain'         => "matado",
@@ -1701,7 +1701,7 @@ $lang = array(
         'normal'        => "Normal",
         'special'       => "Especial",
 
-        'currentArea'   => '&lt;current area&gt;',
+        'currentArea'   => '&lt;área actual&gt;',
         'discovered'    => "Aprendido via descubrimiento",
         'ppm'           => "(%.1f procs por minuto)",
         'procChance'    => "Probabilidad de que accione: %.4g%%",
@@ -1856,8 +1856,8 @@ $lang = array(
             "Gahz'ridian (DND)",                    "Reventar",                             "Apertura JcJ",                         "Cierre JcJ",                           "Pescar",
             "Inscripción",                          "Abrir desde vehículo"
         ),
-        'stealthType'   => ["GENERAL", "TRAP"],
-        'invisibilityType' => ["General", "UNK-1", "UNK-2", "Trap", "UNK-4", "UNK-5", "Drunk", "UNK-7", "UNK-8", "UNK-9", "UNK-10", "UNK-11"],
+        'stealthType'   => ["GENERAL", "TRAMPA"],
+        'invisibilityType' => ["General", "UNK-1", "UNK-2", "Trampa", "UNK-4", "UNK-5", "Ebrio", "UNK-7", "UNK-8", "UNK-9", "UNK-10", "UNK-11"],
         'summonControl' => ["Sin control", "Guardián", "Mascota", "Embelesado", "Vehículo poseído", "Vehículo sin control"],
         'summonSlot'    => ["Mascota", "Tótem de Fuego", "Tótem de Tierra", "Tótem de Agua", "Tótem de Aire", "Mascota mansa", "Misión"],
         'unkEffect'     => 'Efecto desconocido (%1$d)',

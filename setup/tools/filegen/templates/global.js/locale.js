@@ -66,4 +66,6 @@ var Locale = {
 
 };
 
-Locale.set(LOCALE_ENUS); // Default
+// aowow - LOCALE_ENUS not necessarily available
+// Locale.set(LOCALE_ENUS); // Default
+Locale.set(Object.values(Locale.locales)[0]?.id);

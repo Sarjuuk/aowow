@@ -68,7 +68,9 @@ See to it, that the web server is able to write the following directories and th
  * `datasets/`  
  
 #### 4. Extract the client archives (MPQs)
-Extract the following directories from the client archives into `setup/mpqdata/`, while maintaining patch order (base mpq -> patch-mpq: 1 -> 9 -> A -> Z). The required paths are scattered across the archives. Overwrite older files if asked to.  
+Extract the following directories from the client archives into `setup/mpqdata/`, while maintaining patch order (named MPQs first -> patch.mpq -> patch-[2 -> 9].mpq -> patch-[A -> Z].mpq). Replace files from previous patches if asked to.  
+⚠ DO NOT change the case of the extracted files. (i.e. don't use the `-c` switch when using the MPQExtractor)  
+  
    .. for every locale you are going to use:
    > \<localeCode>/DBFilesClient/  
    > \<localeCode>/Interface/WorldMap/  
@@ -112,7 +114,7 @@ A: You are using multiple cache optimization modules for php that are in conflic
 Q: Some generated images appear distorted or have alpha-channel issues.  
 A: Image compression is beyond my understanding, so i am unable to fix these issues within the blpReader.
  BUT you can convert the affected blp file into a png file in the same directory, using the provided BLPConverter.
- AoWoW will prioritize png files over blp files.
+ The setup will prioritize png files over blp files.
 
 Q: How can i get the modelviewer to work?  
 A: You can't anymore. Wowhead switched from Flash to WebGL (as they should) and moved or deleted the old files in the process.
@@ -128,6 +130,10 @@ A: That's a web server configuration issue. If you are using Apache you may need
 
 Q: An Item, Quest or NPC i added or edited can't be searched. Why?  
 A: A search is only conducted against the currently used locale. You may have only edited the name field in the base table instead of adding multiple strings into the appropriate \*_locale tables. In this case searches in a non-english locale are run against an empty name field.  
+
+Q: Images embedded in readable Items / Gameobjects are missing!  
+A: Check that you didn't change the case of the files extracted from the mpq archives. The paths stored in TDBs page_text table are used as \<img> src and while AoWoW is case agnostic and will happily process all files, a web server runnig on a unix system will only serve files matching the exact case.  
+
 
 ## Thanks
 

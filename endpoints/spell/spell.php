@@ -82,20 +82,9 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         // returns self or firstRank
         if ($fr = DB::World()->selectCell('SELECT `first_spell_id` FROM spell_ranks WHERE `spell_id` = %i', $this->typeId))
             $this->firstRank = $fr;
-     /* >firstRank is used exclusively to query world db tables. So this expensive else-branch is probably obsolete
         else
-            $this->firstRank = DB::Aowow()->selectCell(
-               'SELECT      IF(s1.`RankNo` <> 1 AND s2.`id`, s2.`id`, s1.`id`)
-                FROM        ::spell s1
-                LEFT JOIN   ::spell s2
-                    ON      s1.`SpellFamilyId`     = s2.`SpelLFamilyId`     AND s1.`SpellFamilyFlags1` = s2.`SpelLFamilyFlags1` AND
-                            s1.`SpellFamilyFlags2` = s2.`SpellFamilyFlags2` AND s1.`SpellFamilyFlags3` = s2.`SpellFamilyFlags3` AND
-                            s2.`RankNo`            = 1                      AND IFNULL(NULLIF(s1.name_loc%i, ""), s1.`name_loc0`) = IFNULL(NULLIF(s2.name_loc%i, ""), s2.`name_loc0`)
-                WHERE       s1.`id` = %i',
-                Lang::getLocale()->value, Lang::getLocale()->value,
-                $this->typeId
-            );
-     */
+            $this->firstRank = $this->typeId;
+
         $this->h1 = Util::htmlEscape($this->subject->name);
 
         $this->gPageInfo += array(
@@ -969,7 +958,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
     private function tabExclusiveWith() : array
     {
-        if (!$this->firstRank || !DB::World()->selectCell('SELECT 1 FROM spell_group WHERE `spell_id` = %i', $this->firstRank))
+        if (!DB::World()->selectCell('SELECT 1 FROM spell_group WHERE `spell_id` = %i', $this->firstRank))
             return [];
 
         // unpack recursion

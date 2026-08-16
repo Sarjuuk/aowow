@@ -124,7 +124,7 @@
     if (!$this->user::isLoggedIn()):
 ?>
 
-            <small>No has iniciado sesión. <a href="?account=signin">Inicia sesión</a> para enviar un video.</small>
+            <small>No has iniciado sesión. <a href="?account=signin">Inicia sesión</a> para enviar un vídeo.</small>
 
 <?php
     endif;

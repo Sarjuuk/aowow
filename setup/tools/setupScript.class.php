@@ -307,7 +307,7 @@ trait TrImageProcessor
             imagefill($outRes, 0, 0, $transparentindex);
         }
 
-        imagecopyresampled($outRes, $src, $destDims['x'], $destDims['x'], $srcDims['x'], $srcDims['y'], $destDims['w'], $destDims['h'], $srcDims['w'], $srcDims['h']);
+        imagecopyresampled($outRes, $src, $destDims['x'], $destDims['y'], $srcDims['x'], $srcDims['y'], $destDims['w'], $destDims['h'], $srcDims['w'], $srcDims['h']);
 
         switch ($ext)
         {
