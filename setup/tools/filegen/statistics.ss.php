@@ -93,7 +93,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 continue;
 
             // if there is ever a case where a racial is shared between races i don't want to know about it!
-            $raceId = log($racials->getEntry($spellId)['reqRaceMask'], 2) + 1;
+            $raceId = intVal(log($racials->getEntry($spellId)['reqRaceMask'], 2) + 1);
             if (!isset($raceData[$raceId]))
                 continue;
 
