@@ -139,17 +139,12 @@
     };
 
 
-    /*!
-    * @license twgl.js 4.24.0 Copyright (c) 2015, Gregg Tavares All Rights Reserved.
-    * Available via the MIT license.
-    * see: http://github.com/greggman/twgl.js for details
-    */
+    /*
+     * aowow - twgl was included in file
+     */
 
     import { twgl } from "./mod.twgl";
 
-    /*
-     * twgl - end
-     */
 
     var Programs = {};
 
@@ -318,17 +313,11 @@
     var Tools = new ProgramTool();
 
 
-    /* gl-matrix - High performance matrix and vector operations
-     * @author Brandon Jones
-     * @author Colin MacKenzie IV
-     * Copyright (c) 2015-2025, Brandon Jones, Colin MacKenzie IV.
+    /*
+     * aowow - gl-matrix was included in file
      */
 
     import { gl_matrix } from "./mod.gl-matrix";
-
-    /*
-     * gl-matrix end
-     */
 
 
     var mat4Multiply = mat4Mult;
@@ -4085,16 +4074,11 @@
 
 
     /*
-     * PAKO 2.1.0 https://github.com/nodeca/pako @license (MIT AND Zlib)
-     * https://github.com/nodeca/pako/blob/master/dist/pako.js
+     * aowow - PAKO was included in file
      */
 
-    // import { pako } from "./pako";
+    import { pako } from "./pako";
 
-
-    /*
-     * PAKO - end
-     */
 
     var pakoInflate = inflate;
 
