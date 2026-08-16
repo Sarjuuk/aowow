@@ -1,3 +1,8 @@
+/*!
+ * @license twgl.js 4.24.0 Copyright (c) 2015, Gregg Tavares All Rights Reserved.
+ * Available via the MIT license.
+ * see: http://github.com/greggman/twgl.js for details
+ */
 export function twgl()
 {
     let VecType = Float32Array;
