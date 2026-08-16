@@ -1,11 +1,14 @@
+/* gl-matrix - High performance matrix and vector operations
+ * @author Brandon Jones
+ * @author Colin MacKenzie IV
+ * Copyright (c) 2015-2025, Brandon Jones, Colin MacKenzie IV.
+ */
+
 export function gl_matrix()
 {
 
     var GLMAT_EPSILON = 0.000001,
         GLMAT_ARRAY_TYPE = "undefined" != typeof Float32Array ? Float32Array : Array;
-
-    // Math.random;
-    // Math.PI;
 
     function vec3Create()
     {
