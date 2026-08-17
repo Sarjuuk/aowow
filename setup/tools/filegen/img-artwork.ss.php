@@ -63,12 +63,12 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
         $sum       = 0;
         $imgGroups = [];
-        $files     = CLISetup::filesInPath('/'.str_replace('/', '\\/', $realPath).'/i', true);
+        $files     = CLISetup::filesInPath($realPath);
         $fileTpl   = $outInfo[0][0].'%s.png';
 
         foreach ($files as $f)
         {
-            if (preg_match('/([^\/]+)(\d).blp/i', $f, $m))
+            if (preg_match('/\b([^\/\\\\]+)(\d).blp/i', $f, $m))
             {
                 if (!$m[1] || !$m[2])
                     continue;
@@ -111,8 +111,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
             $order = $tileOrder[$fmt];
 
-            $im = $this->assembleImage($realPath.'/'.$name, $order, count($order[0]) * 256, count($order) * 256);
-            if (!$im)
+            if (!($im = $this->assembleImage($realPath.'/'.$name, $order)))
             {
                 CLI::write(' - could not assemble file '.$name, CLI::LOG_ERROR);
                 $this->success = false;

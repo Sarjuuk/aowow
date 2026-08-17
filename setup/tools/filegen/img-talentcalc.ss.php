@@ -55,8 +55,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
         sleep(2);
 
-        $tTabs = DB::Aowow()->selectAssoc('SELECT tt.`creatureFamilyMask`, tt.`textureFile`, tt.`tabNumber`, cc.`fileString` FROM dbc_talenttab tt LEFT JOIN dbc_chrclasses cc ON cc.`id` = IF(tt.`classMask`, LOG(2, tt.`classMask`) + 1, 0)');
-        if (!$tTabs)
+        if (!($tTabs = DB::Aowow()->selectAssoc('SELECT tt.`creatureFamilyMask`, tt.`textureFile`, tt.`tabNumber`, cc.`fileString` FROM dbc_talenttab tt LEFT JOIN dbc_chrclasses cc ON cc.`id` = IF(tt.`classMask`, LOG(2, tt.`classMask`) + 1, 0)')))
         {
             CLI::write(' - TalentTab.dbc or ChrClasses.dbc is empty...?', CLI::LOG_ERROR);
             $this->success = false;
@@ -91,8 +90,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 continue;
             }
 
-            $im = $this->assembleImage($realPath.'/'.$tt['textureFile'], $tileOrder, 256 + 44, 256 + 75);
-            if (!$im)
+            if (!($im = $this->assembleImage($realPath.'/'.$tt['textureFile'], $tileOrder, 256 + 44, 256 + 75)))
             {
                 CLI::write(' - could not assemble file '.$tt['textureFile'], CLI::LOG_ERROR);
                 $this->success = false;

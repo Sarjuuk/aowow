@@ -28,7 +28,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
     private const M_SPAWNS   = (1 << 1);
     private const M_SUBZONES = (1 << 2);
 
-    private $modeMask = self::M_SPAWNS | self::M_MAPS;
+    private int $modeMask = self::M_SPAWNS | self::M_MAPS;
 
     private const SPAWNMAP_WH   = 1000;                     // it is square
     private const MAP_W         = 1002;
@@ -358,8 +358,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                     if ($doSkip == 0xF)
                         continue;
 
-                    $resMap = $this->assembleImage($file, self::TILEORDER, self::MAP_W, self::MAP_H);
-                    if (!$resMap)
+                    if (!($resMap = $this->assembleImage($file, self::TILEORDER, self::MAP_W, self::MAP_H)))
                     {
                         CLI::write(' - could not create image resource for zone '.$zoneId.($nFloors ? ' floor '.$floorIdx : ''), CLI::LOG_ERROR);
                         $this->success = false;
@@ -369,7 +368,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                     if ($resOverlay && !$floorIdx)
                     {
                         imagecopymerge($resMap, $resOverlay, 0, 0, 0, 0, imagesx($resOverlay), imagesy($resOverlay), 100);
-                        imagedestroy($resOverlay);
+                        unset($resOverlay);
                     }
 
                     // create map
@@ -390,8 +389,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 if ($resMap && isset($this->wmOverlays[$wmaId]) && $this->modeMask & self::M_SUBZONES)
                     $this->buildSubZones($resMap, $wmaId, $loc);
 
-                if ($resMap)
-                    imagedestroy($resMap);
+                unset($resMap);
 
                 // this takes a while; ping mysql just in case
                 DB::Aowow()->selectCell('SELECT 1');
@@ -634,8 +632,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                     if ($doSkip == 0xF && !($this->modeMask & self::M_SUBZONES))
                         continue;
 
-                    $resMap = $this->assembleImage($srcFile, self::TILEORDER, self::MAP_W, self::MAP_H);
-                    if (!$resMap)
+                    if (!($resMap = $this->assembleImage($srcFile, self::TILEORDER, self::MAP_W, self::MAP_H)))
                     {
                         CLI::write('[img-maps] - Could not create image resource for '.($nFloors ? 'floor '.$srcFloorIdx : 'base level'), CLI::LOG_ERROR);
                         $this->success = false;
@@ -645,7 +642,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                     if ($resOverlay && !$nFloors)
                     {
                         imagecopymerge($resMap, $resOverlay, 0, 0, 0, 0, imagesx($resOverlay), imagesy($resOverlay), 100);
-                        imagedestroy($resOverlay);
+                        unset($resOverlay);
                     }
 
                     // create map
@@ -666,8 +663,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 if ($resMap && isset($this->wmOverlays[$wmaId]) && $this->modeMask & self::M_SUBZONES)
                     $this->buildSubZones($resMap, $wmaId, $loc);
 
-                if ($resMap)
-                    imagedestroy($resMap);
+                unset($resMap);
 
                 // this takes a while; ping mysql just in case
                 DB::Aowow()->selectCell('SELECT 1');
@@ -805,7 +801,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                     $this->success = false;
             }
 
-            imagedestroy($subZone);
+            unset($subZone);
         }
     }
 
@@ -825,8 +821,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 $x = 0;
                 while ($x < $row['w'])
                 {
-                    $img = $this->loadImageFile($basePath . $row['textureString'] . $i, $noSrcFile);
-                    if (!$img)
+                    if (!($img = $this->loadImageFile($basePath . $row['textureString'] . $i, $noSrcFile)))
                     {
                         if ($noSrcFile)
                             CLI::write('[img-maps] - overlay tile ' . $basePath . $row['textureString'] . $i . '.blp missing.', CLI::LOG_ERROR);
@@ -851,7 +846,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                                     imagesetpixel($row['maskimage'], $x + $mx, $y + $my, $row['maskcolor']);
                     }
 
-                    imagedestroy($img);
+                    unset($img);
 
                     $x += 256;
                     $i++;

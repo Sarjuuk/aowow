@@ -285,7 +285,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                                 $this->success = false;
                             }
 
-                            imagedestroy($dest);
+                            unset($dest);
                         }
                         */
                     }

@@ -8,11 +8,12 @@ if (!defined('AOWOW_REVISION'))
 
 class BinaryFile
 {
-    private /*res*/ $handle = null;
-    private string  $data   = '';
-    private int     $pos    = 0;
+    private /*res*/ $handle     = null;
+    private string  $data       = '';
+    private int     $pos        = 0;
+    private int     $ptchOffset = 0;                        // in case of ptch - copy, the actual file starts at 0x44
 
-    protected int $filesize     = 0;
+    protected int $filesize = 0;
 
     public string $error = '';
 
@@ -34,6 +35,28 @@ class BinaryFile
 
         if ($inRAM)
             $this->data = file_get_contents($file);
+
+        // predict replacement patch files
+        // ref: http://www.zezula.net/en/mpq/patchfiles.html
+        if ($this->read(4) == "PTCH")
+        {
+            $this->ffwd(60);                                // skip through TPatchHeader
+            if ($this->read(4) != "COPY")
+            {
+                $this->error = 'file '.$file.' is an incremental patch file and cannot be used.';
+                $this->close();
+                return;
+            }
+
+            $this->filesize -= 68;
+
+            if ($this->inRAM)
+                $this->data = substr($this->data, 68);
+            else
+                $this->ptchOffset = 68;
+        }
+
+        $this->seek(0);                                     // reset position
     }
 
     public function __destruct()
@@ -48,7 +71,7 @@ class BinaryFile
 
     public function read(int $bytes) : ?string
     {
-        if ($this->error || !is_resource($this->handle) || $bytes < 0)
+        if (!$this->canRead() || $bytes < 0)
             return null;
 
         $start = $this->pos;
@@ -62,17 +85,16 @@ class BinaryFile
 
     public function readOffset(int $bytes, int $offset, bool $jumpBack = true) : ?string
     {
-        if ($this->error || !is_resource($this->handle))
+        if (!$this->canRead())
             return null;
 
-        if ($jumpBack)
-            $curPos = $this->inRAM ? $this->pos : ftell($this->handle);
+        $curPos = $jumpBack ? $this->pos : null;            // no need to ftell, >pos is always updated
 
         $this->seek($offset);
 
         $str = $this->read($bytes);
 
-        if ($jumpBack)
+        if ($curPos !== null)
             $this->seek($curPos);
 
         return $str;
@@ -80,7 +102,7 @@ class BinaryFile
 
     public function seek(int $pos) : int
     {
-        if (!is_resource($this->handle))
+        if (!$this->canRead())
             return 0;
 
         if ($pos < 0)
@@ -91,17 +113,17 @@ class BinaryFile
         $this->pos = $pos;
 
         if (!$this->inRAM)
-            fseek($this->handle, $pos, SEEK_SET);
+            fseek($this->handle, $pos + $this->ptchOffset, SEEK_SET);
 
         return $pos;
     }
 
     public function ffwd(int $bytes) : int
     {
-        if (!is_resource($this->handle))
+        if (!$this->canRead())
             return 0;
 
-        $curPos = $this->inRAM ? $this->pos : ftell($this->handle);
+        $curPos = $this->pos;                               // no need to ftell, >pos is always updated
 
         if ($curPos + $bytes < 0)
             $bytes -= $curPos;
@@ -110,11 +132,10 @@ class BinaryFile
 
         $this->pos += $bytes;
 
-        if ($this->inRAM)
-            return $this->pos;
+        if (!$this->inRAM)
+            fseek($this->handle, $bytes, SEEK_CUR);
 
-        fseek($this->handle, $bytes, SEEK_CUR);
-        return ftell($this->handle);
+        return $this->pos;;
     }
 
     public function close() : void
@@ -125,11 +146,13 @@ class BinaryFile
 
     public function tell() : int
     {
-        if (!is_resource($this->handle))
+        if (!$this->canRead())
             return 0;
 
-        return $this->inRAM ? $this->pos : ftell($this->handle);
+        // >pos is always updated, no need to ftell()
+        return $this->pos;
     }
+
 
     /******************/
     /* read Primitive */
@@ -137,65 +160,80 @@ class BinaryFile
 
     public function readInt8() : ?Int8
     {
-        if (!is_resource($this->handle))
+        if (!$this->canRead())
             return null;
         return new Int8($this);
     }
 
     public function readInt16() : ?Int16
     {
-        if (!is_resource($this->handle))
+        if (!$this->canRead())
             return null;
         return new Int16($this);
     }
 
     public function readInt32() : ?Int32
     {
-        if (!is_resource($this->handle))
+        if (!$this->canRead())
             return null;
         return new Int32($this);
     }
 
     public function readUInt8() : ?UInt8
     {
-        if (!is_resource($this->handle))
+        if (!$this->canRead())
             return null;
         return new UInt8($this);
     }
 
     public function readUInt16() : ?UInt16
     {
-        if (!is_resource($this->handle))
+        if (!$this->canRead())
             return null;
         return new UInt16($this);
     }
 
     public function readUInt32() : ?UInt32
     {
-        if (!is_resource($this->handle))
+        if (!$this->canRead())
             return null;
         return new UInt32($this);
     }
 
     public function readFloat() : ?Double
     {
-        if (!is_resource($this->handle))
+        if (!$this->canRead())
             return null;
         return new Double($this);
     }
 
     public function readChar() : ?Char
     {
-        if (!is_resource($this->handle))
+        if (!$this->canRead())
             return null;
         return new Char($this);
     }
 
     public function readBool() : ?Boolean
     {
-        if (!is_resource($this->handle))
+        if (!$this->canRead())
             return null;
         return new Boolean($this);
+    }
+
+    /******************/
+    /* misc internals */
+    /******************/
+
+    private function canRead() : bool
+    {
+        if ($this->error)
+            return false;
+        if ($this->inRAM && !$this->data)
+            return false;
+        if (!$this->inRAM && !is_resource($this->handle))
+            return false;
+        return true;
     }
 }
 

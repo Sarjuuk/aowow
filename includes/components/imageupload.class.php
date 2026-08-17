@@ -202,7 +202,7 @@ abstract class ImageUpload
         imagecopy($destImg, self::$img, 0, 0, $x, $y, $w, $h);
 
         self::$img = $destImg;
-        imagedestroy($destImg);
+        unset($destImg);
 
         return true;
     }
@@ -252,7 +252,7 @@ abstract class ImageUpload
 
         imagealphablending(self::$img, true);
         imagecopy(self::$img, $image, 0, 0, 0, 0, imagesx($image), imagesy($image));
-        imagedestroy($image);
+        unset($image);
 
         return true;
     }
@@ -276,7 +276,7 @@ abstract class ImageUpload
 
         imagealphablending(self::$img, true);
         imagecopy(self::$img, $image, 0, 0, 0, 0, imagesx($image), imagesy($image));
-        imagedestroy($image);
+        unset($image);
 
         return true;
     }

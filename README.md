@@ -111,11 +111,6 @@ A: The static content is not being displayed. You are either using SSL and AoWoW
 Q: Fatal error: Can't inherit abstract function \<functionName> (previously declared abstract in \<className>) in \<path>  
 A: You are using multiple cache optimization modules for php that are in conflict with each other. (Zend OPcache, XCache, ..) Disable all but one.
 
-Q: Some generated images appear distorted or have alpha-channel issues.  
-A: Image compression is beyond my understanding, so i am unable to fix these issues within the blpReader.
- BUT you can convert the affected blp file into a png file in the same directory, using the provided BLPConverter.
- The setup will prioritize png files over blp files.
-
 Q: How can i get the modelviewer to work?  
 A: You can't anymore. Wowhead switched from Flash to WebGL (as they should) and moved or deleted the old files in the process.
 
