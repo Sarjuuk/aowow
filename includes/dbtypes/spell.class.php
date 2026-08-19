@@ -747,8 +747,8 @@ class SpellList extends DBTypeList
 
         if ($rppl)
         {
-            $modMin = '<!--ppl'.$baseLvl.':'.($maxLvl ?: $level).':'.$min.':'.($rppl * 100 * $nTicks).'-->';
-            $modMax = '<!--ppl'.$baseLvl.':'.($maxLvl ?: $level).':'.$max.':'.($rppl * 100 * $nTicks).'-->';
+            $modMin = '<!--ppl'.$baseLvl.':'.($maxLvl ?: $level).':'.abs($min).':'.(abs($rppl) * 100 * $nTicks).'-->';
+            $modMax = '<!--ppl'.$baseLvl.':'.($maxLvl ?: $level).':'.abs($max).':'.(abs($rppl) * 100 * $nTicks).'-->';
         }
         else if ($this->getField('attributes0') & SPELL_ATTR0_LEVEL_DAMAGE_CALCULATION && in_array($effIdx, $LDSEffs) && $spellLvl)
         {
@@ -2192,8 +2192,8 @@ class SpellList extends DBTypeList
             {
                 $spells = $buffSpells = [];
 
-                $buff = $this->renderBuff(MAX_LEVEL, buffSpells: $buffSpells);
-                $tTip = $this->renderTooltip(MAX_LEVEL, ttSpells: $spells);
+                $buff = $this->renderBuff(MAX_LEVEL, SpellList::INTERACTIVE_FULL, $buffSpells);
+                $tTip = $this->renderTooltip(MAX_LEVEL, SpellList::INTERACTIVE_FULL, $spells);
 
                 foreach ($spells as $relId => $_)
                     if (empty($data[Type::SPELL][$relId]))
