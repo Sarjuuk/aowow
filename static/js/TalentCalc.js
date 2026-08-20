@@ -1199,10 +1199,12 @@ function TalentCalc() {
                 afterUrl = '?' + _versionBuild;
 
             if (_mode == MODE_PET) {
+                d.style.backgroundSize = '244px 364px';     // aowow - custom
                 d.style.backgroundImage = 'url(' + g_staticUrl + '/images/wow/hunterpettalents/bg_' + (c[0].i + 1) + '.jpg' + afterUrl + ')';
                 iconBg = g_staticUrl + '/images/wow/hunterpettalents/icons_' + (c[0].i + 1) + '.jpg' + afterUrl
             }
             else {
+                d.style.backgroundSize = '204px 554px';     // aowow - custom
                 d.style.backgroundImage = 'url(' + g_staticUrl + '/images/wow/talents/backgrounds/' + g_file_classes[classId] + '_' + (tree + 1) + '.jpg' + afterUrl + ')';
                 iconBg = g_staticUrl + '/images/wow/talents/icons/' + g_file_classes[classId] + '_' + (tree + 1) + '.jpg' + afterUrl;
             }

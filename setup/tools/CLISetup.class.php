@@ -435,6 +435,21 @@ class CLISetup
         return $result;
     }
 
+    public static function setOpt(string $opt, bool|array $value) : bool
+    {
+        if (!isset(self::$optDefs[$opt]))                   // do not set unexpected opts
+            return false;
+        if (isset(self::$opts[$opt]))                       // do not overwrite explicitly set opts
+            return false;
+        if (self::$optDefs[$opt][2] & self::ARGV_ARRAY && !is_array($value))
+            return false;
+        if (!(self::$optDefs[$opt][2] & self::ARGV_ARRAY) && is_array($value))
+            return false;
+
+        self::$opts[$opt] = $value;
+        return true;
+    }
+
 
     /*******************/
     /* web page access */

@@ -14,7 +14,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
     use TrComplexImage;
 
     protected $info = array(
-        'img-maps'   => [[   ], CLISetup::ARGV_PARAM,    'Generate zone and continental maps and the corresponding \'zones\' datasets.'                                                          ],
+        'img-maps'   => [[   ], CLISetup::ARGV_PARAM,    'Generate zone and continental maps and the corresponding \'zones\' datasets.'                 ],
 /* 1 */ 'spawnmaps'  => [['1'], CLISetup::ARGV_OPTIONAL, 'Fallback to generate alpha masks for each zone to match creature and gameobject spawn points.'],
 /* 2 */ 'subzones'   => [['2'], CLISetup::ARGV_OPTIONAL, 'Generate additional area maps with highlighting for subzones (optional; skipped by default)'  ],
 /* 4 */ 'skip-zones' => [['3'], CLISetup::ARGV_OPTIONAL, 'Prevent default output of zone maps.'                                                         ]
@@ -44,10 +44,10 @@ CLISetup::registerSetup("build", new class extends SetupScript
     private const CONTINENTS = [0, 1, 530, 571];            // Map.dbc/id
 
     private const DEST_DIRS = array(
-        ['static/images/wow/maps/%snormal/',   488, 325],
+     // ['static/images/wow/maps/%snormal/',   488, 325],   // deprecated sizes
         ['static/images/wow/maps/%soriginal/',   0,   0],   // 1002, 668
-        ['static/images/wow/maps/%ssmall/',    224, 149],
-        ['static/images/wow/maps/%szoom/',     772, 515]
+     // ['static/images/wow/maps/%ssmall/',    224, 149],
+     // ['static/images/wow/maps/%szoom/',     772, 515]
     );
 
     private const TILEORDER = array(
@@ -513,6 +513,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
         foreach (CLISetup::$locales as $l => $loc)
         {
             // source for mapFiles
+            $mapDestDirs = $this->genSteps[self::M_MAPS][4];
             $mapSrcDir = '';
             if ($this->modeMask & self::M_SPAWNS)
                 $mapSrcDir = $this->genSteps[self::M_SPAWNS][1][$l] ?? '';
@@ -617,7 +618,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                     if (!($this->modeMask & (self::M_MAPS | self::M_SUBZONES)))
                         continue;
 
-                    foreach (self::DEST_DIRS as $sizeIdx => [$path, $width, $height])
+                    foreach ($mapDestDirs as $sizeIdx => [$path, $width, $height])
                     {
                         $outPaths[$sizeIdx] = sprintf($path, strtolower($loc->json()).DIRECTORY_SEPARATOR) . $outFile . '.jpg';
 
@@ -629,7 +630,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                     }
 
                     // can't skip map creation if we are to generate subzones later. although they may already exist and get skipped anyway *shrug*
-                    if ($doSkip == 0xF && !($this->modeMask & self::M_SUBZONES))
+                    if ($doSkip == array_reduce(array_keys($mapDestDirs), fn($c, $x) => $c |= (1 << $x)) && !($this->modeMask & self::M_SUBZONES))
                         continue;
 
                     if (!($resMap = $this->assembleImage($srcFile, self::TILEORDER, self::MAP_W, self::MAP_H)))
@@ -648,7 +649,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                     // create map
                     if ($this->modeMask & self::M_MAPS)
                     {
-                        foreach (self::DEST_DIRS as $sizeIdx => [, $width, $height])
+                        foreach ($mapDestDirs as $sizeIdx => [, $width, $height])
                         {
                             if ($doSkip & (1 << $sizeIdx))
                                 continue;
@@ -775,7 +776,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             $doSkip  = 0x0;
             $outFile = [];
 
-            foreach (self::DEST_DIRS as $sizeIdx => [$path, , ])
+            foreach ($this->genSteps[self::M_SUBZONES][4] as $sizeIdx => [$path, , ])
             {
                 $outFile[$sizeIdx] = sprintf($path, $loc->json() . DIRECTORY_SEPARATOR) . $row['areaTableId'].'.jpg';
                 if (!CLISetup::getOpt('force') && file_exists($outFile[$sizeIdx]))
@@ -785,14 +786,14 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 }
             }
 
-            if ($doSkip == 0xF)
+            if ($doSkip == array_reduce(array_keys($this->genSteps[self::M_SUBZONES][4]), fn($c, $x) => $c |= (1 << $x)))
                 continue;
 
             $subZone = imagecreatetruecolor(self::MAP_W, self::MAP_H);
             imagecopy($subZone, $resMap, 0, 0, 0, 0, imagesx($resMap), imagesy($resMap));
             imagecopy($subZone, $row['maskimage'], $row['x'], $row['y'], 0, 0, imagesx($row['maskimage']), imagesy($row['maskimage']));
 
-            foreach (self::DEST_DIRS as $sizeIdx => [, $width, $height])
+            foreach ($this->genSteps[self::M_SUBZONES][4] as $sizeIdx => [, $width, $height])
             {
                 if ($doSkip & (1 << $sizeIdx))
                     continue;

@@ -75,12 +75,12 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
             if ($tt['creatureFamilyMask'])      // is PetCalc
             {
-                $size = [244, 364];
+             // $size = [244, 364];
                 $outFile = sprintf($outInfo[0][0].'bg_%d.jpg', log($tt['creatureFamilyMask'], 2) + 1);
             }
             else
             {
-                $size = [204, 554];
+             // $size = [204, 554];
                 $outFile = sprintf($outInfo[1][0].'%s_%d.jpg', strtolower($tt['fileString']), $tt['tabNumber'] + 1);
             }
 
@@ -97,7 +97,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 continue;
             }
 
-            if (!$this->writeImageFile($im, $outFile, $size[0], $size[1]))
+            if (!$this->writeImageFile($im, $outFile, imagesx($im), imagesy($im))) // ...$size
                 $this->success = false;
         }
 

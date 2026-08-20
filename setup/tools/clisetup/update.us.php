@@ -100,7 +100,10 @@ CLISetup::registerUtility(new class extends UtilityScript
             CLI::write('[update] The following sql scripts have been scheduled: '.implode(', ', $sql));
 
         if ($build)
+        {
+            CLISetup::setOpt('force', true);                // overwrite existing images if demanded by update
             CLI::write('[update] The following build scripts have been scheduled: '.implode(', ', $build));
+        }
 
         return true;
     }

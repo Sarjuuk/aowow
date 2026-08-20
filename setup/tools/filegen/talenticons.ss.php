@@ -113,19 +113,11 @@ CLISetup::registerSetup("build", new class extends SetupScript
             $im = imagecreatefromjpeg($imgFile);
 
             // colored
-            imagecopymerge($res, $im, $i * self::ICON_SIZE, 0, 0, 0, imageSX($im), imageSY($im), 100);
+            imagecopymerge($res, $im, $i * self::ICON_SIZE, 0, 0, 0, imagesx($im), imagesy($im), 100);
 
             // grayscale
-            if (imageistruecolor($im))
-                imagetruecolortopalette($im, false, 256);
-
-            for ($j = 0; $j < imagecolorstotal($im); $j++)
-            {
-                $color = imagecolorsforindex($im, $j);
-                $gray  = round(0.299 * $color['red'] + 0.587 * $color['green'] + 0.114 * $color['blue']);
-                imagecolorset($im, $j, $gray, $gray, $gray);
-            }
-            imagecopymerge($res, $im, $i * self::ICON_SIZE, self::ICON_SIZE, 0, 0, imageSX($im), imageSY($im), 100);
+            imagefilter($im, IMG_FILTER_GRAYSCALE);
+            imagecopymerge($res, $im, $i * self::ICON_SIZE, self::ICON_SIZE, 0, 0, imagesx($im), imagesy($im), 100);
         }
 
         return $res;

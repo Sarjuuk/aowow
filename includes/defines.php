@@ -60,7 +60,7 @@ define ('SC_FLAG_NOCACHE',                  0x10);
 define('ICON_SIZE_TINY',                    15);
 define('ICON_SIZE_SMALL',                   18);
 define('ICON_SIZE_MEDIUM',                  36);
-define('ICON_SIZE_LARGE',                   56);
+define('ICON_SIZE_LARGE',                   56);            // original size of 64px minus 4px per icon border
 
 // Databases
 define('DB_AOWOW',                          0);

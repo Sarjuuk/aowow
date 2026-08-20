@@ -356,7 +356,11 @@ Mapper.prototype = {
 
         var type = Locale.getName();
 
-        this.span.style.background = 'url(' + g_staticUrl + '/images/wow/maps/' + type + '/' + Mapper.sizes[this.zoom][2] + '/' + map + '.jpg)';
+     // this.span.style.background = 'url(' + g_staticUrl + '/images/wow/maps/' + type + '/' + Mapper.sizes[this.zoom][2] + '/' + map + '.jpg)';
+     // aowow - custom start
+        this.span.style.backgroundSize = 'contain';
+        this.span.style.background = 'url(' + g_staticUrl + '/images/wow/maps/' + type + '/' + Mapper.sizes[2][2] + '/' + map + '.jpg)';
+     // aowow - custom end
 
         if (this.overlay)
             this.overlaySpan.style.background = 'url(' + g_staticUrl + '/images/wow/maps/overlay/' + Mapper.sizes[this.zoom][2] + '/' + map + '.png)';
