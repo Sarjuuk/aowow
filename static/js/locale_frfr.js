@@ -4580,7 +4580,7 @@ var LANG = {
     pr_tip_quests:   "Note: <span class=\"tip\">Certaines</span> quêtes ne sont pas retrouvables par les API de Blizzard.",
 
     pr_header_noname:    "Sans nom",
-    pr_header_character: "Niveau $1 <a href=\"?class=$4\">$2</a> <a href=\"?class=$5\" class=\"c$5\">$3</a>",
+    pr_header_character: 'Niveau $1 <a href="?race=$4">$2</a> <a href="?class=$5" class="c$5">$3</a>',
     pr_header_edit:      "Édition",
     pr_header_armory:    "Armurerie",
     pr_header_help:      "Aide",

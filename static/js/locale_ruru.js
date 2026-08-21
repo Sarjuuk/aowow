@@ -4581,7 +4581,7 @@ var LANG = {
     pr_tip_quests:   "Предупреждение: <span class=\"tip\">Некоторые</span> задания не могут быть отслежены в игре.",
 
     pr_header_noname:    "Без имени",
-    pr_header_character: "<a href=\"?race=$4\">$2</a> <a href=\"?class=$5\" class=\"c$5\">$3</a> $1-го уровня",
+    pr_header_character: '<a href="?race=$4">$2</a> <a href="?class=$5" class="c$5">$3</a> $1-го уровня',
     pr_header_edit:      "Редактировать",
     pr_header_armory:    "Оружейная",
     pr_header_help:      "Справка",
