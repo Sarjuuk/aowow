@@ -15,6 +15,7 @@ require_once 'includes/setup/datatypes/primitives.php';
 require_once 'includes/setup/files/binaryfile.class.php';
 require_once 'includes/setup/files/dbcfile.class.php';
 require_once 'includes/setup/files/blp2file.class.php';
+require_once 'includes/setup/files/mpqarchive.class.php';
 
 require_once 'setup/tools/setupScript.class.php';
 require_once 'setup/tools/utilityScript.class.php';

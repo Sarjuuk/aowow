@@ -21,7 +21,8 @@
         "ext-gd": "*",
         "ext-mysqli": "*",
         "ext-fileinfo": "*",
-        "ext-intl": "*"
+        "ext-intl": "*",
+        "ext-ffi": "*"
     },
     "require-dev": {
         "jfcherng/php-diff": "^6.16"
