@@ -25,7 +25,8 @@ Also, this project is not meant to be used for commercial purposes of any kind!
   + [Multibyte String](https://www.php.net/manual/en/book.mbstring.php)
   + [File Information](https://www.php.net/manual/en/book.fileinfo.php)
   + [Internationalization](https://www.php.net/manual/en/book.intl.php)
-  + [GNU Multiple Precision](https://www.php.net/manual/en/book.gmp.php) (When using TrinityCore as auth source)
+  + [Foreign Function Interface](https://www.php.net/manual/en/book.ffi.php) (when direclty reading MPQs through StormLib)
+  + [GNU Multiple Precision](https://www.php.net/manual/en/book.gmp.php) (when using TrinityCore as auth source)
 + MySQL ≥ 5.7.0 OR MariaDB ≥ 10.6.4 OR similar
 + [Composer](https://getcomposer.org/download/)
 + [TDB 335.25101](https://github.com/TrinityCore/TrinityCore/releases/tag/TDB335.25101) including updates up to [TrinityCore/TrinityCore@8300a6d](https://github.com/TrinityCore/TrinityCore/commit/8300a6d8463aa862ae154392558c1f11dc2fce5d) (no other other providers are supported at this time)
@@ -57,7 +58,7 @@ Import files 01 - 03 from `setup/sql/` in order into the AoWoW database `mysql -
 **Optional**: If you are using MySQL ≥ 8.4.0 and want to support fulltext search for locale zhCN, additionally import `setup/sql/04-db_optional_mysql_only.sql`. Enables this in settings after AoWoW has been set up.  
 
 #### 3. Server created files
-See to it, that the web server is able to write the following directories and their children. If they are missing, the setup will create them with appropriate permissions
+See to it, that the web server is able to write the following directories and their children. If they are missing, the setup will try to create them with appropriate permissions
  * `cache/`
  * `config/`
  * `static/download/`

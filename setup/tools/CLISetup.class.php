@@ -9,7 +9,7 @@ if (!CLI)
     die('not in cli mode');
 
 
-class CLISetup
+final class CLISetup
 {
     public const int SQL_BATCH     = 1000;                  // max. n items per sql insert
 
@@ -30,10 +30,12 @@ class CLISetup
     private const string GLOBALSTRINGS_LUA = '%s%sinterface/framexml/globalstrings.lua';
 
     /** @var Locale[] $locales */
-    public  static array  $locales = [];
-    public  static string $srcDir  = 'setup/mpqdata/';
+    public  static array  $locales  = [];
+    public  static string $srcDir   = 'setup/mpqdata/';
+    public  static string $mpqDir   = 'setup/data/';
+    public  static string $stormLib = '';                   // set when first required
 
-    private static array $mpqFiles        = [];
+    private static array $clientFiles     = [];
     /** @var array<string, UtilityScript> $utilScriptRefs - name => usScriptRef*/
     private static array $utilScriptRefs  = [];
     /** @var array{string, string, SetupScript}[] $setupScriptRefs - {invokingUS, scriptName, ssScriptRef} */
@@ -54,6 +56,7 @@ class CLISetup
         'force'     => [self::OPT_GRP_MISC, ['f'], self::ARGV_NONE,                        'Force existing files to be overwritten.',                                                                   ''                                 ],
         'locales'   => [self::OPT_GRP_MISC, [],    self::ARGV_ARRAY | self::ARGV_OPTIONAL, 'Limit setup to enUS, frFR, deDE, zhCN, esES and/or ruRU. (does not override config settings)',              '=<regionCodes,>'                  ],
         'datasrc'   => [self::OPT_GRP_MISC, [],    self::ARGV_OPTIONAL,                    'Manually point to directory with extracted game files. Accepts absolute paths or paths relative to setup/. (default: setup/mpqdata/)', '=path/'],
+        'mpqsrc'    => [self::OPT_GRP_MISC, [],    self::ARGV_OPTIONAL,                    'Manually point to the Data/ directory of the game client. Accepts absolute paths or paths relative to setup/. (default: setup/data/)', '=path/'],
         'step'      => [self::OPT_GRP_MISC, [],    self::ARGV_REQUIRED,                    'Start setup at given step (can be used to better automate the setup process).',                             '=step'                            ]
     );
 
@@ -505,7 +508,7 @@ class CLISetup
             foreach (new \RecursiveIteratorIterator($iterator, \RecursiveIteratorIterator::SELF_FIRST) as $path)
             {
                 $_ = CLI::nicePath($path->getPathname());
-                self::$mpqFiles[mb_strtolower($_)] = $_;
+                self::$clientFiles[mb_strtolower($_)] = $_;
             }
 
             CLI::write('indexing game data from '.self::$srcDir.' for first time use... done!', CLI::LOG_INFO);
@@ -522,7 +525,7 @@ class CLISetup
     public static function fileExists(string &$file) : bool
     {
         // read mpq source file structure to tree
-        if (!self::$mpqFiles)
+        if (!self::$clientFiles)
             if (!self::buildFileList())
                 return false;
 
@@ -533,9 +536,9 @@ class CLISetup
         if (mb_substr($_, -1, 1) == DIRECTORY_SEPARATOR)
             $_ = mb_substr($_, 0, -1);
 
-        if (isset(self::$mpqFiles[$_]))
+        if (isset(self::$clientFiles[$_]))
         {
-            $file = self::$mpqFiles[$_];
+            $file = self::$clientFiles[$_];
             return true;
         }
 
@@ -547,14 +550,14 @@ class CLISetup
         $result = [];
 
         // read mpq source file structure to tree
-        if (!self::$mpqFiles)
+        if (!self::$clientFiles)
             if (!self::buildFileList())
                 return [];
 
         // backslash to forward slash
         $_ = strtolower(CLI::nicePath($path));
 
-        foreach (self::$mpqFiles as $lowerFile => $realFile)
+        foreach (self::$clientFiles as $lowerFile => $realFile)
         {
             if (!$useRegEx && strstr($lowerFile, $_))
                 $result[] = $realFile;

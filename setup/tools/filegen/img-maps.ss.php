@@ -22,6 +22,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
     protected bool  $useGlobalStrings = true;
     protected array $dbcSourceFiles   = ['worldmapoverlay', 'worldmaparea', 'dungeonmap'];
+    protected array $setupAfter       = [[], ['clientfiles']];
     protected array $requiredDirs     = ['datasets/'];
 
     private const int M_MAPS     = (1 << 0);
