@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a076983e412f18945edf2b9634ac8930",
+    "content-hash": "f4ec486bd8bd8167a4f5fed285b6a9fd",
     "packages": [
         {
             "name": "dibi/dibi",
@@ -334,7 +334,8 @@
         "ext-gd": "*",
         "ext-mysqli": "*",
         "ext-fileinfo": "*",
-        "ext-intl": "*"
+        "ext-intl": "*",
+        "ext-ffi": "*"
     },
     "platform-dev": {},
     "plugin-api-version": "2.9.0"
