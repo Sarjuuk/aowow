@@ -17,6 +17,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
     protected bool  $useGlobalStrings = true;
     protected array $dbcSourceFiles   = ['emotes', 'emotestext', 'emotestextdata'];
+    protected array $setupAfter       = [[], ['clientfiles']];
 
     private array $textData = [];
 

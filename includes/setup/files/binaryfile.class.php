@@ -9,7 +9,6 @@ if (!defined('AOWOW_REVISION'))
 class BinaryFile
 {
     private /*res*/ $handle     = null;
-    private string  $data       = '';
     private int     $pos        = 0;
     private int     $ptchOffset = 0;                        // in case of ptch - copy, the actual file starts at 0x44
 
@@ -17,24 +16,9 @@ class BinaryFile
 
     public string $error = '';
 
-    public function __construct(string $file, private bool $inRAM = true)
+    public function __construct(private string $data, private bool $inRAM = true)
     {
-        if (!file_exists($file))
-        {
-            $this->error = 'file '.$file.' not found';
-            return;
-        }
-
-        if (!$this->handle = fopen($file, 'rb'))
-        {
-            $this->error = 'failed to open file '.$file;
-            return;
-        }
-
-        $this->filesize = filesize($file);
-
-        if ($inRAM)
-            $this->data = file_get_contents($file);
+        $this->filesize = strlen($data);
 
         // predict replacement patch files
         // ref: http://www.zezula.net/en/mpq/patchfiles.html
@@ -43,7 +27,7 @@ class BinaryFile
             $this->ffwd(60);                                // skip through TPatchHeader
             if ($this->read(4) != "COPY")
             {
-                $this->error = 'file '.$file.' is an incremental patch file and cannot be used.';
+                $this->error = 'file is an incremental patch file and cannot be used.';
                 $this->close();
                 return;
             }
@@ -62,6 +46,19 @@ class BinaryFile
     public function __destruct()
     {
         $this->close();
+    }
+
+    public static function open(string $file) : ?static
+    {
+        if (!file_exists($file))
+            return null;
+
+        if (!$data = file_get_contents($file))
+            return null;
+
+        // ugh .. cant set $handle?
+
+        return new self($data);
     }
 
 
