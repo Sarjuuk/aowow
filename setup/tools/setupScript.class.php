@@ -177,8 +177,12 @@ trait TrImageProcessor
 
     private const JPEG_QUALITY = 85;                        // 0: worst - 100: best
 
+    /** * @var array{string, string, bool, array, array{string, int, int}}[] $genSteps - {src, resourcePath, localized, [tileOrder], [[dest, destW, destH]]} */
+    private array $genSteps = [];
+
     private function checkSourceDirs() : bool
     {
+        $success    = true;
         $outTblLen  = 0;
         $foundCache = [];
 
@@ -197,23 +201,18 @@ trait TrImageProcessor
             $outTblLen = max($outTblLen, strlen($subDir));
 
             $path = $this->imgPath.$subDir;
-            if ($p = CLISetup::filesInPathLocalized($path, $this->success, $localized))
+            if ($p = CLISetup::filesInPathLocalized($path, $success, $localized))
             {
                 $foundCache[$subDir] = $p;
                 $this->genSteps[$i][self::GEN_IDX_SRC_REAL] = $p;
             }
             else
-                $this->success = false;
+                $success = false;
         }
 
         $locList = [];
-        foreach (Locale::cases() as $loc)
-        {
-            if (!$loc->validate() || !in_array($loc, CLISetup::$locales))
-                continue;
-
+        foreach (CLISetup::$locales as $loc)
             $locList = array_merge($locList, $loc->gameDirs());
-        }
 
         CLI::write('[img-proc] required resources overview:', CLI::LOG_INFO);
 
@@ -228,7 +227,7 @@ trait TrImageProcessor
             if (!$realPaths)
             {
                 CLI::write(CLI::red('MISSING').' - '.str_pad($subDir, $outTblLen).' @ '.sprintf($this->imgPath, '['.implode('/ ', $locList).'/]').$subDir);
-                $this->success = false;
+                $success = false;
             }
             else if ($localized)
             {
@@ -262,7 +261,7 @@ trait TrImageProcessor
             if (!$localized && $realPaths)
                 $this->genSteps[$i][self::GEN_IDX_SRC_REAL] = reset($realPaths);
 
-        return $this->success;
+        return $success;
     }
 
     // NOTE: the feature to preferably load PNGs is still in place for compatibility reasons
@@ -449,9 +448,6 @@ abstract class SetupScript
     protected $fileTemplateDest   = [];
     protected $fileTemplatePath   = 'setup/tools/filegen/templates/';
     protected $fileTemplateSrc    = [];
-
-    // SQLGen
-    protected $result = '';
 
     // FileGen + SQLGen
     protected $dbcSourceFiles     = [];                     // relies on these dbc files. Read into db if related table is missing

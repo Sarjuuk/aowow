@@ -59,7 +59,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
     private const MAP_FILE_PATTERN = '/((\w{4})\/interface\/worldmap(?:\/microdungeon\/([^\/]+))?\/([^\/]+)\/)(\4)(?:(\d{1,2})_)?(\d{1,2})\.(?:blp|png)/i';
 
     // src, resourcePath, localized, [tileOrder], [[dest, destW, destH]]
-    private $genSteps = array(
+    private const /* array */ STEPS = array(
         self::M_MAPS     => ['WorldMap/', null, true,  self::TILEORDER, self::DEST_DIRS             ],
         self::M_SPAWNS   => ['WorldMap/', null, true,  self::TILEORDER, [['cache/alphaMaps/', 0, 0]]],
         self::M_SUBZONES => ['WorldMap/', null, true,  self::TILEORDER, self::DEST_DIRS             ]
@@ -77,6 +77,8 @@ CLISetup::registerSetup("build", new class extends SetupScript
     {
         $this->imgPath = CLISetup::$srcDir.$this->imgPath;
         $this->maxExecTime = ini_get('max_execution_time');
+
+        $this->genSteps = self::STEPS;
 
         // init directories
         foreach ($this->genSteps as [, , , , $outInfo])

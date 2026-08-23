@@ -30,7 +30,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
     );
 
     // src, resourcePath, localized, [tileOrder], [[dest, destW, destH]]
-    private $genSteps = array(
+    private const /* array */ STEPS = array(
         ['TalentFrame/', null, false, self::TILEORDER,  self::DEST_DIRS]
     );
 
@@ -38,6 +38,8 @@ CLISetup::registerSetup("build", new class extends SetupScript
     {
         $this->imgPath = CLISetup::$srcDir.$this->imgPath;
         $this->maxExecTime = ini_get('max_execution_time');
+
+        $this->genSteps = self::STEPS;
 
         // init directories
         foreach (self::DEST_DIRS as $dir)

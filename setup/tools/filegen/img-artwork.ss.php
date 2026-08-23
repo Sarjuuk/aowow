@@ -35,7 +35,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
     );
 
     // src, resourcePath, localized, [tileOrder], [[dest, destW, destH]]
-    private $genSteps = array(
+    private const /* array */ STEPS = array(
         ['Glues/Credits/', null, false, self::TILEORDER, [['cache/Artworks/', 0, 0]]]
     );
 
@@ -43,6 +43,8 @@ CLISetup::registerSetup("build", new class extends SetupScript
     {
         $this->imgPath = CLISetup::$srcDir.$this->imgPath;
         $this->maxExecTime = ini_get('max_execution_time');
+
+        $this->genSteps = self::STEPS;
 
         foreach ($this->genSteps[0][self::GEN_IDX_DEST_INFO] as $dir)
             $this->requiredDirs[] = $dir[0];

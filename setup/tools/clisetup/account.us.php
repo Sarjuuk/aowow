@@ -28,8 +28,6 @@ CLISetup::registerUtility(new class extends UtilityScript
 
     public const USE_CLI_ARGS = true;
 
-    public $runArgs = ['name', 'passw', 'email'];
-
     private $fields = array(
         'name'  => ['Username',         false],
         'pass1' => ['Enter Password',   true ],

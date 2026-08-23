@@ -122,11 +122,8 @@ class DBCReader
         $this->isGameTable = array_values($this->format) == ['f'] && substr($this->file, 0, 2) == 'gt';
 
         $foundMask = 0x0;
-        foreach (Locale::cases() as $loc)
+        foreach (CLISetup::$locales as $loc)
         {
-            if (!in_array($loc, CLISetup::$locales))
-                continue;
-
             if ($foundMask & (1 << $loc->value))
                 continue;
 

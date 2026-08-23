@@ -11,19 +11,11 @@ if (!CLI)
 
 class CLISetup
 {
-    public  static $locales       = [];
-
-    public  static $srcDir        = 'setup/mpqdata/';
-
-    private static $mpqFiles      = [];
-
     public  const SQL_BATCH       = 1000;                   // max. n items per sql insert
 
     public  const LOCK_OFF        = 0;
     public  const LOCK_ON         = 1;
     public  const LOCK_RESTORE    = 2;
-
-    private static $lock          = self::LOCK_ON;
 
     public const ARGV_NONE        = 0x00;
     public const ARGV_REQUIRED    = 0x01;
@@ -37,6 +29,22 @@ class CLISetup
 
     private const GLOBALSTRINGS_LUA = '%s%sinterface/framexml/globalstrings.lua';
 
+    /** @var Locale[] $locales */
+    public  static array  $locales = [];
+    public  static string $srcDir  = 'setup/mpqdata/';
+
+    private static array $mpqFiles        = [];
+    /** @var array<string, UtilityScript> $utilScriptRefs - name => usScriptRef*/
+    private static array $utilScriptRefs  = [];
+    /** @var array{string, string, SetupScript}[] $setupScriptRefs - {invokingUS, scriptName, ssScriptRef} */
+    private static array $setupScriptRefs = [];
+    /** @var array{string, string, SetupScript}[] $tmpStore - SetupScriptRefs with missing dependencies to be slotted later */
+    private static array $tmpStore        = [];
+    /** @var array<int, string[]> $gsFiles - localeId => file(GlobalStrings.lua)  */
+    private static array $gsFiles         = [];
+
+    private static int   $lock            = self::LOCK_ON;
+
     private static $opts          = [];
     private static $optGroups     = ['AoWoW Setup', 'Utility Functions', 'Additional Options'];
     private static $optDefs       = array(                  // cmd => [groupId, aliases[], argvFlags, description, appendix]
@@ -48,11 +56,6 @@ class CLISetup
         'datasrc'   => [self::OPT_GRP_MISC, [],    self::ARGV_OPTIONAL,                    'Manually point to directory with extracted game files. Accepts absolute paths or paths relative to setup/. (default: setup/mpqdata/)', '=path/'],
         'step'      => [self::OPT_GRP_MISC, [],    self::ARGV_REQUIRED,                    'Start setup at given step (can be used to better automate the setup process).',                             '=step'                            ]
     );
-
-    private static $utilScriptRefs  = [];
-    private static $setupScriptRefs = [];
-    private static $tmpStore        = [];
-    private static $gsFiles         = [];
 
     public static function registerUtility(UtilityScript $us) : void
     {
@@ -73,7 +76,7 @@ class CLISetup
             return;
         }
 
-        if (isset(self::$setupScriptRefs[$invoker][$ss->getName()]))
+        if (array_find(self::$setupScriptRefs, fn($x) => $x[0] == $invoker && $x[1] == $ss->getName()))
         {
             CLI::write(' Subscript function '.CLI::bold($ss->getName()).' already defined for invoker '.CLI::bold($invoker).'. Skipping...', CLI::LOG_ERROR);
             return;
@@ -100,17 +103,17 @@ class CLISetup
             self::$setupScriptRefs[] = [$invoker, $ss->getName(), $ss];
 
             // recheck temp stored dependencies
-            foreach (self::$tmpStore as $idx => [$invoker, $ts])
+            foreach (self::$tmpStore as $idx => $scriptRef)
             {
-                if (!self::checkDependencies($ts))
+                if (!self::checkDependencies($scriptRef[2]))
                     continue;
 
-                self::$setupScriptRefs[] = [$invoker, $ts->getName(), $ts];
+                self::$setupScriptRefs[] = $scriptRef;
                 unset(self::$tmpStore[$idx]);
             }
         }
         else                                                // if dependencies haven't been stored yet, put aside for later use
-            self::$tmpStore[] = [$invoker, $ss];
+            self::$tmpStore[] = [$invoker, $ss->getName(), $ss];
     }
 
     private static function checkDependencies(SetupScript &$ss) : bool
@@ -120,8 +123,8 @@ class CLISetup
 
         [$sDep, $bDep] = $ss->getSelfDependencies();
 
-        return ((!$sDep || $sDep == array_intersect($sDep, array_column(array_filter(self::$setupScriptRefs, function($x) { return $x[0] == 'sql';   }), 1))) &&
-                (!$bDep || $bDep == array_intersect($bDep, array_column(array_filter(self::$setupScriptRefs, function($x) { return $x[0] == 'build'; }), 1))));
+        return ((!$sDep || $sDep == array_intersect($sDep, array_column(array_filter(self::$setupScriptRefs, fn($x) => $x[0] == 'sql'  ), 1))) &&
+                (!$bDep || $bDep == array_intersect($bDep, array_column(array_filter(self::$setupScriptRefs, fn($x) => $x[0] == 'build'), 1))));
     }
 
     public static function loadScripts() : void
@@ -134,15 +137,15 @@ class CLISetup
             CLI::write('Some SubScripts have unresolved dependencies and have not been loaded', CLI::LOG_ERROR);
             CLI::write();
             $tbl = [['Name', '--sql dep.', '--build dep.']];
-            foreach (self::$tmpStore as [$_, $ssRef])
+            foreach (self::$tmpStore as [, , $ssRef])
             {
                 [$sDep, $bDep] = $ssRef->getSelfDependencies();
 
-                $missS = array_intersect($sDep, array_column(array_filter(self::$setupScriptRefs, function($x) { return $x[0] == 'sql';   }), 1));
-                $missB = array_intersect($sDep, array_column(array_filter(self::$setupScriptRefs, function($x) { return $x[0] == 'build'; }), 1));
+                $missS = array_intersect($sDep, array_column(array_filter(self::$setupScriptRefs, fn($x) => $x[0] == 'sql'  ), 1));
+                $missB = array_intersect($sDep, array_column(array_filter(self::$setupScriptRefs, fn($x) => $x[0] == 'build'), 1));
 
-                array_walk($sDep, function (&$x) use($missS) { $x = in_array($x, $missS) ? $x : CLI::red($x); });
-                array_walk($bDep, function (&$x) use($missB) { $x = in_array($x, $missB) ? $x : CLI::red($x); });
+                array_walk($sDep, fn(&$x) => $x = in_array($x, $missS) ? $x : CLI::red($x));
+                array_walk($bDep, fn(&$x) => $x = in_array($x, $missB) ? $x : CLI::red($x));
 
                 $tbl[] = [$ssRef->getName(), implode(', ', $sDep), implode(', ', $bDep)];
             }
@@ -151,6 +154,7 @@ class CLISetup
         }
 
         // link SubScipts back to UtilityScript after all UtilityScripts have been loaded
+        /** @var UtilityScript&TrSubScripts $us */
         foreach (self::$utilScriptRefs as $name => $us)
             if (in_array(TrSubScripts::class, class_uses($us)))
                 $us->assignGenerators($name);
@@ -261,7 +265,7 @@ class CLISetup
                     break;
             }
 
-        if ($dbError = array_filter($us::REQUIRED_DB, function ($x) { return !DB::isConnected($x); }))
+        if ($dbError = array_filter($us::REQUIRED_DB, fn($x) => !DB::isConnected($x)))
         {
             CLI::write('Database on index '.implode(', ', $dbError).' not yet set up!', CLI::LOG_ERROR);
             CLI::write('Please use '.CLI::bold('"php aowow --db"').' for setup', CLI::LOG_BLANK);
@@ -306,14 +310,14 @@ class CLISetup
     }
 
     // consecutive calls
-    public static function run(string $cmd, &$args) : bool
+    public static function run(string $cmd, array &$args) : bool
     {
         if (!isset(self::$utilScriptRefs[$cmd]))
             return false;
 
         $us = &self::$utilScriptRefs[$cmd];
 
-        if ($dbError = array_filter($us::REQUIRED_DB, function ($x) { return !DB::isConnected($x); }))
+        if ($dbError = array_filter($us::REQUIRED_DB, fn($x) => !DB::isConnected($x)))
         {
             CLI::write('Database on index '.implode(', ', $dbError).' not yet set up!', CLI::LOG_ERROR);
             CLI::write('Please use '.CLI::bold('"php aowow --db"').' for setup', CLI::LOG_BLANK);
@@ -406,7 +410,7 @@ class CLISetup
         }
     }
 
-    public static function getOpt(/* string|int */ ...$args) // : bool|array|string
+    public static function getOpt(string|int ...$args) : bool|array|string
     {
         if (!$args)
             return false;
@@ -435,7 +439,7 @@ class CLISetup
         return $result;
     }
 
-    public static function setOpt(string $opt, bool|array $value) : bool
+    public static function setOpt(string $opt, bool|array|string $value) : bool
     {
         if (!isset(self::$optDefs[$opt]))                   // do not set unexpected opts
             return false;

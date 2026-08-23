@@ -35,7 +35,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
         ['static/images/wow/icons/tiny/',   'gif',  0, ICON_SIZE_TINY,   4]
     );
 
-    private $genSteps = array(
+    private const /* array */ STEPS = array(
       //       srcPath,           realPath, localized, [pattern, isIcon, tileSize],                             [[dest, ext, srcSize, destSize, borderOffset]]
          0 => ['Icons/',                  null, false, ['.*\.(blp|png)$',                           true,   0], self::ICON_DIRS,                                                 ],
          1 => ['Spellbook/',              null, false, ['UI-Glyph-Rune-?\d+.(blp|png)$',            false,  0], [['static/images/wow/Interface/Spellbook/',     'png', 0,  0, 0]]],
@@ -119,6 +119,8 @@ CLISetup::registerSetup("build", new class extends SetupScript
         $this->imgPath = CLISetup::$srcDir.$this->imgPath;
         $this->maxExecTime = ini_get('max_execution_time');
 
+        $this->genSteps = self::STEPS;
+
         // init directories to be checked when registered
         foreach (array_column($this->genSteps, self::GEN_IDX_DEST_INFO) as $subDirs)
             foreach ($subDirs as $sd)
@@ -162,6 +164,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
         if (!$this->checkSourceDirs())
         {
             CLI::write('[simpleimg] one or more required directories are missing:', CLI::LOG_ERROR);
+            $this->success = false;
             return false;
         }
 

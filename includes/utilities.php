@@ -641,7 +641,7 @@ abstract class Util
     {
         $success = false;
 
-        $parentDir = mb_substr($file, 0, mb_strrpos($file, '/'));
+        $parentDir = mb_substr($file, 0, mb_strrpos($file, DIRECTORY_SEPARATOR));
         if (!self::writeDir($parentDir))
             return false;
 

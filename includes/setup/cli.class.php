@@ -23,8 +23,9 @@ abstract class CLI
     public const LOG_INFO       = LOG_LEVEL_INFO;
     public const LOG_OK         = 4;
 
-    private static $logHandle   = null;
-    private static $hasReadline = null;
+    /** @var resource|null */
+    private static       $logHandle   = null;
+    private static ?bool $hasReadline = null;
 
     private static $overwriteLast = false;
 
@@ -196,12 +197,7 @@ abstract class CLI
         $path = '';
 
         if ($pathParts)
-        {
-            foreach ($pathParts as &$pp)
-                $pp = trim($pp);
-
-            $path .= implode(DIRECTORY_SEPARATOR, $pathParts);
-        }
+            $path .= implode(DIRECTORY_SEPARATOR, array_map(fn($x) => trim($x), $pathParts));
 
         $path .= ($path ? DIRECTORY_SEPARATOR : '').trim($fileOrPath);
 
@@ -212,25 +208,14 @@ abstract class CLI
         if (!$path)                                         // empty strings given. (faulty dbc data?)
             return '';
 
-        if (DIRECTORY_SEPARATOR == '/')                     // *nix
-        {
-            $path = str_replace('\\', '/', $path);
-            $path = preg_replace('/\/+/i', '/', $path);
-        }
-        else if (DIRECTORY_SEPARATOR == '\\')               // win
-        {
-            $path = str_replace('/', '\\', $path);
-            $path = preg_replace('/\\\\+/i', '\\', $path);
-        }
-        else
-            self::write('Dafuq! Your directory separator is "'.DIRECTORY_SEPARATOR.'". Please report this!', self::LOG_ERROR);
+        $path = preg_replace('/[\\\\\/]+/i', DIRECTORY_SEPARATOR, $path);
 
         // resolve *nix home shorthand
         if (!OS_WIN)
         {
-            if (preg_match('/^~(\w+)\/.*/i', $path, $m))
+            if (preg_match('/^~\w+\/.*/i', $path))
                 $path = '/home/'.substr($path, 1);
-            else if (substr($path, 0, 2) == '~/')
+            else if (str_starts_with($path, '~/'))
                 $path = getenv('HOME').substr($path, 1);
         }
 
