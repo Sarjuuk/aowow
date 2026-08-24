@@ -11,12 +11,12 @@ if (!CLI)
 
 CLISetup::registerSetup('sql', new class extends SetupScript
 {
-    protected $info = array(
+    protected array $info = array(
         'areatrigger' => [[], CLISetup::ARGV_PARAM, 'Compiles data for type: Areatrigger from dbc and world db.']
     );
 
-    protected $dbcSourceFiles  = ['areatrigger'];
-    protected $worldDependency = ['areatrigger_involvedrelation', 'areatrigger_scripts', 'areatrigger_tavern', 'areatrigger_teleport', 'quest_template', 'quest_template_addon'];
+    protected array $dbcSourceFiles  = ['areatrigger'];
+    protected array $worldDependency = ['areatrigger_involvedrelation', 'areatrigger_scripts', 'areatrigger_tavern', 'areatrigger_teleport', 'quest_template', 'quest_template_addon'];
 
     public function generate() : bool
     {

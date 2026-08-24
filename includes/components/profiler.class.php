@@ -8,23 +8,23 @@ if (!defined('AOWOW_REVISION'))
 
 class Profiler
 {
-    public const /* string */ PID_FILE     = 'config/pr-queue-pid';
-    public const /* int    */ CHAR_GMFLAGS = 0x1 | 0x8 | 0x10 | 0x20; // PLAYER_EXTRA_ :: GM_ON | TAXICHEAT | GM_INVISIBLE | GM_CHAT
+    public const string PID_FILE     = 'config/pr-queue-pid';
+    public const int    CHAR_GMFLAGS = 0x1 | 0x8 | 0x10 | 0x20; // PLAYER_EXTRA_ :: GM_ON | TAXICHEAT | GM_INVISIBLE | GM_CHAT
 
-    public const /* int    */ FETCH_RESULT_OK             = 1;
-    public const /* int    */ FETCH_RESULT_OK_UNCHANGED   = 2;
-    public const /* int    */ FETCH_RESULT_ERR_NOT_FOUND  = 3;
-    public const /* int    */ FETCH_RESULT_ERR_NAME_EMPTY = 4;
-    public const /* int    */ FETCH_RESULT_ERR_NO_MEMBERS = 5;
-    public const /* int    */ FETCH_RESULT_ERR_INTERNAL   = 6;
+    public const int    FETCH_RESULT_OK             = 1;
+    public const int    FETCH_RESULT_OK_UNCHANGED   = 2;
+    public const int    FETCH_RESULT_ERR_NOT_FOUND  = 3;
+    public const int    FETCH_RESULT_ERR_NAME_EMPTY = 4;
+    public const int    FETCH_RESULT_ERR_NO_MEMBERS = 5;
+    public const int    FETCH_RESULT_ERR_INTERNAL   = 6;
 
-    public const /* int    */ COMPLETION_EXCLUDE = 1;
-    public const /* int    */ COMPLETION_INCLUDE = 2;
+    public const int    COMPLETION_EXCLUDE = 1;
+    public const int    COMPLETION_INCLUDE = 2;
 
-    public const /* array  */ REGIONS      = array(         // see cfg_categories.dbc
+    public const array  REGIONS      = array(               // see cfg_categories.dbc
         'us' => [2, 3, 4, 5],                               // US (us, oceanic, latin america, americas - tournament)
-        'kr' => [6, 7],                                     // KR (kr, tournament)
         'eu' => [8, 9, 10, 11, 12, 13],                     // EU (english, german, french, spanish, russian, eu - tournament)
+        'kr' => [6, 7],                                     // KR (kr, tournament)
         'tw' => [14, 15],                                   // TW (tw, tournament)
         'cn' => [16, 17, 18, 19, 20, 21, 22, 23, 24, 25],   // CN (cn, CN1-8, tournament)
        'dev' => [1, 26, 27, 28, 30]                         // Development, Test Server, Test Server - tournament, QA Server, Test Server 2
@@ -132,7 +132,7 @@ class Profiler
         $queuePID = self::queueStatus();
         if ($queuePID && $queuePID != $pid)
         {
-            trigger_error('pSync - another queue with PID #'.$queuePID.' is already running', E_USER_ERROR);
+            trigger_error('pSync - another queue with PID #'.$queuePID.' is already running', E_USER_WARNING);
             return false;
         }
 
@@ -303,9 +303,9 @@ class Profiler
         }
 
         if (!$newId)
-            trigger_error('Profiler::scheduleResync() - tried to resync type #'.$type.' guid #'.$guid.' from realm #'.$realmId.' without preloaded data', E_USER_ERROR);
+            trigger_error('Profiler::scheduleResync() - tried to resync type #'.$type.' guid #'.$guid.' from realm #'.$realmId.' without preloaded data', E_USER_WARNING);
         else if (!self::queueStart($msg))
-            trigger_error('Profiler::scheduleResync() - '.$msg, E_USER_ERROR);
+            trigger_error('Profiler::scheduleResync() - '.$msg, E_USER_WARNING);
 
         return $newId;
     }

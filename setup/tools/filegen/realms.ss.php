@@ -26,12 +26,12 @@ if (!CLI)
 
 CLISetup::registerSetup("build", new class extends SetupScript
 {
-    protected $info = array(
+    protected array $info = array(
         'realms' => [[], CLISetup::ARGV_PARAM, 'Generates \'realms\'-file to be referenced by the profiler tool.']
     );
 
-    protected $worldDependency = ['realmlist'];
-    protected $requiredDirs    = ['datasets/'];
+    protected array $worldDependency = ['realmlist'];
+    protected array $requiredDirs    = ['datasets/'];
 
     public function generate() : bool
     {

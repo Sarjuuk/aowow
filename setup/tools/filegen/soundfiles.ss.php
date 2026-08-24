@@ -11,12 +11,12 @@ if (!CLI)
 
 CLISetup::registerSetup("build", new class extends SetupScript
 {
-    protected $info = array(
+    protected array $info = array(
         'soundfiles' => [[], CLISetup::ARGV_PARAM, 'Links converted sound files to database and moves them to destination.']
     );
 
-    protected $requiredDirs = ['static/wowsounds/'];
-    protected $setupAfter   = [['sounds'], []];
+    protected array $requiredDirs = ['static/wowsounds/'];
+    protected array $setupAfter   = [['sounds'], []];
 
     public function generate() : bool
     {

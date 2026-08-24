@@ -15,28 +15,28 @@ if (!CLI)
 
 CLISetup::registerUtility(new class extends UtilityScript
 {
-    public $argvOpts    = ['c'];
-    public $optGroup    = CLISetup::OPT_GRP_SETUP;
-    public $followupFn  = 'build';
+    public array  $argvOpts   = ['c'];
+    public int    $optGroup   = CLISetup::OPT_GRP_SETUP;
+    public string $followupFn = 'build';
 
-    public const COMMAND      = 'configure';
-    public const APPENDIX     = ' [action<E|R|N|D> cfgName [newValue]]';
-    public const DESCRIPTION  = 'Configure site variables.';
-    public const PROMPT       = 'SITE_HOST and STATIC_HOST *must* be set. Also enable FORCE_SSL if needed. You may also want to change other variables such as NAME, NAME_SHORT or LOCALES.';
-    public const NOTE_ERROR   = 'could not access:';
+    public const string COMMAND      = 'configure';
+    public const string APPENDIX     = ' [action<E|R|N|D> cfgName [newValue]]';
+    public const string DESCRIPTION  = 'Configure site variables.';
+    public const string PROMPT       = 'SITE_HOST and STATIC_HOST *must* be set. Also enable FORCE_SSL if needed. You may also want to change other variables such as NAME, NAME_SHORT or LOCALES.';
+    public const string NOTE_ERROR   = 'could not access:';
 
-    public const REQUIRED_DB = [DB_AOWOW];
+    public const array  REQUIRED_DB  = [DB_AOWOW];
 
-    public const USE_CLI_ARGS = true;
+    public const bool   USE_CLI_ARGS = true;
 
-    private const HTTP_STATUS_OK = 200;
-    private const HTTP_STATUS_MOVED_PERM = 301;
-    private const HTTP_STATUS_MOVED_TEMP = 302;
+    private const int HTTP_STATUS_OK         = 200;
+    private const int HTTP_STATUS_MOVED_PERM = 301;
+    private const int HTTP_STATUS_MOVED_TEMP = 302;
 
-    private $updScripts = [];
+    private array $updScripts = [];
 
     // args: action, configName, configValue, pendingUpdates[] // iiio
-    public function run(&$args) : bool
+    public function run(array &$args) : bool
     {
         $action = $args[0] ?? '';
         $name   = $args[1] ?? '';

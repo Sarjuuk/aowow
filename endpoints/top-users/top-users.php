@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 
 class TopusersBaseResponse extends TemplateResponse
 {
-    private const /* int */ MAX_RESULTS = 500;
+    private const int MAX_RESULTS = 500;
 
     protected  string $template   = 'list-page-generic';
     protected  string $pageName   = 'top-users';

@@ -10,9 +10,9 @@ class SpellList extends DBTypeList
 {
     use listviewHelper, sourceHelper;
 
-    public const /* int */ INTERACTIVE_NONE     = 0;
-    public const /* int */ INTERACTIVE_EMBEDDED = 1;        // parse combat ratings to %
-    public const /* int */ INTERACTIVE_FULL     = 2;        // additionaly allow links and hover tooltips
+    public const int INTERACTIVE_NONE     = 0;
+    public const int INTERACTIVE_EMBEDDED = 1;              // parse combat ratings to %
+    public const int INTERACTIVE_FULL     = 2;              // additionaly allow links and hover tooltips
 
     public static  int      $type       = Type::SPELL;
     public static  string   $brickFile  = 'spell';
@@ -27,7 +27,7 @@ class SpellList extends DBTypeList
         11 => SKILLS_TRADE_PRIMARY                                                                        // prim. Professions
     );
 
-    public const MOD_AURAS                = array(
+    public const array MOD_AURAS                = array(
         SPELL_AURA_ADD_FLAT_MODIFIER,      SPELL_AURA_ADD_PCT_MODIFIER,                 SPELL_AURA_NO_REAGENT_USE,
         SPELL_AURA_ABILITY_PERIODIC_CRIT,  SPELL_AURA_MOD_TARGET_ABILITY_ABSORB_SCHOOL, SPELL_AURA_ABILITY_IGNORE_AURASTATE,
         SPELL_AURA_ALLOW_ONLY_ABILITY,     SPELL_AURA_IGNORE_MELEE_RESET,               SPELL_AURA_ABILITY_CONSUME_NO_AMMO,
@@ -35,76 +35,77 @@ class SpellList extends DBTypeList
         SPELL_AURA_MOD_DAMAGE_FROM_CASTER, SPELL_AURA_ADD_TARGET_TRIGGER,               SPELL_AURA_IGNORE_COMBAT_RESULT,     /* SPELL_AURA_DUMMY ? */
     );
 
-    public const EFFECTS_SCALING_HEAL     = array( // as per Unit::SpellHealingBonusDone() calls in TC
+    public const array EFFECTS_SCALING_HEAL     = array( // as per Unit::SpellHealingBonusDone() calls in TC
         SPELL_EFFECT_HEAL,                  SPELL_EFFECT_HEAL_PCT,                          SPELL_EFFECT_HEAL_MECHANICAL,                   SPELL_EFFECT_HEALTH_LEECH
     );
-    public const EFFECTS_SCALING_DAMAGE   = array( // as per Unit::SpellDamageBonusDone() calls in TC
+    public const array EFFECTS_SCALING_DAMAGE   = array( // as per Unit::SpellDamageBonusDone() calls in TC
         SPELL_EFFECT_SCHOOL_DAMAGE,         SPELL_EFFECT_HEALTH_LEECH,                      SPELL_EFFECT_POWER_BURN
     );
-    public const EFFECTS_LDC_SCALING      = array(
+    public const array EFFECTS_LDC_SCALING      = array(
         SPELL_EFFECT_SCHOOL_DAMAGE,         SPELL_EFFECT_DUMMY,                             SPELL_EFFECT_POWER_DRAIN,                       SPELL_EFFECT_HEALTH_LEECH,                      SPELL_EFFECT_HEAL,
         SPELL_EFFECT_WEAPON_DAMAGE,         SPELL_EFFECT_POWER_BURN,                        SPELL_EFFECT_SCRIPT_EFFECT,                     SPELL_EFFECT_NORMALIZED_WEAPON_DMG,             SPELL_EFFECT_FORCE_CAST_WITH_VALUE,
         SPELL_EFFECT_TRIGGER_SPELL_WITH_VALUE,                                              SPELL_EFFECT_TRIGGER_MISSILE_SPELL_WITH_VALUE
     );
-    public const EFFECTS_ITEM_CREATE      = array(
+    public const array EFFECTS_ITEM_CREATE      = array(
         SPELL_EFFECT_CREATE_ITEM,           SPELL_EFFECT_SUMMON_CHANGE_ITEM,                SPELL_EFFECT_CREATE_RANDOM_ITEM,                SPELL_EFFECT_CREATE_MANA_GEM,                   SPELL_EFFECT_CREATE_ITEM_2
     );
-    public const EFFECTS_TRIGGER          = array(
+    public const array EFFECTS_TRIGGER          = array(
         SPELL_EFFECT_DUMMY,                 SPELL_EFFECT_TRIGGER_MISSILE,                   SPELL_EFFECT_TRIGGER_SPELL,                     SPELL_EFFECT_FEED_PET,                          SPELL_EFFECT_FORCE_CAST,
         SPELL_EFFECT_FORCE_CAST_WITH_VALUE, SPELL_EFFECT_TRIGGER_SPELL_WITH_VALUE,          SPELL_EFFECT_TRIGGER_MISSILE_SPELL_WITH_VALUE,  SPELL_EFFECT_TRIGGER_SPELL_2,                   SPELL_EFFECT_SUMMON_RAF_FRIEND,
         SPELL_EFFECT_TITAN_GRIP,            SPELL_EFFECT_FORCE_CAST_2,                      SPELL_EFFECT_REMOVE_AURA
     );
-    public const EFFECTS_TEACH            = array(
+    public const array EFFECTS_TEACH            = array(
         SPELL_EFFECT_LEARN_SPELL,           SPELL_EFFECT_LEARN_PET_SPELL                    /*SPELL_EFFECT_UNLEARN_SPECIALIZATION*/
     );
-    public const EFFECTS_MODEL_OBJECT     = array(
+    public const array EFFECTS_MODEL_OBJECT     = array(
         SPELL_EFFECT_TRANS_DOOR,            SPELL_EFFECT_SUMMON_OBJECT_WILD,                SPELL_EFFECT_SUMMON_OBJECT_SLOT1,               SPELL_EFFECT_SUMMON_OBJECT_SLOT2,               SPELL_EFFECT_SUMMON_OBJECT_SLOT3,
         SPELL_EFFECT_SUMMON_OBJECT_SLOT4
     );
-    public const EFFECTS_MODEL_NPC        = array(
+    public const array EFFECTS_MODEL_NPC        = array(
         SPELL_EFFECT_SUMMON,                SPELL_EFFECT_SUMMON_PET,                        SPELL_EFFECT_SUMMON_DEMON,                      SPELL_EFFECT_KILL_CREDIT,                       SPELL_EFFECT_KILL_CREDIT2
     );
-    public const EFFECTS_DIRECT_SCALING   = array( // as per Unit::GetCastingTimeForBonus()
+    public const array EFFECTS_DIRECT_SCALING   = array( // as per Unit::GetCastingTimeForBonus()
         SPELL_EFFECT_SCHOOL_DAMAGE,         SPELL_EFFECT_ENVIRONMENTAL_DAMAGE,              SPELL_EFFECT_POWER_DRAIN,                       SPELL_EFFECT_HEALTH_LEECH,                      SPELL_EFFECT_POWER_BURN,
         SPELL_EFFECT_HEAL
     );
-    public const EFFECTS_ENCHANTMENT      = array(
+    public const array EFFECTS_ENCHANTMENT      = array(
         SPELL_EFFECT_ENCHANT_ITEM,          SPELL_EFFECT_ENCHANT_ITEM_TEMPORARY,            SPELL_EFFECT_ENCHANT_HELD_ITEM,                 SPELL_EFFECT_ENCHANT_ITEM_PRISMATIC
     );
 
-    public const AURAS_SCALING_HEAL       = array( // as per Unit::SpellHealingBonusDone() calls in TC (SPELL_AURA_SCHOOL_ABSORB + SPELL_AURA_MANA_SHIELD priest/mage cases are scripted)
+    public const array AURAS_SCALING_HEAL       = array( // as per Unit::SpellHealingBonusDone() calls in TC (SPELL_AURA_SCHOOL_ABSORB + SPELL_AURA_MANA_SHIELD priest/mage cases are scripted)
         SPELL_AURA_PERIODIC_HEAL,           SPELL_AURA_PERIODIC_LEECH,                      SPELL_AURA_OBS_MOD_HEALTH
     );
-    public const AURAS_SCALING_DAMAGE     = array( // as per Unit::SpellDamageBonusDone() calls in TC
+    public const array AURAS_SCALING_DAMAGE     = array( // as per Unit::SpellDamageBonusDone() calls in TC
         SPELL_AURA_PERIODIC_DAMAGE,         SPELL_AURA_PERIODIC_LEECH,                      SPELL_AURA_DAMAGE_SHIELD,                       SPELL_AURA_PROC_TRIGGER_DAMAGE
     );
-    public const AURAS_LDC_SCALING      = array(
+    public const array AURAS_LDC_SCALING      = array(
         SPELL_AURA_PERIODIC_DAMAGE,         SPELL_AURA_DUMMY,                               SPELL_AURA_PERIODIC_HEAL,                       SPELL_AURA_DAMAGE_SHIELD,                       SPELL_AURA_PROC_TRIGGER_DAMAGE,
         SPELL_AURA_PERIODIC_LEECH,          SPELL_AURA_PERIODIC_MANA_LEECH,                 SPELL_AURA_SCHOOL_ABSORB,                       SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE
     );
-    public const AURAS_ITEM_CREATE        = array(
+    public const array AURAS_ITEM_CREATE        = array(
         SPELL_AURA_CHANNEL_DEATH_ITEM
     );
-    public const AURAS_TRIGGER            = array(
+    public const array AURAS_TRIGGER            = array(
         SPELL_AURA_DUMMY,                   SPELL_AURA_PERIODIC_TRIGGER_SPELL,              SPELL_AURA_PROC_TRIGGER_SPELL,                  SPELL_AURA_PERIODIC_TRIGGER_SPELL_FROM_CLIENT,  SPELL_AURA_ADD_TARGET_TRIGGER,
         SPELL_AURA_PERIODIC_DUMMY,          SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE,   SPELL_AURA_PROC_TRIGGER_SPELL_WITH_VALUE,       SPELL_AURA_CONTROL_VEHICLE,                     SPELL_AURA_LINKED
     );
-    public const AURAS_MODEL_NPC          = array(
+    public const array AURAS_MODEL_NPC          = array(
         SPELL_AURA_TRANSFORM,               SPELL_AURA_MOUNTED,                             SPELL_AURA_CHANGE_MODEL_FOR_ALL_HUMANOIDS,      SPELL_AURA_X_RAY,
         SPELL_AURA_MOD_FAKE_INEBRIATE
     );
-    public const AURAS_PERIODIC_SCALING   = array( // as per Unit::GetCastingTimeForBonus()
+    public const array AURAS_PERIODIC_SCALING   = array( // as per Unit::GetCastingTimeForBonus()
         SPELL_AURA_PERIODIC_DAMAGE,         SPELL_AURA_PERIODIC_HEAL,                       SPELL_AURA_PERIODIC_LEECH
     );
 
-    private        array $spellVars   = [];
-    private        array $refSpells   = [];
-    private        array $tools       = [];
-    private        int   $interactive = self::INTERACTIVE_EMBEDDED;
-    private        int   $charLevel   = MAX_LEVEL;
-    private        array $scaling     = [];
-    private        array $parsedText  = [];
-    private static array $spellTypes  = array(
+    private array $spellVars   = [];
+    private array $refSpells   = [];
+    private array $tools       = [];
+    private int   $interactive = self::INTERACTIVE_EMBEDDED;
+    private int   $charLevel   = MAX_LEVEL;
+    private array $scaling     = [];
+    private array $parsedText  = [];
+
+    private static array $spellTypes = array(
          6 => 1,
          8 => 2,
         10 => 4
@@ -2316,8 +2317,8 @@ class SpellList extends DBTypeList
 
 class SpellListFilter extends Filter
 {
-    const MAX_SPELL_EFFECT = 167;
-    const MAX_SPELL_AURA   = 316;
+    const int MAX_SPELL_EFFECT = 167;
+    const int MAX_SPELL_AURA   = 316;
 
     public static array $attributesFilter = array(          // attrFieldId => [attrBit => cr, ...]; if cr < 0 ? filter is negated
         0 => array(

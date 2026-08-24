@@ -17,7 +17,7 @@ class GotoreplyBaseResponse extends TextResponse
     {
         if (!$this->assertGET('id'))
         {
-            trigger_error('GotoreplyBaseResponse - malformed request received', E_USER_ERROR);
+            trigger_error('GotoreplyBaseResponse - malformed request received', E_USER_WARNING);
             return;
         }
 
@@ -25,13 +25,13 @@ class GotoreplyBaseResponse extends TextResponse
         $reply = DB::Aowow()->selectRow('SELECT c.`id`, r.`id` AS "reply", c.`type`, c.`typeId` FROM ::comments r JOIN ::comments c ON r.`replyTo` = c.`id` WHERE r.`id` = %i', $this->_get['id']);
         if (!$reply)
         {
-            trigger_error('GotoreplyBaseResponse - reply #'.$this->_get['id'].' not found', E_USER_ERROR);
+            trigger_error('GotoreplyBaseResponse - reply #'.$this->_get['id'].' not found', E_USER_WARNING);
             return;
         }
 
         if (!Type::validateIds($reply['type'], $reply['typeId']))
         {
-            trigger_error('GotoreplyBaseResponse - parent comment #'.$reply['id'].' belongs to nonexistent type/typeID combo '.$reply['type'].'/'.$reply['typeId'], E_USER_ERROR);
+            trigger_error('GotoreplyBaseResponse - parent comment #'.$reply['id'].' belongs to nonexistent type/typeID combo '.$reply['type'].'/'.$reply['typeId'], E_USER_WARNING);
             return;
         }
 

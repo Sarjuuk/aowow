@@ -13,8 +13,8 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 {
     use TrDBCcopy;
 
-    protected $command         = 'itemenchantmentcondition';
-    protected $dbcSourceFiles  = ['spellitemenchantmentcondition'];
+    protected string $command        = 'itemenchantmentcondition';
+    protected array  $dbcSourceFiles = ['spellitemenchantmentcondition'];
 });
 
 ?>

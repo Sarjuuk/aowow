@@ -8,15 +8,16 @@ if (!defined('AOWOW_REVISION'))
 
 class Announcement implements \JsonSerializable
 {
-    public const MODE_PAGE_TOP    = 0;
-    public const MODE_CONTENT_TOP = 1;
+    public const int MODE_PAGE_TOP    = 0;
+    public const int MODE_CONTENT_TOP = 1;
 
-    public const STATUS_DISABLED  = 0;
-    public const STATUS_ENABLED   = 1;
-    public const STATUS_DELETED   = 2;
+    public const int STATUS_DISABLED  = 0;
+    public const int STATUS_ENABLED   = 1;
+    public const int STATUS_DELETED   = 2;
 
     public readonly int $status;
-    private bool        $editable = false;
+
+    private bool $editable = false;
 
     public function __construct(
         public readonly int $id,

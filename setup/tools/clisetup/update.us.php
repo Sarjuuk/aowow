@@ -15,19 +15,19 @@ if (!CLI)
 
 CLISetup::registerUtility(new class extends UtilityScript
 {
-    public $argvOpts    = ['u'];
-    public $optGroup    = CLISetup::OPT_GRP_SETUP;
-    public $followupFn  = 'sync';
+    public array  $argvOpts   = ['u'];
+    public int    $optGroup   = CLISetup::OPT_GRP_SETUP;
+    public string $followupFn = 'sync';
 
-    public const COMMAND     = 'update';
-    public const DESCRIPTION = 'Apply new sql updates fetched from Github and run --sync as needed.';
+    public const string COMMAND     = 'update';
+    public const string DESCRIPTION = 'Apply new sql updates fetched from Github and run --sync as needed.';
 
-    public const REQUIRED_DB = [DB_AOWOW];
+    public const array  REQUIRED_DB = [DB_AOWOW];
 
-    public const SITE_LOCK   = CLISetup::LOCK_RESTORE;
+    public const int    SITE_LOCK   = CLISetup::LOCK_RESTORE;
 
-    private $date = 0;
-    private $part = 0;
+    private int $date = 0;
+    private int $part = 0;
 
     public function __construct()
     {
@@ -36,7 +36,7 @@ CLISetup::registerUtility(new class extends UtilityScript
     }
 
     // args: null, null, sqlToDo, buildToDo // nnoo
-    public function run(&$args) : bool
+    public function run(array &$args) : bool
     {
         $sql   = &$args['doSql'];
         $build = &$args['doBuild'];

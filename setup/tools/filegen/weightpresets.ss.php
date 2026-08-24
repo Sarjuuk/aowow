@@ -12,11 +12,11 @@ if (!CLI)
 // Creates 'weight-presets'-file
 CLISetup::registerSetup("build", new class extends SetupScript
 {
-    protected $info = array(
+    protected array $info = array(
         'weightpresets' => [[], CLISetup::ARGV_PARAM, 'Generates stat weight presets file for the item comparison tool.']
     );
 
-    protected $requiredDirs = ['datasets/'];
+    protected array $requiredDirs = ['datasets/'];
 
     public function generate() : bool
     {

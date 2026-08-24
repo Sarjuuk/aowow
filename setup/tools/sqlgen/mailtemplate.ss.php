@@ -11,12 +11,12 @@ if (!CLI)
 
 CLISetup::registerSetup("sql", new class extends SetupScript
 {
-    protected $info = array(
+    protected array $info = array(
         'mails' => [[], CLISetup::ARGV_PARAM, 'Compiles data for type: Mail from dbc and world db.']
     );
 
-    protected $dbcSourceFiles  = ['mailtemplate'];
-    protected $worldDependency = ['achievement_reward', 'achievement_reward_locale', 'mail_loot_template'];
+    protected array $dbcSourceFiles  = ['mailtemplate'];
+    protected array $worldDependency = ['achievement_reward', 'achievement_reward_locale', 'mail_loot_template'];
 
     public function generate() : bool
     {

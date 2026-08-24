@@ -8,11 +8,11 @@ if (!defined('AOWOW_REVISION'))
 
 class AdminGuideResponse extends TextResponse
 {
-    private const /* int */ ERR_NONE          = 0;
-    private const /* int */ ERR_GUIDE         = 1;
-    private const /* int */ ERR_STATUS        = 2;
-    private const /* int */ ERR_WRITE_DB      = 3;
-    private const /* int */ ERR_MISCELLANEOUS = 999;
+    private const int ERR_NONE          = 0;
+    private const int ERR_GUIDE         = 1;
+    private const int ERR_STATUS        = 2;
+    private const int ERR_WRITE_DB      = 3;
+    private const int ERR_MISCELLANEOUS = 999;
 
     protected int   $requiredUserGroup = U_GROUP_STAFF;
 
@@ -26,7 +26,7 @@ class AdminGuideResponse extends TextResponse
     {
         if (!$this->assertPOST('id', 'status'))
         {
-            trigger_error('AdminGuideResponse - malformed request received', E_USER_ERROR);
+            trigger_error('AdminGuideResponse - malformed request received', E_USER_WARNING);
             $this->result = self::ERR_MISCELLANEOUS;
             return;
         }
@@ -34,14 +34,14 @@ class AdminGuideResponse extends TextResponse
         $guide = DB::Aowow()->selectRow('SELECT `userId`, `status` FROM ::guides WHERE `id` = %i', $this->_post['id']);
         if (!$guide)
         {
-            trigger_error('AdminGuideResponse - guide #'.$this->_post['id'].' not found', E_USER_ERROR);
+            trigger_error('AdminGuideResponse - guide #'.$this->_post['id'].' not found', E_USER_WARNING);
             $this->result = self::ERR_GUIDE;
             return;
         }
 
         if ($this->_post['status'] == $guide['status'])
         {
-            trigger_error('AdminGuideResponse - guide #'.$this->_post['id'].' already has status #'.$this->_post['status'], E_USER_ERROR);
+            trigger_error('AdminGuideResponse - guide #'.$this->_post['id'].' already has status #'.$this->_post['status'], E_USER_WARNING);
             $this->result = self::ERR_STATUS;
             return;
         }
@@ -49,7 +49,7 @@ class AdminGuideResponse extends TextResponse
         // status can only be APPROVED or REJECTED due to input validation
         if (!$this->update($this->_post['id'], $this->_post['status'], $this->_post['msg']))
         {
-            trigger_error('AdminGuideResponse - write to db failed for guide #'.$this->_post['id'], E_USER_ERROR);
+            trigger_error('AdminGuideResponse - write to db failed for guide #'.$this->_post['id'], E_USER_WARNING);
             $this->result = self::ERR_WRITE_DB;
             return;
         }

@@ -17,19 +17,19 @@ CLISetup::registerUtility(new class extends UtilityScript
 {
     use TrSubScripts;
 
-    public $argvFlags = CLISetup::ARGV_ARRAY | CLISetup::ARGV_OPTIONAL;
-    public $optGroup  = CLISetup::OPT_GRP_UTIL;
+    public int $argvFlags = CLISetup::ARGV_ARRAY | CLISetup::ARGV_OPTIONAL;
+    public int $optGroup  = CLISetup::OPT_GRP_UTIL;
 
-    public const COMMAND       = 'sql';
-    public const DESCRIPTION   = 'Generate DB content from your world tables.';
-    public const APPENDIX      = '=<SetupScriptList,>';
-    public const NOTE_START    = '[sql] begin generation of:';
-    public const NOTE_END_OK   = 'successfully finished sql generation';
-    public const NOTE_END_FAIL = 'finished sql generation with errors';
+    public const string COMMAND       = 'sql';
+    public const string DESCRIPTION   = 'Generate DB content from your world tables.';
+    public const string APPENDIX      = '=<SetupScriptList,>';
+    public const string NOTE_START    = '[sql] begin generation of:';
+    public const string NOTE_END_OK   = 'successfully finished sql generation';
+    public const string NOTE_END_FAIL = 'finished sql generation with errors';
 
-    public const REQUIRED_DB = [DB_AOWOW, DB_WORLD];
+    public const array  REQUIRED_DB   = [DB_AOWOW, DB_WORLD];
 
-    public const LOCK_SITE   = CLISetup::LOCK_RESTORE;
+    public const int    LOCK_SITE     = CLISetup::LOCK_RESTORE;
 
     public function __construct()
     {
@@ -47,7 +47,7 @@ CLISetup::registerUtility(new class extends UtilityScript
     }
 
     // args: scriptToDo, scriptSuccess, null, null // ionn
-    public function run(&$args) : bool
+    public function run(array &$args) : bool
     {
         $todo = &$args['doSql'];
         $done = &$args['doneSql'];

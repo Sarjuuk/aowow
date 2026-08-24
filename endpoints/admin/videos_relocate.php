@@ -20,7 +20,7 @@ class AdminVideosActionRelocateResponse extends TextResponse
     {
         if (!$this->assertGET('id', 'typeid'))
         {
-            trigger_error('AdminVideosActionRelocateResponse - videoId or typeId empty', E_USER_ERROR);
+            trigger_error('AdminVideosActionRelocateResponse - videoId or typeId empty', E_USER_WARNING);
             return;
         }
 
@@ -44,6 +44,6 @@ class AdminVideosActionRelocateResponse extends TextResponse
                 DB::Aowow()->qry('UPDATE %n SET `cuFlags` = `cuFlags` & ~%i WHERE `id` = %i', $tbl, CUSTOM_HAS_VIDEO, $oldTypeId);
         }
         else
-            trigger_error('AdminVideosActionRelocateResponse - invalid typeId #'.$typeId.' for type #'.$type, E_USER_ERROR);
+            trigger_error('AdminVideosActionRelocateResponse - invalid typeId #'.$typeId.' for type #'.$type, E_USER_WARNING);
     }
 }

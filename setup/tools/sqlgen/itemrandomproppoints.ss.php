@@ -13,8 +13,8 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 {
     use TrDBCcopy;
 
-    protected $command           = 'itemrandomproppoints';
-    protected $dbcSourceFiles    = ['randproppoints'];
+    protected string $command        = 'itemrandomproppoints';
+    protected array  $dbcSourceFiles = ['randproppoints'];
 });
 
 ?>

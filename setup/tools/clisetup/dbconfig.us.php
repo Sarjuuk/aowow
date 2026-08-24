@@ -15,19 +15,19 @@ if (!CLI)
 
 CLISetup::registerUtility(new class extends UtilityScript
 {
-    public $argvOpts = ['db'];
-    public $optGroup = CLISetup::OPT_GRP_SETUP;
+    public array $argvOpts = ['db'];
+    public int   $optGroup = CLISetup::OPT_GRP_SETUP;
 
-    public const COMMAND     = 'database';
-    public const DESCRIPTION = 'Set up DB connection.';
-    public const PROMPT      = 'Please enter your database credentials.';
-    public const NOTE_ERROR  = 'could not establish connection to:';
+    public const string COMMAND     = 'database';
+    public const string DESCRIPTION = 'Set up DB connection.';
+    public const string PROMPT      = 'Please enter your database credentials.';
+    public const string NOTE_ERROR  = 'could not establish connection to:';
 
-    private const CONFIG_FILE = 'config/config.php';
+    private const string CONFIG_FILE = 'config/config.php';
 
-    private $databases = ['aowow', 'world', 'auth', 'characters'];
-    private $config    = [];
-    private $dbFields  = array(
+    private array $databases = ['aowow', 'world', 'auth', 'characters'];
+    private array $config    = [];
+    private array $dbFields  = array(
         'host'   => ['Server Host',   false],
         'user'   => ['User',          false],
         'pass'   => ['Password',      true ],
@@ -35,14 +35,14 @@ CLISetup::registerUtility(new class extends UtilityScript
         'prefix' => ['Table prefix',  false]
     );
 
-    private $icons   = ['Normal[0]', 'PvP', null, null, 'Normal[4]', 'RP', null, 'RP-PvP'];
-    private $regions = array(
+    private array $icons     = ['Normal[0]', 'PvP', null, null, 'Normal[4]', 'RP', null, 'RP-PvP'];
+    private array $regions   = array(
         null, 'Development', 'United States', 'Oceanic', 'Latin America', 'Tournament (Americas)', 'Korea',  'Tournament (Korea)', 'English', 'German', 'French', 'Spanish', 'Russian', 'Tournament (EU)', 'Taiwan', 'Tournament (Taiwan)', 'China',
         25 => 'Tournament (China)', 26 => 'Test Server', 27 => 'Tournament (Test Server)', 28 => 'QA Server', 30 => 'Test Server 2'
     );
 
     // args: null, null, null, null // nnnn
-    public function run(&$args) : bool
+    public function run(array &$args) : bool
     {
         if (!$this->config && file_exists(self::CONFIG_FILE))
         {
@@ -238,7 +238,7 @@ CLISetup::registerUtility(new class extends UtilityScript
         return empty($error);
     }
 
-    private function testDB($idx, $name, $dbInfo)
+    private function testDB(int $idx, string $name, array $dbInfo) : array
     {
         $buff = ['['.CLI::bold($idx).']', $name];
 

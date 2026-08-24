@@ -11,13 +11,13 @@ if (!CLI)
 
 CLISetup::registerSetup("sql", new class extends SetupScript
 {
-    protected $info = array(
+    protected array $info = array(
         'taxi' => [[], CLISetup::ARGV_PARAM, 'Compiles supplemental data for type: NPC from dbc and world db.']
     );
 
-    protected $dbcSourceFiles  = ['taxipath', 'taxinodes', 'worldmaparea', 'worldmaptransforms', 'factiontemplate'];
-    protected $worldDependency = ['creature', 'creature_template'];
-    protected $setupAfter      = [['dungeonmap', 'worldmaparea'], []]; // accessed by WorldPosition::toZonePos
+    protected array $dbcSourceFiles  = ['taxipath', 'taxinodes', 'worldmaparea', 'worldmaptransforms', 'factiontemplate'];
+    protected array $worldDependency = ['creature', 'creature_template'];
+    protected array $setupAfter      = [['dungeonmap', 'worldmaparea'], []]; // accessed by WorldPosition::toZonePos
 
     public function generate() : bool
     {

@@ -13,11 +13,11 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 {
     use TrCustomData;                                       // import custom data from DB
 
-    protected $info = array(
+    protected array $info = array(
         'sounds' => [[], CLISetup::ARGV_PARAM, 'Compiles data for type: Sound from dbc.']
     );
 
-    protected $dbcSourceFiles = array(
+    protected array $dbcSourceFiles = array(
         // base          emotes             race
         'soundentries', 'emotestextsound', 'vocaluisounds',
         // creatures

@@ -30,10 +30,10 @@ if (!CLI)
 
 class DBCReader
 {
-    private const /* string */ INI_FILE_PATH   = 'setup/tools/dbc/%s.ini';
-    private const /* int    */ MAX_INSERT_ROWS = 500;
+    private const string INI_FILE_PATH   = 'setup/tools/dbc/%s.ini';
+    private const int    MAX_INSERT_ROWS = 500;
 
-    public  const /* string */ DEFAULT_WOW_BUILD = '12340';
+    public  const string DEFAULT_WOW_BUILD = '12340';
 
     private bool   $isGameTable = false;
     private bool   $isLocalized = false;

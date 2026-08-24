@@ -10,7 +10,7 @@ class GuidePowerResponse extends TextResponse implements ICache
 {
     use TrCache, TrTooltip;
 
-    private const /* string */ POWER_TEMPLATE = '$WowheadPower.registerGuide(%s, %d, %s);';
+    private const string POWER_TEMPLATE = '$WowheadPower.registerGuide(%s, %d, %s);';
 
     protected int   $type        = Type::GUIDE;
     protected int   $typeId      = 0;

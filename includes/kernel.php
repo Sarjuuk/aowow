@@ -7,27 +7,27 @@ mb_substitute_character('none');                            // drop invalid char
 error_reporting(E_ALL);
 mysqli_report(MYSQLI_REPORT_ERROR);
 
-define('AOWOW_REVISION', 51);
+define('AOWOW_REVISION', 52);
 define('OS_WIN', substr(PHP_OS, 0, 3) == 'WIN');            // OS_WIN as per compile info of php
 define('CLI', PHP_SAPI === 'cli');
 define('CLI_HAS_E', CLI &&                                  // WIN10 and later usually support ANSI escape sequences
     (!OS_WIN || (function_exists('sapi_windows_vt100_support') && sapi_windows_vt100_support(STDOUT))));
 
 
-$reqExt = ['SimpleXML', 'gd', 'mysqli', 'mbstring', 'fileinfo', 'intl'/*, 'gmp'*/];
+$reqExt = ['SimpleXML', 'gd', 'mysqli', 'mbstring', 'fileinfo', 'intl', 'ffi'/*, 'gmp'*/];
 $badExt = [];
 $error  = '';
 if ($ext = array_filter($reqExt, fn($x) => !extension_loaded($x)))
-    $error .= 'Required Extension <b>'.implode(', ', $ext)."</b> was not found. Please check if it should exist, using \"<i>php -m</i>\"\n\n";
+    $error .= 'Required Extension <b>'.implode(', ', $ext).'</b> was not found. Please check if it should exist, using "<pre>php -m</pre>"';
 
 if ($ext = array_filter($badExt, fn($x) => extension_loaded($x)))
-    $error .= 'Loaded Extension <b>'.implode(', ', $ext)."</b> is incompatible and must be disabled.\n\n";
+    $error .= 'Loaded Extension <b>'.implode(', ', $ext).'</b> is incompatible and must be disabled.';
 
-if (version_compare(PHP_VERSION, '8.2.0') < 0)
-    $error .= 'PHP Version <b>8.2</b> or higher required! Your version is <b>'.PHP_VERSION."</b>.\nCore functions are unavailable!\n";
+if (version_compare(PHP_VERSION, '8.4.0') < 0)
+    $error .= 'PHP Version <b>8.4</b> or higher required! Your version is <b>'.PHP_VERSION.'</b>.'.PHP_EOL.'Core functions are unavailable!';
 
 if ($error)
-    die(CLI ? strip_tags($error) : $error);
+    die(CLI ? strip_tags($error).PHP_EOL.PHP_EOL : $error);
 
 
 require_once 'includes/defines.php';
@@ -143,17 +143,16 @@ set_error_handler(function(int $errNo, string $errStr, string $errFile, int $err
 
     $logLevel = match($errNo)
     {
-        E_RECOVERABLE_ERROR, E_USER_ERROR      => LOG_LEVEL_ERROR,
-        E_WARNING,           E_USER_WARNING    => LOG_LEVEL_WARN,
-        E_NOTICE,            E_USER_NOTICE     => LOG_LEVEL_INFO,
+        E_RECOVERABLE_ERROR       => LOG_LEVEL_ERROR,
+        E_WARNING, E_USER_WARNING => LOG_LEVEL_WARN,
+        E_NOTICE,  E_USER_NOTICE  => LOG_LEVEL_INFO,
         default => 0
     };
     $errName = match($errNo)
     {
         E_RECOVERABLE_ERROR       => 'RECOVERABLE_ERROR',
-        E_USER_ERROR              => 'USER_ERROR',
         E_USER_WARNING, E_WARNING => 'WARNING',
-        E_USER_NOTICE, E_NOTICE   => 'NOTICE',
+        E_USER_NOTICE,  E_NOTICE  => 'NOTICE',
         default                   => 'UNKNOWN_ERROR'        // errors not in this list can not be handled by set_error_handler (as per documentation) or are ignored
     };
 
@@ -271,7 +270,7 @@ if (!CLI)
     session_cache_limiter('private');
     if (!session_start())
     {
-        trigger_error('failed to start session', E_USER_ERROR);
+        trigger_error('failed to start session', E_USER_WARNING);
         (new TemplateResponse())->generateError();
     }
 

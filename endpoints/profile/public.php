@@ -34,13 +34,13 @@ class ProfilePublicResponse extends TextResponse
     {
         if (!$this->assertGET('id'))
         {
-            trigger_error('ProfilePublicResponse - profileId empty', E_USER_ERROR);
+            trigger_error('ProfilePublicResponse - profileId empty', E_USER_WARNING);
             return;
         }
 
         if ($this->_get['user'] && User::$username != $this->_get['user'] && !User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
         {
-            trigger_error('ProfilePublicResponse - user #'.User::$id.' tried to mark profiles of "'.$this->_get['user'].'" as public.', E_USER_ERROR);
+            trigger_error('ProfilePublicResponse - user #'.User::$id.' tried to mark profiles of "'.$this->_get['user'].'" as public.', E_USER_WARNING);
             return;
         }
 
@@ -52,7 +52,7 @@ class ProfilePublicResponse extends TextResponse
 
         if (!$uid)
         {
-            trigger_error('ProfilePublicResponse - user "'.$this->_get['user'].'" does not exist', E_USER_ERROR);
+            trigger_error('ProfilePublicResponse - user "'.$this->_get['user'].'" does not exist', E_USER_WARNING);
             return;
         }
 

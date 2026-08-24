@@ -11,7 +11,7 @@ if (!CLI)
 
 CLISetup::registerSetup("build", new class extends SetupScript
 {
-    protected $info = array(
+    protected array $info = array(
         'profiler'      => [[   ], CLISetup::ARGV_PARAM,    'Generates data dumps and completion exclusion filters for the profiler tool.'],
         'quests'        => [['1'], CLISetup::ARGV_OPTIONAL, '...available quests by category'],
         'titles'        => [['2'], CLISetup::ARGV_OPTIONAL, '...available titles by gender'],
@@ -23,14 +23,14 @@ CLISetup::registerSetup("build", new class extends SetupScript
         'quickexcludes' => [['9'], CLISetup::ARGV_OPTIONAL, '...unobtainable items, mutually exclusive recipes, factions, etc.'],
     );
 
-    protected $localized       = true;
-    protected $requiredDirs    = ['datasets/'];
-    protected $worldDependency = ['player_factionchange_spells', 'conditions'];
-    protected $setupAfter      = [['quests', 'quests_startend', 'items', 'currencies', 'titles', 'spell', 'factions', 'achievement'], []];
+    protected bool  $localized       = true;
+    protected array $requiredDirs    = ['datasets/'];
+    protected array $worldDependency = ['player_factionchange_spells', 'conditions'];
+    protected array $setupAfter      = [['quests', 'quests_startend', 'items', 'currencies', 'titles', 'spell', 'factions', 'achievement'], []];
 
-    private $spellFactions = [];
-    private $exclusions    = [];
-    private $opts          = [];
+    private array $spellFactions = [];
+    private array $exclusions    = [];
+    private array $opts          = [];
 
     public function generate() : bool
     {

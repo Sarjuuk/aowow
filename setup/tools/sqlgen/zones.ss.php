@@ -13,13 +13,13 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 {
     use TrCustomData;                                       // import custom data from DB
 
-    protected $info = array(
+    protected array $info = array(
         'zones' => [[], CLISetup::ARGV_PARAM, 'Compiles supplemental data for type: Zone from dbc and world db.']
     );
 
-    protected $dbcSourceFiles  = ['worldmaptransforms', 'worldmaparea', 'map', 'mapdifficulty', 'areatable', 'lfgdungeons', 'battlemasterlist', 'areatrigger'];
-    protected $worldDependency = ['access_requirement', 'areatrigger_teleport'];
-    protected $setupAfter      = [['dungeonmap', 'worldmaparea'], []];
+    protected array $dbcSourceFiles  = ['worldmaptransforms', 'worldmaparea', 'map', 'mapdifficulty', 'areatable', 'lfgdungeons', 'battlemasterlist', 'areatrigger'];
+    protected array $worldDependency = ['access_requirement', 'areatrigger_teleport'];
+    protected array $setupAfter      = [['dungeonmap', 'worldmaparea'], []];
 
     public function generate() : bool
     {

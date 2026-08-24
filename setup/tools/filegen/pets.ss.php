@@ -29,14 +29,14 @@ if (!CLI)
 // builds 'pets'-file for available locales
 CLISetup::registerSetup("build", new class extends SetupScript
 {
-    protected $info = array(
+    protected array $info = array(
         'pets' => [[], CLISetup::ARGV_PARAM, 'Compiles tameable hunter pets to file for the talent calculator tool.']
     );
 
-    protected $dbcSourceFiles = ['creaturefamily'];
-    protected $setupAfter     = [['creature', 'factions', 'spawns'], []];
-    protected $requiredDirs   = ['datasets/'];
-    protected $localized      = true;
+    protected array $dbcSourceFiles = ['creaturefamily'];
+    protected array $setupAfter     = [['creature', 'factions', 'spawns'], []];
+    protected array $requiredDirs   = ['datasets/'];
+    protected bool  $localized      = true;
 
     public function generate() : bool
     {

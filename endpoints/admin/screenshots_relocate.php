@@ -20,7 +20,7 @@ class AdminScreenshotsActionRelocateResponse extends TextResponse
     {
         if (!$this->assertGET('id', 'typeid'))
         {
-            trigger_error('AdminScreenshotsActionRelocateResponse - screenshotId or typeId empty', E_USER_ERROR);
+            trigger_error('AdminScreenshotsActionRelocateResponse - screenshotId or typeId empty', E_USER_E_USER_WARNINGERROR);
             return;
         }
 
@@ -43,6 +43,6 @@ class AdminScreenshotsActionRelocateResponse extends TextResponse
                 DB::Aowow()->qry('UPDATE %n SET `cuFlags` = `cuFlags` & ~%i WHERE `id` = %i', $tbl, CUSTOM_HAS_SCREENSHOT, $oldTypeId);
         }
         else
-            trigger_error('AdminScreenshotsActionRelocateResponse - invalid typeId #'.$typeId.' for type #'.$type, E_USER_ERROR);
+            trigger_error('AdminScreenshotsActionRelocateResponse - invalid typeId #'.$typeId.' for type #'.$type, E_USER_WARNING);
     }
 }

@@ -13,8 +13,8 @@ CLISetup::registerSetup('sql', new class extends SetupScript
 {
     use TrDBCcopy;
 
-    protected $command        = 'achievementcriteria';
-    protected $dbcSourceFiles = ['achievement_criteria'];
+    protected string $command        = 'achievementcriteria';
+    protected array  $dbcSourceFiles = ['achievement_criteria'];
 });
 
 ?>

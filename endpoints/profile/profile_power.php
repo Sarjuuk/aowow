@@ -10,7 +10,7 @@ class ProfilePowerResponse extends TextResponse implements ICache
 {
     use TrProfilerDetail, TrCache, TrTooltip;
 
-    private const /* string */ POWER_TEMPLATE = '$WowheadPower.registerProfile(%s, %d, %s);';
+    private const string POWER_TEMPLATE = '$WowheadPower.registerProfile(%s, %d, %s);';
 
     protected int   $type        = Type::PROFILE;
     protected int   $cacheType   = CACHE_TYPE_TOOLTIP;

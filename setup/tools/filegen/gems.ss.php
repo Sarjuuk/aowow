@@ -24,13 +24,13 @@ if (!CLI)
 
 CLISetup::registerSetup("build", new class extends SetupScript
 {
-    protected $info = array(
+    protected array $info = array(
         'gems' => [[], CLISetup::ARGV_PARAM, 'Compiles gems to file for the item comparison tool and profiler tool.']
     );
 
-    protected $setupAfter   = [['items', 'itemenchantment', 'icons'], []];
-    protected $requiredDirs = ['datasets/'];
-    protected $localized    = true;
+    protected array $setupAfter   = [['items', 'itemenchantment', 'icons'], []];
+    protected array $requiredDirs = ['datasets/'];
+    protected bool  $localized    = true;
 
     public function generate() : bool
     {

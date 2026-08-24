@@ -10,10 +10,10 @@ if (!CLI)
 
 trait TrSubScripts
 {
-    public $defaultExecTime = 30;
+    public int $defaultExecTime = 30;
 
-    private $generators = [];
-    private $inited     = false;
+    private array $generators = [];
+    private bool  $inited     = false;
 
     public function assignGenerators(string $usName) : bool
     {
@@ -30,25 +30,25 @@ trait TrSubScripts
 
 abstract class UtilityScript
 {
-    public $argvOpts    = [];
-    public $argvFlags   = 0x0;
-    public $optGroup    = -1;
-    public $childArgs   = [];
-    public $followupFn  = '';
+    public array  $argvOpts    = [];
+    public int    $argvFlags   = 0x0;
+    public int    $optGroup    = -1;
+    public array  $childArgs   = [];
+    public string $followupFn  = '';
 
-    public const COMMAND       = '';
-    public const DESCRIPTION   = '';
-    public const APPENDIX      = '';
-    public const PROMPT        = '';
-    public const NOTE_START    = '';
-    public const NOTE_ERROR    = '';
-    public const NOTE_END_OK   = '';
-    public const NOTE_END_FAIL = '';
+    public const string COMMAND       = '';
+    public const string DESCRIPTION   = '';
+    public const string APPENDIX      = '';
+    public const string PROMPT        = '';
+    public const string NOTE_START    = '';
+    public const string NOTE_ERROR    = '';
+    public const string NOTE_END_OK   = '';
+    public const string NOTE_END_FAIL = '';
 
-    public const REQUIRED_DB = [];
+    public const array  REQUIRED_DB   = [];
 
-    public const USE_CLI_ARGS = false;
-    public const LOCK_SITE    = CLISetup::LOCK_OFF;
+    public const bool   USE_CLI_ARGS  = false;
+    public const int    LOCK_SITE     = CLISetup::LOCK_OFF;
 
     /*
         actual UtilityScript functionality
@@ -58,7 +58,7 @@ abstract class UtilityScript
             script success
 
     */
-    abstract public function run(&$args) : bool;
+    abstract public function run(array &$args) : bool;
 
     /*
         implement help output here.

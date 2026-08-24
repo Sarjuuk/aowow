@@ -8,33 +8,33 @@ if (!defined('AOWOW_REVISION'))
 
 class ScreenshotMgr extends ImageUpload
 {
-    // config value
-    public static int $MIN_SIZE;                            // 200
     // 4k resolution
-    private const /* int */ MAX_W = 4096;
-    private const /* int */ MAX_H = 2160;
+    private const int MAX_W = 4096;
+    private const int MAX_H = 2160;
 
     // as expected by js - this also makes the CC-flags functionally exclusive with each other
-    private const /* int */ STATUS_PENDING  = 0;
-    private const /* int */ STATUS_DELETED  = 999;
-    private const /* int */ STATUS_APPROVED = 100;
-    private const /* int */ STATUS_STICKY   = 105;
+    private const int STATUS_PENDING  = 0;
+    private const int STATUS_DELETED  = 999;
+    private const int STATUS_APPROVED = 100;
+    private const int STATUS_STICKY   = 105;
 
-    private const /* array */ DIMS_RESIZED = [772, 618];
-    private const /* array */ DIMS_THUMB   = [150, 150];
+    private const array DIMS_RESIZED = [772, 618];
+    private const array DIMS_THUMB   = [150, 150];
+
+    public const string PATH_TEMP    = 'static/uploads/screenshots/temp/%s.jpg';
+    public const string PATH_PENDING = 'static/uploads/screenshots/pending/%d.jpg';
+    public const string PATH_THUMB   = 'static/uploads/screenshots/thumb/%d.jpg';
+    public const string PATH_RESIZED = 'static/uploads/screenshots/resized/%d.jpg';
+    public const string PATH_NORMAL  = 'static/uploads/screenshots/normal/%d.jpg';
+
+    public static int $minSize;                             // 200
 
     protected static string $uploadFormField = 'screenshotfile';
     protected static string $tmpPath         = self::PATH_TEMP;
 
-    public const /* string */ PATH_TEMP    = 'static/uploads/screenshots/temp/%s.jpg';
-    public const /* string */ PATH_PENDING = 'static/uploads/screenshots/pending/%d.jpg';
-    public const /* string */ PATH_THUMB   = 'static/uploads/screenshots/thumb/%d.jpg';
-    public const /* string */ PATH_RESIZED = 'static/uploads/screenshots/resized/%d.jpg';
-    public const /* string */ PATH_NORMAL  = 'static/uploads/screenshots/normal/%d.jpg';
-
     public static function init() : bool
     {
-        self::$MIN_SIZE = Cfg::get('SCREENSHOT_MIN_SIZE');
+        self::$minSize = Cfg::get('SCREENSHOT_MIN_SIZE');
 
         $dirErr = false;
         foreach (['TEMP', 'PENDING', 'THUMB', 'RESIZED', 'NORMAL'] as $p)
@@ -42,7 +42,7 @@ class ScreenshotMgr extends ImageUpload
             $path = constant('self::PATH_' . $p);
             if (!is_writable(substr($path, 0, strrpos($path, '/'))))
             {
-                trigger_error('ScreenshotMgr::init - directory '.substr($path, 0, strrpos($path, '/')).' not writable', E_USER_ERROR);
+                trigger_error('ScreenshotMgr::init - directory '.substr($path, 0, strrpos($path, '/')).' not writable', E_USER_WARNING);
                 $dirErr = true;
             }
         }
@@ -62,7 +62,7 @@ class ScreenshotMgr extends ImageUpload
         if ($is = getimagesize(self::$fileName))
         {
             // image size out of bounds
-            if ($is[0] < self::$MIN_SIZE || $is[1] < self::$MIN_SIZE)
+            if ($is[0] < self::$minSize || $is[1] < self::$minSize)
                 self::$error = Lang::screenshot('error', 'tooSmall');
             else if ($is[0] > self::MAX_W || $is[1] > self::MAX_H)
                 self::$error = Lang::screenshot('error', 'selectSS');

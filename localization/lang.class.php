@@ -49,13 +49,13 @@ class Lang
 
     private static ?Locale $locale = null;
 
-    public const FMT_RAW    = 0;
-    public const FMT_HTML   = 1;
-    public const FMT_MARKUP = 2;
+    public const int FMT_RAW    = 0;
+    public const int FMT_HTML   = 1;
+    public const int FMT_MARKUP = 2;
 
-    public const CONCAT_NONE = 0;
-    public const CONCAT_AND  = 1;
-    public const CONCAT_OR   = 2;
+    public const int CONCAT_NONE = 0;
+    public const int CONCAT_AND  = 1;
+    public const int CONCAT_OR   = 2;
 
     public static function load(Locale $loc) : void
     {

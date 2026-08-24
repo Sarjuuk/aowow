@@ -13,14 +13,13 @@ CLISetup::registerSetup("build", new class extends SetupScript
 {
     use TrTemplateFile;
 
-    protected $info = array(
+    protected array $info = array(
         'spellscaling' => [[], CLISetup::ARGV_PARAM, 'Compiles spell scaling data to file for spells with attribute SPELL_ATTR0_LEVEL_DAMAGE_CALCULATION.']
     );
 
-    protected $fileTemplateDest = ['datasets/spell-scaling'];
-    protected $fileTemplateSrc  = ['spell-scaling.in'];
-
-    protected $dbcSourceFiles   = ['gtnpcmanacostscaler'];
+    protected array $fileTemplateDest = ['datasets/spell-scaling'];
+    protected array $fileTemplateSrc  = ['spell-scaling.in'];
+    protected array $dbcSourceFiles   = ['gtnpcmanacostscaler'];
 
     private function debugify(array $data) : string
     {

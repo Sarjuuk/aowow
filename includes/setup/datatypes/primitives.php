@@ -8,8 +8,8 @@ if (!defined('AOWOW_REVISION'))
 
 abstract class Primitive
 {
-    public const /* int */    SIZE     = 1;
-    public const /* string */ PACK_FMT = 'x';
+    public const int    SIZE     = 1;
+    public const string PACK_FMT = 'x';
 
     protected string $data;
 
@@ -39,8 +39,8 @@ abstract class Primitive
 
 class Char extends Primitive
 {
-    public const /* int */    SIZE     = 1;
-    public const /* string */ PACK_FMT = 'C';
+    public const int    SIZE     = 1;
+    public const string PACK_FMT = 'C';
 
     public function unpack() : string
     {
@@ -50,8 +50,8 @@ class Char extends Primitive
 
 class Boolean extends Primitive
 {
-    public const /* int */    SIZE     = 1;
-    public const /* string */ PACK_FMT = 'C';
+    public const int    SIZE     = 1;
+    public const string PACK_FMT = 'C';
 
     public function unpack() : string
     {
@@ -61,44 +61,44 @@ class Boolean extends Primitive
 
 class UInt8 extends Primitive
 {
-    public const /* int */    SIZE     = 1;
-    public const /* string */ PACK_FMT = 'C';
+    public const int    SIZE     = 1;
+    public const string PACK_FMT = 'C';
 }
 
 class Int8 extends Primitive
 {
-    public const /* int */    SIZE     = 1;
-    public const /* string */ PACK_FMT = 'c';
+    public const int    SIZE     = 1;
+    public const string PACK_FMT = 'c';
 }
 
 class UInt16 extends Primitive
 {
-    public const /* int */    SIZE     = 2;
-    public const /* string */ PACK_FMT = 'v';
+    public const int    SIZE     = 2;
+    public const string PACK_FMT = 'v';
 }
 
 class Int16 extends Primitive
 {
-    public const /* int */    SIZE     = 2;
-    public const /* string */ PACK_FMT = 's';
+    public const int    SIZE     = 2;
+    public const string PACK_FMT = 's';
 }
 
 class UInt32 extends Primitive
 {
-    public const /* int */    SIZE     = 4;
-    public const /* string */ PACK_FMT = 'V';
+    public const int    SIZE     = 4;
+    public const string PACK_FMT = 'V';
 }
 
 class Int32 extends Primitive
 {
-    public const /* int */    SIZE     = 4;
-    public const /* string */ PACK_FMT = 'l';
+    public const int    SIZE     = 4;
+    public const string PACK_FMT = 'l';
 }
 
 class Double extends Primitive
 {
-    public const /* int */    SIZE     = 4;
-    public const /* string */ PACK_FMT = 'f';
+    public const int    SIZE     = 4;
+    public const string PACK_FMT = 'f';
 }
 
 ?>

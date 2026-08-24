@@ -13,11 +13,11 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 {
     use TrCustomData;                                       // import custom data from DB
 
-    protected $info = array(
+    protected array $info = array(
         'shapeshiftforms' => [[], CLISetup::ARGV_PARAM, 'Compiles supplemental data for type: Spell from dbc.']
     );
 
-    protected $dbcSourceFiles = ['spellshapeshiftform'];
+    protected array $dbcSourceFiles = ['spellshapeshiftform'];
 
     public function generate() : bool
     {

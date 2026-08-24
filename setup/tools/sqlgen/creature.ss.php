@@ -11,12 +11,12 @@ if (!CLI)
 
 CLISetup::registerSetup("sql", new class extends SetupScript
 {
-    protected $info = array(
+    protected array $info = array(
         'creature' => [[], CLISetup::ARGV_PARAM, 'Compiles data for type: NPC from dbc and world db.']
     );
 
-    protected $dbcSourceFiles  = ['creaturedisplayinfo', 'creaturedisplayinfoextra'];
-    protected $worldDependency = ['creature_template', 'creature_template_locale', 'creature_template_resistance', 'creature_template_spell', 'creature_classlevelstats', 'creature_default_trainer', 'trainer', 'instance_encounters'];
+    protected array $dbcSourceFiles  = ['creaturedisplayinfo', 'creaturedisplayinfoextra'];
+    protected array $worldDependency = ['creature_template', 'creature_template_locale', 'creature_template_resistance', 'creature_template_spell', 'creature_classlevelstats', 'creature_default_trainer', 'trainer', 'instance_encounters'];
 
     public function generate() : bool
     {

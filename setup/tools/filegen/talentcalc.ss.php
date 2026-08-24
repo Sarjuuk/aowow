@@ -28,18 +28,18 @@ if (!CLI)
 
 CLISetup::registerSetup("build", new class extends SetupScript
 {
-    protected $info = array(
+    protected array $info = array(
         'talentcalc' => [[], CLISetup::ARGV_PARAM, 'Compiles talent tree data to file for the talent calculator tool.']
     );
 
-    protected $dbcSourceFiles = ['talenttab', 'talent', 'spell', 'creaturefamily', 'spellicon'];
-    protected $setupAfter     = [['spell'], []];
-    protected $requiredDirs   = ['datasets/'];
-    protected $localized      = true;
+    protected array $dbcSourceFiles = ['talenttab', 'talent', 'spell', 'creaturefamily', 'spellicon'];
+    protected array $setupAfter     = [['spell'], []];
+    protected array $requiredDirs   = ['datasets/'];
+    protected bool  $localized      = true;
 
-    private $petFamIcons = [];
-    private $tSpells     = null;
-    private $spellMods   = [];
+    private  array     $petFamIcons = [];
+    private ?SpellList $tSpells     = null;
+    private  array     $spellMods   = [];
 
     public function generate() : bool
     {
@@ -111,7 +111,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
             if (!$classMask)
             {
-                $petFamId                = log($tabs[$tabIdx]['creatureFamilyMask'], 2);
+                $petFamId                = intval(log($tabs[$tabIdx]['creatureFamilyMask'], 2));
                 $result[$tabIdx]['icon'] = $this->petFamIcons[$petFamId];
                 $petCategories           = DB::Aowow()->SelectCol('SELECT `id` AS ARRAY_KEY, `categoryEnumID` FROM dbc_creaturefamily WHERE `petTalentType` = %i', $petFamId);
                 $result[$tabIdx]['f']    = array_keys($petCategories);

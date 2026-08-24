@@ -11,13 +11,13 @@ if (!CLI)
 
 CLISetup::registerSetup("sql", new class extends SetupScript
 {
-    protected $info = array(
+    protected array $info = array(
         'source' => [[], CLISetup::ARGV_PARAM, 'Compiles source data for type: Item, Spell & Titles from dbc and world db.']
     );
 
-    protected $dbcSourceFiles  = ['charstartoutfit', 'talent', 'spell', 'skilllineability', 'itemextendedcost', 'lock'];
-    protected $worldDependency = ['playercreateinfo_skills', 'playercreateinfo_item', 'skill_discovery_template', 'achievement_reward', 'skill_perfect_item_template', 'item_template', 'gameobject_template', 'quest_template', 'quest_template_addon', 'creature_template', 'creature', 'creature_default_trainer', 'trainer_spell', 'npc_vendor', 'game_event_npc_vendor', 'reference_loot_template', 'item_loot_template', 'creature_loot_template', 'gameobject_loot_template', 'mail_loot_template', 'disenchant_loot_template', 'fishing_loot_template', 'skinning_loot_template', 'milling_loot_template', 'prospecting_loot_template', 'pickpocketing_loot_template'];
-    protected $setupAfter      = [['spell', 'achievement', 'items', 'itemset', 'spawns', 'creature', 'zones', 'titles'], []];
+    protected array $dbcSourceFiles  = ['charstartoutfit', 'talent', 'spell', 'skilllineability', 'itemextendedcost', 'lock'];
+    protected array $worldDependency = ['playercreateinfo_skills', 'playercreateinfo_item', 'skill_discovery_template', 'achievement_reward', 'skill_perfect_item_template', 'item_template', 'gameobject_template', 'quest_template', 'quest_template_addon', 'creature_template', 'creature', 'creature_default_trainer', 'trainer_spell', 'npc_vendor', 'game_event_npc_vendor', 'reference_loot_template', 'item_loot_template', 'creature_loot_template', 'gameobject_loot_template', 'mail_loot_template', 'disenchant_loot_template', 'fishing_loot_template', 'skinning_loot_template', 'milling_loot_template', 'prospecting_loot_template', 'pickpocketing_loot_template'];
+    protected array $setupAfter      = [['spell', 'achievement', 'items', 'itemset', 'spawns', 'creature', 'zones', 'titles'], []];
 
     private array $srcBuffer = [];
     private array $refLoot   = [];
@@ -25,10 +25,10 @@ CLISetup::registerSetup("sql", new class extends SetupScript
     private array $dummyGOs  = [];
     private array $disables  = [];
 
-    private const /* array */ PVP_MONEY        = [26045, 24581, 24579, 43589, 37836]; // Nagrand, Hellfire Pen. H, Hellfire Pen. A, Wintergrasp, Grizzly Hills
-    private const /* int */   COMMON_THRESHOLD = 30;        // if an item has more than X sources it gets filtered by default in loot listviews; ancient WH versions have chance < 1% instead of checking for commonloot property.
+    private const array PVP_MONEY        = [26045, 24581, 24579, 43589, 37836]; // Nagrand, Hellfire Pen. H, Hellfire Pen. A, Wintergrasp, Grizzly Hills
+    private const int   COMMON_THRESHOLD = 30;              // if an item has more than X sources it gets filtered by default in loot listviews; ancient WH versions have chance < 1% instead of checking for commonloot property.
                                                             // but that would include the super rare vanity pet drops etc, so.. idk? Make it depend of item class and/or quality? That sounds like pain. :<
-    private const /* array */ FAKE_CHESTS      = array(     // special cases where multiple chests share the same loot and are spawned for the same encounter
+    private const array FAKE_CHESTS      = array(           // special cases where multiple chests share the same loot and are spawned for the same encounter
         // icc - gunship armory                             // if we process it like normal the contained items show up as zone drop because technically they have multiple sources. So lets avoid that!
         201873 => 202178,                                   // A -> H
         201874 => 202180,
@@ -81,7 +81,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             $hasChanged = false;
             foreach ($this->refLoot as $entry => $refData)
             {
-                foreach ($refData as $itemOrRef => $data)
+                foreach ($refData as $itemOrRef => $_)
                 {
                     if ($itemOrRef > 0)
                         continue;

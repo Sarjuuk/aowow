@@ -40,7 +40,7 @@ class AccountDeleteiconResponse extends TextResponse
 
         $path = sprintf('static/uploads/avatars/%d.jpg', $this->_post['id']);
         if (!unlink($path))
-            trigger_error('AccountDeleteiconResponse - failed to delete file: '.$path, E_USER_ERROR);
+            trigger_error('AccountDeleteiconResponse - failed to delete file: '.$path, E_USER_WARNING);
     }
 }
 

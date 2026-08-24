@@ -10,7 +10,7 @@ class QuestPowerResponse extends TextResponse implements ICache
 {
     use TrCache, TrTooltip;
 
-    private const /* string */ POWER_TEMPLATE = '$WowheadPower.registerQuest(%d, %d, %s);';
+    private const string POWER_TEMPLATE = '$WowheadPower.registerQuest(%d, %d, %s);';
 
     protected int   $type        = Type::QUEST;
     protected int   $typeId      = 0;

@@ -79,7 +79,7 @@ class VideoCompleteResponse extends TextResponse
 
         if (!is_int($newId))                                // 0 is valid, NULL or FALSE is not
         {
-            trigger_error('VideoCompleteResponse - video query failed', E_USER_ERROR);
+            trigger_error('VideoCompleteResponse - video query failed', E_USER_WARNING);
             return false;
         }
 

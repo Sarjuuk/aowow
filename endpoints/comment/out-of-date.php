@@ -21,7 +21,7 @@ class CommentOutofdateResponse extends TextResponse
     {
         if (!$this->assertPOST('id'))
         {
-            trigger_error('CommentOutofdateResponse - malformed request received', E_USER_ERROR);
+            trigger_error('CommentOutofdateResponse - malformed request received', E_USER_WARNING);
             if (User::isInGroup(U_GROUP_STAFF))
                 $this->result = 'malformed request received';
         }
@@ -46,7 +46,7 @@ class CommentOutofdateResponse extends TextResponse
 
         if (!$ok)
         {
-            trigger_error('CommentOutofdateResponse - failed to update comment in db', E_USER_ERROR);
+            trigger_error('CommentOutofdateResponse - failed to update comment in db', E_USER_WARNING);
             $this->result = Lang::main('intError');
             return;
         }

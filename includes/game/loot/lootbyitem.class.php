@@ -8,24 +8,24 @@ if (!defined('AOWOW_REVISION'))
 
 class LootByItem extends Loot
 {
-    public const /* int */ ITEM_CONTAINED     = 0;
-    public const /* int */ ITEM_DISENCHANTED  = 1;
-    public const /* int */ ITEM_PROSPECTED    = 2;
-    public const /* int */ ITEM_MILLED        = 3;
-    public const /* int */ NPC_DROPPED        = 4;
-    public const /* int */ NPC_PICKPOCKETED   = 5;
-    public const /* int */ NPC_SKINNED        = 6;
-    public const /* int */ NPC_MINED          = 7;
-    public const /* int */ NPC_SALVAGED       = 8;
-    public const /* int */ NPC_GATHERED       = 9;
-    public const /* int */ QUEST_REWARD       = 10;
-    public const /* int */ ZONE_FISHED        = 11;
-    public const /* int */ OBJECT_CONTAINED   = 12;
-    public const /* int */ OBJECT_MINED       = 13;
-    public const /* int */ OBJECT_GATHERED    = 14;
-    public const /* int */ OBJECT_FISHED      = 15;
-    public const /* int */ SPELL_CREATED      = 16;
-    public const /* int */ ACHIEVEMENT_REWARD = 17;
+    public const int ITEM_CONTAINED     = 0;
+    public const int ITEM_DISENCHANTED  = 1;
+    public const int ITEM_PROSPECTED    = 2;
+    public const int ITEM_MILLED        = 3;
+    public const int NPC_DROPPED        = 4;
+    public const int NPC_PICKPOCKETED   = 5;
+    public const int NPC_SKINNED        = 6;
+    public const int NPC_MINED          = 7;
+    public const int NPC_SALVAGED       = 8;
+    public const int NPC_GATHERED       = 9;
+    public const int QUEST_REWARD       = 10;
+    public const int ZONE_FISHED        = 11;
+    public const int OBJECT_CONTAINED   = 12;
+    public const int OBJECT_MINED       = 13;
+    public const int OBJECT_GATHERED    = 14;
+    public const int OBJECT_FISHED      = 15;
+    public const int SPELL_CREATED      = 16;
+    public const int ACHIEVEMENT_REWARD = 17;
 
     private array  $chanceMods    = [];
     private array  $listviewTabs  = array(

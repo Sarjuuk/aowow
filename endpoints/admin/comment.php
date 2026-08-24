@@ -8,9 +8,9 @@ if (!defined('AOWOW_REVISION'))
 
 class AdminCommentResponse extends TextResponse
 {
-    private const /* int */ ERR_NONE          = 1;
-    private const /* int */ ERR_WRITE_DB      = 0;
-    private const /* int */ ERR_MISCELLANEOUS = 999;
+    private const int ERR_NONE          = 1;
+    private const int ERR_WRITE_DB      = 0;
+    private const int ERR_MISCELLANEOUS = 999;
 
     protected int   $requiredUserGroup = U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_MOD;
 
@@ -23,7 +23,7 @@ class AdminCommentResponse extends TextResponse
     {
         if (!$this->assertPOST('id', 'status'))
         {
-            trigger_error('AdminCommentResponse - malformed request received', E_USER_ERROR);
+            trigger_error('AdminCommentResponse - malformed request received', E_USER_WARNING);
             $this->result = self::ERR_MISCELLANEOUS;
             return;
         }

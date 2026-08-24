@@ -19,7 +19,7 @@ enum ChrClass : int
     case WARLOCK     = 9;
     case DRUID       = 11;
 
-    public const MASK_ALL    = 0x5FF;
+    public const int MASK_ALL = 0x5FF;
 
     public function matches(int $classMask) : bool
     {

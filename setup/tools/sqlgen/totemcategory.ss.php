@@ -13,8 +13,8 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 {
     use TrDBCcopy;
 
-    protected $command           = 'totemcategory';
-    protected $dbcSourceFiles    = ['totemcategory'];
+    protected string $command        = 'totemcategory';
+    protected array  $dbcSourceFiles = ['totemcategory'];
 });
 
 ?>

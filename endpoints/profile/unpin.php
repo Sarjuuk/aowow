@@ -32,7 +32,7 @@ class ProfileUnpinResponse extends TextResponse
     {
         if (!$this->assertGET('id'))
         {
-            trigger_error('ProfileUnpinResponse - profileId empty', E_USER_ERROR);
+            trigger_error('ProfileUnpinResponse - profileId empty', E_USER_WARNING);
             return;
         }
 
@@ -44,7 +44,7 @@ class ProfileUnpinResponse extends TextResponse
 
         if (!$uid)
         {
-            trigger_error('ProfileUnpinResponse - user "'.$this->_get['user'].'" does not exist', E_USER_ERROR);
+            trigger_error('ProfileUnpinResponse - user "'.$this->_get['user'].'" does not exist', E_USER_WARNING);
             return;
         }
 

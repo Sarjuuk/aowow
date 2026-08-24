@@ -13,7 +13,7 @@ if (!CLI)
 
 CLISetup::registerSetup("sql", new class extends SetupScript
 {
-    protected $info = array(
+    protected array $info = array(
         'spawns'       => [[   ], CLISetup::ARGV_PARAM,    'Compiles map points from dbc and world db.'       ],
         'creatures'    => [['1'], CLISetup::ARGV_OPTIONAL, '...just the creature positions.'                  ],
         'objects'      => [['2'], CLISetup::ARGV_OPTIONAL, '...just the gameobject positions.'                ],
@@ -23,16 +23,16 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         'waypoints'    => [['6'], CLISetup::ARGV_OPTIONAL, '...just the creature waypoints.'                  ]
    );
 
-    protected $dbcSourceFiles  = ['worldmaparea', 'map', 'taxipathnode', 'soundemitters', 'areatrigger', 'areatable'];
-    protected $worldDependency = ['creature', 'creature_addon', 'creature_template_addon', 'gameobject', 'gameobject_template', 'vehicle_accessory', 'vehicle_accessory_template', 'waypoint_data', 'smart_scripts', 'areatrigger_teleport'];
-    protected $setupAfter      = [['dungeonmap', 'worldmaparea', 'zones'], ['img-maps']];
+    protected array $dbcSourceFiles  = ['worldmaparea', 'map', 'taxipathnode', 'soundemitters', 'areatrigger', 'areatable'];
+    protected array $worldDependency = ['creature', 'creature_addon', 'creature_template_addon', 'gameobject', 'gameobject_template', 'vehicle_accessory', 'vehicle_accessory_template', 'waypoint_data', 'smart_scripts', 'areatrigger_teleport'];
+    protected array $setupAfter      = [['dungeonmap', 'worldmaparea', 'zones'], ['img-maps']];
 
     private array $transports   = [];
     private array $overrideData = [];
     private array $mapToArea    = [];
     private array $areaParents  = [];
 
-    private $steps = array(
+    private array $steps = array(
         0x01 => ['creature',     Type::NPC,         false, '`creature` spawns',                                ],
         0x02 => ['gameobject',   Type::OBJECT,      false, '`gameobject` spawns',                              ],
         0x04 => ['soundemitter', Type::SOUND,       false, 'SoundEmitters.dbc positions',                      ],
@@ -40,7 +40,6 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         0x10 => ['instances',    Type::ZONE,        false, 'Map.dbc instance portals positions'                ],
         0x20 => ['waypoints',    Type::NPC,         true,  'NPC waypoints from `waypoint_data`'                ]
     );
-
 
     public function generate() : bool
     {

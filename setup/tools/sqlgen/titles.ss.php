@@ -13,14 +13,14 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 {
     use TrCustomData;                                       // import custom data from DB
 
-    protected $info = array(
+    protected array $info = array(
         'titles' => [[], CLISetup::ARGV_PARAM, 'Compiles data for type: Title from dbc and world db.']
     );
 
-    protected $dbcSourceFiles  = ['chartitles'];
-    protected $worldDependency = ['quest_template', 'game_event_seasonal_questrelation', 'game_event', 'achievement_reward'];
+    protected array $dbcSourceFiles  = ['chartitles'];
+    protected array $worldDependency = ['quest_template', 'game_event_seasonal_questrelation', 'game_event', 'achievement_reward'];
 
-    private $titleHoliday = array(
+    private array $titleHoliday = array(
         137 => 201,
         138 => 201,
         124 => 324,

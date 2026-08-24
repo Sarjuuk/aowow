@@ -111,7 +111,7 @@ class AccountSigninResponse extends TemplateResponse
     {
         if (!User::$ip)
         {
-            trigger_error('AccountSigninResponse::onAuthSuccess() - tried to login user without ip set', E_USER_ERROR);
+            trigger_error('AccountSigninResponse::onAuthSuccess() - tried to login user without ip set', E_USER_WARNING);
             return Lang::main('intError');
         }
 
@@ -124,7 +124,7 @@ class AccountSigninResponse extends TemplateResponse
 
         if (!is_int($ok))                                   // num updated fields or null on fail
         {
-            trigger_error('AccountSigninResponse::onAuthSuccess() - failed to update account status', E_USER_ERROR);
+            trigger_error('AccountSigninResponse::onAuthSuccess() - failed to update account status', E_USER_WARNING);
             return Lang::main('intError');
         }
 

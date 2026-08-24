@@ -8,20 +8,19 @@ if (!defined('AOWOW_REVISION'))
 
 class AvatarMgr extends ImageUpload
 {
-    private const MIN_SIZE = ICON_SIZE_LARGE;
     // 4k resolution
-    private const MAX_W    = 4096;
-    private const MAX_H    = 2160;
+    private const int MAX_W    = 4096;
+    private const int MAX_H    = 2160;
 
-    public const STATUS_PENDING  = 0;                      // guessed
-    public const STATUS_APPROVED = 1;                      // guessed
-    public const STATUS_REJECTED = 2;
+    public const int    STATUS_PENDING  = 0;                // guessed
+    public const int    STATUS_APPROVED = 1;                // guessed
+    public const int    STATUS_REJECTED = 2;
+
+    public const string PATH_TEMP    = 'static/uploads/temp/%s.jpg';
+    public const string PATH_AVATARS = 'static/uploads/avatars/%d.jpg';
 
     protected static string $uploadFormField = 'iconfile';
     protected static string $tmpPath         = self::PATH_TEMP;
-
-    public const PATH_TEMP    = 'static/uploads/temp/%s.jpg';
-    public const PATH_AVATARS = 'static/uploads/avatars/%d.jpg';
 
     public static function init() : bool
     {
@@ -31,7 +30,7 @@ class AvatarMgr extends ImageUpload
             $path = constant('self::PATH_' . $p);
             if (!is_writable(substr($path, 0, strrpos($path, '/'))))
             {
-                trigger_error('AvatarMgr::init - directory '.substr($path, 0, strrpos($path, '/')).' not writable', E_USER_ERROR);
+                trigger_error('AvatarMgr::init - directory '.substr($path, 0, strrpos($path, '/')).' not writable', E_USER_WARNING);
                 $dirErr = true;
             }
         }

@@ -13,13 +13,13 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 {
     use TrCustomData;
 
-    protected $info = array(
+    protected array $info = array(
         'pet' => [[], CLISetup::ARGV_PARAM, 'Compiles data for type: Pet from dbc and world db.']
     );
 
-    protected $dbcSourceFiles     = ['talent', 'spell', 'skilllineability', 'creaturefamily'];
-    protected $worldDependency    = ['creature_template', 'creature'];
-    protected $setupAfter         = [['icons'], []];
+    protected array $dbcSourceFiles  = ['talent', 'spell', 'skilllineability', 'creaturefamily'];
+    protected array $worldDependency = ['creature_template', 'creature'];
+    protected array $setupAfter      = [['icons'], []];
 
     public function generate() : bool
     {

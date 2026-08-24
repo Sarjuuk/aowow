@@ -15,20 +15,20 @@ if (!CLI)
 
 CLISetup::registerUtility(new class extends UtilityScript
 {
-    public $argvOpts = ['a'];
-    public $optGroup = CLISetup::OPT_GRP_SETUP;
+    public array $argvOpts = ['a'];
+    public int   $optGroup = CLISetup::OPT_GRP_SETUP;
 
-    public const COMMAND      = 'account';
-    public const DESCRIPTION  = 'Create an account with admin privileges.';
-    public const APPENDIX     = ' [name [password [email]]]';
-    public const PROMPT       = 'Please create your admin account.';
-    public const NOTE_ERROR   = 'There is no user with administrator privileges in the DB.';
+    public const string COMMAND      = 'account';
+    public const string DESCRIPTION  = 'Create an account with admin privileges.';
+    public const string APPENDIX     = ' [name [password [email]]]';
+    public const string PROMPT       = 'Please create your admin account.';
+    public const string NOTE_ERROR   = 'There is no user with administrator privileges in the DB.';
 
-    public const REQUIRED_DB = [DB_AOWOW];
+    public const array  REQUIRED_DB  = [DB_AOWOW];
 
-    public const USE_CLI_ARGS = true;
+    public const bool   USE_CLI_ARGS = true;
 
-    private $fields = array(
+    private array $fields = array(
         'name'  => ['Username',         false],
         'pass1' => ['Enter Password',   true ],
         'pass2' => ['Confirm Password', true ],
@@ -36,7 +36,7 @@ CLISetup::registerUtility(new class extends UtilityScript
     );
 
     // args: username, password, email, null // iiin
-    public function run(&$args) : bool
+    public function run(array &$args) : bool
     {
         Lang::load(Locale::EN);
 

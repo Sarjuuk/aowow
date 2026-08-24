@@ -13,12 +13,12 @@ CLISetup::registerSetup("build", new class extends SetupScript
 {
     use TrTemplateFile;
 
-    protected $info = array(
+    protected array $info = array(
         'robots' => [[], CLISetup::ARGV_PARAM, 'Fills robots.txt with site variables.']
     );
 
-    protected $fileTemplateSrc  = ['robots.txt.in'];
-    protected $fileTemplateDest = ['robots.txt'];           // aowow root
+    protected array $fileTemplateSrc  = ['robots.txt.in'];
+    protected array $fileTemplateDest = ['robots.txt'];     // aowow root
 });
 
 ?>

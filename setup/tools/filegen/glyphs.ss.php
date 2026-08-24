@@ -23,13 +23,13 @@ if (!CLI)
 
 CLISetup::registerSetup("build", new class extends SetupScript
 {
-    protected $info = array(
+    protected array $info = array(
         'glyphs' => [[], CLISetup::ARGV_PARAM, 'Compiles glyphs to file for the talent calculator tool.']
     );
 
-    protected $setupAfter         = [['items', 'spell', 'glyphproperties', 'icons'], []];
-    protected $requiredDirs       = ['datasets/'];
-    protected $localized          = true;
+    protected array $setupAfter         = [['items', 'spell', 'glyphproperties', 'icons'], []];
+    protected array $requiredDirs       = ['datasets/'];
+    protected bool  $localized          = true;
 
     public function generate() : bool
     {

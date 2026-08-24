@@ -10,7 +10,7 @@ class EventPowerResponse extends TextResponse implements ICache
 {
     use TrCache, TrTooltip;
 
-    private const /* string */ POWER_TEMPLATE = '$WowheadPower.registerHoliday(%d, %d, %s);';
+    private const string POWER_TEMPLATE = '$WowheadPower.registerHoliday(%d, %d, %s);';
 
     protected int   $type        = Type::WORLDEVENT;
     protected int   $typeId      = 0;

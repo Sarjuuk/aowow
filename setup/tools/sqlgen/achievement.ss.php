@@ -13,13 +13,13 @@ CLISetup::registerSetup('sql', new class extends SetupScript
 {
     use TrCustomData;                                       // import custom data from DB
 
-    protected $info = array(
+    protected array $info = array(
         'achievement' => [[], CLISetup::ARGV_PARAM, 'Compiles data for type: Achievement from dbc and world db.']
     );
 
-    protected $dbcSourceFiles     = ['achievement_category', 'achievement', 'spellicon'];
-    protected $worldDependency    = ['dbc_achievement', 'disables'];
-    protected $setupAfter         = [['icons'], []];
+    protected array $dbcSourceFiles     = ['achievement_category', 'achievement', 'spellicon'];
+    protected array $worldDependency    = ['dbc_achievement', 'disables'];
+    protected array $setupAfter         = [['icons'], []];
 
     public function generate() : bool
     {

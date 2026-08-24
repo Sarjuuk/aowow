@@ -15,17 +15,17 @@ if (!CLI)
 
 CLISetup::registerUtility(new class extends UtilityScript
 {
-    public $argvFlags   = CLISetup::ARGV_ARRAY | CLISetup::ARGV_OPTIONAL;
-    public $optGroup    = CLISetup::OPT_GRP_UTIL;
+    public int $argvFlags = CLISetup::ARGV_ARRAY | CLISetup::ARGV_OPTIONAL;
+    public int $optGroup  = CLISetup::OPT_GRP_UTIL;
 
-    public const COMMAND     = 'sync';
-    public const DESCRIPTION = 'Regenerate tables/files that depend on given world DB table.';
-    public const APPENDIX    = '=<worldTableList,>';
+    public const string COMMAND     = 'sync';
+    public const string DESCRIPTION = 'Regenerate tables/files that depend on given world DB table.';
+    public const string APPENDIX    = '=<worldTableList,>';
 
-    public const REQUIRED_DB = [DB_AOWOW, DB_WORLD];
+    public const array  REQUIRED_DB = [DB_AOWOW, DB_WORLD];
 
     // sqlToDo, buildToDo, null, null // iinn
-    public function run(&$args) : bool
+    public function run(array &$args) : bool
     {
         $s = &$args['doSql'];
         $b = &$args['doBuild'];

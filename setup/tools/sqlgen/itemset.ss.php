@@ -17,13 +17,13 @@ if (!CLI)
 
 CLISetup::registerSetup("sql", new class extends SetupScript
 {
-    protected $info = array(
+    protected array $info = array(
         'itemset' => [[], CLISetup::ARGV_PARAM, 'Compiles data for type: Itemset from dbc and world db.']
     );
 
-    protected $dbcSourceFiles     = ['itemset'];
-    protected $worldDependency    = ['item_template', 'game_event'];
-    protected $setupAfter         = [['spell'], []];
+    protected array $dbcSourceFiles  = ['itemset'];
+    protected array $worldDependency = ['item_template', 'game_event'];
+    protected array $setupAfter      = [['spell'], []];
 
     private array $setToHoliday = array (
         761 => 141,                                         // Winterveil

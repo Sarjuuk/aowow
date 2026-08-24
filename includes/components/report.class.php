@@ -8,49 +8,49 @@ if (!defined('AOWOW_REVISION'))
 
 class Report
 {
-    public const MODE_GENERAL         = 0;
-    public const MODE_COMMENT         = 1;
-    public const MODE_FORUM_POST      = 2;
-    public const MODE_SCREENSHOT      = 3;
-    public const MODE_CHARACTER       = 4;
-    public const MODE_VIDEO           = 5;
-    public const MODE_GUIDE           = 6;
+    public const int MODE_GENERAL         = 0;
+    public const int MODE_COMMENT         = 1;
+    public const int MODE_FORUM_POST      = 2;
+    public const int MODE_SCREENSHOT      = 3;
+    public const int MODE_CHARACTER       = 4;
+    public const int MODE_VIDEO           = 5;
+    public const int MODE_GUIDE           = 6;
 
-    public const GEN_FEEDBACK         = 1;
-    public const GEN_BUG_REPORT       = 2;
-    public const GEN_TYPO_TRANSLATION = 3;
-    public const GEN_OP_ADVERTISING   = 4;
-    public const GEN_OP_PARTNERSHIP   = 5;
-    public const GEN_PRESS_INQUIRY    = 6;
-    public const GEN_MISCELLANEOUS    = 7;
-    public const GEN_MISINFORMATION   = 8;
-    public const CO_ADVERTISING       = 15;
-    public const CO_INACCURATE        = 16;
-    public const CO_OUT_OF_DATE       = 17;
-    public const CO_SPAM              = 18;
-    public const CO_INAPPROPRIATE     = 19;
-    public const CO_MISCELLANEOUS     = 20;
-    public const FO_ADVERTISING       = 30;
-    public const FO_AVATAR            = 31;
-    public const FO_INACCURATE        = 32;
-    public const FO_OUT_OF_DATE       = 33;
-    public const FO_SPAM              = 34;
-    public const FO_STICKY_REQUEST    = 35;
-    public const FO_INAPPROPRIATE     = 36;
-    public const FO_MISCELLANEOUS     = 37;
-    public const SS_INACCURATE        = 45;
-    public const SS_OUT_OF_DATE       = 46;
-    public const SS_INAPPROPRIATE     = 47;
-    public const SS_MISCELLANEOUS     = 48;
-    public const PR_INACCURATE_DATA   = 60;
-    public const PR_MISCELLANEOUS     = 61;
-    public const VI_INACCURATE        = 45;
-    public const VI_OUT_OF_DATE       = 46;
-    public const VI_INAPPROPRIATE     = 47;
-    public const VI_MISCELLANEOUS     = 48;
-    public const AR_INACCURATE        = 45;
-    public const AR_OUT_OF_DATE       = 46;
-    public const AR_MISCELLANEOUS     = 48;
+    public const int GEN_FEEDBACK         = 1;
+    public const int GEN_BUG_REPORT       = 2;
+    public const int GEN_TYPO_TRANSLATION = 3;
+    public const int GEN_OP_ADVERTISING   = 4;
+    public const int GEN_OP_PARTNERSHIP   = 5;
+    public const int GEN_PRESS_INQUIRY    = 6;
+    public const int GEN_MISCELLANEOUS    = 7;
+    public const int GEN_MISINFORMATION   = 8;
+    public const int CO_ADVERTISING       = 15;
+    public const int CO_INACCURATE        = 16;
+    public const int CO_OUT_OF_DATE       = 17;
+    public const int CO_SPAM              = 18;
+    public const int CO_INAPPROPRIATE     = 19;
+    public const int CO_MISCELLANEOUS     = 20;
+    public const int FO_ADVERTISING       = 30;
+    public const int FO_AVATAR            = 31;
+    public const int FO_INACCURATE        = 32;
+    public const int FO_OUT_OF_DATE       = 33;
+    public const int FO_SPAM              = 34;
+    public const int FO_STICKY_REQUEST    = 35;
+    public const int FO_INAPPROPRIATE     = 36;
+    public const int FO_MISCELLANEOUS     = 37;
+    public const int SS_INACCURATE        = 45;
+    public const int SS_OUT_OF_DATE       = 46;
+    public const int SS_INAPPROPRIATE     = 47;
+    public const int SS_MISCELLANEOUS     = 48;
+    public const int PR_INACCURATE_DATA   = 60;
+    public const int PR_MISCELLANEOUS     = 61;
+    public const int VI_INACCURATE        = 45;
+    public const int VI_OUT_OF_DATE       = 46;
+    public const int VI_INAPPROPRIATE     = 47;
+    public const int VI_MISCELLANEOUS     = 48;
+    public const int AR_INACCURATE        = 45;
+    public const int AR_OUT_OF_DATE       = 46;
+    public const int AR_MISCELLANEOUS     = 48;
 
     private array $context = array(
         self::MODE_GENERAL => array(
@@ -103,17 +103,17 @@ class Report
         )
     );
 
-    private const ERR_NONE             = 0;                 // aka: success
-    private const ERR_INVALID_CAPTCHA  = 1;                 // captcha not in use
-    private const ERR_DESC_TOO_LONG    = 2;
-    private const ERR_NO_DESC          = 3;
-    private const ERR_ALREADY_REPORTED = 7;
-    private const ERR_MISCELLANEOUS    = -1;
+    private const int ERR_NONE             = 0;             // aka: success
+    private const int ERR_INVALID_CAPTCHA  = 1;             // captcha not in use
+    private const int ERR_DESC_TOO_LONG    = 2;
+    private const int ERR_NO_DESC          = 3;
+    private const int ERR_ALREADY_REPORTED = 7;
+    private const int ERR_MISCELLANEOUS    = -1;
 
-    public  const STATUS_OPEN           = 0;
-    public  const STATUS_ASSIGNED       = 1;
-    public  const STATUS_CLOSED_WONTFIX = 2;
-    public  const STATUS_CLOSED_SOLVED  = 3;
+    public const int STATUS_OPEN           = 0;
+    public const int STATUS_ASSIGNED       = 1;
+    public const int STATUS_CLOSED_WONTFIX = 2;
+    public const int STATUS_CLOSED_SOLVED  = 3;
 
     private int $errorCode = self::ERR_NONE;
 
@@ -122,21 +122,21 @@ class Report
     {
         if ($mode < 0 || $reason <= 0)
         {
-            trigger_error('Report - malformed contact request received', E_USER_ERROR);
+            trigger_error('Report - malformed contact request received', E_USER_WARNING);
             $this->errorCode = self::ERR_MISCELLANEOUS;
             return;
         }
 
         if (!isset($this->context[$mode][$reason]))
         {
-            trigger_error('Report - report has invalid context (mode:'.$mode.' / reason:'.$reason.')', E_USER_ERROR);
+            trigger_error('Report - report has invalid context (mode:'.$mode.' / reason:'.$reason.')', E_USER_WARNING);
             $this->errorCode = self::ERR_MISCELLANEOUS;
             return;
         }
 
         if (!User::isLoggedIn() && !User::$ip)
         {
-            trigger_error('Report - could not determine IP for anonymous user', E_USER_ERROR);
+            trigger_error('Report - could not determine IP for anonymous user', E_USER_WARNING);
             $this->errorCode = self::ERR_MISCELLANEOUS;
             return;
         }

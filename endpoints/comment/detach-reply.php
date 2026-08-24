@@ -19,7 +19,7 @@ class CommentDetachreplyResponse extends TextResponse
     {
         if (!$this->assertPOST('id'))
         {
-            trigger_error('CommentDetachreplyResponse - malformed request received', E_USER_ERROR);
+            trigger_error('CommentDetachreplyResponse - malformed request received', E_USER_WARNING);
             $this->generate404(User::isInGroup(U_GROUP_STAFF) ? 'request malformed' : '');
         }
 

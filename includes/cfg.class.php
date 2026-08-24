@@ -7,47 +7,47 @@ if (!defined('AOWOW_REVISION'))
 
 class Cfg
 {
-    public const PATTERN_CONF_KEY_CHAR = '/[a-z0-9_\.\-]/i';
-    public const PATTERN_CONF_KEY_FULL = '/^[a-z0-9_\.\-]+$/i';
-    public const PATTERN_INVALID_CHARS = '/\p{C}/ui';
+    public const string PATTERN_CONF_KEY_CHAR = '/[a-z0-9_\.\-]/i';
+    public const string PATTERN_CONF_KEY_FULL = '/^[a-z0-9_\.\-]+$/i';
+    public const string PATTERN_INVALID_CHARS = '/\p{C}/ui';
 
     // config flags
-    public const FLAG_TYPE_INT    = 0x001;                   // validate with intVal()
-    public const FLAG_TYPE_FLOAT  = 0x002;                   // validate with floatVal()
-    public const FLAG_TYPE_BOOL   = 0x004;                   // 0 || 1
-    public const FLAG_TYPE_STRING = 0x008;                   //
-    public const FLAG_OPT_LIST    = 0x010;                   // single option
-    public const FLAG_BITMASK     = 0x020;                   // multiple options
-    public const FLAG_PHP         = 0x040;                   // applied with ini_set() [restrictions apply!]
-    public const FLAG_PERSISTENT  = 0x080;                   // can not be deleted
-    public const FLAG_REQUIRED    = 0x100;                   // required to have non-empty value
-    public const FLAG_ON_LOAD_FN  = 0x200;                   // run static function of the same name after load
-    public const FLAG_ON_SET_FN   = 0x400;                   // run static function of the same name as validator
-    public const FLAG_INTERNAL    = 0x800;                   // can not be configures, automaticly calculated, skip on lists
+    public const int FLAG_TYPE_INT    = 0x001;              // validate with intVal()
+    public const int FLAG_TYPE_FLOAT  = 0x002;              // validate with floatVal()
+    public const int FLAG_TYPE_BOOL   = 0x004;              // 0 || 1
+    public const int FLAG_TYPE_STRING = 0x008;              //
+    public const int FLAG_OPT_LIST    = 0x010;              // single option
+    public const int FLAG_BITMASK     = 0x020;              // multiple options
+    public const int FLAG_PHP         = 0x040;              // applied with ini_set() [restrictions apply!]
+    public const int FLAG_PERSISTENT  = 0x080;              // can not be deleted
+    public const int FLAG_REQUIRED    = 0x100;              // required to have non-empty value
+    public const int FLAG_ON_LOAD_FN  = 0x200;              // run static function of the same name after load
+    public const int FLAG_ON_SET_FN   = 0x400;              // run static function of the same name as validator
+    public const int FLAG_INTERNAL    = 0x800;              // can not be configures, automaticly calculated, skip on lists
 
-    public const CAT_MISCELLANEOUS   = 0;
-    public const CAT_SITE            = 1;
-    public const CAT_CACHE           = 2;
-    public const CAT_ACCOUNT         = 3;
-    public const CAT_SESSION         = 4;
-    public const CAT_SITE_REPUTATION = 5;
-    public const CAT_ANALYTICS       = 6;
-    public const CAT_PROFILER        = 7;
+    public const int CAT_MISCELLANEOUS   = 0;
+    public const int CAT_SITE            = 1;
+    public const int CAT_CACHE           = 2;
+    public const int CAT_ACCOUNT         = 3;
+    public const int CAT_SESSION         = 4;
+    public const int CAT_SITE_REPUTATION = 5;
+    public const int CAT_ANALYTICS       = 6;
+    public const int CAT_PROFILER        = 7;
 
-    public static $categories = array(                      // don't mind the ordering ... please?
+    public static array $categories = array(                // don't mind the ordering ... please?
         1 => 'Site', 'Caching', 'Account', 'Session', 'Site Reputation', 'Google Analytics', 'Profiler', 0 => 'Other'
     );
 
-    private const IDX_VALUE    = 0;
-    private const IDX_FLAGS    = 1;
-    private const IDX_CATEGORY = 2;
-    private const IDX_DEFAULT  = 3;
-    private const IDX_COMMENT  = 4;
+    private const int IDX_VALUE    = 0;
+    private const int IDX_FLAGS    = 1;
+    private const int IDX_CATEGORY = 2;
+    private const int IDX_DEFAULT  = 3;
+    private const int IDX_COMMENT  = 4;
 
-    private static $store    = [];                          // name => [value, flags, cat, default, comment]
-    private static $isLoaded = false;
+    private static array $store    = [];                    // name => [value, flags, cat, default, comment]
+    private static bool  $isLoaded = false;
 
-    private static $rebuildScripts = array(
+    private static array $rebuildScripts = array(
         'rep_req_border_uncommon'  => ['globaljs'],
         'rep_req_border_rare'      => ['globaljs'],
         'rep_req_border_epic'      => ['globaljs'],
@@ -381,7 +381,7 @@ class Cfg
         if (CLI)
             CLI::write($msg, CLI::LOG_ERROR);
         else
-            trigger_error($msg, E_USER_ERROR);
+            trigger_error($msg, E_USER_WARNING);
     }
 
     private static function useSSL() : bool

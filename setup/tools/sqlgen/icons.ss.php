@@ -11,7 +11,7 @@ if (!CLI)
 
 CLISetup::registerSetup("sql", new class extends SetupScript
 {
-    private const /* array */ HOLIDAY_ICONS = array(
+    private const array HOLIDAY_ICONS = array(
         'calendar_winterveilstart',
         'calendar_noblegardenstart',
         'calendar_childrensweekstart',
@@ -31,11 +31,11 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         'calendar_fireworksstart'
     );
 
-    protected $info = array(
+    protected array $info = array(
         'icons' => [[], CLISetup::ARGV_PARAM, 'Compiles data for type: Icons from dbc.']
     );
 
-    protected $dbcSourceFiles = ['spellicon', 'itemdisplayinfo', 'creaturefamily'];
+    protected array $dbcSourceFiles = ['spellicon', 'itemdisplayinfo', 'creaturefamily'];
 
     public function generate() : bool
     {

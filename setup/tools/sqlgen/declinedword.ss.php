@@ -11,11 +11,11 @@ if (!CLI)
 
 CLISetup::registerSetup("sql", new class extends SetupScript
 {
-    protected $info = array(
+    protected array $info = array(
         'declinedwords' => [[], CLISetup::ARGV_PARAM, 'Compiles data for type: Enchantment from dbc and world db.']
     );
 
-    protected $dbcSourceFiles  = ['declinedword', 'declinedwordcases'];
+    protected array $dbcSourceFiles = ['declinedword', 'declinedwordcases'];
 
     public function generate() : bool
     {

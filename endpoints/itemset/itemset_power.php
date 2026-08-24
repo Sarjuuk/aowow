@@ -10,7 +10,7 @@ class ItemsetPowerResponse extends TextResponse implements ICache
 {
     use TrCache, TrTooltip;
 
-    private const /* string */ POWER_TEMPLATE = '$WowheadPower.registerItemSet(%d, %d, %s);';
+    private const string POWER_TEMPLATE = '$WowheadPower.registerItemSet(%d, %d, %s);';
 
     protected int   $type        = Type::ITEMSET;
     protected int   $typeId      = 0;

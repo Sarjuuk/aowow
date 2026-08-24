@@ -11,164 +11,164 @@ class SmartAction
 {
     use SmartHelper;
 
-    public const ACTION_NONE                               = 0;   //  Do nothing
-    public const ACTION_TALK                               = 1;   //  Param2 in Milliseconds.
-    public const ACTION_SET_FACTION                        = 2;   //  Sets faction to creature.
-    public const ACTION_MORPH_TO_ENTRY_OR_MODEL            = 3;   //  Take DisplayID of creature (param1) OR Turn to DisplayID (param2) OR Both = 0 for Demorph
-    public const ACTION_SOUND                              = 4;   //  TextRange = 0 only sends sound to self, TextRange = 1 sends sound to everyone in visibility range
-    public const ACTION_PLAY_EMOTE                         = 5;   //  Play Emote
-    public const ACTION_FAIL_QUEST                         = 6;   //  Fail Quest of Target
-    public const ACTION_OFFER_QUEST                        = 7;   //  Add Quest to Target
-    public const ACTION_SET_REACT_STATE                    = 8;   //  React State. Can be Passive (0), Defensive (1), Aggressive (2), Assist (3).
-    public const ACTION_ACTIVATE_GOBJECT                   = 9;   //  Activate Object
-    public const ACTION_RANDOM_EMOTE                       = 10;  //  Play Random Emote
-    public const ACTION_CAST                               = 11;  //  Cast Spell ID at Target
-    public const ACTION_SUMMON_CREATURE                    = 12;  //  Summon Unit
-    public const ACTION_THREAT_SINGLE_PCT                  = 13;  //  Change Threat Percentage for Single Target
-    public const ACTION_THREAT_ALL_PCT                     = 14;  //  Change Threat Percentage for All Enemies
-    public const ACTION_CALL_AREAEXPLOREDOREVENTHAPPENS    = 15;  //
-    public const ACTION_SET_INGAME_PHASE_ID                = 16;  //  [RESERVED] For 4.3.4 + only
-    public const ACTION_SET_EMOTE_STATE                    = 17;  //  Play Emote Continuously
-    public const ACTION_SET_UNIT_FLAG                      = 18;  //  [DEPRECATED] Can set Multi-able flags at once
-    public const ACTION_REMOVE_UNIT_FLAG                   = 19;  //  [DEPRECATED] Can Remove Multi-able flags at once
-    public const ACTION_AUTO_ATTACK                        = 20;  //  Stop or Continue Automatic Attack.
-    public const ACTION_ALLOW_COMBAT_MOVEMENT              = 21;  //  Allow or Disable Combat Movement
-    public const ACTION_SET_EVENT_PHASE                    = 22;  //
-    public const ACTION_INC_EVENT_PHASE                    = 23;  //  Set param1 OR param2 (not both). Value 0 has no effect.
-    public const ACTION_EVADE                              = 24;  //  Evade Incoming Attack
-    public const ACTION_FLEE_FOR_ASSIST                    = 25;  //  If you want the fleeing NPC to say '%s attempts to run away in fear' on flee, use 1 on param1. 0 for no message.
-    public const ACTION_CALL_GROUPEVENTHAPPENS             = 26;  //
-    public const ACTION_COMBAT_STOP                        = 27;  //
-    public const ACTION_REMOVEAURASFROMSPELL               = 28;  //  0 removes all auras
-    public const ACTION_FOLLOW                             = 29;  //  Follow Target
-    public const ACTION_RANDOM_PHASE                       = 30;  //
-    public const ACTION_RANDOM_PHASE_RANGE                 = 31;  //
-    public const ACTION_RESET_GOBJECT                      = 32;  //  Reset Gameobject
-    public const ACTION_CALL_KILLEDMONSTER                 = 33;  //  This is the ID from quest_template.RequiredNpcOrGo
-    public const ACTION_SET_INST_DATA                      = 34;  //  Set Instance Data
-    public const ACTION_SET_INST_DATA64                    = 35;  //  Set Instance Data uint64
-    public const ACTION_UPDATE_TEMPLATE                    = 36;  //  Updates creature_template to given entry
-    public const ACTION_DIE                                = 37;  //  Kill Target
-    public const ACTION_SET_IN_COMBAT_WITH_ZONE            = 38;  //
-    public const ACTION_CALL_FOR_HELP                      = 39;  //  If you want the NPC to say '%s calls for help!'. Use 1 on param1, 0 for no message.
-    public const ACTION_SET_SHEATH                         = 40;  //
-    public const ACTION_FORCE_DESPAWN                      = 41;  //  Despawn Target after param1 in Milliseconds. If you want to set respawn time set param2 in seconds.
-    public const ACTION_SET_INVINCIBILITY_HP_LEVEL         = 42;  //  If you use both params, only percent will be used.
-    public const ACTION_MOUNT_TO_ENTRY_OR_MODEL            = 43;  //  Mount to Creature Entry (param1) OR Mount to Creature Display (param2) Or both = 0 for Unmount
-    public const ACTION_SET_INGAME_PHASE_MASK              = 44;  //
-    public const ACTION_SET_DATA                           = 45;  //  Set Data For Target, can be used with SMART_EVENT_DATA_SET
-    public const ACTION_ATTACK_STOP                        = 46;  //
-    public const ACTION_SET_VISIBILITY                     = 47;  //  Makes creature Visible = 1  or  Invisible = 0
-    public const ACTION_SET_ACTIVE                         = 48;  //
-    public const ACTION_ATTACK_START                       = 49;  //  Allows basic melee swings to creature.
-    public const ACTION_SUMMON_GO                          = 50;  //  Spawns Gameobject, use target_type to set spawn position.
-    public const ACTION_KILL_UNIT                          = 51;  //  Kills Creature.
-    public const ACTION_ACTIVATE_TAXI                      = 52;  //  Sends player to flight path. You have to be close to Flight Master, which gives Taxi ID you need.
-    public const ACTION_WP_START                           = 53;  //  Creature starts Waypoint Movement. Use waypoint_data table to create movement.
-    public const ACTION_WP_PAUSE                           = 54;  //  Creature pauses its Waypoint Movement for given time.
-    public const ACTION_WP_STOP                            = 55;  //  Creature stops its Waypoint Movement.
-    public const ACTION_ADD_ITEM                           = 56;  //  Adds item(s) to player.
-    public const ACTION_REMOVE_ITEM                        = 57;  //  Removes item(s) from player.
-    public const ACTION_INSTALL_AI_TEMPLATE                = 58;  //  [DEPRECATED]
-    public const ACTION_SET_RUN                            = 59;  //
-    public const ACTION_SET_DISABLE_GRAVITY                = 60;  //  Only works for creatures with inhabit air.
-    public const ACTION_SET_SWIM                           = 61;  //  [DEPRECATED]
-    public const ACTION_TELEPORT                           = 62;  //  Continue this action with the TARGET_TYPE column. Use any target_type (except 0), and use target_x, target_y, target_z, target_o as the coordinates
-    public const ACTION_SET_COUNTER                        = 63;  //
-    public const ACTION_STORE_TARGET_LIST                  = 64;  //
-    public const ACTION_WP_RESUME                          = 65;  //  Creature continues in its Waypoint Movement.
-    public const ACTION_SET_ORIENTATION                    = 66;  //
-    public const ACTION_CREATE_TIMED_EVENT                 = 67;  //
-    public const ACTION_PLAYMOVIE                          = 68;  //
-    public const ACTION_MOVE_TO_POS                        = 69;  //  PointId is called by SMART_EVENT_MOVEMENTINFORM. Continue this action with the TARGET_TYPE column. Use any target_type, and use target_x, target_y, target_z, target_o as the coordinates
-    public const ACTION_ENABLE_TEMP_GOBJ                   = 70;  //  param1 = duration
-    public const ACTION_EQUIP                              = 71;  //  only slots with mask set will be sent to client, bits are 1, 2, 4, leaving mask 0 is defaulted to mask 7 (send all), Slots1-3 are only used if no Param1 is set
-    public const ACTION_CLOSE_GOSSIP                       = 72;  //  Closes gossip window.
-    public const ACTION_TRIGGER_TIMED_EVENT                = 73;  //
-    public const ACTION_REMOVE_TIMED_EVENT                 = 74;  //
-    public const ACTION_ADD_AURA                           = 75;  //  [DEPRECATED] Adds aura to player(s). Use target_type 17 to make AoE aura.
-    public const ACTION_OVERRIDE_SCRIPT_BASE_OBJECT        = 76;  //  [DEPRECATED] WARNING: CAN CRASH CORE, do not use if you dont know what you are doing
-    public const ACTION_RESET_SCRIPT_BASE_OBJECT           = 77;  //  [DEPRECATED]
-    public const ACTION_CALL_SCRIPT_RESET                  = 78;  //
-    public const ACTION_SET_RANGED_MOVEMENT                = 79;  //  Sets movement to follow at a specific range to the target.
-    public const ACTION_CALL_TIMED_ACTIONLIST              = 80;  //
-    public const ACTION_SET_NPC_FLAG                       = 81;  //
-    public const ACTION_ADD_NPC_FLAG                       = 82;  //
-    public const ACTION_REMOVE_NPC_FLAG                    = 83;  //
-    public const ACTION_SIMPLE_TALK                        = 84;  //  Makes a player say text. SMART_EVENT_TEXT_OVER is not triggered and whispers can not be used.
-    public const ACTION_SELF_CAST                          = 85;  //  spellID, castFlags
-    public const ACTION_CROSS_CAST                         = 86;  //  This action is used to make selected caster (in CasterTargetType) to cast spell. Actual target is entered in target_type as normally.
-    public const ACTION_CALL_RANDOM_TIMED_ACTIONLIST       = 87;  //  Will select one entry from the ones provided. 0 is ignored.
-    public const ACTION_CALL_RANDOM_RANGE_TIMED_ACTIONLIST = 88;  //  0 is ignored.
-    public const ACTION_RANDOM_MOVE                        = 89;  //  Creature moves to random position in given radius.
-    public const ACTION_SET_UNIT_FIELD_BYTES_1             = 90;  //
-    public const ACTION_REMOVE_UNIT_FIELD_BYTES_1          = 91;  //
-    public const ACTION_INTERRUPT_SPELL                    = 92;  //  This action allows you to interrupt the current spell being cast. If you do not set the spellId, the core will find the current spell depending on the withDelay and the withInstant values.
-    public const ACTION_SEND_GO_CUSTOM_ANIM                = 93;  //  [DEPRECATED] oldFlag = newFlag
-    public const ACTION_SET_DYNAMIC_FLAG                   = 94;  //  [DEPRECATED] oldFlag |= newFlag
-    public const ACTION_ADD_DYNAMIC_FLAG                   = 95;  //  [DEPRECATED] oldFlag &= ~newFlag
-    public const ACTION_REMOVE_DYNAMIC_FLAG                = 96;  //  [DEPRECATED]
-    public const ACTION_JUMP_TO_POS                        = 97;  //
-    public const ACTION_SEND_GOSSIP_MENU                   = 98;  //  Can be used together with 'SMART_EVENT_GOSSIP_HELLO' to set custom gossip.
-    public const ACTION_GO_SET_LOOT_STATE                  = 99;  //
-    public const ACTION_SEND_TARGET_TO_TARGET              = 100; //  Send targets previously stored with SMART_ACTION_STORE_TARGET, to another npc/go, the other npc/go can then access them as if it was its own stored list
-    public const ACTION_SET_HOME_POS                       = 101; //  Use with SMART_TARGET_SELF or SMART_TARGET_POSITION
-    public const ACTION_SET_HEALTH_REGEN                   = 102; //  Sets the current creatures health regen on or off.
-    public const ACTION_SET_ROOT                           = 103; //  Enables or disables creature movement
-    public const ACTION_SET_GO_FLAG                        = 104; //  [DEPRECATED] oldFlag = newFlag
-    public const ACTION_ADD_GO_FLAG                        = 105; //  [DEPRECATED] oldFlag |= newFlag
-    public const ACTION_REMOVE_GO_FLAG                     = 106; //  [DEPRECATED] oldFlag &= ~newFlag
-    public const ACTION_SUMMON_CREATURE_GROUP              = 107; //  Use creature_summon_groups table. SAI target has no effect, use 0
-    public const ACTION_SET_POWER                          = 108; //
-    public const ACTION_ADD_POWER                          = 109; //
-    public const ACTION_REMOVE_POWER                       = 110; //
-    public const ACTION_GAME_EVENT_STOP                    = 111; //
-    public const ACTION_GAME_EVENT_START                   = 112; //
-    public const ACTION_START_CLOSEST_WAYPOINT             = 113; //  Make target follow closest waypoint to its location
-    public const ACTION_MOVE_OFFSET                        = 114; //  Use  target_x,  target_y,  target_z With target_type=1
-    public const ACTION_RANDOM_SOUND                       = 115; //
-    public const ACTION_SET_CORPSE_DELAY                   = 116; //
-    public const ACTION_DISABLE_EVADE                      = 117; //
-    public const ACTION_GO_SET_GO_STATE                    = 118; //
-    public const ACTION_SET_CAN_FLY                        = 119; //  [DEPRECATED]
-    public const ACTION_REMOVE_AURAS_BY_TYPE               = 120; //  [DEPRECATED]
-    public const ACTION_SET_SIGHT_DIST                     = 121; //  [DEPRECATED]
-    public const ACTION_FLEE                               = 122; //  [DEPRECATED]
-    public const ACTION_ADD_THREAT                         = 123; //
-    public const ACTION_LOAD_EQUIPMENT                     = 124; //
-    public const ACTION_TRIGGER_RANDOM_TIMED_EVENT         = 125; //
-    public const ACTION_REMOVE_ALL_GAMEOBJECTS             = 126; //  [DEPRECATED]
-    public const ACTION_PAUSE_MOVEMENT                     = 127; //  MovementSlot (default = 0, active = 1, controlled = 2), PauseTime (ms), Force
-    public const ACTION_PLAY_ANIMKIT                       = 128; //  [RESERVED] don't use on 3.3.5a
-    public const ACTION_SCENE_PLAY                         = 129; //  [RESERVED] don't use on 3.3.5a
-    public const ACTION_SCENE_CANCEL                       = 130; //  [RESERVED] don't use on 3.3.5a
-    public const ACTION_SPAWN_SPAWNGROUP                   = 131; //
-    public const ACTION_DESPAWN_SPAWNGROUP                 = 132; //
-    public const ACTION_RESPAWN_BY_SPAWNID                 = 133; //  type, typeGuid - Use to respawn npcs and gobs, the target in this case is always=1 and only a single unit could be a target via the spawnId (action_param1, action_param2)
-    public const ACTION_INVOKER_CAST                       = 134; //  spellID, castFlags
-    public const ACTION_PLAY_CINEMATIC                     = 135; //  cinematic
-    public const ACTION_SET_MOVEMENT_SPEED                 = 136; //  movementType, speedInteger, speedFraction
-    public const ACTION_PLAY_SPELL_VISUAL_KIT              = 137; //  [RESERVED] spellVisualKitId
-    public const ACTION_OVERRIDE_LIGHT                     = 138; //  zoneId, areaLightId, overrideLightID, transitionMilliseconds
-    public const ACTION_OVERRIDE_WEATHER                   = 139; //  zoneId, weatherId, intensity
-    public const ACTION_SET_AI_ANIM_KIT                    = 140; //  [RESERVED]
-    public const ACTION_SET_HOVER                          = 141; //  Enable/Disable hover for target units.
-    public const ACTION_SET_HEALTH_PCT                     = 142; //  Set current health percentage of target units.
-    public const ACTION_CREATE_CONVERSATION                = 143; //  [RESERVED]
-    public const ACTION_SET_IMMUNE_PC                      = 144; //  Enable/Disable immunity to players of target units.
-    public const ACTION_SET_IMMUNE_NPC                     = 145; //  Enable/Disable immunity to creatures of target units.
-    public const ACTION_SET_UNINTERACTIBLE                 = 146; //  Make/Reset target units uninteractible.
-    public const ACTION_ACTIVATE_GAMEOBJECT                = 147; //  Activate target gameobjects, using given action.
-    public const ACTION_ADD_TO_STORED_TARGET_LIST          = 148; //  Add selected targets to varID for later use.
-    public const ACTION_BECOME_PERSONAL_CLONE_FOR_PLAYER   = 149; //  [RESERVED]
-    public const ACTION_TRIGGER_GAME_EVENT                 = 150; //  [RESERVED]
-    public const ACTION_DO_ACTION                          = 151; //  [RESERVED]
+    public const int ACTION_NONE                               = 0;   //  Do nothing
+    public const int ACTION_TALK                               = 1;   //  Param2 in Milliseconds.
+    public const int ACTION_SET_FACTION                        = 2;   //  Sets faction to creature.
+    public const int ACTION_MORPH_TO_ENTRY_OR_MODEL            = 3;   //  Take DisplayID of creature (param1) OR Turn to DisplayID (param2) OR Both = 0 for Demorph
+    public const int ACTION_SOUND                              = 4;   //  TextRange = 0 only sends sound to self, TextRange = 1 sends sound to everyone in visibility range
+    public const int ACTION_PLAY_EMOTE                         = 5;   //  Play Emote
+    public const int ACTION_FAIL_QUEST                         = 6;   //  Fail Quest of Target
+    public const int ACTION_OFFER_QUEST                        = 7;   //  Add Quest to Target
+    public const int ACTION_SET_REACT_STATE                    = 8;   //  React State. Can be Passive (0), Defensive (1), Aggressive (2), Assist (3).
+    public const int ACTION_ACTIVATE_GOBJECT                   = 9;   //  Activate Object
+    public const int ACTION_RANDOM_EMOTE                       = 10;  //  Play Random Emote
+    public const int ACTION_CAST                               = 11;  //  Cast Spell ID at Target
+    public const int ACTION_SUMMON_CREATURE                    = 12;  //  Summon Unit
+    public const int ACTION_THREAT_SINGLE_PCT                  = 13;  //  Change Threat Percentage for Single Target
+    public const int ACTION_THREAT_ALL_PCT                     = 14;  //  Change Threat Percentage for All Enemies
+    public const int ACTION_CALL_AREAEXPLOREDOREVENTHAPPENS    = 15;  //
+    public const int ACTION_SET_INGAME_PHASE_ID                = 16;  //  [RESERVED] For 4.3.4 + only
+    public const int ACTION_SET_EMOTE_STATE                    = 17;  //  Play Emote Continuously
+    public const int ACTION_SET_UNIT_FLAG                      = 18;  //  [DEPRECATED] Can set Multi-able flags at once
+    public const int ACTION_REMOVE_UNIT_FLAG                   = 19;  //  [DEPRECATED] Can Remove Multi-able flags at once
+    public const int ACTION_AUTO_ATTACK                        = 20;  //  Stop or Continue Automatic Attack.
+    public const int ACTION_ALLOW_COMBAT_MOVEMENT              = 21;  //  Allow or Disable Combat Movement
+    public const int ACTION_SET_EVENT_PHASE                    = 22;  //
+    public const int ACTION_INC_EVENT_PHASE                    = 23;  //  Set param1 OR param2 (not both). Value 0 has no effect.
+    public const int ACTION_EVADE                              = 24;  //  Evade Incoming Attack
+    public const int ACTION_FLEE_FOR_ASSIST                    = 25;  //  If you want the fleeing NPC to say '%s attempts to run away in fear' on flee, use 1 on param1. 0 for no message.
+    public const int ACTION_CALL_GROUPEVENTHAPPENS             = 26;  //
+    public const int ACTION_COMBAT_STOP                        = 27;  //
+    public const int ACTION_REMOVEAURASFROMSPELL               = 28;  //  0 removes all auras
+    public const int ACTION_FOLLOW                             = 29;  //  Follow Target
+    public const int ACTION_RANDOM_PHASE                       = 30;  //
+    public const int ACTION_RANDOM_PHASE_RANGE                 = 31;  //
+    public const int ACTION_RESET_GOBJECT                      = 32;  //  Reset Gameobject
+    public const int ACTION_CALL_KILLEDMONSTER                 = 33;  //  This is the ID from quest_template.RequiredNpcOrGo
+    public const int ACTION_SET_INST_DATA                      = 34;  //  Set Instance Data
+    public const int ACTION_SET_INST_DATA64                    = 35;  //  Set Instance Data uint64
+    public const int ACTION_UPDATE_TEMPLATE                    = 36;  //  Updates creature_template to given entry
+    public const int ACTION_DIE                                = 37;  //  Kill Target
+    public const int ACTION_SET_IN_COMBAT_WITH_ZONE            = 38;  //
+    public const int ACTION_CALL_FOR_HELP                      = 39;  //  If you want the NPC to say '%s calls for help!'. Use 1 on param1, 0 for no message.
+    public const int ACTION_SET_SHEATH                         = 40;  //
+    public const int ACTION_FORCE_DESPAWN                      = 41;  //  Despawn Target after param1 in Milliseconds. If you want to set respawn time set param2 in seconds.
+    public const int ACTION_SET_INVINCIBILITY_HP_LEVEL         = 42;  //  If you use both params, only percent will be used.
+    public const int ACTION_MOUNT_TO_ENTRY_OR_MODEL            = 43;  //  Mount to Creature Entry (param1) OR Mount to Creature Display (param2) Or both = 0 for Unmount
+    public const int ACTION_SET_INGAME_PHASE_MASK              = 44;  //
+    public const int ACTION_SET_DATA                           = 45;  //  Set Data For Target, can be used with SMART_EVENT_DATA_SET
+    public const int ACTION_ATTACK_STOP                        = 46;  //
+    public const int ACTION_SET_VISIBILITY                     = 47;  //  Makes creature Visible = 1  or  Invisible = 0
+    public const int ACTION_SET_ACTIVE                         = 48;  //
+    public const int ACTION_ATTACK_START                       = 49;  //  Allows basic melee swings to creature.
+    public const int ACTION_SUMMON_GO                          = 50;  //  Spawns Gameobject, use target_type to set spawn position.
+    public const int ACTION_KILL_UNIT                          = 51;  //  Kills Creature.
+    public const int ACTION_ACTIVATE_TAXI                      = 52;  //  Sends player to flight path. You have to be close to Flight Master, which gives Taxi ID you need.
+    public const int ACTION_WP_START                           = 53;  //  Creature starts Waypoint Movement. Use waypoint_data table to create movement.
+    public const int ACTION_WP_PAUSE                           = 54;  //  Creature pauses its Waypoint Movement for given time.
+    public const int ACTION_WP_STOP                            = 55;  //  Creature stops its Waypoint Movement.
+    public const int ACTION_ADD_ITEM                           = 56;  //  Adds item(s) to player.
+    public const int ACTION_REMOVE_ITEM                        = 57;  //  Removes item(s) from player.
+    public const int ACTION_INSTALL_AI_TEMPLATE                = 58;  //  [DEPRECATED]
+    public const int ACTION_SET_RUN                            = 59;  //
+    public const int ACTION_SET_DISABLE_GRAVITY                = 60;  //  Only works for creatures with inhabit air.
+    public const int ACTION_SET_SWIM                           = 61;  //  [DEPRECATED]
+    public const int ACTION_TELEPORT                           = 62;  //  Continue this action with the TARGET_TYPE column. Use any target_type (except 0), and use target_x, target_y, target_z, target_o as the coordinates
+    public const int ACTION_SET_COUNTER                        = 63;  //
+    public const int ACTION_STORE_TARGET_LIST                  = 64;  //
+    public const int ACTION_WP_RESUME                          = 65;  //  Creature continues in its Waypoint Movement.
+    public const int ACTION_SET_ORIENTATION                    = 66;  //
+    public const int ACTION_CREATE_TIMED_EVENT                 = 67;  //
+    public const int ACTION_PLAYMOVIE                          = 68;  //
+    public const int ACTION_MOVE_TO_POS                        = 69;  //  PointId is called by SMART_EVENT_MOVEMENTINFORM. Continue this action with the TARGET_TYPE column. Use any target_type, and use target_x, target_y, target_z, target_o as the coordinates
+    public const int ACTION_ENABLE_TEMP_GOBJ                   = 70;  //  param1 = duration
+    public const int ACTION_EQUIP                              = 71;  //  only slots with mask set will be sent to client, bits are 1, 2, 4, leaving mask 0 is defaulted to mask 7 (send all), Slots1-3 are only used if no Param1 is set
+    public const int ACTION_CLOSE_GOSSIP                       = 72;  //  Closes gossip window.
+    public const int ACTION_TRIGGER_TIMED_EVENT                = 73;  //
+    public const int ACTION_REMOVE_TIMED_EVENT                 = 74;  //
+    public const int ACTION_ADD_AURA                           = 75;  //  [DEPRECATED] Adds aura to player(s). Use target_type 17 to make AoE aura.
+    public const int ACTION_OVERRIDE_SCRIPT_BASE_OBJECT        = 76;  //  [DEPRECATED] WARNING: CAN CRASH CORE, do not use if you dont know what you are doing
+    public const int ACTION_RESET_SCRIPT_BASE_OBJECT           = 77;  //  [DEPRECATED]
+    public const int ACTION_CALL_SCRIPT_RESET                  = 78;  //
+    public const int ACTION_SET_RANGED_MOVEMENT                = 79;  //  Sets movement to follow at a specific range to the target.
+    public const int ACTION_CALL_TIMED_ACTIONLIST              = 80;  //
+    public const int ACTION_SET_NPC_FLAG                       = 81;  //
+    public const int ACTION_ADD_NPC_FLAG                       = 82;  //
+    public const int ACTION_REMOVE_NPC_FLAG                    = 83;  //
+    public const int ACTION_SIMPLE_TALK                        = 84;  //  Makes a player say text. SMART_EVENT_TEXT_OVER is not triggered and whispers can not be used.
+    public const int ACTION_SELF_CAST                          = 85;  //  spellID, castFlags
+    public const int ACTION_CROSS_CAST                         = 86;  //  This action is used to make selected caster (in CasterTargetType) to cast spell. Actual target is entered in target_type as normally.
+    public const int ACTION_CALL_RANDOM_TIMED_ACTIONLIST       = 87;  //  Will select one entry from the ones provided. 0 is ignored.
+    public const int ACTION_CALL_RANDOM_RANGE_TIMED_ACTIONLIST = 88;  //  0 is ignored.
+    public const int ACTION_RANDOM_MOVE                        = 89;  //  Creature moves to random position in given radius.
+    public const int ACTION_SET_UNIT_FIELD_BYTES_1             = 90;  //
+    public const int ACTION_REMOVE_UNIT_FIELD_BYTES_1          = 91;  //
+    public const int ACTION_INTERRUPT_SPELL                    = 92;  //  This action allows you to interrupt the current spell being cast. If you do not set the spellId, the core will find the current spell depending on the withDelay and the withInstant values.
+    public const int ACTION_SEND_GO_CUSTOM_ANIM                = 93;  //  [DEPRECATED] oldFlag = newFlag
+    public const int ACTION_SET_DYNAMIC_FLAG                   = 94;  //  [DEPRECATED] oldFlag |= newFlag
+    public const int ACTION_ADD_DYNAMIC_FLAG                   = 95;  //  [DEPRECATED] oldFlag &= ~newFlag
+    public const int ACTION_REMOVE_DYNAMIC_FLAG                = 96;  //  [DEPRECATED]
+    public const int ACTION_JUMP_TO_POS                        = 97;  //
+    public const int ACTION_SEND_GOSSIP_MENU                   = 98;  //  Can be used together with 'SMART_EVENT_GOSSIP_HELLO' to set custom gossip.
+    public const int ACTION_GO_SET_LOOT_STATE                  = 99;  //
+    public const int ACTION_SEND_TARGET_TO_TARGET              = 100; //  Send targets previously stored with SMART_ACTION_STORE_TARGET, to another npc/go, the other npc/go can then access them as if it was its own stored list
+    public const int ACTION_SET_HOME_POS                       = 101; //  Use with SMART_TARGET_SELF or SMART_TARGET_POSITION
+    public const int ACTION_SET_HEALTH_REGEN                   = 102; //  Sets the current creatures health regen on or off.
+    public const int ACTION_SET_ROOT                           = 103; //  Enables or disables creature movement
+    public const int ACTION_SET_GO_FLAG                        = 104; //  [DEPRECATED] oldFlag = newFlag
+    public const int ACTION_ADD_GO_FLAG                        = 105; //  [DEPRECATED] oldFlag |= newFlag
+    public const int ACTION_REMOVE_GO_FLAG                     = 106; //  [DEPRECATED] oldFlag &= ~newFlag
+    public const int ACTION_SUMMON_CREATURE_GROUP              = 107; //  Use creature_summon_groups table. SAI target has no effect, use 0
+    public const int ACTION_SET_POWER                          = 108; //
+    public const int ACTION_ADD_POWER                          = 109; //
+    public const int ACTION_REMOVE_POWER                       = 110; //
+    public const int ACTION_GAME_EVENT_STOP                    = 111; //
+    public const int ACTION_GAME_EVENT_START                   = 112; //
+    public const int ACTION_START_CLOSEST_WAYPOINT             = 113; //  Make target follow closest waypoint to its location
+    public const int ACTION_MOVE_OFFSET                        = 114; //  Use  target_x,  target_y,  target_z With target_type=1
+    public const int ACTION_RANDOM_SOUND                       = 115; //
+    public const int ACTION_SET_CORPSE_DELAY                   = 116; //
+    public const int ACTION_DISABLE_EVADE                      = 117; //
+    public const int ACTION_GO_SET_GO_STATE                    = 118; //
+    public const int ACTION_SET_CAN_FLY                        = 119; //  [DEPRECATED]
+    public const int ACTION_REMOVE_AURAS_BY_TYPE               = 120; //  [DEPRECATED]
+    public const int ACTION_SET_SIGHT_DIST                     = 121; //  [DEPRECATED]
+    public const int ACTION_FLEE                               = 122; //  [DEPRECATED]
+    public const int ACTION_ADD_THREAT                         = 123; //
+    public const int ACTION_LOAD_EQUIPMENT                     = 124; //
+    public const int ACTION_TRIGGER_RANDOM_TIMED_EVENT         = 125; //
+    public const int ACTION_REMOVE_ALL_GAMEOBJECTS             = 126; //  [DEPRECATED]
+    public const int ACTION_PAUSE_MOVEMENT                     = 127; //  MovementSlot (default = 0, active = 1, controlled = 2), PauseTime (ms), Force
+    public const int ACTION_PLAY_ANIMKIT                       = 128; //  [RESERVED] don't use on 3.3.5a
+    public const int ACTION_SCENE_PLAY                         = 129; //  [RESERVED] don't use on 3.3.5a
+    public const int ACTION_SCENE_CANCEL                       = 130; //  [RESERVED] don't use on 3.3.5a
+    public const int ACTION_SPAWN_SPAWNGROUP                   = 131; //
+    public const int ACTION_DESPAWN_SPAWNGROUP                 = 132; //
+    public const int ACTION_RESPAWN_BY_SPAWNID                 = 133; //  type, typeGuid - Use to respawn npcs and gobs, the target in this case is always=1 and only a single unit could be a target via the spawnId (action_param1, action_param2)
+    public const int ACTION_INVOKER_CAST                       = 134; //  spellID, castFlags
+    public const int ACTION_PLAY_CINEMATIC                     = 135; //  cinematic
+    public const int ACTION_SET_MOVEMENT_SPEED                 = 136; //  movementType, speedInteger, speedFraction
+    public const int ACTION_PLAY_SPELL_VISUAL_KIT              = 137; //  [RESERVED] spellVisualKitId
+    public const int ACTION_OVERRIDE_LIGHT                     = 138; //  zoneId, areaLightId, overrideLightID, transitionMilliseconds
+    public const int ACTION_OVERRIDE_WEATHER                   = 139; //  zoneId, weatherId, intensity
+    public const int ACTION_SET_AI_ANIM_KIT                    = 140; //  [RESERVED]
+    public const int ACTION_SET_HOVER                          = 141; //  Enable/Disable hover for target units.
+    public const int ACTION_SET_HEALTH_PCT                     = 142; //  Set current health percentage of target units.
+    public const int ACTION_CREATE_CONVERSATION                = 143; //  [RESERVED]
+    public const int ACTION_SET_IMMUNE_PC                      = 144; //  Enable/Disable immunity to players of target units.
+    public const int ACTION_SET_IMMUNE_NPC                     = 145; //  Enable/Disable immunity to creatures of target units.
+    public const int ACTION_SET_UNINTERACTIBLE                 = 146; //  Make/Reset target units uninteractible.
+    public const int ACTION_ACTIVATE_GAMEOBJECT                = 147; //  Activate target gameobjects, using given action.
+    public const int ACTION_ADD_TO_STORED_TARGET_LIST          = 148; //  Add selected targets to varID for later use.
+    public const int ACTION_BECOME_PERSONAL_CLONE_FOR_PLAYER   = 149; //  [RESERVED]
+    public const int ACTION_TRIGGER_GAME_EVENT                 = 150; //  [RESERVED]
+    public const int ACTION_DO_ACTION                          = 151; //  [RESERVED]
 
-    public const ACTION_ALL_SPELLCASTS         = [self::ACTION_CAST, self::ACTION_ADD_AURA, self::ACTION_INVOKER_CAST, self::ACTION_SELF_CAST, self::ACTION_CROSS_CAST];
-    public const ACTION_ALL_TIMED_ACTION_LISTS = [self::ACTION_CALL_TIMED_ACTIONLIST, self::ACTION_CALL_RANDOM_TIMED_ACTIONLIST, self::ACTION_CALL_RANDOM_RANGE_TIMED_ACTIONLIST];
+    public const array ACTION_ALL_SPELLCASTS         = [self::ACTION_CAST, self::ACTION_ADD_AURA, self::ACTION_INVOKER_CAST, self::ACTION_SELF_CAST, self::ACTION_CROSS_CAST];
+    public const array ACTION_ALL_TIMED_ACTION_LISTS = [self::ACTION_CALL_TIMED_ACTIONLIST, self::ACTION_CALL_RANDOM_TIMED_ACTIONLIST, self::ACTION_CALL_RANDOM_RANGE_TIMED_ACTIONLIST];
 
-    private const ACTION_CELL_TPL = '[tooltip name=a-#rowIdx#]%1$s[/tooltip][span tooltip=a-#rowIdx#]%2$s[/span]';
-    private const TAL_TAB_ANCHOR  = '[url=#sai-actionlist-%1$d onclick=TalTabClick(%1$d)]#%1$d[/url]';
+    private const string ACTION_CELL_TPL = '[tooltip name=a-#rowIdx#]%1$s[/tooltip][span tooltip=a-#rowIdx#]%2$s[/span]';
+    private const string TAL_TAB_ANCHOR  = '[url=#sai-actionlist-%1$d onclick=TalTabClick(%1$d)]#%1$d[/url]';
 
     private array $data = array(
         self::ACTION_NONE                               => [null, null, null, null, null, null, 0],  // No action
@@ -325,8 +325,8 @@ class SmartAction
         self::ACTION_DO_ACTION                          => [null, null, null, null, null, null, 2]   // actionId (RESERVED, PENDING CHERRYPICK)
     );
 
-    private array $jsGlobals = [];
-    private ?array $summons  = null;
+    private  array $jsGlobals = [];
+    private ?array $summons   = null;
 
     public function __construct(
         private int $id,

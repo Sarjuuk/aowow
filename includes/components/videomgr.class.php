@@ -9,16 +9,16 @@ if (!defined('AOWOW_REVISION'))
 class VideoMgr
 {
     // as expected by js - this also makes the CC-flags functionally exclusive with each other
-    private const STATUS_PENDING  = 0;
-    private const STATUS_DELETED  = 999;
-    private const STATUS_APPROVED = 100;
-    private const STATUS_STICKY   = 105;
+    private const int STATUS_PENDING  = 0;
+    private const int STATUS_DELETED  = 999;
+    private const int STATUS_APPROVED = 100;
+    private const int STATUS_STICKY   = 105;
 
-    public const TYPE_YOUTUBE = 1;                          // for in the grim darkness of the future, there is only youtube
+    public const int    TYPE_YOUTUBE = 1;                   // for in the grim darkness of the future, there is only youtube
 
-    public const PATH_TEMP    = 'static/uploads/temp/%s';
+    public const string PATH_TEMP    = 'static/uploads/temp/%s';
 
-    private static $tmpFile = '';
+    private static string $tmpFile = '';
 
     public static function saveSuggestion(\stdClass $videoInfo, int $destType, int $destTypeId, ?string &$uid) : bool
     {

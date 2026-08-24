@@ -53,13 +53,13 @@ if (!CLI)
 
 CLISetup::registerSetup("build", new class extends SetupScript
 {
-    protected $info = array(
+    protected array $info = array(
         'enchants' => [[], CLISetup::ARGV_PARAM, 'Compiles enchantment effects to file for the item comparison tool and profiler tool.']
     );
 
-    protected $setupAfter   = [['items', 'spell', 'itemenchantment', 'icons', 'source'], []];
-    protected $requiredDirs = ['datasets/'];
-    protected $localized    = true;
+    protected array $setupAfter   = [['items', 'spell', 'itemenchantment', 'icons', 'source'], []];
+    protected array $requiredDirs = ['datasets/'];
+    protected bool  $localized    = true;
 
     public function generate() : bool
     {

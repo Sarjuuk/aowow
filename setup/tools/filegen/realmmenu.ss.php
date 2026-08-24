@@ -38,17 +38,17 @@ CLISetup::registerSetup("build", new class extends SetupScript
 {
     use TrTemplateFile;
 
-    protected $info = array(
+    protected array $info = array(
         'realmmenu' => [[], CLISetup::ARGV_PARAM, 'Generates \'profile_all.js\'-file that extends the profiler menus.']
     );
 
-    protected $fileTemplateSrc  = ['profile_all.js.in'];
-    protected $fileTemplateDest = ['static/js/profile_all.js'];
-    protected $worldDependency  = ['realmlist'];
+    protected array $fileTemplateSrc  = ['profile_all.js.in'];
+    protected array $fileTemplateDest = ['static/js/profile_all.js'];
+    protected array $worldDependency  = ['realmlist'];
 
     private function realmMenu() : string
     {
-        $subs = [];
+        $subs = array_fill_keys(array_keys(Profiler::REGIONS), []);
         $set  = 0x0;
         $menu = [
             // skip usage of battlegroup
@@ -56,16 +56,12 @@ CLISetup::registerSetup("build", new class extends SetupScript
             // ['eu', Lang::profiler('regions', 'eu'), null,[[Profiler::urlize(Cfg::get('BATTLEGROUP')), Cfg::get('BATTLEGROUP'), null, &$subEU]]]
         ];
 
-        foreach (Util::$regions as $idx => $n)
-            $subs[$idx] = [];
-
         if (!DB::isConnectable(DB_AUTH))
             CLI::write('[realmmenu] Auth DB not set up .. realm menu will be empty', CLI::LOG_WARN);
         else
             foreach (Profiler::getRealms() as $row)
             {
-                $idx = array_search($row['region'], Util::$regions);
-                if ($idx === false)
+                if (($idx = array_search($row['region'], Profiler::REGIONS)) === false)
                     continue;
 
                 $set |= (1 << $idx);
@@ -78,7 +74,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
         // why is this file not localized!?
         Lang::load(Locale::EN);
 
-        foreach (Util::$regions as $idx => $n)
+        foreach (array_keys(Profiler::REGIONS) as $idx => $n)
             if ($set & (1 << $idx))
                 $menu[] = [$n, Lang::profiler('regions', $n), null, &$subs[$idx]];
 

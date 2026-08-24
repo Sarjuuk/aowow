@@ -13,8 +13,8 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 {
     use TrDBCcopy;
 
-    protected $command           = 'lock';
-    protected $dbcSourceFiles    = ['lock'];
+    protected string $command        = 'lock';
+    protected array  $dbcSourceFiles = ['lock'];
 });
 
 ?>

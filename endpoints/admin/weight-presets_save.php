@@ -8,10 +8,10 @@ if (!defined('AOWOW_REVISION'))
 
 class AdminWeightpresetsActionSaveResponse extends TextResponse
 {
-    private const /* int */ ERR_NONE          = 0;
-    private const /* int */ ERR_WRITE_DB      = 1;
-    private const /* int */ ERR_WRITE_FILE    = 2;
-    private const /* int */ ERR_MISCELLANEOUS = 999;
+    private const int ERR_NONE          = 0;
+    private const int ERR_WRITE_DB      = 1;
+    private const int ERR_WRITE_FILE    = 2;
+    private const int ERR_MISCELLANEOUS = 999;
 
     protected int   $requiredUserGroup = U_GROUP_DEV | U_GROUP_ADMIN | U_GROUP_BUREAU;
     protected array $expectedPOST      = array(
@@ -24,7 +24,7 @@ class AdminWeightpresetsActionSaveResponse extends TextResponse
     {
         if (!$this->assertPOST('id', '__icon', 'scale'))
         {
-            trigger_error('AdminWeightpresetsActionSaveResponse - malformed request received', E_USER_ERROR);
+            trigger_error('AdminWeightpresetsActionSaveResponse - malformed request received', E_USER_WARNING);
             $this->result = self::ERR_MISCELLANEOUS;
             return;
         }
@@ -42,7 +42,7 @@ class AdminWeightpresetsActionSaveResponse extends TextResponse
 
             if (DB::Aowow()->qry('INSERT INTO ::account_weightscale_data VALUES (%i, %s, %i)', $this->_post['id'], $k, $v) === null)
             {
-                trigger_error('AdminWeightpresetsActionSaveResponse - failed to write to database', E_USER_ERROR);
+                trigger_error('AdminWeightpresetsActionSaveResponse - failed to write to database', E_USER_WARNING);
                 $this->result = self::ERR_WRITE_DB;
                 return;
             }
@@ -53,7 +53,7 @@ class AdminWeightpresetsActionSaveResponse extends TextResponse
         foreach ($out as $o)
             if (strstr($o, 'ERR'))
             {
-                trigger_error('AdminWeightpresetsActionSaveResponse - failed to write dataset' . $o, E_USER_ERROR);
+                trigger_error('AdminWeightpresetsActionSaveResponse - failed to write dataset' . $o, E_USER_WARNING);
                 $this->result = self::ERR_WRITE_FILE;
                 return;
             }

@@ -13,8 +13,8 @@ CLISetup::registerSetup('sql', new class extends SetupScript
 {
     use TrDBCcopy;
 
-    protected $command        = 'dungeonmap';
-    protected $dbcSourceFiles = ['dungeonmap'];
+    protected string $command        = 'dungeonmap';
+    protected array  $dbcSourceFiles = ['dungeonmap'];
 });
 
 ?>

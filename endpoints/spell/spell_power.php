@@ -10,7 +10,7 @@ class SpellPowerResponse extends TextResponse implements ICache
 {
     use TrCache, TrTooltip;
 
-    private const /* string */ POWER_TEMPLATE = '$WowheadPower.registerSpell(%d, %d, %s);';
+    private const string POWER_TEMPLATE = '$WowheadPower.registerSpell(%d, %d, %s);';
 
     protected int   $type        = Type::SPELL;
     protected int   $typeId      = 0;

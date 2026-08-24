@@ -10,7 +10,7 @@ class AchievementPowerResponse extends TextResponse implements ICache
 {
     use TrCache, TrTooltip;
 
-    private const /* string */ POWER_TEMPLATE = '$WowheadPower.registerAchievement(%d, %d, %s);';
+    private const string POWER_TEMPLATE = '$WowheadPower.registerAchievement(%d, %d, %s);';
 
     protected int   $type        = Type::ACHIEVEMENT;
     protected int   $typeId      = 0;

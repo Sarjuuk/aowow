@@ -11,12 +11,12 @@ if (!CLI)
 
 CLISetup::registerSetup("sql", new class extends SetupScript
 {
-    protected $info = array(
+    protected array $info = array(
         'objects' => [[], CLISetup::ARGV_PARAM, 'Compiles data for type: Gameobject from dbc and world db.']
     );
 
-    protected $dbcSourceFiles  = ['lock'];
-    protected $worldDependency = ['gameobject_template', 'gameobject_template_addon', 'gameobject_template_locale', 'gameobject_questitem'];
+    protected array $dbcSourceFiles  = ['lock'];
+    protected array $worldDependency = ['gameobject_template', 'gameobject_template_addon', 'gameobject_template_locale', 'gameobject_questitem'];
 
     public function generate() : bool
     {

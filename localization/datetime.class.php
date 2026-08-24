@@ -8,9 +8,9 @@ if (!defined('AOWOW_REVISION'))
 
 class DateTime extends \DateTimeImmutable
 {
-    // in msec                         yr           mo          w          d         h        m      s      ms
-    private const /* array */ RANGE = [31557600000, 2629800000, 604800000, 86400000, 3600000, 60000, 1000,  1];
-    private const /* string */ NBSP = "\u{00A0}";           // \u00A0 is usable by js
+    // in msec                    yr           mo          w          d         h        m      s      ms
+    private const array  RANGE = [31557600000, 2629800000, 604800000, 86400000, 3600000, 60000, 1000,  1];
+    private const string NBSP  = "\u{00A0}";                // \u00A0 is usable by js
 
     public function __construct(int $seconds = 0)
     {
@@ -164,11 +164,9 @@ class DateTime extends \DateTimeImmutable
      */
     public static function formatTimeElapsed(int $delay, int $maxRange = 3) : string
     {
-        if ($maxRange > 7 || $maxRange < 0)
-            $maxRange = 3;                                  // default: days
-
-        $subunit = [1, 3, 3, -1, 5, -1, 7, -1];
-        $delay   = max($delay, 1);
+        $maxRange = clamp($maxRange, 0, 7);
+        $subunit  = [1, 3, 3, -1, 5, -1, 7, -1];
+        $delay    = max($delay, 1);
 
         for ($i = $maxRange; $i < count(self::RANGE); ++$i)
         {

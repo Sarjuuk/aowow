@@ -19,7 +19,7 @@ class AdminVideosActionDeleteResponse extends TextResponse
     {
         if (!$this->assertGET('id'))
         {
-            trigger_error('AdminVideosActionDeleteResponse - videoId empty', E_USER_ERROR);
+            trigger_error('AdminVideosActionDeleteResponse - videoId empty', E_USER_WARNING);
             return;
         }
 

@@ -15,7 +15,7 @@
     },
     "require": {
         "dibi/dibi": "^5.1",
-        "php": "8.2 - 8.4",
+        "php": "8.4 - 8.6",
         "ext-mbstring": "*",
         "ext-simplexml": "*",
         "ext-gd": "*",
@@ -24,7 +24,6 @@
         "ext-intl": "*"
     },
     "require-dev": {
-        "jfcherng/php-diff": "6.16",
-        "triggerhappy/mpq": "dev-master"
+        "jfcherng/php-diff": "6.16"
     }
 }

@@ -8,16 +8,16 @@ if (!defined('AOWOW_REVISION'))
 
 class Listview implements \JsonSerializable
 {
-    public const /* int */ MODE_DEFAULT  = 0;
-    public const /* int */ MODE_CHECKBOX = 1;
-    public const /* int */ MODE_DIV      = 2;
-    public const /* int */ MODE_TILED    = 3;
-    public const /* int */ MODE_CALENDAR = 4;
-    public const /* int */ MODE_FLEXGRID = 5;
+    public const int MODE_DEFAULT  = 0;
+    public const int MODE_CHECKBOX = 1;
+    public const int MODE_DIV      = 2;
+    public const int MODE_TILED    = 3;
+    public const int MODE_CALENDAR = 4;
+    public const int MODE_FLEXGRID = 5;
 
-    public const /* int */ DEFAULT_SIZE  = 300;
+    public const int DEFAULT_SIZE  = 300;
 
-    private const TEMPLATES = array(
+    private const array TEMPLATES = array(
         'achievement'       => ['template' => 'achievement',       'id' => 'achievements',    'name' => '$LANG.tab_achievements'  ],
         'areatrigger'       => ['template' => 'areatrigger',       'id' => 'areatrigger',                                         ],
         'calendar'          => ['template' => 'holidaycal',        'id' => 'calendar',        'name' => '$LANG.tab_calendar'      ],
@@ -122,7 +122,7 @@ class Listview implements \JsonSerializable
         }
 
         if ($addIn && !Template\PageTemplate::test('listviews/', $addIn.'.tpl'))
-            trigger_error('Nonexistent Listview addin requested: template/listviews/'.$addIn.'.tpl', E_USER_ERROR);
+            trigger_error('Nonexistent Listview addin requested: template/listviews/'.$addIn.'.tpl', E_USER_WARNING);
         else if ($addIn)
             $this->__addIn = 'template/listviews/'.$addIn.'.tpl';
     }

@@ -13,13 +13,13 @@ CLISetup::registerSetup("build", new class extends SetupScript
 {
     use TrComplexImage;
 
-    protected $info = array(
+    protected array $info = array(
         'img-artwork' => [[], CLISetup::ARGV_PARAM, 'Generate images from /glues/credits (not used on page)'],
     );
 
-    public $isOptional = true;
+    public bool $isOptional = true;
 
-    private const TILEORDER = array(
+    private const array TILEORDER = array(
         1 => [ [1] ],
         2 => [ [1],
                [2] ],
@@ -35,7 +35,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
     );
 
     // src, resourcePath, localized, [tileOrder], [[dest, destW, destH]]
-    private const /* array */ STEPS = array(
+    private const array STEPS = array(
         ['Glues/Credits/', null, false, self::TILEORDER, [['cache/Artworks/', 0, 0]]]
     );
 

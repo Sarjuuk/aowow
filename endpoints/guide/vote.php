@@ -20,7 +20,7 @@ class GuideVoteResponse extends TextResponse
     {
         if (!$this->assertPOST('id', 'rating'))
         {
-            trigger_error('GuideVoteResponse - malformed request received', E_USER_ERROR);
+            trigger_error('GuideVoteResponse - malformed request received', E_USER_WARNING);
             $this->generate404();
         }
 

@@ -20,13 +20,13 @@ if (!defined('AOWOW_REVISION'))
 
 class CommunityContent
 {
-    public const /* int */ COMMENT_LENGTH_MIN = 10;
-    public const /* int */ COMMENT_LENGTH_MAX = 7500;
-    public const /* int */ REPLY_LENGTH_MIN   = 15;
-    public const /* int */ REPLY_LENGTH_MAX   = 600;
+    public const int COMMENT_LENGTH_MIN = 10;
+    public const int COMMENT_LENGTH_MAX = 7500;
+    public const int REPLY_LENGTH_MIN   = 15;
+    public const int REPLY_LENGTH_MAX   = 600;
 
-    public const /* int */ REPORT_THRESHOLD_AUTO_DELETE      = 10;
-    public const /* int */ REPORT_THRESHOLD_AUTO_OUT_OF_DATE = 5;
+    public const int REPORT_THRESHOLD_AUTO_DELETE      = 10;
+    public const int REPORT_THRESHOLD_AUTO_OUT_OF_DATE = 5;
 
     private static array $jsGlobals = [];
     private static array $subjCache = [];

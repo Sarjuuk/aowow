@@ -8,9 +8,9 @@ if (!defined('AOWOW_REVISION'))
 
 trait TrRecoveryHelper
 {
-    const MODE_INFO       = 0;
-    const MODE_FORM_PASS  = 1;
-    const MODE_FORM_EMAIL = 2;
+    const int MODE_INFO       = 0;
+    const int MODE_FORM_PASS  = 1;
+    const int MODE_FORM_EMAIL = 2;
 
     private function startRecovery(int $newStatus, string $mailTemplate, string $email) : string
     {
@@ -51,6 +51,7 @@ trait TrGetNext
 }
 
 
+/** @property array $cacheStats */
 Interface ICache
 {
     public function saveCache(string|Template\PageTemplate $toCache) : void;
@@ -62,8 +63,8 @@ Interface ICache
 
 trait TrCache
 {
-    private const STORE_METHOD_OBJECT = 0;
-    private const STORE_METHOD_STRING = 1;
+    private const int STORE_METHOD_OBJECT = 0;
+    private const int STORE_METHOD_STRING = 1;
 
     private  int        $_cacheType    = CACHE_TYPE_NONE;
     private  int        $skipCache     = 0x0;
@@ -73,7 +74,7 @@ trait TrCache
     private ?\Memcached $memcached     = null;
     private  array      $onCacheLoaded = [null, null];      // post-load updater
 
-    public  static array $cacheStats = [];                  // load info for page footer
+    public static array $cacheStats = [];                   // load info for page footer
 
     // visible properties or given strings are cached
     public function saveCache(string|object $toCache) : void
@@ -219,7 +220,7 @@ trait TrCache
     {
         if (!class_exists('\Memcached'))
         {
-            trigger_error('Memcached is enabled by us but not in php!', E_USER_ERROR);
+            trigger_error('Memcached is enabled by us but not in php!', E_USER_WARNING);
             return null;
         }
 
@@ -362,7 +363,7 @@ trait TrProfiler
 
         $cat = array_map('urldecode', $cat);
 
-        if (array_search($cat[0], Util::$regions) === false)
+        if (!isset(Profiler::REGIONS[$cat[0]]))
             return;
 
         $this->region = $cat[0];
@@ -446,7 +447,7 @@ trait TrProfilerList
     public function getRegions() : void
     {
         $usedRegions = array_column(Profiler::getRealms(), 'region');
-        foreach (Util::$regions as $idx => $id)
+        foreach (array_keys(Profiler::REGIONS) as $id)
             if (in_array($id, $usedRegions))
                 $this->regions[$id] = Lang::profiler('regions', $id);
     }
@@ -455,8 +456,8 @@ trait TrProfilerList
 
 abstract class BaseResponse
 {
-    protected const PATTERN_TEXT_LINE = '/[\p{Cc}\p{Cf}\p{Co}\p{Cs}\p{Cn}]/iu';
-    protected const PATTERN_TEXT_BLOB = '/[\x00-\x09\x0B-\x1F\p{Cf}\p{Co}\p{Cs}\p{Cn}]/iu';
+    protected const string PATTERN_TEXT_LINE = '/[\p{Cc}\p{Cf}\p{Co}\p{Cs}\p{Cn}]/iu';
+    protected const string PATTERN_TEXT_BLOB = '/[\x00-\x09\x0B-\x1F\p{Cf}\p{Co}\p{Cs}\p{Cn}]/iu';
 
     protected static array $sql = [];                       // debug: sql stats container
 

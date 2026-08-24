@@ -138,8 +138,8 @@ class DibiConnection extends \Dibi\Connection
 
 class DB
 {
-    public const /* string */ AND = '%and';
-    public const /* string */ OR  = '%or';
+    public const string AND = '%and';
+    public const string OR  = '%or';
 
     private static array $interfaceCache = [];
     private static array $interfaceTimes = [];
@@ -227,7 +227,7 @@ class DB
         else if (User::isInGroup(U_GROUP_ADMIN) && Cfg::get('DEBUG') >= LOG_LEVEL_INFO)
             echo PHP_EOL . '<pre>' . $msg . '</pre>' . PHP_EOL;
 
-        trigger_error($evt->result->getMessage(), E_USER_ERROR);
+        trigger_error($evt->result->getMessage(), E_USER_WARNING);
     }
 
     public static function profiler(\Dibi\Event $evt/* mixed $self, string $query, mixed $trace */) : void

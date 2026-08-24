@@ -114,7 +114,7 @@ class User
         {
             // Don't know why, don't know how .. doesn't matter, both parties are out.
             DB::Aowow()->qry('UPDATE ::account_sessions SET `touched` = %i, `status` = %i WHERE `userId` IN %in AND `status` = %i', time(), SESSION_FORCED_LOGOUT, [$userData['id'], $session['userId']], SESSION_ACTIVE);
-            trigger_error('User::init - tried to resume session "'.session_id().'" of user #'.$_SESSION['user'].' linked to session data for user #'.$session['userId'].' Kicked both!', E_USER_ERROR);
+            trigger_error('User::init - tried to resume session "'.session_id().'" of user #'.$_SESSION['user'].' linked to session data for user #'.$session['userId'].' Kicked both!', E_USER_WARNING);
             self::destroy();
             return false;
         }
@@ -323,7 +323,7 @@ class User
     {
         if (!file_exists('config/extAuth.php'))
         {
-            trigger_error('User::authExtern - AUTH_MODE_EXTERNAL is selected but config/extAuth.php does not exist!', E_USER_ERROR);
+            trigger_error('User::authExtern - AUTH_MODE_EXTERNAL is selected but config/extAuth.php does not exist!', E_USER_WARNING);
             return AUTH_INTERNAL_ERR;
         }
 
@@ -331,7 +331,7 @@ class User
 
         if (!function_exists('\extAuth'))
         {
-            trigger_error('User::authExtern - AUTH_MODE_EXTERNAL is selected but function extAuth() is not defined!', E_USER_ERROR);
+            trigger_error('User::authExtern - AUTH_MODE_EXTERNAL is selected but function extAuth() is not defined!', E_USER_WARNING);
             return AUTH_INTERNAL_ERR;
         }
 

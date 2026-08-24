@@ -8,13 +8,13 @@ if (!defined('AOWOW_REVISION'))
 
 class IconElement
 {
-    public const SIZE_SMALL  = 0;
-    public const SIZE_MEDIUM = 1;
-    public const SIZE_LARGE  = 2;
+    public const int SIZE_SMALL  = 0;
+    public const int SIZE_MEDIUM = 1;
+    public const int SIZE_LARGE  = 2;
 
-    private const CREATE_ICON_TPL  = "\$WH.ge('%s%d').appendChild(%s.createIcon(%s));\n";
+    private const string CREATE_ICON_TPL = "\$WH.ge('%s%d').appendChild(%s.createIcon(%s));\n";
 
-    private int    $idx    = 0;
+    private int $idx = 0;
 
     public readonly  string $quality;
     public readonly ?string $align;

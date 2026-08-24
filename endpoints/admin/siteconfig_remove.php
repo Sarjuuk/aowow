@@ -18,7 +18,7 @@ class AdminSiteconfigActionRemoveResponse extends TextResponse
     {
         if (!$this->assertGET('key'))
         {
-            trigger_error('AdminSiteconfigActionRemoveResponse - malformed request received', E_USER_ERROR);
+            trigger_error('AdminSiteconfigActionRemoveResponse - malformed request received', E_USER_WARNING);
             $this->result = Lang::main('intError');
             return;
         }

@@ -13,8 +13,8 @@ CLISetup::registerSetup('sql', new class extends SetupScript
 {
     use TrDBCcopy;
 
-    protected $command        = 'skilllineability';
-    protected $dbcSourceFiles = ['skilllineability'];
+    protected string $command        = 'skilllineability';
+    protected array  $dbcSourceFiles = ['skilllineability'];
 });
 
 ?>

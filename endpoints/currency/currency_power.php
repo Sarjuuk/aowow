@@ -10,7 +10,7 @@ class CurrencyPowerResponse extends TextResponse implements ICache
 {
     use TrTooltip, TrCache;
 
-    private const /* string */ POWER_TEMPLATE = '$WowheadPower.registerCurrency(%d, %d, %s);';
+    private const string POWER_TEMPLATE = '$WowheadPower.registerCurrency(%d, %d, %s);';
 
     protected int   $type        = Type::CURRENCY;
     protected int   $typeId      = 0;

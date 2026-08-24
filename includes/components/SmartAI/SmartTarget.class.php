@@ -11,39 +11,39 @@ class SmartTarget
 {
     use SmartHelper;
 
-    public const TARGET_NONE                   = 0;         //  None.
-    public const TARGET_SELF                   = 1;         //  Self cast.
-    public const TARGET_VICTIM                 = 2;         //  Our current target. (ie: highest aggro)
-    public const TARGET_HOSTILE_SECOND_AGGRO   = 3;         //  Second highest aggro.
-    public const TARGET_HOSTILE_LAST_AGGRO     = 4;         //  Dead last on aggro.
-    public const TARGET_HOSTILE_RANDOM         = 5;         //  Just any random target on our threat list.
-    public const TARGET_HOSTILE_RANDOM_NOT_TOP = 6;         //  Any random target except top threat.
-    public const TARGET_ACTION_INVOKER         = 7;         //  Unit who caused this Event to occur.
-    public const TARGET_POSITION               = 8;         //  Use xyz from event params.
-    public const TARGET_CREATURE_RANGE         = 9;         //  (Random?) creature with specified ID within specified range.
-    public const TARGET_CREATURE_GUID          = 10;        //  Creature with specified GUID.
-    public const TARGET_CREATURE_DISTANCE      = 11;        //  Creature with specified ID within distance. (Different from #9?)
-    public const TARGET_STORED                 = 12;        //  Uses pre-stored target(list)
-    public const TARGET_GAMEOBJECT_RANGE       = 13;        //  (Random?) object with specified ID within specified range.
-    public const TARGET_GAMEOBJECT_GUID        = 14;        //  Object with specified GUID.
-    public const TARGET_GAMEOBJECT_DISTANCE    = 15;        //  Object with specified ID within distance. (Different from #13?)
-    public const TARGET_INVOKER_PARTY          = 16;        //  Invoker's party members
-    public const TARGET_PLAYER_RANGE           = 17;        //  (Random?) player within specified range.
-    public const TARGET_PLAYER_DISTANCE        = 18;        //  (Random?) player within specified distance. (Different from #17?)
-    public const TARGET_CLOSEST_CREATURE       = 19;        //  Closest creature with specified ID within specified range.
-    public const TARGET_CLOSEST_GAMEOBJECT     = 20;        //  Closest object with specified ID within specified range.
-    public const TARGET_CLOSEST_PLAYER         = 21;        //  Closest player within specified range.
-    public const TARGET_ACTION_INVOKER_VEHICLE = 22;        //  Unit's vehicle who caused this Event to occur
-    public const TARGET_OWNER_OR_SUMMONER      = 23;        //  Unit's owner or summoner
-    public const TARGET_THREAT_LIST            = 24;        //  All units on creature's threat list
-    public const TARGET_CLOSEST_ENEMY          = 25;        //  Any attackable target (creature or player) within maxDist
-    public const TARGET_CLOSEST_FRIENDLY       = 26;        //  Any friendly unit (creature, player or pet) within maxDist
-    public const TARGET_LOOT_RECIPIENTS        = 27;        //  All tagging players
-    public const TARGET_FARTHEST               = 28;        //  Farthest unit on the threat list
-    public const TARGET_VEHICLE_PASSENGER      = 29;        //  Vehicle can target unit in given seat
-    public const TARGET_CLOSEST_UNSPAWNED_GO   = 30;        //  entry(0any), maxDist
+    public const int TARGET_NONE                   = 0;     //  None.
+    public const int TARGET_SELF                   = 1;     //  Self cast.
+    public const int TARGET_VICTIM                 = 2;     //  Our current target. (ie: highest aggro)
+    public const int TARGET_HOSTILE_SECOND_AGGRO   = 3;     //  Second highest aggro.
+    public const int TARGET_HOSTILE_LAST_AGGRO     = 4;     //  Dead last on aggro.
+    public const int TARGET_HOSTILE_RANDOM         = 5;     //  Just any random target on our threat list.
+    public const int TARGET_HOSTILE_RANDOM_NOT_TOP = 6;     //  Any random target except top threat.
+    public const int TARGET_ACTION_INVOKER         = 7;     //  Unit who caused this Event to occur.
+    public const int TARGET_POSITION               = 8;     //  Use xyz from event params.
+    public const int TARGET_CREATURE_RANGE         = 9;     //  (Random?) creature with specified ID within specified range.
+    public const int TARGET_CREATURE_GUID          = 10;    //  Creature with specified GUID.
+    public const int TARGET_CREATURE_DISTANCE      = 11;    //  Creature with specified ID within distance. (Different from #9?)
+    public const int TARGET_STORED                 = 12;    //  Uses pre-stored target(list)
+    public const int TARGET_GAMEOBJECT_RANGE       = 13;    //  (Random?) object with specified ID within specified range.
+    public const int TARGET_GAMEOBJECT_GUID        = 14;    //  Object with specified GUID.
+    public const int TARGET_GAMEOBJECT_DISTANCE    = 15;    //  Object with specified ID within distance. (Different from #13?)
+    public const int TARGET_INVOKER_PARTY          = 16;    //  Invoker's party members
+    public const int TARGET_PLAYER_RANGE           = 17;    //  (Random?) player within specified range.
+    public const int TARGET_PLAYER_DISTANCE        = 18;    //  (Random?) player within specified distance. (Different from #17?)
+    public const int TARGET_CLOSEST_CREATURE       = 19;    //  Closest creature with specified ID within specified range.
+    public const int TARGET_CLOSEST_GAMEOBJECT     = 20;    //  Closest object with specified ID within specified range.
+    public const int TARGET_CLOSEST_PLAYER         = 21;    //  Closest player within specified range.
+    public const int TARGET_ACTION_INVOKER_VEHICLE = 22;    //  Unit's vehicle who caused this Event to occur
+    public const int TARGET_OWNER_OR_SUMMONER      = 23;    //  Unit's owner or summoner
+    public const int TARGET_THREAT_LIST            = 24;    //  All units on creature's threat list
+    public const int TARGET_CLOSEST_ENEMY          = 25;    //  Any attackable target (creature or player) within maxDist
+    public const int TARGET_CLOSEST_FRIENDLY       = 26;    //  Any friendly unit (creature, player or pet) within maxDist
+    public const int TARGET_LOOT_RECIPIENTS        = 27;    //  All tagging players
+    public const int TARGET_FARTHEST               = 28;    //  Farthest unit on the threat list
+    public const int TARGET_VEHICLE_PASSENGER      = 29;    //  Vehicle can target unit in given seat
+    public const int TARGET_CLOSEST_UNSPAWNED_GO   = 30;    //  entry(0any), maxDist
 
-    private const TARGET_TPL = '[tooltip name=t-#rowIdx#]%1$s[/tooltip][span class=tip tooltip=t-#rowIdx#]%2$s[/span]';
+    private const string TARGET_TPL = '[tooltip name=t-#rowIdx#]%1$s[/tooltip][span class=tip tooltip=t-#rowIdx#]%2$s[/span]';
 
     private array $targets = array(
         self::TARGET_NONE                   => [null,                    null,                    null, null], // NONE

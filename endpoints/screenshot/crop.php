@@ -76,7 +76,7 @@ class ScreenshotCropResponse extends TemplateResponse
         $this->cropper = $dims + array(
             'url'     => Cfg::get('STATIC_URL').'/uploads/screenshots/temp/'.$fileBase.'.jpg',
             'parent'  => 'ss-container',
-            'minCrop' => ScreenshotMgr::$MIN_SIZE,          // optional; defaults to 150 - min selection size (a square)
+            'minCrop' => ScreenshotMgr::$minSize,           // optional; defaults to 150 - min selection size (a square)
             'type'    => $this->destType,                   // only used to check against NPC: 15384 [OLDWorld Trigger (DO NOT DELETE)] for U_GROUP_MODERATOR | U_GROUP_EDITOR. If successful drops minCrop constraint
             'typeId'  => $this->destTypeId                  // i guess this was used to upload arbitrary imagery for articles, blog posts, etc
         );

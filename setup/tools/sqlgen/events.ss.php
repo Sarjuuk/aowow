@@ -11,11 +11,11 @@ if (!CLI)
 
 CLISetup::registerSetup("sql", new class extends SetupScript
 {
-    protected $info = array(
+    protected array $info = array(
         'events' => [[], CLISetup::ARGV_PARAM, 'Compiles data for type: Event from world db.']
     );
 
-    protected $worldDependency = ['game_event', 'game_event_prerequisite'];
+    protected array $worldDependency = ['game_event', 'game_event_prerequisite'];
 
     public function generate() : bool
     {

@@ -7,26 +7,6 @@ if (!defined('AOWOW_REVISION'))
 
 
 
-// PHP 8.4 polyfill
-if (version_compare(PHP_VERSION, '8.4.0') < 0)
-{
-    function array_find(array $array, callable $callback) : mixed
-    {
-        foreach ($array as $k => $v)
-            if ($callback($v, $k))
-                return $array[$k];
-        return null;
-    }
-
-    function array_find_key(array $array, callable $callback) : mixed
-    {
-        foreach ($array as $k => $v)
-            if ($callback($v, $k))
-                return $k;
-        return null;
-    }
-}
-
 // PHP 8.6 polyfill
 if (version_compare(PHP_VERSION, '8.6.0') < 0)
 {
@@ -61,19 +41,13 @@ abstract class Util
      * And thus web interface actions fail with permission denied, unless the files are flagged +wx for everyone.
      * This probably has to be solved on the system level by having www-data and the CLI user share a group or something.
      */
-    public const FILE_ACCESS = 0777;
-    public const DIR_ACCESS  = 0777;
+    public const int FILE_ACCESS = 0777;
+    public const int DIR_ACCESS  = 0777;
 
-    private const GEM_SCORE_BASE_WOTLK = 16;                // rare quality wotlk gem score
-    private const GEM_SCORE_BASE_BC    = 8;                 // rare quality bc gem score
+    private const int GEM_SCORE_BASE_WOTLK = 16;            // rare quality wotlk gem score
+    private const int GEM_SCORE_BASE_BC    = 8;             // rare quality bc gem score
 
-    private static $perfectGems             = null;
-
-    public static $regions                  = array(
-        'us',           'eu',           'kr',           'tw',           'cn',           'dev'
-    );
-
-    public static $ssdMaskFields            = array(
+    public static array  $ssdMaskFields            = array(
         'shoulderMultiplier',           'trinketMultiplier',            'weaponMultiplier',             'primBudged',
         'rangedMultiplier',             'clothShoulderArmor',           'leatherShoulderArmor',         'mailShoulderArmor',
         'plateShoulderArmor',           'weaponDPS1H',                  'weaponDPS2H',                  'casterDPS1H',
@@ -82,25 +56,27 @@ abstract class Util
         'clothChestArmor',              'leatherChestArmor',            'mailChestArmor',               'plateChestArmor'
     );
 
-    public static $dateFormatInternal       = "Y/m/d H:i:s";
+    public static string $dateFormatInternal       = "Y/m/d H:i:s";
 
-    public static $changeLevelString        = '<a href="javascript:;" onmousedown="return false" class="tip" style="color: white; cursor: pointer" onclick="$WH.g_staticTooltipLevelClick(this, null, 0)" onmouseover="$WH.Tooltip.showAtCursor(event, \'<span class=\\\'q2\\\'>\' + LANG.tooltip_changelevel + \'</span>\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()"><!--lvl-->%s</a>';
-    public static $setRatingLevelString     = '<a href="javascript:;" onmousedown="return false" class="tip" style="color: white; cursor: pointer" onclick="$WH.g_setRatingLevel(this, %s, %s, %s)" onmouseover="$WH.Tooltip.showAtCursor(event, \'<span class=\\\'q2\\\'>\' + LANG.tooltip_changelevel + \'</span>\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">%s</a>';
-    public static $lvTabNoteString          = '<b class="tip" onmouseover="$WH.Tooltip.showAtCursor(event, \'%s\', 0, 0, \'q\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">%s</b>';
+    public static string $changeLevelString        = '<a href="javascript:;" onmousedown="return false" class="tip" style="color: white; cursor: pointer" onclick="$WH.g_staticTooltipLevelClick(this, null, 0)" onmouseover="$WH.Tooltip.showAtCursor(event, \'<span class=\\\'q2\\\'>\' + LANG.tooltip_changelevel + \'</span>\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()"><!--lvl-->%s</a>';
+    public static string $setRatingLevelString     = '<a href="javascript:;" onmousedown="return false" class="tip" style="color: white; cursor: pointer" onclick="$WH.g_setRatingLevel(this, %s, %s, %s)" onmouseover="$WH.Tooltip.showAtCursor(event, \'<span class=\\\'q2\\\'>\' + LANG.tooltip_changelevel + \'</span>\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">%s</a>';
+    public static string $lvTabNoteString          = '<b class="tip" onmouseover="$WH.Tooltip.showAtCursor(event, \'%s\', 0, 0, \'q\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">%s</b>';
 
-    public static $filterResultString       = '$$WH.sprintf(LANG.lvnote_filterresults, \'%s\')';
-    public static $tryFilteringString       = '$$WH.sprintf(%s, %s, %s) + LANG.dash + LANG.lvnote_tryfiltering.replace(\'<a>\', \'<a href="javascript:;" onclick="fi_toggle()">\')';
-    public static $tryFilteringEntityString = '$$WH.sprintf(LANG.lvnote_entitiesfound, %s, %s, %s) + LANG.dash + LANG.lvnote_tryfiltering.replace(\'<a>\', \'<a href="javascript:;" onclick="fi_toggle()">\')';
-    public static $tryNarrowingString       = '$$WH.sprintf(%s, %s, %s) + LANG.dash + LANG.lvnote_trynarrowing';
+    public static string $filterResultString       = '$$WH.sprintf(LANG.lvnote_filterresults, \'%s\')';
+    public static string $tryFilteringString       = '$$WH.sprintf(%s, %s, %s) + LANG.dash + LANG.lvnote_tryfiltering.replace(\'<a>\', \'<a href="javascript:;" onclick="fi_toggle()">\')';
+    public static string $tryFilteringEntityString = '$$WH.sprintf(LANG.lvnote_entitiesfound, %s, %s, %s) + LANG.dash + LANG.lvnote_tryfiltering.replace(\'<a>\', \'<a href="javascript:;" onclick="fi_toggle()">\')';
+    public static string $tryNarrowingString       = '$$WH.sprintf(%s, %s, %s) + LANG.dash + LANG.lvnote_trynarrowing';
 
-    public static $dfnString                = '<dfn title="%s" class="w">%s</dfn>';
+    public static string $dfnString                = '<dfn title="%s" class="w">%s</dfn>';
 
-    public static $mapSelectorString        = '<a href="javascript:;" onclick="myMapper.update({zone: %d}); g_setSelectedLink(this, \'mapper\'); return false" onmousedown="return false">%s</a>&nbsp;(%d)';
+    public static string $mapSelectorString        = '<a href="javascript:;" onclick="myMapper.update({zone: %d}); g_setSelectedLink(this, \'mapper\'); return false" onmousedown="return false">%s</a>&nbsp;(%d)';
 
-    public static $expansionString          = [null, 'bc', 'wotlk'];
+    public static array  $expansionString          = [null, 'bc', 'wotlk'];
 
-    public static $tcEncoding               = '0zMcmVokRsaqbdrfwihuGINALpTjnyxtgevElBCDFHJKOPQSUWXYZ123456789';
-    private static $notes                   = [];
+    public static string $tcEncoding               = '0zMcmVokRsaqbdrfwihuGINALpTjnyxtgevElBCDFHJKOPQSUWXYZ123456789';
+
+    private static ?array $perfectGems = null;
+    private static  array $notes       = [];
 
     public static function addNote(string $note, int $uGroupMask = U_GROUP_EMPLOYEE, int $level = LOG_LEVEL_ERROR) : void
     {
@@ -282,13 +258,9 @@ abstract class Util
         return $interactive ? sprintf(self::$setRatingLevelString, $level, $statId, $val, $result) : $result;
     }
 
-    // default ucFirst doesn't convert UTF-8 chars (php 8.4 finally implemented this .. see ya in 2027)
     public static function ucFirst(string $str) : string
     {
-        $first = mb_substr($str, 0, 1);
-        $rest  = mb_substr($str, 1);
-
-        return mb_strtoupper($first).$rest;
+        return mb_ucfirst($str);
     }
 
     public static function ucWords(string $str) : string
@@ -469,9 +441,8 @@ abstract class Util
         return '';
     }
 
-    public static function loadStaticFile($file, &$result, $localized = false)
+    public static function loadStaticFile(string $file, ?string &$result, bool $localized = false) : bool
     {
-        $success = true;
         if ($localized)
         {
             if (file_exists('datasets/'.Lang::getLocale()->json().'/'.$file))
@@ -479,17 +450,17 @@ abstract class Util
             else if (file_exists('datasets/enus/'.$file))
                 $result .= file_get_contents('datasets/enus/'.$file);
             else
-                $success = false;
+                return false;
         }
         else
         {
             if (file_exists('datasets/'.$file))
                 $result .= file_get_contents('datasets/'.$file);
             else
-                $success = false;
+                return false;
         }
 
-        return $success;
+        return true;
     }
 
     // just some random numbers for unsafe identification purpose
@@ -534,7 +505,7 @@ abstract class Util
         return true;
     }
 
-    public static function gainSiteReputation($user, $action, $miscData = [])
+    public static function gainSiteReputation(int $user, int $action, array $miscData = []) : bool
     {
         if (!$user || !$action)
             return false;
@@ -616,7 +587,7 @@ abstract class Util
         return DB::Aowow()->qry('INSERT IGNORE INTO ::account_reputation %v', $x);
     }
 
-    public static function toJSON($data, $forceFlags = 0)
+    public static function toJSON(mixed $data, int $forceFlags = 0) : string
     {
         $flags = $forceFlags ?: (JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE);
 
@@ -650,12 +621,12 @@ abstract class Util
             if (fWrite($handle, $content))
                 $success = true;
             else
-                trigger_error('could not write to file', E_USER_ERROR);
+                trigger_error('could not write to file', E_USER_WARNING);
 
             fClose($handle);
         }
         else
-            trigger_error('could not create file', E_USER_ERROR);
+            trigger_error('could not create file', E_USER_WARNING);
 
         if ($success)
             @chmod($file, self::FILE_ACCESS);
@@ -686,7 +657,7 @@ abstract class Util
         if (@mkdir($dir, self::DIR_ACCESS, true))
             return true;
 
-        trigger_error('could not create directory', E_USER_ERROR);
+        trigger_error('could not create directory', E_USER_WARNING);
         return false;
     }
 
@@ -784,8 +755,7 @@ abstract class Util
     public static function getGemScore(int $itemLevel, int $quality, bool $profSpec = false, int $itemId = 0) : float
     {
         // prepare score-lookup
-        if (empty(self::$perfectGems))
-            self::$perfectGems = DB::World()->selectCol('SELECT perfectItemType FROM skill_perfect_item_template WHERE requiredSpecialization = %i', 55534);
+        self::$perfectGems ??= (DB::World()->selectCol('SELECT perfectItemType FROM skill_perfect_item_template WHERE requiredSpecialization = %i', 55534) ?: []);
 
         // epic - WotLK - increased stats / profession specific (Dragon's Eyes)
         if ($profSpec)
@@ -911,7 +881,7 @@ abstract class Util
     }
 
     // orientation is 2*M_PI for a full circle, increasing counterclockwise
-    public static function O2Deg($o)
+    public static function O2Deg(float $o) : array
     {
         // orientation values can exceed boundaries (for whatever reason)
         while ($o < 0)
@@ -1065,7 +1035,7 @@ abstract class Util
 
         if (!$template)
         {
-            trigger_error('Util::SendMail() - mail template not found: '.$tplFile, E_USER_ERROR);
+            trigger_error('Util::SendMail() - mail template not found: '.$tplFile, E_USER_WARNING);
             return false;
         }
 

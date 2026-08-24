@@ -27,20 +27,20 @@ CLISetup::registerSetup("build", new class extends SetupScript
 {
     use TrComplexImage;
 
-    protected $info = array(
+    protected array $info = array(
         'img-emblems' => [[], CLISetup::ARGV_PARAM, '[NYI] Generate emblem components for guilds and arena teams'],
     );
 
-    public $isOptional = true;
+    public bool $isOptional = true;
 
-    private const /* array */ SRC_FILES = array(
+    private const array SRC_FILES = array(
         'background_%d.png' => 'Background_(\d\d)_T(U|L)_U',
         'border_%d_%d.png'  => 'Border_(\d\d)_(\d\d)_T(U|L)_U',
         'emblem_%d_%d.png'  => 'Emblem_(\d\d)_(\d\d)_T(U|L)_U'
     );
 
     // src, resourcePath, localized, [tileOrder], [[dest, destW, destH]]
-    private const /* array */ STEPS = array(
+    private const array STEPS = array(
         ['textures/GuildEmblems/',   null, false, [['U'], ['L']], [['images/wow/emblems/guild', 0, 0]]],
         ['Interface/PVPFrame/',      null, false, [''],           [['images/wow/emblems/arena', 0, 0]]],
         ['Interface/PVPFrame/icons', null, false, [''],           [['images/wow/emblems/arena/icons', 0, 0]]]

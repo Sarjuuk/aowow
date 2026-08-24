@@ -12,7 +12,7 @@ trait TrProfilerFilter
 
     protected function cbRegionCheck(string &$v) : bool
     {
-        if (in_array($v, Util::$regions))
+        if (isset(Profiler::REGIONS[$v]))
         {
             $this->parentCats[0] = $v;                      // directly redirect onto this region
             $v = '';                                        // remove from filter
@@ -40,62 +40,62 @@ trait TrProfilerFilter
 
 abstract class Filter
 {
-    public const CR_BOOLEAN   = 1;
-    public const CR_FLAG      = 2;
-    public const CR_NUMERIC   = 3;
-    public const CR_STRING    = 4;
-    public const CR_NUMSTRING = 5;
-    public const CR_ENUM      = 6;
-    public const CR_STAFFFLAG = 7;
-    public const CR_CALLBACK  = 8;
-    public const CR_NYI_PH    = 999;
+    public const int CR_BOOLEAN   = 1;
+    public const int CR_FLAG      = 2;
+    public const int CR_NUMERIC   = 3;
+    public const int CR_STRING    = 4;
+    public const int CR_NUMSTRING = 5;
+    public const int CR_ENUM      = 6;
+    public const int CR_STAFFFLAG = 7;
+    public const int CR_CALLBACK  = 8;
+    public const int CR_NYI_PH    = 999;
 
-    public const V_EQUAL      = 8;
-    public const V_RANGE      = 9;
-    public const V_LIST       = 10;
-    public const V_CALLBACK   = 11;
-    public const V_REGEX      = 12;
-    public const V_NAME       = 13;
+    public const int V_EQUAL      = 8;
+    public const int V_RANGE      = 9;
+    public const int V_LIST       = 10;
+    public const int V_CALLBACK   = 11;
+    public const int V_REGEX      = 12;
+    public const int V_NAME       = 13;
 
-    protected const ENUM_ANY     = -2323;
-    protected const ENUM_NONE    = -2324;
+    protected const int ENUM_ANY  = -2323;
+    protected const int ENUM_NONE = -2324;
 
-    protected const PATTERN_NAME  = '/[\p{C};%\\\\]/ui';
-    protected const PATTERN_CRV   = '/[\p{C};:%\\\\]/ui';
-    protected const PATTERN_INT   = '/\D/';
-    public    const PATTERN_PARAM = '/^[\p{L}\p{Sm} \d\p{P}]+$/ui';
-    public    const PATTERN_FT    = '/[^[:alpha:] \d_]/iu'; // +-*<>@()~" have special meaning; ' seems to fuck up the search; other irregular cases?
+    protected const string PATTERN_NAME  = '/[\p{C};%\\\\]/ui';
+    protected const string PATTERN_CRV   = '/[\p{C};:%\\\\]/ui';
+    protected const string PATTERN_INT   = '/\D/';
+    public    const string PATTERN_PARAM = '/^[\p{L}\p{Sm} \d\p{P}]+$/ui';
+    public    const string PATTERN_FT    = '/[^[:alpha:] \d_]/iu'; // +-*<>@()~" have special meaning; ' seems to fuck up the search; other irregular cases?
 
-    protected const ENUM_FACTION       = array(  469,  1037,  1106,   529,  1012,    87,    21,   910,   609,   942,   909,   530,    69,   577,   930,  1068,  1104,   729,   369,    92,
-                                                  54,   946,    67,  1052,   749,    47,   989,  1090,  1098,   978,  1011,    93,  1015,  1038,    76,   470,   349,  1031,  1077,   809,
-                                                 911,   890,   970,   169,   730,    72,    70,   932,  1156,   933,   510,  1126,  1067,  1073,   509,   941,  1105,   990,   934,   935,
-                                                1094,  1119,  1124,  1064,   967,  1091,    59,   947,    81,   576,   922,    68,  1050,  1085,   889,   589,   270);
-    protected const ENUM_CURRENCY      = array(32572, 32569, 29736, 44128, 20560, 20559, 29434, 37829, 23247, 44990, 24368, 43016, 41596, 34052, 45624, 49426, 40752, 47241, 40753, 29024,
-                                               24245, 26045, 26044, 38425, 29735, 24579, 24581, 32897, 22484,  4291, 28558, 43228, 34664, 37836, 20558, 34597, 43589);
-    protected const ENUM_EVENT         = array(  372,   283,   285,   353,   420,   400,   284,   201,   374,   409,   141,   324,   321,   424,   423,   327,   341,  181,   404,    398,
-                                                 301);
-    protected const ENUM_ZONE          = array(   36,    45,     3,     4,    46,    41,  2257,     1,    10,   139,    12,  3430,  3433,   267,  1537,  4080,    38,  4298,    44,    51,
-                                                3487,   130,  1519,    33,     8,    47,    85,  1497,    28,    40,    11,   331,    16,  3524,  3525,   148,  1657,   405,    14,    15,
-                                                 361,   357,   493,   215,  1637,  1377,   406,   440,   141,    17,  3557,   400,  1638,   490,   618,  4494,  3790,  4277,   719,  1584,
-                                                1583,  3713,  1581,  2557,  4196,   721,  4416,  4272,  4820,  4264,  3562,  4131,  3792,  2100,  2367,  4813,  2437,   722,   491,   796,
-                                                2057,  3791,  3789,   209,  3714,  3717,   717,  2017,  1477,  3848,  2366,  3847,  4100,  4809,  3717,  3849,  4265,  4228,  3715,  4723,
-                                                1337,  3716,   206,  1196,  4415,   718,  1176,  3428,  3959,  2677,  3923,  4812,  3457,  3836,  2717,  3456,  2159,  3429,  3607,  3845,
-                                                3606,  4500,  4493,  4987,  4075,  4722,  4273,  4603,  3805,  1977,  2597,  3358,  3820,  4710,  4384,  3277,  3522,  3483,  3518,  3523,
-                                                3520,  3703,  3519,  3521,  3702,  4378,  3698,  3968,  4406,  3537,  2817,  4395,    65,   394,   495,  4742,   210,  3711,    67,  4197,
-                                                  66);
-    protected const ENUM_HEROICDUNGEON = array( 4494,  3790,  4277,  4196,  4416,  4272,  4820,  4264,  3562,  4131,  3792,  2367,  4813,  3791,  3789,  3848,  2366,  3713,  3847,  4100,
-                                                4809,  3849,  4265,  4228,  3714,  3717,  3715,  3716,  4415,  4723,  206,   1196);
-    protected const ENUM_MULTIMODERAID = array( 4812,  3456,  2159,  4500,  4493,  4722,  4273,  4603,  4987);
-    protected const ENUM_HEROICRAID    = array( 4987,  4812,  4722);
-    protected const ENUM_CLASSS        = array( null,     1,     2,     3,     4,     5,     6,     7,     8,     9,  null,    11,  true, false);
-    protected const ENUM_RACE          = array( null,     1,     2,     3,     4,     5,     6,     7,     8,  null,    10,    11,  true, false);
-    protected const ENUM_PROFESSION    = array( null,   171,   164,   185,   333,   202,   129,   755,   165,   186,   197,  true, false,   356,   182,   773);
-    protected const ENUM_ITEM_VISUAL   = array(             // ItemVisualEffect.dbc/ids pointing to sensible models
+    protected const array ENUM_FACTION       = array(  469,  1037,  1106,   529,  1012,    87,    21,   910,   609,   942,   909,   530,    69,   577,   930,  1068,  1104,   729,   369,    92,
+                                                        54,   946,    67,  1052,   749,    47,   989,  1090,  1098,   978,  1011,    93,  1015,  1038,    76,   470,   349,  1031,  1077,   809,
+                                                       911,   890,   970,   169,   730,    72,    70,   932,  1156,   933,   510,  1126,  1067,  1073,   509,   941,  1105,   990,   934,   935,
+                                                      1094,  1119,  1124,  1064,   967,  1091,    59,   947,    81,   576,   922,    68,  1050,  1085,   889,   589,   270);
+    protected const array ENUM_CURRENCY      = array(32572, 32569, 29736, 44128, 20560, 20559, 29434, 37829, 23247, 44990, 24368, 43016, 41596, 34052, 45624, 49426, 40752, 47241, 40753, 29024,
+                                                     24245, 26045, 26044, 38425, 29735, 24579, 24581, 32897, 22484,  4291, 28558, 43228, 34664, 37836, 20558, 34597, 43589);
+    protected const array ENUM_EVENT         = array(  372,   283,   285,   353,   420,   400,   284,   201,   374,   409,   141,   324,   321,   424,   423,   327,   341,  181,   404,    398,
+                                                       301);
+    protected const array ENUM_ZONE          = array(   36,    45,     3,     4,    46,    41,  2257,     1,    10,   139,    12,  3430,  3433,   267,  1537,  4080,    38,  4298,    44,    51,
+                                                      3487,   130,  1519,    33,     8,    47,    85,  1497,    28,    40,    11,   331,    16,  3524,  3525,   148,  1657,   405,    14,    15,
+                                                       361,   357,   493,   215,  1637,  1377,   406,   440,   141,    17,  3557,   400,  1638,   490,   618,  4494,  3790,  4277,   719,  1584,
+                                                      1583,  3713,  1581,  2557,  4196,   721,  4416,  4272,  4820,  4264,  3562,  4131,  3792,  2100,  2367,  4813,  2437,   722,   491,   796,
+                                                      2057,  3791,  3789,   209,  3714,  3717,   717,  2017,  1477,  3848,  2366,  3847,  4100,  4809,  3717,  3849,  4265,  4228,  3715,  4723,
+                                                      1337,  3716,   206,  1196,  4415,   718,  1176,  3428,  3959,  2677,  3923,  4812,  3457,  3836,  2717,  3456,  2159,  3429,  3607,  3845,
+                                                      3606,  4500,  4493,  4987,  4075,  4722,  4273,  4603,  3805,  1977,  2597,  3358,  3820,  4710,  4384,  3277,  3522,  3483,  3518,  3523,
+                                                      3520,  3703,  3519,  3521,  3702,  4378,  3698,  3968,  4406,  3537,  2817,  4395,    65,   394,   495,  4742,   210,  3711,    67,  4197,
+                                                        66);
+    protected const array ENUM_HEROICDUNGEON = array( 4494,  3790,  4277,  4196,  4416,  4272,  4820,  4264,  3562,  4131,  3792,  2367,  4813,  3791,  3789,  3848,  2366,  3713,  3847,  4100,
+                                                      4809,  3849,  4265,  4228,  3714,  3717,  3715,  3716,  4415,  4723,  206,   1196);
+    protected const array ENUM_MULTIMODERAID = array( 4812,  3456,  2159,  4500,  4493,  4722,  4273,  4603,  4987);
+    protected const array ENUM_HEROICRAID    = array( 4987,  4812,  4722);
+    protected const array ENUM_CLASSS        = array( null,     1,     2,     3,     4,     5,     6,     7,     8,     9,  null,    11,  true, false);
+    protected const array ENUM_RACE          = array( null,     1,     2,     3,     4,     5,     6,     7,     8,  null,    10,    11,  true, false);
+    protected const array ENUM_PROFESSION    = array( null,   171,   164,   185,   333,   202,   129,   755,   165,   186,   197,  true, false,   356,   182,   773);
+    protected const array ENUM_ITEM_VISUAL   = array(       // ItemVisualEffect.dbc/ids pointing to sensible models
                                                             // Enchantment
-                                                   1,     2,     3,    42,    45,    46,    47,    48,    50,    51,    52,    62,    81,   101,   121,   122,   123,   124,   125,   126,
-                                                 127,   141,   142,   143,   144,   145,   146,   147,   148,   182,   183,   184,   185,   186,   187,   193,   194,
+                                                         1,     2,     3,    42,    45,    46,    47,    48,    50,    51,    52,    62,    81,   101,   121,   122,   123,   124,   125,   126,
+                                                       127,   141,   142,   143,   144,   145,   146,   147,   148,   182,   183,   184,   185,   186,   187,   193,   194,
                                                             // Spell
-                                                 158,   177,   195,   207);
+                                                       158,   177,   195,   207);
 
     public bool  $error        = false;
     public bool  $shouldReload = false;                     // erroneous params have been corrected. Build GET string and reload

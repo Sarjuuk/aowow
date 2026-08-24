@@ -13,12 +13,12 @@ CLISetup::registerSetup("build", new class extends SetupScript
 {
     use TrTemplateFile;
 
-    protected $info = array(
+    protected array $info = array(
         'tooltips' => [[], CLISetup::ARGV_PARAM, 'Fills powered tooltips (static/widgets/power.js) with site variables.']
     );
 
-    protected $fileTemplateSrc  = ['power.js.in'];
-    protected $fileTemplateDest = ['static/widgets/power.js'];
+    protected array $fileTemplateSrc  = ['power.js.in'];
+    protected array $fileTemplateDest = ['static/widgets/power.js'];
 
     public function generate() : bool
     {

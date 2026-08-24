@@ -13,8 +13,8 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 {
     use TrDBCcopy;
 
-    protected $command           = 'spellvariables';
-    protected $dbcSourceFiles    = ['spelldescriptionvariables'];
+    protected string $command        = 'spellvariables';
+    protected array  $dbcSourceFiles = ['spelldescriptionvariables'];
 });
 
 ?>

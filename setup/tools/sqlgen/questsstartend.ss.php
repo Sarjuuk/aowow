@@ -11,11 +11,11 @@ if (!CLI)
 
 CLISetup::registerSetup("sql", new class extends SetupScript
 {
-    protected $info = array(
+    protected array $info = array(
         'quests_startend' => [[], CLISetup::ARGV_PARAM, 'Compiles supplemental data for type: Quest from world db.']
     );
 
-    protected $worldDependency = ['creature_queststarter', 'creature_questender', 'game_event_creature_quest', 'gameobject_queststarter', 'gameobject_questender', 'game_event_gameobject_quest', 'item_template'];
+    protected array $worldDependency = ['creature_queststarter', 'creature_questender', 'game_event_creature_quest', 'gameobject_queststarter', 'gameobject_questender', 'game_event_gameobject_quest', 'item_template'];
 
     public function generate() : bool
     {

@@ -11,15 +11,13 @@ if (!CLI)
 
 CLISetup::registerSetup("build", new class extends SetupScript
 {
-    protected $info = array(
+    protected array $info = array(
         'talenticons' => [[], CLISetup::ARGV_PARAM, 'Generates icon textures for the talent calculator tool.']
     );
 
-    protected $dbcSourceFiles = ['talenttab', 'talent', 'spell'];
-    protected $setupAfter     = [['icons', 'spell'], ['simpleimg']];
-    protected $requiredDirs   = ['static/images/wow/talents/icons', 'static/images/wow/hunterpettalents'];
-
-    private const ICON_SIZE = 36;                           // px
+    protected array $dbcSourceFiles = ['talenttab', 'talent', 'spell'];
+    protected array $setupAfter     = [['icons', 'spell'], ['simpleimg']];
+    protected array $requiredDirs   = ['static/images/wow/talents/icons', 'static/images/wow/hunterpettalents'];
 
     public function generate() : bool
     {
@@ -94,7 +92,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             return null;
         }
 
-        $res = imageCreateTrueColor(count($icons) * self::ICON_SIZE, 2 * self::ICON_SIZE);
+        $res = imageCreateTrueColor(count($icons) * ICON_SIZE_MEDIUM, 2 * ICON_SIZE_MEDIUM);
         if (!$res)
         {
             CLI::write('[talenticons] - image resource not created', CLI::LOG_ERROR);
@@ -113,11 +111,11 @@ CLISetup::registerSetup("build", new class extends SetupScript
             $im = imagecreatefromjpeg($imgFile);
 
             // colored
-            imagecopymerge($res, $im, $i * self::ICON_SIZE, 0, 0, 0, imagesx($im), imagesy($im), 100);
+            imagecopymerge($res, $im, $i * ICON_SIZE_MEDIUM, 0, 0, 0, imagesx($im), imagesy($im), 100);
 
             // grayscale
             imagefilter($im, IMG_FILTER_GRAYSCALE);
-            imagecopymerge($res, $im, $i * self::ICON_SIZE, self::ICON_SIZE, 0, 0, imagesx($im), imagesy($im), 100);
+            imagecopymerge($res, $im, $i * ICON_SIZE_MEDIUM, ICON_SIZE_MEDIUM, 0, 0, imagesx($im), imagesy($im), 100);
         }
 
         return $res;

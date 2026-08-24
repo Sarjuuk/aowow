@@ -13,12 +13,12 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 {
     use TrCustomData;                                       // import custom data from DB
 
-    protected $info = array(
+    protected array $info = array(
         'classes' => [[], CLISetup::ARGV_PARAM, 'Compiles data for type: PlayerClass from dbc.']
     );
 
-    protected $setupAfter     = [['icons'], []];
-    protected $dbcSourceFiles = ['spell', 'charbaseinfo', 'skillraceclassinfo', 'skilllineability', 'chrclasses'];
+    protected array $setupAfter     = [['icons'], []];
+    protected array $dbcSourceFiles = ['spell', 'charbaseinfo', 'skillraceclassinfo', 'skilllineability', 'chrclasses'];
 
     public function generate() : bool
     {

@@ -11,12 +11,12 @@ if (!CLI)
 
 CLISetup::registerSetup("sql", new class extends SetupScript
 {
-    protected $info = array(
+    protected array $info = array(
         'itemenchantment' => [[], CLISetup::ARGV_PARAM, 'Compiles data for type: Enchantment from dbc and world db.']
     );
 
-    protected $dbcSourceFiles  = ['spellitemenchantment'];
-    protected $worldDependency = ['spell_enchant_proc_data'];
+    protected array $dbcSourceFiles  = ['spellitemenchantment'];
+    protected array $worldDependency = ['spell_enchant_proc_data'];
 
     public function generate() : bool
     {

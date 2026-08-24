@@ -8,43 +8,43 @@ if (!defined('AOWOW_REVISION'))
 
 class Search
 {
-    public const /* int */ DEFAULT_MAX_RESULTS     = 500;
-    public const /* int */ SUGGESTIONS_MAX_RESULTS = 10;
+    public const int DEFAULT_MAX_RESULTS     = 500;
+    public const int SUGGESTIONS_MAX_RESULTS = 10;
 
-    public const /* int */ MOD_CLASS            = 0;
-    public const /* int */ MOD_RACE             = 1;
-    public const /* int */ MOD_TITLE            = 2;
-    public const /* int */ MOD_WORLDEVENT       = 3;
-    public const /* int */ MOD_CURRENCY         = 4;
-    public const /* int */ MOD_ITEMSET          = 5;        // must come before MOD_ITEM as its pieces may also be returned in result set
-    public const /* int */ MOD_ITEM             = 6;
-    public const /* int */ MOD_ABILITY          = 7;
-    public const /* int */ MOD_TALENT           = 8;
-    public const /* int */ MOD_GLYPH            = 9;
-    public const /* int */ MOD_PROFICIENCY      = 10;
-    public const /* int */ MOD_PROFESSION       = 11;
-    public const /* int */ MOD_COMPANION        = 12;
-    public const /* int */ MOD_MOUNT            = 13;
-    public const /* int */ MOD_CREATURE         = 14;
-    public const /* int */ MOD_QUEST            = 15;
-    public const /* int */ MOD_ACHIEVEMENT      = 16;
-    public const /* int */ MOD_STATISTIC        = 17;
-    public const /* int */ MOD_ZONE             = 18;
-    public const /* int */ MOD_OBJECT           = 19;
-    public const /* int */ MOD_FACTION          = 20;
-    public const /* int */ MOD_SKILL            = 21;
-    public const /* int */ MOD_PET              = 22;
-    public const /* int */ MOD_CREATURE_ABILITY = 23;
-    public const /* int */ MOD_SPELL            = 24;
-    public const /* int */ MOD_EMOTE            = 25;
-    public const /* int */ MOD_ENCHANTMENT      = 26;
-    public const /* int */ MOD_SOUND            = 27;
+    public const int MOD_CLASS            = 0;
+    public const int MOD_RACE             = 1;
+    public const int MOD_TITLE            = 2;
+    public const int MOD_WORLDEVENT       = 3;
+    public const int MOD_CURRENCY         = 4;
+    public const int MOD_ITEMSET          = 5;              // must come before MOD_ITEM as its pieces may also be returned in result set
+    public const int MOD_ITEM             = 6;
+    public const int MOD_ABILITY          = 7;
+    public const int MOD_TALENT           = 8;
+    public const int MOD_GLYPH            = 9;
+    public const int MOD_PROFICIENCY      = 10;
+    public const int MOD_PROFESSION       = 11;
+    public const int MOD_COMPANION        = 12;
+    public const int MOD_MOUNT            = 13;
+    public const int MOD_CREATURE         = 14;
+    public const int MOD_QUEST            = 15;
+    public const int MOD_ACHIEVEMENT      = 16;
+    public const int MOD_STATISTIC        = 17;
+    public const int MOD_ZONE             = 18;
+    public const int MOD_OBJECT           = 19;
+    public const int MOD_FACTION          = 20;
+    public const int MOD_SKILL            = 21;
+    public const int MOD_PET              = 22;
+    public const int MOD_CREATURE_ABILITY = 23;
+    public const int MOD_SPELL            = 24;
+    public const int MOD_EMOTE            = 25;
+    public const int MOD_ENCHANTMENT      = 26;
+    public const int MOD_SOUND            = 27;
 
-    public const /* int */ TYPE_REGULAR = 0x10000000;
-    public const /* int */ TYPE_OPEN    = 0x20000000;
-    public const /* int */ TYPE_JSON    = 0x40000000;
+    public const int TYPE_REGULAR = 0x10000000;
+    public const int TYPE_OPEN    = 0x20000000;
+    public const int TYPE_JSON    = 0x40000000;
 
-    private const /* array */ MODULES = array(
+    private const array MODULES = array(
         self::MOD_CLASS            => '_searchCharClass',
         self::MOD_RACE             => '_searchCharRace',
         self::MOD_TITLE            => '_searchTitle',

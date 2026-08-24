@@ -13,20 +13,20 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 {
     use TrCustomData;                                       // import custom data from DB
 
-    protected $info = array(
+    protected array $info = array(
         'items' => [[], CLISetup::ARGV_PARAM, 'Compiles data for type: Item from dbc and world db.']
     );
 
-    protected $dbcSourceFiles     = ['gemproperties', 'itemdisplayinfo', 'spell', 'glyphproperties', 'durabilityquality', 'durabilitycosts'];
-    protected $worldDependency    = ['item_template', 'item_template_locale', 'spell_group', 'game_event'];
-    protected $setupAfter         = [['icons', 'spell', 'spellvariables', 'spellrange'], []];
+    protected array $dbcSourceFiles  = ['gemproperties', 'itemdisplayinfo', 'spell', 'glyphproperties', 'durabilityquality', 'durabilitycosts'];
+    protected array $worldDependency = ['item_template', 'item_template_locale', 'spell_group', 'game_event'];
+    protected array $setupAfter      = [['icons', 'spell', 'spellvariables', 'spellrange'], []];
 
-    private const /* array */ SKILL_CATG = array(
-        SKILL_INSCRIPTION  => 11,
-        SKILL_FISHING      =>  9,
-        SKILL_MINING       => 12,
-        SKILL_COOKING      =>  5,
-        SKILL_ALCHEMY      =>  6
+    private const array SKILL_CATG = array(
+        SKILL_INSCRIPTION => 11,
+        SKILL_FISHING     =>  9,
+        SKILL_MINING      => 12,
+        SKILL_COOKING     =>  5,
+        SKILL_ALCHEMY     =>  6
     );
 
     public function generate() : bool

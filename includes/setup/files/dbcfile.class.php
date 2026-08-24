@@ -8,8 +8,8 @@ if (!defined('AOWOW_REVISION'))
 
 class DBCFile extends BinaryFile
 {
-    private const /* string */ MAGIC       = 'WDBC';
-    private const /* int    */ HEADER_SIZE = 16;
+    private const string MAGIC       = 'WDBC';
+    private const int    HEADER_SIZE = 16;
 
     private readonly int $stringSize;
     private readonly int $stringOffset;

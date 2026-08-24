@@ -11,11 +11,11 @@ if (!CLI)
 
 CLISetup::registerSetup("sql", new class extends SetupScript
 {
-    protected $info = array(
+    protected array $info = array(
         'talents' => [[], CLISetup::ARGV_PARAM, 'Compiles supplemental data for type: Profile from dbc.']
     );
 
-    protected $dbcSourceFiles = ['talent', 'talenttab'];
+    protected array $dbcSourceFiles = ['talent', 'talenttab'];
 
     public function generate() : bool
     {

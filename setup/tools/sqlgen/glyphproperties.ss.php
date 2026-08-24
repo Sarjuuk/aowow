@@ -11,12 +11,12 @@ if (!CLI)
 
 CLISetup::registerSetup("sql", new class extends SetupScript
 {
-    protected $info = array(
+    protected array $info = array(
         'glyphproperties' => [[], CLISetup::ARGV_PARAM, 'Compiles supplemental data for type: Item & Spell from dbc.']
     );
 
-    protected $dbcSourceFiles = ['glyphproperties', 'spellicon'];
-    protected $setupAfter     = [['icons'], []];
+    protected array $dbcSourceFiles = ['glyphproperties', 'spellicon'];
+    protected array $setupAfter     = [['icons'], []];
 
     public function generate() : bool
     {

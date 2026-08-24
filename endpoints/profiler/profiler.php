@@ -36,7 +36,7 @@ class ProfilerBaseResponse extends TemplateResponse
     {
         //                                                              just so the form does not break. There won't be any results.
         $usedRegions = array_column(Profiler::getRealms(), 'region') ?: ['us'];
-        foreach (Util::$regions as $idx => $id)
+        foreach (array_keys(Profiler::REGIONS) as $idx => $id)
             if (in_array($id, $usedRegions))
                 $this->regions[$id] = [Lang::profiler('regions', $id), $idx + 1];
 

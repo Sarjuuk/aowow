@@ -13,14 +13,14 @@ CLISetup::registerSetup("build", new class extends SetupScript
 {
     use TrTemplateFile;
 
-    protected $info = array(
+    protected array $info = array(
         'itemscaling' => [[], CLISetup::ARGV_PARAM, 'Compiles item scaling data to file to make heirloom tooltips interactive.']
     );
 
-    protected $fileTemplateDest = ['datasets/item-scaling'];
-    protected $fileTemplateSrc  = ['item-scaling.in'];
+    protected array $fileTemplateDest = ['datasets/item-scaling'];
+    protected array $fileTemplateSrc  = ['item-scaling.in'];
 
-    protected $dbcSourceFiles   = ['scalingstatdistribution', 'scalingstatvalues', 'gtoctclasscombatratingscalar', 'gtcombatratings'];
+    protected array $dbcSourceFiles   = ['scalingstatdistribution', 'scalingstatvalues', 'gtoctclasscombatratingscalar', 'gtcombatratings'];
 
     private function debugify(array $data) : string
     {

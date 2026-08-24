@@ -13,24 +13,24 @@ CLISetup::registerSetup("build", new class extends SetupScript
 {
     use TrComplexImage;
 
-    protected $info = array(
+    protected array $info = array(
         'img-talentcalc' => [[], CLISetup::ARGV_PARAM, 'Generate backgrounds for the talent calculator.'],
     );
 
-    protected $dbcSourceFiles = ['talenttab', 'chrclasses'];
+    protected array $dbcSourceFiles = ['talenttab', 'chrclasses'];
 
-    private const DEST_DIRS = array(
+    private const array DEST_DIRS = array(
         ['static/images/wow/hunterpettalents/',    0, 0],
         ['static/images/wow/talents/backgrounds/', 0, 0]
     );
 
-    private const TILEORDER = array(
+    private const array TILEORDER = array(
         ['-TopLeft',    '-TopRight'],
         ['-BottomLeft', '-BottomRight']
     );
 
     // src, resourcePath, localized, [tileOrder], [[dest, destW, destH]]
-    private const /* array */ STEPS = array(
+    private const array STEPS = array(
         ['TalentFrame/', null, false, self::TILEORDER,  self::DEST_DIRS]
     );
 

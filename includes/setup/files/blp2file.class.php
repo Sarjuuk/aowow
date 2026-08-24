@@ -8,33 +8,33 @@ if (!defined('AOWOW_REVISION'))
 
 class BLP2File extends BinaryFile
 {
-    private const /* string */ MAGIC       = 'BLP2';
-    private const /* int    */ HEADER_SIZE = 148 + 1024;
+    private const string MAGIC       = 'BLP2';
+    private const int    HEADER_SIZE = 148 + 1024;
 
     // colorEncoding
-    private const /* int    */ COLOR_JPEG    = 0;
-    private const /* int    */ COLOR_PALETTE = 1;
-    private const /* int    */ COLOR_DXT     = 2;
-    private const /* int    */ COLOR_ARGB    = 3;           // wowdev.wiki/BLP says this is cata+, but no
-    private const /* int    */ COLOR_ARGB2   = 4;           // same like 3, not expected in WotLK
+    private const int    COLOR_JPEG    = 0;
+    private const int    COLOR_PALETTE = 1;
+    private const int    COLOR_DXT     = 2;
+    private const int    COLOR_ARGB    = 3;                 // wowdev.wiki/BLP says this is cata+, but no
+    private const int    COLOR_ARGB2   = 4;                 // same like 3, not expected in WotLK
 
     // pixelFormat
-    private const /* int    */ PIXEL_DXT1        = 0;       // COLOR_DXT
-    private const /* int    */ PIXEL_DXT3        = 1;       // COLOR_DXT
-    private const /* int    */ PIXEL_ARGB8888    = 2;       // COLOR_PALETTE
-    private const /* int    */ PIXEL_ARGB1555    = 3;
-    private const /* int    */ PIXEL_ARGB4444    = 4;       // COLOR_PALETTE
-    private const /* int    */ PIXEL_RGB565      = 5;
-    private const /* int    */ PIXEL_A8          = 6;
-    private const /* int    */ PIXEL_DXT5        = 7;       // COLOR_DXT
-    private const /* int    */ PIXEL_UNSPECIFIED = 8;       // COLOR_PALETTE
-    private const /* int    */ PIXEL_ARGB2565    = 9;
-    private const /* int    */ PIXEL_BC5         = 11;      // DXGI_FORMAT_BC5_UNORM
+    private const int    PIXEL_DXT1        = 0;             // COLOR_DXT
+    private const int    PIXEL_DXT3        = 1;             // COLOR_DXT
+    private const int    PIXEL_ARGB8888    = 2;             // COLOR_PALETTE
+    private const int    PIXEL_ARGB1555    = 3;
+    private const int    PIXEL_ARGB4444    = 4;             // COLOR_PALETTE
+    private const int    PIXEL_RGB565      = 5;
+    private const int    PIXEL_A8          = 6;
+    private const int    PIXEL_DXT5        = 7;             // COLOR_DXT
+    private const int    PIXEL_UNSPECIFIED = 8;             // COLOR_PALETTE
+    private const int    PIXEL_ARGB2565    = 9;
+    private const int    PIXEL_BC5         = 11;            // DXGI_FORMAT_BC5_UNORM
 
     // mipFlags
-    private const /* int    */ MIPS_NONE      = 0x0;
-    private const /* int    */ MIPS_GENERATED = 0x1;
-    private const /* int    */ MIPS_HANDMADE  = 0x2;        // not handled differently, a mipmap is a mipmap
+    private const int    MIPS_NONE      = 0x0;
+    private const int    MIPS_GENERATED = 0x1;
+    private const int    MIPS_HANDMADE  = 0x2;              // not handled differently, a mipmap is a mipmap
 
     // header
     private readonly int   $colorEncoding;

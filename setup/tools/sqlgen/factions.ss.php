@@ -13,11 +13,11 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 {
     use TrCustomData;                                       // import custom data from DB
 
-    protected $info = array(
+    protected array $info = array(
         'factions' => [[], CLISetup::ARGV_PARAM, 'Compiles data for type: Faction from dbc.']
     );
 
-    protected $dbcSourceFiles = ['faction', 'factiontemplate'];
+    protected array $dbcSourceFiles = ['faction', 'factiontemplate'];
 
     public function generate() : bool
     {

@@ -13,12 +13,12 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 {
     use TrCustomData;                                       // import custom data from DB
 
-    protected $info = array(
+    protected array $info = array(
         'quests' => [[], CLISetup::ARGV_PARAM, 'Compiles data for type: Quest from dbc and world db.']
     );
 
-    protected $dbcSourceFiles  = ['questxp', 'questfactionreward'];
-    protected $worldDependency = ['quest_template', 'quest_template_addon', 'quest_template_locale', 'game_event', 'game_event_seasonal_questrelation', 'quest_request_items', 'quest_request_items_locale', 'quest_offer_reward', 'quest_offer_reward_locale',  'disables'];
+    protected array $dbcSourceFiles  = ['questxp', 'questfactionreward'];
+    protected array $worldDependency = ['quest_template', 'quest_template_addon', 'quest_template_locale', 'game_event', 'game_event_seasonal_questrelation', 'quest_request_items', 'quest_request_items_locale', 'quest_offer_reward', 'quest_offer_reward_locale',  'disables'];
 
     public function generate() : bool
     {

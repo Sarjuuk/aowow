@@ -17,7 +17,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 {
     use TrImageProcessor;
 
-    protected $info = array(
+    protected array $info = array(
         'simpleimg'      => [[   ], CLISetup::ARGV_PARAM,    'Converts and resizes BLP2 images smaller than 255x255 into required formats (mostly icons)'],
         'icons'          => [['1'], CLISetup::ARGV_OPTIONAL, 'Generate icons for spells, items, classes, races, ect.'],
         'glyphs'         => [['2'], CLISetup::ARGV_OPTIONAL, 'Generate decorative glyph symbols displayed on related item and spell pages.'],
@@ -25,17 +25,17 @@ CLISetup::registerSetup("build", new class extends SetupScript
         'loadingscreens' => [['4'], CLISetup::ARGV_OPTIONAL, 'Generate loading screen images (not used on page; skipped by default)']
     );
 
-    protected $dbcSourceFiles = ['holidays', 'spellicon', 'itemdisplayinfo'];
-    protected $setupAfter     = [['icons'], []];
+    protected array $dbcSourceFiles = ['holidays', 'spellicon', 'itemdisplayinfo'];
+    protected array $setupAfter     = [['icons'], []];
 
-    private const ICON_DIRS = array(
+    private const array ICON_DIRS = array(
         ['static/images/wow/icons/large/',  'jpg',  0, ICON_SIZE_LARGE,  4],
         ['static/images/wow/icons/medium/', 'jpg',  0, ICON_SIZE_MEDIUM, 4],
         ['static/images/wow/icons/small/',  'jpg',  0, ICON_SIZE_SMALL,  4],
         ['static/images/wow/icons/tiny/',   'gif',  0, ICON_SIZE_TINY,   4]
     );
 
-    private const /* array */ STEPS = array(
+    private const array STEPS = array(
       //       srcPath,           realPath, localized, [pattern, isIcon, tileSize],                             [[dest, ext, srcSize, destSize, borderOffset]]
          0 => ['Icons/',                  null, false, ['.*\.(blp|png)$',                           true,   0], self::ICON_DIRS,                                                 ],
          1 => ['Spellbook/',              null, false, ['UI-Glyph-Rune-?\d+.(blp|png)$',            false,  0], [['static/images/wow/Interface/Spellbook/',     'png', 0,  0, 0]]],
@@ -54,7 +54,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
     // textures are composed of 64x64 icons
     // numeric indexed arrays mimick the position on the texture
-    private $cuNames = array(
+    private array $cuNames = array(
         2 => array(
             'ui-paperdoll-slot-chest'         => 'inventoryslot_chest',
             'ui-backpack-emptyslot'           => 'inventoryslot_empty',

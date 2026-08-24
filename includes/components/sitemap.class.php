@@ -14,12 +14,12 @@ if (!defined('AOWOW_REVISION'))
 
 class Sitemap
 {
-    public const /* string */ ERR_TITLE  = 'Invalid sitemap';
-    public const /* string */ ERR_PAGE   = 'This sitemap does not exist.';
-    public const /* string */ ERR_OFFSET = 'The maximum page for this sitemap is %d.';
+    public const string ERR_TITLE  = 'Invalid sitemap';
+    public const string ERR_PAGE   = 'This sitemap does not exist.';
+    public const string ERR_OFFSET = 'The maximum page for this sitemap is %d.';
 
-    private const /* int */ MAX_ENTRIES  = 50000;
-    private const /* int */ LASTMOD_BASE = 1435701600;      // 01.07.2015 - 00:00:00
+    private const int MAX_ENTRIES  = 50000;
+    private const int LASTMOD_BASE = 1435701600;            // 01.07.2015 - 00:00:00
 
     public static int $maxPage = 0;
 

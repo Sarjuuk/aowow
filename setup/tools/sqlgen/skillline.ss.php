@@ -13,12 +13,12 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 {
     use TrCustomData;                                       // import custom data from DB
 
-    protected $info = array(
+    protected array $info = array(
         'skillline' => [[], CLISetup::ARGV_PARAM, 'Compiles data for type: Skill from dbc.']
     );
 
-    protected $dbcSourceFiles     = ['skillline', 'spell', 'skilllineability'];
-    protected $setupAfter         = [['icons'], []];
+    protected array $dbcSourceFiles = ['skillline', 'spell', 'skilllineability'];
+    protected array $setupAfter     = [['icons'], []];
 
     public function generate() : bool
     {

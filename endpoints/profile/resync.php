@@ -31,7 +31,7 @@ class ProfileResyncResponse extends TextResponse
 
         if (!$this->assertGET('id'))
         {
-            trigger_error('ProfileResyncResponse - invalid id received', E_USER_ERROR);
+            trigger_error('ProfileResyncResponse - invalid id received', E_USER_WARNING);
             return;
         }
 
@@ -40,7 +40,7 @@ class ProfileResyncResponse extends TextResponse
                 Profiler::scheduleResync(Type::PROFILE, $c['realm'], $c['realmGUID']);
 
         if ($_ = array_diff(array_keys($chars ?: []), $this->_get['id']))
-            trigger_error('ProfileResyncResponse - profiles '.implode(', ', $_).' not found in db', E_USER_ERROR);
+            trigger_error('ProfileResyncResponse - profiles '.implode(', ', $_).' not found in db', E_USER_WARNING);
     }
 }
 

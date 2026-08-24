@@ -10,7 +10,7 @@ class NpcPowerResponse extends TextResponse implements ICache
 {
     use TrCache, TrTooltip;
 
-    private const /* string */ POWER_TEMPLATE = '$WowheadPower.registerNpc(%d, %d, %s);';
+    private const string POWER_TEMPLATE = '$WowheadPower.registerNpc(%d, %d, %s);';
 
     protected int   $type        = Type::NPC;
     protected int   $typeId      = 0;

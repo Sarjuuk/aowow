@@ -17,7 +17,7 @@ class AdminVideosActionStickyResponse extends TextResponse
     {
         if (!$this->assertGET('id'))
         {
-            trigger_error('AdminVideosActionStickyResponse - videoId empty', E_USER_ERROR);
+            trigger_error('AdminVideosActionStickyResponse - videoId empty', E_USER_WARNING);
             return;
         }
 

@@ -13,7 +13,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 {
     use TrCustomData;
 
-    protected $info = array(
+    protected array $info = array(
         'search'   => [[   ], CLISetup::ARGV_PARAM,    'Normalize strings from creatures, items, objects, quests & spells for fulltext search.'],
 /* 1 */ 'creature' => [['1'], CLISetup::ARGV_OPTIONAL, '...only for creatures.'],
 /* 2 */ 'item'     => [['2'], CLISetup::ARGV_OPTIONAL, '...only for items.'],
@@ -22,15 +22,14 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 /*16 */ 'quest'    => [['5'], CLISetup::ARGV_OPTIONAL, '...only for quests.']
     );
 
-    protected $setupAfter = [['creature', 'items', 'objects', 'spell', 'quests'], []];
+    protected array $setupAfter = [['creature', 'items', 'objects', 'spell', 'quests'], []];
 
-    private const /* int */ OPT_NPCS    = (1 << 0);
-    private const /* int */ OPT_ITEMS   = (1 << 1);
-    private const /* int */ OPT_OBJECTS = (1 << 2);
-    private const /* int */ OPT_SPELLS  = (1 << 3);
-    private const /* int */ OPT_QUESTS  = (1 << 4);
+    private const int OPT_NPCS    = (1 << 0);
+    private const int OPT_ITEMS   = (1 << 1);
+    private const int OPT_OBJECTS = (1 << 2);
+    private const int OPT_SPELLS  = (1 << 3);
+    private const int OPT_QUESTS  = (1 << 4);
 
-    private array $spells  = [];
     private array $locales = [];
 
     public function generate() : bool
@@ -332,6 +331,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
         foreach ($words as $word)
         {
+            $n = null;
             if (($new = trim(preg_replace(Filter::PATTERN_FT, ' ', $word, count: $n))) && $n)
             {
                 if (!strpos($new, ' '))                     // caught trailing dots or something

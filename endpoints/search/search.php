@@ -15,8 +15,8 @@ class SearchBaseResponse extends TemplateResponse implements ICache
 {
     use TrCache, TrSearch;
 
-    private const /* int   */ SEARCH_MODS_ALL = 0x0FFFFFFF; // yeah im lazy, now what?
-    private const /* array */ SPECIAL_TOKENS  = ['mankrik', 'wife'];
+    private const int   SEARCH_MODS_ALL = 0x0FFFFFFF;       // yeah im lazy, now what?
+    private const array SPECIAL_TOKENS  = ['mankrik', 'wife'];
 
     protected  int    $cacheType   = CACHE_TYPE_SEARCH;
 

@@ -52,7 +52,7 @@ trait TrCustomData
             }
             catch (\Exception $e)
             {
-                trigger_error('custom data for entry #'.$id.': '.$e->getMessage(), E_USER_ERROR);
+                trigger_error('custom data for entry #'.$id.': '.$e->getMessage(), E_USER_WARNING);
                 $ok = false;
             }
         }
@@ -165,19 +165,19 @@ trait TrTemplateFile
 
 trait TrImageProcessor
 {
-    private $imgPath     = '%sInterface/';
-    private $status      = '';
-    private $maxExecTime = 30;
+    private string $imgPath     = '%sInterface/';
+    private string $status      = '';
+    private int    $maxExecTime = 30;
 
-    private const GEN_IDX_SRC_PATH  = 0;
-    private const GEN_IDX_SRC_REAL  = 1;
-    private const GEN_IDX_LOCALE    = 2;
-    private const GEN_IDX_SRC_INFO  = 3;
-    private const GEN_IDX_DEST_INFO = 4;
+    private const int GEN_IDX_SRC_PATH  = 0;
+    private const int GEN_IDX_SRC_REAL  = 1;
+    private const int GEN_IDX_LOCALE    = 2;
+    private const int GEN_IDX_SRC_INFO  = 3;
+    private const int GEN_IDX_DEST_INFO = 4;
 
-    private const JPEG_QUALITY = 85;                        // 0: worst - 100: best
+    private const int JPEG_QUALITY = 85;                    // 0: worst - 100: best
 
-    /** * @var array{string, string, bool, array, array{string, int, int}}[] $genSteps - {src, resourcePath, localized, [tileOrder], [[dest, destW, destH]]} */
+    /** * @var array{string, string, bool, array, array{string, int, int}[]}[] $genSteps - {src, resourcePath, localized, [tileOrder], [[dest, destW, destH]]} */
     private array $genSteps = [];
 
     private function checkSourceDirs() : bool
@@ -444,24 +444,23 @@ trait TrComplexImage
 abstract class SetupScript
 {
     // FileGen
-    protected $requiredDirs       = [];
-    protected $fileTemplateDest   = [];
-    protected $fileTemplatePath   = 'setup/tools/filegen/templates/';
-    protected $fileTemplateSrc    = [];
+    protected array  $requiredDirs     = [];
+    protected array  $fileTemplateDest = [];
+    protected string $fileTemplatePath = 'setup/tools/filegen/templates/';
+    protected array  $fileTemplateSrc  = [];
 
-    // FileGen + SQLGen
-    protected $dbcSourceFiles     = [];                     // relies on these dbc files. Read into db if related table is missing
-    protected $worldDependency    = [];                     // query when this table changed (--sync command)
+    // FileGen + DataGen
+    protected array  $dbcSourceFiles   = [];                // relies on these dbc files. Read into db if related table is missing
+    protected array  $worldDependency  = [];                // query when this table changed (--sync command)
 
-    protected $info               = [];                     // arr: 0 => self, n => genSteps        cmd => [[arr<str>:optionalArgs], int:argFlags, str:description]
-    protected $setupAfter         = [[], []];               // [[sqlgen], [filegen]]                used to sort scripts that rely on each other being executed in the right order (script names are not necessarily the same as their table names)
+    protected array  $info             = [];                // arr: 0 => self, n => genSteps        cmd => [[arr<str>:optionalArgs], int:argFlags, str:description]
+    protected array  $setupAfter       = [[], []];          // [[sqlgen], [filegen]]                used to sort scripts that rely on each other being executed in the right order (script names are not necessarily the same as their table names)
 
-    protected $success            = true;
-    protected $localized          = false;                  // push locale directories onto $requiredDirs?
-    protected $useGlobalStrings   = false;                  // uses data from interface/framexml/globalstrings.lua
+    protected bool   $success          = true;
+    protected bool   $localized        = false;             // push locale directories onto $requiredDirs?
+    protected bool   $useGlobalStrings = false;             // uses data from interface/framexml/globalstrings.lua
 
-    public $isOptional            = false;                  // not a part of the setup chain
-
+    public bool $isOptional = false;                        // not a part of the setup chain
 
     abstract public function generate() : bool;
 

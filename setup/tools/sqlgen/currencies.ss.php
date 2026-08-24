@@ -13,13 +13,13 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 {
     use TrCustomData;                                       // import custom data from DB
 
-    protected $info = array(
+    protected array $info = array(
         'currencies' => [[], CLISetup::ARGV_PARAM, 'Compiles data for type: Currency from dbc and world db.']
     );
 
-    protected $dbcSourceFiles  = ['itemdisplayinfo', 'currencytypes'];
-    protected $worldDependency = ['item_template', 'item_template_locale'];
-    protected $setupAfter      = [['icons'], []];
+    protected array $dbcSourceFiles  = ['itemdisplayinfo', 'currencytypes'];
+    protected array $worldDependency = ['item_template', 'item_template_locale'];
+    protected array $setupAfter      = [['icons'], []];
 
     public function generate() : bool
     {

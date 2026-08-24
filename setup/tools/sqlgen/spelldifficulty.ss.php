@@ -11,13 +11,13 @@ if (!CLI)
 
 CLISetup::registerSetup("sql", new class extends SetupScript
 {
-    protected $info = array(
+    protected array $info = array(
         'spelldifficulty' => [[], CLISetup::ARGV_PARAM, 'Compiles supplemental data for type: Spell from dbc and world db.']
     );
 
-    protected $dbcSourceFiles  = ['spelldifficulty'];
-    protected $worldDependency = ['spelldifficulty_dbc'];
-    protected $setupAfter      = [['creature', 'spawns'], []];
+    protected array $dbcSourceFiles  = ['spelldifficulty'];
+    protected array $worldDependency = ['spelldifficulty_dbc'];
+    protected array $setupAfter      = [['creature', 'spawns'], []];
 
     public function generate() : bool
     {

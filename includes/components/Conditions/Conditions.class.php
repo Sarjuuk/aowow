@@ -11,124 +11,131 @@ if (!defined('AOWOW_REVISION'))
 class Conditions
 {
     // enum TypeID
-    private const TYPEID_OBJECT        = 0;
-    private const TYPEID_ITEM          = 1;
-    private const TYPEID_CONTAINER     = 2;
-    private const TYPEID_UNIT          = 3;
-    private const TYPEID_PLAYER        = 4;
-    private const TYPEID_GAMEOBJECT    = 5;
-    private const TYPEID_DYNAMICOBJECT = 6;
-    private const TYPEID_CORPSE        = 7;
+    private const int TYPEID_OBJECT        = 0;
+    private const int TYPEID_ITEM          = 1;
+    private const int TYPEID_CONTAINER     = 2;
+    private const int TYPEID_UNIT          = 3;
+    private const int TYPEID_PLAYER        = 4;
+    private const int TYPEID_GAMEOBJECT    = 5;
+    private const int TYPEID_DYNAMICOBJECT = 6;
+    private const int TYPEID_CORPSE        = 7;
 
-    public const OP_E    = 0;                               // ==
-    public const OP_GT   = 1;                               // >
-    public const OP_LT   = 2;                               // <
-    public const OP_GT_E = 3;                               // >=
-    public const OP_LT_E = 4;                               // <=
+    public const int OP_E    = 0;                           // ==
+    public const int OP_GT   = 1;                           // >
+    public const int OP_LT   = 2;                           // <
+    public const int OP_GT_E = 3;                           // >=
+    public const int OP_LT_E = 4;                           // <=
                                                             // Group,      Entry,     Id
-    public const SRC_NONE                        = 0;       // null,       null,      null - use when adding external conditions
-    public const SRC_CREATURE_LOOT_TEMPLATE      = 1;       // tplEntry,   itemId,    null
-    public const SRC_DISENCHANT_LOOT_TEMPLATE    = 2;       // tplEntry,   itemId,    null
-    public const SRC_FISHING_LOOT_TEMPLATE       = 3;       // tplEntry,   itemId,    null
-    public const SRC_GAMEOBJECT_LOOT_TEMPLATE    = 4;       // tplEntry,   itemId,    null
-    public const SRC_ITEM_LOOT_TEMPLATE          = 5;       // tplEntry,   itemId,    null
-    public const SRC_MAIL_LOOT_TEMPLATE          = 6;       // tplEntry,   itemId,    null
-    public const SRC_MILLING_LOOT_TEMPLATE       = 7;       // tplEntry,   itemId,    null
-    public const SRC_PICKPOCKETING_LOOT_TEMPLATE = 8;       // tplEntry,   itemId,    null
-    public const SRC_PROSPECTING_LOOT_TEMPLATE   = 9;       // tplEntry,   itemId,    null
-    public const SRC_REFERENCE_LOOT_TEMPLATE     = 10;      // tplEntry,   itemId,    null
-    public const SRC_SKINNING_LOOT_TEMPLATE      = 11;      // tplEntry,   itemId,    null
-    public const SRC_SPELL_LOOT_TEMPLATE         = 12;      // tplEntry,   itemId,    null
-    public const SRC_SPELL_IMPLICIT_TARGET       = 13;      // effectMask, spellId,   null
-    public const SRC_GOSSIP_MENU                 = 14;      // menuId,     textId,    null
-    public const SRC_GOSSIP_MENU_OPTION          = 15;      // menuId,     optionId,  null
-    public const SRC_CREATURE_TEMPLATE_VEHICLE   = 16;      // npcId,      null,      null
-    public const SRC_SPELL                       = 17;      // null,       spellId,   null
-    public const SRC_SPELL_CLICK_EVENT           = 18;      // npcId,      spellId,   null
-    public const SRC_QUEST_AVAILABLE             = 19;      // null,       questId,   null
-    public const SRC_QUEST_SHOW_MARK             = 20;      // null,       questId,   null - ⚠️ unused as of 01.05.2024
-    public const SRC_VEHICLE_SPELL               = 21;      // npcId,      spellId,   null
-    public const SRC_SMART_EVENT                 = 22;      // id,         entryGuid, srcType
-    public const SRC_NPC_VENDOR                  = 23;      // npcId,      itemId,    null
-    public const SRC_SPELL_PROC                  = 24;      // null,       spellId,   null
-//  public const SRC_SPELL_TERRAIN_SWAP          = 25;      //                             - ❌ reserved for TC master
-//  public const SRC_SPELL_PHASE                 = 26;      //                             - ❌ reserved for TC master
-//  public const SRC_SPELL_GRAVEYARD             = 27;      //                             - ❌ reserved for TC master
-//  public const SRC_SPELL_AREATRIGGER           = 28;      //                             - ❌ reserved for TC master
-//  public const SRC_SPELL_CONVERSATION_LINE     = 29;      //                             - ❌ reserved for TC master
-    public const SRC_AREATRIGGER_CLIENT          = 30;      // null,       atId,      null
-//  public const SRC_SPELL_TRAINER_SPELL         = 31;      //                             - ❌ reserved for TC master
-//  public const SRC_SPELL_OBJECT_VISIBILITY     = 32;      //                             - ❌ reserved for TC master
-//  public const SRC_SPELL_SPAWN_GROUP           = 33;      //                             - ❌ reserved for TC master
+    public const int SRC_NONE                        = 0;   // null,       null,      null - use when adding external conditions
+    public const int SRC_CREATURE_LOOT_TEMPLATE      = 1;   // tplEntry,   itemId,    null
+    public const int SRC_DISENCHANT_LOOT_TEMPLATE    = 2;   // tplEntry,   itemId,    null
+    public const int SRC_FISHING_LOOT_TEMPLATE       = 3;   // tplEntry,   itemId,    null
+    public const int SRC_GAMEOBJECT_LOOT_TEMPLATE    = 4;   // tplEntry,   itemId,    null
+    public const int SRC_ITEM_LOOT_TEMPLATE          = 5;   // tplEntry,   itemId,    null
+    public const int SRC_MAIL_LOOT_TEMPLATE          = 6;   // tplEntry,   itemId,    null
+    public const int SRC_MILLING_LOOT_TEMPLATE       = 7;   // tplEntry,   itemId,    null
+    public const int SRC_PICKPOCKETING_LOOT_TEMPLATE = 8;   // tplEntry,   itemId,    null
+    public const int SRC_PROSPECTING_LOOT_TEMPLATE   = 9;   // tplEntry,   itemId,    null
+    public const int SRC_REFERENCE_LOOT_TEMPLATE     = 10;  // tplEntry,   itemId,    null
+    public const int SRC_SKINNING_LOOT_TEMPLATE      = 11;  // tplEntry,   itemId,    null
+    public const int SRC_SPELL_LOOT_TEMPLATE         = 12;  // tplEntry,   itemId,    null
+    public const int SRC_SPELL_IMPLICIT_TARGET       = 13;  // effectMask, spellId,   null
+    public const int SRC_GOSSIP_MENU                 = 14;  // menuId,     textId,    null
+    public const int SRC_GOSSIP_MENU_OPTION          = 15;  // menuId,     optionId,  null
+    public const int SRC_CREATURE_TEMPLATE_VEHICLE   = 16;  // npcId,      null,      null
+    public const int SRC_SPELL                       = 17;  // null,       spellId,   null
+    public const int SRC_SPELL_CLICK_EVENT           = 18;  // npcId,      spellId,   null
+    public const int SRC_QUEST_AVAILABLE             = 19;  // null,       questId,   null
+    public const int SRC_QUEST_SHOW_MARK             = 20;  // null,       questId,   null - ⚠️ unused as of 01.05.2024
+    public const int SRC_VEHICLE_SPELL               = 21;  // npcId,      spellId,   null
+    public const int SRC_SMART_EVENT                 = 22;  // id,         entryGuid, srcType
+    public const int SRC_NPC_VENDOR                  = 23;  // npcId,      itemId,    null
+    public const int SRC_SPELL_PROC                  = 24;  // null,       spellId,   null
+//  public const int SRC_SPELL_TERRAIN_SWAP          = 25;  //                             - ❌ reserved for TC master
+//  public const int SRC_SPELL_PHASE                 = 26;  //                             - ❌ reserved for TC master
+//  public const int SRC_SPELL_GRAVEYARD             = 27;  //                             - ❌ reserved for TC master
+//  public const int SRC_SPELL_AREATRIGGER           = 28;  //                             - ❌ reserved for TC master
+//  public const int SRC_SPELL_CONVERSATION_LINE     = 29;  //                             - ❌ reserved for TC master
+    public const int SRC_AREATRIGGER_CLIENT          = 30;  // null,       atId,      null
+//  public const int SRC_SPELL_TRAINER_SPELL         = 31;  //                             - ❌ reserved for TC master
+//  public const int SRC_SPELL_OBJECT_VISIBILITY     = 32;  //                             - ❌ reserved for TC master
+//  public const int SRC_SPELL_SPAWN_GROUP           = 33;  //                             - ❌ reserved for TC master
 
-    public const NONE                     = 0;              // always true:             NULL,           NULL,           NULL
-    public const AURA                     = 1;              // aura is applied:         spellId,        effIdx,         NULL
-    public const ITEM                     = 2;              // owns item:               itemId,         count,          includeBank?
-    public const ITEM_EQUIPPED            = 3;              // has item equipped:       itemId,         NULL,           NULL
-    public const ZONEID                   = 4;              // is in zone:              areaId,         NULL,           NULL
-    public const REPUTATION_RANK          = 5;              // reputation status:       factionId,      rankMask,       NULL
-    public const TEAM                     = 6;              // is on team:              teamId,         NULL,           NULL
-    public const SKILL                    = 7;              // has skill:               skillId,        value,          NULL
-    public const QUESTREWARDED            = 8;              // has finished quest:      questId,        NULL,           NULL
-    public const QUESTTAKEN               = 9;              // has accepted quest:      questId,        NULL,           NULL
-    public const DRUNKENSTATE             = 10;             // has drunken status:      stateId,        NULL,           NULL
-    public const WORLD_STATE              = 11;             // world var == value:      worldStateId,   value,          NULL
-    public const ACTIVE_EVENT             = 12;             // world event is active:   eventId,        NULL,           NULL
-    public const INSTANCE_INFO            = 13;             // instance var == data:    entry           data,           type
-    public const QUEST_NONE               = 14;             // never seen quest:        questId,        NULL,           NULL
-    public const CHR_CLASS                = 15;             // belongs to classes:      classMask,      NULL,           NULL
-    public const CHR_RACE                 = 16;             // belongs to races:        raceMask,       NULL,           NULL
-    public const ACHIEVEMENT              = 17;             // obtained achievement:    achievementId,  NULL,           NULL
-    public const TITLE                    = 18;             // obtained title:          titleId,        NULL,           NULL
-    public const SPAWNMASK                = 19;             //                          spawnMask,      NULL,           NULL
-    public const GENDER                   = 20;             // has gender:              genderId,       NULL,           NULL
-    public const UNIT_STATE               = 21;             // unit has state:          unitState,      NULL,           NULL
-    public const MAPID                    = 22;             // is on map:               mapId,          NULL,           NULL
-    public const AREAID                   = 23;             // is in area:              areaId,         NULL,           NULL
-    public const CREATURE_TYPE            = 24;             // creature is of type:     creaturetypeId, NULL,           NULL
-    public const SPELL                    = 25;             // knows spell:             spellId,        NULL,           NULL
-    public const PHASEMASK                = 26;             // is in phase:             phaseMask,      NULL,           NULL
-    public const LEVEL                    = 27;             // player level is..:       level,          comparator,     NULL
-    public const QUEST_COMPLETE           = 28;             // has completed quest:     questId,        NULL,           NULL
-    public const NEAR_CREATURE            = 29;             // is near creature:        creatureId,     dist,           includeCorpse?
-    public const NEAR_GAMEOBJECT          = 30;             // is near gameObject:      gameObjectId,   dist,           NULL
-    public const OBJECT_ENTRY_GUID        = 31;             // target is ???:           objectType,     id,             guid
-    public const TYPE_MASK                = 32;             // target matches type:     typeMask,       NULL,           NULL
-    public const RELATION_TO              = 33;             //                          Cond.Target,    relation,       NULL
-    public const REACTION_TO              = 34;             //                          Cond.Target,    rankMask,       NULL
-    public const DISTANCE_TO              = 35;             // distance to target       Cond.Target,    dist,           comparator
-    public const ALIVE                    = 36;             // target is alive:         NULL,           NULL,           NULL
-    public const HP_VAL                   = 37;             // targets absolute health: amount,         comparator,     NULL
-    public const HP_PCT                   = 38;             // targets relative health: amount,         comparator,     NULL
-    public const REALM_ACHIEVEMENT        = 39;             // realmfirst was achieved: achievementId,  NULL,           NULL
-    public const IN_WATER                 = 40;             // unit is swimming:        NULL,           NULL,           NULL
-//  public const TERRAIN_SWAP             = 41;             // ❌ reserved for TC master
-    public const STAND_STATE              = 42;             //                          stateType,      state,          NULL
-    public const DAILY_QUEST_DONE         = 43;             // repeatable quest done:   questId,        NULL,           NULL
-    public const CHARMED                  = 44;             // unit is charmed:         NULL,           NULL,           NULL
-    public const PET_TYPE                 = 45;             // player has pet of type:  petType,        NULL,           NULL
-    public const TAXI                     = 46;             // player is on taxi:       NULL,           NULL,           NULL
-    public const QUESTSTATE               = 47;             //                          questId,        stateMask,      NULL
-    public const QUEST_OBJECTIVE_PROGRESS = 48;             //                          questId,        objectiveIdx,   count
-    public const DIFFICULTY_ID            = 49;             // map has difficulty id:   difficulty,     NULL,           NULL
-    public const GAMEMASTER               = 50;             // player is GM:            canBeGM?,       NULL,           NULL
-//  public const OBJECT_ENTRY_GUID_MASTER = 51;             // ❌ reserved for TC master
-//  public const TYPE_MASK_MASTER         = 52;             // ❌ reserved for TC master
-//  public const BATTLE_PET_COUNT         = 53;             // ❌ reserved for TC master
-//  public const SCENARIO_STEP            = 54;             // ❌ reserved for TC master
-//  public const SCENE_IN_PROGRESS        = 55;             // ❌ reserved for TC master
-//  public const PLAYER_CONDITION         = 56;             // ❌ reserved for TC master
-//  public const PRIVATE_OBJECT           = 57;             // ❌ reserved for TC master
-    public const STRING_ID                = 58;             // go or npc has StringId   NULL,           NULL,           NULL
-//  public const LABEL                    = 59;             // ❌ reserved for TC master
-    public const GROUP_STATUS             = 60;             // player in (raid) group   group status,   NULL,           NULL
+    public const int NONE                     = 0;          // always true:             NULL,           NULL,           NULL
+    public const int AURA                     = 1;          // aura is applied:         spellId,        effIdx,         NULL
+    public const int ITEM                     = 2;          // owns item:               itemId,         count,          includeBank?
+    public const int ITEM_EQUIPPED            = 3;          // has item equipped:       itemId,         NULL,           NULL
+    public const int ZONEID                   = 4;          // is in zone:              areaId,         NULL,           NULL
+    public const int REPUTATION_RANK          = 5;          // reputation status:       factionId,      rankMask,       NULL
+    public const int TEAM                     = 6;          // is on team:              teamId,         NULL,           NULL
+    public const int SKILL                    = 7;          // has skill:               skillId,        value,          NULL
+    public const int QUESTREWARDED            = 8;          // has finished quest:      questId,        NULL,           NULL
+    public const int QUESTTAKEN               = 9;          // has accepted quest:      questId,        NULL,           NULL
+    public const int DRUNKENSTATE             = 10;         // has drunken status:      stateId,        NULL,           NULL
+    public const int WORLD_STATE              = 11;         // world var == value:      worldStateId,   value,          NULL
+    public const int ACTIVE_EVENT             = 12;         // world event is active:   eventId,        NULL,           NULL
+    public const int INSTANCE_INFO            = 13;         // instance var == data:    entry           data,           type
+    public const int QUEST_NONE               = 14;         // never seen quest:        questId,        NULL,           NULL
+    public const int CHR_CLASS                = 15;         // belongs to classes:      classMask,      NULL,           NULL
+    public const int CHR_RACE                 = 16;         // belongs to races:        raceMask,       NULL,           NULL
+    public const int ACHIEVEMENT              = 17;         // obtained achievement:    achievementId,  NULL,           NULL
+    public const int TITLE                    = 18;         // obtained title:          titleId,        NULL,           NULL
+    public const int SPAWNMASK                = 19;         //                          spawnMask,      NULL,           NULL
+    public const int GENDER                   = 20;         // has gender:              genderId,       NULL,           NULL
+    public const int UNIT_STATE               = 21;         // unit has state:          unitState,      NULL,           NULL
+    public const int MAPID                    = 22;         // is on map:               mapId,          NULL,           NULL
+    public const int AREAID                   = 23;         // is in area:              areaId,         NULL,           NULL
+    public const int CREATURE_TYPE            = 24;         // creature is of type:     creaturetypeId, NULL,           NULL
+    public const int SPELL                    = 25;         // knows spell:             spellId,        NULL,           NULL
+    public const int PHASEMASK                = 26;         // is in phase:             phaseMask,      NULL,           NULL
+    public const int LEVEL                    = 27;         // player level is..:       level,          comparator,     NULL
+    public const int QUEST_COMPLETE           = 28;         // has completed quest:     questId,        NULL,           NULL
+    public const int NEAR_CREATURE            = 29;         // is near creature:        creatureId,     dist,           includeCorpse?
+    public const int NEAR_GAMEOBJECT          = 30;         // is near gameObject:      gameObjectId,   dist,           NULL
+    public const int OBJECT_ENTRY_GUID        = 31;         // target is ???:           objectType,     id,             guid
+    public const int TYPE_MASK                = 32;         // target matches type:     typeMask,       NULL,           NULL
+    public const int RELATION_TO              = 33;         //                          Cond.Target,    relation,       NULL
+    public const int REACTION_TO              = 34;         //                          Cond.Target,    rankMask,       NULL
+    public const int DISTANCE_TO              = 35;         // distance to target       Cond.Target,    dist,           comparator
+    public const int ALIVE                    = 36;         // target is alive:         NULL,           NULL,           NULL
+    public const int HP_VAL                   = 37;         // targets absolute health: amount,         comparator,     NULL
+    public const int HP_PCT                   = 38;         // targets relative health: amount,         comparator,     NULL
+    public const int REALM_ACHIEVEMENT        = 39;         // realmfirst was achieved: achievementId,  NULL,           NULL
+    public const int IN_WATER                 = 40;         // unit is swimming:        NULL,           NULL,           NULL
+//  public const int TERRAIN_SWAP             = 41;         // ❌ reserved for TC master
+    public const int STAND_STATE              = 42;         //                          stateType,      state,          NULL
+    public const int DAILY_QUEST_DONE         = 43;         // repeatable quest done:   questId,        NULL,           NULL
+    public const int CHARMED                  = 44;         // unit is charmed:         NULL,           NULL,           NULL
+    public const int PET_TYPE                 = 45;         // player has pet of type:  petType,        NULL,           NULL
+    public const int TAXI                     = 46;         // player is on taxi:       NULL,           NULL,           NULL
+    public const int QUESTSTATE               = 47;         //                          questId,        stateMask,      NULL
+    public const int QUEST_OBJECTIVE_PROGRESS = 48;         //                          questId,        objectiveIdx,   count
+    public const int DIFFICULTY_ID            = 49;         // map has difficulty id:   difficulty,     NULL,           NULL
+    public const int GAMEMASTER               = 50;         // player is GM:            canBeGM?,       NULL,           NULL
+//  public const int OBJECT_ENTRY_GUID_MASTER = 51;         // ❌ reserved for TC master
+//  public const int TYPE_MASK_MASTER         = 52;         // ❌ reserved for TC master
+//  public const int BATTLE_PET_COUNT         = 53;         // ❌ reserved for TC master
+//  public const int SCENARIO_STEP            = 54;         // ❌ reserved for TC master
+//  public const int SCENE_IN_PROGRESS        = 55;         // ❌ reserved for TC master
+//  public const int PLAYER_CONDITION         = 56;         // ❌ reserved for TC master
+//  public const int PRIVATE_OBJECT           = 57;         // ❌ reserved for TC master
+    public const int STRING_ID                = 58;         // go or npc has StringId   NULL,           NULL,           NULL
+//  public const int LABEL                    = 59;         // ❌ reserved for TC master
+    public const int GROUP_STATUS             = 60;         // player in (raid) group   group status,   NULL,           NULL
 
-    private const IDX_SRC_GROUP = 0;
-    private const IDX_SRC_ENTRY = 1;
-    private const IDX_SRC_ID    = 2;
-    private const IDX_SRC_FN    = 3;
+    private const int IDX_SRC_GROUP = 0;
+    private const int IDX_SRC_ENTRY = 1;
+    private const int IDX_SRC_ID    = 2;
+    private const int IDX_SRC_FN    = 3;
 
-    private static $source = array(           // [Group,        Entry,             Id,   typeResolverFN]
+    /**
+     * Source type definitions keyed by source identifier.
+     * Each entry contains the expected source group, entry and id types,
+     * followed by an optional resolver function name.
+     *
+     * @var array<int, array{?int|bool, ?int|bool, ?int|bool, ?string}> $source
+     */
+    private static array $source = array(
         self::SRC_NONE                        => [null,         null,              null, null],
         self::SRC_CREATURE_LOOT_TEMPLATE      => [Type::NPC,    Type::ITEM,        null, 'lootIdToNpc'],
         self::SRC_DISENCHANT_LOOT_TEMPLATE    => [Type::ITEM,   Type::ITEM,        null, 'disenchantIdToItem'],
@@ -157,12 +164,19 @@ class Conditions
         self::SRC_AREATRIGGER_CLIENT          => [null,         Type::AREATRIGGER, null, null]
     );
 
-    private const IDX_CND_VAL1 = 0;
-    private const IDX_CND_VAL2 = 1;
-    private const IDX_CND_VAL3 = 2;
-    private const IDX_CND_FN   = 3;
+    private const int IDX_CND_VAL1 = 0;
+    private const int IDX_CND_VAL2 = 1;
+    private const int IDX_CND_VAL3 = 2;
+    private const int IDX_CND_FN   = 3;
 
-    private static $conditions = array(// [Value1, Value2, Value3, handlerFn]
+    /**
+     * Condition type definitions keyed by condition identifier.
+     * Each entry contains the expected types for Value1, Value2 and Value3, (resolve to type, true: passthrough or null: ignore)
+     * followed by an optional handler function name.
+     *
+     * @var array<int, array{?int|bool, ?int|bool, ?int|bool, ?string}>
+     */
+    private static array $conditions = array(
         self::NONE                     => [null,              null, null, null],
         self::AURA                     => [Type::SPELL,       null, null, null],
         self::ITEM                     => [Type::ITEM,        true, true, null],
@@ -217,10 +231,10 @@ class Conditions
         self::GROUP_STATUS             => [true,              null, null, null]
     );
 
-    private $jsGlobals   = [];
-    private $rows        = [];
-    private $result      = [];
-    private $resultExtra = [];
+    private array $jsGlobals   = [];
+    private array $rows        = [];
+    private array $result      = [];
+    private array $resultExtra = [];
 
 
     /******/

@@ -87,7 +87,7 @@ class VideoAddResponse extends TextResponse
         $curl = curl_init('https://youtube.com/oembed?format=json&url=https://www.youtube.com/watch?v='.$videoId);
         if (!$curl)
         {
-            trigger_error('VideoAddResponse - curl_init fail', E_USER_ERROR);
+            trigger_error('VideoAddResponse - curl_init fail', E_USER_WARNING);
             $_SESSION['error']['vi'] = Lang::main('intError');
             return false;
         }

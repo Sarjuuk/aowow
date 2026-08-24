@@ -15,19 +15,19 @@ if (!CLI)
 
 CLISetup::registerUtility(new class extends UtilityScript
 {
-    public $argvFlags   = CLISetup::ARGV_ARRAY | CLISetup::ARGV_REQUIRED;
-    public $optGroup    = CLISetup::OPT_GRP_UTIL;
+    public int $argvFlags = CLISetup::ARGV_ARRAY | CLISetup::ARGV_REQUIRED;
+    public int $optGroup  = CLISetup::OPT_GRP_UTIL;
 
-    public const COMMAND      = 'dbc';
-    public const DESCRIPTION  = 'Extract dbc files from datasrc into sql table. Structural ini file must be defined in setup/tools/dbc/.';
-    public const APPENDIX     = '=<dbcfileList,> [tablename [wowbuild]]';
+    public const string COMMAND      = 'dbc';
+    public const string DESCRIPTION  = 'Extract dbc files from datasrc into sql table. Structural ini file must be defined in setup/tools/dbc/.';
+    public const string APPENDIX     = '=<dbcfileList,> [tablename [wowbuild]]';
 
-    public const REQUIRED_DB = [DB_AOWOW];
+    public const array  REQUIRED_DB  = [DB_AOWOW];
 
-    public const USE_CLI_ARGS = true;
+    public const bool   USE_CLI_ARGS = true;
 
     // args: tblName, wowbuild, null, null // iinn
-    public function run(&$args) : bool
+    public function run(array &$args) : bool
     {
         foreach (CLISetup::getOpt('dbc') as $n)
         {

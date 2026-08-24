@@ -89,12 +89,12 @@ trait TrGuideEditor
 
 class TemplateResponse extends BaseResponse
 {
-    final protected const /* int */ TAB_DATABASE  = 0;
-    final protected const /* int */ TAB_TOOLS     = 1;
-    final protected const /* int */ TAB_MORE      = 2;
-    final protected const /* int */ TAB_COMMUNITY = 3;
-    final protected const /* int */ TAB_STAFF     = 4;
-    final protected const /* int */ TAB_GUIDES    = 6;
+    final protected const int TAB_DATABASE  = 0;
+    final protected const int TAB_TOOLS     = 1;
+    final protected const int TAB_MORE      = 2;
+    final protected const int TAB_COMMUNITY = 3;
+    final protected const int TAB_STAFF     = 4;
+    final protected const int TAB_GUIDES    = 6;
 
     private array  $jsgBuffer     = [];                     // throw any db type references in here to be processed later
     private array  $header        = [];

@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "25b289a987a7600746f0fd1f2491864b",
+    "content-hash": "bc01e51b92b3c763d2d359212cface97",
     "packages": [
         {
             "name": "dibi/dibi",
-            "version": "v5.1.0",
+            "version": "v5.1.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/dg/dibi.git",
-                "reference": "32b6976209859f61eb79380c5a8904ea33db47df"
+                "url": "https://github.com/dibi/dibi.git",
+                "reference": "a94470268345395377be8a52b9260587d56d9d7a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dg/dibi/zipball/32b6976209859f61eb79380c5a8904ea33db47df",
-                "reference": "32b6976209859f61eb79380c5a8904ea33db47df",
+                "url": "https://api.github.com/repos/dibi/dibi/zipball/a94470268345395377be8a52b9260587d56d9d7a",
+                "reference": "a94470268345395377be8a52b9260587d56d9d7a",
                 "shasum": ""
             },
             "require": {
@@ -29,8 +29,10 @@
             "require-dev": {
                 "jetbrains/phpstorm-attributes": "^1.0",
                 "nette/di": "^3.1",
+                "nette/phpstan-rules": "^1.0",
                 "nette/tester": "^2.5",
-                "phpstan/phpstan-nette": "^2.0@stable",
+                "phpstan/extension-installer": "^1.4@stable",
+                "phpstan/phpstan": "^2.1@stable",
                 "tracy/tracy": "^2.9"
             },
             "type": "library",
@@ -60,7 +62,7 @@
                 }
             ],
             "description": "Dibi is Database Abstraction Library for PHP",
-            "homepage": "https://dibiphp.com",
+            "homepage": "https://dibi.nette.org",
             "keywords": [
                 "access",
                 "database",
@@ -76,78 +78,12 @@
             ],
             "support": {
                 "issues": "https://github.com/dg/dibi/issues",
-                "source": "https://github.com/dg/dibi/tree/v5.1.0"
+                "source": "https://github.com/dg/dibi/tree/v5.1.1"
             },
-            "time": "2025-08-06T22:26:19+00:00"
+            "time": "2026-02-22T20:46:57+00:00"
         }
     ],
     "packages-dev": [
-        {
-            "name": "chdemko/sorted-collections",
-            "version": "1.0.10",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/chdemko/php-sorted-collections.git",
-                "reference": "d9cf7021e6fda1eb68b9f35caf99215327f6db76"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/chdemko/php-sorted-collections/zipball/d9cf7021e6fda1eb68b9f35caf99215327f6db76",
-                "reference": "d9cf7021e6fda1eb68b9f35caf99215327f6db76",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=8.2"
-            },
-            "require-dev": {
-                "php-coveralls/php-coveralls": "^2.7",
-                "phpbench/phpbench": "^1.3",
-                "phpunit/phpunit": "^11.3",
-                "squizlabs/php_codesniffer": "^3.10"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-main": "1.0.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "chdemko\\SortedCollection\\": "src/SortedCollection"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Christophe Demko",
-                    "email": "chdemko@gmail.com",
-                    "homepage": "https://chdemko.pagelab.univ-lr.fr/",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Sorted Collections for PHP >= 8.1",
-            "homepage": "https://php-sorted-collections.readthedocs.io/en/latest/?badge=latest",
-            "keywords": [
-                "avl",
-                "collection",
-                "iterator",
-                "map",
-                "ordered",
-                "set",
-                "sorted",
-                "tree",
-                "treemap",
-                "treeset"
-            ],
-            "support": {
-                "issues": "https://github.com/chdemko/php-sorted-collections/issues",
-                "source": "https://github.com/chdemko/php-sorted-collections/tree/1.0.10"
-            },
-            "time": "2024-08-04T14:31:40+00:00"
-        },
         {
             "name": "jfcherng/php-color-output",
             "version": "3.0.0",
@@ -384,64 +320,15 @@
                 }
             ],
             "time": "2023-05-21T07:57:08+00:00"
-        },
-        {
-            "name": "triggerhappy/mpq",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/cipherxof/PHP-MPQ.git",
-                "reference": "628ca77b307d1cdf28b76da9750f3c8cbe958f49"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/cipherxof/PHP-MPQ/zipball/628ca77b307d1cdf28b76da9750f3c8cbe958f49",
-                "reference": "628ca77b307d1cdf28b76da9750f3c8cbe958f49",
-                "shasum": ""
-            },
-            "require": {
-                "chdemko/sorted-collections": "1.0.*@dev",
-                "php": ">=5.4"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "5.2.*"
-            },
-            "default-branch": true,
-            "type": "project",
-            "autoload": {
-                "psr-4": {
-                    "TriggerHappy\\MPQ\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-3.0-only"
-            ],
-            "description": "Handle the MPQ (MoPaQ) format natively from PHP with support for Warcraft III & Starcraft II.",
-            "keywords": [
-                "MPQ",
-                "archive",
-                "mopaq",
-                "php-mpq",
-                "phpmpq",
-                "triggerhappy"
-            ],
-            "support": {
-                "issues": "https://github.com/cipherxof/PHP-MPQ/issues",
-                "source": "https://github.com/cipherxof/PHP-MPQ/tree/master"
-            },
-            "time": "2018-07-31T04:22:01+00:00"
         }
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "triggerhappy/mpq": 20
-    },
+    "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "8.2 - 8.4",
+        "php": "8.4 - 8.6",
         "ext-mbstring": "*",
         "ext-simplexml": "*",
         "ext-gd": "*",

@@ -10,7 +10,7 @@ class QuestsBaseResponse extends TemplateResponse implements ICache
 {
     use TrListPage, TrCache;
 
-    private const SUB_SUB_CAT = array(
+    private const array SUB_SUB_CAT = array(
         // Quest Hubs
         3679 => 3519,   4024 => 3537,   25   => 46,     1769 => 361,
         // Startzones: Horde

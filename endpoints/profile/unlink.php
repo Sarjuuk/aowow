@@ -33,13 +33,13 @@ class ProfileUnlinkResponse extends TextResponse
     {
         if (!$this->assertGET('id'))
         {
-            trigger_error('ProfileUnlinkResponse - profileId empty', E_USER_ERROR);
+            trigger_error('ProfileUnlinkResponse - profileId empty', E_USER_WARNING);
             return;
         }
 
         if ($this->_get['user'] && User::$username != $this->_get['user'] && !User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
         {
-            trigger_error('ProfileUnlinkResponse - user #'.User::$id.' tried to unlink profiles from "'.$this->_get['user'], E_USER_ERROR);
+            trigger_error('ProfileUnlinkResponse - user #'.User::$id.' tried to unlink profiles from "'.$this->_get['user'], E_USER_WARNING);
             return;
         }
 
@@ -51,7 +51,7 @@ class ProfileUnlinkResponse extends TextResponse
 
         if (!$uid)
         {
-            trigger_error('ProfileUnlinkResponse - user "'.$this->_get['user'].'" does not exist', E_USER_ERROR);
+            trigger_error('ProfileUnlinkResponse - user "'.$this->_get['user'].'" does not exist', E_USER_WARNING);
             return;
         }
 

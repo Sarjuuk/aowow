@@ -11,8 +11,8 @@ if (!defined('AOWOW_REVISION'))
  */
 abstract class WorldPosition
 {
-    private const /* string */ ALPHAMAP_PATH = 'cache/alphaMaps/%d.png';
-    private const /* array  */ CAPITAL_CITIES = array(      // capitals take precedence over their surrounding area
+    private const string ALPHAMAP_PATH = 'cache/alphaMaps/%d.png';
+    private const array  CAPITAL_CITIES = array(            // capitals take precedence over their surrounding area
         1497, 1637, 1638, 3487,                             // Undercity,      Ogrimmar,  Thunder Bluff, Silvermoon City
         1519, 1537, 1657, 3557,                             // Stormwind City, Ironforge, Darnassus,     The Exodar
         3703, 4395                                          // Shattrath City, Dalaran

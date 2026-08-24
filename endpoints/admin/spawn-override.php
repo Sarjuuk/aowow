@@ -8,12 +8,12 @@ if (!defined('AOWOW_REVISION'))
 
 class AdminSpawnoverrideResponse extends TextResponse
 {
-    private const /* int */ ERR_NONE          = 0;
-    private const /* int */ ERR_NO_POINTS     = 1;
-    private const /* int */ ERR_WORLD_POS     = 2;
-    private const /* int */ ERR_WRONG_TYPE    = 3;
-    private const /* int */ ERR_WRITE_DB      = 4;
-    private const /* int */ ERR_MISCELLANEOUS = 999;
+    private const int ERR_NONE          = 0;
+    private const int ERR_NO_POINTS     = 1;
+    private const int ERR_WORLD_POS     = 2;
+    private const int ERR_WRONG_TYPE    = 3;
+    private const int ERR_WRITE_DB      = 4;
+    private const int ERR_MISCELLANEOUS = 999;
 
     protected int   $requiredUserGroup = U_GROUP_MODERATOR;
 
@@ -28,7 +28,7 @@ class AdminSpawnoverrideResponse extends TextResponse
     {
         if (!$this->assertGET('type', 'guid', 'area', 'floor'))
         {
-            trigger_error('AdminSpawnoverrideResponse - malformed request received', E_USER_ERROR);
+            trigger_error('AdminSpawnoverrideResponse - malformed request received', E_USER_WARNING);
             $this->result = self::ERR_MISCELLANEOUS;
             return;
         }
@@ -40,7 +40,7 @@ class AdminSpawnoverrideResponse extends TextResponse
 
         if (!in_array($type, [Type::NPC, Type::OBJECT, Type::SOUND, Type::AREATRIGGER, Type::ZONE]))
         {
-            trigger_error('AdminSpawnoverrideResponse - can\'t move pip of type '.Type::getFileString($type), E_USER_ERROR);
+            trigger_error("AdminSpawnoverrideResponse - can't move pip of type ".Type::getFileString($type), E_USER_WARNING);
             $this->result = self::ERR_WRONG_TYPE;
             return;
         }

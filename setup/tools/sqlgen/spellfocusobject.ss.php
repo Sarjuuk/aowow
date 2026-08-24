@@ -13,8 +13,8 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 {
     use TrDBCcopy;
 
-    protected $command           = 'spellfocusobject';
-    protected $dbcSourceFiles    = ['spellfocusobject'];
+    protected string $command        = 'spellfocusobject';
+    protected array  $dbcSourceFiles = ['spellfocusobject'];
 });
 
 ?>

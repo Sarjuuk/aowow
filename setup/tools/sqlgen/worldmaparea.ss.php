@@ -13,8 +13,8 @@ CLISetup::registerSetup('sql', new class extends SetupScript
 {
     use TrDBCcopy;
 
-    protected $command        = 'worldmaparea';
-    protected $dbcSourceFiles = ['worldmaparea'];
+    protected string $command        = 'worldmaparea';
+    protected array  $dbcSourceFiles = ['worldmaparea'];
 });
 
 ?>

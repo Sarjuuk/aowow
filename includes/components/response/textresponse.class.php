@@ -151,6 +151,7 @@ class TextResponse extends BaseResponse
             echo "/*\n";
             echo " * generated in ".DateTime::formatTimeElapsedFloat((microtime(true) - self::$time) * 1000)."\n";
             echo " * " . parent::$sql['count'] . " SQL queries in " . DateTime::formatTimeElapsedFloat(parent::$sql['time'] * 1000) . "\n";
+
             if ($this instanceof ICache && static::$cacheStats)
             {
                 [$mode, $set, $lifetime] = static::$cacheStats;

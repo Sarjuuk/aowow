@@ -10,7 +10,7 @@ class SpellsBaseResponse extends TemplateResponse implements ICache
 {
     use TrListPage, TrCache;
 
-    private const SHORT_FILTER = array(
+    private const array SHORT_FILTER = array(
         SKILL_FIRST_AID      => [ 6,  7],
         SKILL_BLACKSMITHING  => [ 2,  4],
         SKILL_LEATHERWORKING => [ 8,  1],

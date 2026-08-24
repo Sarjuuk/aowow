@@ -65,12 +65,12 @@ class ItemStatSetup extends ItemList
 
 CLISetup::registerSetup("sql", new class extends SetupScript
 {
-    protected $info = array(
+    protected array $info = array(
         'stats' => [[], CLISetup::ARGV_PARAM, 'Compiles stats data for type: Item & Enchantment from dbc and world db.']
     );
 
-    protected $dbcSourceFiles = ['spellitemenchantment'];
-    protected $setupAfter     = [['items', 'spell'], []];
+    protected array $dbcSourceFiles = ['spellitemenchantment'];
+    protected array $setupAfter     = [['items', 'spell'], []];
 
     private array $relSpells = [];
 

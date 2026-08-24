@@ -13,8 +13,8 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 {
     use TrDBCcopy;
 
-    protected $command           = 'scalingstatdistribution';
-    protected $dbcSourceFiles    = ['scalingstatdistribution'];
+    protected string $command        = 'scalingstatdistribution';
+    protected array  $dbcSourceFiles = ['scalingstatdistribution'];
 });
 
 ?>

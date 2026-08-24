@@ -14,7 +14,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 {
     use TrCustomData;                                       // import custom data from DB
 
-    private const /* array */ CUSTOM_ICONS = array(
+    private const array CUSTOM_ICONS = array(
          62 => 'calendar_fireworksstart',                   // has no texture in dbc but exists as blp
         283 => 'inv_jewelry_necklace_21',
         284 => 'inv_misc_rune_07',
@@ -24,12 +24,12 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         420 => 'achievement_bg_winwsg'
     );
 
-    protected $info = array(
+    protected array $info = array(
         'holidays' => [[], CLISetup::ARGV_PARAM, 'Compiles supplemental data for type: Event from dbc.']
     );
 
-    protected $setupAfter     = [['icons'], []];
-    protected $dbcSourceFiles = ['holidays', 'holidaydescriptions', 'holidaynames'];
+    protected array $setupAfter     = [['icons'], []];
+    protected array $dbcSourceFiles = ['holidays', 'holidaydescriptions', 'holidaynames'];
 
     public function generate() : bool
     {

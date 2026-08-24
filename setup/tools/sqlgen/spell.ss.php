@@ -13,13 +13,13 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 {
     use TrCustomData;
 
-    protected $info = array(
+    protected array $info = array(
         'spell' => [[], CLISetup::ARGV_PARAM, 'Compiles data for type: Spell from dbc and world db.']
     );
 
-    protected $dbcSourceFiles  = ['spell', 'spellradius', 'spellduration', 'spellrunecost', 'spellcasttimes', 'skillline', 'skilllineability', 'skillraceclassinfo', 'talent', 'talenttab', 'glyphproperties', 'spellicon', 'itemdisplayinfo'];
-    protected $worldDependency = ['item_template', 'creature_template', 'creature_template_addon', 'creature_template_spell', 'smart_scripts', 'trainer_spell', 'disables', 'spell_ranks', 'spell_dbc', 'skill_discovery_template'];
-    protected $setupAfter      = [['icons', 'spellrange'], []]; // spellrange required to use SpellList
+    protected array $dbcSourceFiles  = ['spell', 'spellradius', 'spellduration', 'spellrunecost', 'spellcasttimes', 'skillline', 'skilllineability', 'skillraceclassinfo', 'talent', 'talenttab', 'glyphproperties', 'spellicon', 'itemdisplayinfo'];
+    protected array $worldDependency = ['item_template', 'creature_template', 'creature_template_addon', 'creature_template_spell', 'smart_scripts', 'trainer_spell', 'disables', 'spell_ranks', 'spell_dbc', 'skill_discovery_template'];
+    protected array $setupAfter      = [['icons', 'spellrange'], []]; // spellrange required to use SpellList
 
     public function generate() : bool
     {

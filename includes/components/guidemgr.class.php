@@ -8,18 +8,18 @@ if (!defined('AOWOW_REVISION'))
 
 class GuideMgr
 {
-    public const /* int */ STATUS_NONE     = 0;
-    public const /* int */ STATUS_DRAFT    = 1;
-    public const /* int */ STATUS_REVIEW   = 2;
-    public const /* int */ STATUS_APPROVED = 3;
-    public const /* int */ STATUS_REJECTED = 4;
-    public const /* int */ STATUS_ARCHIVED = 5;
+    private const string IMG_DEST_DIR = 'static/uploads/guide/images/';
+    private const string IMG_TMP_DIR  = 'static/uploads/temp/';
 
-    private const /* string */ IMG_DEST_DIR = 'static/uploads/guide/images/';
-    private const /* string */ IMG_TMP_DIR  = 'static/uploads/temp/';
+    public const int    STATUS_NONE      = 0;
+    public const int    STATUS_DRAFT     = 1;
+    public const int    STATUS_REVIEW    = 2;
+    public const int    STATUS_APPROVED  = 3;
+    public const int    STATUS_REJECTED  = 4;
+    public const int    STATUS_ARCHIVED  = 5;
 
-    public const VALID_URL     = '/^[a-z0-9_\-]{2,64}$/i';
-    public const STATUS_COLORS = array(
+    public const string VALID_URL        = '/^[a-z0-9_\-]{2,64}$/i';
+    public const array  STATUS_COLORS    = array(
         self::STATUS_DRAFT    => '#71D5FF',
         self::STATUS_REVIEW   => '#FFFF00',
         self::STATUS_APPROVED => '#1EFF00',
@@ -89,7 +89,7 @@ class GuideMgr
         // move to final location
         if (!rename(self::IMG_TMP_DIR.$result['newFilename'], self::IMG_DEST_DIR.$targetFile))
         {
-            trigger_error('GuideMgr::handleUpload - failed to move file', E_USER_ERROR);
+            trigger_error('GuideMgr::handleUpload - failed to move file', E_USER_WARNING);
             return ['error' => Lang::main('intError')];
         }
 

@@ -211,46 +211,46 @@ trait SmartHelper
 
 class SmartAI
 {
-    public const SRC_TYPE_CREATURE    = 0;
-    public const SRC_TYPE_OBJECT      = 1;
-    public const SRC_TYPE_AREATRIGGER = 2;
-    public const SRC_TYPE_ACTIONLIST  = 9;
+    public const int SRC_TYPE_CREATURE    = 0;
+    public const int SRC_TYPE_OBJECT      = 1;
+    public const int SRC_TYPE_AREATRIGGER = 2;
+    public const int SRC_TYPE_ACTIONLIST  = 9;
 
-    public const CAST_FLAG_INTERRUPT_PREV = 0x01;           // Interrupt any spell casting
-    public const CAST_FLAG_TRIGGERED      = 0x02;           // Triggered (this makes spell cost zero mana and have no cast time)
-//  public const CAST_FORCE_CAST          = 0x04;           // Forces cast even if creature is out of mana or out of range
-//  public const CAST_NO_MELEE_IF_OOM     = 0x08;           // Prevents creature from entering melee if out of mana or out of range
-//  public const CAST_FORCE_TARGET_SELF   = 0x10;           // the target to cast this spell on itself
-    public const CAST_FLAG_AURA_MISSING   = 0x20;           // Only casts the spell if the target does not have an aura from the spell
-    public const CAST_FLAG_COMBAT_MOVE    = 0x40;           // Prevents combat movement if cast successful. Allows movement on range, OOM, LOS
-    public const CAST_FLAG_VALIDATE       = self::CAST_FLAG_INTERRUPT_PREV | self::CAST_FLAG_TRIGGERED | self::CAST_FLAG_AURA_MISSING | self::CAST_FLAG_COMBAT_MOVE;
+    public const int CAST_FLAG_INTERRUPT_PREV = 0x01;       // Interrupt any spell casting
+    public const int CAST_FLAG_TRIGGERED      = 0x02;       // Triggered (this makes spell cost zero mana and have no cast time)
+ // public const int CAST_FORCE_CAST          = 0x04;       // Forces cast even if creature is out of mana or out of range
+ // public const int CAST_NO_MELEE_IF_OOM     = 0x08;       // Prevents creature from entering melee if out of mana or out of range
+ // public const int CAST_FORCE_TARGET_SELF   = 0x10;       // the target to cast this spell on itself
+    public const int CAST_FLAG_AURA_MISSING   = 0x20;       // Only casts the spell if the target does not have an aura from the spell
+    public const int CAST_FLAG_COMBAT_MOVE    = 0x40;       // Prevents combat movement if cast successful. Allows movement on range, OOM, LOS
+    public const int CAST_FLAG_VALIDATE       = self::CAST_FLAG_INTERRUPT_PREV | self::CAST_FLAG_TRIGGERED | self::CAST_FLAG_AURA_MISSING | self::CAST_FLAG_COMBAT_MOVE;
 
-    public const REACT_PASSIVE    = 0;
-    public const REACT_DEFENSIVE  = 1;
-    public const REACT_AGGRESSIVE = 2;
-    public const REACT_ASSIST     = 3;
+    public const int REACT_PASSIVE    = 0;
+    public const int REACT_DEFENSIVE  = 1;
+    public const int REACT_AGGRESSIVE = 2;
+    public const int REACT_ASSIST     = 3;
 
-    public const SUMMON_TIMED_OR_DEAD_DESPAWN   = 1;
-    public const SUMMON_TIMED_OR_CORPSE_DESPAWN = 2;
-    public const SUMMON_TIMED_DESPAWN           = 3;
-    public const SUMMON_TIMED_DESPAWN_OOC       = 4;
-    public const SUMMON_CORPSE_DESPAWN          = 5;
-    public const SUMMON_CORPSE_TIMED_DESPAWN    = 6;
-    public const SUMMON_DEAD_DESPAWN            = 7;
-    public const SUMMON_MANUAL_DESPAWN          = 8;
+    public const int SUMMON_TIMED_OR_DEAD_DESPAWN   = 1;
+    public const int SUMMON_TIMED_OR_CORPSE_DESPAWN = 2;
+    public const int SUMMON_TIMED_DESPAWN           = 3;
+    public const int SUMMON_TIMED_DESPAWN_OOC       = 4;
+    public const int SUMMON_CORPSE_DESPAWN          = 5;
+    public const int SUMMON_CORPSE_TIMED_DESPAWN    = 6;
+    public const int SUMMON_DEAD_DESPAWN            = 7;
+    public const int SUMMON_MANUAL_DESPAWN          = 8;
 
-    public const TEMPLATE_BASIC          = 0;               //
-    public const TEMPLATE_CASTER         = 1;               //  +JOIN: target_param1 as castFlag
-    public const TEMPLATE_TURRET         = 2;               //  +JOIN: target_param1 as castflag
-    public const TEMPLATE_PASSIVE        = 3;               //
-    public const TEMPLATE_CAGED_GO_PART  = 4;               //
-    public const TEMPLATE_CAGED_NPC_PART = 5;               //
+    public const int TEMPLATE_BASIC          = 0;           //
+    public const int TEMPLATE_CASTER         = 1;           //  +JOIN: target_param1 as castFlag
+    public const int TEMPLATE_TURRET         = 2;           //  +JOIN: target_param1 as castflag
+    public const int TEMPLATE_PASSIVE        = 3;           //
+    public const int TEMPLATE_CAGED_GO_PART  = 4;           //
+    public const int TEMPLATE_CAGED_NPC_PART = 5;           //
 
-    public const SPAWN_FLAG_NONE           = 0x00;
-    public const SPAWN_FLAG_IGNORE_RESPAWN = 0x01;          // onSpawnIn - ignore & reset respawn timer
-    public const SPAWN_FLAG_FORCE_SPAWN    = 0x02;          // onSpawnIn - force additional spawn if already in world
-    public const SPAWN_FLAG_NOSAVE_RESPAWN = 0x04;          // onDespawn - remove respawn time
-    public const SPAWN_FLAG_VALIDATE       = self::SPAWN_FLAG_IGNORE_RESPAWN | self::SPAWN_FLAG_FORCE_SPAWN | self::SPAWN_FLAG_NOSAVE_RESPAWN;
+    public const int SPAWN_FLAG_NONE           = 0x00;
+    public const int SPAWN_FLAG_IGNORE_RESPAWN = 0x01;      // onSpawnIn - ignore & reset respawn timer
+    public const int SPAWN_FLAG_FORCE_SPAWN    = 0x02;      // onSpawnIn - force additional spawn if already in world
+    public const int SPAWN_FLAG_NOSAVE_RESPAWN = 0x04;      // onDespawn - remove respawn time
+    public const int SPAWN_FLAG_VALIDATE       = self::SPAWN_FLAG_IGNORE_RESPAWN | self::SPAWN_FLAG_FORCE_SPAWN | self::SPAWN_FLAG_NOSAVE_RESPAWN;
 
     private array $jsGlobals  = [];
     private array $rawData    = [];

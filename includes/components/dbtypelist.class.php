@@ -183,7 +183,7 @@ abstract class DBTypeList
                 {
                     // just .. roll with the unparsed, deprecated ARRAY_KEY, hmk?
                     if (isset($this->templates[$row['ARRAY_KEY']]))
-                        trigger_error('GUID for List already in use #'.$row['ARRAY_KEY'].'. Additional occurrence omitted!', E_USER_ERROR);
+                        trigger_error('GUID for List already in use #'.$row['ARRAY_KEY'].'. Additional occurrence omitted!', E_USER_WARNING);
                     else
                         $this->templates[$row['ARRAY_KEY']] = (array)$row;
                 }
@@ -306,7 +306,7 @@ abstract class DBTypeList
     /**
      * iterate over fetched templates
      *
-     * @return array the current template
+     * @return \Generator the current template
      */
     public function &iterate() : \Generator
     {
@@ -592,7 +592,7 @@ trait listviewHelper
 */
 trait spawnHelper
 {
-    private $spawnResult = array(
+    private array $spawnResult = array(
         SPAWNINFO_FULL  => null,
         SPAWNINFO_SHORT => null,
         SPAWNINFO_ZONES => null,
@@ -859,9 +859,9 @@ trait spawnHelper
 
 trait profilerHelper
 {
-    public static $brickFile = 'profile';                   // profile is multipurpose
+    public static string $brickFile = 'profile';            // profile is multipurpose
 
-    private static $subjectGUID = 0;
+    private static int $subjectGUID = 0;
 
     public function selectRealms(?array $fi) : bool
     {

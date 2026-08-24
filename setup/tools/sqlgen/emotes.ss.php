@@ -11,14 +11,14 @@ if (!CLI)
 
 CLISetup::registerSetup("sql", new class extends SetupScript
 {
-    protected $info = array(
+    protected array $info = array(
         'emotes' => [[], CLISetup::ARGV_PARAM, 'Compiles data for type: Emote from dbc and GlobalStrings.lua.']
     );
 
-    protected $useGlobalStrings = true;
-    protected $dbcSourceFiles   = ['emotes', 'emotestext', 'emotestextdata'];
+    protected bool  $useGlobalStrings = true;
+    protected array $dbcSourceFiles   = ['emotes', 'emotestext', 'emotestextdata'];
 
-    private $textData = [];
+    private array $textData = [];
 
     public function generate() : bool
     {

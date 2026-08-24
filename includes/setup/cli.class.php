@@ -8,26 +8,26 @@ if (!defined('AOWOW_REVISION'))
 
 abstract class CLI
 {
-    private const CHR_BELL      = 7;
-    private const CHR_BACK      = 8;
-    private const CHR_TAB       = 9;
-    private const CHR_LF        = 10;
-    private const CHR_CR        = 13;
-    private const CHR_ESC       = 27;
-    private const CHR_BACKSPACE = 127;
+    private const int CHR_BELL      = 7;
+    private const int CHR_BACK      = 8;
+    private const int CHR_TAB       = 9;
+    private const int CHR_LF        = 10;
+    private const int CHR_CR        = 13;
+    private const int CHR_ESC       = 27;
+    private const int CHR_BACKSPACE = 127;
 
-    public const LOG_NONE       = -1;
-    public const LOG_BLANK      = 0;
-    public const LOG_ERROR      = LOG_LEVEL_ERROR;
-    public const LOG_WARN       = LOG_LEVEL_WARN;
-    public const LOG_INFO       = LOG_LEVEL_INFO;
-    public const LOG_OK         = 4;
+    public const int LOG_NONE  = -1;
+    public const int LOG_BLANK =  0;
+    public const int LOG_ERROR =  LOG_LEVEL_ERROR;
+    public const int LOG_WARN  =  LOG_LEVEL_WARN;
+    public const int LOG_INFO  =  LOG_LEVEL_INFO;
+    public const int LOG_OK    =  4;
 
     /** @var resource|null */
-    private static       $logHandle   = null;
-    private static ?bool $hasReadline = null;
+    private static       $logHandle     = null;
+    private static ?bool $hasReadline   = null;
 
-    private static $overwriteLast = false;
+    private static  bool $overwriteLast = false;
 
     /********************/
     /* formatted output */

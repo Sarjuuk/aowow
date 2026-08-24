@@ -1735,10 +1735,10 @@ class ItemList extends DBTypeList
 
 class ItemListFilter extends Filter
 {
-    public const /* int */ GROUP_BY_NONE   = 0;
-    public const /* int */ GROUP_BY_SLOT   = 1;
-    public const /* int */ GROUP_BY_LEVEL  = 2;
-    public const /* int */ GROUP_BY_SOURCE = 3;
+    public const int GROUP_BY_NONE   = 0;
+    public const int GROUP_BY_SLOT   = 1;
+    public const int GROUP_BY_LEVEL  = 2;
+    public const int GROUP_BY_SOURCE = 3;
 
     private array  $ubFilter     = [];                      // usable-by - limit weapon/armor selection per CharClass - itemClass => available itemsubclasses
     private string $extCostQuery = 'SELECT `item` FROM npc_vendor            WHERE `extendedCost` IN %in UNION

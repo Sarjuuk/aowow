@@ -30,9 +30,9 @@ enum ChrRace : int
     case NORTHREND_SKELETON = 20;
     case ICE_TROLL          = 21;
 
-    public const MASK_ALLIANCE = 0x44D;                     // HUMAN, DWARF, NIGHTELF, GNOME, DRAENEI
-    public const MASK_HORDE    = 0x2B2;                     // ORC, UNDEAD, TAUREN, TROLL, BLOODELF
-    public const MASK_ALL      = self::MASK_ALLIANCE | self::MASK_HORDE;
+    public const int MASK_ALLIANCE = 0x44D;                 // HUMAN, DWARF, NIGHTELF, GNOME, DRAENEI
+    public const int MASK_HORDE    = 0x2B2;                 // ORC, UNDEAD, TAUREN, TROLL, BLOODELF
+    public const int MASK_ALL      = self::MASK_ALLIANCE | self::MASK_HORDE;
 
     public function matches(int $raceMask) : bool
     {

@@ -19,7 +19,7 @@ class AdminVideosActionOrderResponse extends TextResponse
     {
         if (!$this->assertGET('id', 'move') || $this->_get['move'] === 0)
         {
-            trigger_error('AdminVideosActionOrderResponse - id or move empty', E_USER_ERROR);
+            trigger_error('AdminVideosActionOrderResponse - id or move empty', E_USER_WARNING);
             return;
         }
 

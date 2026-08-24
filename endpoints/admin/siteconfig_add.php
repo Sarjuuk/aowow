@@ -19,7 +19,7 @@ class AdminSiteconfigActionAddResponse extends TextResponse
     {
         if (!$this->assertGET('key', 'val'))
         {
-            trigger_error('AdminSiteconfigActionAddResponse - malformed request received', E_USER_ERROR);
+            trigger_error('AdminSiteconfigActionAddResponse - malformed request received', E_USER_WARNING);
             $this->result = Lang::main('intError');
             return;
         }

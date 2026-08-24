@@ -19,7 +19,7 @@ class AdminScreenshotsActionDeleteResponse extends TextResponse
     {
         if (!$this->assertGET('id'))
         {
-            trigger_error('AdminScreenshotsActionDeleteResponse - screenshotId empty', E_USER_ERROR);
+            trigger_error('AdminScreenshotsActionDeleteResponse - screenshotId empty', E_USER_WARNING);
             return;
         }
 

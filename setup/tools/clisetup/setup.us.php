@@ -15,18 +15,20 @@ if (!CLI)
 
 CLISetup::registerUtility(new class extends UtilityScript
 {
-    public $argvOpts = ['s'];
-    public $optGroup = CLISetup::OPT_GRP_SETUP;
+    public array $argvOpts = ['s'];
+    public int   $optGroup = CLISetup::OPT_GRP_SETUP;
 
-    public const COMMAND       = 'setup';
-    public const DESCRIPTION   = 'Step by step initial setup. Resumes if interrupted.';
-    public const NOTE_END_OK   = 'setup finished successfully';
-    public const NOTE_END_FAIL = 'setup finished with errors';
+    public const string COMMAND       = 'setup';
+    public const string DESCRIPTION   = 'Step by step initial setup. Resumes if interrupted.';
+    public const string NOTE_END_OK   = 'setup finished successfully';
+    public const string NOTE_END_FAIL = 'setup finished with errors';
 
-    public const SITE_LOCK     = CLISetup::LOCK_ON;
+    public const int    SITE_LOCK     = CLISetup::LOCK_ON;
 
-    private $dynArgs = ['doSql' => [], 'doBuild' => []]; // ref to pass commands from 'update' to 'sync'
-    private $steps   = array(
+    private const string STEP_FILE = 'cache/setup/firstrun';
+
+    private array $dynArgs = ['doSql' => [], 'doBuild' => []]; // ref to pass commands from 'update' to 'sync'
+    private array $steps   = array(
      // [staticUS, $name, [...args]]
         ['database',  '', []],
         ['configure', '', []],
@@ -35,8 +37,6 @@ CLISetup::registerUtility(new class extends UtilityScript
         ['sync',      '', []],
         ['account',   '', []]
     );
-
-    private const STEP_FILE = 'cache/setup/firstrun';
 
     private function getSavedStartStep() : int
     {
@@ -75,7 +75,7 @@ CLISetup::registerUtility(new class extends UtilityScript
     }
 
     // args: null, null, null, null // nnnn
-    public function run(&$args) : bool
+    public function run(array &$args) : bool
     {
         /******************/
         /* get start step */

@@ -12,13 +12,13 @@ if (!CLI)
 // Create 'statistics'-file in datasets
 CLISetup::registerSetup("build", new class extends SetupScript
 {
-    protected $info = array(
+    protected array $info = array(
         'statistics' => [[], CLISetup::ARGV_PARAM, 'Compiles player stats into file for the character profiler tool.']
     );
 
-    protected $worldDependency = ['player_levelstats', 'player_classlevelstats'];
-    protected $dbcSourceFiles  = ['gtchancetomeleecrit', 'gtchancetomeleecritbase', 'gtchancetospellcrit', 'gtchancetospellcritbase', 'gtoctregenhp', 'gtregenmpperspt', 'gtregenhpperspt'];
-    protected $requiredDirs    = ['datasets/'];
+    protected array $worldDependency = ['player_levelstats', 'player_classlevelstats'];
+    protected array $dbcSourceFiles  = ['gtchancetomeleecrit', 'gtchancetomeleecritbase', 'gtchancetospellcrit', 'gtchancetospellcritbase', 'gtoctregenhp', 'gtregenmpperspt', 'gtregenhpperspt'];
+    protected array $requiredDirs    = ['datasets/'];
 
     public function generate() : bool
     {

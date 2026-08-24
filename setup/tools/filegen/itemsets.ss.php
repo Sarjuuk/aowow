@@ -33,13 +33,13 @@ if (!CLI)
 // Create 'itemsets'-file for available locales
 CLISetup::registerSetup("build", new class extends SetupScript
 {
-    protected $info = array(
+    protected array $info = array(
         'itemsets' => [[], CLISetup::ARGV_PARAM, 'Compiles available item sets used throughout the page to file.']
     );
 
-    protected $setupAfter   = [['itemset', 'spell'], []];
-    protected $requiredDirs = ['datasets/'];
-    protected $localized    = true;
+    protected array $setupAfter   = [['itemset', 'spell'], []];
+    protected array $requiredDirs = ['datasets/'];
+    protected bool  $localized    = true;
 
     public function generate() : bool
     {

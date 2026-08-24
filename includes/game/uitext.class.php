@@ -11,14 +11,14 @@ if (!defined('AOWOW_REVISION'))
  */
 final class UIText
 {
-    private const /* array */ LINE_BREAK = array(
+    private const array LINE_BREAK = array(
         -1               => ' ',
         Lang::FMT_RAW    => "\n",
         Lang::FMT_HTML   => '<br />',
         Lang::FMT_MARKUP => '[br]'
     );
 
-    private const /* array */ VALID_TAGS = array(
+    private const array VALID_TAGS = array(
         'h1', 'h2', 'h3', 'p', 'a', 'img', 'span', 'br'     // also html + body but they are handled separately
     );
 

@@ -13,8 +13,8 @@ CLISetup::registerSetup('sql', new class extends SetupScript
 {
     use TrDBCcopy;
 
-    protected $command        = 'soundemitters';
-    protected $dbcSourceFiles = ['soundemitters'];
+    protected string $command        = 'soundemitters';
+    protected array  $dbcSourceFiles = ['soundemitters'];
 });
 
 ?>

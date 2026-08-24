@@ -36,7 +36,7 @@ class ProfileLoadResponse extends TextResponse
 
         if (!$this->assertGET('id'))
         {
-            trigger_error('ProfileLoadResponse - profileId empty', E_USER_ERROR);
+            trigger_error('ProfileLoadResponse - profileId empty', E_USER_WARNING);
             return;
         }
 

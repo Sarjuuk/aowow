@@ -21,7 +21,7 @@ enum Locale : int
     case PT = 10;                                           // ptPT, ptBR   x       ?
     case IT = 11;                                           // itIT         x   x   x
 
-    private const MASK_ALL = 0b000101011101;                // technically supported locales
+    private const int MASK_ALL = 0b000101011101;            // technically supported locales
 
     public function domain() : string                       // our subdomain / locale in web context
     {
@@ -175,7 +175,7 @@ enum Locale : int
                 return $l;
 
         // wow, you really fucked up your config mate!
-        trigger_error('Locale::getFallback - there are no valid locales', E_USER_ERROR);
+        trigger_error('Locale::getFallback - there are no valid locales', E_USER_WARNING);
         return self::EN;
     }
 }

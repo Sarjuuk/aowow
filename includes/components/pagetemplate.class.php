@@ -11,7 +11,7 @@ if (!defined('AOWOW_REVISION'))
 class PageTemplate
 {
 
-    private const GUIDE_RATING_TPL = "$(document).ready(function() { $('#guiderating').append(GetStars(%.10F, %s, %u, %u)); });\n";
+    private const string GUIDE_RATING_TPL = "$(document).ready(function() { $('#guiderating').append(GetStars(%.10F, %s, %u, %u)); });\n";
 
     private readonly \Aowow\Locale $locale;
 
@@ -107,7 +107,7 @@ class PageTemplate
     {
         if (!self::test('template/pages/', $this->template))
         {
-            trigger_error('Error: nonexistent template requested: template/pages/'.$this->template.'.tpl.php', E_USER_ERROR);
+            trigger_error('Error: nonexistent template requested: template/pages/'.$this->template.'.tpl.php', E_USER_WARNING);
             return false;
         }
 
@@ -152,7 +152,7 @@ class PageTemplate
 
         if (!self::test('bricks/', $file))
         {
-            trigger_error('Nonexistent template requested: template/bricks/'.$file, E_USER_ERROR);
+            trigger_error('Nonexistent template requested: template/bricks/'.$file, E_USER_WARNING);
             return;
         }
 
@@ -188,7 +188,7 @@ class PageTemplate
             return;
         }
 
-        trigger_error('Nonexistent template requested: template/localized/'.$_file, E_USER_ERROR);
+        trigger_error('Nonexistent template requested: template/localized/'.$_file, E_USER_WARNING);
     }
 
     private function localizedBrickIf(mixed $boolish, string $file, array $localVars = []) : void

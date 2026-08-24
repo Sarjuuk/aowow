@@ -46,7 +46,7 @@ class SearchOpenResponse extends TextResponse implements ICache
 {
     use TrCache, TrSearch;
 
-    private const /* int */ SEARCH_MODS_OPEN =
+    private const int SEARCH_MODS_OPEN =
         1 << Search::MOD_CLASS    | 1 << Search::MOD_RACE     | 1 << Search::MOD_TITLE   | 1 << Search::MOD_WORLDEVENT  |
         1 << Search::MOD_CURRENCY | 1 << Search::MOD_ITEMSET  | 1 << Search::MOD_ITEM    | 1 << Search::MOD_ABILITY     |
         1 << Search::MOD_TALENT   | 1 << Search::MOD_CREATURE | 1 << Search::MOD_QUEST   | 1 << Search::MOD_ACHIEVEMENT |

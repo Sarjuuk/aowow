@@ -13,65 +13,65 @@ CLISetup::registerSetup("build", new class extends SetupScript
 {
     use TrComplexImage;
 
-    protected $info = array(
+    protected array $info = array(
         'img-maps'   => [[   ], CLISetup::ARGV_PARAM,    'Generate zone and continental maps and the corresponding \'zones\' datasets.'                 ],
 /* 1 */ 'spawnmaps'  => [['1'], CLISetup::ARGV_OPTIONAL, 'Fallback to generate alpha masks for each zone to match creature and gameobject spawn points.'],
 /* 2 */ 'subzones'   => [['2'], CLISetup::ARGV_OPTIONAL, 'Generate additional area maps with highlighting for subzones (optional; skipped by default)'  ],
 /* 4 */ 'skip-zones' => [['3'], CLISetup::ARGV_OPTIONAL, 'Prevent default output of zone maps.'                                                         ]
     );
 
-    protected $useGlobalStrings = true;
-    protected $dbcSourceFiles   = ['worldmapoverlay', 'worldmaparea', 'dungeonmap'];
-    protected $requiredDirs     = ['datasets/'];
+    protected bool  $useGlobalStrings = true;
+    protected array $dbcSourceFiles   = ['worldmapoverlay', 'worldmaparea', 'dungeonmap'];
+    protected array $requiredDirs     = ['datasets/'];
 
-    private const M_MAPS     = (1 << 0);
-    private const M_SPAWNS   = (1 << 1);
-    private const M_SUBZONES = (1 << 2);
+    private const int M_MAPS     = (1 << 0);
+    private const int M_SPAWNS   = (1 << 1);
+    private const int M_SUBZONES = (1 << 2);
 
     private int $modeMask = self::M_SPAWNS | self::M_MAPS;
 
-    private const SPAWNMAP_WH   = 1000;                     // it is square
-    private const MAP_W         = 1002;
-    private const MAP_H         = 668;
-    private const A_THRESHOLD   = 95;                       // alpha threshold to define subZones: set it too low and you have unspawnable areas inside a zone; set it too high and the border regions overlap
-    private const COLOR_WHITE   = [255, 255, 255];          // rgb
-    private const COLOR_BLACK   = [  0,   0,   0];          // rgb
-    private const COLOR_SUBZONE = [  0, 230, 255, 74];      // rgba - note: rgb is 0-255, a is 0-127
+    private const int   SPAWNMAP_WH   = 1000;                // it is square
+    private const int   MAP_W         = 1002;
+    private const int   MAP_H         = 668;
+    private const int   A_THRESHOLD   = 95;                  // alpha threshold to define subZones: set it too low and you have unspawnable areas inside a zone; set it too high and the border regions overlap
+    private const array COLOR_WHITE   = [255, 255, 255];     // rgb
+    private const array COLOR_BLACK   = [  0,   0,   0];     // rgb
+    private const array COLOR_SUBZONE = [  0, 230, 255, 74]; // rgba - note: rgb is 0-255, a is 0-127
 
-    private const AREA_FLAG_DEFAULT_FLOOR_TERRAIN = 0x004;  // Default Dungeon Floor is Terrain
-    private const AREA_FLAG_NO_DEFAULT_FLOOR      = 0x100;  // Don't use Default Dungeon Floor (typically 1)
+    private const int   AREA_FLAG_DEFAULT_FLOOR_TERRAIN = 0x004; // Default Dungeon Floor is Terrain
+    private const int   AREA_FLAG_NO_DEFAULT_FLOOR      = 0x100; // Don't use Default Dungeon Floor (typically 1)
 
-    private const CONTINENTS = [0, 1, 530, 571];            // Map.dbc/id
+    private const array CONTINENTS = [0, 1, 530, 571];      // Map.dbc/id
 
-    private const DEST_DIRS = array(
+    private const array DEST_DIRS = array(
      // ['static/images/wow/maps/%snormal/',   488, 325],   // deprecated sizes
         ['static/images/wow/maps/%soriginal/',   0,   0],   // 1002, 668
      // ['static/images/wow/maps/%ssmall/',    224, 149],
      // ['static/images/wow/maps/%szoom/',     772, 515]
     );
 
-    private const TILEORDER = array(
+    private const array TILEORDER = array(
         [1,  2,  3,  4],
         [5,  6,  7,  8],
         [9, 10, 11, 12]
     );
 
-    private const MAP_FILE_PATTERN = '/((\w{4})\/interface\/worldmap(?:\/microdungeon\/([^\/]+))?\/([^\/]+)\/)(\4)(?:(\d{1,2})_)?(\d{1,2})\.(?:blp|png)/i';
+    private const string MAP_FILE_PATTERN = '/((\w{4})\/interface\/worldmap(?:\/microdungeon\/([^\/]+))?\/([^\/]+)\/)(\4)(?:(\d{1,2})_)?(\d{1,2})\.(?:blp|png)/i';
 
     // src, resourcePath, localized, [tileOrder], [[dest, destW, destH]]
-    private const /* array */ STEPS = array(
+    private const array STEPS = array(
         self::M_MAPS     => ['WorldMap/', null, true,  self::TILEORDER, self::DEST_DIRS             ],
         self::M_SPAWNS   => ['WorldMap/', null, true,  self::TILEORDER, [['cache/alphaMaps/', 0, 0]]],
         self::M_SUBZONES => ['WorldMap/', null, true,  self::TILEORDER, self::DEST_DIRS             ]
     );
 
-    private $progress        = 0;
-    private $wmOverlays      = [];
-    private $dmFloorData     = [];
-    private $wmAreas         = [];
-    private $multiLevelZones = [];
-    private $mapFiles        = [];                          // [nameINT][floorIdx][loc][tileIdx] => filePath
-    private $microDungeons   = [];
+    private int   $progress        = 0;
+    private array $wmOverlays      = [];
+    private array $dmFloorData     = [];
+    private array $wmAreas         = [];
+    private array $multiLevelZones = [];
+    private array $mapFiles        = [];                    // [nameINT][floorIdx][loc][tileIdx] => filePath
+    private array $microDungeons   = [];
 
     public function __construct()
     {

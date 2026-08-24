@@ -8,17 +8,17 @@ if (!defined('AOWOW_REVISION'))
 
 class Markup implements \JsonSerializable
 {
-    private const DB_TAG_PATTERN = '/(?<!\\\\)\[(%s)=(-?\d+)([^\]])*\]/i';
+    private const string DB_TAG_PATTERN = '/(?<!\\\\)\[(%s)=(-?\d+)([^\]])*\]/i';
 
-    private const /* int */ IDX_DBTYPE         = 0;
-    private const /* int */ IDX_SELF_CLOSED    = 1;
-    private const /* int */ IDX_CONTENT_POLICY = 2;
+    private const int IDX_DBTYPE         = 0;
+    private const int IDX_SELF_CLOSED    = 1;
+    private const int IDX_CONTENT_POLICY = 2;
 
-    private const /* int */ STRIP_NONE = 0;                 // replace tag with jsGlobal data or dummy data; keep content
-    private const /* int */ STRIP_TAG  = 1;                 // strip tag but keep content
-    private const /* int */ STRIP_ALL  = 2;                 // strip everything
+    private const int STRIP_NONE = 0;                       // replace tag with jsGlobal data or dummy data; keep content
+    private const int STRIP_TAG  = 1;                       // strip tag but keep content
+    private const int STRIP_ALL  = 2;                       // strip everything
 
-    private const /* array */ TAGS = array(
+    private const array TAGS = array(
         // db types
         'achievement'       => [Type::ACHIEVEMENT, true,  self::STRIP_NONE, null],
         'class'             => [Type::CHR_CLASS,   true,  self::STRIP_NONE, null],
@@ -116,38 +116,38 @@ class Markup implements \JsonSerializable
 
     // there are more, but only these two are needed for preparing jsGlobals
     // note: tryFromDomain() does not understand 'www' as substitute for 'en'
-    private const /* array */ GLOBAL_ATTRIBUTES = array(
+    private const array GLOBAL_ATTRIBUTES = array(
         'site'   => [Locale::class, 'tryFromDomain'],
         'domain' => [Locale::class, 'tryFromDomain']
     );
 
     // const val
-    public const MARKUP_MODE_COMMENT    = 1;
-    public const MARKUP_MODE_ARTICLE    = 2;
-    public const MARKUP_MODE_QUICKFACTS = 3;
-    public const MARKUP_MODE_SIGNATURE  = 4;
-    public const MARKUP_MODE_REPLY      = 5;
+    public const int    MARKUP_MODE_COMMENT    = 1;
+    public const int    MARKUP_MODE_ARTICLE    = 2;
+    public const int    MARKUP_MODE_QUICKFACTS = 3;
+    public const int    MARKUP_MODE_SIGNATURE  = 4;
+    public const int    MARKUP_MODE_REPLY      = 5;
 
     // js var
-    public const MODE_COMMENT    = '$Markup.MODE_COMMENT';
-    public const MODE_ARTICLE    = '$Markup.MODE_ARTICLE';
-    public const MODE_QUICKFACTS = '$Markup.MODE_QUICKFACTS';
-    public const MODE_SIGNATURE  = '$Markup.MODE_SIGNATURE';
-    public const MODE_REPLY      = '$Markup.MODE_REPLY';
+    public const string MODE_COMMENT    = '$Markup.MODE_COMMENT';
+    public const string MODE_ARTICLE    = '$Markup.MODE_ARTICLE';
+    public const string MODE_QUICKFACTS = '$Markup.MODE_QUICKFACTS';
+    public const string MODE_SIGNATURE  = '$Markup.MODE_SIGNATURE';
+    public const string MODE_REPLY      = '$Markup.MODE_REPLY';
 
     // const val
-    public const MARKUP_CLASS_ADMIN   = 40;
-    public const MARKUP_CLASS_STAFF   = 30;
-    public const MARKUP_CLASS_PREMIUM = 20;
-    public const MARKUP_CLASS_USER    = 10;
-    public const MARKUP_CLASS_PENDING = 1;
+    public const int    MARKUP_CLASS_ADMIN   = 40;
+    public const int    MARKUP_CLASS_STAFF   = 30;
+    public const int    MARKUP_CLASS_PREMIUM = 20;
+    public const int    MARKUP_CLASS_USER    = 10;
+    public const int    MARKUP_CLASS_PENDING = 1;
 
     // js var
-    public const CLASS_ADMIN   = '$Markup.CLASS_ADMIN';
-    public const CLASS_STAFF   = '$Markup.CLASS_STAFF';
-    public const CLASS_PREMIUM = '$Markup.CLASS_PREMIUM';
-    public const CLASS_USER    = '$Markup.CLASS_USER';
-    public const CLASS_PENDING = '$Markup.CLASS_PENDING';
+    public const string CLASS_ADMIN   = '$Markup.CLASS_ADMIN';
+    public const string CLASS_STAFF   = '$Markup.CLASS_STAFF';
+    public const string CLASS_PREMIUM = '$Markup.CLASS_PREMIUM';
+    public const string CLASS_USER    = '$Markup.CLASS_USER';
+    public const string CLASS_PENDING = '$Markup.CLASS_PENDING';
 
     // options
     private ?string $prepend     = null;                    // html in front of article

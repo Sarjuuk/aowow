@@ -20,7 +20,7 @@ class CommentStickyResponse extends TextResponse
     {
         if (!$this->assertPOST('id', 'sticky'))
         {
-            trigger_error('CommentStickyResponse - malformed request received', E_USER_ERROR);
+            trigger_error('CommentStickyResponse - malformed request received', E_USER_WARNING);
             return;
         }
 

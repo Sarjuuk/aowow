@@ -10,7 +10,7 @@ class RaceBaseResponse extends TemplateResponse implements ICache
 {
     use TrDetailPage, TrCache;
 
-    private const MOUNT_VENDORS = array(                    // race => [starter, argent tournament]
+    private const array MOUNT_VENDORS = array(              // race => [starter, argent tournament]
         null,           [384,   33307], [3362,  33553], [1261,  33310],
         [4730,  33653], [4731,  33555], [3685,  33556], [7955,  33650],
         [7952,  33554], null,           [16264, 33557], [17584, 33657]
