@@ -493,8 +493,8 @@ $lang = array(
             "In-Game-Store"
         ),
         'pvpSources'    => array(
-             42 => "Arenasaison 1",          52 => "Arenasaison 2",          71 => "Arenasaison 3",          80 => "Arenasaison 4",         157 => "Arenasaison 5",
-            163 => "Arenasaison 6",         167 => "Arenasaison 7",         169 => "Arenasaison 8",         177 => "2009 Arena-Turnier"
+             42 => "Arenasaison 1",          62 => "Arenasaison 2",          71 => "Arenasaison 3",          80 => "Arenasaison 4",         157 => "Arenasaison 5",
+            167 => "Arenasaison 6",         169 => "Arenasaison 7",         177 => "Arenasaison 8",         163 => "2009 Arena-Turnier"
         ),
         'languages'     => array(
              1 => "Orcisch",                 2 => "Darnassisch",             3 => "Taurisch",                6 => "Zwergisch",               7 => "Gemeinsprache",           8 => "Dämonisch",

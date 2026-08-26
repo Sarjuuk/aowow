@@ -494,8 +494,8 @@ $lang = array(
             "In-Game Store"
         ),
         'pvpSources'    => array(
-             42 => "Arena Season 1",         52 => "Arena Season 2",         71 => "Arena Season 3",         80 => "Arena Season 4",        157 => "Arena Season 5",
-            163 => "Arena Season 6",        167 => "Arena Season 7",        169 => "Arena Season 8",        177 => "2009 Arena Tournament"
+             42 => "Arena Season 1",         62 => "Arena Season 2",         71 => "Arena Season 3",         80 => "Arena Season 4",        157 => "Arena Season 5",
+            167 => "Arena Season 6",        169 => "Arena Season 7",        177 => "Arena Season 8",        163 => "2009 Arena Tournament"
         ),
         'languages'     => array(                           // Languages.dbc
              1 => "Orcish",                  2 => "Darnassian",              3 => "Taurahe",                 6 => "Dwarvish",                7 => "Common",                  8 => "Demonic",

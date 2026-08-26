@@ -494,8 +494,8 @@ $lang = array(
             "Tienda del juego"
         ),
         'pvpSources'    => array(
-             42 => "Temporada de arena 1",   52 => "Temporada de arena 2",   71 => "Temporada de arena 3",   80 => "Temporada de arena 4",  157 => "Temporada de arena 5",
-            163 => "Temporada de arena 6",  167 => "Temporada de arena 7",  169 => "Temporada de arena 8",  177 => "Torneo de arena 2009"
+             42 => "Temporada de arena 1",   62 => "Temporada de arena 2",   71 => "Temporada de arena 3",   80 => "Temporada de arena 4",  157 => "Temporada de arena 5",
+            167 => "Temporada de arena 6",  169 => "Temporada de arena 7",  177 => "Temporada de arena 8",  163 => "Torneo de arena 2009"
         ),
         'languages'     => array(
              1 => "Orco",                    2 => "Darnassiano",             3 => "Taurahe",                 6 => "Enánico",                 7 => "Lengua común",            8 => "Demoníaco",
