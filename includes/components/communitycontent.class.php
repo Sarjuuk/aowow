@@ -89,27 +89,18 @@ class CommunityContent
         ORDER BY  c.`date` DESC
                   %lmt';
 
-    private static function addSubject(int $type, int $typeId) : void
+    private static function initSubject(int $type, int $typeId) : void
     {
-        if (!isset(self::$subjCache[$type][$typeId]))
-            self::$subjCache[$type][$typeId] = 0;
+        self::$subjCache[$type][$typeId] ??= 0;
     }
 
     private static function getSubjects() : void
     {
         foreach (self::$subjCache as $type => $ids)
-        {
-            $_ = array_filter(array_keys($ids), 'is_numeric');
-            if (!$_)
-                continue;
-
-            $obj = Type::newList($type, [['id', $_]]);
-            if (!$obj)
-                continue;
-
-            foreach ($obj->iterate() as $id => $__)
-                self::$subjCache[$type][$id] = $obj->getField('name', true, true);
-        }
+            if ($_ = array_filter($ids, 'is_numeric'))
+                if (!($obj = Type::newList($type, [['id', array_keys($_)]]))->error)
+                    foreach ($obj->iterate() as $id => $__)
+                        self::$subjCache[$type][$id] = $obj->getField('name', true, true);
     }
 
     public static function getCommentPreviews(array $opt = [], ?int &$nFound = 0, bool $dateFmt = true, int $resultLimit = PHP_INT_MAX) : array
@@ -146,33 +137,25 @@ class CommunityContent
         $nFound = DB::Aowow()->selectCell(substr_replace(self::$previewQuery, 'SELECT COUNT(*) ', 0, strpos(self::$previewQuery, 'FROM')), $where, PHP_INT_MAX);
 
         foreach ($comments as $c)
-            self::addSubject($c['type'], $c['typeId']);
+            self::initSubject($c['type'], $c['typeId']);
 
         self::getSubjects();
 
         foreach ($comments as $idx => &$c)
         {
-            if (!empty(self::$subjCache[$c['type']][$c['typeId']]))
-            {
-                // apply subject
-                $c['subject'] = self::$subjCache[$c['type']][$c['typeId']];
+            // apply subject
+            $c['subject'] = self::$subjCache[$c['type']][$c['typeId']] ?? Lang::user('removed');
 
-                // format date
-                $c['elapsed'] = time() - $c['date'];
-                $c['date']    = $dateFmt ? date(Util::$dateFormatInternal, $c['date']) : intVal($c['date']);
+            // format date
+            $c['elapsed'] = time() - $c['date'];
+            $c['date']    = $dateFmt ? date(Util::$dateFormatInternal, $c['date']) : intVal($c['date']);
 
-                // remove commentid if not looking for replies
-                if (empty($opt['replies']))
-                    unset($c['commentid']);
+            // remove commentid if not looking for replies
+            if (empty($opt['replies']))
+                unset($c['commentid']);
 
-                // format text for listview
-                $c['preview'] = Lang::trimTextClean($c['preview']);
-            }
-            else
-            {
-                trigger_error('Comment '.$c['id'].' belongs to nonexistent subject.', E_USER_NOTICE);
-                unset($comments[$idx]);
-            }
+            // format text for listview
+            $c['preview'] = Lang::trimTextClean($c['preview']);
         }
 
         return array_values($comments);
@@ -319,7 +302,7 @@ class CommunityContent
         if ($typeOrUser <= 0)                               // not for search by type/typeId
         {
             foreach ($videos as $v)
-                self::addSubject($v['type'], $v['typeId']);
+                self::initSubject($v['type'], $v['typeId']);
 
             self::getSubjects();
         }
@@ -328,12 +311,7 @@ class CommunityContent
         foreach ($videos as &$v)
         {
             if ($typeOrUser <= 0)                           // not for search by type/typeId
-            {
-                if (!empty(self::$subjCache[$v['type']][$v['typeId']]) && !is_numeric(self::$subjCache[$v['type']][$v['typeId']]))
-                    $v['subject'] = self::$subjCache[$v['type']][$v['typeId']];
-                else
-                    $v['subject'] = Lang::user('removed');
-            }
+                $v['subject'] = self::$subjCache[$v['type']][$v['typeId']] ?? Lang::user('removed');
 
             $v['date']      = $dateFmt ? date(Util::$dateFormatInternal, $v['date']) : intVal($v['date']);
             $v['videoType'] = 1;                            // always youtube
@@ -377,7 +355,7 @@ class CommunityContent
         if ($typeOrUser <= 0)                               // not for search by type/typeId
         {
             foreach ($screenshots as $s)
-                self::addSubject($s['type'], $s['typeId']);
+                self::initSubject($s['type'], $s['typeId']);
 
             self::getSubjects();
         }
@@ -386,12 +364,7 @@ class CommunityContent
         foreach ($screenshots as &$s)
         {
             if ($typeOrUser <= 0)                           // not for search by type/typeId
-            {
-                if (!empty(self::$subjCache[$s['type']][$s['typeId']]) && !is_numeric(self::$subjCache[$s['type']][$s['typeId']]))
-                    $s['subject'] = self::$subjCache[$s['type']][$s['typeId']];
-                else
-                    $s['subject'] = Lang::user('removed');
-            }
+                $s['subject'] = self::$subjCache[$s['type']][$s['typeId']] ?? Lang::user('removed');
 
             $s['date'] = $dateFmt ? date(Util::$dateFormatInternal, $s['date']) : intVal($s['date']);
 
