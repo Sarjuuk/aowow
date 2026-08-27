@@ -140,24 +140,22 @@ class SpellsBaseResponse extends TemplateResponse implements ICache
 
         $foo = [];
         $c = $this->category;                               // shothand
-        if (isset($c[2]) && $c[0] == 11)
-            array_unshift($foo, Lang::spell('cat', ...$c));
-        else if (isset($c[1]))
+        if (count($c) >= 3 && !in_array($c[0], [7, -2]))
+            $foo[] = Lang::spell('cat', $c[0], 1, $c[1], 1, $c[2]);
+        if (count($c) >= 2)
         {
-            if (!in_array($c[0], [7, -2]))
-                array_unshift($foo, Lang::spell('cat', $c[0], $c[1]));
+            if (in_array($c[0], [7, -2]))
+                $foo[] = Lang::game('cl', $c[1]);
             else
-                array_unshift($foo, Lang::game('cl', $c[1]));
+                $foo[] = current((array)Lang::spell('cat', $c[0], 1, $c[1]));
         }
-
-        if (isset($c[0]) && count($foo) < 2)
-            array_unshift($foo, Lang::spell('cat', $c[0], 0));
+        if (count($c) >= 1)
+            $foo[] = Lang::spell('cat', $c[0], 0);
 
         if (count($foo) < 2)
-            array_unshift($foo, $this->h1);
+            $foo[] = $this->h1;
 
-        foreach ($foo as $bar)
-            array_unshift($this->title, $bar);
+        array_unshift($this->title, ...$foo);
 
 
         /****************/
@@ -397,7 +395,7 @@ class SpellsBaseResponse extends TemplateResponse implements ICache
                             else if ($relItems)
                                 $txt = Lang::spell('relItems', 'recipes', [$relItems]);
 
-                            $note = Lang::spell('cat', $this->category[0], $this->category[1], 0);
+                            $note = Lang::spell('cat', $this->category[0], 1, $this->category[1], 0);
 
                             $tabData['note'] = Lang::spell('relItems', 'base', [$txt, $note]);
                             $tabData['sort'] = ['skill', 'name'];
@@ -503,14 +501,14 @@ class SpellsBaseResponse extends TemplateResponse implements ICache
         if (isset($c[2]))
         {
             if (!in_array($c[0], [7, -2]))
-                $keywords[] = Lang::spell('cat', ...$c);
+                $keywords[] = Lang::spell('cat', $c[0], 1, $c[1], 1, $c[2]);
             else if ($_ = SkillList::getName($c[2]))
                 $keywords[] = $_;
         }
         if (isset($c[1]))
         {
             if (!in_array($c[0], [7, -2]))
-                $keywords[] = Lang::spell('cat', $c[0], $c[1]);
+                $keywords[] = current((array)Lang::spell('cat', $c[0], 1, $c[1]));
             else
                 $keywords[] = Lang::game('cl', $c[1]);
         }

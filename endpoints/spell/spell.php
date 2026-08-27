@@ -2991,14 +2991,14 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         if (isset($c[2]))
         {
             if (!in_array($c[0], [7, -2]))
-                $keywords[] = Lang::spell('cat', ...$c);
+                $keywords[] = Lang::spell('cat', $c[0], 1, $c[1], 1, $c[2]);
             else if ($_ = SkillList::getName($c[2]))
                 $keywords[] = $_;
         }
         if (isset($c[1]))
         {
             if (!in_array($c[0], [7, -2]))
-                $keywords[] = Lang::spell('cat', $c[0], $c[1]);
+                $keywords[] = current((array)Lang::spell('cat', $c[0], 1, $c[1]));
             else
                 $keywords[] = Lang::game('cl', $c[1]);
         }
