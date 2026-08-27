@@ -323,7 +323,7 @@ var mn_objects = [
     [19, "Briefkästen"],
     [ 9, "Bücher"],
     [-4, "Erzadern"],
-    [ 6, "Fallen"]
+    [ 6, "Fallen"],
     [25, "Fischschwärme"],
     [-9, "Interaktive Objekte"],
     [-3, "Kräuter"],
