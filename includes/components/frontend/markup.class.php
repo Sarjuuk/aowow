@@ -224,11 +224,12 @@ class Markup implements \JsonSerializable
 
             foreach ($matches as [, $tag, $id, $attrString])
             {
-                $fn   = self::TAGS[$tag][self::IDX_CONTENT_POLICY];
-                $attr = self::parseTagAttributes($attrString);
+                $fn    = self::TAGS[$tag][self::IDX_CONTENT_POLICY];
+                $attr  = self::parseTagAttributes($attrString);
+                $attr += ['unnamed' => $id];
 
                 if (is_callable($fn))
-                    $fn($id, $attr, [], $jsgStubs);
+                    $fn($attr, [], $jsgStubs);
                 else
                     $jsgStubs[self::TAGS[$tag][self::IDX_DBTYPE]][$id] = $id;
             }
