@@ -35,7 +35,7 @@ class FactionEntry extends DBTypeEntry
         'ft' => ['j' => '::factiontemplate ft ON ft.`factionId` = f.`id`']
     );
 
-    public function applyInitData(array $initData, array $opts) : void
+    public function applyInitData(array $initData, array $opts) : bool
     {
         parent::applyInitData($initData, $opts);
 
@@ -56,6 +56,8 @@ class FactionEntry extends DBTypeEntry
 
         $this->templateIds = explode(' ', $initData['templateIds']);
         $this->qmNpcIds    = explode(' ', $initData['qmNpcIds']);
+
+        return true;
     }
 
     public function getListviewRow(int $addInfoMask = 0x0) : array

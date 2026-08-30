@@ -33,7 +33,7 @@ class UserEntry extends DBTypeEntry
         'r' => ['j' => ['::account_reputation r ON r.`userId` = a.`id`', true], 's' => ', IFNULL(SUM(r.`amount`), 0) AS "reputation"', 'g' => 'a.`id`']
     );
 
-    public function applyInitData(array $initData, array $opts) : void
+    public function applyInitData(array $initData, array $opts) : bool
     {
         parent::applyInitData($initData, $opts);
 
@@ -45,6 +45,8 @@ class UserEntry extends DBTypeEntry
         $this->wowicon      = $initData['wowicon'];
         $this->title        = $initData['title'];
         $this->reputation   = $initData['reputation'];
+
+        return true;
     }
 
     public function getListviewRow(int $addInfoMask = 0x0) : array { return []; }

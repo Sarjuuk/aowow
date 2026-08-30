@@ -21,7 +21,7 @@ class Profiler
     public const int    COMPLETION_EXCLUDE = 1;
     public const int    COMPLETION_INCLUDE = 2;
 
-    public const array  REGIONS      = array(               // see cfg_categories.dbc
+    public const array REGIONS = array(                     // see cfg_categories.dbc
         'us' => [2, 3, 4, 5],                               // US (us, oceanic, latin america, americas - tournament)
         'eu' => [8, 9, 10, 11, 12, 13],                     // EU (english, german, french, spanish, russian, eu - tournament)
         'kr' => [6, 7],                                     // KR (kr, tournament)
@@ -30,9 +30,7 @@ class Profiler
        'dev' => [1, 26, 27, 28, 30]                         // Development, Test Server, Test Server - tournament, QA Server, Test Server 2
     );
 
-    private static ?array $realms = null;
-
-    public static array $slot2InvType = array(
+    public const array SLOT_INVTYPE_MAP = array(
         1  => [INVTYPE_HEAD],                               // head
         2  => [INVTYPE_NECK],                               // neck
         3  => [INVTYPE_SHOULDERS],                          // shoulder
@@ -48,19 +46,19 @@ class Profiler
         13 => [INVTYPE_TRINKET],                            // trinket1
         14 => [INVTYPE_TRINKET],                            // trinket2
         15 => [INVTYPE_CLOAK],                              // chest
-        16 => [INVTYPE_WEAPONMAINHAND, INVTYPE_WEAPON, INVTYPE_2HWEAPON],                   // mainhand
-        17 => [INVTYPE_WEAPONOFFHAND, INVTYPE_WEAPON, INVTYPE_HOLDABLE, INVTYPE_SHIELD],    // offhand
-        18 => [INVTYPE_RANGED, INVTYPE_THROWN, INVTYPE_RELIC],                              // ranged + relic
+        16 => [INVTYPE_WEAPONMAINHAND, INVTYPE_WEAPON, INVTYPE_2HWEAPON],                 // mainhand
+        17 => [INVTYPE_WEAPONOFFHAND,  INVTYPE_WEAPON, INVTYPE_HOLDABLE, INVTYPE_SHIELD], // offhand
+        18 => [INVTYPE_RANGED,         INVTYPE_THROWN, INVTYPE_RELIC],                    // ranged + relic
         19 => [INVTYPE_TABARD],                             // tabard
     );
 
-    public static array $raidProgression = array( // statisticAchievement => relevantCriterium ; don't forget to enable this in /js/Profiler.js as well
-        1361 => 5100, 1362 => 5101, 1363 => 5102, 1365 => 5104, 1366 => 5108, 1364 => 5110, 1369 => 5112, 1370 => 5113, 1371 => 5114, 1372 => 5117, 1373 => 5119, 1374 => 5120, 1375 => 7805, 1376 => 5122, 1377 => 5123,  // Naxxramas 10
+    public const array RAID_PROGRESS = array(               // statisticAchievement => relevantCriterium ; don't forget to enable this in /js/Profiler.js as well
+        1361 => 5100, 1362 => 5101, 1363 => 5102, 1365 => 5104, 1366 => 5108, 1364 => 5110, 1369 => 5112, 1370 => 5113, 1371 => 5114, 1372 => 5117, 1373 => 5119, 1374 => 5120, 1375 => 7805, 1376 => 5122, 1377 => 5123, // Naxxramas 10
         1367 => 5103, 1368 => 5111, 1378 => 5124, 1379 => 5125, 1380 => 5126, 1381 => 5127, 1382 => 5128, 1383 => 7806, 1384 => 5130, 1385 => 5131, 1386 => 5132, 1387 => 5133, 1388 => 5134, 1389 => 5135, 1390 => 5136, // Naxxramas 25
-        2856 => 9938, 2857 => 9939, 2858 => 9940, 2859 => 9941, 2861 => 9943, 2865 => 9947, 2866 => 9948, 2868 => 9950, 2869 => 9951, 2870 => 9952, 2863 => 10558, 2864 => 10559, 2862 => 10560, 2867 => 10565, 2860 => 10580, // Ulduar 10
+        2856 => 9938, 2857 => 9939, 2858 => 9940, 2859 => 9941, 2861 => 9943, 2865 => 9947, 2866 => 9948, 2868 => 9950, 2869 => 9951, 2870 => 9952, 2863 => 10558, 2864 => 10559, 2862 => 10560, 2867 => 10565, 2860 => 10580,  // Ulduar 10
         2872 => 9954, 2873 => 9955, 2874 => 9956, 2884 => 9957, 2875 => 9959, 2879 => 9963, 2880 => 9964, 2882 => 9966, 2883 => 9967, 3236 => 10542, 3257 => 10561, 3256 => 10562, 3258 => 10563, 2881 => 10566, 2885 => 10581, // Ulduar 25
-        1098 => 3271,   // Onyxia's Lair 10
-        1756 => 13345,  // Onyxia's Lair 25
+        1098 => 3271,  // Onyxia's Lair 10
+        1756 => 13345, // Onyxia's Lair 25
         4031 => 12230, 4034 => 12234, 4038 => 12238, 4042 => 12242, 4046 => 12246, // Trial of the Crusader 25 nh
         4029 => 12231, 4035 => 12235, 4039 => 12239, 4043 => 12243, 4047 => 12247, // Trial of the Crusader 25 hc
         4030 => 12229, 4033 => 12233, 4037 => 12237, 4041 => 12241, 4045 => 12245, // Trial of the Crusader 10 hc
@@ -75,129 +73,12 @@ class Profiler
         4821 => 13466, // Ruby Sanctum 10 nh
     );
 
-    public static function getBuyoutForItem(int $itemId) : int
-    {
-        if (!$itemId)
-            return 0;
 
-        // try, when having filled char-DB at hand
-        // return DB::Characters()->selectCell('SELECT SUM(a.buyoutprice) / SUM(ii.count) FROM auctionhouse a JOIN item_instance ii ON ii.guid = a.itemguid WHERE ii.itemEntry = %i', $itemId);
-        return 0;
-    }
+    /*******************/
+    /* Realm functions */
+    /*******************/
 
-    public static function queueStart(?string &$msg = '') : bool
-    {
-        $queuePID = self::queueStatus();
-
-        if ($queuePID)
-        {
-            $msg = 'queue already running';
-            return true;
-        }
-
-        if (OS_WIN)                                         // here be gremlins! .. suggested was "start /B php prQueue" as background process. but that closes itself
-            pclose(popen('start php prQueue --log=cache/profiling.log', 'r'));
-        else
-            exec('php prQueue --log=cache/profiling.log > /dev/null 2>/dev/null &');
-
-        usleep(500000);
-        if (self::queueStatus())
-            return true;
-        else
-        {
-            $msg = 'failed to start queue';
-            return false;
-        }
-    }
-
-    public static function queueStatus() : int
-    {
-        if (!file_exists(self::PID_FILE))
-            return 0;
-
-        $pid = file_get_contents(self::PID_FILE);
-        $cmd = OS_WIN ? 'tasklist /NH /FO CSV /FI "PID eq %d"' : 'ps --no-headers p %d';
-
-        exec(sprintf($cmd, $pid), $out);
-        if ($out && stripos($out[0], $pid) !== false)
-            return $pid;
-
-        // have pidFile but no process with this pid
-        self::queueFree();
-        return 0;
-    }
-
-    public static function queueLock(int $pid) : bool
-    {
-        $queuePID = self::queueStatus();
-        if ($queuePID && $queuePID != $pid)
-        {
-            trigger_error('pSync - another queue with PID #'.$queuePID.' is already running', E_USER_WARNING);
-            return false;
-        }
-
-        // no queue running; create or overwrite pidFile
-        $ok = false;
-        if ($fh = fopen(self::PID_FILE, 'w'))
-        {
-            if (fwrite($fh, $pid))
-                $ok = true;
-
-            fclose($fh);
-        }
-
-        return $ok;
-    }
-
-    public static function queueFree() : void
-    {
-        unlink(self::PID_FILE);
-    }
-
-    public static function urlize(string $str, bool $allowLocales = false, bool $profile = false) : string
-    {
-        $search  = ['<',    '>',    ' / ', "'"];
-        $replace = ['&lt;', '&gt;', '-',   '' ];
-        $str = str_replace($search, $replace, $str);
-
-        if ($profile)
-        {
-            $str = str_replace(['(', ')'], ['', ''], $str);
-            $accents = array(
-                "ß" => "ss",
-                "á" => "a", "ä" => "a", "à" => "a", "â" => "a",
-                "è" => "e", "ê" => "e", "é" => "e", "ë" => "e",
-                "í" => "i", "î" => "i", "ì" => "i", "ï" => "i",
-                "ñ" => "n",
-                "ò" => "o", "ó" => "o", "ö" => "o", "ô" => "o",
-                "ú" => "u", "ü" => "u", "û" => "u", "ù" => "u",
-                "œ" => "oe",
-                "Á" => "A", "Ä" => "A", "À" => "A", "Â" => "A",
-                "È" => "E", "Ê" => "E", "É" => "E", "Ë" => "E",
-                "Í" => "I", "Î" => "I", "Ì" => "I", "Ï" => "I",
-                "Ñ" => "N",
-                "Ò" => "O", "Ó" => "O", "Ö" => "O", "Ô" => "O",
-                "Ú" => "U", "Ü" => "U", "Û" => "U", "Ù" => "U",
-                "Œ" => "Oe"
-            );
-            $str = strtr($str, $accents);
-        }
-
-        $str = trim($str);
-
-        if ($allowLocales)
-            $str = str_replace(' ', '-', $str);
-        else
-            $str = preg_replace('/[^a-z0-9]/i', '-', $str);
-
-        $str = str_replace('--', '-', $str);
-        $str = str_replace('--', '-', $str);
-
-        $str = rtrim($str, '-');
-        $str = strtolower($str);
-
-        return $str;
-    }
+    private static ?array $realms = null;
 
     public static function getRealms() : array
     {
@@ -269,6 +150,101 @@ class Profiler
         return array_unique(array_column(self::$realms, 'region'));
     }
 
+    public static function getRealmDBs(?string $region = null, ?int $realmId = null) : array
+    {
+        $dbNames = [];
+
+        foreach (self::getRealms() as $idx => $r)
+        {
+            if ($realmId && $realmId != $idx)
+                continue;
+
+            if ($region && $r['region'] != $region)
+                continue;
+
+            $dbNames[$idx] = 'characters';
+        }
+
+        return $dbNames;
+    }
+
+
+    /**********************/
+    /* Queue: process mgr */
+    /**********************/
+
+    public static function queueStart(?string &$msg = '') : bool
+    {
+        if (self::queueStatus())
+        {
+            $msg = 'queue already running';
+            return true;
+        }
+
+        if (OS_WIN)                                         // here be gremlins! .. suggested was "start /B php prQueue" as background process. but that closes itself
+            pclose(popen('start php prQueue --log=cache/profiling.log', 'r'));
+        else
+            exec('php prQueue --log=cache/profiling.log > /dev/null 2>/dev/null &');
+
+        usleep(500000);
+        if (self::queueStatus())
+            return true;
+        else
+        {
+            $msg = 'failed to start queue';
+            return false;
+        }
+    }
+
+    public static function queueStatus() : int
+    {
+        if (!file_exists(self::PID_FILE))
+            return 0;
+
+        $pid = file_get_contents(self::PID_FILE);
+        $cmd = OS_WIN ? 'tasklist /NH /FO CSV /FI "PID eq %d"' : 'ps --no-headers p %d';
+
+        exec(sprintf($cmd, $pid), $out);
+        if ($out && stripos($out[0], $pid) !== false)
+            return $pid;
+
+        // have pidFile but no process with this pid
+        self::queueFree();
+        return 0;
+    }
+
+    public static function queueLock(int $pid) : bool
+    {
+        $queuePID = self::queueStatus();
+        if ($queuePID && $queuePID != $pid)
+        {
+            trigger_error(__METHOD__.' - another queue with PID #'.$queuePID.' is already running', E_USER_WARNING);
+            return false;
+        }
+
+        // no queue running; create or overwrite pidFile
+        $ok = false;
+        if ($fh = fopen(self::PID_FILE, 'w'))
+        {
+            if (fwrite($fh, $pid))
+                $ok = true;
+
+            fclose($fh);
+        }
+
+        return $ok;
+    }
+
+    public static function queueFree() : void
+    {
+        unlink(self::PID_FILE);
+    }
+
+
+    /***********************/
+    /* Queue: entity fetch */
+    /***********************/
+
     private static function queueInsert(int $realmId, int $guid, int $type, int $localId) : void
     {
         if ($rData = DB::Aowow()->selectRow('SELECT `requestTime` AS "time", `status` FROM ::profiler_sync WHERE `realm` = %i AND `realmGUID` = %i AND `type` = %i AND `typeId` = %i AND `status` <> %i', $realmId, $guid, $type, $localId, PR_QUEUE_STATUS_WORKING))
@@ -286,34 +262,22 @@ class Profiler
 
     public static function scheduleResync(int $type, int $realmId, int $guid) : int
     {
-        $newId = 0;
-
-        switch ($type)
+        $newId = match ($type)
         {
-            case Type::PROFILE:
-                if ($newId = DB::Aowow()->selectCell('SELECT `id` FROM ::profiler_profiles WHERE `realm` = %i AND `realmGUID` = %i', $realmId, $guid))
-                    self::queueInsert($realmId, $guid, Type::PROFILE, $newId);
+            Type::PROFILE    => DB::Aowow()->selectCell('SELECT `id` FROM ::profiler_profiles   WHERE `realm` = %i AND `realmGUID` = %i', $realmId, $guid),
+            Type::GUILD      => DB::Aowow()->selectCell('SELECT `id` FROM ::profiler_guild      WHERE `realm` = %i AND `realmGUID` = %i', $realmId, $guid),
+            Type::ARENA_TEAM => DB::Aowow()->selectCell('SELECT `id` FROM ::profiler_arena_team WHERE `realm` = %i AND `realmGUID` = %i', $realmId, $guid),
+            default          => trigger_error(__METHOD__.' - unknown type #'.$type.' omiting..', E_USER_WARNING) & 0
+        };
 
-                break;
-            case Type::GUILD:
-                if ($newId = DB::Aowow()->selectCell('SELECT `id` FROM ::profiler_guild WHERE `realm` = %i AND `realmGUID` = %i', $realmId, $guid))
-                    self::queueInsert($realmId, $guid, Type::GUILD, $newId);
-
-                break;
-            case Type::ARENA_TEAM:
-                if ($newId = DB::Aowow()->selectCell('SELECT `id` FROM ::profiler_arena_team WHERE `realm` = %i AND `realmGUID` = %i', $realmId, $guid))
-                    self::queueInsert($realmId, $guid, Type::ARENA_TEAM, $newId);
-
-                break;
-            default:
-                trigger_error('scheduling resync for unknown type #'.$type.' omiting..', E_USER_WARNING);
-                return 0;
+        if ($newId)
+        {
+            self::queueInsert($realmId, $guid, $type, $newId);
+            if (!self::queueStart($msg))
+                trigger_error(__METHOD__.' - '.$msg, E_USER_WARNING);
         }
-
-        if (!$newId)
-            trigger_error('Profiler::scheduleResync() - tried to resync type #'.$type.' guid #'.$guid.' from realm #'.$realmId.' without preloaded data', E_USER_WARNING);
-        else if (!self::queueStart($msg))
-            trigger_error('Profiler::scheduleResync() - '.$msg, E_USER_WARNING);
+        else
+            trigger_error(__METHOD__.' - tried to resync type #'.$type.' guid #'.$guid.' from realm #'.$realmId.' without preloaded data', E_USER_WARNING);
 
         return $newId;
     }
@@ -379,16 +343,14 @@ class Profiler
 
     public static function getCharFromRealm(int $realmId, int $charGuid) : int
     {
-        $char = DB::Characters($realmId)->selectRow('SELECT c.* FROM characters c WHERE c.`guid` = %i', $charGuid);
-        if (!$char)
+        if (!($char = DB::Characters($realmId)->selectRow('SELECT c.* FROM characters c WHERE c.`guid` = %i', $charGuid)))
             return self::FETCH_RESULT_ERR_NOT_FOUND;
 
         if (!$char['name'])
             return self::FETCH_RESULT_ERR_NAME_EMPTY;
 
         // reminder: this query should not fail: a placeholder entry is created as soon as a char listview is created or profile detail page is called
-        $profile = DB::Aowow()->selectRow('SELECT `id`, `lastupdated` FROM ::profiler_profiles WHERE `realm` = %i AND `realmGUID` = %i', $realmId, $char['guid']);
-        if (!$profile)
+        if (!($profile = DB::Aowow()->selectRow('SELECT `id`, `lastupdated` FROM ::profiler_profiles WHERE `realm` = %i AND `realmGUID` = %i', $realmId, $char['guid'])))
             return self::FETCH_RESULT_ERR_INTERNAL;         // well ... it failed
 
         $profileId = $profile['id'];
@@ -796,9 +758,9 @@ class Profiler
 
         DB::Aowow()->qry('DELETE FROM ::profiler_completion_statistics WHERE `id` = %i', $profileId);
 
-        if ($progress = DB::Characters($realmId)->selectAssoc('SELECT `criteria`, `date`, `counter` FROM character_achievement_progress WHERE `guid` = %i AND `criteria` IN %in', $char['guid'], self::$raidProgression))
+        if ($progress = DB::Characters($realmId)->selectAssoc('SELECT `criteria`, `date`, `counter` FROM character_achievement_progress WHERE `guid` = %i AND `criteria` IN %in', $char['guid'], self::RAID_PROGRESS))
         {
-            array_walk($progress, fn(&$x)  => $x['achievement'] = array_search($x['criteria'], self::$raidProgression));
+            array_walk($progress, fn(&$x) => $x['achievement'] = array_search($x['criteria'], self::RAID_PROGRESS));
 
             DB::Aowow()->qry('INSERT INTO ::profiler_completion_statistics %m', array(
                 'id'            => array_fill(0, count($progress), $profileId),
@@ -924,8 +886,7 @@ class Profiler
 
     public static function getGuildFromRealm(int $realmId, int $guildGuid) : int
     {
-        $guild = DB::Characters($realmId)->selectRow('SELECT `guildId`, `name`, `createDate`, `info`, `backgroundColor`, `emblemStyle`, `emblemColor`, `borderStyle`, `borderColor` FROM guild WHERE `guildId` = %i', $guildGuid);
-        if (!$guild)
+        if (!($guild = DB::Characters($realmId)->selectRow('SELECT `guildId`, `name`, `createDate`, `info`, `backgroundColor`, `emblemStyle`, `emblemColor`, `borderStyle`, `borderColor` FROM guild WHERE `guildId` = %i', $guildGuid)))
             return self::FETCH_RESULT_ERR_NOT_FOUND;
 
         if (!$guild['name'])
@@ -967,9 +928,7 @@ class Profiler
             [['extra_flags', self::CHAR_GMFLAGS, '&'], 0]   // not a staff char
         );
 
-        // this here should all happen within ProfileList
-        $members = new RemoteProfileContainer($conditions, ['sv' => $realmId]);
-        if ($members->error)
+        if (($members = new RemoteProfileContainer($conditions, ['sv' => $realmId]))->error)
             return self::FETCH_RESULT_ERR_NO_MEMBERS;
 
         $members->initializeLocalEntries();
@@ -988,8 +947,7 @@ class Profiler
 
     public static function getArenateamFromRealm(int $realmId, int $teamGuid) : int
     {
-        $team = DB::Characters($realmId)->selectRow('SELECT `arenaTeamId`, `name`, `type`, `captainGuid`, `rating`, `seasonGames`, `seasonWins`, `weekGames`, `weekWins`, `rank`, `backgroundColor`, `emblemStyle`, `emblemColor`, `borderStyle`, `borderColor` FROM arena_team WHERE `arenaTeamId` = %i', $teamGuid);
-        if (!$team)
+        if (!($team = DB::Characters($realmId)->selectRow('SELECT `arenaTeamId`, `name`, `type`, `captainGuid`, `rating`, `seasonGames`, `seasonWins`, `weekGames`, `weekWins`, `rank`, `backgroundColor`, `emblemStyle`, `emblemColor`, `borderStyle`, `borderColor` FROM arena_team WHERE `arenaTeamId` = %i', $teamGuid)))
             return self::FETCH_RESULT_ERR_NOT_FOUND;
 
         if (!$team['name'])
@@ -1039,8 +997,7 @@ class Profiler
             [['extra_flags', self::CHAR_GMFLAGS, '&'], 0]   // not a staff char
         );
 
-        $mProfiles = new RemoteProfileContainer($conditions, ['sv' => $realmId]);
-        if ($mProfiles->error)
+        if (($mProfiles = new RemoteProfileContainer($conditions, ['sv' => $realmId]))->error)
             return self::FETCH_RESULT_ERR_NO_MEMBERS;
 
         $mProfiles->initializeLocalEntries();
@@ -1077,6 +1034,66 @@ class Profiler
         DB::Aowow()->qry('UPDATE ::profiler_arena_team SET `stub` = 0 WHERE `id` = %i', $teamId);
 
         return self::FETCH_RESULT_OK;
+    }
+
+
+    /***************/
+    /* Misc helper */
+    /***************/
+
+    public static function getBuyoutForItem(int $itemId) : int
+    {
+        if (!$itemId)
+            return 0;
+
+        // try, when having filled char-DB at hand
+        // return DB::Characters()->selectCell('SELECT SUM(a.buyoutprice) / SUM(ii.count) FROM auctionhouse a JOIN item_instance ii ON ii.guid = a.itemguid WHERE ii.itemEntry = %i', $itemId);
+        return 0;
+    }
+
+    public static function urlize(string $str, bool $allowLocales = false, bool $profile = false) : string
+    {
+        $search  = ['<',    '>',    ' / ', "'"];
+        $replace = ['&lt;', '&gt;', '-',   '' ];
+        $str = str_replace($search, $replace, $str);
+
+        if ($profile)
+        {
+            $str = str_replace(['(', ')'], ['', ''], $str);
+            $accents = array(
+                "ß" => "ss",
+                "á" => "a", "ä" => "a", "à" => "a", "â" => "a",
+                "è" => "e", "ê" => "e", "é" => "e", "ë" => "e",
+                "í" => "i", "î" => "i", "ì" => "i", "ï" => "i",
+                "ñ" => "n",
+                "ò" => "o", "ó" => "o", "ö" => "o", "ô" => "o",
+                "ú" => "u", "ü" => "u", "û" => "u", "ù" => "u",
+                "œ" => "oe",
+                "Á" => "A", "Ä" => "A", "À" => "A", "Â" => "A",
+                "È" => "E", "Ê" => "E", "É" => "E", "Ë" => "E",
+                "Í" => "I", "Î" => "I", "Ì" => "I", "Ï" => "I",
+                "Ñ" => "N",
+                "Ò" => "O", "Ó" => "O", "Ö" => "O", "Ô" => "O",
+                "Ú" => "U", "Ü" => "U", "Û" => "U", "Ù" => "U",
+                "Œ" => "Oe"
+            );
+            $str = strtr($str, $accents);
+        }
+
+        $str = trim($str);
+
+        if ($allowLocales)
+            $str = str_replace(' ', '-', $str);
+        else
+            $str = preg_replace('/[^a-z0-9]/i', '-', $str);
+
+        $str = str_replace('--', '-', $str);
+        $str = str_replace('--', '-', $str);
+
+        $str = rtrim($str, '-');
+        $str = strtolower($str);
+
+        return $str;
     }
 }
 

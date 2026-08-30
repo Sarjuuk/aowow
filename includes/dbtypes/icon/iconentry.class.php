@@ -75,13 +75,15 @@ class IconEntry extends DBTypeEntry
   * );
   */
 
-    public function applyInitData(array $initData, array $opts) : void
+    public function applyInitData(array $initData, array $opts) : bool
     {
         parent::applyInitData($initData, $opts);
 
         $this->cuFlags     = $initData['cuFlags'];
         $this->name        = $initData['name'];
         $this->name_source = $initData['name_source'];
+
+        return true;
     }
 
     public function getListviewRow(int $addInfoMask = 0x0) : array

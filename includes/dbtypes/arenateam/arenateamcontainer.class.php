@@ -6,20 +6,19 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-abstract class ArenateamContainer extends DBTypeContainer
+abstract class ArenateamContainer extends DBTypeContainer implements IProfiler
 {
     public static int $dbType = Type::ARENA_TEAM;
 
-    public function __construct(?array $conditions = [], array $miscData = [])
-    {
-        parent::__construct($conditions, $miscData);
+    abstract public static function entityObj() : string;
+}
 
-    }
-
+class RemoteArenateamContainer extends ArenateamContainer
+{
     /**
      * iterate over fetched sets
      *
-     * @return \Generator<string, ArenateamEntry> key => arena team template
+     * @return \Generator<string, RemoteArenateamEntry> key => arena team template
      */
     public function iterate() : \Generator
     {
@@ -27,16 +26,13 @@ abstract class ArenateamContainer extends DBTypeContainer
     }
 
     /**
-     * @return ?ArenateamEntry
+     * @return ?RemoteArenateamEntry
      */
-    public function getEntry(null|string|int $key = null) : ?ArenateamEntry
+    public function getEntry(?int $key = null) : ?RemoteArenateamEntry
     {
         return parent::getEntry($key);
     }
-}
 
-class RemoteArenateamContainer extends ArenateamContainer
-{
     public function initializeLocalEntries() : void
     {
         $profiles = [];
@@ -111,11 +107,46 @@ class RemoteArenateamContainer extends ArenateamContainer
             DB::Aowow()->qry('INSERT INTO ::profiler_arena_team_member %m ON DUPLICATE KEY UPDATE `profileId` = `profileId`', $memberData);
         }
     }
+
+    public function import(DBTypeEntry ...$entries) : void
+    {
+        foreach (array_filter($entries, fn($x) => !$x->error) as $e)
+            if (is_a($e, RemoteArenateamEntry::class))
+                $this->sets[$e->subjectGUID] = $e;
+
+        $this->reset();
+    }
+
+    public static function entityObj() : string
+    {
+        return RemoteArenateamEntry::class;
+    }
 }
 
 class LocalArenateamContainer extends ArenateamContainer
 {
+    /**
+     * iterate over fetched sets
+     *
+     * @return \Generator<string, LocalArenateamEntry> key => arena team template
+     */
+    public function iterate() : \Generator
+    {
+        yield from parent::iterate();
+    }
 
+    /**
+     * @return ?LocalArenateamEntry
+     */
+    public function getEntry(?int $key = null) : ?LocalArenateamEntry
+    {
+        return parent::getEntry($key);
+    }
+
+    public static function entityObj() : string
+    {
+        return LocalArenateamEntry::class;
+    }
 }
 
 ?>

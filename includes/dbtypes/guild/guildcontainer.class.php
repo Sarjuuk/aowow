@@ -6,33 +6,11 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-abstract class GuildContainer extends DBTypeContainer
+abstract class GuildContainer extends DBTypeContainer implements IProfiler
 {
     public static int $dbType = Type::GUILD;
 
-    public function __construct(?array $conditions = [], array $miscData = [])
-    {
-        parent::__construct($conditions, $miscData);
-
-    }
-
-    /**
-     * iterate over fetched sets
-     *
-     * @return \Generator<string, GuildEntry> key => arena team template
-     */
-    public function iterate() : \Generator
-    {
-        yield from parent::iterate();
-    }
-
-    /**
-     * @return ?GuildEntry
-     */
-    public function getEntry(null|string|int $key = null) : ?GuildEntry
-    {
-        return parent::getEntry($key);
-    }
+    abstract public static function entityObj() : string;
 }
 
 class RemoteGuildContainer extends GuildContainer
@@ -61,11 +39,64 @@ class RemoteGuildContainer extends GuildContainer
             if (isset($localIds[$guid]))
                 $_curTpl['id'] = $localIds[$guid];
     }
+
+    /**
+     * iterate over fetched sets
+     *
+     * @return \Generator<string, RemoteGuildEntry> key => guild template
+     */
+    public function iterate() : \Generator
+    {
+        yield from parent::iterate();
+    }
+
+    /**
+     * @return ?RemoteGuildEntry
+     */
+    public function getEntry(?int $key = null) : ?RemoteGuildEntry
+    {
+        return parent::getEntry($key);
+    }
+
+    public function import(DBTypeEntry ...$entries) : void
+    {
+        foreach (array_filter($entries, fn($x) => !$x->error) as $e)
+            if (is_a($e, RemoteGuildEntry::class))
+                $this->sets[$e->subjectGUID] = $e;
+
+        $this->reset();
+    }
+
+    public static function entityObj() : string
+    {
+        return RemoteGuildEntry::class;
+    }
 }
 
 class LocalGuildContainer extends GuildContainer
 {
+    /**
+     * iterate over fetched sets
+     *
+     * @return \Generator<string, LocalGuildEntry> key => guild template
+     */
+    public function iterate() : \Generator
+    {
+        yield from parent::iterate();
+    }
 
+    /**
+     * @return ?LocalGuildEntry
+     */
+    public function getEntry(?int $key = null) : ?LocalGuildEntry
+    {
+        return parent::getEntry($key);
+    }
+
+    public static function entityObj() : string
+    {
+        return LocalGuildEntry::class;
+    }
 }
 
 ?>

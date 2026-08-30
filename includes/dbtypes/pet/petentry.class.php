@@ -36,7 +36,7 @@ class PetEntry extends DBTypeEntry
         'ic' => ['j' => ['::icons ic ON p.`iconId` = ic.`id`', true], 's' => ', ic.`name` AS "icon"'],
     );
 
-    public function applyInitData(array $initData, array $opts) : void
+    public function applyInitData(array $initData, array $opts) : bool
     {
         parent::applyInitData($initData, $opts);
 
@@ -56,6 +56,8 @@ class PetEntry extends DBTypeEntry
         $this->armor       = $initData['armor'];
         $this->damage      = $initData['damage'];
         $this->health      = $initData['health'];
+
+        return true;
     }
 
     public function getListviewRow(int $addInfoMask = 0x0) : array
