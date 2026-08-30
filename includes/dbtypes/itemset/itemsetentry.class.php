@@ -51,7 +51,7 @@ class ItemsetEntry extends DBTypeEntry implements ITooltip
         'src' => ['j' => ['::source src ON `src`.`typeId` = `set`.`id` AND `src`.`type` = 4', true], 's' => ', `moreType`, `moreTypeId`, `moreZoneId`, `moreMask`, `src1`, `src2`, `src3`, `src4`, `src5`, `src6`, `src7`, `src8`, `src9`, `src10`, `src11`, `src12`, `src13`, `src14`, `src15`, `src16`, `src17`, `src18`, `src19`, `src20`, `src21`, `src22`, `src23`, `src24`']
     );
 
-    public function applyInitData(array $initData, array $opts) : void
+    public function applyInitData(array $initData, array $opts) : bool
     {
         parent::applyInitData($initData, $opts);
 
@@ -84,6 +84,8 @@ class ItemsetEntry extends DBTypeEntry implements ITooltip
         $this->pieceToSet = array_combine($this->items, array_fill(0, count($this->items), $this->id));
 
         $this->initSources($initData);
+
+        return true;
     }
 
     public function getListviewRow(int $addInfoMask = 0x0) : array
