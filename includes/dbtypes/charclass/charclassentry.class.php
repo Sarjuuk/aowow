@@ -33,7 +33,7 @@ class CharClassEntry extends DBTypeEntry
         'ic' => ['j' => ['::icons ic ON ic.`id` = c.`iconId`', true], 's' => ', ic.`name` AS "icon"']
     );
 
-    public function applyInitData(array $initData, array $opts) : void
+    public function applyInitData(array $initData, array $opts) : bool
     {
         parent::applyInitData($initData, $opts);
 
@@ -50,6 +50,8 @@ class CharClassEntry extends DBTypeEntry
         $this->weaponTypeMask = $initData['weaponTypeMask'];
         $this->armorTypeMask  = $initData['armorTypeMask'];
         $this->expansion      = $initData['expansion'];
+
+        return true;
     }
 
     public function getListviewRow(int $addInfoMask = 0x0) : array

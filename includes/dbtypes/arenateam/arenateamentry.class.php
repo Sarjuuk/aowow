@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-abstract class ArenateamEntry extends DBTypeEntry implements IProfiler
+abstract class ArenateamEntry extends DBTypeEntry
 {
     use TrProfilerHelper;
 
@@ -68,16 +68,16 @@ class RemoteArenateamEntry extends ArenateamEntry
 
     private array $rankOrder = [];
 
-    public function __construct(array $conditions = [], array $miscData = [])
+    public function __construct(int|array $initData, array $extraOpts = [])
     {
-        // select DB by realm
-        if (!$dbNames = self::getRealmDBs($miscData))
+        // if id lookup, select DB by realm
+        if (is_int($initData) && (!$targetDBs = Profiler::getRealmDBs($extraOpts['rg'] ?? null, $extraOpts['sv'] ?? null)))
         {
-            trigger_error('RemoteArenateamList::__construct - cannot access any realm.', E_USER_WARNING);
+            trigger_error(__METHOD__.' - cannot access any realm.', E_USER_WARNING);
             return;
         }
 
-        parent::__construct($conditions, $miscData);
+        parent::__construct($initData, $extraOpts, $targetDBs ?? []);
 
         if ($this->error)
             return;
@@ -199,7 +199,7 @@ class LocalArenateamEntry extends ArenateamEntry
 
         if (!$realms)
         {
-            trigger_error('LocalArenateamList::__construct - cannot access any realm.', E_USER_WARNING);
+            trigger_error(__METHOD__.' - cannot access any realm.', E_USER_WARNING);
             return;
         }
 

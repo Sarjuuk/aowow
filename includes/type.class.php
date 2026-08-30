@@ -222,16 +222,6 @@ abstract class Type
         return (self::$data[$type][self::IDX_OBJECT])::$$attr ?? null;
     }
 
-    // obsolete in php8.3 and beyond
-    public static function getClassConst(int $type, string $const) : mixed
-    {
-        if (!self::exists($type))
-            return null;
-
-        $c = self::$data[$type][self::IDX_OBJECT] . '::' . $const;
-        return defined($c) ? constant($c) : null;
-    }
-
     public static function exists(int $type) : ?int
     {
         return !empty(self::$data[$type]) ? $type : null;

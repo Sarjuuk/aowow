@@ -34,7 +34,7 @@ class TitleEntry extends DBTypeEntry
         'src' => ['j' => ['::source src ON `type` = 11 AND `typeId` = t.`id`', true], 's' => ', `src4`, `src12`, `src13`, `moreType`, `moreTypeId`, `moreZoneId`, `moreMask`']
     );
 
-    public function applyInitData(array $initData, array $opts) : void
+    public function applyInitData(array $initData, array $opts) : bool
     {
         parent::applyInitData($initData, $opts);
 
@@ -52,6 +52,8 @@ class TitleEntry extends DBTypeEntry
 
         // preparse sources - notice: under this system titles can't have more than one source (or two for achivements), which is enough for standard TC cases but may break custom cases
         $this->initSources($initData, $initData['src12Ext'] ?: 0);
+
+        return true;
     }
 
     public function getListviewRow(int $addInfoMask = 0x0) : array

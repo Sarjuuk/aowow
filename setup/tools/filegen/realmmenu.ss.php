@@ -48,8 +48,6 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
     private function realmMenu() : string
     {
-        $subs = array_fill_keys(array_keys(Profiler::REGIONS), []);
-        $set  = 0x0;
         $menu = [
             // skip usage of battlegroup
             // ['us', Lang::profiler('regions', 'us'), null,[[Profiler::urlize(Cfg::get('BATTLEGROUP')), Cfg::get('BATTLEGROUP'), null, &$subUS]]],
@@ -57,28 +55,24 @@ CLISetup::registerSetup("build", new class extends SetupScript
         ];
 
         if (!DB::isConnectable(DB_AUTH))
+        {
             CLI::write('[realmmenu] Auth DB not set up .. realm menu will be empty', CLI::LOG_WARN);
-        else
-            foreach (Profiler::getRealms() as $row)
-            {
-                if (($idx = array_search($row['region'], Profiler::REGIONS)) === false)
-                    continue;
-
-                $set |= (1 << $idx);
-                $subs[$idx][] = [Profiler::urlize($row['name'], true), $row['name'], null, null, $row['access'] ? ['requiredAccess' => $row['access']] : null];
-            }
-
-        if (!$set)
-            CLI::write('[realmmenu] no viable realms found .. realm menu will be empty', CLI::LOG_WARN);
+            return Util::toJSON($menu);
+        }
 
         // why is this file not localized!?
         Lang::load(Locale::EN);
 
-        foreach (array_keys(Profiler::REGIONS) as $idx => $n)
-            if ($set & (1 << $idx))
-                $menu[] = [$n, Lang::profiler('regions', $n), null, &$subs[$idx]];
+        foreach (Profiler::getRealms() as $row)
+        {
+            $menu[$row['region']]               ??= [$row['region'], Lang::profiler('regions', $row['region']), null, []];
+            $menu[$row['region']][MENU_IDX_SUB][] = [Profiler::urlize($row['name'], true), $row['name'], null, null, $row['access'] ? ['requiredAccess' => $row['access']] : null];
+        }
 
-        return Util::toJSON($menu);
+        if (!$menu)
+            CLI::write('[realmmenu] no viable realms found .. realm menu will be empty', CLI::LOG_WARN);
+
+        return Util::toJSON(array_values($menu));
     }
 });
 

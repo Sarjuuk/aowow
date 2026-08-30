@@ -46,7 +46,7 @@ class AchievementEntry extends DBTypeEntry implements ISource, ITooltip
         'ac' => ['j' => ['::achievementcriteria ac ON ac.`refAchievementId` = a.`id`', true], 'g' => 'a.`id`']
     );
 
-    public function applyInitData(array $initData, array $opts) : void
+    public function applyInitData(array $initData, array $opts) : bool
     {
         parent::applyInitData($initData, $opts);
 
@@ -66,6 +66,8 @@ class AchievementEntry extends DBTypeEntry implements ISource, ITooltip
         $this->chainPos         = $initData['chainPos'];
         $this->reqCriteriaCount = $initData['reqCriteriaCount'];
         $this->itemExtra        = $initData['itemExtra'] ?? 0;
+
+        return true;
     }
 
     /**

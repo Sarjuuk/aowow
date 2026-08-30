@@ -6,6 +6,12 @@ if (!defined('AOWOW_REVISION'))
     die("illegal access");
 
 
+interface IProfiler
+{
+    public static function entityObj() : string;
+    public function import(DBTypeEntry ...$entries) : void;
+}
+
 abstract class DBTypeContainer
 {
     protected array $sets = [];
@@ -21,11 +27,6 @@ abstract class DBTypeContainer
 
     public function __construct(?array $conditions = [], array $miscData = [], array $targetDBs = ['Aowow'])
     {
-        $query    = Type::getClassConst(static::$dbType, 'QUERY_BASE');
-        $baseOpts = Type::getClassConst(static::$dbType, 'QUERY_OPTS');
-        if (!$query)
-            return;
-
         // we want en empty set to import DBtypes into later on
         if (is_null($conditions))
         {
@@ -33,13 +34,57 @@ abstract class DBTypeContainer
             return;
         }
 
-        $dbQuery = new DBQuery($targetDBs, $query, $baseOpts, $miscData['queryOpts'] ?? [], $miscData['calcTotal'] ?? false);
+        if (!($entityClass = $this instanceof IProfiler ? $this->entityObj() : Type::getClassName(static::$dbType)))
+            return;
+
+        $dbQuery = new DBQuery($targetDBs, $entityClass::QUERY_BASE, $entityClass::QUERY_OPTS, $miscData['queryOpts'] ?? [], $miscData['calcTotal'] ?? false);
         if (!$dbQuery->build($conditions))
             return;
 
-        foreach ($dbQuery->fetch() as $data)
-            if (($entry = Type::newEntry(static::$dbType, (array)$data, $miscData)) && !$entry->error)
-                $this->import($entry);
+        // try to distribute found results equally across all dbs (realms)
+        foreach ($conditions as $c)
+            if (is_int($c))
+                $limit = $c;
+
+        $limit ??= Listview::DEFAULT_SIZE;
+
+        if (count($targetDBs) > 1 && $limit)
+        {
+            $resultCache = [];
+            foreach ($dbQuery->results() as $realmId => $result)
+                $resultCache[$realmId] = array(
+                    $result->getRowCount(),
+                    $result
+                );
+
+            $total = array_sum(array_column($resultCache, 0));
+            foreach ($resultCache as [&$count, ])
+                $count = ceil($limit * $count / $total);
+
+            foreach ($resultCache as $realmId => [$max, $result])
+            {
+                foreach ($result->getIterator() as $row)
+                {
+                    if ($max-- <= 0 || $limit-- <= 0)
+                        break;
+
+                    if (!($entry = new $entityClass((array)$row + ['realmId' => $realmId], $miscData))->error)
+                        $this->import($entry);
+                }
+
+                $result->free();
+            }
+        }
+        else
+        {
+            foreach ($dbQuery->results() as $result)
+            {
+                foreach ($result->getIterator() as $row)
+                    if (!($entry = new $entityClass((array)$row, $miscData))->error)
+                        $this->import($entry);
+                $result->free();
+            }
+        }
 
         $this->error = empty($this->sets);
 

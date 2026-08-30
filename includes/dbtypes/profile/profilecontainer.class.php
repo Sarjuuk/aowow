@@ -6,14 +6,9 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-abstract class ProfileContainer extends DBTypeContainer
+abstract class ProfileContainer extends DBTypeContainer implements IProfiler
 {
     public static int $dbType = Type::PROFILE;
-
-    public function __construct(?array $conditions = [], array $miscData = [])
-    {
-        parent::__construct($conditions, $miscData);
-    }
 
     /**
      * @param int $addMask exclusive switch what data to expose to javascript
@@ -26,10 +21,57 @@ abstract class ProfileContainer extends DBTypeContainer
     {
         return parent::getJSGlobals($addMask);
     }
+
+    abstract public static function entityObj() : string;
 }
 
 class RemoteProfileContainer extends ProfileContainer
 {
+    public function __construct(?array $conditions = [], array $miscData = [])
+    {
+        if (!$targetDBs = Profiler::getRealmDBs($miscData['rg'] ?? null, $miscData['sv'] ?? null))
+        {
+            trigger_error(__METHOD__.' - cannot access any realm.', E_USER_WARNING);
+            return;
+        }
+
+        parent::__construct($conditions, $miscData, $targetDBs);
+
+        $talentSpells = $talentLookup = $rnItr = [];
+
+        // post processing
+        foreach ($this->iterate() as $profile)
+        {
+            // talent points pre
+            $talentLookup[$profile->realmId][$profile->realmGUID] = [];
+            $talentSpells[] = $profile->class;
+
+            // char is pending rename
+            if ($profile->renamePending)
+                $rnItr[$profile->realmId][$profile->name] = null;
+        }
+
+        foreach ($talentLookup as $realm => $chars)
+            $talentLookup[$realm] = DB::Characters($realm)->selectCol('SELECT `guid` AS ARRAY_KEY, `spell` AS ARRAY_KEY2, `talentGroup` FROM character_talent ct WHERE `guid` IN %in', array_keys($chars));
+
+        $talentSpells = DB::Aowow()->selectAssoc('SELECT `spell` AS ARRAY_KEY, `tab` + 1 AS "0", `rank` AS "1" FROM ::talents WHERE `class` IN %in', array_unique($talentSpells));
+
+        foreach ($rnItr as $realmId => $names)
+            $rnItr[$realmId] = RemoteProfileEntry::fetchRenameItrs($realmId, ...array_keys($names));
+
+        foreach ($this->iterate() as $guid => $profile)
+        {
+            // talent points post
+            $tree1 = $tree2 = $tree3 = 0;
+            $talents = array_filter($talentLookup[$profile->realmId][$profile->realmGUID] ?? [], fn($x) => $profile->activespec == $x);
+            foreach (array_intersect_key($talentSpells, $talents) as [$tab, $rank])
+                ${'tree' . $tab} += $rank;
+
+            $profile->setTalentDistribution($tree1, $tree2, $tree3);
+            $profile->setRenameItr($rnItr[$profile->realmId]);
+        }
+    }
+
     /**
      * iterate over fetched sets
      *
@@ -43,7 +85,7 @@ class RemoteProfileContainer extends ProfileContainer
     /**
      * @return ?RemoteProfileEntry
      */
-    public function getEntry(null|string|int $key = null) : ?RemoteProfileEntry
+    public function getEntry(?int $key = null) : ?RemoteProfileEntry
     {
         return parent::getEntry($key);
     }
@@ -68,124 +110,6 @@ class RemoteProfileContainer extends ProfileContainer
             }
 
         return $data;
-    }
-
-    private function whatsitsnameagain()
-    {
-        if ($this->error)
-            return;
-
-        $realms       = Profiler::getRealms();
-        $talentSpells = [];
-        $talentLookup = [];
-        $distrib      = [];
-
-        // post processing
-        foreach ($this->iterate() as $guid => &$curTpl)
-        {
-            // battlegroup
-            $curTpl['battlegroup'] = Cfg::get('BATTLEGROUP');
-
-            // realm
-            [$r, $g] = explode(':', $guid);
-            if (!empty($realms[$r]))
-            {
-                $curTpl['realm']     = $r;
-                $curTpl['realmName'] = $realms[$r]['name'];
-                $curTpl['region']    = $realms[$r]['region'];
-            }
-            else
-            {
-                trigger_error('char #'.$guid.' belongs to nonexistent realm #'.$r, E_USER_WARNING);
-                unset($this->templates[$guid]);
-                continue;
-            }
-
-            // empty name
-            if (!$curTpl['name'])
-            {
-                trigger_error('char #'.$guid.' on realm #'.$r.' has empty name.', E_USER_WARNING);
-                unset($this->templates[$guid]);
-                continue;
-            }
-
-            // temp id
-            $curTpl['id'] = 0;
-
-            // talent points pre
-            $talentLookup[$r][$g] = [];
-            $talentSpells[] = $curTpl['class'];
-            $curTpl['activespec'] = $curTpl['activeTalentGroup'];
-
-            // equalize distribution
-            if (empty($distrib[$curTpl['realm']]))
-                $distrib[$curTpl['realm']] = 1;
-            else
-                $distrib[$curTpl['realm']]++;
-
-            // char is pending rename
-            if ($curTpl['at_login'] & 0x1)
-            {
-                $this->rnItr[$curTpl['name']] ??= DB::Aowow()->selectCell('SELECT MAX(`renameItr`) FROM ::profiler_profiles WHERE `realm` = %i AND `custom` = 0 AND `name` = %s', $r, $curTpl['name']) ?: 0;
-
-                // already saved as "pending rename"
-                if ($rnItr = DB::Aowow()->selectCell('SELECT `renameItr` FROM ::profiler_profiles WHERE `realm` = %i AND `realmGUID` = %i', $r, $g))
-                    $curTpl['renameItr'] = $rnItr;
-                // not yet recognized: get max itr
-                else
-                    $curTpl['renameItr'] = ++$this->rnItr[$curTpl['name']];
-            }
-            else
-                $curTpl['renameItr'] = 0;
-
-            $curTpl['cuFlags'] = 0;
-        }
-
-        foreach ($talentLookup as $realm => $chars)
-            $talentLookup[$realm] = DB::Characters($realm)->selectCol('SELECT `guid` AS ARRAY_KEY, `spell` AS ARRAY_KEY2, `talentGroup` FROM character_talent ct WHERE `guid` IN %in', array_keys($chars));
-
-        $talentSpells = DB::Aowow()->selectAssoc('SELECT `spell` AS ARRAY_KEY, `tab`, `rank` FROM ::talents WHERE `class` IN %in', array_unique($talentSpells));
-
-        // equalize subject distribution across realms
-        $limit = 0;
-        foreach ($conditions as $c)
-            if (is_numeric($c))
-                $limit = max(0, (int)$c);
-
-        if (!$limit)                                        // int:0 means unlimited, so skip process
-            $distrib = [];
-
-        $total = array_sum($distrib);
-        foreach ($distrib as &$d)
-            $d = ceil($limit * $d / $total);
-
-        foreach ($this->iterate() as $guid => &$curTpl)
-        {
-            if ($distrib)
-            {
-                if ($limit <= 0 || $distrib[$curTpl['realm']] <= 0)
-                {
-                    unset($this->templates[$guid]);
-                    continue;
-                }
-
-                $distrib[$curTpl['realm']]--;
-                $limit--;
-            }
-
-            [$r, $g] = explode(':', $guid);
-
-            // talent points post
-            $curTpl['talenttree1'] = 0;
-            $curTpl['talenttree2'] = 0;
-            $curTpl['talenttree3'] = 0;
-            if (!empty($talentLookup[$r][$g]))
-            {
-                $talents = array_filter($talentLookup[$r][$g], function($v) use ($curTpl) { return $curTpl['activespec'] == $v; } );
-                foreach (array_intersect_key($talentSpells, $talents) as $spell => $data)
-                    $curTpl['talenttree'.($data['tab'] + 1)] += $data['rank'];
-            }
-        }
     }
 
     public function initializeLocalEntries() : void
@@ -258,21 +182,53 @@ class RemoteProfileContainer extends ProfileContainer
                 $baseData['realm'], $baseData['realmGUID']
             );
 
-            foreach ($this->iterate() as $guid => $entry)
+            foreach ($this->iterate() as $guid => $profile)
             {
-                [$realm, $realmGUID] = $entry->unpackId($entry->id);
-                if (!isset($localData[$realm][$realmGUID]))
-                    trigger_error('RemoteProfileContainer::initializeLocalEntries - local entry not generated for char with realm #'.$realm.' realmGUID #'.$realmGUID, E_USER_WARNING);
+                if (!isset($localData[$profile->realmId][$profile->realmGUID]))
+                    trigger_error(__METHOD__.' - local entry not generated for char with realm #'.$profile->realmId.' realmGUID #'.$profile->realmGUID, E_USER_WARNING);
 
                 // still call this fn or the readonly properties remain uninitialized
-                $entry->amendLocalData($localData[$realm][$realmGUID] ?? []);
+                // $profile->amendLocalData($localData[$profile->realmId][$profile->realmGUID] ?? []);
             }
         }
+    }
+
+    public function import(DBTypeEntry ...$entries) : void
+    {
+        foreach (array_filter($entries, fn($x) => !$x->error) as $e)
+            if (is_a($e, RemoteProfileEntry::class))
+                $this->sets[$e->subjectGUID] = $e;
+
+        $this->reset();
+    }
+
+    public static function entityObj() : string
+    {
+        return RemoteProfileEntry::class;
     }
 }
 
 class LocalProfileContainer extends ProfileContainer
 {
+    public function __construct(?array $conditions = [], array $miscData = [], array $targetDBs = ['Aowow'])
+    {
+        $realms = Profiler::getRealms();
+
+        // graft realm selection from miscData onto conditions
+        $realmIds = [];
+        if (isset($miscData['sv']) && isset($realms[$miscData['sv']]))
+            $realmIds = [$miscData['sv']];
+        if (isset($miscData['rg']))
+            $realmIds = array_merge($realmIds, array_keys(array_filter($realms, fn($x) => $x['region'] == $miscData['rg'])));
+
+        if ($conditions && $realmIds)
+            $conditions = [DB::AND, ['realm', $realmIds], $conditions];
+        else if ($realmIds)
+            $conditions = [['realm', $realmIds]];
+
+        parent::__construct($conditions, $miscData, $targetDBs);
+    }
+
     /**
      * iterate over fetched sets
      *
@@ -286,11 +242,15 @@ class LocalProfileContainer extends ProfileContainer
     /**
      * @return ?LocalProfileEntry
      */
-    public function getEntry(null|string|int $key = null) : ?LocalProfileEntry
+    public function getEntry(?int $key = null) : ?LocalProfileEntry
     {
         return parent::getEntry($key);
     }
 
+    public static function entityObj() : string
+    {
+        return LocalProfileEntry::class;
+    }
 }
 
 ?>
