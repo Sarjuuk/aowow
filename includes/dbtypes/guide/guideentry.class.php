@@ -26,12 +26,14 @@ class GuideEntry extends DBTypeEntry implements ITooltip
     public readonly ?int    $userId;
     public readonly ?string $author;
     public readonly  int    $date;
- // public readonly  int    $approveUserId;
- // public readonly  int    $approveDate;
- // public readonly  int    $deleteUserId;
- // public readonly  int    $deleteData;
-    public readonly  int    $nvotes;
-    public readonly  int    $rating;
+
+    public private(set) ?int $nvotes = null {
+        get => $this->nvotes ?? ($this->setVoting() ?? $this->nvotes);
+    }
+
+    public private(set) ?int $rating = null {
+        get => $this->rating ?? ($this->setVoting() ?? $this->rating);
+    }
 
     public static int    $dbType     = Type::GUIDE;
     public static string $brickFile  = 'guide';
@@ -48,18 +50,6 @@ class GuideEntry extends DBTypeEntry implements ITooltip
         'c'  => ['j' => ['::comments c ON c.`type` = '.Type::GUIDE.' AND c.`typeId` = g.`id` AND (c.`flags` & '.CC_FLAG_DELETED.') = 0', true], 's' => ', COUNT(c.`id`) AS "comments"'],
         'ar' => ['j' => ['::articles ar ON ar.`type` = 300 AND ar.`typeId` = g.`id`'], 's' => ', MAX(ar.`rev`) AS "latest"']
     );
-
-    public function __construct(int|array $initData, array $extraOpts = [])
-    {
-        parent::__construct($initData, $extraOpts);
-
-        // not filled by batch operation
-        if (is_int($initData))
-        {
-            $ratings = GuideMgr::getRatings([$this->id]);
-            $this->setVoting($ratings[$this->id]['nvotes'] ?? 0, $ratings[$this->id]['rating'] ?? -1);
-        }
-    }
 
     public function applyInitData(array $initData, array $opts) : void
     {
@@ -83,8 +73,6 @@ class GuideEntry extends DBTypeEntry implements ITooltip
         $this->userId      = $initData['userId'];
         $this->author      = $initData['author'];
         $this->date        = $initData['date'];
-        $this->nvotes      = $initData['nvotes'];
-        $this->rating      = $initData['rating'];
     }
 
     public function getListviewRow(int $addInfoMask = 0x0) : array
@@ -201,10 +189,12 @@ class GuideEntry extends DBTypeEntry implements ITooltip
         return $this->userId != User::$id && $this->status != GuideMgr::STATUS_ARCHIVED;
     }
 
-    public function setVoting(int $nVotes, int $rating) : void
+    public function setVoting(?array $ratings = null) : void
     {
-        $this->nvotes = $nVotes;
-        $this->rating = $rating;
+        $ratings ??= GuideMgr::getRatings([$this->id]);
+
+        $this->nvotes = $ratings[$this->id]['nvotes'] ??  0;
+        $this->rating = $ratings[$this->id]['rating'] ?? -1;
     }
 
     public static function getName(int $id) : ?LocString
