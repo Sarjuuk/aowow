@@ -15,8 +15,8 @@ class GuideContainer extends DBTypeContainer
         parent::__construct($conditions, $miscData);
 
         $ratings = GuideMgr::getRatings($this->getFoundIds());
-        foreach ($this->iterate() as $id => $entry)
-            $entry->setVoting($ratings[$id]['nvotes'] ?? 0, $ratings[$id]['rating'] ?? -1);
+        foreach ($this->iterate() as $entry)
+            $entry->setVoting($ratings);
     }
 
     /**
