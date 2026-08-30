@@ -155,7 +155,7 @@ trait TrTemplateFile
     {
         // replace constants
         if ($content = file_get_contents($file))
-            return Cfg::applyToString($content, $this->numFmt ?? true);
+            return Cfg::applyToString($content, $this->formatNumbers);
 
         CLI::write('[build] template file is not readable - '.CLI::bold($file), CLI::LOG_ERROR);
         $this->success = false;
@@ -448,6 +448,7 @@ abstract class SetupScript
     protected array  $fileTemplateDest = [];
     protected string $fileTemplatePath = 'setup/tools/filegen/templates/';
     protected array  $fileTemplateSrc  = [];
+    protected bool   $formatNumbers    = true;              // when applying numeric value from config, format it or nah
 
     // FileGen + DataGen
     protected array  $dbcSourceFiles   = [];                // relies on these dbc files. Read into db if related table is missing

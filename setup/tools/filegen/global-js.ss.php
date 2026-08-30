@@ -58,6 +58,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
     protected array $fileTemplateDest = ['static/js/global.js'];
     protected array $fileTemplateSrc  = ['global.js'];
+    protected bool  $formatNumbers    = false;
 
     private function locales() : string
     {
