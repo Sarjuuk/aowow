@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-abstract class GuildEntry extends DBTypeEntry implements IProfiler
+abstract class GuildEntry extends DBTypeEntry
 {
     public readonly  string $name;
 
@@ -88,16 +88,16 @@ class RemoteGuildEntry extends GuildEntry
         'c'  => ['j' => 'characters c ON c.`guid` = gm.`guid`', 's' => ', BIT_OR(IF(c.`race` IN (1, 3, 4, 7, 11), 1, 2)) - 1 AS "faction"']
     );
 
-    public function __construct(array $conditions = [], array $miscData = [])
+    public function __construct(int|array $initData, array $extraOpts = [])
     {
-        // select DB by realm
-        if (!$dbNames = self::getRealmDBs($miscData))
+        // if id lookup, select DB by realm
+        if (is_int($initData) && (!$targetDBs = Profiler::getRealmDBs($extraOpts['rg'] ?? null, $extraOpts['sv'] ?? null)))
         {
-            trigger_error('RemoteGuildList::__construct - cannot access any realm.', E_USER_WARNING);
+            trigger_error(__METHOD__.' - cannot access any realm.', E_USER_WARNING);
             return;
         }
 
-        parent::__construct($conditions, $miscData);
+        parent::__construct($initData, $extraOpts, $targetDBs ?? []);
 
         if ($this->error)
             return;
@@ -191,7 +191,7 @@ class LocalGuildEntry extends GuildEntry
 
         if (!$realms)
         {
-            trigger_error('LocalGuildList::__construct - cannot access any realm.', E_USER_WARNING);
+            trigger_error(__METHOD__.' - cannot access any realm.', E_USER_WARNING);
             return;
         }
 
@@ -226,13 +226,7 @@ class LocalGuildEntry extends GuildEntry
 
     public function getProfileUrl() : string
     {
-        $url = '?guild=';
-
-        return $url.implode('.', array(
-            $this->region,
-            Profiler::urlize($this->realmName, true),
-            Profiler::urlize($this->name)
-        ));
+        return '?guild=' . $this->region . '.' . Profiler::urlize($this->realmName, true) . '.' . Profiler::urlize($this->name);
     }
 }
 

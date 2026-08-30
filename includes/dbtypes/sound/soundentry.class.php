@@ -29,7 +29,7 @@ class SoundEntry extends DBTypeEntry
 
     private const array FILE_TYPES = [SOUND_TYPE_OGG => MIME_TYPE_OGG, SOUND_TYPE_MP3 => MIME_TYPE_MP3];
 
-    public function applyInitData(array $initData, array $opts) : void
+    public function applyInitData(array $initData, array $opts) : bool
     {
         parent::applyInitData($initData, $opts);
 
@@ -47,6 +47,8 @@ class SoundEntry extends DBTypeEntry
             unset($initData['soundFile'.$i]);
         }
         $this->fileIds = $fileIds;
+
+        return true;
     }
 
     public function getListviewRow(int $addInfoMask = 0x0) : array
