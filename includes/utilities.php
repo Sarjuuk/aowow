@@ -20,6 +20,16 @@ if (version_compare(PHP_VERSION, '8.6.0') < 0)
     }
 }
 
+// PHP 8.5 polyfill
+if (version_compare(PHP_VERSION, '8.5.0') < 0)
+{
+    function array_last(array $array) : mixed
+    {
+        return $array ? $array[array_key_last($array)] : null;
+    }
+}
+
+
 class SimpleXML extends \SimpleXMLElement
 {
     public function addCData(string $cData) : \SimpleXMLElement
