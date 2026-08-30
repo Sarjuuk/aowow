@@ -31,7 +31,7 @@ class EmoteEntry extends DBTypeEntry
 
     public const string QUERY_BASE = 'SELECT e.*, e.`id` AS ARRAY_KEY FROM ::emotes e';
 
-    public function applyInitData(array $initData, array $opts) : void
+    public function applyInitData(array $initData, array $opts) : bool
     {
         parent::applyInitData($initData, $opts);
 
@@ -50,6 +50,8 @@ class EmoteEntry extends DBTypeEntry
         $this->extToMe   = new LocString($initData, 'extToMe',   UIText::formatMarkup(...));
         $this->extToExt  = new LocString($initData, 'extToExt',  UIText::formatMarkup(...));
         $this->extToNone = new LocString($initData, 'extToNone', UIText::formatMarkup(...));
+
+        return true;
     }
 
     public function getListviewRow(int $addInfoMask = 0x0) : array

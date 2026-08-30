@@ -43,7 +43,7 @@ class EnchantmentEntry extends DBTypeEntry
         'is' => ['j' => ['::item_stats `is`  ON `is`.`type` = 502 AND `is`.`typeId` = `ie`.`id`', true], 's' => ', `is`.*'],
     );
 
-    public function applyInitData(array $initData, array $opts) : void
+    public function applyInitData(array $initData, array $opts) : bool
     {
         parent::applyInitData($initData, $opts);
 
@@ -76,6 +76,8 @@ class EnchantmentEntry extends DBTypeEntry
             };
         }
         $this->spells = array_filter($spells);
+
+        return true;
     }
 
     public function getListviewRow(int $addInfoMask = 0x0) : array
