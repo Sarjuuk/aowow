@@ -63,7 +63,7 @@ class GameobjectEntry extends DBTypeEntry implements ISource, ITooltip
         's'   => ['j' => '::objects_spawns s ON s.`typeId` = o.`id`']
     );
 
-    public function applyInitData(array $initData, array $opts) : void
+    public function applyInitData(array $initData, array $opts) : bool
     {
         parent::applyInitData($initData, $opts);
 
@@ -125,6 +125,8 @@ class GameobjectEntry extends DBTypeEntry implements ISource, ITooltip
         $this->capturePoint = $capture;
         $this->lootStack    = $lootStack;
         $this->transport    = $transport;
+
+        return true;
     }
 
     public function getListviewRow(int $addInfoMask = 0x0, ?array $location = null) : array

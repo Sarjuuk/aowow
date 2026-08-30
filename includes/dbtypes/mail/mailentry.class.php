@@ -20,7 +20,7 @@ class MailEntry extends DBTypeEntry
 
     public const string QUERY_BASE = 'SELECT m.*, m.`id` AS ARRAY_KEY FROM ::mails m';
 
-    public function applyInitData(array $initData, array $opts) : void
+    public function applyInitData(array $initData, array $opts) : bool
     {
         parent::applyInitData($initData, $opts);
 
@@ -35,6 +35,8 @@ class MailEntry extends DBTypeEntry
         $this->name    = $subject;
         $this->subject = $subject;
         $this->text    = new LocString($initData, 'text');
+
+        return true;
     }
 
     public static function getName(int $id) : ?LocString

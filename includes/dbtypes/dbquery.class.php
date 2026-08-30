@@ -153,9 +153,9 @@ class DBQuery
     }
 
     /**
-     * @return \Generator<int, array> id => DBTypeEntry data
+     * @return \Generator<int, \Dibi\Result> db id => query result
      */
-    public function fetch() : \Generator
+    public function results() : \Generator
     {
         if (!$this->queryBase)
             return;
@@ -166,6 +166,7 @@ class DBQuery
             try                                             // does not go through the compatibility layer as we need to be able to fetch individual rows here
             {
                 $query  = str_replace('DB_IDX', $dbIdx, $this->queryBase);
+                /** @var \Dibi\Result $result */
                 $result = DB::{$n}($dbIdx)->query($query, $this->where);
 
                 if ($this->calcTotal && $result->getRowCount())
@@ -179,11 +180,7 @@ class DBQuery
                     $this->resultTotal += DB::{$n}($dbIdx)->selectCell('SELECT COUNT(*) FROM ('.$this->totalQuery.') x', $this->where);
                 }
 
-                // just .. roll with the unparsed, deprecated ARRAY_KEY, hmk?
-                foreach ($result->getIterator() as $row)
-                    yield $row['ARRAY_KEY'] => (array)$row;
-
-                $result->free();
+                yield $dbIdx => $result;
             }
             catch (\Exception $e)
             {
