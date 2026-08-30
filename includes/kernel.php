@@ -53,45 +53,6 @@ require_once 'includes/game/misc.php';                      // Misc game related
 
 // hmm .. should every autoloader be differentiated by namespace?
 
-
-// game client data interfaces
-spl_autoload_register(function (string $class) : void
-{
-    if ($i = strrpos($class, '\\'))
-        $class = substr($class, $i + 1);
-
-    if (preg_match('/[^\w]/i', $class))
-        return;
-
-    $class = strtolower($class);
-
-    if ($class == 'stat' || $class == 'statscontainer')     // entity statistics conversion
-        require_once 'includes/game/chrstatistics.php';
-    else if (file_exists('includes/game/'.$class.'.class.php'))
-        require_once 'includes/game/'.$class.'.class.php';
-    else if (file_exists('includes/game/loot/'.$class.'.class.php'))
-        require_once 'includes/game/loot/'.$class.'.class.php';
-});
-
-// our site components
-spl_autoload_register(function (string $class) : void
-{
-    if ($i = strrpos($class, '\\'))
-        $class = substr($class, $i + 1);
-
-    if (preg_match('/[^\w]/i', $class))
-        return;
-
-    $class = strtolower($class);
-
-    if (file_exists('includes/components/'.$class.'.class.php'))
-        require_once 'includes/components/'.$class.'.class.php';
-    else if (file_exists('includes/components/frontend/'.$class.'.class.php'))
-        require_once 'includes/components/frontend/'.$class.'.class.php';
-    else if (file_exists('includes/components/response/'.$class.'.class.php'))
-        require_once 'includes/components/response/'.$class.'.class.php';
-});
-
 // TC systems in components
 spl_autoload_register(function (string $class) : void
 {
@@ -112,7 +73,7 @@ spl_autoload_register(function (string $class) : void
     }
 });
 
-// dbtype autloader
+// game client data interfaces
 spl_autoload_register(function (string $class) : void
 {
     if ($i = strrpos($class, '\\'))
@@ -123,19 +84,40 @@ spl_autoload_register(function (string $class) : void
 
     $class = strtolower($class);
 
-    // profiler...
-    $class = strtr($class, ['remote' => '', 'local' => '']);
+    // special case: entity statistics conversion
+    if ($class == 'stat' || $class == 'statscontainer')
+    {
+        require_once 'includes/game/chrstatistics.php';
+        return;
+    }
 
-    $dir = strtr($class, ['entry' => '', 'container' => '', 'filter' => '']);
+    $paths = array(
+        'includes/game/',
+        'includes/game/loot/',
+        'includes/components/',
+        'includes/components/frontend/',
+        'includes/components/response/',
+        'includes/dbtypes/'
+    );
+
+    foreach ($paths as $p)
+    {
+        if (!file_exists($p.$class.'.class.php'))
+            continue;
+
+        require_once($p.$class.'.class.php');
+        return;
+    }
+
+    // dbtype autloader
+    $class = strtr($class, ['remote' => '', 'local'     => ''                ]);
+    $dir   = strtr($class, ['entry'  => '', 'container' => '', 'filter' => '']);
 
     if (file_exists('includes/dbtypes/'.$dir.'/'.$class.'.class.php'))
     {
         require_once 'includes/dbtypes/dbquery.class.php';
         require_once 'includes/dbtypes/dbtypeentry.class.php';
         require_once 'includes/dbtypes/dbtypecontainer.class.php';
-
-        if ($class == $dir.'filter')
-            require_once 'includes/dbtypes/dbtypefilter.class.php';
 
         require_once 'includes/dbtypes/'.$dir.'/'.$class.'.class.php';
     }

@@ -147,7 +147,7 @@ abstract class Type
     {
         $x = self::getFileStringsFor(self::FLAG_FILTRABLE);
         if ($type = array_search($fileStr, $x))
-            return new (strtr(self::$data[$type][self::IDX_OBJECT], ['Entry' => 'DBTypeFilter']))($data, $opts);
+            return new (strtr(self::$data[$type][self::IDX_OBJECT], ['Entry' => 'Filter']))($data, $opts);
 
         return null;
     }

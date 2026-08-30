@@ -363,26 +363,23 @@ abstract class DBTypeEntry
 
     public function __construct(int|array $initData, array $extraOpts = [], array $targetDBs = ['Aowow'])
     {
-        if (is_int($initData))
+        if (is_array($initData))
         {
-            $dbQuery = new DBQuery($targetDBs, static::QUERY_BASE, static::QUERY_OPTS, $extraOpts['queryOpts'] ?? []);
-            if (!$dbQuery->build([['id', $initData]]))
-                return;
-
-            foreach ($dbQuery->fetch() as $data)
-            {
-                $this->applyInitData($data, $extraOpts['apply'] ?? []);
+            if ($this->applyInitData($initData, $extraOpts['apply'] ?? []))
                 $this->error = false;
-                break;                                      // should only ever be one row
-            }
 
             return;
         }
 
-        if ($initData)
+        $dbQuery = new DBQuery($targetDBs, static::QUERY_BASE, static::QUERY_OPTS, $extraOpts['queryOpts'] ?? []);
+        if (!$dbQuery->build([['id', $initData]]))
+            return;
+
+        foreach ($dbQuery->fetch() as $data)
         {
-            $this->applyInitData($initData, $extraOpts['apply'] ?? []);
+            $this->applyInitData($data, $extraOpts['apply'] ?? []);
             $this->error = false;
+            break;                                      // should only ever be one row
         }
     }
 
