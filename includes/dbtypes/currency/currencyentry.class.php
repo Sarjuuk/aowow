@@ -27,7 +27,7 @@ class CurrencyEntry extends DBTypeEntry implements ITooltip
         'ic' => ['j' => ['::icons ic ON ic.`id` = c.`iconId`', true], 's' => ', ic.`name` AS "icon"']
     );
 
-    public function applyInitData(array $initData, array $opts) : void
+    public function applyInitData(array $initData, array $opts) : bool
     {
         parent::applyInitData($initData, $opts);
 
@@ -39,6 +39,8 @@ class CurrencyEntry extends DBTypeEntry implements ITooltip
         $this->itemId      = $initData['itemId'];
         $this->iconId      = $initData['iconId'];
         $this->icon        = $initData['icon'] ?: DEFAULT_ICON;
+
+        return true;
     }
 
     public function getListviewRow(int $addInfoMask = 0x0) : array

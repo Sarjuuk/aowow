@@ -35,7 +35,7 @@ class CharRaceEntry extends DBTypeEntry
         'ic1' => ['j' => ['::icons ic1 ON ic1.`id` = r.`iconId1`', true], 's' => ', ic1.`name` AS "iconFemale"']
     );
 
-    public function applyInitData(array $initData, array $opts) : void
+    public function applyInitData(array $initData, array $opts) : bool
     {
         parent::applyInitData($initData, $opts);
 
@@ -50,6 +50,8 @@ class CharRaceEntry extends DBTypeEntry
         $this->iconId      = [$initData['iconId0'], $initData['iconId1']];
         $this->icon        = [$initData['iconMale'], $initData['iconFemale']];
         $this->expansion   = $initData['expansion'];
+
+        return true;
     }
 
     public function getListviewRow(int $addInfoMask = 0x0) : array

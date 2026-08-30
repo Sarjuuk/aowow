@@ -33,7 +33,7 @@ class SkillEntry extends DBTypeEntry
         'ic' => ['j' => ['::icons ic ON ic.`id` = sl.`iconId`', true], 's' => ', ic.`name` AS "icon"'],
     );
 
-    public function applyInitData(array $initData, array $opts) : void
+    public function applyInitData(array $initData, array $opts) : bool
     {
         parent::applyInitData($initData, $opts);
 
@@ -48,6 +48,8 @@ class SkillEntry extends DBTypeEntry
         $this->recipeSubClass  = $initData['recipeSubClass'];
         $this->specializations = array_pad(explode(' ', $initData['specializations']), 5, 0);
         $this->expansion       = EXP_CLASSIC;               // todo: not yet set in DB
+
+        return true;
     }
 
     public function getListviewRow(int $addInfoMask = 0x0) : array

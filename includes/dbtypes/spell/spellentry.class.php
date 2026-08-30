@@ -277,7 +277,7 @@ class SpellEntry extends DBTypeEntry implements ISource, ITooltip
 
     }
 
-    public function applyInitData(array $initData, array $opts) : void
+    public function applyInitData(array $initData, array $opts) : bool
     {
         parent::applyInitData($initData, $opts);
 
@@ -408,6 +408,8 @@ class SpellEntry extends DBTypeEntry implements ISource, ITooltip
 
         $this->error = false;                               // prematurely set as o.k. or the import fails
         $this->refSpells->import($this);
+
+        return true;
     }
 
     /**

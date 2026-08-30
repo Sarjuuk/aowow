@@ -201,7 +201,7 @@ class ProfileLoadResponse extends TextResponse
                 $data  = $phItems->getListviewData(LISTVIEWINFO_ITEMEXTRA | LISTVIEWINFO_SUBITEMS);
                 foreach ($phItems->iterate() as $iId => $phEntry)
                 {
-                    foreach (Profiler::$slot2InvType as $slot => $invTypes)
+                    foreach (Profiler::SLOT_INVTYPE_MAP as $slot => $invTypes)
                     {
                         if (in_array($phEntry->slot, $invTypes) && !in_array($slot, $usedSlots))
                         {

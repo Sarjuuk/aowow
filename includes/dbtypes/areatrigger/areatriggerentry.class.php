@@ -27,7 +27,7 @@ class AreatriggerEntry extends DBTypeEntry
         's' => ['j' => ['::spawns s ON s.`type` = 503 AND s.`typeId` = a.`id` AND s.`guid` > 0', true], 's' => ', GROUP_CONCAT(s.`areaId` ORDER BY s.`typeId` DESC) AS "location"', 'g' => 'a.`id`']
     );
 
-    public function applyInitData(array $initData, array $opts) : void
+    public function applyInitData(array $initData, array $opts) : bool
     {
         parent::applyInitData($initData, $opts);
 
@@ -37,6 +37,8 @@ class AreatriggerEntry extends DBTypeEntry
         $this->quest       = $initData['quest'];
         $this->orientation = $initData['orientation'];
         $this->location    = explode(',', $initData['location']);
+
+        return true;
     }
 
     public function getListviewRow(int $addInfoMask = 0x0) : array
