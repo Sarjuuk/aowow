@@ -782,23 +782,18 @@ class SpellEntry extends DBTypeEntry implements ISource, ITooltip
     public function getProfilerMods() : array
     {
         // weapon hand check: param: slot, class, subclass, value
-        $whCheck = '$function() { var j, w = _inventory.getInventory()[%d]; if (!w[0] || !g_items[w[0]]) { return 0; } j = g_items[w[0]].jsonequip; return (j.classs == %d && (%d & (1 << (j.subclass)))) ? %d : 0; }';
+        static $whCheck = '$function() { var j, w = _inventory.getInventory()[%d]; if (!w[0] || !g_items[w[0]]) { return 0; } j = g_items[w[0]].jsonequip; return (j.classs == %d && (%d & (1 << (j.subclass)))) ? %d : 0; }';
 
-        $data = [];                                         // flat gains
-        foreach ($this->getStatGain() as $spellData)
-        {
-            $data = $spellData->toJson(STAT::FLAG_ITEM | STAT::FLAG_PROFILER, false);
+        // flat gains
+        $data = $this->getStatGain()->toJson(STAT::FLAG_ITEM | STAT::FLAG_PROFILER, false);
 
-            // apply weapon restrictions
-            $class    = $this->equippedItemClass;
-            $subClass = $this->equippedItemSubClassMask;
-            $slot     = $subClass & 0x5000C ? 18 : 16;
-            if ($class != ITEM_CLASS_WEAPON || !$subClass)
-                continue;
-
+        // apply weapon restrictions
+        $class    = $this->equippedItemClass;
+        $subClass = $this->equippedItemSubClassMask;
+        $slot     = $subClass & 0x5000C ? 18 : 16;
+        if ($class == ITEM_CLASS_WEAPON && $subClass)
             foreach ($data as $key => $amt)
                 $data[$key] = [1, 'functionOf', sprintf($whCheck, $slot, $class, $subClass, $amt)];
-        }
 
         // 4 possible modifiers found
         // <statistic> => [0.15, 'functionOf', <funcName:int>]
