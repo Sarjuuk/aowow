@@ -116,7 +116,7 @@ class QuestEntry extends DBTypeEntry implements ISource, ITooltip
         'e'   => ['j' => ['::events e ON e.`id` = q.`eventId`', true], 's' => ', e.`holidayId`']
     );
 
-    public function applyInitData(array $initData, array $opts) : void
+    public function applyInitData(array $initData, array $opts) : bool
     {
         parent::applyInitData($initData, $opts);
 
@@ -230,6 +230,8 @@ class QuestEntry extends DBTypeEntry implements ISource, ITooltip
             else
                 $this->rewardItems[$rewItem] = ($this->rewardItems[$rewItem] ?? 0) + $qty;
         }
+
+        return true;
     }
 
     public function getListviewRow(int $addInfoMask = 0x0, int $reputationCol = 0) : array

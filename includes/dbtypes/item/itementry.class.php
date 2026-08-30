@@ -159,7 +159,7 @@ class ItemEntry extends DBTypeEntry implements ISource, ITooltip
             $this->enhance = $extraOpts['enhance'];
     }
 
-    public function applyInitData(array $initData, array $opts) : void
+    public function applyInitData(array $initData, array $opts) : bool
     {
         parent::applyInitData($initData, $opts);            // id
 
@@ -293,6 +293,8 @@ class ItemEntry extends DBTypeEntry implements ISource, ITooltip
         $this->initSources($initData);
 
         $this->initJsonStats();
+
+        return true;
     }
 
     /**

@@ -38,7 +38,7 @@ class WorldeventEntry extends DBTypeEntry implements ITooltip
         'ic' => ['j' => ['::icons ic ON ic.`id` = h.`iconId`',     true], 's' => ', ic.`name` AS "icon"']
     );
 
-    public function applyInitData(array $initData, array $opts) : void
+    public function applyInitData(array $initData, array $opts) : bool
     {
         parent::applyInitData($initData, $opts);
 
@@ -71,6 +71,8 @@ class WorldeventEntry extends DBTypeEntry implements ITooltip
              2      => 3,                                   // PvP
             default => 0                                    // Uncategorized (holidayId == 0)
         };
+
+        return true;
     }
 
     public function getListviewRow(int $addInfoMask = 0x0) : array

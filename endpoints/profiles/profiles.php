@@ -126,7 +126,7 @@ class ProfilesBaseResponse extends TemplateResponse implements IProfilerList
 
         $miscParams = ['calcTotal' => true];
         if ($this->realm)
-            $miscParams['sv'] = $this->realm;
+            $miscParams['sv'] = $this->realmId;
         if ($this->region)
             $miscParams['rg'] = $this->region;
         if ($_ = $this->filter->queryOpts)

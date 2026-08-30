@@ -149,59 +149,26 @@ trait TrSourceHelper
     }
 }
 
-interface IProfiler
-{
-    public function packId(int $realmId, int $realmGUID) : int;
-    public function unpackId(int $packedId) : array;
-    public static function getRealmDBs(?array $fi) : array;
-}
-
 trait TrProfilerHelper
 {
     public static string $brickFile = 'profile';            // profile is multipurpose
 
-    public readonly int    $subjectGUID;
+ // public readonly string $battlegroup;
+    public readonly string $region;
     public readonly int    $realmId;
     public readonly int    $realmGUID;
     public readonly string $realmName;
 
-    public readonly string $region;
- // public readonly string $battlegroup;
-
     // sooo subjectGUID cant' be used as $id, because it's not unique across realms <realmId>:<subjectGUID>
     // so we pack them .. assumes PHP_INT_SIZE == 8 / an x64 system
-    public function packId(int $realmId, int $realmGUID) : int
-    {
-        // return ($this->realmId & 0xFFFF) << 40 | ($this->realmGUID & 0xFFFFFFFFFF);
-        return ($realmId & 0xFFFF) << 40 | ($realmGUID & 0xFFFFFFFFFF);
-    }
-
-    public function unpackId(int $packedId) : array
-    {
-        // $this->realmId   = ($packedId >> 40) & 0xFFFF;
-        // $this->realmGUID =  $packedId        & 0xFFFFFFFFFF;
-        return [
-            ($packedId >> 40) & 0xFFFF,
-             $packedId        & 0xFFFFFFFFFF
-        ];
-    }
-
-    public static function getRealmDBs(?array $fi) : array
-    {
-        $dbNames = [];
-
-        foreach (Profiler::getRealms() as $idx => $r)
-        {
-            if (!empty($fi['sv']) && Profiler::urlize($r['name']) != Profiler::urlize($fi['sv']) && intVal($fi['sv']) != $idx)
-                continue;
-
-            if (!empty($fi['rg']) && Profiler::urlize($r['region']) != Profiler::urlize($fi['rg']))
-                continue;
-
-            $dbNames[$idx] = 'characters';
+    // max realmID:          1 048 575
+    // max charGUID: 1 099 511 627 775
+    public private(set) int $subjectGUID {
+        get => ($this->realmId & 0xFFFFF) << 44 | ($this->realmGUID & 0xFFFFFFFFFFF);
+        set (int $packedId) {
+            $this->realmId   = ($packedId >> 44) & 0xFFFFF;
+            $this->realmGUID =  $packedId        & 0xFFFFFFFFFFF;
         }
-
-        return $dbNames;
     }
 }
 
@@ -375,18 +342,25 @@ abstract class DBTypeEntry
         if (!$dbQuery->build([['id', $initData]]))
             return;
 
-        foreach ($dbQuery->fetch() as $data)
+        foreach ($dbQuery->results() as $result)
         {
-            $this->applyInitData($data, $extraOpts['apply'] ?? []);
-            $this->error = false;
-            break;                                      // should only ever be one row
+            foreach ($result->getIterator() as $data)
+            {
+                if ($this->applyInitData((array)$data, $extraOpts['apply'] ?? []))
+                    $this->error = false;
+                break;                                  // should only ever be one row
+            }
+
+            $result->free();
+            break;
         }
     }
 
     // readonly props may only be written like they were private; so force per DBTypeEntry implementation
-    public function applyInitData(array $initData, array $opts) : void
+    public function applyInitData(array $initData, array $opts) : bool
     {
         $this->id = $initData['id'];
+        return true;
     }
 
     public static function getName(int $id) : ?LocString

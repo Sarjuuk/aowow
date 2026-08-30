@@ -37,7 +37,7 @@ class ZoneEntry extends DBTypeEntry
 
     public const string QUERY_BASE = 'SELECT z.*, z.`id` AS ARRAY_KEY FROM ::zones z';
 
-    public function applyInitData(array $initData, array $opts) : void
+    public function applyInitData(array $initData, array $opts) : bool
     {
         parent::applyInitData($initData, $opts);
 
@@ -78,6 +78,8 @@ class ZoneEntry extends DBTypeEntry
             $attnmt[$type][] = -$typeId;
         }
         $this->attunements = $attnmt;
+
+        return true;
     }
 
     public function getListviewRow(int $addInfoMask = 0x0) : array
