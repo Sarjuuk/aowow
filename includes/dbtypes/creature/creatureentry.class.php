@@ -97,7 +97,7 @@ class CreatureEntry extends DBTypeEntry implements ISource, ITooltip
         's'    => ['j' => ['::spawns s ON s.`type` = 1 AND s.`typeId` = ct.`id`', true]]
     );
 
-    public function applyInitData(array $initData, array $opts) : void
+    public function applyInitData(array $initData, array $opts) : bool
     {
         parent::applyInitData($initData, $opts);
 
@@ -165,6 +165,8 @@ class CreatureEntry extends DBTypeEntry implements ISource, ITooltip
 
         $this->startsQuests = $initData['startsQuests'];
  //     $this->endsQuests   = $initData['endsQuests'];
+
+        return true;
     }
 
     /**

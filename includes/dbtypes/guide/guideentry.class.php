@@ -51,7 +51,7 @@ class GuideEntry extends DBTypeEntry implements ITooltip
         'ar' => ['j' => ['::articles ar ON ar.`type` = 300 AND ar.`typeId` = g.`id`'], 's' => ', MAX(ar.`rev`) AS "latest"']
     );
 
-    public function applyInitData(array $initData, array $opts) : void
+    public function applyInitData(array $initData, array $opts) : bool
     {
         parent::applyInitData($initData, $opts);
 
@@ -73,7 +73,9 @@ class GuideEntry extends DBTypeEntry implements ITooltip
         $this->userId      = $initData['userId'];
         $this->author      = $initData['author'];
         $this->date        = $initData['date'];
-    }
+
+        return true;
+     }
 
     public function getListviewRow(int $addInfoMask = 0x0) : array
     {
