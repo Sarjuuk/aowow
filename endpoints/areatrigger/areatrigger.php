@@ -83,7 +83,7 @@ class AreatriggerBaseResponse extends TemplateResponse implements ICache
         // Smart AI
         if ($_type == AT_TYPE_SMART)
         {
-            $sai = new SmartAI(SmartAI::SRC_TYPE_AREATRIGGER, $this->typeId, ['teleportTargetArea' => end($this->subject->location)]);
+            $sai = new SmartAI(SmartAI::SRC_TYPE_AREATRIGGER, $this->typeId, ['teleportTargetArea' => array_last($this->subject->location)]);
             if ($sai->prepare())
             {
                 $this->extendGlobalData($sai->getJSGlobals());

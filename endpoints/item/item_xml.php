@@ -42,23 +42,19 @@ class ItemXmlResponse extends TextResponse implements ICache
         if ($this->search)
         {
             // DBTypeEntry cant search for strings, so we have to be roundabout
-            $container = new ItemContainer(array(['name_loc'.Lang::getLocale()->value, $this->search]));
-            if ($container->error)
+            if (($container = new ItemContainer(array(['name_loc'.Lang::getLocale()->value, $this->search])))->error)
             {
                 $this->handleError();
                 return;
             }
+
             $this->subject = $container->getEntry($container->id);
             $this->typeId  = $this->subject->id;
         }
-        else
+        else if (($this->subject = new ItemEntry($this->typeId))->error)
         {
-            $this->subject = new ItemEntry($this->typeId);
-            if ($this->subject->error)
-            {
-                $this->handleError();
-                return;
-            }
+            $this->handleError();
+            return;
         }
 
         $root = new SimpleXML('<aowow />');
