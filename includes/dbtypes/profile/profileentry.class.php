@@ -10,6 +10,7 @@ abstract class ProfileEntry extends DBTypeEntry implements ITooltip
 {
     use TrProfilerHelper;
 
+    public static int $dbType     = Type::PROFILE;
     public static int $contribute = CONTRIBUTE_NONE;
 
     public readonly  string $name;
@@ -18,7 +19,7 @@ abstract class ProfileEntry extends DBTypeEntry implements ITooltip
     public readonly  int    $class;
     public readonly  int    $gender;
     public readonly  int    $level;
-    public readonly  int    $title;
+    public readonly ?int    $title;
     /** @var int[] $talenttree length:3 - points per tree */
     public readonly  array  $talenttree;
     public readonly  int    $activespec;
@@ -43,26 +44,54 @@ abstract class ProfileEntry extends DBTypeEntry implements ITooltip
     public readonly ?bool   $custom;
     // character only
     public readonly ?int    $renameItr;
+    public readonly  bool   $renamePending;
 
     private array $extraColData = [];
 
-    public function applyInitData(array $initData, array $opts) : void
+    public function __construct(int|array $initData, array $extraOpts = [], array $targetDBs = ['Aowow'])
+    {
+        parent::__construct($initData, $extraOpts, $targetDBs);
+
+        if (is_int($initData))
+            $this->setRenameItr();
+    }
+
+    public function applyInitData(array $initData, array $opts) : bool
     {
         parent::applyInitData($initData, $opts);
 
-        $this->name = new LocString($initData, 'name', pruneFromSrc: true);
+        $this->name    = $initData['name'];
+        $this->cuFlags = $initData['cuFlags'];
+        $this->race    = $initData['race'];
+        $this->class   = $initData['class'];
+        $this->gender  = $initData['gender'];
+        $this->level   = $initData['level'];
+        $this->title   = $initData['title'];
 
-        foreach ($initData as $k => $v)
-        {
-            switch ($k)
-            {
-                case 'id':                                  // id defined by parent
-                    continue 2;
-                default:
-                    if (property_exists($this, $k))
-                        $this->$k = $v;
-            }
-        }
+     // $this->talenttree        = $initData['talenttree']        ?? [0, 0, 0];
+        $this->activespec        = $initData['activespec']        ?? 0;
+        $this->achievementpoints = $initData['achievementpoints'] ?? 0;
+        $this->gearscore         = $initData['gearscore']         ?? 0;
+
+        $this->guild     = $initData['guild']     ?? null;
+        $this->guildname = $initData['guildname'] ?? null;
+        $this->guildrank = $initData['guildrank'] ?? null;
+
+        $this->arenateam   = $initData['arenateam']   ?? null;
+        $this->rating      = $initData['rating']      ?? null;
+        $this->captain     = $initData['captain']     ?? null;
+        $this->seasonGames = $initData['seasonGames'] ?? null;
+        $this->seasonWins  = $initData['seasonWins']  ?? null;
+
+        $this->user        = $initData['user']        ?? null;
+        $this->description = $initData['description'] ?? null;
+        $this->icon        = $initData['icon']        ?? null;
+        $this->deleted     = $initData['deleted']     ?? false;
+        $this->custom      = $initData['custom']      ?? false;
+
+        $this->renamePending = $initData['renamePending'] ?? false;
+
+        return true;
     }
 
     /**
@@ -159,7 +188,7 @@ abstract class ProfileEntry extends DBTypeEntry implements ITooltip
         if (($addMask & GLOBALINFO_PROFILE) && $this->isCustom())
         {
             $profile = array(
-                'id'     => $this->id,
+             // 'id'     => $this->id,
                 'name'   => $this->name,
                 'race'   => $this->race,
                 'classs' => $this->class,
@@ -170,14 +199,14 @@ abstract class ProfileEntry extends DBTypeEntry implements ITooltip
             if ($this->icon)
                 $profile['icon'] = $this->icon;
 
-            return $profile;
+            return [self::$dbType => [$this->id => $profile]];
         }
 
         $realms = Profiler::getRealms();
         if ($addMask & GLOBALINFO_CHARACTER && !$this->isCustom() && isset($realms[$this->realmId]))
         {
-            return array(
-                'id'        => $this->id,
+            return [self::$dbType => [$this->id => array(
+             // 'id'        => $this->id,
                 'name'      => $this->name,
                 'realmname' => $realms[$this->realmId]['name'],
                 'region'    => $realms[$this->realmId]['region'],
@@ -187,7 +216,7 @@ abstract class ProfileEntry extends DBTypeEntry implements ITooltip
                 'level'     => $this->level,
                 'gender'    => $this->gender,
                 'pinned'    => $this->cuFlags & PROFILER_CU_PINNED ? 1 : 0
-            );
+            )]];
         }
 
         return [];
@@ -254,6 +283,38 @@ abstract class ProfileEntry extends DBTypeEntry implements ITooltip
         );
     }
 
+    public function getProfileUrl() : string
+    {
+        if ($this->isCustom())
+            return '?profile=' . $this->id;
+
+        return '?profile=' . $this->region . '.' . Profiler::urlize($this->realmName, true) . '.' . urlencode($this->name) . ($this->renameItr ? '-' . $this->renameItr : '');
+    }
+
+    public function setRenameItr(?array &$itrData = []) : void
+    {
+        // already saved as "pending rename"
+        if ($itr = DB::Aowow()->selectCell('SELECT `renameItr` FROM ::profiler_profiles WHERE `realm` = %i AND `realmGUID` = %i', $this->realmId, $this->realmGUID))
+        {
+            $this->renameItr = $itr;
+            return;
+        }
+
+        // not yet recognized: get max itr
+        if (($itrData ??= self::fetchRenameItrs($this->realmId, $this->name)) && isset($itrData[$this->name]))
+        {
+            $this->renameItr = ++$itrData[$this->name];
+            return;
+        }
+
+        $this->renameItr = 0;
+    }
+
+    public static function fetchRenameItrs(int $realmId, string ...$names) : array
+    {
+        return DB::Aowow()->selectCol('SELECT `name` AS ARRAY_KEY, MAX(`renameItr`) FROM ::profiler_profiles WHERE `realm` = %i AND `custom` = 0 AND `name` IN %in GROUP BY `name`', $realmId, $names) ?: [];
+    }
+
     public static function getName(int $id) : ?LocString { return null; }
 }
 
@@ -262,97 +323,70 @@ class RemoteProfileEntry extends ProfileEntry
 {
     public readonly string $battlegroup;
 
-    public const string QUERY_BASE = 'SELECT `c`.*, `c`.`guid` AS ARRAY_KEY FROM characters c';
+    public const string QUERY_BASE = 'SELECT c.`guid`, c.`name`, c.`race`, c.`class`, c.`gender`, c.`level`, c.`at_login`, c.`chosenTitle`, c.`activeTalentGroup` FROM characters c';
     public const array  QUERY_OPTS = array(
-        'c'   => [['gm', 'g', 'cap']],                                                             // 12698: use criteria of Achievement 4496 as shortcut to get total achievement points
+        'c'   => [['gm', 'g', 'cap']],                      // 12698: use criteria of Achievement 4496 as shortcut to get total achievement points
         'cap' => ['j' => ['character_achievement_progress cap ON cap.`guid` = c.`guid` AND cap.`criteria` = 12698', true], 's' => ', IFNULL(cap.`counter`, 0) AS "achievementpoints"'],
         'gm'  => ['j' => ['guild_member gm ON gm.`guid` = c.`guid`', true], 's' => ', gm.`rank` AS "guildrank"'],
         'g'   => ['j' => ['guild g ON g.`guildid` = gm.`guildid`', true], 's' => ', g.`guildid` AS "guild", g.`name` AS "guildname"'],
         'atm' => ['j' => ['arena_team_member atm ON atm.`guid` = c.`guid`', true], 's' => ', atm.`personalRating` AS "rating"'],
-        'at'  => [['atm'], 'j' => 'arena_team at ON atm.`arenaTeamId` = at.`arenaTeamId`', 's' => ', at.`name` AS "arenateam", IF(at.`captainGuid` = c.`guid`, 1, 0) AS "captain"']
+        'at'  => [['atm'], 'j' => 'arena_team at ON atm.`arenaTeamId` = at.`arenaTeamId`', 's' => ', at.`name` AS "arenateamname", at.`arenaTeamId` AS "arenateam", IF(at.`captainGuid` = c.`guid`, 1, 0) AS "captain"']
     );
 
-    private array $rnItr = [];                              // rename iterator [name => nCharsWithThisName]
-
-    public function __construct(array $conditions = [], array $miscData = [])
+    public function __construct(int|array $initData, array $extraOpts = [])
     {
-        // select DB by realm
-        if (!$dbNames = self::getRealmDBs($miscData))
+        // if id lookup, select DB by realm
+        $targetDBs = Profiler::getRealmDBs($extraOpts['rg'] ?? null, $extraOpts['sv'] ?? null);
+
+        if (is_int($initData) && !$targetDBs)
         {
-            trigger_error('RemoteProfileEntry::__construct - cannot access any realm.', E_USER_WARNING);
+            trigger_error(__METHOD__.' - cannot access any realm.', E_USER_WARNING);
             return;
         }
 
-        parent::__construct($conditions, $miscData, $dbNames);
+        // warning: jank! - realmId is not already set by container only if the user preselected just the region in the search from and the region only contains a single realm
+        if (is_array($initData) && $targetDBs && !isset($initData['realmId']))
+            $initData['realmId'] = key($targetDBs);
     }
 
-    public function applyInitData(array $initData, array $opts) : void
+    public function applyInitData(array $initData, array $opts) : bool
     {
-        $realms       = Profiler::getRealms();
-        $talentSpells = [];
-        $talentLookup = [];
-        $distrib      = [];
-
-        // battlegroup
-        $this->battlegroup = Cfg::get('BATTLEGROUP');
-
-        // realm
-        [$r, $g] = explode(':', $guid);
-        if (!empty($realms[$r]))
+        if (!$initData['name'])
         {
-            $curTpl['realm']     = $r;
-            $curTpl['realmName'] = $realms[$r]['name'];
-            $curTpl['region']    = $realms[$r]['region'];
-        }
-        else
-        {
-            trigger_error('char #'.$guid.' belongs to nonexistent realm #'.$r, E_USER_WARNING);
-            unset($this->templates[$guid]);
+            trigger_error('char #'.$initData['guid'].' on realm #'.$initData['realmId'].' has empty name.', E_USER_WARNING);
+            return false;
         }
 
-        // empty name
-        if (!$curTpl['name'])
+        if (!(['name' => $realmName, 'region' => $region] = Profiler::getRealms()[$initData['realmId']] ?? null))
         {
-            trigger_error('char #'.$guid.' on realm #'.$r.' has empty name.', E_USER_WARNING);
-            unset($this->templates[$guid]);
+            trigger_error(__METHOD__.' realm #'.$initData['realmId'].' is inaccessible or does not exist.', E_USER_WARNING);
+            return false;
         }
 
-        // temp id
-        $curTpl['id'] = 0;
+        $this->region    = $region;
+        $this->realmId   = $initData['realmId'];
+        $this->realmGUID = $initData['guid'];
+        $this->realmName = $realmName;
 
-        // talent points pre
-        $talentLookup[$r][$g] = [];
-        $talentSpells[] = $curTpl['class'];
-        $curTpl['activespec'] = $curTpl['activeTalentGroup'];
+        // rename to fit our structure
+        $initData['renamePending'] = $initData['at_login'] & 0x1 ? 1 : 0;
+        $initData['cuFlags']       = 0;
+        $initData['activespec']    = $initData['activeTalentGroup'];
+        $initData['id']            = $this->subjectGUID;
+        $initData['title']         = $initData['chosenTitle'];
 
-        // equalize distribution
-        if (empty($distrib[$curTpl['realm']]))
-            $distrib[$curTpl['realm']] = 1;
-        else
-            $distrib[$curTpl['realm']]++;
-
-        // char is pending rename
-        if ($curTpl['at_login'] & 0x1)
-        {
-            $this->rnItr[$curTpl['name']] ??= DB::Aowow()->selectCell('SELECT MAX(`renameItr`) FROM ::profiler_profiles WHERE `realm` = %i AND `custom` = 0 AND `name` = %s', $r, $curTpl['name']) ?: 0;
-
-            // already saved as "pending rename"
-            if ($rnItr = DB::Aowow()->selectCell('SELECT `renameItr` FROM ::profiler_profiles WHERE `realm` = %i AND `realmGUID` = %i', $r, $g))
-                $curTpl['renameItr'] = $rnItr;
-            // not yet recognized: get max itr
-            else
-                $curTpl['renameItr'] = ++$this->rnItr[$curTpl['name']];
-        }
-        else
-            $curTpl['renameItr'] = 0;
-
-        $curTpl['cuFlags'] = 0;
+        return parent::applyInitData($initData, $opts);
     }
 
     public function amendLocalData(array $localData) : void
     {
         $this->id        = $localData['id'] ?? 0;
         $this->gearscore = $localData['gearscore'] ?? 0;
+    }
+
+    public function setTalentDistribution(int ...$trees) : void
+    {
+        $this->talenttree = [...$trees];
     }
 }
 
@@ -368,64 +402,23 @@ class LocalProfileEntry extends ProfileEntry
         'g'   => ['j' => ['::profiler_guild g ON g.`id` = p.`guild`', true], 's' => ', g.`name` AS "guildname"']
     );
 
-    public function __construct(
-                  int|array $initData,
-        protected array     $extraOpts = [],
-                  array     $targetDBs = ['Aowow']
-    )
+    public function applyInitData(array $initData, array $opts) : bool
     {
-        $realms = Profiler::getRealms();
-
-        // graft realm selection from miscData onto conditions
-        $realmIds = [];
-        if (isset($miscData['sv']))
-            $realmIds = array_keys(array_filter($realms, fn($x) => Profiler::urlize($x['name']) == Profiler::urlize($miscData['sv'])));
-
-        if (isset($miscData['rg']))
-            $realmIds = array_merge($realmIds, array_keys(array_filter($realms, fn($x) => $x['region'] == $miscData['rg'])));
-
-        if ($conditions && $realmIds)
+        if ($initData['realm'] && !(['name' => $realmName, 'region' => $region] = Profiler::getRealms()[$initData['realm']] ?? null))
         {
-            array_unshift($conditions, DB::AND);
-            $conditions = [DB::AND, ['realm', $realmIds], $conditions];
+            trigger_error(__METHOD__.' realm #'.$initData['realm'].' is inaccessible or does not exist.', E_USER_WARNING);
+            return false;
         }
-        else if ($realmIds)
-            $conditions = [['realm', $realmIds]];
 
-        parent::__construct($conditions, $extraOpts);
+        $this->region    = $region                ?? '';
+        $this->realmId   = $initData['realm']     ?? 0;
+        $this->realmGUID = $initData['realmGUID'] ?? 0;
+        $this->realmName = $realmName             ?? '';
 
-        if ($this->error)
-            return;
+        // rename to fit our structure
+        $initData['renamePending'] = 0;
 
-        foreach ($this->iterate() as $id => &$curTpl)
-        {
-            if (!$curTpl['realm'])                          // custom profile w/o realminfo
-                continue;
-
-            if (!isset($realms[$curTpl['realm']]))
-            {
-                unset($this->templates[$id]);
-                continue;
-            }
-
-            $curTpl['realmName']   = $realms[$curTpl['realm']]['name'];
-            $curTpl['region']      = $realms[$curTpl['realm']]['region'];
-            $curTpl['battlegroup'] = Cfg::get('BATTLEGROUP');
-        }
-    }
-
-    public function getProfileUrl() : string
-    {
-        $url = '?profile=';
-
-        if ($this->isCustom())
-            return $url.$this->id;
-
-        return $url.implode('.', array(
-            $this->region,
-            Profiler::urlize($this->realmName, true),
-            urlencode($this->name)
-        ));
+        return parent::applyInitData($initData, $opts);
     }
 }
 
