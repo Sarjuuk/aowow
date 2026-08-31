@@ -23,7 +23,7 @@ class SkillContainer extends DBTypeContainer
     /**
      * @return ?SkillEntry
      */
-    public function getEntry(null|string|int $key = null) : ?SkillEntry
+    public function getEntry(?int $key = null) : ?SkillEntry
     {
         return parent::getEntry($key);
     }

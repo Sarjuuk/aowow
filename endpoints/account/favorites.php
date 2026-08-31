@@ -45,7 +45,7 @@ class AccountFavoritesResponse extends TextResponse
         if ($this->assertPOST('id', 'add') && Type::validateIds($this->_post['add'], $this->_post['id']))
             DB::Aowow()->qry('INSERT INTO ::account_favorites (`userId`, `type`, `typeId`) VALUES (%i, %i, %i)', User::$id, $this->_post['add'], $this->_post['id']);
         else
-            trigger_error('AccountFavoritesResponse::addFavorite() - failed to add [userId: '.User::$id.', type: '.$this->_post['add'].', typeId: '.$this->_post['id'], E_USER_NOTICE);
+            trigger_error(__METHOD__.' - failed to add [userId: '.User::$id.', type: '.$this->_post['add'].', typeId: '.$this->_post['id'], E_USER_NOTICE);
     }
 }
 

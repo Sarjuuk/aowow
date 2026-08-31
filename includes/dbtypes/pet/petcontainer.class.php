@@ -23,7 +23,7 @@ class PetContainer extends DBTypeContainer
     /**
      * @return ?PetEntry
      */
-    public function getEntry(null|string|int $key = null) : ?PetEntry
+    public function getEntry(?int $key = null) : ?PetEntry
     {
         return parent::getEntry($key);
     }

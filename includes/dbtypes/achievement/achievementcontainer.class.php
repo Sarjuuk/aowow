@@ -35,7 +35,7 @@ class AchievementContainer extends DBTypeContainer
     /**
      * @return ?AchievementEntry
      */
-    public function getEntry(null|string|int $key = null) : ?AchievementEntry
+    public function getEntry(?int $key = null) : ?AchievementEntry
     {
         return parent::getEntry($key);
     }

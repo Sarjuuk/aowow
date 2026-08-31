@@ -15,7 +15,7 @@ trait SmartHelper
         if ($_ = DB::Aowow()->selectCell('SELECT `typeId` FROM ::spawns WHERE `type` = %i AND `guid` = %i', $type, $guid))
             return $_;
 
-        trigger_error('SmartAI::resolveGuid - failed to resolve guid '.$guid.' of type '.$type, E_USER_WARNING);
+        trigger_error(__METHOD__.' - failed to resolve guid '.$guid.' of type '.$type, E_USER_WARNING);
         return null;
     }
 
@@ -39,7 +39,7 @@ trait SmartHelper
     {
         if ($x = ($flags & ~SmartAI::CAST_FLAG_VALIDATE))
         {
-            trigger_error('SmartAI::castFlags - unknown SmartCastFlags '.Util::asBin($x).' set on id #'.$this->id, E_USER_NOTICE);
+            trigger_error(__METHOD__.' - unknown SmartCastFlags '.Util::asBin($x).' set on id #'.$this->id, E_USER_NOTICE);
             $flags &= SmartAI::CAST_FLAG_VALIDATE;
         }
 
@@ -55,7 +55,7 @@ trait SmartHelper
     {
         if ($x = ($flags & ~NPC_FLAG_VALIDATE))
         {
-            trigger_error('SmartAI::npcFlags - unknown NpcFlags '.Util::asBin($x).' set on id #'.$this->id, E_USER_NOTICE);
+            trigger_error(__METHOD__.' - unknown NpcFlags '.Util::asBin($x).' set on id #'.$this->id, E_USER_NOTICE);
             $flags &= NPC_FLAG_VALIDATE;
         }
 
@@ -71,7 +71,7 @@ trait SmartHelper
     {
         if ($x = ($flags & ~UNIT_DYNFLAG_VALIDATE))
         {
-            trigger_error('SmartAI::dynFlags - unknown unit dynFlags '.Util::asBin($x).' set on id #'.$this->id, E_USER_NOTICE);
+            trigger_error(__METHOD__.' - unknown unit dynFlags '.Util::asBin($x).' set on id #'.$this->id, E_USER_NOTICE);
             $flags &= UNIT_DYNFLAG_VALIDATE;
         }
 
@@ -87,7 +87,7 @@ trait SmartHelper
     {
         if ($x = ($flags & ~GO_FLAG_VALIDATE))
         {
-            trigger_error('SmartAI::goFlags - unknown GameobjectFlags '.Util::asBin($x).' set on id #'.$this->id, E_USER_NOTICE);
+            trigger_error(__METHOD__.' - unknown GameobjectFlags '.Util::asBin($x).' set on id #'.$this->id, E_USER_NOTICE);
             $flags &= GO_FLAG_VALIDATE;
         }
 
@@ -103,7 +103,7 @@ trait SmartHelper
     {
         if ($x = ($flags & ~SmartAI::SPAWN_FLAG_VALIDATE))
         {
-            trigger_error('SmartAI::spawnFlags - unknown SmartSpawnFlags '.Util::asBin($x).' set on id #'.$this->id, E_USER_NOTICE);
+            trigger_error(__METHOD__.' - unknown SmartSpawnFlags '.Util::asBin($x).' set on id #'.$this->id, E_USER_NOTICE);
             $flags &= SmartAI::SPAWN_FLAG_VALIDATE;
         }
 
@@ -119,13 +119,13 @@ trait SmartHelper
     {
         if ($x = ($flags & ~UNIT_FLAG_VALIDATE))
         {
-            trigger_error('SmartAI::unitFlags - unknown UnitFlags '.Util::asBin($x).' set on id #'.$this->id, E_USER_NOTICE);
+            trigger_error(__METHOD__.' - unknown UnitFlags '.Util::asBin($x).' set on id #'.$this->id, E_USER_NOTICE);
             $flags &= UNIT_FLAG_VALIDATE;
         }
 
         if ($x = ($flags2 & ~UNIT_FLAG2_VALIDATE))
         {
-            trigger_error('SmartAI::unitFlags - unknown UnitFlags2 '.Util::asBin($x).' set on id #'.$this->id, E_USER_NOTICE);
+            trigger_error(__METHOD__.' - unknown UnitFlags2 '.Util::asBin($x).' set on id #'.$this->id, E_USER_NOTICE);
             $flags2 &= UNIT_FLAG2_VALIDATE;
         }
 

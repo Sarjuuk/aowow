@@ -165,7 +165,7 @@ class GuideEntry extends DBTypeEntry implements ITooltip
                 return $this->article[$a['rev']];
             }
             else
-                trigger_error('GuideList::getArticle - linked article is missing');
+                trigger_error(__METHOD__.' - linked article is missing');
         }
 
         return $this->article[$rev] ?? '';

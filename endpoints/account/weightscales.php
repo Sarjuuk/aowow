@@ -63,7 +63,7 @@ class AccountWeightscalesResponse extends TextResponse
         // not in DB or not owned by user
         if (!DB::Aowow()->selectCell('SELECT 1 FROM ::account_weightscales WHERE `userId` = %i AND `id` = %i', User::$id, $this->_post['id']))
         {
-            trigger_error('AccountWeightscalesResponse::updateWeights - scale #'.$this->_post['id'].' not in db or not owned by user #'.User::$id, E_USER_WARNING);
+            trigger_error(__METHOD__.' - scale #'.$this->_post['id'].' not in db or not owned by user #'.User::$id, E_USER_WARNING);
             return;
         }
 

@@ -87,7 +87,7 @@ abstract class DBTypeContainer
     }
 
     // read-access to sets
-    public function getEntry(null|string|int $key = null) : ?DBTypeEntry
+    public function getEntry(?int $key = null) : ?DBTypeEntry
     {
         if (is_null($key))
             return $this->sets[$this->id] ?? null;
@@ -101,13 +101,13 @@ abstract class DBTypeContainer
 
     public function getRandomId() : int
     {
-        if (!($qb = Type::getClassConst(static::$dbType, 'QUERY_BASE')))
+        if (!Type::isRandomSearchable(static::$dbType))
             return 0;
 
-        if (!preg_match('/SELECT .*? FROM (\?\_[\w_-]+) /i', $qb, $m))
+        if (!($tbl = Type::getClassAttrib(static::$dbType, 'dataTable')))
             return 0;
 
-        $ids = DB::Aowow()->selectCol('SELECT `id` FROM %n', $m[1], '%if', User::isInGroup(U_GROUP_EMPLOYEE), 'WHERE (`cuFlags` & %i) = 0 %endif', CUSTOM_EXCLUDE_FOR_LISTVIEW) ?? [0];
+        $ids = DB::Aowow()->selectCol('SELECT `id` FROM %n', $tbl, '%if', User::isInGroup(U_GROUP_EMPLOYEE), 'WHERE (`cuFlags` & %i) = 0 %end', CUSTOM_EXCLUDE_FOR_LISTVIEW) ?? [0];
 
         return $ids[rand(0, count($ids))];
     }

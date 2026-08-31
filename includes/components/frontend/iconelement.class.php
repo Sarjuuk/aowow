@@ -46,7 +46,7 @@ class IconElement
 
         if ($size < self::SIZE_SMALL || $size > self::SIZE_LARGE)
         {
-            trigger_error('IconElement::__construct - invalid icon size '.$size.'. Normalied to 1 [small]', E_USER_WARNING);
+            trigger_error(__METHOD__.' - invalid icon size '.$size.'. Normalied to 1 [small]', E_USER_WARNING);
             $this->size = self::SIZE_SMALL;
         }
         else
@@ -54,7 +54,7 @@ class IconElement
 
         if ($align && !in_array($align, ['left', 'right', 'center', 'justify']))
         {
-            trigger_error('IconElement::__construct - unset invalid align value "'.$align.'".', E_USER_WARNING);
+            trigger_error(__METHOD__.' - unset invalid align value "'.$align.'".', E_USER_WARNING);
             $this->align = null;
         }
         else

@@ -71,13 +71,13 @@ class PageTemplate
 
         if (!$str)
         {
-            trigger_error('PageTemplate::addScript - content empty', E_USER_WARNING);
+            trigger_error(__METHOD__.' - content empty', E_USER_WARNING);
             return false;
         }
 
         if (!$tpl)
         {
-            trigger_error('PageTemplate::addScript - unknown script type #'.$type, E_USER_WARNING);
+            trigger_error(__METHOD__.' - unknown script type #'.$type, E_USER_WARNING);
             return false;
         }
 
