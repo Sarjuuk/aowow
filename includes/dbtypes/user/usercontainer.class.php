@@ -23,7 +23,7 @@ class UserContainer extends DBTypeContainer
     /**
      * @return ?UserEntry
      */
-    public function getEntry(null|string|int $key = null) : ?UserEntry
+    public function getEntry(?int $key = null) : ?UserEntry
     {
         return parent::getEntry($key);
     }

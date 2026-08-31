@@ -100,7 +100,7 @@ class Lang
 
         $dbt  = debug_backtrace()[0];
         $file = explode(DIRECTORY_SEPARATOR, $dbt['file']);
-        trigger_error('Lang - undefined property Lang::$'.$prop.'[\''.implode('\'][\'', $args).'\'], called in '.array_pop($file).':'.$dbt['line'], E_USER_WARNING);
+        trigger_error(__METHOD__.' - undefined property Lang::$'.$prop.'[\''.implode('\'][\'', $args).'\'], called in '.array_pop($file).':'.$dbt['line'], E_USER_WARNING);
 
         return null;
     }
@@ -234,14 +234,14 @@ class Lang
 
         if (!isset(self::$$prop))
         {
-            trigger_error('Lang::sort - tried to use undefined property Lang::$'.$prop, E_USER_WARNING);
+            trigger_error(__METHOD__.' - tried to use undefined property Lang::$'.$prop, E_USER_WARNING);
             return;
         }
 
         $var = &self::$$prop;
         if (!isset($var[$group]))
         {
-            trigger_error('Lang::sort - tried to use undefined property Lang::$'.$prop.'[\''.$group.'\']', E_USER_WARNING);
+            trigger_error(__METHOD__.' - tried to use undefined property Lang::$'.$prop.'[\''.$group.'\']', E_USER_WARNING);
             return;
         }
 
@@ -549,7 +549,7 @@ class Lang
             $ref = &self::$$prop[$src];
         else
         {
-            trigger_error('Lang::formatTime - tried to access undefined property Lang::$'.$prop, E_USER_WARNING);
+            trigger_error(__METHOD__.' - tried to access undefined property Lang::$'.$prop, E_USER_WARNING);
             return '';
         }
 

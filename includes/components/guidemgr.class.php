@@ -89,7 +89,7 @@ class GuideMgr
         // move to final location
         if (!rename(self::IMG_TMP_DIR.$result['newFilename'], self::IMG_DEST_DIR.$targetFile))
         {
-            trigger_error('GuideMgr::handleUpload - failed to move file', E_USER_WARNING);
+            trigger_error(__METHOD__.' - failed to move file', E_USER_WARNING);
             return ['error' => Lang::main('intError')];
         }
 

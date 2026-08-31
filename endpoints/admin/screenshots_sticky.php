@@ -18,7 +18,7 @@ class AdminScreenshotsActionStickyResponse extends TextResponse
     {
         if (!$this->assertGET('id'))
         {
-            trigger_error('AdminScreenshotsActionStickyResponse - screenshotId empty', E_USER_WARNING);
+            trigger_error(__METHOD__.' - screenshotId empty', E_USER_WARNING);
             return;
         }
 
@@ -67,6 +67,6 @@ class AdminScreenshotsActionStickyResponse extends TextResponse
         }
 
         if ($errIds = array_diff($this->_get['id'], array_keys($ssEntries)))
-            trigger_error('AdminScreenshotsActionStickyResponse - screenshot(s) #'.implode(', #', $errIds).' not in db or flagged as deleted', E_USER_WARNING);
+            trigger_error(__METHOD__.' - screenshot(s) #'.implode(', #', $errIds).' not in db or flagged as deleted', E_USER_WARNING);
     }
 }

@@ -23,7 +23,7 @@ class FactionContainer extends DBTypeContainer
     /**
      * @return ?FactionEntry
      */
-    public function getEntry(null|string|int $key = null) : ?FactionEntry
+    public function getEntry(?int $key = null) : ?FactionEntry
     {
         return parent::getEntry($key);
     }

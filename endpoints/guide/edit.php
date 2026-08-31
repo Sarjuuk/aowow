@@ -117,7 +117,7 @@ class GuideEditResponse extends TemplateResponse
         // test requiered fields set
         if (!$this->assertPOST('title', 'name', 'body', 'locale', 'category'))
         {
-            trigger_error('GuideEditResponse::saveGuide - received malformed request', E_USER_WARNING);
+            trigger_error(__METHOD__.' - received malformed request', E_USER_WARNING);
             return false;
         }
 
@@ -159,7 +159,7 @@ class GuideEditResponse extends TemplateResponse
             $guideData += ['userId' => User::$id];
             if (!($this->typeId = (int)DB::Aowow()->qry('INSERT INTO ::guides %v', $guideData)))
             {
-                trigger_error('GuideEditResponse::saveGuide - failed to save guide to db', E_USER_WARNING);
+                trigger_error(__METHOD__.' - failed to save guide to db', E_USER_WARNING);
                 return false;
             }
         }
@@ -168,7 +168,7 @@ class GuideEditResponse extends TemplateResponse
             DB::Aowow()->qry('INSERT INTO ::guides_changelog (`id`, `rev`, `date`, `userId`, `msg`) VALUES (%i, %i, %i, %i, %s)', $this->typeId, $this->editRev, time(), User::$id, $this->_post['changelog']);
         else
         {
-            trigger_error('GuideEditResponse::saveGuide - failed to update guide in db', E_USER_WARNING);
+            trigger_error(__METHOD__.' - failed to update guide in db', E_USER_WARNING);
             return false;
         }
 
@@ -188,7 +188,7 @@ class GuideEditResponse extends TemplateResponse
             if ($this->_get['id'] === 0)
                 DB::Aowow()->qry('DELETE FROM ::guides WHERE `id` = %i', $this->typeId);
 
-            trigger_error('GuideEditResponse::saveGuide - failed to save article to db', E_USER_WARNING);
+            trigger_error(__METHOD__.' - failed to save article to db', E_USER_WARNING);
             return false;
         }
 

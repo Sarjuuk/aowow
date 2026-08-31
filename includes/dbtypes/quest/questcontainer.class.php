@@ -25,7 +25,7 @@ class QuestContainer extends DBTypeContainer
     /**
      * @return ?QuestEntry
      */
-    public function getEntry(null|string|int $key = null) : ?QuestEntry
+    public function getEntry(?int $key = null) : ?QuestEntry
     {
         return parent::getEntry($key);
     }

@@ -19,7 +19,7 @@ class AdminVideosActionOrderResponse extends TextResponse
     {
         if (!$this->assertGET('id', 'move') || $this->_get['move'] === 0)
         {
-            trigger_error('AdminVideosActionOrderResponse - id or move empty', E_USER_WARNING);
+            trigger_error(__METHOD__.' - id or move empty', E_USER_WARNING);
             return;
         }
 
@@ -28,7 +28,7 @@ class AdminVideosActionOrderResponse extends TextResponse
         $videos = DB::Aowow()->selectCol('SELECT a.`id` AS ARRAY_KEY, a.`pos` FROM ::videos a, ::videos b WHERE a.`type` = b.`type` AND a.`typeId` = b.`typeId` AND (a.`status` & %i) = 0 AND b.`id` = %i ORDER BY a.`pos` ASC', CC_FLAG_DELETED, $id);
         if (!$videos || count($videos) == 1)
         {
-            trigger_error('AdminVideosActionOrderResponse - not enough videos to sort', E_USER_WARNING);
+            trigger_error(__METHOD__.' - not enough videos to sort', E_USER_WARNING);
             return;
         }
 
@@ -37,13 +37,13 @@ class AdminVideosActionOrderResponse extends TextResponse
 
         if ($dir == -1 && $curPos == 0)
         {
-            trigger_error('AdminVideosActionOrderResponse - video #'.$id.' already in top position', E_USER_WARNING);
+            trigger_error(__METHOD__.' - video #'.$id.' already in top position', E_USER_WARNING);
             return;
         }
 
         if ($dir == 1 && $curPos + 1 == count($videos))
         {
-            trigger_error('AdminVideosActionOrderResponse - video #'.$id.' already in bottom position', E_USER_WARNING);
+            trigger_error(__METHOD__.' - video #'.$id.' already in bottom position', E_USER_WARNING);
             return;
         }
 

@@ -23,7 +23,7 @@ class SpellContainer extends DBTypeContainer
     /**
      * @return ?SpellEntry
      */
-    public function getEntry(null|string|int $key = null) : ?SpellEntry
+    public function getEntry(?int $key = null) : ?SpellEntry
     {
         return parent::getEntry($key);
     }

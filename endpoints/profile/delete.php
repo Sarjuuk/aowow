@@ -31,7 +31,7 @@ class ProfileDeleteResponse extends TextResponse
     {
         if (!$this->assertGET('id'))
         {
-            trigger_error('ProfileDeleteResponse - profileId empty', E_USER_WARNING);
+            trigger_error(__METHOD__.' - profileId empty', E_USER_WARNING);
             return;
         }
 

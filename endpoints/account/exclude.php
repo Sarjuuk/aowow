@@ -62,7 +62,7 @@ class AccountExcludeResponse extends TextResponse
             DB::Aowow()->qry('INSERT INTO ::account_excludes %m ON DUPLICATE KEY UPDATE `mode` = (`mode` ^ 0x3)', $insert);
         }
         else
-            trigger_error('AccountExcludeResponse::excludeById - validation failed [type: '.$this->_post['type'].', typeId: '.implode(',', $this->_post['id']).']', E_USER_NOTICE);
+            trigger_error(__METHOD__.' - validation failed [type: '.$this->_post['type'].', typeId: '.implode(',', $this->_post['id']).']', E_USER_NOTICE);
     }
 
     private function resetExcludes() : void

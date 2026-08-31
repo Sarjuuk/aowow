@@ -36,7 +36,7 @@ class SoundContainer extends DBTypeContainer
     /**
      * @return ?SoundEntry
      */
-    public function getEntry(null|string|int $key = null) : ?SoundEntry
+    public function getEntry(?int $key = null) : ?SoundEntry
     {
         return parent::getEntry($key);
     }

@@ -587,7 +587,7 @@ class Conditions
         }
         else
         {
-            trigger_error('Conditions - CONDITION_MAPID has invalid mapId #'.$cVal1, E_USER_WARNING);
+            trigger_error(__METHOD__.' - CONDITION_MAPID has invalid mapId #'.$cVal1, E_USER_WARNING);
             return false;
         }
 
@@ -642,7 +642,7 @@ class Conditions
     {
         if (!$sGroup)
         {
-            trigger_error('Conditions::lootToNpc - skipping reference to creature_loot_template entry 0', E_USER_WARNING);
+            trigger_error(__METHOD__.' - skipping reference to creature_loot_template entry 0', E_USER_WARNING);
             return false;
         }
 
@@ -658,7 +658,7 @@ class Conditions
             return true;
         }
 
-        trigger_error('Conditions::lootToNpc - creature_loot_template #'.$sGroup.' unreferenced?', E_USER_WARNING);
+        trigger_error(__METHOD__.' - creature_loot_template #'.$sGroup.' unreferenced?', E_USER_WARNING);
         return false;
     }
 
@@ -666,7 +666,7 @@ class Conditions
     {
         if (!$sGroup)
         {
-            trigger_error('Conditions::disenchantIdToItem - skipping reference to disenchant_loot_template entry 0', E_USER_WARNING);
+            trigger_error(__METHOD__.' - skipping reference to disenchant_loot_template entry 0', E_USER_WARNING);
             return false;
         }
 
@@ -682,7 +682,7 @@ class Conditions
             return true;
         }
 
-        trigger_error('Conditions::disenchantIdToItem - disenchant_loot_template #'.$sGroup.' unreferenced?', E_USER_WARNING);
+        trigger_error(__METHOD__.' - disenchant_loot_template #'.$sGroup.' unreferenced?', E_USER_WARNING);
         return false;
     }
 
@@ -690,7 +690,7 @@ class Conditions
     {
         if (!$sGroup)
         {
-            trigger_error('Conditions::lootIdToGObject - skipping reference to gameobject_loot_template entry 0', E_USER_WARNING);
+            trigger_error(__METHOD__.' - skipping reference to gameobject_loot_template entry 0', E_USER_WARNING);
             return false;
         }
 
@@ -706,7 +706,7 @@ class Conditions
             return true;
         }
 
-        trigger_error('Conditions::lootIdToGObject - gameobject_loot_template #'.$sGroup.' unreferenced?', E_USER_WARNING);
+        trigger_error(__METHOD__.' - gameobject_loot_template #'.$sGroup.' unreferenced?', E_USER_WARNING);
         return false;
     }
 
@@ -714,7 +714,7 @@ class Conditions
     {
         if (!$sGroup)
         {
-            trigger_error('Conditions::RewardTemplateToQuest - skipping reference to mail_loot_template entry 0', E_USER_WARNING);
+            trigger_error(__METHOD__.' - skipping reference to mail_loot_template entry 0', E_USER_WARNING);
             return false;
         }
 
@@ -730,7 +730,7 @@ class Conditions
             return true;
         }
 
-        trigger_error('Conditions::RewardTemplateToQuest - mail_loot_template #'.$sGroup.' unreferenced?', E_USER_WARNING);
+        trigger_error(__METHOD__.' - mail_loot_template #'.$sGroup.' unreferenced?', E_USER_WARNING);
         return false;
     }
 
@@ -738,7 +738,7 @@ class Conditions
     {
         if (!$sGroup)
         {
-            trigger_error('Conditions::PickpocketLootToNpc - skipping reference to pickpocketing_loot_template entry 0', E_USER_WARNING);
+            trigger_error(__METHOD__.' - skipping reference to pickpocketing_loot_template entry 0', E_USER_WARNING);
             return false;
         }
 
@@ -754,7 +754,7 @@ class Conditions
             return true;
         }
 
-        trigger_error('Conditions::PickpocketLootToNpc - pickpocketing_loot_template #'.$sGroup.' unreferenced?', E_USER_WARNING);
+        trigger_error(__METHOD__.' - pickpocketing_loot_template #'.$sGroup.' unreferenced?', E_USER_WARNING);
         return false;
     }
 
@@ -762,7 +762,7 @@ class Conditions
     {
         if (!$sGroup)
         {
-            trigger_error('Conditions::SkinLootToNpc - skipping reference to skinning_loot_template entry 0', E_USER_WARNING);
+            trigger_error(__METHOD__.' - skipping reference to skinning_loot_template entry 0', E_USER_WARNING);
             return false;
         }
 
@@ -778,7 +778,7 @@ class Conditions
             return true;
         }
 
-        trigger_error('Conditions::SkinLootToNpc - skinning_loot_template #'.$sGroup.' unreferenced?', E_USER_WARNING);
+        trigger_error(__METHOD__.' - skinning_loot_template #'.$sGroup.' unreferenced?', E_USER_WARNING);
         return false;
     }
 }

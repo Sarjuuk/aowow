@@ -177,7 +177,7 @@ class Markup implements \JsonSerializable
             if (property_exists($this, $k))
                 $this->$k = $v;
             else
-                trigger_error(self::class.'::__construct - unrecognized option: ' . $k);
+                trigger_error(__METHOD__.' - unrecognized option: ' . $k);
         }
 
         $this->__text = $text;

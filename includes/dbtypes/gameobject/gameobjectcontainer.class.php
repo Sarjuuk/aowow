@@ -28,7 +28,7 @@ class GameobjectContainer extends DBTypeContainer
     /**
      * @return ?GameobjectEntry
      */
-    public function getEntry(null|string|int $key = null) : ?GameobjectEntry
+    public function getEntry(?int $key = null) : ?GameobjectEntry
     {
         return parent::getEntry($key);
     }

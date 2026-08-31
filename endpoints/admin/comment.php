@@ -23,7 +23,7 @@ class AdminCommentResponse extends TextResponse
     {
         if (!$this->assertPOST('id', 'status'))
         {
-            trigger_error('AdminCommentResponse - malformed request received', E_USER_WARNING);
+            trigger_error(__METHOD__.' - malformed request received', E_USER_WARNING);
             $this->result = self::ERR_MISCELLANEOUS;
             return;
         }

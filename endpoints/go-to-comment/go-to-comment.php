@@ -17,7 +17,7 @@ class GotocommentBaseResponse extends TextResponse
     {
         if (!$this->assertGET('id'))
         {
-            trigger_error('GotocommentBaseResponse - malformed request received', E_USER_WARNING);
+            trigger_error(__METHOD__.' - malformed request received', E_USER_WARNING);
             return;
         }
 
@@ -26,13 +26,13 @@ class GotocommentBaseResponse extends TextResponse
         $comment = DB::Aowow()->selectRow('SELECT IFNULL(c2.`id`, c1.`id`) AS "id", IFNULL(c2.`type`, c1.`type`) AS "type", IFNULL(c2.`typeId`, c1.`typeId`) AS "typeId" FROM ::comments c1 LEFT JOIN ::comments c2 ON c1.`replyTo` = c2.`id` WHERE c1.`id` = %i', $this->_get['id']);
         if (!$comment)
         {
-            trigger_error('GotocommentBaseResponse - comment #'.$this->_get['id'].' not found', E_USER_WARNING);
+            trigger_error(__METHOD__.' - comment #'.$this->_get['id'].' not found', E_USER_WARNING);
             return;
         }
 
         if (!Type::validateIds($comment['type'], $comment['typeId']))
         {
-            trigger_error('GotocommentBaseResponse - comment #'.$this->_get['id'].' belongs to nonexistent type/typeID combo '.$comment['type'].'/'.$comment['typeId'], E_USER_WARNING);
+            trigger_error(__METHOD__.' - comment #'.$this->_get['id'].' belongs to nonexistent type/typeID combo '.$comment['type'].'/'.$comment['typeId'], E_USER_WARNING);
             return;
         }
 

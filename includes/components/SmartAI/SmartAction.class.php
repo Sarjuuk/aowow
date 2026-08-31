@@ -490,7 +490,7 @@ class SmartAction
                     $this->param[10] = $areaId;
                 // ...whelp
                 else
-                    trigger_error('SmartAction::process - could not resolve teleport target: map:'.$this->param[0].' x:'.$x.' y:'.$y);
+                    trigger_error(__METHOD__.' - could not resolve teleport target: map:'.$this->param[0].' x:'.$x.' y:'.$y);
 
                 if ($this->param[10])
                     $this->jsGlobals[Type::ZONE][$this->param[10]] = $this->param[10];
@@ -547,7 +547,7 @@ class SmartAction
                     }
                 }
                 else if (!$this->param[1])
-                    trigger_error('SmartAI::action - action #124 (SmartAction::ACTION_LOAD_EQIPMENT) is malformed');
+                    trigger_error(__METHOD__.' - action #124 (SmartAction::ACTION_LOAD_EQIPMENT) is malformed');
 
                 $this->param[10] = Lang::concat($buff);
                 $footer = true;
@@ -733,7 +733,7 @@ class SmartAction
                     }
                 }
                 else
-                    trigger_error('SmartAI::action - could not determine talk source for action #'.$this->type);
+                    trigger_error(__METHOD__.' - could not determine talk source for action #'.$this->type);
                 break;
         }
 

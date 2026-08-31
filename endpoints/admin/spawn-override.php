@@ -28,7 +28,7 @@ class AdminSpawnoverrideResponse extends TextResponse
     {
         if (!$this->assertGET('type', 'guid', 'area', 'floor'))
         {
-            trigger_error('AdminSpawnoverrideResponse - malformed request received', E_USER_WARNING);
+            trigger_error(__METHOD__.' - malformed request received', E_USER_WARNING);
             $this->result = self::ERR_MISCELLANEOUS;
             return;
         }
@@ -40,7 +40,7 @@ class AdminSpawnoverrideResponse extends TextResponse
 
         if (!in_array($type, [Type::NPC, Type::OBJECT, Type::SOUND, Type::AREATRIGGER, Type::ZONE]))
         {
-            trigger_error("AdminSpawnoverrideResponse - can't move pip of type ".Type::getFileString($type), E_USER_WARNING);
+            trigger_error(__METHOD__.' - can't move pip of type ".Type::getFileString($type), E_USER_WARNING);
             $this->result = self::ERR_WRONG_TYPE;
             return;
         }

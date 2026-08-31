@@ -23,7 +23,7 @@ class CharClassContainer extends DBTypeContainer
     /**
      * @return ?CharClassEntry
      */
-    public function getEntry(null|string|int $key = null) : ?CharClassEntry
+    public function getEntry(?int $key = null) : ?CharClassEntry
     {
         return parent::getEntry($key);
     }
