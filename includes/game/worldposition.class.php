@@ -110,11 +110,11 @@ abstract class WorldPosition
                      ));
                 break;
             default:
-                trigger_error('WorldPosition::getForGUID - unsupported TYPE #'.$type, E_USER_WARNING);
+                trigger_error(__METHOD__.' - unsupported TYPE #'.$type, E_USER_WARNING);
         }
 
         if ($diff = array_diff($guids, array_keys($result)))
-            trigger_error('WorldPosition::getForGUID - no spawn points for TYPE #'.$type.' GUIDS: '.implode(', ', $diff), E_USER_WARNING);
+            trigger_error(__METHOD__.' - no spawn points for TYPE #'.$type.' GUIDS: '.implode(', ', $diff), E_USER_WARNING);
 
         return $result;
     }

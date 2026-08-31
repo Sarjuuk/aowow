@@ -23,7 +23,7 @@ class TitleContainer extends DBTypeContainer
     /**
      * @return ?TitleEntry
      */
-    public function getEntry(null|string|int $key = null) : ?TitleEntry
+    public function getEntry(?int $key = null) : ?TitleEntry
     {
         return parent::getEntry($key);
     }

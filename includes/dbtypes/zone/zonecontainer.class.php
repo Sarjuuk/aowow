@@ -23,7 +23,7 @@ class ZoneContainer extends DBTypeContainer
     /**
      * @return ?ZoneEntry
      */
-    public function getEntry(null|string|int $key = null) : ?ZoneEntry
+    public function getEntry(?int $key = null) : ?ZoneEntry
     {
         return parent::getEntry($key);
     }

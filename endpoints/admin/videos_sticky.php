@@ -17,7 +17,7 @@ class AdminVideosActionStickyResponse extends TextResponse
     {
         if (!$this->assertGET('id'))
         {
-            trigger_error('AdminVideosActionStickyResponse - videoId empty', E_USER_WARNING);
+            trigger_error(__METHOD__.' - videoId empty', E_USER_WARNING);
             return;
         }
 
@@ -51,6 +51,6 @@ class AdminVideosActionStickyResponse extends TextResponse
         }
 
         if ($errIds = array_diff($this->_get['id'], array_keys($viEntries)))
-            trigger_error('AdminVideosActionStickyResponse - video(s) #'.implode(', #', $errIds).' not in db or flagged as deleted', E_USER_WARNING);
+            trigger_error(__METHOD__.' - video(s) #'.implode(', #', $errIds).' not in db or flagged as deleted', E_USER_WARNING);
     }
 }

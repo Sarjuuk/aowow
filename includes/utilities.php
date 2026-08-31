@@ -1017,7 +1017,7 @@ abstract class Util
 
         if (!$template)
         {
-            trigger_error('Util::SendMail() - mail template not found: '.$tplFile, E_USER_WARNING);
+            trigger_error(__METHOD__.' - mail template not found: '.$tplFile, E_USER_WARNING);
             return false;
         }
 

@@ -24,7 +24,7 @@ class AdminWeightpresetsActionSaveResponse extends TextResponse
     {
         if (!$this->assertPOST('id', '__icon', 'scale'))
         {
-            trigger_error('AdminWeightpresetsActionSaveResponse - malformed request received', E_USER_WARNING);
+            trigger_error(__METHOD__.' - malformed request received', E_USER_WARNING);
             $this->result = self::ERR_MISCELLANEOUS;
             return;
         }
@@ -42,7 +42,7 @@ class AdminWeightpresetsActionSaveResponse extends TextResponse
 
             if (DB::Aowow()->qry('INSERT INTO ::account_weightscale_data VALUES (%i, %s, %i)', $this->_post['id'], $k, $v) === null)
             {
-                trigger_error('AdminWeightpresetsActionSaveResponse - failed to write to database', E_USER_WARNING);
+                trigger_error(__METHOD__.' - failed to write to database', E_USER_WARNING);
                 $this->result = self::ERR_WRITE_DB;
                 return;
             }
@@ -53,7 +53,7 @@ class AdminWeightpresetsActionSaveResponse extends TextResponse
         foreach ($out as $o)
             if (strstr($o, 'ERR'))
             {
-                trigger_error('AdminWeightpresetsActionSaveResponse - failed to write dataset' . $o, E_USER_WARNING);
+                trigger_error(__METHOD__.' - failed to write dataset' . $o, E_USER_WARNING);
                 $this->result = self::ERR_WRITE_FILE;
                 return;
             }

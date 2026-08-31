@@ -18,7 +18,7 @@ class AdminVideosActionApproveResponse extends TextResponse
     {
         if (!$this->assertGET('id'))
         {
-            trigger_error('AdminVideosActionApproveResponse - videoId empty', E_USER_WARNING);
+            trigger_error(__METHOD__.' - videoId empty', E_USER_WARNING);
             return;
         }
 
@@ -39,6 +39,6 @@ class AdminVideosActionApproveResponse extends TextResponse
         }
 
         if ($errIds = array_diff($this->_get['id'], array_keys($viEntries)))
-            trigger_error('AdminVideosActionApproveResponse - video(s) #'.implode(', #', $errIds).' not in db or already approved', E_USER_WARNING);
+            trigger_error(__METHOD__.' - video(s) #'.implode(', #', $errIds).' not in db or already approved', E_USER_WARNING);
     }
 }
