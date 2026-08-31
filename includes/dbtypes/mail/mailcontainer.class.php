@@ -23,7 +23,7 @@ class MailContainer extends DBTypeContainer
     /**
      * @return ?MailEntry
      */
-    public function getEntry(null|string|int $key = null) : ?MailEntry
+    public function getEntry(?int $key = null) : ?MailEntry
     {
         return parent::getEntry($key);
     }

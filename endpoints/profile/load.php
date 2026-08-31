@@ -36,14 +36,14 @@ class ProfileLoadResponse extends TextResponse
 
         if (!$this->assertGET('id'))
         {
-            trigger_error('ProfileLoadResponse - profileId empty', E_USER_WARNING);
+            trigger_error(__METHOD__.' - profileId empty', E_USER_WARNING);
             return;
         }
 
         $pBase = DB::Aowow()->selectRow('SELECT pg.`name` AS "guildname", p.* FROM ::profiler_profiles p LEFT JOIN ::profiler_guild pg ON pg.`id` = p.`guild` WHERE p.`id` = %i', $this->_get['id']);
         if (!$pBase)
         {
-            trigger_error('ProfileLoadResponse - called with invalid profileId #'.$this->_get['id'], E_USER_WARNING);
+            trigger_error(__METHOD__.' - called with invalid profileId #'.$this->_get['id'], E_USER_WARNING);
             return;
         }
 

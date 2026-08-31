@@ -22,7 +22,7 @@ class CommentAddreplyResponse extends TextResponse
     {
         if (!$this->assertPOST('commentId', 'replyId', 'body'))
         {
-            trigger_error('CommentAddreplyResponse - malformed request received', E_USER_WARNING);
+            trigger_error(__METHOD__.' - malformed request received', E_USER_WARNING);
             $this->generate404(User::isInGroup(U_GROUP_STAFF) ? 'request malformed' : '');
         }
 
@@ -31,7 +31,7 @@ class CommentAddreplyResponse extends TextResponse
 
         if (!$this->_post['commentId'] || !DB::Aowow()->selectCell('SELECT 1 FROM ::comments WHERE `id` = %i', $this->_post['commentId']))
         {
-            trigger_error('CommentAddreplyResponse - parent comment #'.$this->_post['commentId'].' does not exist', E_USER_WARNING);
+            trigger_error(__METHOD__.' - parent comment #'.$this->_post['commentId'].' does not exist', E_USER_WARNING);
             $this->generate404(Lang::main('intError'));
         }
 
@@ -40,7 +40,7 @@ class CommentAddreplyResponse extends TextResponse
 
         if (!DB::Aowow()->qry('INSERT INTO ::comments (`userId`, `roles`, `body`, `date`, `replyTo`) VALUES (%i, %i, %s, UNIX_TIMESTAMP(), %i)', User::$id, User::$groups, $this->_post['body'], $this->_post['commentId']))
         {
-            trigger_error('CommentAddreplyResponse - write to db failed', E_USER_WARNING);
+            trigger_error(__METHOD__.' - write to db failed', E_USER_WARNING);
             $this->generate404(Lang::main('intError'));
         }
 

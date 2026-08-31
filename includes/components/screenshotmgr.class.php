@@ -42,7 +42,7 @@ class ScreenshotMgr extends ImageUpload
             $path = constant('self::PATH_' . $p);
             if (!is_writable(substr($path, 0, strrpos($path, '/'))))
             {
-                trigger_error('ScreenshotMgr::init - directory '.substr($path, 0, strrpos($path, '/')).' not writable', E_USER_WARNING);
+                trigger_error(__METHOD__.' - directory '.substr($path, 0, strrpos($path, '/')).' not writable', E_USER_WARNING);
                 $dirErr = true;
             }
         }
@@ -198,7 +198,7 @@ class ScreenshotMgr extends ImageUpload
             {
                 if (empty($p['name']))
                 {
-                    trigger_error('ScreenshotMgr::getPages - screenshot linked to nonexistent type/typeId combination: '.$p['type'].'/'.$p['typeId'], E_USER_NOTICE);
+                    trigger_error(__METHOD__.' - screenshot linked to nonexistent type/typeId combination: '.$p['type'].'/'.$p['typeId'], E_USER_NOTICE);
                     unset($p);
                 }
                 else

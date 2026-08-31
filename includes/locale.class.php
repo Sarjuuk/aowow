@@ -175,7 +175,7 @@ enum Locale : int
                 return $l;
 
         // wow, you really fucked up your config mate!
-        trigger_error('Locale::getFallback - there are no valid locales', E_USER_WARNING);
+        trigger_error(__METHOD__.' - there are no valid locales', E_USER_WARNING);
         return self::EN;
     }
 }

@@ -45,27 +45,27 @@ abstract class ImageUpload
         {
             case UPLOAD_ERR_INI_SIZE:                       // 1
             case UPLOAD_ERR_FORM_SIZE:                      // 2
-                trigger_error('ImageUpload::validateUpload - the file exceeds the maximum size of '.ini_get('upload_max_filesize'), E_USER_WARNING);
+                trigger_error(__METHOD__.' - the file exceeds the maximum size of '.ini_get('upload_max_filesize'), E_USER_WARNING);
                 self::$error = Lang::main('intError');
                 return false;
             case UPLOAD_ERR_PARTIAL:                        // 3
-                trigger_error('ImageUpload::validateUpload - upload was interrupted', E_USER_WARNING);
+                trigger_error(__METHOD__.' - upload was interrupted', E_USER_WARNING);
                 self::$error = Lang::screenshot('error', 'selectSS');
                 return false;
             case UPLOAD_ERR_NO_FILE:                        // 4
-                trigger_error('ImageUpload::validateUpload - no file was received', E_USER_WARNING);
+                trigger_error(__METHOD__.' - no file was received', E_USER_WARNING);
                 self::$error = Lang::screenshot('error', 'selectSS');
                 return false;
             case UPLOAD_ERR_NO_TMP_DIR:                     // 6
-                trigger_error('ImageUpload::validateUpload - temporary upload directory is not set', E_USER_WARNING);
+                trigger_error(__METHOD__.' - temporary upload directory is not set', E_USER_WARNING);
                 self::$error = Lang::main('intError');
                 return false;
             case UPLOAD_ERR_CANT_WRITE:                     // 7
-                trigger_error('ImageUpload::validateUpload - could not write temporary file to disk', E_USER_WARNING);
+                trigger_error(__METHOD__.' - could not write temporary file to disk', E_USER_WARNING);
                 self::$error = Lang::main('intError');
                 return false;
             case UPLOAD_ERR_EXTENSION:                      // 8
-                trigger_error('ImageUpload::validateUpload - a php extension stopped the file upload.', E_USER_WARNING);
+                trigger_error(__METHOD__.' - a php extension stopped the file upload.', E_USER_WARNING);
                 self::$error = Lang::main('intError');
                 return false;
         }
@@ -75,7 +75,7 @@ abstract class ImageUpload
         // points to invalid file
         if (!is_uploaded_file(self::$fileName))
         {
-            trigger_error('ImageUpload::validateUpload - uploaded file not in upload directory', E_USER_WARNING);
+            trigger_error(__METHOD__.' - uploaded file not in upload directory', E_USER_WARNING);
             self::$error    = Lang::main('intError');
             self::$fileName = '';
             return false;
@@ -116,7 +116,7 @@ abstract class ImageUpload
 
         if (!file_exists(self::$fileName))
         {
-            trigger_error('ImageUpload::loadFile - image ('.self::$fileName.') not found', E_USER_WARNING);
+            trigger_error(__METHOD__.' - image ('.self::$fileName.') not found', E_USER_WARNING);
             self::$fileName = '';
             return false;
         }
@@ -168,13 +168,13 @@ abstract class ImageUpload
         $res = imagecreatetruecolor($rW, $rH);
         if (!$res)
         {
-            trigger_error('ImageUpload::tempSaveUpload - imagecreate failed', E_USER_WARNING);
+            trigger_error(__METHOD__.' - imagecreate failed', E_USER_WARNING);
             return false;
         }
 
         if (!imagecopyresampled($res, self::$img, 0, 0, 0, 0, $rW, $rH, $oW, $oH))
         {
-            trigger_error('ImageUpload::tempSaveUpload - imagecopy failed', E_USER_WARNING);
+            trigger_error(__METHOD__.' - imagecopy failed', E_USER_WARNING);
             return false;
         }
 
@@ -215,7 +215,7 @@ abstract class ImageUpload
         if (imagejpeg(self::$img, sprintf($path, $file), self::JPEG_QUALITY))
             return true;
 
-        trigger_error('ImageUpload::writeImage - write failed', E_USER_WARNING);
+        trigger_error(__METHOD__.' - write failed', E_USER_WARNING);
         return false;
     }
 
@@ -233,7 +233,7 @@ abstract class ImageUpload
         else if ($mime && preg_match('/^image\/jpe?g/i', $mime))
             self::$mimeType = self::MIME_JPG;
         else
-            trigger_error('ImageUpload::setMimeType - uploaded file is of type: '.$mime, E_USER_WARNING);
+            trigger_error(__METHOD__.' - uploaded file is of type: '.$mime, E_USER_WARNING);
 
         return self::$mimeType != self::MIME_UNK;
     }

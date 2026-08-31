@@ -39,7 +39,7 @@ class ProfileStatusResponse extends TextResponse
 
         if (!$ids)
         {
-            trigger_error('ProfileStatusResponse - no profileIds to resync'.($this->_get['guild'] ? ' for guild #' : ($this->_get['arena-team'] ? ' for areana team #' : ' #')).Util::toString($this->_get['id']), E_USER_WARNING);
+            trigger_error(__METHOD__.' - no profileIds to resync'.($this->_get['guild'] ? ' for guild #' : ($this->_get['arena-team'] ? ' for areana team #' : ' #')).Util::toString($this->_get['id']), E_USER_WARNING);
             $this->result = Util::toJSON([1, [PR_QUEUE_STATUS_ERROR, 0, 0, PR_QUEUE_ERROR_CHAR]]);
         }
 

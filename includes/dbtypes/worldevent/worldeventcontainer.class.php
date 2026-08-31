@@ -23,7 +23,7 @@ class WorldeventContainer extends DBTypeContainer
     /**
      * @return ?WorldeventEntry
      */
-    public function getEntry(null|string|int $key = null) : ?WorldeventEntry
+    public function getEntry(?int $key = null) : ?WorldeventEntry
     {
         return parent::getEntry($key);
     }

@@ -33,7 +33,7 @@ class DataBaseResponse extends TextResponse
             // requires valid token to hinder automated access
             if ($set != 'item-scaling' && $set != 'spell-scaling' && (!$this->_get['t'] || empty($_SESSION['dataKey']) || $this->_get['t'] != $_SESSION['dataKey']))
             {
-                trigger_error('DataBaseResponse::generate - session data key empty or expired', E_USER_WARNING);
+                trigger_error(__METHOD__.' - session data key empty or expired', E_USER_WARNING);
                 continue;
             }
 
@@ -67,7 +67,7 @@ class DataBaseResponse extends TextResponse
                 'itemsets',
                 'pets',
                 'zones' => $this->loadLocalizedFile($set),
-                default => (function($x) { trigger_error('DataBaseResponse::generate - invalid file "'.$x.'" in request', E_USER_WARNING); })($set),
+                default => (function($x) { trigger_error(__METHOD__.' - invalid file "'.$x.'" in request', E_USER_WARNING); })($set),
             };
         }
     }

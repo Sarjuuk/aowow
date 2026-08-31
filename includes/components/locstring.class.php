@@ -18,7 +18,7 @@ class LocString implements \JsonSerializable
 
         // given that certain types have large initial data (250+ items), multiple strings (5+) and containers may hold 1k+ at a time this test has too much of a time cost
         // if (!array_filter($data, fn($k) => strstr($k, $key.'_loc'), ARRAY_FILTER_USE_KEY))
-        //     trigger_error('LocString::__construct - data has no localized strings for key '.$key, E_USER_WARNING);
+        //     trigger_error(__METHOD__.' - data has no localized strings for key '.$key, E_USER_WARNING);
 
         foreach (Locale::cases() as $l)
         {
@@ -69,7 +69,7 @@ class LocString implements \JsonSerializable
         {
             $rf = new \ReflectionFunction($this->formatter);
             if ($rf->isAnonymous())
-                trigger_error('LocString::__serialize - anonymous formatting functions cannot be serialized', E_USER_WARNING);
+                trigger_error(__METHOD__.' - anonymous formatting functions cannot be serialized', E_USER_WARNING);
             else if ($scope = $rf->getClosureScopeClass())
                 $fmt = [$scope->name, $rf->name];
             else

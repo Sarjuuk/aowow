@@ -288,7 +288,7 @@ abstract class DBTypeFilter
         {
             if (!strstr($field, '='))
             {
-                trigger_error('DBTypeFilter::transformGET - malformed GET string', E_USER_NOTICE);
+                trigger_error(__METHOD__.' - malformed GET string', E_USER_NOTICE);
                 $this->error =
                 $this->shouldReload = true;
                 continue;
@@ -298,7 +298,7 @@ abstract class DBTypeFilter
 
             if (!isset(static::$inputFields[$k]))
             {
-                trigger_error('DBTypeFilter::transformGET - GET param not in filter: '.$k, E_USER_NOTICE);
+                trigger_error(__METHOD__.' - GET param not in filter: '.$k, E_USER_NOTICE);
                 $this->error =
                 $this->shouldReload = true;
                 continue;
@@ -379,7 +379,7 @@ abstract class DBTypeFilter
 
         if (empty($this->values['cr']) || empty($this->values['crs']) || empty($this->values['crv']))
         {
-            trigger_error('DBTypeFilter::evalCriteria - one of cr, crs, crv is missing', E_USER_NOTICE);
+            trigger_error(__METHOD__.' - one of cr, crs, crv is missing', E_USER_NOTICE);
             unset($this->values['cr'], $this->values['crs'], $this->values['crv']);
 
             $this->error =
@@ -404,7 +404,7 @@ abstract class DBTypeFilter
             if (count($_crs) > $min)
                 array_splice($_crs, $min);
 
-            trigger_error('DBTypeFilter::evalCriteria - cr, crs, crv are imbalanced', E_USER_NOTICE);
+            trigger_error(__METHOD__.' - cr, crs, crv are imbalanced', E_USER_NOTICE);
             $this->error =
             $this->shouldReload = true;
         }
@@ -414,9 +414,9 @@ abstract class DBTypeFilter
             if (!isset(static::$genericFilter[$_cr[$i]]) || $_crs[$i] === '' || $_crv[$i] === '')
             {
                 if ($_crs[$i] === '' || $_crv[$i] === '')
-                    trigger_error('DBTypeFilter::evalCriteria - received malformed criterium ["'.$_cr[$i].'", "'.$_crs[$i].'", "'.$_crv[$i].'"]', E_USER_NOTICE);
+                    trigger_error(__METHOD__.' - received malformed criterium ["'.$_cr[$i].'", "'.$_crs[$i].'", "'.$_crv[$i].'"]', E_USER_NOTICE);
                 else
-                    trigger_error('DBTypeFilter::evalCriteria - received unhandled criterium: '.$_cr[$i], E_USER_NOTICE);
+                    trigger_error(__METHOD__.' - received unhandled criterium: '.$_cr[$i], E_USER_NOTICE);
 
                 unset($_cr[$i], $_crs[$i], $_crv[$i]);
 
@@ -466,11 +466,11 @@ abstract class DBTypeFilter
                 case self::CR_NYI_PH:
                     continue 2;
                 default:
-                    trigger_error('DBTypeFilter::evalCriteria - unknown criteria type: '.$crType, E_USER_WARNING);
+                    trigger_error(__METHOD__.' - unknown criteria type: '.$crType, E_USER_WARNING);
                     break;
             }
 
-            trigger_error('DBTypeFilter::evalCriteria - generic check failed ["'.$_cr[$i].'", "'.$_crs[$i].'", "'.$_crv[$i].'"]', E_USER_NOTICE);
+            trigger_error(__METHOD__.' - generic check failed ["'.$_cr[$i].'", "'.$_crs[$i].'", "'.$_crv[$i].'"]', E_USER_NOTICE);
             unset($_cr[$i], $_crs[$i], $_crv[$i]);
 
             $this->error =
@@ -489,7 +489,7 @@ abstract class DBTypeFilter
         // one empty: erroneous manual input?
         if (!$this->values['wt'] || !$this->values['wtv'])
         {
-            trigger_error('DBTypeFilter::setWeights - one of wt, wtv is missing', E_USER_NOTICE);
+            trigger_error(__METHOD__.' - one of wt, wtv is missing', E_USER_NOTICE);
             unset($this->values['wt'], $this->values['wtv']);
 
             $this->error =
@@ -505,7 +505,7 @@ abstract class DBTypeFilter
 
         if ($nwt != $nwtv)
         {
-            trigger_error('DBTypeFilter::setWeights - wt, wtv are imbalanced', E_USER_NOTICE);
+            trigger_error(__METHOD__.' - wt, wtv are imbalanced', E_USER_NOTICE);
             $this->error =
             $this->shouldReload = true;
         }
@@ -578,7 +578,7 @@ abstract class DBTypeFilter
 
         if (!$recursive)
         {
-            trigger_error('DBTypeFilter::checkInput - check failed [type: '.$type.' valid: '.Util::toString($checkInfo).' val: '.((string)$val).']', E_USER_NOTICE);
+            trigger_error(__METHOD__.' - check failed [type: '.$type.' valid: '.Util::toString($checkInfo).' val: '.((string)$val).']', E_USER_NOTICE);
             $this->error = true;
         }
 
@@ -638,7 +638,7 @@ abstract class DBTypeFilter
 
         if (empty($this->inTokens[$field]))
         {
-            trigger_error('DBTypeFilter::tokenizeString - could not tokenize string: "'.$string.'" for input: '.$field, E_USER_NOTICE);
+            trigger_error(__METHOD__.' - could not tokenize string: "'.$string.'" for input: '.$field, E_USER_NOTICE);
             $this->error = true;
             return false;
         }
@@ -864,7 +864,7 @@ abstract class DBTypeFilter
         if (!$result)
         {
             // this really should not have happened. The relevant checks are run on __construct()
-            trigger_error('DBTypeFilter::createSQLForCriterium - failed to resolve criterium: ["'.$cr.'", "'.$crs.'", "'.$crv.'"]', E_USER_WARNING);
+            trigger_error(__METHOD__.' - failed to resolve criterium: ["'.$cr.'", "'.$crs.'", "'.$crv.'"]', E_USER_WARNING);
             return [];
         }
 

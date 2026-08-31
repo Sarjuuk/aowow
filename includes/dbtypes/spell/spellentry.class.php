@@ -2400,7 +2400,7 @@ class SpellEntry extends DBTypeEntry implements ISource, ITooltip
             // this should be 0 if all went well
             if ($condBrktCnt > 0)
             {
-                trigger_error('SpellEntry::handleConditions() - string contains unbalanced condition', E_USER_WARNING);
+                trigger_error(__METHOD__.' - string contains unbalanced condition', E_USER_WARNING);
                 $condParts[3] = $condParts[3] ?? '';
             }
 
