@@ -20,7 +20,7 @@ class CommentVoteResponse extends TextResponse
     {
         if (!$this->assertGET('id', 'rating'))
         {
-            trigger_error('CommentVoteResponse - malformed request received', E_USER_WARNING);
+            trigger_error(__METHOD__.' - malformed request received', E_USER_WARNING);
             $this->result = Util::toJSON(['error' => 1, 'message' => Lang::main('genericError')]);
             return;
         }
@@ -37,7 +37,7 @@ class CommentVoteResponse extends TextResponse
         );
         if (!$target)
         {
-            trigger_error('CommentVoteResponse - target comment #'.$this->_get['id'].' not found', E_USER_WARNING);
+            trigger_error(__METHOD__.' - target comment #'.$this->_get['id'].' not found', E_USER_WARNING);
             $this->result = Util::toJSON(['error' => 1, 'message' => Lang::main('genericError')]);
             return;
         }

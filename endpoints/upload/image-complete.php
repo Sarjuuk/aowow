@@ -65,7 +65,7 @@ class UploadImagecompleteResponse extends TextResponse
         $newId = DB::Aowow()->qry('INSERT INTO ::account_avatars (`id`, `userId`, `name`, `when`, `size`) VALUES (%i, %i, %s, %i, %i)', $this->newId, User::$id, 'Avatar '.$this->newId, time(), $fSize);
         if (!is_int($newId))
         {
-            trigger_error('UploadImagecompleteResponse - avatar query failed', E_USER_WARNING);
+            trigger_error(__METHOD__.' - avatar query failed', E_USER_WARNING);
             return false;
         }
 

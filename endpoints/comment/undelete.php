@@ -19,7 +19,7 @@ class CommentUndeleteResponse extends TextResponse
     {
         if (!$this->assertPOST('id'))
         {
-            trigger_error('CommentUndeleteResponse - malformed request received', E_USER_WARNING);
+            trigger_error(__METHOD__.' - malformed request received', E_USER_WARNING);
             return;
         }
 
@@ -42,7 +42,7 @@ class CommentUndeleteResponse extends TextResponse
             return;
         }
 
-        trigger_error('CommentUndeleteResponse - user #'.User::$id.' could not unflag comment(s) #'.implode(', ', $this->_post['id']).' from deleted', E_USER_WARNING);
+        trigger_error(__METHOD__.' - user #'.User::$id.' could not unflag comment(s) #'.implode(', ', $this->_post['id']).' from deleted', E_USER_WARNING);
     }
 }
 

@@ -23,7 +23,7 @@ class CurrencyContainer extends DBTypeContainer
     /**
      * @return ?CurrencyEntry
      */
-    public function getEntry(null|string|int $key = null) : ?CurrencyEntry
+    public function getEntry(?int $key = null) : ?CurrencyEntry
     {
         return parent::getEntry($key);
     }

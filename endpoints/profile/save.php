@@ -142,7 +142,7 @@ class ProfileSaveResponse extends TextResponse
                 {
                     if (!$itemData)
                     {
-                        trigger_error('ProfileSaveResponse::generate - skipping malformed inventory definition for slot #'.$slot.': '.Util::toString($itemData), E_USER_NOTICE);
+                        trigger_error(__METHOD__.' - skipping malformed inventory definition for slot #'.$slot.': '.Util::toString($itemData), E_USER_NOTICE);
                         continue;
                     }
 

@@ -16,10 +16,10 @@ class Book implements \JsonSerializable
         private ?int    $page = null)                       // start page; defaults to 1
     {
         if (!$parent)
-            trigger_error(self::class.'::__construct - initialized without parent element', E_USER_WARNING);
+            trigger_error(__METHOD__.' - initialized without parent element', E_USER_WARNING);
 
         if (!$pages)
-            trigger_error(self::class.'::__construct - initialized without content', E_USER_WARNING);
+            trigger_error(__METHOD__.' - initialized without content', E_USER_WARNING);
         else
             foreach ($pages as $p)
                 $this->pages[] = UIText::format($p, Lang::FMT_HTML);

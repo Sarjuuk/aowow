@@ -23,7 +23,7 @@ class AreatriggerContainer extends DBTypeContainer
     /**
      * @return ?AreatriggerEntry
      */
-    public function getEntry(null|string|int $key = null) : ?AreatriggerEntry
+    public function getEntry(?int $key = null) : ?AreatriggerEntry
     {
         return parent::getEntry($key);
     }

@@ -122,21 +122,21 @@ class Report
     {
         if ($mode < 0 || $reason <= 0)
         {
-            trigger_error('Report - malformed contact request received', E_USER_WARNING);
+            trigger_error(__METHOD__.' - malformed contact request received', E_USER_WARNING);
             $this->errorCode = self::ERR_MISCELLANEOUS;
             return;
         }
 
         if (!isset($this->context[$mode][$reason]))
         {
-            trigger_error('Report - report has invalid context (mode:'.$mode.' / reason:'.$reason.')', E_USER_WARNING);
+            trigger_error(__METHOD__.' - report has invalid context (mode:'.$mode.' / reason:'.$reason.')', E_USER_WARNING);
             $this->errorCode = self::ERR_MISCELLANEOUS;
             return;
         }
 
         if (!User::isLoggedIn() && !User::$ip)
         {
-            trigger_error('Report - could not determine IP for anonymous user', E_USER_WARNING);
+            trigger_error(__METHOD__.' - could not determine IP for anonymous user', E_USER_WARNING);
             $this->errorCode = self::ERR_MISCELLANEOUS;
             return;
         }

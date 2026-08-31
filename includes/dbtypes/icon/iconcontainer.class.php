@@ -33,7 +33,7 @@ class IconContainer extends DBTypeContainer
     /**
      * @return ?IconEntry
      */
-    public function getEntry(null|string|int $key = null) : ?IconEntry
+    public function getEntry(?int $key = null) : ?IconEntry
     {
         return parent::getEntry($key);
     }

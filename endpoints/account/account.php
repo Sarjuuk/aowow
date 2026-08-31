@@ -86,7 +86,7 @@ class AccountBaseResponse extends TemplateResponse
             if (property_exists($this, $var.'Message'))
                 $this->{$var.'Message'} = [$status, $msg];
             else
-                trigger_error('AccountBaseResponse::generate - unknown var in $_SESSION msg: '.$var, E_USER_WARNING);
+                trigger_error(__METHOD__.' - unknown var in $_SESSION msg: '.$var, E_USER_WARNING);
 
             unset($_SESSION['msg']);
         }

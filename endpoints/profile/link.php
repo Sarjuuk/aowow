@@ -31,7 +31,7 @@ class ProfileLinkResponse extends TextResponse
     {
         if (!$this->assertGET('id'))
         {
-            trigger_error('ProfileLinkResponse - profileId empty', E_USER_WARNING);
+            trigger_error(__METHOD__.' - profileId empty', E_USER_WARNING);
             return;
         }
 
@@ -43,7 +43,7 @@ class ProfileLinkResponse extends TextResponse
         );
 
         if (!is_int($newId))
-            trigger_error('ProfileLinkResponse - some of the profileIds were custom or do not exist', E_USER_WARNING);
+            trigger_error(__METHOD__.' - some of the profileIds were custom or do not exist', E_USER_WARNING);
     }
 }
 

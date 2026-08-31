@@ -23,7 +23,7 @@ class CommentAddResponse extends TextResponse
     {
         if (!$this->assertGET('type', 'typeid') || !$this->assertPOST('commentbody') || !Type::validateIds($this->_get['type'], $this->_get['typeid']))
         {
-            trigger_error('CommentAddResponse - malforemd request received', E_USER_WARNING);
+            trigger_error(__METHOD__.' - malforemd request received', E_USER_WARNING);
             return;                                      // whatever, we cant even send him back
         }
 
@@ -38,7 +38,7 @@ class CommentAddResponse extends TextResponse
         // this type cannot be commented on
         if (!Type::checkClassAttrib($this->_get['type'], 'contribute', CONTRIBUTE_CO))
         {
-            trigger_error('CommentAddResponse - tried to comment on unsupported type: '.Type::getFileString($this->_get['type']), E_USER_WARNING);
+            trigger_error(__METHOD__.' - tried to comment on unsupported type: '.Type::getFileString($this->_get['type']), E_USER_WARNING);
             $_SESSION['error']['co'] = Lang::main('intError');
             return;
         }
@@ -71,7 +71,7 @@ class CommentAddResponse extends TextResponse
             return;
         }
 
-        trigger_error('CommentAddResponse - write to db failed', E_USER_WARNING);
+        trigger_error(__METHOD__.' - write to db failed', E_USER_WARNING);
         $_SESSION['error']['co'] = Lang::main('intError');
     }
 }

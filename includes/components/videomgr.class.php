@@ -29,7 +29,7 @@ class VideoMgr
         $tmpFile = fopen(self::$tmpFile, 'w');
         if (!$tmpFile)
         {
-            trigger_error('VideoMrg::saveSuggestion - failed to create temp file');
+            trigger_error(__METHOD__.' - failed to create temp file');
             return false;
         }
 
@@ -202,7 +202,7 @@ class VideoMgr
             {
                 if (empty($p['name']))
                 {
-                    trigger_error('VideoMgr::getPages - video linked to nonexistent type/typeId combination: '.$p['type'].'/'.$p['typeId'], E_USER_NOTICE);
+                    trigger_error(__METHOD__.' - video linked to nonexistent type/typeId combination: '.$p['type'].'/'.$p['typeId'], E_USER_NOTICE);
                     unset($p);
                 }
                 else

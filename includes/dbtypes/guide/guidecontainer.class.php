@@ -32,7 +32,7 @@ class GuideContainer extends DBTypeContainer
     /**
      * @return ?GuideEntry
      */
-    public function getEntry(null|string|int $key = null) : ?GuideEntry
+    public function getEntry(?int $key = null) : ?GuideEntry
     {
         return parent::getEntry($key);
     }

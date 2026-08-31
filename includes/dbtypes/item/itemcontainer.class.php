@@ -25,7 +25,7 @@ class ItemContainer extends DBTypeContainer
     /**
      * @return ?ItemEntry
      */
-    public function getEntry(null|string|int $key = null) : ?ItemEntry
+    public function getEntry(?int $key = null) : ?ItemEntry
     {
         return parent::getEntry($key);
     }

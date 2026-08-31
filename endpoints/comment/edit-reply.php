@@ -22,7 +22,7 @@ class CommentEditreplyResponse extends TextResponse
     {
         if (!$this->assertPOST('commentId', 'replyId', 'body'))
         {
-            trigger_error('CommentEditreplyResponse - malformed request received', E_USER_WARNING);
+            trigger_error(__METHOD__.' - malformed request received', E_USER_WARNING);
             $this->generate404(User::isInGroup(U_GROUP_STAFF) ? 'request malformed' : '');
         }
 
@@ -33,7 +33,7 @@ class CommentEditreplyResponse extends TextResponse
 
         if (!$ownerId)
         {
-            trigger_error('CommentEditreplyResponse - comment #'.$this->_post['commentId'].' or reply #'.$this->_post['replyId'].' does not exist', E_USER_WARNING);
+            trigger_error(__METHOD__.' - comment #'.$this->_post['commentId'].' or reply #'.$this->_post['replyId'].' does not exist', E_USER_WARNING);
             $this->generate404(Lang::main('intError'));
         }
 
@@ -54,7 +54,7 @@ class CommentEditreplyResponse extends TextResponse
 
         if (!DB::Aowow()->qry('UPDATE ::comments SET `editCount` = `editCount` + 1, %a WHERE %and', $update, $where))
         {
-            trigger_error('CommentEditreplyResponse - write to db failed', E_USER_WARNING);
+            trigger_error(__METHOD__.' - write to db failed', E_USER_WARNING);
             $this->generate404(Lang::main('intError'));
         }
 

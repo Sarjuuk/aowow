@@ -19,7 +19,7 @@ class CommentDeletereplyResponse extends TextResponse
     {
         if (!$this->assertPOST('id'))
         {
-            trigger_error('CommentDeletereplyResponse - malformed request received', E_USER_WARNING);
+            trigger_error(__METHOD__.' - malformed request received', E_USER_WARNING);
             $this->generate404(User::isInGroup(U_GROUP_STAFF) ? 'request malformed' : '');
         }
 
@@ -32,7 +32,7 @@ class CommentDeletereplyResponse extends TextResponse
             DB::Aowow()->qry('DELETE FROM ::user_ratings WHERE `type` = %i AND `entry` = %i', RATING_COMMENT, $this->_post['id']);
         else
         {
-            trigger_error('CommentDeletereplyResponse - deleting reply #'.$this->_post['id'].' by user #'.User::$id.' from db failed', E_USER_WARNING);
+            trigger_error(__METHOD__.' - deleting reply #'.$this->_post['id'].' by user #'.User::$id.' from db failed', E_USER_WARNING);
             $this->generate404(Lang::main('intError'));
         }
     }

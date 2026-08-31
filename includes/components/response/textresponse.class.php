@@ -143,7 +143,7 @@ class TextResponse extends BaseResponse
     // by default ajax has nothing to say
     protected function onUserGroupMismatch() : never
     {
-        trigger_error('TextResponse::onUserGroupMismatch - loggedIn: '.($this->requiresLogin ? 'yes' : 'no').'; expected: '.Util::asHex($this->requiredUserGroup).'; is: '.Util::asHex(User::$groups), E_USER_WARNING);
+        trigger_error(__METHOD__.' - loggedIn: '.($this->requiresLogin ? 'yes' : 'no').'; expected: '.Util::asHex($this->requiredUserGroup).'; is: '.Util::asHex(User::$groups), E_USER_WARNING);
 
         $this->generate403();
     }

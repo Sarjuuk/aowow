@@ -23,7 +23,7 @@ class CreatureContainer extends DBTypeContainer
     /**
      * @return ?CreatureEntry creature template
      */
-    public function getEntry(null|string|int $key = null) : ?CreatureEntry
+    public function getEntry(?int $key = null) : ?CreatureEntry
     {
         return parent::getEntry($key);
     }

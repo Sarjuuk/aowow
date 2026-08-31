@@ -22,7 +22,7 @@ class CommentEditResponse extends TextResponse
     {
         if (!$this->assertGET('id') || !$this->assertPOST('body'))
         {
-            trigger_error('CommentEditResponse - malforemd request received', E_USER_WARNING);
+            trigger_error(__METHOD__.' - malforemd request received', E_USER_WARNING);
             return;
         }
 
@@ -30,7 +30,7 @@ class CommentEditResponse extends TextResponse
 
         if (!User::canComment() || (User::$id != $ownerId && !User::isInGroup(U_GROUP_MODERATOR)))
         {
-            trigger_error('CommentEditResponse - user #'.User::$id.' not allowed to edit comment #'.$this->_get['id'], E_USER_WARNING);
+            trigger_error(__METHOD__.' - user #'.User::$id.' not allowed to edit comment #'.$this->_get['id'], E_USER_WARNING);
             return;
         }
 

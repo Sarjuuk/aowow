@@ -40,13 +40,13 @@ class AdminAnnouncementsResponse extends TemplateResponse
     {
         if (!$this->assertGET('status', 'id'))
         {
-            trigger_error('AdminAnnouncementsResponse::updateStatus - error in _GET id/status');
+            trigger_error(__METHOD__.' - error in _GET id/status');
             return;
         }
 
         if (!DB::Aowow()->selectCell('SELECT 1 FROM ::announcements WHERE `id` = %i', $this->_get['id']))
         {
-            trigger_error('AdminAnnouncementsResponse::updateStatus - announcement does not exist');
+            trigger_error(__METHOD__.' - announcement does not exist');
             return;
         }
 
