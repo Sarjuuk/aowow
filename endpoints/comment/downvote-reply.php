@@ -19,7 +19,7 @@ class CommentDownvotereplyResponse extends TextResponse
     {
         if (!$this->assertPOST('id'))
         {
-            trigger_error('CommentDownvotereplyResponse - malformed request received', E_USER_WARNING);
+            trigger_error(__METHOD__.' - malformed request received', E_USER_WARNING);
             $this->generate404(User::isInGroup(U_GROUP_STAFF) ? 'request malformed' : '');
         }
 
@@ -29,7 +29,7 @@ class CommentDownvotereplyResponse extends TextResponse
         $comment = DB::Aowow()->selectRow('SELECT `userId`, IF(`flags` & %i, 1, 0) AS "deleted" FROM ::comments WHERE `id` = %i', CC_FLAG_DELETED, $this->_post['id']);
         if (!$comment)
         {
-            trigger_error('CommentDownvotereplyResponse - comment #'.$this->_post['id'].' not found in db', E_USER_WARNING);
+            trigger_error(__METHOD__.' - comment #'.$this->_post['id'].' not found in db', E_USER_WARNING);
             $this->generate404(User::isInGroup(U_GROUP_STAFF) ? 'replyID not found' : '');
         }
 
@@ -43,7 +43,7 @@ class CommentDownvotereplyResponse extends TextResponse
             RATING_COMMENT, $this->_post['id'], User::$id, User::canSupervote() ? -2 : -1
         )))
         {
-            trigger_error('CommentDownvotereplyResponse - write to db failed', E_USER_WARNING);
+            trigger_error(__METHOD__.' - write to db failed', E_USER_WARNING);
             $this->generate404(User::isInGroup(U_GROUP_STAFF) ? 'write to db failed' : '');
         }
 

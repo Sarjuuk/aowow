@@ -44,7 +44,7 @@ class EnchantmentContainer extends DBTypeContainer
     /**
      * @return ?EnchantmentEntry
      */
-    public function getEntry(null|string|int $key = null) : ?EnchantmentEntry
+    public function getEntry(?int $key = null) : ?EnchantmentEntry
     {
         return parent::getEntry($key);
     }

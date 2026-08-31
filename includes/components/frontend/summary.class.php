@@ -28,13 +28,13 @@ class Summary implements \JsonSerializable
             if (property_exists($this, $k))
                 $this->$k = $v;
             else
-                trigger_error(self::class.'::__construct - unrecognized option: ' . $k);
+                trigger_error(__METHOD__.' - unrecognized option: ' . $k);
         }
 
         if (!$this->template)
-            trigger_error(self::class.'::__construct - initialized without template', E_USER_WARNING);
+            trigger_error(__METHOD__.' - initialized without template', E_USER_WARNING);
         if (!$this->id)
-            trigger_error(self::class.'::__construct - initialized without HTMLNode#id to reference', E_USER_WARNING);
+            trigger_error(__METHOD__.' - initialized without HTMLNode#id to reference', E_USER_WARNING);
     }
 
     public function &iterate() : \Generator

@@ -23,7 +23,7 @@ class EmoteContainer extends DBTypeContainer
     /**
      * @return ?EmoteEntry
      */
-    public function getEntry(null|string|int $key = null) : ?EmoteEntry
+    public function getEntry(?int $key = null) : ?EmoteEntry
     {
         return parent::getEntry($key);
     }

@@ -18,7 +18,7 @@ class AdminScreenshotsActionApproveResponse extends TextResponse
     {
         if (!$this->assertGET('id'))
         {
-            trigger_error('AdminScreenshotsActionApproveResponse - screenshotId empty', E_USER_WARNING);
+            trigger_error(__METHOD__.' - screenshotId empty', E_USER_WARNING);
             return;
         }
 
@@ -55,6 +55,6 @@ class AdminScreenshotsActionApproveResponse extends TextResponse
         }
 
         if ($errIds = array_diff($this->_get['id'], array_keys($ssEntries)))
-            trigger_error('AdminScreenshotsActionApproveResponse - screenshot(s) #'.implode(', #', $errIds).' not in db or already approved', E_USER_WARNING);
+            trigger_error(__METHOD__.' - screenshot(s) #'.implode(', #', $errIds).' not in db or already approved', E_USER_WARNING);
     }
 }

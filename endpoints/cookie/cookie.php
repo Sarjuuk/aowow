@@ -40,14 +40,14 @@ class CookieBaseResponse extends TextResponse
 
         if (!$this->param || !$this->assertGET($this->param))
         {
-            trigger_error('CookieBaseResponse - malformed request received', E_USER_WARNING);
+            trigger_error(__METHOD__.' - malformed request received', E_USER_WARNING);
             return;
         }
 
         if (DB::Aowow()->qry('REPLACE INTO ::account_cookies VALUES (%i, %s, %s)', User::$id, $this->param, $this->_get[$this->param]))
             $this->result = 0;
         else
-            trigger_error('CookieBaseResponse - write to db failed', E_USER_WARNING);
+            trigger_error(__METHOD__.' - write to db failed', E_USER_WARNING);
     }
 }
 

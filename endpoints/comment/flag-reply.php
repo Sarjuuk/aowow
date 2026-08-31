@@ -19,14 +19,14 @@ class CommentFlagreplyResponse extends TextResponse
     {
         if (!$this->assertPOST('id'))
         {
-            trigger_error('CommentFlagreplyResponse - malformed request received', E_USER_WARNING);
+            trigger_error(__METHOD__.' - malformed request received', E_USER_WARNING);
             $this->generate404(User::isInGroup(U_GROUP_STAFF) ? 'request malformed' : '');
         }
 
         $replyOwner = DB::Aowow()->selectCell('SELECT `userId` FROM ::commments WHERE `id` = %i', $this->_post['id']);
         if (!$replyOwner)
         {
-            trigger_error('CommentFlagreplyResponse - reply not found', E_USER_WARNING);
+            trigger_error(__METHOD__.' - reply not found', E_USER_WARNING);
             $this->generate404(Lang::main('intError'));
         }
 

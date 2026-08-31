@@ -333,7 +333,7 @@ class SmartEvent
                     };
                 }
                 else
-                    trigger_error('SmartAI::event - could not find gossip menu option for event #'.$this->type);
+                    trigger_error(__METHOD__.' - could not find gossip menu option for event #'.$this->type);
                 break;
             case self::EVENT_DISTANCE_CREATURE:             // 75  -  On creature guid OR any instance of creature entry is within distance.
                 if ($this->param[0])
@@ -355,7 +355,7 @@ class SmartEvent
                 else if ($this->param[1])
                     $this->param[10] = $this->param[1];
                 else if (!$this->param[10])
-                    trigger_error('SmartAI::event - entity for event #'.$this->type.' not defined');
+                    trigger_error(__METHOD__.' - entity for event #'.$this->type.' not defined');
                 break;
             case self::EVENT_EVENT_PHASE_CHANGE:            // 66  -  On event phase mask set
                 $this->param[10] = Lang::concat(Util::mask2bits($this->param[0]), Lang::CONCAT_OR);
@@ -403,7 +403,7 @@ class SmartEvent
 
         if ($x = ($flags & ~self::FLAG_VALIDATE))
         {
-            trigger_error('SmartEvent::formatFlags - unused SmartEventFlags '.Util::asBin($x).' set on id #'.$this->id, E_USER_NOTICE);
+            trigger_error(__METHOD__.' - unused SmartEventFlags '.Util::asBin($x).' set on id #'.$this->id, E_USER_NOTICE);
             $flags &= self::FLAG_VALIDATE;
         }
 

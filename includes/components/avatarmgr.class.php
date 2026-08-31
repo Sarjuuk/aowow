@@ -30,7 +30,7 @@ class AvatarMgr extends ImageUpload
             $path = constant('self::PATH_' . $p);
             if (!is_writable(substr($path, 0, strrpos($path, '/'))))
             {
-                trigger_error('AvatarMgr::init - directory '.substr($path, 0, strrpos($path, '/')).' not writable', E_USER_WARNING);
+                trigger_error(__METHOD__.' - directory '.substr($path, 0, strrpos($path, '/')).' not writable', E_USER_WARNING);
                 $dirErr = true;
             }
         }
