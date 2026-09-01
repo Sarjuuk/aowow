@@ -20,7 +20,7 @@ class AreatriggersBaseResponse extends TemplateResponse implements ICache
     protected  array  $breadcrumb        = [0, 102];
 
     protected  array  $scripts           = [[SC_JS_FILE, 'js/filters.js']];
-    protected  array  $expectedGET       = ['filter' => ['filter' => FILTER_VALIDATE_REGEXP, 'options' => ['regexp' => Filter::PATTERN_PARAM]]];
+    protected  array  $expectedGET       = ['filter' => ['filter' => FILTER_CALLBACK, 'options' => [self::class, 'sanitizeFilter']]];
     protected  array  $validCats         = [0, 1, 2, 3, 4, 5];
 
     public function __construct(string $rawParam)

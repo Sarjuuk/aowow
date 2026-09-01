@@ -63,7 +63,7 @@ abstract class Filter
     protected const string PATTERN_NAME  = '/[\p{C};%\\\\]/ui';
     protected const string PATTERN_CRV   = '/[\p{C};:%\\\\]/ui';
     protected const string PATTERN_INT   = '/\D/';
-    public    const string PATTERN_PARAM = '/^[\p{L}\p{Sm} \d\p{P}]+$/ui';
+    public    const string PATTERN_PARAM = '/[^\p{L}\p{Sm} \d\p{P}]/ui';
     public    const string PATTERN_FT    = '/[^[:alpha:] \d_]/iu'; // +-*<>@()~" have special meaning; ' seems to fuck up the search; other irregular cases?
 
     protected const array ENUM_FACTION       = array(  469,  1037,  1106,   529,  1012,    87,    21,   910,   609,   942,   909,   530,    69,   577,   930,  1068,  1104,   729,   369,    92,

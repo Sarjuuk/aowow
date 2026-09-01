@@ -21,7 +21,7 @@ class ItemsetsBaseResponse extends TemplateResponse implements ICache
  // protected  array  $dataLoader  = ['weight-presets'];    // was here since day 1, but was never accessed..?
     protected  array  $scripts     = [[SC_JS_FILE, 'js/filters.js']];
     protected  array  $expectedGET = array(
-        'filter' => ['filter' => FILTER_VALIDATE_REGEXP, 'options' => ['regexp' => Filter::PATTERN_PARAM]]
+        'filter' => ['filter' => FILTER_CALLBACK, 'options' => [self::class, 'sanitizeFilter']]
     );
 
     public function __construct(string $rawParam)

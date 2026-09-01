@@ -23,7 +23,7 @@ class ProfilesBaseResponse extends TemplateResponse implements IProfilerList
         [SC_CSS_FILE, 'css/Profiler.css']
     );
     protected  array  $expectedGET = array(
-        'filter' => ['filter' => FILTER_VALIDATE_REGEXP, 'options' => ['regexp' => Filter::PATTERN_PARAM]],
+        'filter' => ['filter' => FILTER_CALLBACK, 'options' => [self::class, 'sanitizeFilter']],
         // 1 guild; 2,3,4 arenateam (4 => 5-man): puts a resync button on the lv (was probably used before arenateams and guilds had a dedicated page)
         'roster' => ['filter' => FILTER_VALIDATE_INT,    'options' => ['min_value' => 1, 'max_value' => 4]]
     );

@@ -657,6 +657,11 @@ abstract class BaseResponse
         return null;
     }
 
+    protected static function sanitizeFilter(string $filter) : string
+    {
+        return preg_replace(Filter::PATTERN_PARAM, '', $filter);
+    }
+
 
     /********************/
     /* child implements */
