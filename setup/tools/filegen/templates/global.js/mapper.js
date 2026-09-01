@@ -358,8 +358,8 @@ Mapper.prototype = {
 
      // this.span.style.background = 'url(' + g_staticUrl + '/images/wow/maps/' + type + '/' + Mapper.sizes[this.zoom][2] + '/' + map + '.jpg)';
      // aowow - custom start
-        this.span.style.backgroundSize = 'contain';
         this.span.style.background = 'url(' + g_staticUrl + '/images/wow/maps/' + type + '/' + Mapper.sizes[2][2] + '/' + map + '.jpg)';
+        this.span.style.backgroundSize = 'contain';
      // aowow - custom end
 
         if (this.overlay)
