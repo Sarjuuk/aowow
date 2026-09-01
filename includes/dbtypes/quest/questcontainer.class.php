@@ -10,6 +10,8 @@ class QuestContainer extends DBTypeContainer
 {
     public static int $dbType = Type::QUEST;
 
+    private ?array $somData = null;
+
     /**
      * iterate over fetched sets
      *
@@ -51,29 +53,40 @@ class QuestContainer extends DBTypeContainer
         return parent::getJSGlobals($addMask);
     }
 
-    public function getSOMData(int $side = SIDE_BOTH) : array
+    public function getSOMData(array $questIds, int $side = SIDE_BOTH) : array
     {
-        $data   = [];
-        $series = DB::Aowow()->selectAssoc(
-           'SELECT cur.`id` AS ARRAY_KEY, IF(prev.`id` OR cur.`nextQuestIdChain`, 1, 0) AS "series", IF(prev.`id` IS NULL AND cur.`nextQuestIdChain`, 1, 0) AS "first" FROM ::quests cur LEFT JOIN ::quests prev ON prev.`nextQuestIdChain` = cur.`id` WHERE cur.`id` IN %in',
-            $this->getFoundIds()
-        );
-
-        foreach ($this->iterate() as $id => $entry)
+        $this->somData ??= (function()
         {
-            if (!(ChrRace::sideFromMask($entry->reqRaceMask) & $side))
-                continue;
+            $data   = [];
+            $series = DB::Aowow()->selectAssoc(
+            'SELECT cur.`id` AS ARRAY_KEY, IF(prev.`id` OR cur.`nextQuestIdChain`, 1, 0) AS "series", IF(prev.`id` IS NULL AND cur.`nextQuestIdChain`, 1, 0) AS "first" FROM ::quests cur LEFT JOIN ::quests prev ON prev.`nextQuestIdChain` = cur.`id` WHERE cur.`id` IN %in',
+                $this->getFoundIds()
+            );
 
-            $data[$id] = array(
-                'level'     => $entry->level < 0 ? MAX_LEVEL : $entry->level,
-                'name'      => $entry->name,
-                'category'  => $entry->category1,
-                'category2' => $entry->category2
-            ) + $series[$id];
+            foreach ($this->iterate() as $id => $entry)
+            {
+                $data[$id] = array(
+                    'level'     => $entry->level < 0 ? MAX_LEVEL : $entry->level,
+                    'name'      => $entry->name,
+                    'category'  => $entry->category1,
+                    'category2' => $entry->category2,
+                    '__side'    => ChrRace::sideFromMask($entry->reqRaceMask)
+                ) + $series[$id];
 
-            if ($entry->isDaily())
-                $data[$id]['daily'] = 1;
-        }
+                if ($entry->isDaily())
+                    $data[$id]['daily'] = 1;
+            }
+
+            return $data;
+        })();
+
+        $data = array_intersect_key($this->somData, array_flip($questIds));
+
+        if ($side != SIDE_BOTH)
+            $data = array_filter($data, fn($x) => $x['__side'] & $side);
+
+        foreach ($data as &$d)
+            unset($d['__side']);
 
         return $data;
     }
