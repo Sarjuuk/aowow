@@ -227,7 +227,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
             $this->extendGlobalIds(Type::ZONE, $_parentArea);
         }
 
-        // we cannot fetch spawns via lists. lists are grouped by entry
+        // we cannot fetch spawns via container as they are grouped by id
         $oSpawns = DB::Aowow()->selectAssoc('SELECT * FROM ::spawns WHERE `areaId` = %i AND `type` = %i AND `posX` > 0 AND `posY` > 0', $this->typeId, Type::OBJECT);
         $cSpawns = DB::Aowow()->selectAssoc('SELECT * FROM ::spawns WHERE `areaId` = %i AND `type` = %i AND `posX` > 0 AND `posY` > 0', $this->typeId, Type::NPC);
         $aSpawns = User::isInGroup(U_GROUP_STAFF) ? DB::Aowow()->selectAssoc('SELECT * FROM ::spawns WHERE `areaId` = %i AND `type` = %i AND `posX` > 0 AND `posY` > 0', $this->typeId, Type::AREATRIGGER) : [];
@@ -239,16 +239,42 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
         $objectSpawns   = new GameobjectContainer($conditions, ['calcTotal' => true]);
         $creatureSpawns = new CreatureContainer($conditions, ['calcTotal' => true]);
         $atSpawns       = new AreatriggerContainer($conditions);
+        $questsStarted  = null;
 
-        $questsLV = $rewardsLV = [];
+        $questsLV = $rewardsLV = $oQuestIds = $cQuestIds = $startEndMap = [];
 
-        $relQuestZOS = [$this->typeId];
-        foreach (Game::$questSubCats as $parent => $children)
+        foreach ($objectSpawns->iterate() as $entry)
+            if ($entry->startsQuests)
+                $oQuestIds[] = $entry->id;
+
+        foreach ($creatureSpawns->iterate() as $entry)
+            if ($entry->startsQuests)
+                $cQuestIds[] = $entry->id;
+
+        if ($cQuestIds || $oQuestIds)
         {
-            if (in_array($this->typeId, $children))
-                $relQuestZOS[] = $parent;
-            else if ($this->typeId == $parent)
-                $relQuestZOS = array_merge($relQuestZOS, $children);
+            if ($oQuestIds)
+                $startEndMap += DB::Aowow()->selectCol('SELECT -`typeId` AS ARRAY_KEY, `questId` AS ARRAY_KEY2, `questId` FROM ::quests_startend WHERE `method` & 1 AND `type` = %i AND `typeId` IN %in', Type::OBJECT, $oQuestIds);
+            if ($cQuestIds)
+                $startEndMap += DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, `questId` AS ARRAY_KEY2, `questId` FROM ::quests_startend WHERE `method` & 1 AND `type` = %i AND `typeId` IN %in', Type::NPC, $cQuestIds);
+
+            $relQuestZOS = [$this->typeId];
+            foreach (Game::$questSubCats as $parent => $children)
+            {
+                if (in_array($this->typeId, $children))
+                    $relQuestZOS[] = $parent;
+                else if ($this->typeId == $parent)
+                    $relQuestZOS = array_merge($relQuestZOS, $children);
+            }
+
+            $questsStarted = new QuestContainer(array(['id', array_merge(...$startEndMap)]));
+            // store data for misc tabs
+            $questsLV += array_filter($questsStarted->getListviewData(), fn($x) => $x['category'] < 0 || in_array($x['category'], $relQuestZOS));
+            foreach ($questsStarted->iterate() as $questEntry)
+                if ($questEntry->category1 < 0 || in_array($questEntry->category1, $relQuestZOS))
+                    array_push($rewardsLV, ...array_keys($questEntry->getRewardChoiceItems()), ...array_keys($questEntry->getRewardItems()));
+
+            $this->extendGlobalData($questsStarted->getJSGlobals());
         }
 
         // see if we can actually display a map
@@ -309,19 +335,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
 
                 if ($objEntry->startsQuests)
                 {
-                    $started = new QuestContainer(array(['qse.method', 1, '&'], ['qse.type', Type::OBJECT], ['qse.typeId', $objEntry->id]));
-                    if ($started->error)
-                        continue;
-
-                    // store data for misc tabs
-                    $questsLV += array_filter($started->getListviewData(), fn($x) => $x['category'] < 0 || in_array($x['category'], $relQuestZOS));
-
-                    $this->extendGlobalData($started->getJSGlobals());
-
-                    foreach ($started->iterate() as $questEntry)
-                        $rewardsLV = array_merge($rewardsLV, array_keys($questEntry->getRewardChoiceItems()), array_keys($questEntry->getRewardItems()));
-
-                    if (($objEntry->A != -1) && ($_ = $started->getSOMData(SIDE_ALLIANCE)))
+                    if (($objEntry->A != -1) && ($_ = $questsStarted->getSOMData($startEndMap[-$objEntry->id], SIDE_ALLIANCE)))
                         $addToSOM('alliancequests', $objEntry->name, array(
                             'coords' => [[$spawn['posX'], $spawn['posY']]],
                             'level'  => $spawn['floor'],
@@ -332,7 +346,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
                             'quests' => array_values($_)
                         ));
 
-                    if (($objEntry->H != -1) && ($_ = $started->getSOMData(SIDE_HORDE)))
+                    if (($objEntry->H != -1) && ($_ = $questsStarted->getSOMData($startEndMap[-$objEntry->id], SIDE_HORDE)))
                         $addToSOM('hordequests', $objEntry->name, array(
                             'coords' => [[$spawn['posX'], $spawn['posY']]],
                             'level'  => $spawn['floor'],
@@ -391,19 +405,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
 
                 if ($npcEntry->startsQuests)
                 {
-                    $started = new QuestContainer(array(['qse.method', 1, '&'], ['qse.type', Type::NPC], ['qse.typeId', $npcEntry->id]));
-                    if ($started->error)
-                        continue;
-
-                    // store data for misc tabs
-                    $questsLV += array_filter($started->getListviewData(), fn($x) => $x['category'] < 0 || in_array($x['category'], $relQuestZOS));
-
-                    $this->extendGlobalData($started->getJSGlobals());
-
-                    foreach ($started->iterate() as $questEntry)
-                        $rewardsLV = array_merge($rewardsLV, array_keys($questEntry->getRewardChoiceItems()), array_keys($questEntry->getRewardItems()));
-
-                    if (($npcEntry->A != -1) && ($_ = $started->getSOMData(SIDE_ALLIANCE)))
+                    if (($npcEntry->A != -1) && ($_ = $questsStarted->getSOMData($startEndMap[$npcEntry->id], SIDE_ALLIANCE)))
                         $addToSOM('alliancequests', $npcEntry->name, array(
                             'coords'        => [[$spawn['posX'], $spawn['posY']]],
                             'level'         => $spawn['floor'],
@@ -416,7 +418,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
                             'quests'        => array_values($_)
                         ));
 
-                    if (($npcEntry->H != -1) && ($_ = $started->getSOMData(SIDE_HORDE)))
+                    if (($npcEntry->H != -1) && ($_ = $questsStarted->getSOMData($startEndMap[$npcEntry->id], SIDE_HORDE)))
                         $addToSOM('hordequests', $npcEntry->name, array(
                             'coords'        => [[$spawn['posX'], $spawn['posY']]],
                             'level'         => $spawn['floor'],
