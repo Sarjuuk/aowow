@@ -42,7 +42,7 @@ class LocString implements \JsonSerializable
 
     public function __invoke(Locale $l) : string
     {
-        return ($this->formatter)($this->store[$l->value] ?? '');
+        return ($this->formatter)($this->store[$l] ?? '');
     }
 
     public function __toString() : string
