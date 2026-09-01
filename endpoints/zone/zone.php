@@ -247,16 +247,42 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
         $objectSpawns   = new GameObjectList($conditions, ['calcTotal' => true]);
         $creatureSpawns = new CreatureList($conditions, ['calcTotal' => true]);
         $atSpawns       = new AreaTriggerList($conditions);
+        $questsStarted  = null;
 
-        $questsLV = $rewardsLV = [];
+        $questsLV = $rewardsLV = $oQuestIds = $cQuestIds = $startEndMap = [];
 
-        $relQuestZOS = [$this->typeId];
-        foreach (Game::$questSubCats as $parent => $children)
+        foreach ($objectSpawns->iterate() as $entry)
+            if ($entry['startsQuests'])
+                $oQuestIds[] = $entry['id'];
+
+        foreach ($creatureSpawns->iterate() as $entry)
+            if ($entry['startsQuests'])
+                $cQuestIds[] = $entry['id'];
+
+        if ($cQuestIds || $oQuestIds)
         {
-            if (in_array($this->typeId, $children))
-                $relQuestZOS[] = $parent;
-            else if ($this->typeId == $parent)
-                $relQuestZOS = array_merge($relQuestZOS, $children);
+            if ($oQuestIds)
+                $startEndMap += DB::Aowow()->selectCol('SELECT -`typeId` AS ARRAY_KEY, `questId` AS ARRAY_KEY2, `questId` FROM ::quests_startend WHERE `method` & 1 AND `type` = %i AND `typeId` IN %in', Type::OBJECT, $oQuestIds);
+            if ($cQuestIds)
+                $startEndMap += DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, `questId` AS ARRAY_KEY2, `questId` FROM ::quests_startend WHERE `method` & 1 AND `type` = %i AND `typeId` IN %in', Type::NPC, $cQuestIds);
+
+            $relQuestZOS = [$this->typeId];
+            foreach (Game::$questSubCats as $parent => $children)
+            {
+                if (in_array($this->typeId, $children))
+                    $relQuestZOS[] = $parent;
+                else if ($this->typeId == $parent)
+                    $relQuestZOS = array_merge($relQuestZOS, $children);
+            }
+
+            $questsStarted = new QuestList(array(['id', array_merge(...$startEndMap)]));
+            // store data for misc tabs
+            $questsLV += array_filter($questsStarted->getListviewData(), fn($x) => $x['category'] < 0 || in_array($x['category'], $relQuestZOS));
+            foreach ($questsStarted->iterate() as $id => $questEntry)
+                if ($questEntry['cat1'] < 0 || in_array($questEntry['cat1'], $relQuestZOS))
+                    array_push($rewardsLV, ...array_keys($questsStarted->choices[$id][Type::ITEM] ?? []), ...array_keys($questsStarted->rewards[$id][Type::ITEM] ?? []));
+
+            $this->extendGlobalData($questsStarted->getJSGlobals());
         }
 
         // see if we can actually display a map
@@ -320,48 +346,27 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
 
                 if ($tpl['startsQuests'])
                 {
-                        $started = new QuestList(array(['qse.method', 1, '&'], ['qse.type', Type::OBJECT], ['qse.typeId', $tpl['id']]));
-                        if ($started->error)
-                            continue;
+                    if (($tpl['A'] != -1) && ($_ = $questsStarted->getSOMData($startEndMap[-$tpl['id']], SIDE_ALLIANCE)))
+                        $addToSOM('alliancequests', $n, array(
+                            'coords' => [[$spawn['posX'], $spawn['posY']]],
+                            'level'  => $spawn['floor'],
+                            'name'   => $n,
+                            'type'   => Type::OBJECT,
+                            'id'     => $tpl['id'],
+                            'side'   => (($tpl['A'] < 0 ? 0 : SIDE_ALLIANCE) | ($tpl['H'] < 0 ? 0 : SIDE_HORDE)),
+                            'quests' => array_values($_)
+                        ));
 
-                        // store data for misc tabs
-                        foreach ($started->getListviewData() as $id => $data)
-                        {
-                            if ($started->getField('questSortId') > 0 && !in_array($started->getField('questSortId'), $relQuestZOS))
-                                continue;
-
-                            if (!empty($started->rewards[$id][Type::ITEM]))
-                                $rewardsLV = array_merge($rewardsLV, array_keys($started->rewards[$id][Type::ITEM]));
-
-                            if (!empty($started->choices[$id][Type::ITEM]))
-                                $rewardsLV = array_merge($rewardsLV, array_keys($started->choices[$id][Type::ITEM]));
-
-                            $questsLV[$id] = $data;
-                        }
-
-                        $this->extendGlobalData($started->getJSGlobals());
-
-                        if (($tpl['A'] != -1) && ($_ = $started->getSOMData(SIDE_ALLIANCE)))
-                            $addToSOM('alliancequests', $n, array(
-                                'coords' => [[$spawn['posX'], $spawn['posY']]],
-                                'level'  => $spawn['floor'],
-                                'name'   => $n,
-                                'type'   => Type::OBJECT,
-                                'id'     => $tpl['id'],
-                                'side'   => (($tpl['A'] < 0 ? 0 : SIDE_ALLIANCE) | ($tpl['H'] < 0 ? 0 : SIDE_HORDE)),
-                                'quests' => array_values($_)
-                            ));
-
-                        if (($tpl['H'] != -1) && ($_ = $started->getSOMData(SIDE_HORDE)))
-                            $addToSOM('hordequests', $n, array(
-                                'coords' => [[$spawn['posX'], $spawn['posY']]],
-                                'level'  => $spawn['floor'],
-                                'name'   => $n,
-                                'type'   => Type::OBJECT,
-                                'id'     => $tpl['id'],
-                                'side'   => (($tpl['A'] < 0 ? 0 : SIDE_ALLIANCE) | ($tpl['H'] < 0 ? 0 : SIDE_HORDE)),
-                                'quests' => array_values($_)
-                            ));
+                    if (($tpl['H'] != -1) && ($_ = $questsStarted->getSOMData($startEndMap[-$tpl['id']], SIDE_HORDE)))
+                        $addToSOM('hordequests', $n, array(
+                            'coords' => [[$spawn['posX'], $spawn['posY']]],
+                            'level'  => $spawn['floor'],
+                            'name'   => $n,
+                            'type'   => Type::OBJECT,
+                            'id'     => $tpl['id'],
+                            'side'   => (($tpl['A'] < 0 ? 0 : SIDE_ALLIANCE) | ($tpl['H'] < 0 ? 0 : SIDE_HORDE)),
+                            'quests' => array_values($_)
+                        ));
                 }
             }
 
@@ -415,52 +420,31 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
 
                 if ($tpl['startsQuests'])
                 {
-                        $started = new QuestList(array(['qse.method', 1, '&'], ['qse.type', Type::NPC], ['qse.typeId', $tpl['id']]));
-                        if ($started->error)
-                            continue;
+                    if (($tpl['A'] != -1) && ($_ = $questsStarted->getSOMData($startEndMap[$tpl['id']], SIDE_ALLIANCE)))
+                        $addToSOM('alliancequests', $n, array(
+                            'coords'        => [[$spawn['posX'], $spawn['posY']]],
+                            'level'         => $spawn['floor'],
+                            'name'          => $n,
+                            'type'          => Type::NPC,
+                            'id'            => $tpl['id'],
+                            'reacthorde'    => $tpl['H'],
+                            'reactalliance' => $tpl['A'],
+                            'side'          => (($tpl['A'] < 0 ? 0 : SIDE_ALLIANCE) | ($tpl['H'] < 0 ? 0 : SIDE_HORDE)),
+                            'quests'        => array_values($_)
+                        ));
 
-                        // store data for misc tabs
-                        foreach ($started->getListviewData() as $id => $data)
-                        {
-                            if ($started->getField('questSortId') > 0 && !in_array($started->getField('questSortId'), $relQuestZOS))
-                                continue;
-
-                            if (!empty($started->rewards[$id][Type::ITEM]))
-                                $rewardsLV = array_merge($rewardsLV, array_keys($started->rewards[$id][Type::ITEM]));
-
-                            if (!empty($started->choices[$id][Type::ITEM]))
-                                $rewardsLV = array_merge($rewardsLV, array_keys($started->choices[$id][Type::ITEM]));
-
-                            $questsLV[$id] = $data;
-                        }
-
-                        $this->extendGlobalData($started->getJSGlobals());
-
-                        if (($tpl['A'] != -1) && ($_ = $started->getSOMData(SIDE_ALLIANCE)))
-                            $addToSOM('alliancequests', $n, array(
-                                'coords'        => [[$spawn['posX'], $spawn['posY']]],
-                                'level'         => $spawn['floor'],
-                                'name'          => $n,
-                                'type'          => Type::NPC,
-                                'id'            => $tpl['id'],
-                                'reacthorde'    => $tpl['H'],
-                                'reactalliance' => $tpl['A'],
-                                'side'          => (($tpl['A'] < 0 ? 0 : SIDE_ALLIANCE) | ($tpl['H'] < 0 ? 0 : SIDE_HORDE)),
-                                'quests'        => array_values($_)
-                            ));
-
-                        if (($tpl['H'] != -1) && ($_ = $started->getSOMData(SIDE_HORDE)))
-                            $addToSOM('hordequests', $n, array(
-                                'coords'        => [[$spawn['posX'], $spawn['posY']]],
-                                'level'         => $spawn['floor'],
-                                'name'          => $n,
-                                'type'          => Type::NPC,
-                                'id'            => $tpl['id'],
-                                'reacthorde'    => $tpl['H'],
-                                'reactalliance' => $tpl['A'],
-                                'side'          => (($tpl['A'] < 0 ? 0 : SIDE_ALLIANCE) | ($tpl['H'] < 0 ? 0 : SIDE_HORDE)),
-                                'quests'        => array_values($_)
-                            ));
+                    if (($tpl['H'] != -1) && ($_ = $questsStarted->getSOMData($startEndMap[$tpl['id']], SIDE_HORDE)))
+                        $addToSOM('hordequests', $n, array(
+                            'coords'        => [[$spawn['posX'], $spawn['posY']]],
+                            'level'         => $spawn['floor'],
+                            'name'          => $n,
+                            'type'          => Type::NPC,
+                            'id'            => $tpl['id'],
+                            'reacthorde'    => $tpl['H'],
+                            'reactalliance' => $tpl['A'],
+                            'side'          => (($tpl['A'] < 0 ? 0 : SIDE_ALLIANCE) | ($tpl['H'] < 0 ? 0 : SIDE_HORDE)),
+                            'quests'        => array_values($_)
+                        ));
                 }
             }
 

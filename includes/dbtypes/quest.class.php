@@ -15,6 +15,8 @@ class QuestList extends DBTypeList
     public        array  $rewards   = [];
     public        array  $choices   = [];
 
+    private ?array $somData = null;
+
     protected string $queryBase = 'SELECT q.*, q.`id` AS ARRAY_KEY FROM ::quests q';
     protected array  $queryOpts = array(
                         'q'   => [],
@@ -162,32 +164,40 @@ class QuestList extends DBTypeList
         return $data;
     }
 
-    public function getSOMData(int $side = SIDE_BOTH) : array
+    public function getSOMData(array $questIds, int $side = SIDE_BOTH) : array
     {
-        $data = [];
-
-        foreach ($this->iterate() as $__)
+        $this->somData ??= (function()
         {
-            if (!(ChrRace::sideFromMask($this->curTpl['reqRaceMask']) & $side))
-                continue;
-
-            [$series, $first] = DB::Aowow()->SelectRow(
-               'SELECT IF(prev.`id` OR cur.`nextQuestIdChain`, 1, 0) AS "0", IF(prev.`id` IS NULL AND cur.`nextQuestIdChain`, 1, 0) AS "1" FROM ::quests cur LEFT JOIN ::quests prev ON prev.`nextQuestIdChain` = cur.`id` WHERE cur.`id` = %i',
-                $this->id
+            $data   = [];
+            $series = DB::Aowow()->selectAssoc(
+               'SELECT cur.`id` AS ARRAY_KEY, IF(prev.`id` OR cur.`nextQuestIdChain`, 1, 0) AS "series", IF(prev.`id` IS NULL AND cur.`nextQuestIdChain`, 1, 0) AS "first" FROM ::quests cur LEFT JOIN ::quests prev ON prev.`nextQuestIdChain` = cur.`id` WHERE cur.`id` IN %in',
+                $this->getFoundIds()
             );
 
-            $data[$this->id] = array(
-                'level'     => $this->curTpl['level'] < 0 ? MAX_LEVEL : $this->curTpl['level'],
-                'name'      => $this->getField('name', true),
-                'category'  => $this->curTpl['cat1'],
-                'category2' => $this->curTpl['cat2'],
-                'series'    => $series,
-                'first'     => $first
-            );
+            foreach ($this->iterate() as $id => $entry)
+            {
+                $data[$id] = array(
+                    'level'     => $this->curTpl['level'] < 0 ? MAX_LEVEL : $this->curTpl['level'],
+                    'name'      => Util::localizedString($this->curTpl, 'name'),
+                    'category'  => $this->curTpl['cat1'],
+                    'category2' => $this->curTpl['cat2'],
+                    '__side'    => ChrRace::sideFromMask($this->curTpl['reqRaceMask'])
+                ) + $series[$id];
 
-            if ($this->isDaily())
-                $data[$this->id]['daily'] = 1;
-        }
+                if ($this->isDaily())
+                    $data[$id]['daily'] = 1;
+            }
+
+            return $data;
+        })();
+
+        $data = array_intersect_key($this->somData, array_flip($questIds));
+
+        if ($side != SIDE_BOTH)
+            $data = array_filter($data, fn($x) => $x['__side'] & $side);
+
+        foreach ($data as &$d)
+            unset($d['__side']);
 
         return $data;
     }
