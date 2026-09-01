@@ -810,7 +810,7 @@ class Profiler
         if ($spells = DB::Characters($realmId)->selectCol('SELECT `spell` FROM character_spell WHERE `guid` = %i AND `disabled` = 0', $char['guid']))
             DB::Aowow()->qry('INSERT INTO ::profiler_completion_spells %m', array(
                 'id'      => array_fill(0, count($spells), $profileId),
-                'questId' => $spells
+                'spellId' => $spells
             ));
 
         // apply auto-learned spells from trade skills
