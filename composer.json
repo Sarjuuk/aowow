@@ -24,6 +24,6 @@
         "ext-intl": "*"
     },
     "require-dev": {
-        "jfcherng/php-diff": "6.16"
+        "jfcherng/php-diff": "^6.16"
     }
 }
