@@ -15,29 +15,27 @@ abstract class GuildContainer extends DBTypeContainer implements IProfiler
 
 class RemoteGuildContainer extends GuildContainer
 {
-    public function initializeLocalEntries() : void
+    public function __construct(?array $conditions = [], array $miscData = [])
     {
-        $data = [];
-        foreach ($this->iterate() as $guid => $entry)
+        if (!$targetDBs = Profiler::getRealmDBs($miscData['rg'] ?? null, $miscData['sv'] ?? null))
         {
-            $data['realm'][$guid]     = $entry->realmName;
-            $data['realmGUID'][$guid] = $entry->realmGUID;
-            $data['name'][$guid]      = $entry->name;
-            $data['nameUrl'][$guid]   = Profiler::urlize($entry->name);
-            $data['stub'][$guid]      = 1;
+            trigger_error(__METHOD__.' - cannot access any realm.', E_USER_WARNING);
+            return;
         }
 
-        // basic guild data
-        DB::Aowow()->qry('INSERT INTO ::profiler_guild %m ON DUPLICATE KEY UPDATE `id` = `id`', $data);
+        parent::__construct($conditions, $miscData, $targetDBs);
 
-        // merge back local ids
-        $localIds = DB::Aowow()->selectCol('SELECT CONCAT(`realm`, ":", `realmGUID`) AS ARRAY_KEY, `id` FROM ::profiler_guild WHERE `realm` IN %in AND `realmGUID` IN %in',
-            $data['realm'], $data['realmGUID']
-        );
+        // collecting
+        foreach ($this->iterate() as $profile)
+        {
+        }
 
-        foreach ($this->iterate() as $guid => &$_curTpl)
-            if (isset($localIds[$guid]))
-                $_curTpl['id'] = $localIds[$guid];
+        // processing
+
+        // applying
+        foreach ($this->iterate() as $guid => $profile)
+        {
+        }
     }
 
     /**
@@ -67,6 +65,31 @@ class RemoteGuildContainer extends GuildContainer
         $this->reset();
     }
 
+    public function initializeLocalEntries() : void
+    {
+        $data = [];
+        foreach ($this->iterate() as $guid => $entry)
+        {
+            $data['realm'][$guid]     = $entry->realmName;
+            $data['realmGUID'][$guid] = $entry->realmGUID;
+            $data['name'][$guid]      = $entry->name;
+            $data['nameUrl'][$guid]   = Profiler::urlize($entry->name);
+            $data['stub'][$guid]      = 1;
+        }
+
+        // basic guild data
+        DB::Aowow()->qry('INSERT INTO ::profiler_guild %m ON DUPLICATE KEY UPDATE `id` = `id`', $data);
+
+        // merge back local ids
+        $localIds = DB::Aowow()->selectCol('SELECT CONCAT(`realm`, ":", `realmGUID`) AS ARRAY_KEY, `id` FROM ::profiler_guild WHERE `realm` IN %in AND `realmGUID` IN %in',
+            $data['realm'], $data['realmGUID']
+        );
+
+     // foreach ($this->iterate() as $guid => $entry)
+     //     if (isset($localIds[$guid]))
+     //         $entry->id = $localIds[$guid];
+    }
+
     public static function entityObj() : string
     {
         return RemoteGuildEntry::class;
@@ -75,6 +98,25 @@ class RemoteGuildContainer extends GuildContainer
 
 class LocalGuildContainer extends GuildContainer
 {
+    public function __construct(?array $conditions = [], array $miscData = [], array $targetDBs = ['Aowow'])
+    {
+        $realms = Profiler::getRealms();
+
+        // graft realm selection from miscData onto conditions
+        $realmIds = [];
+        if (isset($miscData['sv']) && isset($realms[$miscData['sv']]))
+            $realmIds = [$miscData['sv']];
+        if (isset($miscData['rg']))
+            $realmIds = array_merge($realmIds, array_keys(array_filter($realms, fn($x) => $x['region'] == $miscData['rg'])));
+
+        if ($conditions && $realmIds)
+            $conditions = [DB::AND, ['realm', $realmIds], $conditions];
+        else if ($realmIds)
+            $conditions = [['realm', $realmIds]];
+
+        parent::__construct($conditions, $miscData, $targetDBs);
+    }
+
     /**
      * iterate over fetched sets
      *

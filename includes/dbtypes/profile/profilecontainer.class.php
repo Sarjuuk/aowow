@@ -112,6 +112,15 @@ class RemoteProfileContainer extends ProfileContainer
         return $data;
     }
 
+    public function import(DBTypeEntry ...$entries) : void
+    {
+        foreach (array_filter($entries, fn($x) => !$x->error) as $e)
+            if (is_a($e, RemoteProfileEntry::class))
+                $this->sets[$e->subjectGUID] = $e;
+
+        $this->reset();
+    }
+
     public function initializeLocalEntries() : void
     {
         $baseData = $guildData = [];
@@ -191,15 +200,6 @@ class RemoteProfileContainer extends ProfileContainer
                 // $profile->amendLocalData($localData[$profile->realmId][$profile->realmGUID] ?? []);
             }
         }
-    }
-
-    public function import(DBTypeEntry ...$entries) : void
-    {
-        foreach (array_filter($entries, fn($x) => !$x->error) as $e)
-            if (is_a($e, RemoteProfileEntry::class))
-                $this->sets[$e->subjectGUID] = $e;
-
-        $this->reset();
     }
 
     public static function entityObj() : string
