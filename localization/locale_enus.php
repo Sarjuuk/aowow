@@ -1793,7 +1793,7 @@ $lang = array(
         'linkedWith'    => "Linked with",
         'apMod'         => " (AP mod: %.3g)",
         'spMod'         => " (SP mod: %.3g)",
-        'pointsSpread'  => "%d to %d",                      // INT_SPELL_POINTS_SPREAD_TEMPLATE
+        'pointsSpread'  => "%s to %s",                      // INT_SPELL_POINTS_SPREAD_TEMPLATE
         'instantPhys'   => "Instant",                       // SPELL_CAST_TIME_INSTANT_NO_MANA
         'castTime' => array(
             "Instant cast",                                 // SPELL_CAST_TIME_INSTANT

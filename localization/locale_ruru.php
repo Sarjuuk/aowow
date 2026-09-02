@@ -1794,7 +1794,7 @@ $lang = array(
         'apMod'         => " (Мод.-р АП:%.3g)",
         'spMod'         => " (Мод.-р СП:%.3g)",
         'instantPhys'   => "Мгновенное действие",
-        'pointsSpread'  => "%d - %d",
+        'pointsSpread'  => "%s - %s",
         'castTime' => array(
             "Мгновенное действие",
             "Применение: %.3g сек.",

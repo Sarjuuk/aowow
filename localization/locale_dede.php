@@ -1792,7 +1792,7 @@ $lang = array(
         'linkedWith'    => "Verknüpft mit",
         'apMod'         => " (AP mod: %.3g)",
         'spMod'         => " (ZM mod: %.3g)",
-        'pointsSpread'  => '1$d bis %2$d',
+        'pointsSpread'  => '1$s bis %2$s',
         'instantPhys'   => "Sofort",
         'castTime' => array(
             "Spontanzauber",

@@ -1794,7 +1794,7 @@ $lang = array(
         'apMod'         => "（攻强 mod：%.3g）",
         'spMod'         => "（法力 mod：%.3g）",
         'instantPhys'   => "瞬发",
-        'pointsSpread'  => "%d到%d",
+        'pointsSpread'  => "%s到%s",
         'castTime' => array(
             "瞬发法术",
             "%.3g秒施法时间",

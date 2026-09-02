@@ -1794,7 +1794,7 @@ $lang = array(
         'apMod'         => " (Mod. AP : %.2f)",
         'spMod'         => " (Mod. SP : %.2f)",
         'instantPhys'   => "Instantané",
-        'pointsSpread'  => "%d à %d",
+        'pointsSpread'  => "%s à %s",
         'castTime' => array(
             "Incantation immédiate",
             "%.3g sec. d'incantation",

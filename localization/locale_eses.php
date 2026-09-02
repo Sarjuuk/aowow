@@ -1794,7 +1794,7 @@ $lang = array(
         'apMod'         => " (Mod AP: %.3g)",
         'spMod'         => " (Mod SP: %.3g)",
         'instantPhys'   => "Instantáneo",
-        'pointsSpread'  => "%d-%d",
+        'pointsSpread'  => "%s-%s",
         'castTime' => array(
             "Hechizo instantáneo",
             "%.3g s para lanzar",
