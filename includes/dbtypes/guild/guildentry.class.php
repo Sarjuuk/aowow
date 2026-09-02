@@ -10,12 +10,26 @@ abstract class GuildEntry extends DBTypeEntry
 {
     public readonly  string $name;
 
-    public readonly  int    $faction;
-    public readonly  array  $members;
+    public private(set) ?int   $team = null {
+        get => $this->team ?? ($this->setMembers() ?? $this->team);
+    }
+    public private(set) ?array $members = null {
+        get => $this->members ?? ($this->setMembers() ?? $this->members);
+    }
 
     use TrProfilerHelper;
 
     public static int $contribute = CONTRIBUTE_NONE;
+
+
+    public function applyInitData(array $initData, array $opts) : bool
+    {
+        parent::applyInitData($initData, $opts);
+
+        $this->name = $initData['name'];
+
+        return true;
+    }
 
     public function getListviewRow(int $addInfoMask = 0x0) : array
     {
@@ -24,7 +38,7 @@ abstract class GuildEntry extends DBTypeEntry
         return array(
             'name'              => '$"'.str_replace('"', '', $this->name).'"', // MUST be a string, omit any quotes in name
             'members'           => $this->members,
-            'faction'           => $this->faction,
+            'faction'           => $this->team,
             'achievementpoints' => $achivement,
             'gearscore'         => $gear,
             'realm'             => Profiler::urlize($this->realmName, true),
@@ -45,8 +59,6 @@ abstract class GuildEntry extends DBTypeEntry
     */
     private function calcGuildScore() : array
     {
-        $this->members ??= DB::Aowow()->selectAssoc('SELECT `id` AS ARRAY_KEY, `level`, `gearscore`, `achievementpoints` FROM ::profiler_profiles WHERE `guild` = %i AND `stub` = 0 ORDER BY `gearscore` DESC', $this->id);
-
         if (!$this->members)                                // empty guilds may be a thing if the server owner fucks up
             return [0, 0];
 
@@ -73,7 +85,30 @@ abstract class GuildEntry extends DBTypeEntry
         );
     }
 
+    public function getProfileUrl() : string
+    {
+        return '?guild=' . $this->region . '.' . Profiler::urlize($this->realmName, true) . '.' . Profiler::urlize($this->name);
+    }
+
+    public function setMembers(?array $memberData = null) : void
+    {
+        $memberData ??= self::fetchMembers($this->id);
+
+        $this->members = $memberData[$this->id] ?? [];
+
+        $mask = 0;
+        foreach ($this->members as $m)
+            $mask |= (1 << ($m['race'] - 1));
+
+        $this->team = ChrRace::teamFromMask($mask);
+    }
+
     public function getJSGlobal(int $addMask = GLOBALINFO_SELF) : array { return []; }
+
+    public static function fetchMembers(int ...$guildIds) : array
+    {
+        return DB::Aowow()->selectAssoc('SELECT `guild` AS ARRAY_KEY, `id` AS ARRAY_KEY2, `level`, `gearscore`, `achievementpoints`, `race` FROM ::profiler_profiles WHERE `guild` IN %in AND `stub` = 0 ORDER BY `gearscore` DESC', $guildIds);
+    }
 
     public static function getName(int $id) : ?LocString { return null; }
 }
@@ -91,80 +126,45 @@ class RemoteGuildEntry extends GuildEntry
     public function __construct(int|array $initData, array $extraOpts = [])
     {
         // if id lookup, select DB by realm
-        if (is_int($initData) && (!$targetDBs = Profiler::getRealmDBs($extraOpts['rg'] ?? null, $extraOpts['sv'] ?? null)))
+        $targetDBs = Profiler::getRealmDBs($extraOpts['rg'] ?? null, $extraOpts['sv'] ?? null);
+
+        if (is_int($initData) && !$targetDBs)
         {
             trigger_error(__METHOD__.' - cannot access any realm.', E_USER_WARNING);
             return;
         }
 
-        parent::__construct($initData, $extraOpts, $targetDBs ?? []);
+        // warning: jank! - realmId is not already set by container only if the user preselected just the region in the search from and the region only contains a single realm
+        if (is_array($initData) && $targetDBs && !isset($initData['realmId']))
+            $initData['realmId'] = key($targetDBs);
 
-        if ($this->error)
-            return;
+        parent::__construct($initData, $extraOpts, $targetDBs);
+    }
 
-        reset($this->dbNames);                              // only use when querying single realm
-        $realms  = Profiler::getRealms();
-        $distrib = [];
-
-        // post processing
-        foreach ($this->iterate() as $guid => &$curTpl)
+    public function applyInitData(array $initData, array $opts) : bool
+    {
+        if (!$initData['name'])
         {
-            // battlegroup
-            $curTpl['battlegroup'] = Cfg::get('BATTLEGROUP');
-
-            $r = explode(':', $guid)[0];
-            if (!empty($realms[$r]))
-            {
-                $curTpl['realm']     = $r;
-                $curTpl['realmName'] = $realms[$r]['name'];
-                $curTpl['region']    = $realms[$r]['region'];
-            }
-            else
-            {
-                trigger_error('guild #'.$guid.' belongs to nonexistent realm #'.$r, E_USER_WARNING);
-                unset($this->templates[$guid]);
-                continue;
-            }
-
-            // empty name
-            if (!$curTpl['name'])
-            {
-                trigger_error('guild #'.$guid.' on realm #'.$r.' has empty name.', E_USER_WARNING);
-                unset($this->templates[$guid]);
-                continue;
-            }
-
-            // equalize distribution
-            if (empty($distrib[$curTpl['realm']]))
-                $distrib[$curTpl['realm']] = 1;
-            else
-                $distrib[$curTpl['realm']]++;
+            trigger_error('char #'.$initData['guildid'].' on realm #'.$initData['realmId'].' has empty name.', E_USER_WARNING);
+            return false;
         }
 
-        // equalize subject distribution across realms
-        $limit = 0;
-        foreach ($conditions as $c)
-            if (is_numeric($c))
-                $limit = max(0, (int)$c);
-
-        if (!$limit)                                        // int:0 means unlimited, so skip early
-            return;
-
-        $total = array_sum($distrib);
-        foreach ($distrib as &$d)
-            $d = ceil($limit * $d / $total);
-
-        foreach ($this->iterate() as $guid => &$curTpl)
+        if (!(['name' => $realmName, 'region' => $region] = Profiler::getRealms()[$initData['realmId']] ?? null))
         {
-            if ($limit <= 0 || $distrib[$curTpl['realm']] <= 0)
-            {
-                unset($this->templates[$guid]);
-                continue;
-            }
-
-            $distrib[$curTpl['realm']]--;
-            $limit--;
+            trigger_error(__METHOD__.' realm #'.$initData['realmId'].' is inaccessible or does not exist.', E_USER_WARNING);
+            return false;
         }
+
+        $this->region    = $region;
+        $this->realmId   = $initData['realmId'];
+        $this->realmGUID = $initData['guildid'];
+        $this->realmName = $realmName;
+
+        // rename to fit our structure
+        $initData['cuFlags']       = 0;
+        $initData['id']            = $this->subjectGUID;
+
+        return parent::applyInitData($initData, $opts);
     }
 }
 
@@ -173,60 +173,22 @@ class LocalGuildEntry extends GuildEntry
 {
     public const string QUERY_BASE = 'SELECT g.*, g.`id` AS ARRAY_KEY FROM ::profiler_guild g';
 
-    public function __construct(
-                  int|array $initData,
-        protected array     $extraOpts = [],
-                  array     $targetDBs = ['Aowow']
-    )
+    public function applyInitData(array $initData, array $opts) : bool
     {
-
-        $realms = Profiler::getRealms();
-
-        // graft realm selection from miscData onto conditions
-        if (isset($miscData['sv']))
-            $realms = array_filter($realms, fn($x) => Profiler::urlize($x['name']) == Profiler::urlize($miscData['sv']));
-
-        if (isset($miscData['rg']))
-            $realms = array_filter($realms, fn($x) => $x['region'] == $miscData['rg']);
-
-        if (!$realms)
+        if ($initData['realm'] && !(['name' => $realmName, 'region' => $region] = Profiler::getRealms()[$initData['realm']] ?? null))
         {
-            trigger_error(__METHOD__.' - cannot access any realm.', E_USER_WARNING);
-            return;
+            trigger_error(__METHOD__.' realm #'.$initData['realm'].' is inaccessible or does not exist.', E_USER_WARNING);
+            return false;
         }
 
-        if ($conditions)
-        {
-            array_unshift($conditions, DB::AND);
-            $conditions = [DB::AND, ['realm', array_keys($realms)], $conditions];
-        }
-        else
-            $conditions = [['realm', array_keys($realms)]];
+        $this->region    = $region                ?? '';
+        $this->realmId   = $initData['realm']     ?? 0;
+        $this->realmGUID = $initData['realmGUID'] ?? 0;
+        $this->realmName = $realmName             ?? '';
 
-        parent::__construct($conditions, $extraOpts);
+        // rename to fit our structure
 
-        if ($this->error)
-            return;
-
-        foreach ($this->iterate() as $id => &$curTpl)
-        {
-            if ($curTpl['realm'] && !isset($realms[$curTpl['realm']]))
-                continue;
-
-            if (isset($realms[$curTpl['realm']]))
-            {
-                $curTpl['realmName'] = $realms[$curTpl['realm']]['name'];
-                $curTpl['region']    = $realms[$curTpl['realm']]['region'];
-            }
-
-            // battlegroup
-            $curTpl['battlegroup'] = Cfg::get('BATTLEGROUP');
-        }
-    }
-
-    public function getProfileUrl() : string
-    {
-        return '?guild=' . $this->region . '.' . Profiler::urlize($this->realmName, true) . '.' . Profiler::urlize($this->name);
+        return parent::applyInitData($initData, $opts);
     }
 }
 

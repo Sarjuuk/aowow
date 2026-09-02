@@ -347,6 +347,8 @@ class RemoteProfileEntry extends ProfileEntry
         // warning: jank! - realmId is not already set by container only if the user preselected just the region in the search from and the region only contains a single realm
         if (is_array($initData) && $targetDBs && !isset($initData['realmId']))
             $initData['realmId'] = key($targetDBs);
+
+        parent::__construct($initData, $extraOpts, $targetDBs);
     }
 
     public function applyInitData(array $initData, array $opts) : bool
