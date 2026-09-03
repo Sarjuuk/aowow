@@ -124,10 +124,10 @@ if ($this->getAll):
     echo '                    var vi_getAll = true;'.PHP_EOL;
 endif;
 if ($this->viPages):
-    echo '                    var vim_videoPages = ".$this->json($this->viPages).";'.PHP_EOL;
+    echo '                    var vim_videoPages = '.$this->json($this->viPages).';'.PHP_EOL;
     echo '                    vim_UpdatePages();'.PHP_EOL;
 elseif ($this->viData):
-    echo '                    var vim_videoData = ".$this->json($this->viData).";'.PHP_EOL;
+    echo '                    var vim_videoData = '.$this->json($this->viData).';'.PHP_EOL;
     echo '                    vim_UpdateList();'.PHP_EOL;
 endif;
 ?>

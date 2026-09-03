@@ -124,10 +124,10 @@ if ($this->getAll):
     echo '                    var ss_getAll = true;'.PHP_EOL;
 endif;
 if ($this->ssPages):
-    echo '                    var ssm_screenshotPages = ".$this->json($this->ssPages).";'.PHP_EOL;
+    echo '                    var ssm_screenshotPages = '.$this->json($this->ssPages).';'.PHP_EOL;
     echo '                    ssm_UpdatePages();'.PHP_EOL;
 elseif ($this->ssData):
-    echo '                    var ssm_screenshotData = ".$this->json($this->ssData).";'.PHP_EOL;
+    echo '                    var ssm_screenshotData = '.$this->json($this->ssData).';'.PHP_EOL;
     echo '                    ssm_UpdateList();'.PHP_EOL;
 endif;
 ?>

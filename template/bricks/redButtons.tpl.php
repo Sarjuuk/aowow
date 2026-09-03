@@ -51,7 +51,7 @@ endif;
 // item upgrade search
 if (isset($this->redButtons[BUTTON_UPGRADE])):
     if ($b = $this->redButtons[BUTTON_UPGRADE]):
-        echo '<a href="javascript:;" class="button-red" onclick="this.blur(); pr_showClassPresetMenu(this, '.$this->typeId.', ',$b['class'].', '.$b['slot'].', event);"><em><b><i>'.Lang::main('findUpgrades').'</i></b><span>'.Lang::main('findUpgrades').'</span></em></a>';
+        echo '<a href="javascript:;" class="button-red" onclick="this.blur(); pr_showClassPresetMenu(this, '.$this->typeId.', '.$b['class'].', '.$b['slot'].', event);"><em><b><i>'.Lang::main('findUpgrades').'</i></b><span>'.Lang::main('findUpgrades').'</span></em></a>';
     else:
         echo '<a href="javascript:;" class="button-red button-red-disabled"><em><b><i>'.Lang::main('findUpgrades').'</i></b><span>'.Lang::main('findUpgrades').'</span></em></a>';
     endif;
