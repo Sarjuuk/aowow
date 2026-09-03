@@ -18,7 +18,7 @@
 
 <?php
 if ($this->homeTitle):
-    echo "    <script>document.title = '".$this->homeTitle."';</script>".PHP_EOL;
+    echo "    <script>document.title = '".$this->escJS('homeTitle', varRef: true)."';</script>".PHP_EOL;
 endif;
 
 if ($this->altHomeLogo):
@@ -59,16 +59,16 @@ if ($this->altHomeLogo):
 <?php
 endif;
 
-if ($this->featuredBox):
+if (['markup' => $fbMarkup, 'extended' => $fbExt, 'boxBG' => $fbBoxBG, 'overlays' => $fbOverlays] = $this->featuredBox):
 ?>
 
-        <div class="home-featuredbox<?=$this->featuredBox['extended'] ? ' home-featuredbox-extended' : ''; ?>" style="background-image: url(<?=$this->featuredBox['boxBG']; ?>);" id="home-featuredbox">
+        <div class="home-featuredbox<?=$fbExt ? ' home-featuredbox-extended' : ''; ?>" style="background-image: url(<?=$fbBoxBG; ?>);" id="home-featuredbox">
 
-<?php if ($this->featuredBox['overlays']): ?>
+<?php if ($fbOverlays): ?>
             <div class="home-featuredbox-links">
 
 <?php
-        foreach ($this->featuredBox['overlays'] as ['url' => $u, 'title' => $t, 'left' => $l, 'width' => $w]):
+        foreach ($fbOverlays as ['url' => $u, 'title' => $t, 'left' => $l, 'width' => $w]):
                 echo '                <a href="'.$u.'" title="'.$t.'" style="left: '.$l.'px; top: 18px; width:'.$w.'px; height: 160px"></a>'.PHP_EOL;
                 echo '                <var style="left: '.$l.'px; top: 18px; width:'.$w.'px; height: 160px"></var>'.PHP_EOL;
         endforeach;
@@ -93,8 +93,8 @@ if ($this->locale->value):
 endif;
 echo $this->renderGlobalVars(12);
 
-if ($this->featuredBox):
-    echo '            '.$this->featuredBox['markup'];
+if (['markup' => $fbMarkup] = $this->featuredBox):
+    echo '            '.$fbMarkup;
 endif;
 ?>
 

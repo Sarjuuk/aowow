@@ -587,12 +587,23 @@ class Markup implements \JsonSerializable
         return $this;
     }
 
+    /** break html tags, unify newlines */
     private function cleanText() : string
     {
-        // break script-tags, unify newlines
-        $val = preg_replace(['/script\s*\>/i', "/\r\n/", "/\r/"], ['script>', "\n", "\n"], $this->__text);
+        $txt = strtr($this->__text, array(
+            "\r\n" => "\n",
+            "\r"   => "\n"
+        ));
 
-        return strtr(Util::jsEscape($val), ['script>' => 'scr"+"ipt>']);
+        try
+        {
+            return json_encode($txt, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_THROW_ON_ERROR);
+        }
+        catch (\JsonException $e)
+        {
+            trigger_error(__METHOD__.' - '.$e->getMessage(), E_USER_WARNING);
+            return '';
+        }
     }
 
     public function jsonSerialize() : array
@@ -608,10 +619,10 @@ class Markup implements \JsonSerializable
 
     public function __toString() : string
     {
-        if ($this->jsonSerialize())
-            return 'Markup.printHtml("'.$this->cleanText().'", "'.$this->__parent.'", '.Util::toJSON($this).");\n";
+        if ($attr = $this->jsonSerialize())
+            return 'Markup.printHtml('.$this->cleanText().', "'.$this->__parent.'", '.Util::toJSON($attr).');'.PHP_EOL;
 
-        return 'Markup.printHtml("'.$this->cleanText().'", "'.$this->__parent."\");\n";
+        return 'Markup.printHtml('.$this->cleanText().', "'.$this->__parent.'");'.PHP_EOL;
     }
 }
 

@@ -33,6 +33,7 @@ class SimpleXML extends \SimpleXMLElement
 }
 
 
+/** dumping ground for functions that don't really have a home, so to speak */
 abstract class Util
 {
     /* NOTE!
@@ -141,9 +142,6 @@ abstract class Util
 
     public static function htmlEscape(string|array|null $data) : string|array
     {
-        if (empty($data))                                   // null, '', [] and not "0"
-            return '';
-
         if (is_array($data))
         {
             foreach ($data as &$v)
@@ -152,14 +150,14 @@ abstract class Util
             return $data;
         }
 
+        if (empty($data) && $data !== '0')                  // literal "0" is a valid string
+            return '';
+
         return htmlspecialchars($data, ENT_QUOTES | ENT_DISALLOWED | ENT_HTML5, 'utf-8');
     }
 
     public static function jsEscape(string|array|null $data) : string|array
     {
-        if (empty($data))                                   // null, '', [] and not "0"
-            return '';
-
         if (is_array($data))
         {
             foreach ($data as &$v)
@@ -168,14 +166,19 @@ abstract class Util
             return $data;
         }
 
-        return strtr($data, array(
-            '/'  => '\/',
-            '\\' => '\\\\',
-            "'"  => "\\'",
-            '"'  => '\\"',
-            "\r" => '\\r',
-            "\n" => '\\n'
-        ));
+        if (empty($data) && $data !== '0')                  // literal "0" is a valid string
+            return '';
+
+        // strip encapsulating " added by json_encode(); additionally escape ', ignored by json_encode()
+        try
+        {
+            return strtr(mb_substr(json_encode($data, JSON_HEX_TAG | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR), 1, -1), ["'" => "\\'"]);
+        }
+        catch (\JsonException $e)
+        {
+            trigger_error(__METHOD__.' - '.$e->getMessage(), E_USER_WARNING);
+            return '';
+        }
     }
 
     public static function defStatic(array|string $data) : array|string
@@ -188,6 +191,9 @@ abstract class Util
 
             return $data;
         }
+
+        if (empty($data))
+            return $data;
 
         return strtr($data, array(
             'HOST_URL'      => Cfg::get('HOST_URL'),
@@ -210,20 +216,19 @@ abstract class Util
             return $data[$field.'_loc'.Lang::getLocale()->value];
 
         // locale not enUS; aowow-type localization available; add brackets if not silent
-        else if (Lang::getLocale() != Locale::EN && !empty($data[$field.'_loc0']))
+        if (Lang::getLocale() != Locale::EN && !empty($data[$field.'_loc0']))
             return $silent ? $data[$field.'_loc0'] : '['.$data[$field.'_loc0'].']';
 
         // locale not enUS; TC localization; add brackets if not silent
-        else if (Lang::getLocale() != Locale::EN && !empty($data[$field]))
+        if (Lang::getLocale() != Locale::EN && !empty($data[$field]))
             return $silent ? $data[$field] : '['.$data[$field].']';
 
         // locale enUS; TC localization; return normal
-        else if (Lang::getLocale() == Locale::EN && !empty($data[$field]))
+        if (Lang::getLocale() == Locale::EN && !empty($data[$field]))
             return $data[$field];
 
         // nothing to find; be empty
-        else
-            return '';
+        return '';
     }
 
     // for item and spells
@@ -364,14 +369,14 @@ abstract class Util
         }
     }
 
-    public static function createNumRange(int $min, int $max, ?string $delim = null, ?callable $fn = null) : string
+    public static function createNumRange(int $min, int $max, ?string $delim = null, ?callable $callback = null) : string
     {
         if (!$min && !$max)
             return '';
 
-        $fn ??= fn($x) => $x;
-        $_min = $fn($min);
-        $_max = $fn($max);
+        $callback ??= fn($x) => $x;
+        $_min = $callback($min);
+        $_max = $callback($max);
 
         return $max > $min ? $_min . ($delim ?? Lang::game('valueDelim')) . $_max : $_min;
     }
@@ -594,13 +599,17 @@ abstract class Util
         if (Cfg::get('DEBUG') && !$forceFlags)
             $flags |= JSON_PRETTY_PRINT;
 
-        $json = json_encode($data, $flags);
-
-        // handle strings prefixed with $ as js-variables
-        // literal: match everything (lazy) between first pair of unescaped double quotes. First character must be $.
-        $json = preg_replace_callback('/(?<!\\\\)"\$(.+?)(?<!\\\\)"/i', fn($m) => str_replace('\"', '"', $m[1]), $json);
-
-        return $json;
+        try
+        {
+            // handle strings prefixed with $ as js-variables
+            // literal: match everything (lazy) between first pair of unescaped double quotes. First character must be $.
+            return preg_replace_callback('/(?<!\\\\)"\$(.+?)(?<!\\\\)"/i', fn($m) => str_replace('\"', '"', $m[1]), json_encode($data, $flags | JSON_THROW_ON_ERROR)) ?? '';
+        }
+        catch (\JsonException $e)
+        {
+            trigger_error(__METHOD__.' - '.$e->getMessage(), E_USER_WARNING);
+            return '';
+        }
     }
 
 
@@ -674,70 +683,44 @@ abstract class Util
         $score = $itemLevel;
 
         // quality mod
-        switch ($quality)
+        $score *= match ($quality)
         {
-            case ITEM_QUALITY_POOR:
-                $score = 0;                                 // guessed as crap
-                break;
-            case ITEM_QUALITY_NORMAL:
-                $score = 0;                                 // guessed as crap
-                break;
-            case ITEM_QUALITY_UNCOMMON:
-                $score /= 2.0;
-                break;
-            case ITEM_QUALITY_RARE:
-                $score /= 1.8;
-                break;
-            case ITEM_QUALITY_EPIC:
-                $score /= 1.2;
-                break;
-            case ITEM_QUALITY_LEGENDARY:
-                $score /= 1;
-                break;
-            case ITEM_QUALITY_HEIRLOOM:                     // actual calculation in javascript .. still uses this as some sort of factor..?
-                break;
-            case ITEM_QUALITY_ARTIFACT:
-                break;
-        }
+            ITEM_QUALITY_POOR,
+            ITEM_QUALITY_NORMAL    => 0,                    // guessed as crap
+            ITEM_QUALITY_UNCOMMON  => 1 / 2.0,
+            ITEM_QUALITY_RARE      => 1 / 1.8,
+            ITEM_QUALITY_EPIC      => 1 / 1.2,
+            ITEM_QUALITY_LEGENDARY => 1 / 1,
+            ITEM_QUALITY_HEIRLOOM,
+            ITEM_QUALITY_ARTIFACT  => 1                     // actual calculation in javascript .. still uses this as some sort of factor..?
+        };
 
-        switch ($slot)
+        // slot mod
+        $score *= match ($slot)
         {
-            case INVTYPE_WEAPON:
-            case INVTYPE_WEAPONMAINHAND:
-            case INVTYPE_WEAPONOFFHAND:
-                $score *= 27/64;
-                break;
-            case INVTYPE_SHIELD:
-            case INVTYPE_HOLDABLE:
-                $score *= 9/16;
-                break;
-            case INVTYPE_HEAD:
-            case INVTYPE_CHEST:
-            case INVTYPE_LEGS:
-            case INVTYPE_2HWEAPON:
-                $score *= 1.0;
-                break;
-            case INVTYPE_SHOULDERS:
-            case INVTYPE_HANDS:
-            case INVTYPE_WAIST:
-            case INVTYPE_FEET:
-                $score *= 3/4;
-                break;
-            case INVTYPE_WRISTS:
-            case INVTYPE_NECK:
-            case INVTYPE_CLOAK:
-            case INVTYPE_FINGER:
-            case INVTYPE_TRINKET:
-                $score *= 9/16;
-                break;
-            case INVTYPE_THROWN:
-            case INVTYPE_RANGED:
-            case INVTYPE_RELIC:
-                $score *= 81/256;
-                break;
-            default:
-                $score *= 0.0;
-        }
+            INVTYPE_WEAPON,
+            INVTYPE_WEAPONMAINHAND,
+            INVTYPE_WEAPONOFFHAND   => 27 / 64,
+            INVTYPE_SHIELD,
+            INVTYPE_HOLDABLE        => 9 / 16,
+            INVTYPE_HEAD,
+            INVTYPE_CHEST,
+            INVTYPE_LEGS,
+            INVTYPE_2HWEAPON        => 1,
+            INVTYPE_SHOULDERS,
+            INVTYPE_HANDS,
+            INVTYPE_WAIST,
+            INVTYPE_FEET            => 3 / 4,
+            INVTYPE_WRISTS,
+            INVTYPE_NECK,
+            INVTYPE_CLOAK,
+            INVTYPE_FINGER,
+            INVTYPE_TRINKET         => 9 / 16,
+            INVTYPE_THROWN,
+            INVTYPE_RANGED,
+            INVTYPE_RELIC           => 81 / 256,
+            default                 => 0
+        };
 
         // subtract sockets
         if ($nSockets)
@@ -755,7 +738,7 @@ abstract class Util
     public static function getGemScore(int $itemLevel, int $quality, bool $profSpec = false, int $itemId = 0) : float
     {
         // prepare score-lookup
-        self::$perfectGems ??= (DB::World()->selectCol('SELECT perfectItemType FROM skill_perfect_item_template WHERE requiredSpecialization = %i', 55534) ?: []);
+        self::$perfectGems ??= (DB::World()->selectCol('SELECT `perfectItemType` FROM skill_perfect_item_template WHERE `requiredSpecialization` = %i', 55534) ?: []);
 
         // epic - WotLK - increased stats / profession specific (Dragon's Eyes)
         if ($profSpec)
@@ -797,10 +780,7 @@ abstract class Util
 
     public static function getEnchantmentScore(int $itemLevel, int $quality, bool $profSpec = false, int $idOverride = 0) : float
     {
-        if ($itemLevel < 0)                                 // can this even happen?
-            $itemLevel = 0;
-
-        // some hardcoded values, that defy lookups (cheaper but not skillbound profession versions of spell threads, leg armor)
+        // some hardcoded values that defy lookups (cheaper but not skillbound profession versions of spell threads, leg armor)
         if (in_array($idOverride, [3327, 3328, 3872, 3873]))
             return 20.0;
 
@@ -808,25 +788,17 @@ abstract class Util
             return 40.0;
 
         // other than the constraints (0 - 20 points; 40 for profession perks), everything in here is guesswork
-        $score = min($itemLevel, 80);
+        $score = clamp($itemLevel, 0, 80);
 
-        switch ($quality)
+        $score /= match ($quality)
         {
-            case ITEM_QUALITY_HEIRLOOM:                 // because i say so!
-                $score = 20.0;
-                break;
-            case ITEM_QUALITY_RARE:
-                $score /= 4.8;
-                break;
-            case ITEM_QUALITY_UNCOMMON:
-                $score /= 6.4;
-                break;
-            case ITEM_QUALITY_NORMAL:
-                $score /= 10.0;
-                break;
-            default:
-                $score /= 4.0;
-        }
+            ITEM_QUALITY_NORMAL   => 10.0,
+            ITEM_QUALITY_UNCOMMON => 6.4,
+            ITEM_QUALITY_RARE     => 4.8,
+            ITEM_QUALITY_EPIC,
+            ITEM_QUALITY_HEIRLOOM => 4.0,                   // heirloom is a guess, same as epic because effect amount is the same
+            default               => 1000000                // functionally: set 0
+        };
 
         return round($score, 4);
     }

@@ -17,7 +17,7 @@ class HomeBaseResponse extends TemplateResponse
         [SC_CSS_STRING, '.announcement { margin: auto; max-width: 1200px; padding: 0px 15px 15px 15px }']
     );
 
-    public  array  $featuredBox = [];
+    public ?array  $featuredBox = null;
     public ?Markup $oneliner    = null;
     public  string $homeTitle   = '';
     public ?string $altHomeLogo = null;
@@ -26,7 +26,7 @@ class HomeBaseResponse extends TemplateResponse
     {
         // set <title> element
         if ($_ = DB::Aowow()->selectCell('SELECT `title` FROM ::home_titles WHERE `active` = 1 AND `locale` = %i ORDER BY RAND()', Lang::getLocale()->value))
-            $this->homeTitle = Util::jsEscape(Cfg::get('NAME').Lang::main('colon').$_);
+            $this->homeTitle = Cfg::get('NAME').Lang::main('colon').$_;
 
         // load oneliner
         if ($_ = DB::Aowow()->selectRow('SELECT * FROM ::home_oneliner WHERE `active` = 1 ORDER BY RAND() LIMIT 1'))

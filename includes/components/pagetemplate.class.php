@@ -210,9 +210,9 @@ class PageTemplate
     private function json(mixed $var, int $jsonFlags = 0x0, bool $varRef = false) : string
     {
         if (!is_string($var))
-            return preg_replace('/script\s*\>/i', 'scr"+"ipt>', Util::toJSON($var, $jsonFlags) ?: "{}");
+            return Util::toJSON($var, $jsonFlags | JSON_HEX_TAG | JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE) ?: "{}";
 
-        return preg_replace('/script\s*\>/i', 'scr"+"ipt>', Util::toJSON($varRef ? $this->$var : $var, $jsonFlags) ?: "{}");
+        return Util::toJSON($varRef ? $this->$var : $var, $jsonFlags | JSON_HEX_TAG | JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE) ?: "{}";
     }
 
     private function escHTML(string $var, bool $varRef = false) : string|array
