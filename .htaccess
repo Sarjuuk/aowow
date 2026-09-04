@@ -1,22 +1,5 @@
-Order Deny,Allow
-<FilesMatch "\.(conf|php|in)$">
-    Deny from all
-</FilesMatch>
-<FilesMatch "^(index)\.php$">
-    Allow from all
-</FilesMatch>
-
-<Files "aowow">
-    ForceType application/x-httpd-php
-</Files>
-
-<Files "prQueue">
-    ForceType application/x-httpd-php
-</Files>
-
 # Block view of some folders
 Options -Indexes
-DirectoryIndex index.php
 
 # Support for UTF8
 AddDefaultCharset utf8
@@ -32,6 +15,19 @@ AddDefaultCharset utf8
 </IfModule>
 
 RewriteEngine on
+
+# Allow index.php to handle root requests
+RewriteRule ^$ index.php [L]
+
+# Allow specific files
+RewriteRule ^(index\.php|crossdomain\.xml|robots\.txt)$ - [L,NC]
+
+# Allow static assets
+RewriteRule ^static/.*$ - [L,NC]
+
+# Block everything else
+RewriteRule ^ - [F,L]
+
 # RewriteBase /~user/localPath/     # enable if the rules do not work, when they should
 
 # Mapper-Helper: If you cant provide maps for all locales, redirect the browser
