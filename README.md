@@ -1,11 +1,11 @@
 ![logo](static/images/logos/home.png)
 
 
-## Build Status
+# Build Status
 ![fuck it ship it](https://forthebadge.com/badges/fuck-it-ship-it.svg)
 
 
-## Introduction
+# Introduction
 
 AoWoW is a Database tool for World of Warcraft v3.3.5 (build 12340)
 It is based upon the other famous Database tool for WoW, featuring the red smiling rocket.
@@ -16,7 +16,7 @@ I myself take no credit for the clientside scripting, design and layout that the
 Also, this project is not meant to be used for commercial purposes of any kind!
 
 
-## Requirements
+# Requirements
 
 + Webserver running PHP ≥ 8.4 including extensions:
   + [SimpleXML](https://www.php.net/manual/en/book.simplexml.php)
@@ -25,7 +25,7 @@ Also, this project is not meant to be used for commercial purposes of any kind!
   + [Multibyte String](https://www.php.net/manual/en/book.mbstring.php)
   + [File Information](https://www.php.net/manual/en/book.fileinfo.php)
   + [Internationalization](https://www.php.net/manual/en/book.intl.php)
-  + [Foreign Function Interface](https://www.php.net/manual/en/book.ffi.php) (when direclty reading MPQs through StormLib)
+  + [Foreign Function Interface](https://www.php.net/manual/en/book.ffi.php) (when directly reading MPQs through StormLib)
   + [GNU Multiple Precision](https://www.php.net/manual/en/book.gmp.php) (when using TrinityCore as auth source)
 + MySQL ≥ 5.7.0 OR MariaDB ≥ 10.6.4 OR similar
 + [Composer](https://getcomposer.org/download/)
@@ -39,25 +39,25 @@ Also, this project is not meant to be used for commercial purposes of any kind!
 audio processing may require [lame](https://sourceforge.net/projects/lame/files/lame/3.99/) or [vorbis-tools](https://www.xiph.org/downloads/) (which may require libvorbis (which may require libogg))
 
 
-#### Highly Recommended
+### Highly Recommended
 + setting the following configuration values on your TrinityCore server (and running it once) will greatly increase the accuracy of spawn points
   > Calculate.Creature.Zone.Area.Data = 1  
   > Calculate.Gameobject.Zone.Area.Data = 1
 
 
-## Install
+# Install
 
-#### 1. Acquire the required repositories
+### 1. Acquire the required repositories
 `git clone git@github.com:Sarjuuk/aowow.git aowow`  
 `git clone git@github.com:Sarjuuk/MPQExtractor.git MPQExtractor`  
 
-#### 2. Prepare the database  
+### 2. Prepare the database  
 Ensure that the account you are going to use has **full** access on the database AoWoW is going to occupy and ideally only **read** access on the world and optionally auth and characters databases you are going to reference.  
 Import files 01 - 03 from `setup/sql/` in order into the AoWoW database `mysql --default-character-set=utf8 -p {your-db-here} < setup/sql/01-db_structure.sql`, etc.  
 
 **Optional**: If you are using MySQL ≥ 8.4.0 and want to support fulltext search for locale zhCN, additionally import `setup/sql/04-db_optional_mysql_only.sql`. Enables this in settings after AoWoW has been set up.  
 
-#### 3. Server created files
+### 3. Server created files
 See to it, that the web server is able to write the following directories and their children. If they are missing, the setup will try to create them with appropriate permissions
  * `cache/`
  * `config/`
@@ -68,43 +68,51 @@ See to it, that the web server is able to write the following directories and th
  * `static/images/wow/`
  * `datasets/`  
  
-#### 4. Extract the client archives (MPQs)
-Extract the following directories from the client archives into `setup/mpqdata/`, while maintaining patch order (named MPQs first -> patch.mpq -> patch-[2 -> 9].mpq -> patch-[A -> Z].mpq). Replace files from previous patches if asked to.  
+### 4. Providing client data
+You have two options to provide the required game client files. 
+
+#### 4.I Directly providing the client archives (MPQ files) 
+ (by default: `setup/data/`)
+
+#### 4.II Providing the already extracted files
+Use any external software to extract the following directories from the client archives into `setup/mpqdata/`, while maintaining patch order (named MPQs first -> patch.mpq -> patch-[2 -> 9].mpq -> patch-[A -> Z].mpq). Replace files from previous patches if asked to.  
 ⚠ DO NOT change the case of the extracted files. (i.e. don't use the `-c` switch when using the MPQExtractor)  
   
-   .. for every locale you are going to use:
+   .. from the localized MPQs into:
    > \<localeCode>/DBFilesClient/  
    > \<localeCode>/Interface/WorldMap/  
    > \<localeCode>/Interface/FrameXML/GlobalStrings.lua  
-   
-   .. once is enough (still apply the localeCode though):
-   > \<localeCode>/Interface/TalentFrame/  
-   > \<localeCode>/Interface/Icons/  
-   > \<localeCode>/Interface/Spellbook/  
-   > \<localeCode>/Interface/PaperDoll/  
-   > \<localeCode>/Interface/Glues/CharacterCreate/  
-   > \<localeCode>/Interface/Pictures  
-   > \<localeCode>/Interface/PvPRankBadges  
-   > \<localeCode>/Interface/FlavorImages  
-   > \<localeCode>/Interface/Calendar/Holidays/  
    > \<localeCode>/Sound/  
+   
+   .. from the base MPQs (yes, Sound/ again. this is intended):
+   > Interface/TalentFrame/  
+   > Interface/Icons/  
+   > Interface/Spellbook/  
+   > Interface/PaperDoll/  
+   > Interface/Glues/CharacterCreate/  
+   > Interface/Pictures  
+   > Interface/PvPRankBadges  
+   > Interface/FlavorImages  
+   > Interface/Calendar/Holidays/  
+   > Sound/  
 
-#### 5. Reencode the audio files
+### 5. Reencode the audio files
 WAV-files need to be reencoded as `ogg/vorbis` and some MP3s may identify themselves as `application/octet-stream` instead of `audio/mpeg`.  
+If the setup cannot find the reencoded files it will pause with a prompt to do so.
  * [example for WIN](https://gist.github.com/Sarjuuk/d77b203f7b71d191509afddabad5fc9f)  
  * [example for \*nix](https://gist.github.com/Sarjuuk/1f05ef2affe49a7e7ca0fad7b01c081d)
 
-#### 6. Install dependencies with composer
+### 6. Install dependencies with composer
 `php composer.phar install --no-dev` on a project level composer install, or  
 `composer install --no-dev` on a system level composer install
 
-#### 7. Run the initial setup from the CLI
+### 7. Run the initial setup from the CLI
 `php aowow --setup`.  
 This should guide you through with minimal input required from your end, but will take some time though, especially compiling the zone-images. Use it to familiarize yourself with the other functions this setup has. Yes, I'm dead serious: *Go read the code!* It will help you understand how to configure AoWoW and keep it in sync with your world database.  
 When you've created your admin account you are done.
 
 
-## Troubleshooting
+# Troubleshooting
 
 Q: The Page appears white, without any styles.  
 A: The static content is not being displayed. You are either using SSL and AoWoW is unable to detect it or STATIC_HOST is not defined properly. Either way this can be fixed via config `php aowow --configure`
@@ -131,7 +139,7 @@ Q: Images embedded in readable Items / Gameobjects are missing!
 A: Check that you didn't change the case of the files extracted from the mpq archives. The paths stored in TDBs page_text table are used as \<img> src and while AoWoW is case agnostic and will happily process all files, a web server runnig on a unix system will only serve files matching the exact case.  
 
 
-## Thanks
+# Thanks
 
 @mix: for providing the php-script to parse .blp and .dbc into usable images and tables  
 @LordJZ: the wrapper-class for DBSimple; the basic idea for the user-class  
@@ -139,7 +147,7 @@ A: Check that you didn't change the case of the files extracted from the mpq arc
 @Sarjuuk: maintainer of the project  
 
 
-## Special Thanks
+# Special Thanks
 Said website with the red smiling rocket, for providing this beautiful website!
 Please do not regard this project as blatant rip-off, rather as "We do really liked your presentation, but since time and content progresses, you are sadly no longer supplying the data we need".
 
