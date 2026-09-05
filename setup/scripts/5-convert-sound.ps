@@ -1,0 +1,59 @@
+# ****************************************************************
+# This uses FFMPEG to convert and rename all of the files required
+# for AoWoW sounds and music.
+# ****************************************************************
+# USE: Place ffmpeg.exe besides this 5-convert-sound.ps and run.
+# ****************************************************************
+
+$ErrorActionPreference = 'Stop'
+
+$mpqData = Join-Path [System.IO.Path]::GetFullPath($PSScriptRoot) '..' 'mpqdata'
+$ffmpeg = './ffmpeg.exe'
+
+if (-not (Test-Path -LiteralPath $ffmpeg -PathType Leaf)) {
+	throw "ffmpeg.exe was not found at '$ffmpeg'."
+}
+
+if (-not (Test-Path -LiteralPath $mpqData -PathType Container)) {
+	throw "The MPQ data directory was not found at '$mpqData'."
+}
+
+$soundDirectories = @()
+$rootSound = Join-Path $mpqData 'sound'
+if (Test-Path -LiteralPath $rootSound -PathType Container) {
+	$soundDirectories += Get-Item -LiteralPath $rootSound
+}
+
+$soundDirectories += Get-ChildItem -LiteralPath $mpqData -Directory |
+	Where-Object { $_.Name -match '^[a-z]{2}[A-Z]{2}$' } |
+	ForEach-Object {
+		$localeSound = Join-Path $_.FullName 'sound'
+		if (Test-Path -LiteralPath $localeSound -PathType Container) {
+			Get-Item -LiteralPath $localeSound
+		}
+	}
+
+foreach ($soundDirectory in $soundDirectories) {
+	$outputDirectory = Join-Path $soundDirectory.Parent.FullName '_sound'
+
+	Get-ChildItem -LiteralPath $soundDirectory.FullName -Recurse -File |
+		Where-Object { $_.Extension -in '.mp3', '.wav' } |
+		ForEach-Object {
+			$relativePath = [System.IO.Path]::GetRelativePath($soundDirectory.FullName, $_.FullName)
+			$outputFile = Join-Path $outputDirectory $relativePath
+			$outputParent = Split-Path -Parent $outputFile
+
+			New-Item -ItemType Directory -Path $outputParent -Force | Out-Null
+
+			if ($_.Extension -ieq '.mp3') {
+				$arguments = @('-hide_banner', '-y', '-i', $_.FullName, '-f', 'mp3', '-acodec', 'libmp3lame', $outputFile)
+			} else {
+				$arguments = @('-hide_banner', '-y', '-i', $_.FullName, '-f', 'ogg', '-acodec', 'libvorbis', $outputFile)
+			}
+
+			& $ffmpeg @arguments
+			if ($LASTEXITCODE -ne 0) {
+				throw "ffmpeg failed to convert '$($_.FullName)'."
+			}
+		}
+}
