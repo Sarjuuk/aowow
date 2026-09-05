@@ -44,6 +44,7 @@ class AccountSigninResponse extends TemplateResponse
 
     protected function generate() : void
     {
+        $next       =
         $username   =
         $error      = '';
         $rememberMe = !!$this->_post['remember_me'];
@@ -51,11 +52,11 @@ class AccountSigninResponse extends TemplateResponse
         $this->title = [Lang::account('title')];
 
         // coming from user recovery or creation, prefill username
-        if ($this->_get['key'])
+        if ($this->_get['key'] && ($userData = DB::Aowow()->selectRow('SELECT a.`login` AS "0", IF(s.`expires`, 0, 1) AS "1" FROM ::account a LEFT JOIN ::account_sessions s ON a.`id` = s.`userId` AND a.`token` = s.`sessionId` WHERE a.`status` IN %in AND a.`token` = %s',
+            [ACC_STATUS_RECOVER_USER, ACC_STATUS_NONE], $this->_get['key'])))
         {
-            if ($userData = DB::Aowow()->selectRow('SELECT a.`login` AS "0", IF(s.`expires`, 0, 1) AS "1" FROM ::account a LEFT JOIN ::account_sessions s ON a.`id` = s.`userId` AND a.`token` = s.`sessionId` WHERE a.`status` IN %in AND a.`token` = %s',
-                [ACC_STATUS_RECOVER_USER, ACC_STATUS_NONE], $this->_get['key']))
-                [$username, $rememberMe] = $userData;
+            [$username, $rememberMe] = $userData;
+            $next = 'user='.$username;
         }
 
         if ($this->doSignIn($error))
@@ -66,7 +67,7 @@ class AccountSigninResponse extends TemplateResponse
 
         $this->inputbox = ['inputbox-form-signin', array(
             'head'        => Lang::account('inputbox', 'head', 'signin'),
-            'action'      => '?account=signin&next='.$this->getNext(),
+            'action'      => '?account=signin&next='.($next ?: $this->getNext()),
             'error'       => $error,
             'username'    => $username,
             'rememberMe'  => $rememberMe,
