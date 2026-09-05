@@ -1,0 +1,57 @@
+# Opening a multiple MPQs in merged mode
+#
+# MPQEditor.exe /merged BaseMpq1 BaseMpq2 BaseMpq3 ... BaseMpqN [/patch PatchMpq1 PatchMpq2 ... PatchMpqN] [/listfile ListFileName]
+#
+# This is an example to run a command without opening a console:
+# MPQEditor.exe extract war3.mpq * C:\Work /fp
+#
+# This is an example to run a command with opening a console:
+# MPQEditor.exe /extract war3.mpq * C:\Work /fp
+
+
+###############
+# definitions #
+###############
+
+$LOCALES = @( 'enUS', 'enGB', 'frFR', 'deDE', 'zhCN', 'enCN', 'esES', 'ruRU')
+
+$LOCALIZED = @(
+    "dbfilesclient\\*.dbc",
+    "interface\\worldmap\\*.blp",
+    "interface\\framexml\\globalstrings.lua",
+    "sound\\*"
+)
+
+$NEUTRAL = @(
+    "sound\\*",
+    "interface\\talentframe\\*.blp",
+    "interface\\icons\\*.blp",
+    "interface\\spellbook\\*.blp",
+    "interface\\paperdoll\\*.blp",
+    "interface\\pictures\\*.blp",
+    "interface\\PvPRankBadges\\*.blp",
+    "interface\\FlavorImages\\*.blp",
+    "interface\\glues\\charactercreate\\*.blp",
+    "interface\\calendar\\holidays\\*.blp",
+    "interface\\pvpframe\\*.blp"
+)
+
+$GOODIES = @(
+    "interface\\glues\\loadingscreens\\*.blp",
+    "interface\\glues\\credits\\*.blp"
+)
+
+$ErrorActionPreference = 'Stop'
+
+
+###################
+# check variables #
+###################
+
+$archivePath = Join-Path [System.IO.Path]::GetFullPath($PSScriptRoot) '..' 'data'
+$dataPath    = Join-Path [System.IO.Path]::GetFullPath($PSScriptRoot) '..' 'mpqdata'
+$MPQEdit     = './mpqEdit.exe'
+
+if (-not (Test-Path -LiteralPath $MPQEdit -PathType Leaf)) {
+	throw "MPQEdit.exe was not found at '$MPQEdit'."
+}
