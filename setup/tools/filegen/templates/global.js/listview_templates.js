@@ -4339,7 +4339,9 @@ Listview.templates = {
                 replyBy.append(' ').append(replyWhen).append(' ').append($WH.sprintf(LANG.lvcomment_patch, g_getPatchVersion(creationDate)));
 
 
-                var replyHtml = Markup.toHtml(reply.body, {allow: Markup.CLASS_USER, mode: Markup.MODE_REPLY, roles: 0, locale: comment.locale});
+                // aowow - unsure why 'allow' was fixed CLASS_USER
+                // var replyHtml = Markup.toHtml(reply.body, {allow: Markup.CLASS_USER, mode: Markup.MODE_REPLY, roles: 0, locale: comment.locale});
+                var replyHtml = Markup.toHtml(reply.body, {allow: Markup.rolesToClass(reply.roles), mode: Markup.MODE_REPLY, roles: 0, locale: comment.locale});
 
                 replyHtml = replyHtml.replace(/[^\s<>]{81,}/, function(text) {
                     if (text.substring(0, 4) == 'href' || text.substring(0, 3) == 'src')
