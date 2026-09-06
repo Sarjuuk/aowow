@@ -44,7 +44,6 @@ class AccountSigninResponse extends TemplateResponse
 
     protected function generate() : void
     {
-        $next       =
         $username   =
         $error      = '';
         $rememberMe = !!$this->_post['remember_me'];
@@ -56,7 +55,6 @@ class AccountSigninResponse extends TemplateResponse
             [ACC_STATUS_RECOVER_USER, ACC_STATUS_NONE], $this->_get['key'])))
         {
             [$username, $rememberMe] = $userData;
-            $next = 'user='.$username;
         }
 
         if ($this->doSignIn($error))
@@ -67,7 +65,7 @@ class AccountSigninResponse extends TemplateResponse
 
         $this->inputbox = ['inputbox-form-signin', array(
             'head'        => Lang::account('inputbox', 'head', 'signin'),
-            'action'      => '?account=signin&next='.($next ?: $this->getNext()),
+            'action'      => '?account=signin&next='.$this->getNext(),
             'error'       => $error,
             'username'    => $username,
             'rememberMe'  => $rememberMe,

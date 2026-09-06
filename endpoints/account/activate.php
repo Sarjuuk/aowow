@@ -24,6 +24,9 @@ class AccountActivateResponse extends TemplateResponse
 
     public function __construct()
     {
+        if (User::isLoggedIn())
+            $this->forward('?user='.User::$username);
+
         parent::__construct();
 
         if (!Cfg::get('ACC_ALLOW_REGISTER') || Cfg::get('ACC_AUTH_MODE') != AUTH_MODE_SELF)

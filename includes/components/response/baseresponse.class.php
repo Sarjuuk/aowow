@@ -36,17 +36,20 @@ trait TrRecoveryHelper
 
 trait TrGetNext
 {
-    private function getNext(bool $forHeader = false) : string
+    private function getNext(bool $forHttpHeader = false) : string
     {
         $next = '';
         if (!empty($this->_get['next']))
             $next = $this->_get['next'];
         else if (isset($_SERVER['HTTP_REFERER']) && strstr($_SERVER['HTTP_REFERER'], '?'))
             $next = explode('?', $_SERVER['HTTP_REFERER'])[1];
-        else if ($forHeader)
+        else if ($forHttpHeader)
             return '.';
 
-        return ($forHeader ? '?' : '').$next;
+        if ($forHttpHeader)
+            return '?'.$next;
+
+        return urlencode($next);
     }
 }
 
@@ -540,7 +543,7 @@ abstract class BaseResponse
 
     protected function forwardToSignIn(string $next = '') : never
     {
-        $this->forward('?account=signin'.($next ? '&next='.$next : ''));
+        $this->forward('?account=signin'.($next ? '&next='.urlencode($next) : ''));
     }
 
     protected function sumSQLStats() : void
