@@ -44,7 +44,7 @@ if [ ! -d "/usr/local/share/mysql/trinitycore-sparse" ]; then
       "$SETUP_TC_REPOSITORY" \
       "/usr/local/share/mysql/trinitycore-sparse" || exit 1
     git -C "/usr/local/share/mysql/trinitycore-sparse" \
-      sparse-checkout set "sql/base" "sql/updates" || exit 1
+      sparse-checkout set "sql/base" "sql/old/3.3.5a/world/25101_2026_09_09" || exit 1
   } &
 fi
 wait
@@ -65,7 +65,7 @@ mysql "$DB_CHARACTERS_1_DB" < "/usr/local/share/mysql/trinitycore-sparse/sql/bas
 
   # Official patches
   if [ -n "$SETUP_WORLD_DATABASE_LATEST_PATCH_FILENAME" ]; then
-    find "/usr/local/share/mysql/trinitycore-sparse/sql/updates/world/3.3.5" -type f -iname '*.sql' | sort | while read -r REPLY; do
+    find "/usr/local/share/mysql/trinitycore-sparse/sql/old/3.3.5a/world/25101_2026_09_09" -type f -iname '*.sql' | sort | while read -r REPLY; do
       echo "Applying $(basename "$REPLY")"
       mysql "$DB_WORLD_DB" < "$REPLY";
       #if [[ "$REPLY" == *"$SETUP_WORLD_DATABASE_LATEST_PATCH_FILENAME" ]]; then
