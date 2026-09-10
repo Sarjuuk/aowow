@@ -1,9 +1,8 @@
 ![logo](static/images/logos/home.png)
 
-
 ## Build Status
-![fuck it ship it](https://forthebadge.com/badges/fuck-it-ship-it.svg)
 
+![fuck it ship it](https://forthebadge.com/badges/fuck-it-ship-it.svg)
 
 ## Introduction
 
@@ -15,62 +14,70 @@ This is a complete rewrite of the serverside php code and update to the clientsi
 I myself take no credit for the clientside scripting, design and layout that these php-scripts cater to.
 Also, this project is not meant to be used for commercial purposes of any kind!
 
-
 ## Requirements
 
-+ Webserver running PHP ≥ 8.4 including extensions:
-  + [SimpleXML](https://www.php.net/manual/en/book.simplexml.php)
-  + [GD](https://www.php.net/manual/en/book.image)
-  + [MySQL Improved](https://www.php.net/manual/en/book.mysqli.php)
-  + [Multibyte String](https://www.php.net/manual/en/book.mbstring.php)
-  + [File Information](https://www.php.net/manual/en/book.fileinfo.php)
-  + [Internationalization](https://www.php.net/manual/en/book.intl.php)
-  + [GNU Multiple Precision](https://www.php.net/manual/en/book.gmp.php) (When using TrinityCore as auth source)
-+ MySQL ≥ 5.7.0 OR MariaDB ≥ 10.6.4 OR similar
-+ [Composer](https://getcomposer.org/download/)
-+ [TDB 335.25101](https://github.com/TrinityCore/TrinityCore/releases/tag/TDB335.25101) including updates up to [TrinityCore/TrinityCore@8300a6d](https://github.com/TrinityCore/TrinityCore/commit/8300a6d8463aa862ae154392558c1f11dc2fce5d) (no other other providers are supported at this time)
-+ WIN: php.exe needs to be added to the `PATH` system variable, if it isn't already. 
-+ Tools require cmake: Please refer to the individual repositories for detailed information
-  + [MPQExtractor](https://github.com/Sarjuuk/MPQExtractor) / [FFmpeg](https://ffmpeg.org/download.html) / (optional: [BLPConverter](https://github.com/Sarjuuk/BLPConverter))
-  + WIN users may find it easier to use these alternatives
-     + [MPQEditor](http://www.zezula.net/en/mpq/download.html) / [FFmpeg](http://ffmpeg.zeranoe.com/builds/) / (optional: [BLPConverter](https://github.com/PatrickCyr/BLPConverter))
+- Webserver running PHP ≥ 8.4 including extensions:
+  - [SimpleXML](https://www.php.net/manual/en/book.simplexml.php)
+  - [GD](https://www.php.net/manual/en/book.image)
+  - [MySQL Improved](https://www.php.net/manual/en/book.mysqli.php)
+  - [Multibyte String](https://www.php.net/manual/en/book.mbstring.php)
+  - [File Information](https://www.php.net/manual/en/book.fileinfo.php)
+  - [Internationalization](https://www.php.net/manual/en/book.intl.php)
+  - [GNU Multiple Precision](https://www.php.net/manual/en/book.gmp.php) (When using TrinityCore as auth source)
+- MySQL ≥ 5.7.0 OR MariaDB ≥ 10.6.4 OR similar
+- [Composer](https://getcomposer.org/download/)
+- [TDB 335.25101](https://github.com/TrinityCore/TrinityCore/releases/tag/TDB335.25101) including updates up to [TrinityCore/TrinityCore@8300a6d](https://github.com/TrinityCore/TrinityCore/commit/8300a6d8463aa862ae154392558c1f11dc2fce5d) (no other providers are supported at this time)
+- WIN: php.exe needs to be added to the `PATH` system variable, if it isn't already. 
+- Tools require cmake: Please refer to the individual repositories for detailed information
+  - [MPQExtractor](https://github.com/Sarjuuk/MPQExtractor) / [FFmpeg](https://ffmpeg.org/download.html) / (optional: [BLPConverter](https://github.com/Sarjuuk/BLPConverter))
+  - WIN users may find it easier to use these alternatives
+    - [MPQEditor](http://www.zezula.net/en/mpq/download.html) / [FFmpeg](http://ffmpeg.zeranoe.com/builds/) / (optional: [BLPConverter](https://github.com/PatrickCyr/BLPConverter))
 
 audio processing may require [lame](https://sourceforge.net/projects/lame/files/lame/3.99/) or [vorbis-tools](https://www.xiph.org/downloads/) (which may require libvorbis (which may require libogg))
 
-
 #### Highly Recommended
-+ setting the following configuration values on your TrinityCore server (and running it once) will greatly increase the accuracy of spawn points
+
+- setting the following configuration values on your TrinityCore server (and running it once) will greatly increase the accuracy of spawn points
   > Calculate.Creature.Zone.Area.Data = 1  
   > Calculate.Gameobject.Zone.Area.Data = 1
 
-
 ## Install
+### 1. Acquire the required repositories
 
-#### 1. Acquire the required repositories
-`git clone git@github.com:Sarjuuk/aowow.git aowow`  
-`git clone git@github.com:Sarjuuk/MPQExtractor.git MPQExtractor`  
+```sh
+git clone git@github.com:Sarjuuk/aowow.git aowow
+git clone git@github.com:Sarjuuk/MPQExtractor.git MPQExtractor
+```
 
-#### 2. Prepare the database  
+#### 2. Prepare the database
+
 Ensure that the account you are going to use has **full** access on the database AoWoW is going to occupy and ideally only **read** access on the world and optionally auth and characters databases you are going to reference.  
 Import files 01 - 03 from `setup/sql/` in order into the AoWoW database `mysql --default-character-set=utf8 -p {your-db-here} < setup/sql/01-db_structure.sql`, etc.  
 
 **Optional**: If you are using MySQL ≥ 8.4.0 and want to support fulltext search for locale zhCN, additionally import `setup/sql/04-db_optional_mysql_only.sql`. Enables this in settings after AoWoW has been set up.  
 
-#### 3. Server created files
+### 3. Server created files
+
 See to it, that the web server is able to write the following directories and their children. If they are missing, the setup will create them with appropriate permissions
- * `cache/`
- * `config/`
- * `static/download/`
- * `static/widgets/`
- * `static/js/`
- * `static/uploads/`
- * `static/images/wow/`
- * `datasets/`  
- 
-#### 4. Extract the client archives (MPQs)
-Extract the following directories from the client archives into `setup/mpqdata/`, while maintaining patch order (named MPQs first -> patch.mpq -> patch-[2 -> 9].mpq -> patch-[A -> Z].mpq). Replace files from previous patches if asked to.  
-⚠ DO NOT change the case of the extracted files. (i.e. don't use the `-c` switch when using the MPQExtractor)  
-  
+
+- `cache/`
+- `config/`
+- `static/download/`
+- `static/widgets/`
+- `static/js/`
+- `static/uploads/`
+- `static/images/wow/`
+- `datasets/`
+
+### 4. Extract the client archives (MPQs)
+
+Extract the following directories from the client archives into `setup/mpqdata/`,
+while maintaining patch order (named MPQs first -> patch.mpq -> `patch-[2 -> 9].mpq` -> `patch-[A -> Z].mpq`). 
+Replace files from previous patches if asked to.  
+⚠ DO NOT change the case of the extracted files. (i.e. don't use the `-c` switch when using the `MPQExtractor`)
+
+https://gist.github.com/Sarjuuk/e171bf5e7e9f7503a779
+
    .. for every locale you are going to use:
    > \<localeCode>/DBFilesClient/  
    > \<localeCode>/Interface/WorldMap/  
@@ -88,20 +95,29 @@ Extract the following directories from the client archives into `setup/mpqdata/`
    > \<localeCode>/Interface/Calendar/Holidays/  
    > \<localeCode>/Sound/  
 
-#### 5. Reencode the audio files
+### 5. Reencode the audio files
+
 WAV-files need to be reencoded as `ogg/vorbis` and some MP3s may identify themselves as `application/octet-stream` instead of `audio/mpeg`.  
  * [example for WIN](https://gist.github.com/Sarjuuk/d77b203f7b71d191509afddabad5fc9f)  
  * [example for \*nix](https://gist.github.com/Sarjuuk/1f05ef2affe49a7e7ca0fad7b01c081d)
 
 #### 6. Install dependencies with composer
+
 `php composer.phar install --no-dev` on a project level composer install, or  
 `composer install --no-dev` on a system level composer install
 
 #### 7. Run the initial setup from the CLI
-`php aowow --setup`.  
+
+```sh
+php aowow --setup
+```
+
 This should guide you through with minimal input required from your end, but will take some time though, especially compiling the zone-images. Use it to familiarize yourself with the other functions this setup has. Yes, I'm dead serious: *Go read the code!* It will help you understand how to configure AoWoW and keep it in sync with your world database.  
 When you've created your admin account you are done.
 
+## Run with Docker
+
+See [docker/readme.md](docker.md) file for details.
 
 ## Troubleshooting
 
@@ -129,7 +145,6 @@ A: A search is only conducted against the currently used locale. You may have on
 Q: Images embedded in readable Items / Gameobjects are missing!  
 A: Check that you didn't change the case of the files extracted from the mpq archives. The paths stored in TDBs page_text table are used as \<img> src and while AoWoW is case agnostic and will happily process all files, a web server runnig on a unix system will only serve files matching the exact case.  
 
-
 ## Thanks
 
 @mix: for providing the php-script to parse .blp and .dbc into usable images and tables  
@@ -137,8 +152,8 @@ A: Check that you didn't change the case of the files extracted from the mpq arc
 @kliver: basic implementation of screenshot uploads  
 @Sarjuuk: maintainer of the project  
 
-
 ## Special Thanks
+
 Said website with the red smiling rocket, for providing this beautiful website!
 Please do not regard this project as blatant rip-off, rather as "We do really liked your presentation, but since time and content progresses, you are sadly no longer supplying the data we need".
 
