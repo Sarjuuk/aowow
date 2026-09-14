@@ -1271,7 +1271,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                     $tokens[] = '+' . $ft  . '*';
 
         $lvData = [];
-        if ($tokens && !($byName = new ItemList(array(['nml.nName', $tokens, 'MATCH'])))->error)
+        if ($tokens && !($byName = new ItemList(array(DB::AND, ['id', $this->typeId, '!'], ['nml.nName', $tokens, 'MATCH'])))->error)
         {
             $this->extendGlobalData($byName->getJSGlobals(GLOBALINFO_SELF));
             $lvData += $byName->getListviewData();
