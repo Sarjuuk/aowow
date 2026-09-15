@@ -1683,7 +1683,7 @@ $lang = array(
         'id'            => "[Mail ID]: ",
         'notFound'      => "[This mail doesn't exist].",
         'attachment'    => "[Attachment]",
-        'mailDelivery'  => "Вы получите это письмо%s%s",
+        'mailDelivery'  => 'Вы получите <a href="?mail=%d">это письмо</a>%s%s',
         'mailBy'        => ' от <a href="?npc=%d">%s</a>',
         'mailIn'        => " через %s",
         'delay'         => "[Delay]: %s",
