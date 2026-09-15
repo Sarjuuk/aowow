@@ -271,10 +271,10 @@ abstract class DBTypeList
         return [$literal ? '%SQL' : '%n', $field, $expr, $value];
     }
 
-    private function setColPrefix(mixed $colName) : null|string|array
+    private function setColPrefix(mixed $colName) : ?string
     {
         if (is_array($colName))
-            return array_filter(array_map([$this, 'setColPrefix'], $colName)) ?: null;
+            $colName = $colName[0];
 
         // numeric allows for formulas e.g. (1 < 3)
         if (Util::checkNumeric($colName))
