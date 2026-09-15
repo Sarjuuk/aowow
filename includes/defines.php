@@ -13,7 +13,7 @@ define('JSON_AOWOW_POWER',        JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK | JSON_
 define('FILTER_FLAG_STRIP_AOWOW', FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH | FILTER_FLAG_STRIP_BACKTICK);
 
 define('TDB_WORLD_MINIMUM_VER',  25101);
-define('TDB_WORLD_EXPECTED_VER', 25101);
+define('TDB_WORLD_EXPECTED_VER', 26091);
 
 // as of 01.01.2024     https://www.wowhead.com/wotlk/de/spell=40120/{seo}
 //                      https://www.wowhead.com/wotlk/es/search=vuelo
