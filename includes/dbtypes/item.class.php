@@ -87,10 +87,7 @@ class ItemList extends DBTypeList
 
         if (empty($this->vendors))
         {
-            $itemIds = array_keys($this->templates);
-            if (!empty($filter[Type::NPC]) && is_array($filter[Type::NPC]))
-                $itemIds = array_intersect($itemIds, $filter[Type::NPC]);
-
+            $itemIds    = array_keys($this->templates);
             $itemz      = [];
             $xCostData  = [];
             $rawEntries = DB::World()->selectAssoc(
@@ -113,6 +110,9 @@ class ItemList extends DBTypeList
 
             foreach ($rawEntries as $costEntry)
             {
+                if (isset($filter[Type::NPC]) && is_array($filter[Type::NPC]) && !in_array($costEntry['entry'], $filter[Type::NPC]))
+                    continue;
+
                 if ($costEntry['extendedCost'])
                     $xCostData[] = $costEntry['extendedCost'];
 
