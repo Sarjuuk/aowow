@@ -1316,8 +1316,8 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         $end   = DB::Aowow()->selectRow('SELECT `id`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8`, `reqRaceMask` FROM ::quests WHERE `id` = %i', $lastQuestId ?: $this->typeId);
         $chain = array(array($makeSeriesItem($end)));       // series / step / quest
 
-        $prevStepIds = [$lastQuestId ?: $this->typeId];
-        while ($prevQuests = DB::Aowow()->selectAssoc('SELECT `id`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8`, `reqRaceMask` FROM ::quests WHERE `nextQuestIdChain` IN %in AND `id` <> `nextQuestIdChain` AND (`cuFlags` & %i) = 0 AND `breadcrumbForQuestId` = 0',
+        $prevStepIds = [$lastQuestId ?: $this->typeId];     // note: cannot exclude breadcrumb quests here. cases exists where a chain leads into a breadcrumb which then continues the chain.
+        while ($prevQuests = DB::Aowow()->selectAssoc('SELECT `id`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8`, `reqRaceMask` FROM ::quests WHERE `nextQuestIdChain` IN %in AND `id` <> `nextQuestIdChain` AND (`cuFlags` & %i) = 0 /* AND `breadcrumbForQuestId` = 0 */',
             $prevStepIds, User::isInGroup(U_GROUP_STAFF) ? CUSTOM_EXCLUDE_FOR_LISTVIEW : 0))
         {
             $step = [];
