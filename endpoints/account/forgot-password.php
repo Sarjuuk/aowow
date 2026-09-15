@@ -76,7 +76,7 @@ class AccountforgotpasswordResponse extends TemplateResponse
 
         // on cooldown pretend we dont know the email address
         if ($timeout && $timeout > time())
-            return Cfg::get('DEBUG') ? 'resend on cooldown: '.DateTime::formatTimeElapsed($timeout * 1000).' remaining' : Lang::account('inputbox', 'error', 'emailNotFound');
+            return Cfg::get('DEBUG') ? 'resend on cooldown: '.DateTime::formatTimeElapsed(($timeout - time()) * 1000).' remaining' : Lang::account('inputbox', 'error', 'emailNotFound');
 
         // pretend recovery started
         if (!DB::Aowow()->selectCell('SELECT 1 FROM ::account WHERE `email` = %s', $this->_post['email']))

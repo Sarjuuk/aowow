@@ -107,7 +107,7 @@ class AccountresetpasswordResponse extends TemplateResponse
         if (!$userData)
             return Lang::account('inputbox', 'error', 'emailNotFound');
 
-        if (!User::verifyCrypt($this->_post['c_password'], $userData['passHash']))
+        if (User::verifyCrypt($this->_post['c_password'], $userData['passHash']))
             return Lang::account('newPassDiff');
 
         if (!DB::Aowow()->qry('UPDATE ::account SET `passHash` = %s, `status` = %i WHERE `id` = %i', User::hashCrypt($this->_post['c_password']), ACC_STATUS_NONE, $userData['id']))
