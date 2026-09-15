@@ -147,18 +147,20 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         );
 
         // could have multiple models set, one per effect
-        foreach ($this->modelInfo as $mI)
-        {
-            $this->redButtons[BUTTON_VIEW3D] = ['type' => $mI['type'], 'displayId' => $mI['displayId']];
-
-            if (isset($mI['humanoid']))
-            {
-                $this->redButtons[BUTTON_VIEW3D]['typeId']   = $mI['typeId'];
-                $this->redButtons[BUTTON_VIEW3D]['humanoid'] = 1;
-            }
-
-            break;
-        }
+     /* disabled due to missing models+textures
+      * foreach ($this->modelInfo as $mI)
+      * {
+      *     $this->redButtons[BUTTON_VIEW3D] = ['type' => $mI['type'], 'displayId' => $mI['displayId']];
+      *
+      *     if (isset($mI['humanoid']))
+      *     {
+      *         $this->redButtons[BUTTON_VIEW3D]['typeId']   = $mI['typeId'];
+      *         $this->redButtons[BUTTON_VIEW3D]['humanoid'] = 1;
+      *     }
+      *
+      *     break;
+      * }
+     */
 
 
         /*************************/

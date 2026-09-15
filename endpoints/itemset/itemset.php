@@ -195,7 +195,7 @@ class ItemsetBaseResponse extends TemplateResponse implements ICache
         $this->redButtons  = array(
             BUTTON_WOWHEAD => $this->typeId > 0,            // bool only
             BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId],
-            BUTTON_VIEW3D  => ['type' => Type::ITEMSET, 'typeId' => $this->typeId, 'equipList' => $eqList],
+            BUTTON_VIEW3D  => /* ['type' => Type::ITEMSET, 'typeId' => $this->typeId, 'equipList' => $eqList] */ false, // disabled due to missing models+textures,
             BUTTON_COMPARE => $compare ? ['eqList' => implode(':', $compare), 'qty' => $_cnt] : false
         );
 

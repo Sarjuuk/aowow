@@ -357,7 +357,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         $this->redButtons  = array(
             BUTTON_WOWHEAD => true,
             BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId],
-            BUTTON_VIEW3D  => ['displayId' => $this->subject->getField('displayId'), 'type' => Type::OBJECT, 'typeId' => $this->typeId]
+            BUTTON_VIEW3D  => /* ['displayId' => $this->subject->getField('displayId'), 'type' => Type::OBJECT, 'typeId' => $this->typeId] */ false // disabled due to missing models+textures
         );
 
 

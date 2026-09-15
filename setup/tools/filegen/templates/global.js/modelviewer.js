@@ -673,6 +673,8 @@ var ModelViewer = new function()
     {
         optBak = opt;
 
+        return;                                             // aowow - disabled until models/textures can be generated
+
         Lightbox.show('modelviewer', {
             onShow: onShow,
             onHide: onHide
