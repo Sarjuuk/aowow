@@ -797,7 +797,7 @@ $lang = array(
             SmartAction::ACTION_FLEE_FOR_ASSIST                    => ['Huir por asistencia.', 'Usar emote de huida predeterminado'],
             SmartAction::ACTION_CALL_GROUPEVENTHAPPENS             => ['Satisfacer evento de exploración de [quest=%1$d] para el grupo de #target#.', ''],
             SmartAction::ACTION_COMBAT_STOP                        => ['Terminar combate actual.', ''],
-            SmartAction::ACTION_REMOVEAURASFROMSPELL               => ['Quitar(%2$d)? %2$d cargas de:;(%1$d)? todas las auras: el aura de [spell=%1$d]; de #target#.', 'Solo auras propias'],
+            SmartAction::ACTION_REMOVEAURASFROMSPELL               => ['Quitar(%2$d)? %2$d cargas de:;(%1$d)? el aura de [spell=%1$d]:todas las auras; de #target#.', 'Solo auras propias'],
             SmartAction::ACTION_FOLLOW                             => ['Seguir a #target#(%1$d)? a %1$dm de distancia:;(%3$d)? hasta alcanzar a [npc=%3$d]:;.(%12$d)?El evento de exploración de [quest=%4$d] será satisfecho.:;(%13$d)? Se acreditará una muerte de [npc=%4$d].:;', '(%11$d)?Ángulo de seguimiento %7$.2f°:;'],
 /* 30*/     SmartAction::ACTION_RANDOM_PHASE                       => ['Elegir fase de evento aleatoria de %11$s.', ''],
             SmartAction::ACTION_RANDOM_PHASE_RANGE                 => ['Elegir fase de evento aleatoria entre %1$d y %2$d.', ''],

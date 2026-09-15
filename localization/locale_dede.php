@@ -796,7 +796,7 @@ $lang = array(
             SmartAction::ACTION_FLEE_FOR_ASSIST                    => ['Fliehe nach Hilfe.', 'Benutze Standard Flucht-Emote'],
             SmartAction::ACTION_CALL_GROUPEVENTHAPPENS             => ['Erfülle Entdeckungsereignis von [quest=%1$d] für Gruppe von #target#.', ''],
             SmartAction::ACTION_COMBAT_STOP                        => ['Beende aktuellen Kampf.', ''],
-            SmartAction::ACTION_REMOVEAURASFROMSPELL               => ['Entferne(%2$d)? %2$d Aufladungen von:;(%1$d)? alle Auren:Aura [spell=%1$d]; von #target#.', 'Nur eigene Auren'],
+            SmartAction::ACTION_REMOVEAURASFROMSPELL               => ['Entferne(%2$d)? %2$d Aufladungen von:;(%1$d)? Aura [spell=%1$d]:alle Auren; von #target#.', 'Nur eigene Auren'],
             SmartAction::ACTION_FOLLOW                             => ['Folge #target#(%1$d)? mit %1$dm Abstand:;(%3$d)? bis zum Erreichen von [npc=%3$d]:;.(%12$d)? Am Ende wird ein Entdeckungsereignis für [quest=%4$d] erfüllt.:;(%13$d)? Am Ende wird ein Tod von [npc=%4$d] gutgeschrieben.:;', '(%11$d)?Folgt im Winkel von %11$.2f°:;'],
 /* 30*/     SmartAction::ACTION_RANDOM_PHASE                       => ['Wähle zufällige Ereignisphase aus %11$s.', ''],
             SmartAction::ACTION_RANDOM_PHASE_RANGE                 => ['Wähle zufällige Ereignisphase zwischen %1$d und %2$d.', ''],

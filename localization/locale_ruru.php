@@ -797,7 +797,7 @@ $lang = array(
             SmartAction::ACTION_FLEE_FOR_ASSIST                    => ['Flee for assistance.', 'Use default flee emote'],
             SmartAction::ACTION_CALL_GROUPEVENTHAPPENS             => ['Satisfy exploration event of [quest=%1$d] for group of #target#.', ''],
             SmartAction::ACTION_COMBAT_STOP                        => ['End current combat.', ''],
-            SmartAction::ACTION_REMOVEAURASFROMSPELL               => ['Remove(%2$d)? %2$d charges of:;(%1$d)? all auras: [spell=%1$d]\'s aura; from #target#.', 'Only own auras'],
+            SmartAction::ACTION_REMOVEAURASFROMSPELL               => ['Remove(%2$d)? %2$d charges of:;(%1$d)? [spell=%1$d]\'s aura: all auras; from #target#.', 'Only own auras'],
             SmartAction::ACTION_FOLLOW                             => ['Follow #target#(%1$d)? at %1$dm distance:;(%3$d)? until reaching [npc=%3$d]:;.(%12$d)?Exploration event of [quest=%4$d] will be satisfied.:;(%13$d)? A kill of [npc=%4$d] will be credited.:;', '(%11$d)?Follow angle %7$.2f°:;'],
 /* 30*/     SmartAction::ACTION_RANDOM_PHASE                       => ['Pick random Event Phase from %11$s.', ''],
             SmartAction::ACTION_RANDOM_PHASE_RANGE                 => ['Pick random Event Phase between %1$d and %2$d.', ''],
