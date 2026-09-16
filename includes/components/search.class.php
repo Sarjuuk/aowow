@@ -1017,10 +1017,14 @@ class Search
         if (!$lookup)
             return null;
 
-        $cnd    = array_merge($this->cndBase, array(
-            [['flags', CUSTOM_UNAVAILABLE | CUSTOM_DISABLED, '&'], 0],
-            $lookup
-        ));
+        $cnd = $this->cndBase;
+
+        // Exclude internal wow stuff [override for staff, as done for cuFlags in __construct()]
+        if (!User::isInGroup(U_GROUP_EMPLOYEE))
+            $cnd[] = [['cuFlags', CUSTOM_UNAVAILABLE | CUSTOM_DISABLED, '&'], 0];
+
+        $cnd[] = $lookup;
+
         $quests = new QuestList($cnd, ['calcTotal' => true]);
 
         $data = $quests->getListviewData();
