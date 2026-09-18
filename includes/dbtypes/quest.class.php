@@ -335,7 +335,7 @@ class QuestList extends DBTypeList
             $rng    = $this->curTpl['reqNpcOrGo'.$i];
             $rngQty = $this->curTpl['reqNpcOrGoCount'.$i];
 
-            if (!$ot && ($rngQty < 1 || !$rng))
+            if ($rngQty < 1 || !$rng)
                 continue;
 
             if ($ot)

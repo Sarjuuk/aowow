@@ -49,7 +49,6 @@ if ($this->end || $this->objectiveList):
 ?>
 
                 <table class="iconlist">
-
 <?php
     foreach ($this->objectiveList as $objective):
         if (is_string($objective)):                         // just text line
@@ -78,20 +77,21 @@ if ($this->end || $this->objectiveList):
         echo '                    <tr><th><p style="height: 26px; width: 30px;">&nbsp;</p></th><td>'.Lang::quest('suggestedPl', [$this->suggestedPl]).'</td></tr>'.PHP_EOL;
     endif;
 ?>
-
                 </table>
 
-                <script type="text/javascript">//<![CDATA[
-
 <?php
-    foreach (array_filter($this->objectiveList, fn($x) => is_object($x)) as $k => $objective):
-        echo $objective?->renderJS();
-    endforeach;
+    if ($icons = array_filter($this->objectiveList, fn($x) => is_object($x))):
 ?>
-
-                //]]></script>
-
+                <script type="text/javascript">//<![CDATA[
 <?php
+        foreach ($icons as $k => $objective):
+            echo $objective?->renderJS(20);
+        endforeach;
+?>
+                //]]></script>
+<?php
+    endif;
+
     if ($this->providedItem):
 ?>
 

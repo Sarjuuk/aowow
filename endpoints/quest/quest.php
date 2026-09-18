@@ -648,14 +648,14 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                     foreach ($atSpawns as $atId => $atsp)
                     {
                         $atSpawn = array (
-                                'type'      => User::isInGroup(U_GROUP_STAFF) ? Type::AREATRIGGER : -1,
-                                'id'        => $atId,
-                                'point'     => 'requirement',
-                                'name'      => $this->subject->parseText('end', false) ?: Lang::areatrigger('unnamed', [$atir[0]]),
-                                'coord'     => [$atsp['posX'], $atsp['posY']],
-                                'coords'    => [[$atsp['posX'], $atsp['posY']]],
-                                'objective' => $objectiveIdx++
-                            );
+                            'type'      => User::isInGroup(U_GROUP_STAFF) ? Type::AREATRIGGER : -1,
+                            'id'        => $atId,
+                            'point'     => 'requirement',
+                            'name'      => $this->subject->parseText('end', false) ?: Lang::areatrigger('unnamed', [$atir[0]]),
+                            'coord'     => [$atsp['posX'], $atsp['posY']],
+                            'coords'    => [[$atsp['posX'], $atsp['posY']]],
+                            'objective' => $objectiveIdx++
+                        );
 
                         if (isset($mObjectives[$atsp['areaId']]['levels'][$atsp['floor']]))
                         {
