@@ -9,7 +9,11 @@ if ([$mapper, $mapperData, $som, $foundIn] = $this->map):
     if ($foundIn):
         echo '            <div>'.$foundIn[0].' <span id="mapper-zone-generic">';
         echo Lang::concat($mapperData, true, function ($areaData, $areaId) use ($foundIn) {
-            return '<a href="javascript:;" onclick="myMapper.update({zone: '.$areaId.'}); g_setSelectedLink(this, \'mapper\'); return false" onmousedown="return false">'.$foundIn[$areaId].'</a>&nbsp;('.array_sum(array_column($areaData, 'count')).')';
+            $qty = '';
+            if ($_ = array_sum(array_column($areaData, 'count')))
+                $qty = '&nbsp;('.$_.')';
+
+            return '<a href="javascript:;" onclick="myMapper.update({zone: '.$areaId.'}); g_setSelectedLink(this, \'mapper\'); return false" onmousedown="return false">'.$foundIn[$areaId].'</a>'.$qty;
         });
         echo '.</span></div>'.PHP_EOL;
     else:
