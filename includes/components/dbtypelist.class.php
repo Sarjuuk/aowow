@@ -807,11 +807,11 @@ trait spawnHelper
                 $spawns[$data['areaId']][$data['floor']][$data['typeId']] = array(
                     'type'          => self::$type,
                     'id'            => $data['typeId'],
-                    'point'         => '',                      // tbd later (start, end, requirement, sourcestart, sourceend, sourcerequirement)
+                    'point'         => null,                // tbd later (start, end, requirement, sourcestart, sourceend, sourcerequirement)
                     'name'          => Util::localizedString($this->templates[$data['typeId']], 'name'),
                     'coord'         => [$data['posX'], $data['posY']],
                     'coords'        => [[$data['posX'], $data['posY']]],
-                    'objective'     => 0,                       // tbd later (1-4 set a color; id of creature this entry gives credit for)
+                    'objective'     => null,                // tbd later (1-4 set a color; id of creature this entry gives credit for)
                     'reactalliance' => $this->templates[$data['typeId']]['A'] ?: 0,
                     'reacthorde'    => $this->templates[$data['typeId']]['H'] ?: 0
                 );

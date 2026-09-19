@@ -390,13 +390,10 @@ class QuestBaseResponse extends TemplateResponse implements ICache
             // create proxy-references
             foreach ($olNPCData->iterate() as $id => $__)
             {
-                if ($p = $olNPCData->getField('KillCredit1'))
-                    if (isset($olNPCs[$p]))
-                        $olNPCs[$p][2][$id] = $olNPCData->getField('name', true);
-
-                if ($p = $olNPCData->getField('KillCredit2'))
-                    if (isset($olNPCs[$p]))
-                        $olNPCs[$p][2][$id] = $olNPCData->getField('name', true);
+                if (($p = $olNPCData->getField('KillCredit1')) && isset($olNPCs[$p]))
+                    $olNPCs[$p][2][$id] = $olNPCData->getField('name', true);
+                if (($p = $olNPCData->getField('KillCredit2')) && isset($olNPCs[$p]))
+                    $olNPCs[$p][2][$id] = $olNPCData->getField('name', true);
             }
 
             foreach ($olNPCs as $i => [$qty, $altText, $proxies])
@@ -516,8 +513,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         // gather points of interest
         $mapNPCs = $mapGOs = [];                            // [typeId, start|end|objective, startItemId]
 
-        // todo (med): this double list creation very much sucks ...
-        $getItemSource = function ($itemId, $method = 0) use (&$mapNPCs, &$mapGOs)
+        $getItemSource = function (int $itemId, int $method = 0) use (&$mapNPCs, &$mapGOs)
         {
             $lootTabs  = new LootByItem($itemId);
             if ($lootTabs->getByItem())
@@ -536,9 +532,9 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                 */
 
                 $nSources = 0;
-                foreach ($lootTabs->iterate() as [$type, $data])
-                    if ($type == 'creature' || $type == 'object')
-                        $nSources += count(array_filter($data['data'], fn($x) => $x['percent'] >= 5.0));
+                foreach ($lootTabs->iterate() as [$file, $tabData])
+                    if ($file == 'creature' || $file == 'object')
+                        $nSources += count(array_filter($tabData['data'], fn($x) => $x['percent'] >= 5.0));
 
                 foreach ($lootTabs->iterate() as [$file, $tabData])
                 {
@@ -553,17 +549,10 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                         if ($nSources > 10 && $data['percent'] < 80.0)
                             continue;
 
-                        switch ($file)
-                        {
-                            case 'npc':
-                                $mapNPCs[] = [$data['id'], $method, $itemId];
-                                break;
-                            case 'object':
-                                $mapGOs[]  = [$data['id'], $method, $itemId];
-                                break;
-                            default:
-                                break;
-                        }
+                        if ($file == 'npc')
+                            $mapNPCs[] = [$data['id'], $method, $itemId];
+                        if ($file == 'object')
+                            $mapGOs[]  = [$data['id'], $method, $itemId];
                     }
                 }
             }
@@ -581,24 +570,25 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                 $mapNPCs[] = [$v, $method, $itemId];
         };
 
-        $addObjectiveSpawns = function (array $spawns, callable $processing) use (&$mObjectives)
+        $addObjectiveSpawns = function (array $spawns, ?callable $processing = null) use (&$mObjectives)
         {
+            $processing ??= fn($x) => [$x];
+
             foreach ($spawns as $zoneId => $zoneData)
             {
-                if (!isset($mObjectives[$zoneId]))
-                    $mObjectives[$zoneId] = array(
-                        'zone'     => 'Zone #'.$zoneId,
-                        'mappable' => 1,
-                        'levels'   => []
-                    );
+                $mObjectives[$zoneId] ??= array(
+                    'zone'     => 'Zone #'.$zoneId,
+                    'mappable' => 1,
+                    'levels'   => []
+                );
 
                 foreach ($zoneData as $floor => $floorData)
                 {
-                    if (!isset($mObjectives[$zoneId]['levels'][$floor]))
-                        $mObjectives[$zoneId]['levels'][$floor] = [];
+                    $mObjectives[$zoneId]['levels'][$floor] ??= [];
 
                     foreach ($floorData as $objId => $objData)
-                        $mObjectives[$zoneId]['levels'][$floor][] = $processing($objId, $objData);
+                        foreach ($processing($objData, $objId) as $spawn)
+                            $mObjectives[$zoneId]['levels'][$floor][] = $spawn;
                 }
             }
         };
@@ -607,31 +597,33 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         // POI: start + end
         foreach ($startEnd as $se)
         {
-            if ($se['type'] == Type::NPC)
-                $mapNPCs[] = [$se['typeId'], $se['method'], 0];
-            else if ($se['type'] == Type::OBJECT)
-                $mapGOs[]  = [$se['typeId'], $se['method'], 0];
-            else if ($se['type'] == Type::ITEM)
-                $getItemSource($se['typeId'], $se['method']);
+            match ($se['type'])
+            {
+                Type::NPC    => $mapNPCs[] = [$se['typeId'], $se['method'], 0],
+                Type::OBJECT => $mapGOs[]  = [$se['typeId'], $se['method'], 0],
+                Type::ITEM   => $getItemSource($se['typeId'], $se['method']),
+                default      => null
+            };
         }
 
         $itemObjectives = [];
         $mObjectives    = [];
         $mZones         = [];
         $objectiveIdx   = 0;
+        $hasStartEnd    = 0x0;
 
         // POI objectives
         // also map olItems to objectiveIdx so every container gets the same pin color
         foreach ($olItems as $i => [$itemId, $qty, $provided])
         {
-            if (!$provided && $itemId)
-            {
-                $itemObjectives[$itemId] = $objectiveIdx++;
-                $getItemSource($itemId);
-            }
+            if ($provided || !$itemId)
+                continue;
+
+            $itemObjectives[$itemId] = $objectiveIdx++;
+            $getItemSource($itemId);
         }
 
-        // PSA: 'redundant' data is on purpose (e.g. creature required for kill, also dropps item required to collect)
+        // note: 'redundant' data is on purpose (e.g. creature required for kill, also dropps item required to collect)
 
         // external events
         $endText = $this->subject->parseText('end', false);
@@ -647,7 +639,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
 
                     foreach ($atSpawns as $atId => $atsp)
                     {
-                        $atSpawn = array (
+                        $addObjectiveSpawns([$atsp['areaId'] => [$atsp['floor'] => [$atId => array(
                             'type'      => User::isInGroup(U_GROUP_STAFF) ? Type::AREATRIGGER : -1,
                             'id'        => $atId,
                             'point'     => 'requirement',
@@ -655,19 +647,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                             'coord'     => [$atsp['posX'], $atsp['posY']],
                             'coords'    => [[$atsp['posX'], $atsp['posY']]],
                             'objective' => $objectiveIdx++
-                        );
-
-                        if (isset($mObjectives[$atsp['areaId']]['levels'][$atsp['floor']]))
-                        {
-                            $mObjectives[$atsp['areaId']]['levels'][$atsp['floor']][] = $atSpawn;
-                            continue;
-                        }
-
-                        $mObjectives[$atsp['areaId']] = array(
-                            'zone'     => 'Zone #'.$atsp['areaId'],
-                            'mappable' => 1,
-                            'levels'   => [$atsp['floor'] => [$atSpawn]]
-                        );
+                        )]]]);
                     }
                 }
             }
@@ -681,22 +661,15 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         if ($olNPCData && !$olNPCData->error)
         {
             $spawns = $olNPCData->getSpawns(SPAWNINFO_QUEST);
-            $addObjectiveSpawns($spawns, function ($npcId, $npcData) use ($olNPCs, &$objectiveIdx)
+            $addObjectiveSpawns($spawns, function (array $npcData, int $npcId) use ($olNPCs, &$objectiveIdx)
             {
-                $npcData['point'] = 'requirement';          // always requirement
-                foreach ($olNPCs as $proxyNpcId => $npc)
-                {
-                    if ($npc[1] && $npcId == $proxyNpcId)  // overwrite creature name with quest specific text, if set.
-                        $npcData['name'] = $npc[1];
+                if ($proxyNpcId = array_find_key($olNPCs, fn($x) => !empty($x[2][$npcId])))
+                    $npcData['objective'] = $proxyNpcId;
 
-                    if (!empty($npc[2][$npcId]))
-                        $npcData['objective'] = $proxyNpcId;
-                }
+                $npcData['objective'] ??= $objectiveIdx++;
+                $npcData['point']       = 'requirement';    // always requirement
 
-                if (!$npcData['objective'])
-                    $npcData['objective'] = $objectiveIdx++;
-
-                return $npcData;
+                return [$npcData];
             });
         }
 
@@ -704,126 +677,94 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         if ($olGOData && !$olGOData->error)
         {
             $spawns = $olGOData->getSpawns(SPAWNINFO_QUEST);
-            $addObjectiveSpawns($spawns, function ($goId, $goData) use ($olGOs, &$objectiveIdx)
+            $addObjectiveSpawns($spawns, function (array $goData, int $goId) use (&$objectiveIdx)
             {
-                foreach ($olGOs as $_goId => $go)
-                {
-                    if ($go[1] && $goId == $_goId)          // overwrite object name with quest specific text, if set.
-                    {
-                        $goData['name'] = $go[1];
-                        break;
-                    }
-                }
-
-                $goData['point']     = 'requirement';       // always requirement
                 $goData['objective'] = $objectiveIdx++;
-                return $goData;
+                $goData['point']     = 'requirement';       // always requirement
+
+                return [$goData];
             });
         }
 
         // .. adding npc from: droping queststart item; dropping item needed to collect; starting quest; ending quest
         if ($mapNPCs)
         {
-            $npcs = new CreatureList(array(['id', array_column($mapNPCs, 0)]));
-            if (!$npcs->error)
+            if (!($npcs = new CreatureList(array(['id', array_column($mapNPCs, 0)])))->error)
             {
-                $startEndDupe = [];                         // if quest starter/ender is the same creature, we need to add it twice
-                $spawns       = $npcs->getSpawns(SPAWNINFO_QUEST);
-                $addObjectiveSpawns($spawns, function ($npcId, $npcData) use ($mapNPCs, &$startEndDupe, $itemObjectives)
+                $spawns = $npcs->getSpawns(SPAWNINFO_QUEST);
+                $addObjectiveSpawns($spawns, function (array $npcData, int $npcId) use ($mapNPCs, $itemObjectives, &$hasStartEnd)
                 {
-                    foreach ($mapNPCs as $mn)
+                    if (!([, $method, $startItemId] = array_find($mapNPCs, fn($x) => $x[0] == $npcId)))
+                        return [$npcData];
+
+                    $result = [&$npcData];
+
+                    if ($startItemId)
+                        $npcData['item'] = ItemList::getName($startItemId);
+
+                    $hasStartEnd |= $method;
+
+                    switch ($method)
                     {
-                        if ($mn[0] != $npcId)
-                            continue;
-
-                        if ($mn[2])                         // source for itemId
-                            $npcData['item'] = ItemList::getName($mn[2]);
-
-                        switch ($mn[1])                     // method
-                        {
-                            case 1:                         // quest start
-                                $npcData['point'] = $mn[2] ? 'sourcestart' : 'start';
-                                break;
-                            case 2:                         // quest end (sourceend doesn't actually make sense .. oh well....)
-                                $npcData['point'] = $mn[2] ? 'sourceend' : 'end';
-                                break;
-                            case 3:                         // quest start & end
-                                $npcData['point'] = $mn[2] ? 'sourcestart' : 'start';
-                                $startEndDupe = $npcData;
-                                $startEndDupe['point'] = $mn[2] ? 'sourceend' : 'end';
-                                break;
-                            default:                        // just something to kill for quest
-                                $npcData['point'] = $mn[2] ? 'sourcerequirement' : 'requirement';
-                                if ($mn[2] && !empty($itemObjectives[$mn[2]]))
-                                    $npcData['objective'] = $itemObjectives[$mn[2]];
-                        }
+                        case 1:                             // quest start
+                            $npcData['point'] = $startItemId ? 'sourcestart' : 'start';
+                            break;
+                        case 2:                             // quest end (sourceend doesn't actually make sense .. oh well....)
+                            $npcData['point'] = $startItemId ? 'sourceend' : 'end';
+                            break;
+                        case 3:                             // quest start & end
+                            $result[1] = ['point' => $startItemId ? 'sourceend' : 'end'] + $npcData;
+                            $npcData['point'] = $startItemId ? 'sourcestart' : 'start';
+                            break;
+                        default:                            // just something to kill for quest
+                            $npcData['point'] = $startItemId ? 'sourcerequirement' : 'requirement';
+                            if ($startItemId && !empty($itemObjectives[$startItemId]))
+                                $npcData['objective'] = $itemObjectives[$startItemId];
                     }
 
-                    return $npcData;
+                    return $result;
                 });
-
-                if ($startEndDupe)
-                    foreach ($spawns as $zoneId => $zoneData)
-                        foreach ($zoneData as $floor => $floorData)
-                            foreach ($floorData as $objId => $objData)
-                                if ($objId == $startEndDupe['id'])
-                                {
-                                    $mObjectives[$zoneId]['levels'][$floor][] = $startEndDupe;
-                                    break 3;
-                                }
             }
         }
 
         // .. adding go from: containing queststart item; containing item needed to collect; starting quest; ending quest
         if ($mapGOs)
         {
-            $gos = new GameObjectList(array(['id', array_column($mapGOs, 0)]));
-            if (!$gos->error)
+            if (!($gos = new GameObjectList(array(['id', array_column($mapGOs, 0)])))->error)
             {
-                $startEndDupe = [];                         // if quest starter/ender is the same object, we need to add it twice
-                $spawns       = $gos->getSpawns(SPAWNINFO_QUEST);
-                $addObjectiveSpawns($spawns, function ($goId, $goData) use ($mapGOs, &$startEndDupe, $itemObjectives)
+                $spawns = $gos->getSpawns(SPAWNINFO_QUEST);
+                $addObjectiveSpawns($spawns, function (array $goData, int $goId) use ($mapGOs, $itemObjectives, &$hasStartEnd)
                 {
-                    foreach ($mapGOs as $mgo)
+                    if (!([, $method, $startItemId] = array_find($mapGOs, fn($x) => $x[0] == $goId)))
+                        return [$goData];
+
+                    $result = [&$goData];
+
+                    if ($startItemId)
+                        $goData['item'] = ItemList::getName($startItemId);
+
+                    $hasStartEnd |= $method;
+
+                    switch ($method)
                     {
-                        if ($mgo[0] != $goId)
-                            continue;
-
-                        if ($mgo[2])                        // source for itemId
-                            $goData['item'] = ItemList::getName($mgo[2]);
-
-                        switch ($mgo[1])                    // method
-                        {
-                            case 1:                         // quest start
-                                $goData['point'] = $mgo[2] ? 'sourcestart' : 'start';
-                                break;
-                            case 2:                         // quest end (sourceend doesn't actually make sense .. oh well....)
-                                $goData['point'] = $mgo[2] ? 'sourceend' : 'end';
-                                break;
-                            case 3:                         // quest start & end
-                                $goData['point'] = $mgo[2] ? 'sourcestart' : 'start';
-                                $startEndDupe = $goData;
-                                $startEndDupe['point'] = $mgo[2] ? 'sourceend' : 'end';
-                                break;
-                            default:                        // just something to kill for quest
-                                $goData['point'] = $mgo[2] ? 'sourcerequirement' : 'requirement';
-                                if ($mgo[2] && !empty($itemObjectives[$mgo[2]]))
-                                    $goData['objective'] = $itemObjectives[$mgo[2]];
-                        }
+                        case 1:                             // quest start
+                            $goData['point'] = $startItemId ? 'sourcestart' : 'start';
+                            break;
+                        case 2:                             // quest end (sourceend doesn't actually make sense .. oh well....)
+                            $goData['point'] = $startItemId ? 'sourceend' : 'end';
+                            break;
+                        case 3:                             // quest start & end
+                            $result[1] = ['point' => $startItemId ? 'sourceend' : 'end'] + $goData;
+                            $goData['point'] = $startItemId ? 'sourcestart' : 'start';
+                            break;
+                        default:                            // just something to kill for quest
+                            $goData['point'] = $startItemId ? 'sourcerequirement' : 'requirement';
+                            if ($startItemId && !empty($itemObjectives[$startItemId]))
+                                $goData['objective'] = $itemObjectives[$startItemId];
                     }
 
-                    return $goData;
+                    return $result;
                 });
-
-                if ($startEndDupe)
-                    foreach ($spawns as $zoneId => $zoneData)
-                        foreach ($zoneData as $floor => $floorData)
-                            foreach ($floorData as $objId => $objData)
-                                if ($objId == $startEndDupe['id'])
-                                {
-                                    $mObjectives[$zoneId]['levels'][$floor][] = $startEndDupe;
-                                    break 3;
-                                }
             }
         }
 
@@ -850,22 +791,6 @@ class QuestBaseResponse extends TemplateResponse implements ICache
             }
 
             ksort($mZones);
-        }
-
-        // has start & end?
-        $hasStartEnd = 0x0;
-        foreach ($mObjectives as $levels)
-        {
-            foreach ($levels['levels'] as $floor)
-            {
-                foreach ($floor as $entry)
-                {
-                    if ($entry['point'] == 'start' || $entry['point'] == 'sourcestart')
-                        $hasStartEnd |= 0x1;
-                    else if ($entry['point'] == 'end' || $entry['point'] == 'sourceend')
-                        $hasStartEnd |= 0x2;
-                }
-            }
         }
 
         if ($mObjectives)
