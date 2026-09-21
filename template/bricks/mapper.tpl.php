@@ -8,7 +8,7 @@
 if ([$mapper, $mapperData, $som, $foundIn] = $this->map):
     if ($foundIn):
         echo '            <div>'.$foundIn[0].' <span id="mapper-zone-generic">';
-        echo Lang::concat($mapperData, true, function ($areaData, $areaId) use ($foundIn) {
+        echo Lang::concat($mapperData, callback: function ($areaData, $areaId) use ($foundIn) {
             $qty = '';
             if ($_ = array_sum(array_column($areaData, 'count')))
                 $qty = '&nbsp;('.$_.')';

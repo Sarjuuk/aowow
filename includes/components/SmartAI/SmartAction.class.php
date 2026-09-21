@@ -483,7 +483,7 @@ class SmartAction
                 else if ($pos = WorldPosition::toZonePos($this->param[0], $x, $y))
                 {
                     $this->param[10] = $pos[0]['areaId'];
-                    $this->param[11] = str_pad($pos[0]['posX'] * 10, 3, '0', STR_PAD_LEFT).str_pad($pos[0]['posY'] * 10, 3, '0', STR_PAD_LEFT);
+                    $this->param[11] = sprintf('%03d%03d', $pos[0]['posX'] * 10, $pos[0]['posY'] * 10);
                 }
                 // maybe the mapId is an instane map
                 else if ($areaId = DB::Aowow()->selectCell('SELECT `id` FROM ::zones WHERE `mapId` = %i', $this->param[0]))

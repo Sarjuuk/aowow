@@ -31,7 +31,7 @@
 
 if ($this->accessory):
     echo '                <div>'.Lang::npc('accessoryFor').' ';
-    echo Lang::concat($this->accessory, true, fn ($v) => '<a href="?npc='.$v[0].'">'.$v[1].'</a>');
+    echo Lang::concat($this->accessory, callback: fn($v) => '<a href="?npc='.$v[0].'">'.$v[1].'</a>');
     echo '.</div>'.PHP_EOL;
 endif;
 

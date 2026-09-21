@@ -168,7 +168,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
         {
             $this->addMoveLocationMenu($pa['areaId'], $pa['floor']);
 
-            $pins = str_pad($pa['posX'] * 10, 3, '0', STR_PAD_LEFT) . str_pad($pa['posY'] * 10, 3, '0', STR_PAD_LEFT);
+            $pins = sprintf('%03d%03d', $pa['posX'] * 10, $pa['posY'] * 10);
             $infobox[] = Lang::zone('location').'[lightbox=map zone='.$pa['areaId'].' '.($pa['floor'] > 1 ? 'floor='.--$pa['floor'] : '').' pins='.$pins.']'.ZoneList::getName($pa['areaId']).'[/lightbox]';
         }
 
