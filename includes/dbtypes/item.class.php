@@ -632,9 +632,10 @@ class ItemList extends DBTypeList
             $itemclass[] = '<!--asc'.$_subClass.'-->'.Lang::item('subClass', $_class, $_subClass);
         else if (($_class == ITEM_CLASS_CONTAINER || $_class == ITEM_CLASS_QUIVER) && $this->curTpl['slots'] > 0) // invType ins not displayed for containers for some reason
             $itemclass[0] = Lang::item('containerSlots', [$this->curTpl['slots'], Lang::item('subClass', $_class, $_subClass)]);
-        else if (($_class == ITEM_CLASS_WEAPON     && !in_array($_subClass, [ITEM_SUBCLASS_OBSOLETE, ITEM_SUBCLASS_1H_EXOTIC, ITEM_SUBCLASS_2H_EXOTIC, ITEM_SUBCLASS_MISC_WEAPON])) ||
-                 ($_class == ITEM_CLASS_AMMUNITION && !in_array($_subClass, [0])) || // wand (obsolete)
-                 ($_class == ITEM_CLASS_QUIVER     && !in_array($_subClass, [0, 1]))) // quiver (obsolete) + quiver (obsolete)
+        else if (($_class == ITEM_CLASS_WEAPON     && !in_array($_subClass, [ITEM_SUBCLASS_OBSOLETE, ITEM_SUBCLASS_1H_EXOTIC, ITEM_SUBCLASS_2H_EXOTIC, ITEM_SUBCLASS_MISC_WEAPON, ITEM_SUBCLASS_SPEAR])) ||
+                 ($_class == ITEM_CLASS_AMMUNITION && !in_array($_subClass, [0, 1, 4])) || // wand, bolt, thrown
+                 ($_class == ITEM_CLASS_QUIVER     && !in_array($_subClass, [0, 1])) || // quiver, quiver
+                 ($_class == ITEM_CLASS_MISC       && $_subClass == 5)) // mounts
               /* ($_class == ITEM_CLASS_GLYPH)) flags demand subclass is shown but in-game they are missing..? */
             $itemclass[] = Lang::item('subClass', $_class, $_subClass);
 
