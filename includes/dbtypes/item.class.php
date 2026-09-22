@@ -147,13 +147,13 @@ class ItemList extends DBTypeList
                         // hardcode arena) & honor
                         if (!empty($costs['reqArenaPoints']))
                         {
-                            $data[-103] = $costs['reqArenaPoints'];
+                            $data[-CURRENCY_ARENA_POINTS] = $costs['reqArenaPoints'];
                             $this->jsGlobals[Type::CURRENCY][CURRENCY_ARENA_POINTS] = CURRENCY_ARENA_POINTS;
                         }
 
                         if (!empty($costs['reqHonorPoints']))
                         {
-                            $data[-104] = $costs['reqHonorPoints'];
+                            $data[-CURRENCY_HONOR_POINTS] = $costs['reqHonorPoints'];
                             $this->jsGlobals[Type::CURRENCY][CURRENCY_HONOR_POINTS] = CURRENCY_HONOR_POINTS;
                         }
 

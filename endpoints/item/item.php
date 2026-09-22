@@ -438,79 +438,66 @@ class ItemBaseResponse extends TemplateResponse implements ICache
             $stack    = $this->subject->getField('buyCount');
             $divisor  = $stack;
             $each     = '';
-            $handled  = [];
-            $costList = [];
+            /** @var array{int, array, array}[] $costs */
+            $costs    = [];
             foreach ($vendors as $npcId => $entries)
             {
                 foreach ($entries as $data)
                 {
-                    $tokens   = [];
-                    $currency = [];
-
                     if (!is_array($data))
                         continue;
 
+                    // unset vendor info to prevent having two vendors /w the same cost being cached separately
+                    $data = array_filter($data, fn($v, $k) => $v && is_numeric($k), ARRAY_FILTER_USE_BOTH);
+
+                    // display every cost-combination only once
+                    $hash = md5(serialize($data));
+                    if (isset($costs[$hash]))
+                        continue;
+
+                    $cost = [0, [], []];                    // money, currencies, items
+
                     foreach ($data as $c => $qty)
                     {
-                        if (is_string($c))
-                        {
-                            unset($data[$c]);               // unset miscData to prevent having two vendors /w the same cost being cached, because of different stock or rating-requirements
-                            continue;
-                        }
+                        if (is_float($qty / $stack))
+                            $divisor = 1;
 
                         if ($c < 0)                         // currency items (and honor or arena)
                         {
-                            if (is_float($qty / $stack))
-                                $divisor = 1;
-
-                            $currency[] = [-$c, $qty];
+                            $cost[1][] = [-$c, $qty];
                             $this->extendGlobalIds(Type::CURRENCY, -$c);
                         }
                         else if ($c > 0)                    // plain items (item1,count1,item2,count2,...)
                         {
-                            if (is_float($qty / $stack))
-                                $divisor = 1;
-
-                            $tokens[] = [$c, $qty];
+                            $cost[2][] = [$c, $qty];
                             $this->extendGlobalIds(Type::ITEM, $c);
                         }
+                        else
+                            $cost[0] = $qty;
                     }
 
-                    // display every cost-combination only once
-                    $hash = md5(serialize($data));
-                    if (in_array($hash, $handled))
-                        continue;
-
-                    $handled[] = $hash;
-
-                    if (isset($data[0]))
-                    {
-                        if (is_float($data[0] / $stack))
-                            $divisor = 1;
-
-                        $cost = '[money='.($data[0] / $divisor);
-                    }
-                    else
-                        $cost = '[money';
-
-                    $stringify = fn(&$x) => $x = $x[0] . ',' . ($x[1] / $divisor);
-
-                    if ($tokens)
-                    {
-                        array_walk($tokens, $stringify);
-                        $cost .= ' items='.implode(',', $tokens);
-                    }
-
-                    if ($currency)
-                    {
-                        array_walk($currency, $stringify);
-                        $cost .= ' currency='.implode(',', $currency);
-                    }
-
-                    $cost .= ']';
-
-                    $costList[] = $cost;
+                    $costs[$hash] = $cost;
                 }
+            }
+
+            $costList  = [];
+            $stringify = fn($x) => $x[0] . ',' . ($x[1] / $divisor);
+            foreach ($costs as [$money, $currency, $items])
+            {
+                if ($money)
+                    $cost = '[money='.($money / $divisor);
+                else
+                    $cost = '[money';
+
+                if ($currency)
+                    $cost .= ' currency='.implode(',', array_map($stringify, $currency));
+
+                if ($items)
+                    $cost .= ' items='.implode(',', array_map($stringify, $items));
+
+                $cost .= ']';
+
+                $costList[] = $cost;
             }
 
             if ($stack > 1 && $divisor > 1)
@@ -1103,7 +1090,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         foreach ($sbData as $k => &$row)
         {
             $currency = [];
-            $tokens   = [];
+            $items    = [];
 
             // note: can only display one entry per row, so only use first entry of each vendor
             foreach ($vendors[$k][0] as $id => $qty)
@@ -1112,7 +1099,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                     continue;
 
                 if ($id > 0)
-                    $tokens[] = [$id, $qty];
+                    $items[] = [$id, $qty];
                 else if ($id < 0)
                     $currency[] = [-$id, $qty];
             }
@@ -1123,11 +1110,11 @@ class ItemBaseResponse extends TemplateResponse implements ICache
             if ($e = $vendors[$k][0]['event'])
                 $cnd->addExternalCondition(Conditions::SRC_NONE, $k.':'.$this->typeId, [Conditions::ACTIVE_EVENT, $e]);
 
-            if ($currency || $tokens)               // fill idx:3 if required
+            if ($currency || $items)                // 0-pad currency idx if items are set
                 $row['cost'][] = $currency;
 
-            if ($tokens)
-                $row['cost'][] = $tokens;
+            if ($items)
+                $row['cost'][] = $items;
 
             if ($x = $this->subject->getField('buyPrice'))
                 $row['buyprice'] = $x;
