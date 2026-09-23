@@ -285,8 +285,7 @@ class Lang
             switch ($lock['type'.$i])
             {
                 case LOCK_TYPE_ITEM:
-                    $name = ItemList::getName($prop);
-                    if (!$name)
+                    if (!($name = ItemList::getName($prop)))
                         continue 2;
 
                     if ($fmt == self::FMT_HTML)
@@ -299,22 +298,21 @@ class Lang
 
                     break;
                 case LOCK_TYPE_SKILL:
-                    $name = self::spell('lockType', $prop);
-                    if (!$name)
+                    if (!($name = self::spell('lockType', $prop)))
                         continue 2;
 
-                    // skills
-                    if (in_array($prop, [1, 2, 3, 20]))
-                    {
-                        $skills = array(
-                             1 => SKILL_LOCKPICKING,
-                             2 => SKILL_HERBALISM,
-                             3 => SKILL_MINING,
-                            20 => SKILL_INSCRIPTION
-                        );
+                    $skills = array(
+                         1 => SKILL_LOCKPICKING,
+                         2 => SKILL_HERBALISM,
+                         3 => SKILL_MINING,
+                        20 => SKILL_INSCRIPTION
+                    );
 
+                    // resolve as skill
+                    if (isset($skills[$prop]))
+                    {
                         if ($fmt == self::FMT_HTML)
-                            $name = $interactive ? '<a href="?skill='.$skills[$prop].'">'.$name.'</a>' : '<span class="q1">'.$name.'</span>';
+                            $name = $interactive ? '<a class="q1" href="?skill='.$skills[$prop].'">'.$name.'</a>' : '<span class="q1">'.$name.'</span>';
                         else if ($interactive && $fmt == self::FMT_MARKUP)
                         {
                             $name = '[skill='.$skills[$prop].']';
@@ -322,33 +320,27 @@ class Lang
                         }
                         else
                             $name = SkillList::getName($prop);
-
-                        if ($rank > 0)
-                            $name = self::main('parensFmt', [$name, $rank]);
                     }
-                    // Lockpicking
-                    else if ($prop == 4)
+                    // resolve as spell (mostly generic player spells; also: we know effect open lock only exists on effect idx 0)
+                    else if ($spellId = DB::Aowow()->selectCell('SELECT `id` FROM ::spell WHERE `effect1Id` = %i AND `effect1MiscValue` = %i AND `skillLine1` <> 0 ORDER BY `id` ASC', SPELL_EFFECT_OPEN_LOCK, $prop))
                     {
                         if ($fmt == self::FMT_HTML)
-                            $name = $interactive ? '<a href="?spell=1842">'.$name.'</a>' : '<span class="q1">'.$name.'</span>';
+                            $name = $interactive ? '<a class="q1" href="?spell='.$spellId.'">'.$name.'</a>' : '<span class="q1">'.$name.'</span>';
                         else if ($interactive && $fmt == self::FMT_MARKUP)
                         {
-                            $name = '[spell=1842]';
-                            $ids[Type::SPELL][] = 1842;
+                            $name = '[spell='.$spellId.']';
+                            $ids[Type::SPELL][] = $spellId;
                         }
-                    }
-                    // exclude unusual stuff
-                    else if (User::isInGroup(U_GROUP_STAFF))
-                    {
-                        if ($rank > 0)
-                            $name = self::main('parensFmt', [$name, $rank]);
                     }
                     else
                         continue 2;
+
+                    if ($rank > 0)
+                        $name = self::main('parensFmt', [$name, $rank]);
+
                     break;
                 case LOCK_TYPE_SPELL:
-                    $name = SpellList::getName($prop);
-                    if (!$name)
+                    if (!($name = SpellList::getName($prop)))
                         continue 2;
 
                     if ($fmt == self::FMT_HTML)
