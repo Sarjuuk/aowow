@@ -362,6 +362,13 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
                     case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AREA:
                         $extraData[] = ZoneList::makeLink($xData['value1']);
                         break;
+                    case ACHIEVEMENT_CRITERIA_DATA_TYPE_T_LEVEL:
+                        $extraData[] = Lang::main('_reqLevel').$xData['value1'];
+                        break;
+                    case ACHIEVEMENT_CRITERIA_DATA_TYPE_T_GENDER:
+                        if ($_ = Lang::exist('main', 'sex', $xData['value1'] + 1))
+                            $extraData[] = Lang::main('gender').Lang::main('colon').$_;
+                        break;
                     case ACHIEVEMENT_CRITERIA_DATA_TYPE_SCRIPT:
                         if ($xData['ScriptName'] && User::isInGroup(U_GROUP_STAFF))
                             $extraData[] = 'Script '.$xData['ScriptName'];
@@ -369,6 +376,17 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
                     case ACHIEVEMENT_CRITERIA_DATA_TYPE_HOLIDAY:
                         if ($we = new WorldEventList(array(['holidayId', $xData['value1']])))
                             $extraData[] = '<a href="?event='.$we->id.'">'.$we->getField('name', true).'</a>';
+                        break;
+                    case ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_DIFFICULTY:
+                        if ($_ = Lang::exist('game', 'modes', 0, $xData['value1']))
+                            $extraData[] = $_;
+                        break;
+                    case ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_PLAYER_COUNT:
+                        $extraData[] = Lang::main('players').Lang::main('colon').$xData['value1'];
+                        break;
+                    case ACHIEVEMENT_CRITERIA_DATA_TYPE_T_TEAM:
+                        if ($_ = FactionList::makeLink($xData['value1']))
+                            $extraData[] = $_;
                         break;
                     case ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_ID:
                         $extraData[] = match((int)$xData['value1'])
@@ -383,8 +401,19 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
                             })($xData['value1'])
                         };
                         break;
+                    case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_EQUIPED_ITEM:
+                        $_ = Lang::item('itemLevel', [$xData['value1']]);
+                        if ($q = Lang::exist('item', 'quality', $xData['value2']))
+                            $_ = Lang::main('parensFmt', [$_, $q]);
+
+                        $extraData[] = $_;
+                        break;
                     case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_KNOWN_TITLE:
                         $extraData[] = TitleList::makeLink($xData['value1']);
+                        break;
+                    case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_ITEM_QUALITY:
+                        if ($_ = Lang::exist('item', 'quality', $xData['value1']))
+                            $extraData[] = Lang::item('_quality').'<a href="?items&amp;filter=qu='.$xData['value1'].'">'.$_.'</a>';
                         break;
                     default:
                         if (User::isInGroup(U_GROUP_STAFF))
