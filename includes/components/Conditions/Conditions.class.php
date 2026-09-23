@@ -241,13 +241,13 @@ class Conditions
     /* IN */
     /******/
 
-    public function getBySource(int|array $type, int|array $group = 0, int|array $entry = 0, int|array $id = 0) : self
+    public function getBySource(int|array $type, null|int|array $group = null, null|int|array $entry = null, null|int|array $id = null) : self
     {
-        if ($group)
+        if ($group !== null)
             $group = is_int($group) ? [$group] : array_map('intVal', $group);
-        if ($entry)
+        if ($entry !== null)
             $entry = is_int($entry) ? [$entry] : array_map('intVal', $entry);
-        if ($id)
+        if ($id !== null)
             $id    = is_int($id)    ? [$id]    : array_map('intVal', $id);
         if ($type)
             $type  = is_int($type)  ? [$type]  : array_map('intVal', $type);
@@ -530,7 +530,7 @@ class Conditions
         return [$sType, $sGroup, $sEntry, $sId, $cTarget];
     }
 
-    private function prepareCondition($cId, $cVal1, $cVal2, $cVal3, $cString1) : array
+    private function prepareCondition(int $cId, int $cVal1, int $cVal2, int $cVal3, string $cString1) : array
     {
         if ($fn = self::$conditions[abs($cId)][self::IDX_CND_FN])
             if (!$this->$fn(abs($cId), $cVal1, $cVal2, $cVal3, $cString1))
@@ -557,7 +557,7 @@ class Conditions
         return $result;
     }
 
-    private function factionToSide($cndId, &$cVal1, $cVal2, $cVal3, $cString1) : bool
+    private function factionToSide(int $cndId, int &$cVal1, int $cVal2, int $cVal3, string $cString1) : bool
     {
         if ($cVal1 == 469)
             $cVal1 = SIDE_ALLIANCE;
@@ -569,7 +569,7 @@ class Conditions
         return true;
     }
 
-    private function mapToZone($cndId, &$cVal1, &$cVal2, $cVal3, $cString1) : bool
+    private function mapToZone(int $cndId, int &$cVal1, int &$cVal2, int $cVal3, string $cString1) : bool
     {
         // use g_zone_categories id
         if ($cVal1 == 530)                                  // outland
@@ -594,7 +594,7 @@ class Conditions
         return true;
     }
 
-    private function maskToBits($cndId, &$cVal1, $cVal2, $cVal3, $cString1) : bool
+    private function maskToBits(int $cndId, int &$cVal1, int $cVal2, int $cVal3, string $cString1) : bool
     {
         if ($cndId == self::CHR_CLASS)
         {
@@ -613,7 +613,7 @@ class Conditions
         return true;
     }
 
-    private function typeidToId($cndId, $cVal1, &$cVal2, &$cVal3, $cString1) : bool
+    private function typeidToId(int $cndId, int $cVal1, int &$cVal2, int &$cVal3, string $cString1) : bool
     {
         if ($cVal1 == self::TYPEID_UNIT)
         {
