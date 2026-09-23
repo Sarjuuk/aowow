@@ -267,6 +267,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
                 // link to area
                 case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUESTS_IN_ZONE:
                 case ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL_AT_AREA:
+                case ACHIEVEMENT_CRITERIA_TYPE_EXPLORE_AREA: // worldmapoverlay/id resolved to areatable/id during setup
                     $crtIcon = new IconElement(Type::ZONE, $obj, $crtName ?: ZoneList::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
                     break;
                 // link to skills
