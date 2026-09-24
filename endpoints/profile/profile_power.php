@@ -41,15 +41,11 @@ class ProfilePowerResponse extends TextResponse implements ICache
             if ($x = DB::Aowow()->selectCell('SELECT `id` FROM ::profiler_profiles WHERE `realm` = %i AND `custom` = 0 AND `name` = %s AND `renameItr` = %i', $this->realmId, Util::ucWords($this->subjectName), $renameItr ?? 0))
                 $this->typeId = $x;
         }
-
-        if (!$this->typeId)
-            $this->generate404();
     }
 
     protected function generate() : void
     {
-        $profile = new LocalProfileList(array(['id', $this->typeId]));
-        if ($profile->error || !$profile->isVisibleToUser())
+        if (!$this->typeId || ($profile = new LocalProfileList(array(['id', $this->typeId])))->error || !$profile->isVisibleToUser())
             $this->cacheType = CACHE_TYPE_NONE;
         else
         {
@@ -72,16 +68,8 @@ class ProfilePowerResponse extends TextResponse implements ICache
             );
         }
 
-        if ($_ = $profile->getField('renameItr'))
-            $ri = '-'.$_;
-
         // the 'id' must be exactly as the js requested it or the tooltip won't register
-        if ($this->subjectName)
-            $id = urlencode($this->rawParam) . ($ri ?? '');
-        else
-            $id = $this->typeId;
-
-        $this->result = new Tooltip(self::POWER_TEMPLATE, $id, $opts ?? []);
+        $this->result = new Tooltip(self::POWER_TEMPLATE, urlencode($this->rawParam), $opts ?? []);
     }
 }
 
