@@ -195,6 +195,9 @@ class LootByContainer extends Loot
      */
     public function formatListview(array $difficultyEntries = []) : array
     {
+        if (!$this->itemIds || !$this->rawLoot)
+            return [];
+
         $items = new ItemList(array(['id', $this->itemIds]));
         $this->storeJSGlobals($items->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
         $itemRows = $items->getListviewData();
