@@ -68,7 +68,10 @@ abstract class ProfileEntry extends DBTypeEntry implements ITooltip
         $this->level   = $initData['level'];
         $this->title   = $initData['title'];
 
-     // $this->talenttree        = $initData['talenttree']        ?? [0, 0, 0];
+        // todo - currently only provided for local entries
+        if (isset($initData['talenttree1']))
+            $this->talenttree        = [$initData['talenttree1'], $initData['talenttree2'], $initData['talenttree3']];
+
         $this->activespec        = $initData['activespec']        ?? 0;
         $this->achievementpoints = $initData['achievementpoints'] ?? 0;
         $this->gearscore         = $initData['gearscore']         ?? 0;
