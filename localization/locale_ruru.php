@@ -735,7 +735,7 @@ $lang = array(
             SmartEvent::EVENT_GAME_EVENT_START        => ['[event=%1$d] started', ''],
             SmartEvent::EVENT_GAME_EVENT_END          => ['[event=%1$d] ended', ''],
 /* 70*/     SmartEvent::EVENT_GO_LOOT_STATE_CHANGED   => ['State changed to: %11$s', ''],
-            SmartEvent::EVENT_GO_EVENT_INFORM         => ['Event #[b]%1$d[/b] defined in template was trigered', ''],
+            SmartEvent::EVENT_GO_EVENT_INFORM         => ['Event #[b]%1$d[/b] defined in template was triggered', ''],
             SmartEvent::EVENT_ACTION_DONE             => ['Action #[b]%1$d[/b] requested by other script', ''],
             SmartEvent::EVENT_ON_SPELLCLICK           => ['SpellClick was triggered', ''],
             SmartEvent::EVENT_FRIENDLY_HEALTH_PCT     => ['Health of #target# is at %11$s%%', 'Repeat every %s'],
