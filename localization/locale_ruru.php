@@ -669,7 +669,7 @@ $lang = array(
             SmartEvent::EVENT_HEALTH_PCT              => ['At %11$s%% Health', 'Repeat every %s'],
             SmartEvent::EVENT_MANA_PCT                => ['At %11$s%% Mana', 'Repeat every %s'],
             SmartEvent::EVENT_AGGRO                   => ['On Aggro', ''],
-            SmartEvent::EVENT_KILL                    => ['On killing (%3$d)?a player:(%4$d)?[npc=%4$d]:any creature;;', 'Cooldown: %s'],
+            SmartEvent::EVENT_KILL                    => ['On killing (%3$d)?a player:;(%4$d)?[npc=%4$d]:;(%11$d)?any creature:;', 'Cooldown: %s'],
             SmartEvent::EVENT_DEATH                   => ['On death', ''],
             SmartEvent::EVENT_EVADE                   => ['When evading', ''],
             SmartEvent::EVENT_SPELLHIT                => ['When hit by (%11$s)?%11$s :;(%1$d)?[spell=%1$d]:Spell;', 'Cooldown: %s'],

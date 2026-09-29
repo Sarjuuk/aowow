@@ -668,7 +668,7 @@ $lang = array(
             SmartEvent::EVENT_HEALTH_PCT              => ['Ab %11$s%% Gesundheit', 'Wiederhole alle %s'],
             SmartEvent::EVENT_MANA_PCT                => ['Ab %11$s%% Mana', 'Wiederhole alle %s'],
             SmartEvent::EVENT_AGGRO                   => ['Bei Aggro', ''],
-            SmartEvent::EVENT_KILL                    => ['Beim Töten (%3$d)?eines Spielers:(%4$d)?von [npc=%4$d]:einer Kreatur;;', 'Abklingzeit: %s'],
+            SmartEvent::EVENT_KILL                    => ['Beim Töten (%3$d)?eines Spielers:;(%4$d)?von [npc=%4$d]:;(%11$d)?einer Kreatur:;', 'Abklingzeit: %s'],
             SmartEvent::EVENT_DEATH                   => ['Im Tod', ''],
             SmartEvent::EVENT_EVADE                   => ['Beim Entkommen', ''],
             SmartEvent::EVENT_SPELLHIT                => ['Von (%11$s)?%11$s-:;(%1$d)?[spell=%1$d]:Zauber; getroffen', 'Abklingzeit: %s'],

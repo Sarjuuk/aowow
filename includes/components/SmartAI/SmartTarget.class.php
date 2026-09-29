@@ -97,14 +97,13 @@ class SmartTarget
 
     public function process() : string
     {
-        $target  = '';
+        $target = '';
 
         $targetTT = Lang::smartAI('targetTT', array_merge([$this->type], $this->param, $this->worldPos));
+        $tParams  = $this->targets[$this->type];
 
         for ($i = 0; $i < 4; $i++)
         {
-            $tParams = $this->targets[$this->type];
-
             if (is_array($tParams[$i]))
             {
                 [$fn, $idx, $extraParam] = $tParams[$i];
@@ -150,9 +149,9 @@ class SmartTarget
         $target = Lang::smartAI('targets', $this->type, $this->param) ?? Lang::smartAI('targetUNK', [$this->type]);
 
         // resolve conditionals
-        $i = 0;
-        while (strstr($target, ')?') && $i++ < 3)
-            $target = preg_replace_callback('/\(([^\)]*?)\)\?([^:]*):(([^;]*);*);/i', fn($m) => $m[1] ? $m[2] : $m[3], $target);
+        $target = preg_replace_callback(self::CONDITIONAL_PATTERN, fn($m) => $m[1] ? $m[2] : $m[3], $target);
+
+        $target = self::unescapeForConditional($target);
 
         // wrap in tooltip (suspend action-tooltip)
         return '[/span]'.sprintf(self::TARGET_TPL, $targetTT, $target).'[span tooltip=a-#rowIdx#]';

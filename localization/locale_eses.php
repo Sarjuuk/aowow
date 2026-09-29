@@ -669,7 +669,7 @@ $lang = array(
             SmartEvent::EVENT_HEALTH_PCT              => ['Al %11$s%% de salud', 'Repetir cada %s'],
             SmartEvent::EVENT_MANA_PCT                => ['Al %11$s%% de maná', 'Repetir cada %s'],
             SmartEvent::EVENT_AGGRO                   => ['Al entrar en combate', ''],
-            SmartEvent::EVENT_KILL                    => ['Al matar a (%3$d)?un jugador:(%4$d)?[npc=%4$d]:cualquier criatura;;', 'Enfriamiento: %s'],
+            SmartEvent::EVENT_KILL                    => ['Al matar a (%3$d)?un jugador:;(%4$d)?[npc=%4$d]:;(%11$d)cualquier criatura:;', 'Enfriamiento: %s'],
             SmartEvent::EVENT_DEATH                   => ['Al morir', ''],
             SmartEvent::EVENT_EVADE                   => ['Al evadir', ''],
             SmartEvent::EVENT_SPELLHIT                => ['Al recibir (%11$s)?%11$s :;(%1$d)?[spell=%1$d]:hechizo;', 'Enfriamiento: %s'],

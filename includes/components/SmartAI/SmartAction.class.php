@@ -345,11 +345,10 @@ class SmartAction
         $footer = '';
 
         $actionTT = Lang::smartAI('actionTT', array_merge([$this->type], $this->param));
+        $aParams  = $this->data[$this->type];
 
         for ($i = 0; $i < 5; $i++)
         {
-            $aParams = $this->data[$this->type];
-
             if (is_array($aParams[$i]))
             {
                 [$fn, $idx, $extraParam] = $aParams[$i];
@@ -402,14 +401,11 @@ class SmartAction
                 break;
             case self::ACTION_RANDOM_EMOTE:                 // 10 -> any target
                 $buff = [];
-                for ($i = 0; $i < 6; $i++)
+                foreach (array_filter($this->param) as $i => $p)
                 {
-                    if (empty($this->param[$i]))
-                        continue;
-
-                    $this->param[$i] *= -1;                 // handle creature emote
-                    $buff[] = '[emote='.$this->param[$i].']';
-                    $this->jsGlobals[Type::EMOTE][$this->param[$i]] = $this->param[$i];
+                    $this->param[$i] = -$p;                 // handle creature emote
+                    $buff[] = '[emote='.-$p.']';
+                    $this->jsGlobals[Type::EMOTE][-$p] = -$p;
                 }
                 $this->param[10] = Lang::concat($buff, Lang::CONCAT_OR);
                 break;
@@ -451,12 +447,7 @@ class SmartAction
                 }
                 break;
             case self::ACTION_RANDOM_PHASE:                 // 30 -> self
-                $buff = [];
-                for ($i = 0; $i < 7; $i++)
-                    if ($_ = $this->param[$i])
-                        $buff[] = $_;
-
-                $this->param[10] = Lang::concat($buff);
+                $this->param[10] = Lang::concat(array_filter($this->param));
                 break;
             case self::ACTION_ACTIVATE_TAXI:                // 52 -> invoker
                 $nodes = DB::Aowow()->selectRow(
@@ -467,8 +458,8 @@ class SmartAction
                     WHERE  tp.`id` = %i',
                     Lang::getLocale()->value, Lang::getLocale()->value, Lang::getLocale()->value, Lang::getLocale()->value, $this->param[0]
                 );
-                $this->param[10] = Util::localizedString($nodes, 'start');
-                $this->param[11] = Util::localizedString($nodes, 'end');
+                $this->param[10] = self::escapeForConditional(Util::localizedString($nodes, 'start'));
+                $this->param[11] = self::escapeForConditional(Util::localizedString($nodes, 'end'));
                 break;
             case self::ACTION_SET_INGAME_PHASE_MASK:        // 44 -> any target
                 if ($this->param[0])
@@ -497,7 +488,7 @@ class SmartAction
                 break;
             case self::ACTION_SET_ORIENTATION:              // 66 -> any target
                 if ($this->smartAI->getTarget()->type == SmartTarget::TARGET_POSITION)
-                    $this->param[10] = Util::O2Deg($this->smartAI->getTarget()->getWorldPos()[3])[1];
+                    $this->param[10] = self::escapeForConditional(Util::O2Deg($this->smartAI->getTarget()->getWorldPos()[3])[1]);
                 else if ($this->smartAI->getTarget()->type != SmartTarget::TARGET_SELF)
                     $this->param[10] = '#target#';
                 break;
@@ -553,11 +544,11 @@ class SmartAction
                 $footer = true;
                 break;
             case self::ACTION_CALL_TIMED_ACTIONLIST:        // 80 -> any target
-                $this->param[10] = match ($this->param[1])
+                $this->param[10] = self::escapeForConditional(match ($this->param[1])
                 {
                     0, 1, 2 => Lang::smartAI('saiUpdate', $this->param[1]),
                     default => Lang::smartAI('saiUpdateUNK', [$this->param[1]])
-                };
+                });
 
                 $tal = new SmartAI(SmartAI::SRC_TYPE_ACTIONLIST, $this->param[0], ['baseEntry' => $this->smartAI->getEntry()]);
                 $tal->prepare();
@@ -572,21 +563,18 @@ class SmartAction
                 break;
             case self::ACTION_CALL_KILLEDMONSTER:           // 33: Note: If target is SMART_TARGET_NONE (0) or SMART_TARGET_SELF (1), the kill is credited to all players eligible for loot from this creature.
                 if ($this->smartAI->getTarget()->type == SmartTarget::TARGET_SELF || $this->smartAI->getTarget()->type == SmartTarget::TARGET_NONE)
-                    $this->param[10] = (new SmartTarget($this->id, SmartTarget::TARGET_LOOT_RECIPIENTS, [], [], $this->smartAI))->process();
+                    $this->param[10] = self::escapeForConditional((new SmartTarget($this->id, SmartTarget::TARGET_LOOT_RECIPIENTS, [], [], $this->smartAI))->process());
                 break;
             case self::ACTION_CROSS_CAST:                   // 86 -> entity by TargetingBlock(param3, param4, param5, param6) cross cast spell <param1> at any target
-                $this->param[10] = (new SmartTarget($this->id, $this->param[2], [$this->param[3], $this->param[4], $this->param[5]], [], $this->smartAI))->process();
+                $this->param[10] = self::escapeForConditional((new SmartTarget($this->id, $this->param[2], [$this->param[3], $this->param[4], $this->param[5]], [], $this->smartAI))->process());
                 break;
             case self::ACTION_CALL_RANDOM_TIMED_ACTIONLIST: // 87 -> self
                 $talBuff = [];
-                for ($i = 0; $i < 6; $i++)
+                foreach (array_filter($this->param) as $i => $p)
                 {
-                    if (!$this->param[$i])
-                        continue;
+                    $talBuff[] = sprintf(self::TAL_TAB_ANCHOR, $p);
 
-                    $talBuff[] = sprintf(self::TAL_TAB_ANCHOR, $this->param[$i]);
-
-                    $tal = new SmartAI(SmartAI::SRC_TYPE_ACTIONLIST, $this->param[$i], ['baseEntry' => $this->smartAI->getEntry()]);
+                    $tal = new SmartAI(SmartAI::SRC_TYPE_ACTIONLIST, $p, ['baseEntry' => $this->smartAI->getEntry()]);
                     $tal->prepare();
 
                     $this->smartAI->css .= $tal->css;
@@ -625,17 +613,13 @@ class SmartAction
                 array_splice($this->param, 11, replacement: $this->smartAI->getTarget()->getWorldPos());
                 break;
             case self::ACTION_SUMMON_CREATURE_GROUP:        // 107 -> untargeted
-                if ($this->summons === null)
-                    $this->summons = DB::World()->selectCol('SELECT `groupId` AS ARRAY_KEY, `entry` AS ARRAY_KEY2, COUNT(*) AS "n" FROM creature_summon_groups WHERE `summonerId` = %i GROUP BY `groupId`, `entry`', $this->smartAI->getEntry());
+                $this->summons ??= DB::World()->selectCol('SELECT `groupId` AS ARRAY_KEY, `entry` AS ARRAY_KEY2, COUNT(*) AS "n" FROM creature_summon_groups WHERE `summonerId` = %i GROUP BY `groupId`, `entry`', $this->smartAI->getEntry());
 
                 $buff = [];
-                if (!empty($this->summons[$this->param[0]]))
+                foreach ($this->summons[$this->param[0]] ?? [] as $id => $n)
                 {
-                    foreach ($this->summons[$this->param[0]] as $id => $n)
-                    {
-                        $this->jsGlobals[Type::NPC][$id] = $id;
-                        $buff[] = $n.'x [npc='.$id.']';
-                    }
+                    $this->jsGlobals[Type::NPC][$id] = $id;
+                    $buff[] = $n.'x [npc='.$id.']';
                 }
 
                 if ($buff)
@@ -645,31 +629,28 @@ class SmartAction
                 $this->param[10] = Lang::concat(array_filter($this->param), Lang::CONCAT_OR, fn($x) => '#[b]'.$x.'[/b]');
                 break;
             case self::ACTION_RANDOM_SOUND:                 // 115 -> self
-                for ($i = 0; $i < 4; $i++)
+                foreach (array_filter($this->param) as $i => $p)
                 {
-                    if ($x = $this->param[$i])
-                    {
-                        $this->jsGlobals[Type::SOUND][$x] = $x;
-                        $this->param[10] .= '[sound='.$x.']';
-                    }
+                    $this->jsGlobals[Type::SOUND][$p] = $p;
+                    $this->param[10] .= '[sound='.$p.']';
                 }
 
                 if ($this->param[5])
                     $footer = true;
                 break;
             case self::ACTION_GO_SET_GO_STATE:              // 118 -> ???
-                $this->param[10] = match ($this->param[0])
+                $this->param[10] = self::escapeForConditional(match ($this->param[0])
                 {
                     0, 1, 2 => Lang::smartAI('GOStates', $this->param[0]),
                     default => Lang::smartAI('GOStateUNK', [$this->param[0]])
-                };
+                });
                 break;
             case self::ACTION_REMOVE_AURAS_BY_TYPE:         // 120 -> any target
-                $this->param[10] = Lang::spell('auras', $this->param[0]);
+                $this->param[10] = self::escapeForConditional(Lang::spell('auras', $this->param[0]));
                 break;
             case self::ACTION_SPAWN_SPAWNGROUP:             // 131
             case self::ACTION_DESPAWN_SPAWNGROUP:           // 132
-                $this->param[10] = Util::jsEscape(DB::World()->selectCell('SELECT `GroupName` FROM spawn_group_template WHERE `groupId` = %i', $this->param[0]));
+                $this->param[10] = self::escapeForConditional(Util::jsEscape(DB::World()->selectCell('SELECT `GroupName` FROM spawn_group_template WHERE `groupId` = %i', $this->param[0])));
                 $entities = DB::World()->selectAssoc('SELECT `spawnType` AS "0", `spawnId` AS "1" FROM spawn_group WHERE `groupId` = %i',  $this->param[0]);
 
                 $n = 5;
@@ -695,7 +676,7 @@ class SmartAction
                 if (count($entities) > 5)
                     $buff[] = '+'.(count($entities) - 5).'…';
 
-                $this->param[12] = '[ul][li]'.implode('[/li][li]', $buff).'[/li][/ul]';
+                $this->param[12] = self::escapeForConditional('[ul][li]'.implode('[/li][li]', $buff).'[/li][/ul]');
 
                 // i'd like this stored in $data but numRange can only handle msec
                 if ($time = $this->numRange($this->param[1] * 1000, $this->param[2] * 1000, true))
@@ -728,7 +709,7 @@ class SmartAction
                         foreach ($quotes as ['text' => $text])
                         {
                             $talkTarget = ($talkTarget ?? true) ? Lang::game('target') : $npcSrc;
-                            $this->param[10] .= sprintf($text, $playerSrc ? Lang::main('thePlayer') : $npcSrc, $talkTarget);
+                            $this->param[10] .= self::escapeForConditional(sprintf($text, $playerSrc ? Lang::main('thePlayer') : $npcSrc, $talkTarget));
                         }
                     }
                 }
@@ -744,13 +725,11 @@ class SmartAction
             $footer = Lang::smartAI('actions', $this->type, 1, (array)$footer);
 
         // resolve conditionals
-        $i = 0;
-        while (strstr($body, ')?') && $i++ < 3)
-            $body   = preg_replace_callback('/\(([^\)]*?)\)\?([^:]*):(([^;]*);*);/i', fn($m) => $m[1] ? $m[2] : $m[3], $body);
+        $body   = preg_replace_callback(self::CONDITIONAL_PATTERN, fn($m) => $m[1] ? $m[2] : $m[3], $body);
+        $footer = preg_replace_callback(self::CONDITIONAL_PATTERN, fn($m) => $m[1] ? $m[2] : $m[3], $footer);
 
-        $i = 0;
-        while (strstr($footer, ')?') && $i++ < 3)
-            $footer = preg_replace_callback('/\(([^\)]*?)\)\?([^:]*):(([^;]*);*);/i', fn($m) => $m[1] ? $m[2] : $m[3], $footer);
+        $body   = self::unescapeForConditional($body);
+        $footer = self::unescapeForConditional($footer);
 
         // wrap body in tooltip
         return [sprintf(self::ACTION_CELL_TPL, $actionTT, $body), $footer];

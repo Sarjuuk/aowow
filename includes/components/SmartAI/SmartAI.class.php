@@ -207,6 +207,29 @@ trait SmartHelper
     {
         return Lang::getMagicSchools($x);
     }
+
+
+    /********************************/
+    /* string conditionals handling */
+    /********************************/
+
+    public const string CONDITIONAL_PATTERN = '/\(([^\)]*?)\)(?<!\\\\)\?(.*?)(?<!\\\\):(.*?)(?<!\\\\);/';
+
+    private const array ESC_PAIRS = array(
+        '\\' => '',   '?' => '\?',
+        ':'  => '\:', ';' => '\;'
+    );
+
+    public static function escapeForConditional(string $text)
+    {
+        return strtr($text, self::ESC_PAIRS);
+    }
+
+    public static function unescapeForConditional(string $text)
+    {
+        // skip the '' => '\\' replacement
+        return strtr($text, array_flip(array_filter(self::ESC_PAIRS)));
+    }
 }
 
 class SmartAI
@@ -510,7 +533,8 @@ class SmartAI
             SmartAction::ACTION_SPAWN_SPAWNGROUP        => [1]
         );
 
-        $result = self::getOwnerAction($srcType, $entry, $lookup, $moreInfo);
+        $moreInfo = [];
+        $result   = self::getOwnerAction($srcType, $entry, $lookup, $moreInfo);
 
         // can skip lookups for SmartAction::ACTION_SUMMON_CREATURE_GROUP as creature_summon_groups already contains summoner info
         if ($srcType == self::SRC_TYPE_CREATURE || $srcType == self::SRC_TYPE_OBJECT)
@@ -539,7 +563,8 @@ class SmartAI
             SmartAction::ACTION_SPAWN_SPAWNGROUP => [1]
         );
 
-        $result = self::getOwnerAction($srcType, $entry, $lookup, $moreInfo);
+        $moreInfo = [];
+        $result   = self::getOwnerAction($srcType, $entry, $lookup, $moreInfo);
 
         if (!empty($moreInfo[SmartAction::ACTION_SPAWN_SPAWNGROUP]))
         {

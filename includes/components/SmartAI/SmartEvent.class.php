@@ -240,13 +240,12 @@ class SmartEvent
         $body   =
         $footer = '';
 
-        $phases = Util::mask2bits($this->phaseMask, 1) ?: [0];
+        $phases  = Util::mask2bits($this->phaseMask, 1) ?: [0];
         $eventTT = Lang::smartAI('eventTT', array_merge([$this->type, $phases, $this->chance, $this->flags], $this->param));
+        $eParams = $this->data[$this->type];
 
         for ($i = 0; $i < 5; $i++)
         {
-            $eParams = $this->data[$this->type];
-
             if (is_array($eParams[$i]))
             {
                 [$fn, $idx, $extraParam] = $eParams[$i];
@@ -275,24 +274,31 @@ class SmartEvent
                         $this->param[0] == 2,
                     );
                 break;
+            case self::EVENT_KILL:                          // 5   -  On Creature Kill
+                $this->param[10] = !$this->param[2] && !$this->param[3];
+                break;
             case self::EVENT_RESPAWN:                       // 11  -  On Creature/Gameobject Respawn in Zone/Map
                 if ($this->param[0] == 1)                   // per map
                 {
-                    switch ($this->param[1])
+                    $this->param[10] = match ($this->param[1])
                     {
-                        case 0:   $this->param[10] = Lang::maps('EasternKingdoms'); break;
-                        case 1:   $this->param[10] = Lang::maps('Kalimdor');        break;
-                        case 530: $this->param[10] = Lang::maps('Outland');         break;
-                        case 571: $this->param[10] = Lang::maps('Northrend');       break;
-                        default:
-                            if ($aId = DB::Aowow()->selectCell('SELECT `id` FROM ::zones WHERE `mapId` = %i', $this->param[1]))
-                            {
-                                $this->param[11] = $aId;
-                                $this->jsGlobals[Type::ZONE][$aId] = $aId;
-                            }
-                            else
-                                $this->param[11] = '[span class=q10]Unknown Map[/span] #'.$this->param[1];
+                        0       => Lang::maps('EasternKingdoms'),
+                        1       => Lang::maps('Kalimdor'),
+                        530     => Lang::maps('Outland'),
+                        571     => Lang::maps('Northrend'),
+                        default => 0
                     };
+
+                    if (empty($this->param[10]))
+                    {
+                        if ($aId = DB::Aowow()->selectCell('SELECT `id` FROM ::zones WHERE `mapId` = %i', $this->param[1]))
+                        {
+                            $this->param[11] = $aId;
+                            $this->jsGlobals[Type::ZONE][$aId] = $aId;
+                        }
+                        else
+                            $this->param[11] = '[span class=q10]Unknown Map[/span] #'.$this->param[1];
+                    }
                 }
                 else if ($this->param[0] == 2)              // per zone
                     $this->param[11] = $this->param[2];
@@ -313,7 +319,7 @@ class SmartEvent
 
                 if ($gmo)
                 {
-                    $this->param[10]  = Util::localizedString($gmo, 'text');
+                    $this->param[10]  = self::escapeForConditional(Util::localizedString($gmo, 'text'));
                     $this->param[11]  = 'gossip';
                     $this->param[11] .= match($gmo['OptionIcon'])
                     {
@@ -369,13 +375,11 @@ class SmartEvent
             $footer = Lang::smartAI('events', $this->type, 1, (array)$footer);
 
         // resolve conditionals
-        $i = 0;
-        while (strstr($body, ')?') && $i++ < 3)
-            $body   = preg_replace_callback('/\(([^\)]*?)\)\?([^:]*):(([^;]*);*);/i', fn($m) => $m[1] ? $m[2] : $m[3], $body);
+        $body   = preg_replace_callback(self::CONDITIONAL_PATTERN, fn($m) => $m[1] ? $m[2] : $m[3], $body);
+        $footer = preg_replace_callback(self::CONDITIONAL_PATTERN, fn($m) => $m[1] ? $m[2] : $m[3], $footer);
 
-        $i = 0;
-        while (strstr($footer, ')?') && $i++ < 3)
-            $footer = preg_replace_callback('/\(([^\)]*?)\)\?([^:]*):(([^;]*);*);/i', fn($m) => $m[1] ? $m[2] : $m[3], $footer);
+        $body   = self::unescapeForConditional($body);
+        $footer = self::unescapeForConditional($footer);
 
         if ($_ = $this->formatFlags())
             $footer = $_ . ($footer ? '; '.$footer : '');
