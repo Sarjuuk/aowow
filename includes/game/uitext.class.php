@@ -198,8 +198,8 @@ final class UIText
         if (strpos($text, '|') === false)
             return $text;
 
-        // line break                    |n
-        $text = preg_replace_callback('/\|n/i', function ($m) use ($fmt)
+        // line break                           |n
+        $text = preg_replace_callback('/(?<!\|)\|n/i', function ($m) use ($fmt)
             {
                 switch ($fmt)
                 {
@@ -214,8 +214,8 @@ final class UIText
                 }
             }, $text);
 
-        // color                         |c<aarrggbb><word>|r
-        $text = preg_replace_callback('/\|c([[:xdigit:]]{2})([[:xdigit:]]{6})(.+?)\|r/is', function ($m) use ($fmt)
+        // color                                |c<aarrggbb><word>|r
+        $text = preg_replace_callback('/(?<!\|)\|c([[:xdigit:]]{2})([[:xdigit:]]{6})(.+?)\|r/is', function ($m) use ($fmt)
             {
                 [$_, $a, $rgb, $text] = $m;
 
@@ -232,8 +232,8 @@ final class UIText
                 }
             }, $text);
 
-        // icon                          |T<imgPath+File.blp>:0:0:0:-1|t
-        $text = preg_replace_callback('/\|T([\w]+\\\)*([^\.:]+)(?:\.blp)?:([^\|]+)\|t/i', function ($m) use ($fmt)
+        // icon                                 |T<imgPath+File.blp>:0:0:0:-1|t
+        $text = preg_replace_callback('/(?<!\|)\|T([\w]+\\\)*([^\.:]+)(?:\.blp)?:([^\|]+)\|t/i', function ($m) use ($fmt)
             {
                 /* iconParam - size1, size2, xoffset, yoffset
                     size1 == 0; size2 omitted: Width = Height = TextHeight (always square!)
@@ -258,8 +258,8 @@ final class UIText
                 }
             }, $text);
 
-        // hyperlink                     |H<hyperlinkStruct>|h<name>|h
-        $text = preg_replace_callback('/\|H([^:]+):([^\|]+)\|h([^\|]+)\|h/i', function ($m) use ($fmt)
+        // hyperlink                            |H<hyperlinkStruct>|h<name>|h
+        $text = preg_replace_callback('/(?<!\|)\|H([^:]+):([^\|]+)\|h([^\|]+)\|h/i', function ($m) use ($fmt)
             {
                 /*  type            Params
                     |Hchannel       channelName, channelname == CHANNEL ? channelNr : null
@@ -316,8 +316,8 @@ final class UIText
                 }
             }, $text);
 
-        // |1 - digit singular/plural    <number>|1<singular;<plural>; - Will choose a word depending on whether the digit preceding it is 0/1 or not (i.e. 1,11,21 return the first string, as will 0,10,40). Note that unlike |4 singular and plural forms are separated by semi-colon.
-        $text = preg_replace_callback('/(\d+)\s*\|1([^;]+);([^;]+);/is', function ($m)
+        // |1 - digit singular/plural          <number>|1<singular;<plural>; - Will choose a word depending on whether the digit preceding it is 0/1 or not (i.e. 1,11,21 return the first string, as will 0,10,40). Note that unlike |4 singular and plural forms are separated by semi-colon.
+        $text = preg_replace_callback('/(\d+) *(?<!\|)\|1([^;]+);([^;]+);/is', function ($m)
             {
                 [$_, $num, $singular, $plural] = $m;
 
@@ -331,8 +331,8 @@ final class UIText
                 }
             }, $text);
 
-        // |2 - frFR preposition: de     |2 <word> - Before vowels outputs d' (with apostrophe) and removes any leading spaces from text, otherwise outputs de (with trailing space)
-        $text = preg_replace_callback('/\|2\s?(.)/i', function ($m)
+        // |2 - frFR preposition: de            |2 <word> - Before vowels outputs d' (with apostrophe) and removes any leading spaces from text, otherwise outputs de (with trailing space)
+        $text = preg_replace_callback('/(?<!\|)\|2 ?(.)/i', function ($m)
             {
                 [$_, $char] = $m;
 
@@ -352,8 +352,8 @@ final class UIText
                 }
             }, $text);
 
-        // |3 - ruRU declinations        |3-<caseIdx>(<word>) - Displays text declined to the specified form (index ranges from 1 to GetNumDeclensionSets()).
-        $text = preg_replace_callback('/\|3-(\d+)\(([^\)]+)\)/iu', function ($m)
+        // |3 - ruRU declinations               |3-<caseIdx>(<word>) - Displays text declined to the specified form (index ranges from 1 to GetNumDeclensionSets()).
+        $text = preg_replace_callback('/(?<!\|)\|3-(\d+)\(([^\)]+)\)/iu', function ($m)
             {
                 [$_, $caseIdx, $word] = $m;
 
@@ -369,8 +369,8 @@ final class UIText
                 return $word;
             }, $text);
 
-        // |4 - numeric switch           <number>           |4<singular>:<plural>[:<plural2>]; - Will choose a form based on the number preceding it. More than two forms (separated by colons) may be required by locale 8 (ruRU).
-        $text = preg_replace_callback('/([\d\.\,]+)([^\d]*)\|4([^:]*):([^:;]+)(?::([^;]+))?;/is', function ($m)
+        // |4 - numeric switch           <number>                  |4<singular>:<plural>[:<plural2>]; - Will choose a form based on the number preceding it. More than two forms (separated by colons) may be required by locale 8 (ruRU).
+        $text = preg_replace_callback('/([\d\.\,]+)([^\d]*)(?<!\|)\|4([^:]*):([^:;]+)(?::([^;]+))?;/is', function ($m)
             {
                 [$_, $num, $pad, $singular, $plural1, $plural2] = array_pad($m, 6, null);
 
@@ -389,7 +389,8 @@ final class UIText
                 return $num . $pad . $plural2;
             }, $text);
 
-        return $text;
+        // unescape escaped ui sequences
+        return strtr($text, ['||' => '|']);
     }
 }
 
