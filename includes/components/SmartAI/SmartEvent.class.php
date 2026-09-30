@@ -242,7 +242,7 @@ class SmartEvent
 
         $phases  = Util::mask2bits($this->phaseMask, 1) ?: [0];
         $eventTT = Lang::smartAI('eventTT', array_merge([$this->type, $phases, $this->chance, $this->flags], $this->param));
-        $eParams = $this->data[$this->type];
+        $eParams = self::$data[$this->type];
 
         for ($i = 0; $i < 5; $i++)
         {

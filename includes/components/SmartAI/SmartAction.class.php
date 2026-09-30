@@ -345,7 +345,7 @@ class SmartAction
         $footer = '';
 
         $actionTT = Lang::smartAI('actionTT', array_merge([$this->type], $this->param));
-        $aParams  = $this->data[$this->type];
+        $aParams  = self::$data[$this->type];
 
         for ($i = 0; $i < 5; $i++)
         {
