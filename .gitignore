@@ -1,3 +1,11 @@
+# Environment
+.env*
+!.env*dist
+
+# Docker
+compose.override.yaml
+docker/aowow/etc/msmtprc.override
+
 # cache
 /cache/*
 
