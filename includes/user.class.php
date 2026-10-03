@@ -31,23 +31,9 @@ class User
     {
         # set ip #
 
-        $ipAddr = '';
-        foreach (['HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED', 'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED', 'REMOTE_ADDR'] as $env)
-        {
-            if ($rawIp = getenv($env))
-            {
-                if ($env == 'HTTP_X_FORWARDED')
-                    $rawIp = explode(',', $rawIp)[0];       // [ip, proxy1, proxy2]
-
-                if ($ipAddr = filter_var($rawIp, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4))
-                    break;
-
-                if ($ipAddr = filter_var($rawIp, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6))
-                    break;
-            }
-        }
-
-        self::$ip = $ipAddr ?: null;
+        // Only the SAPI peer is authoritative. Proxy rewriting belongs to an explicit web-server trust policy.
+        $peer = $_SERVER['REMOTE_ADDR'] ?? null;
+        self::$ip = is_string($peer) && filter_var($peer, FILTER_VALIDATE_IP) !== false ? $peer : null;
 
 
         # set locale #
@@ -63,7 +49,7 @@ class User
         # set basic data #
 
         if (empty($_SESSION['dataKey']))                    // session have a dataKey to access the JScripts (yes, also the anons)
-            $_SESSION['dataKey'] = Util::createHash();      // just some random numbers for identification purpose
+            $_SESSION['dataKey'] = Util::createHash();      // unguessable session identifier for script data access
 
         self::$dataKey = $_SESSION['dataKey'];
         self::$agent   = $_SERVER['HTTP_USER_AGENT'] ?? '';
@@ -79,7 +65,7 @@ class User
             if ($ipBan['count'] > Cfg::get('ACC_FAILED_AUTH_COUNT') && $ipBan['active'])
                 return false;
             else if (!$ipBan['active'])
-                DB::Aowow()->qry('DELETE FROM ::account_bannedips WHERE `ip` = %s', self::$ip);
+                DB::Aowow()->qry('DELETE FROM ::account_bannedips WHERE `ip` = %s AND `type` = %i', self::$ip, IP_BAN_TYPE_LOGIN_ATTEMPT);
         }
 
 
@@ -115,6 +101,15 @@ class User
             // Don't know why, don't know how .. doesn't matter, both parties are out.
             DB::Aowow()->qry('UPDATE ::account_sessions SET `touched` = %i, `status` = %i WHERE `userId` IN %in AND `status` = %i', time(), SESSION_FORCED_LOGOUT, [$userData['id'], $session['userId']], SESSION_ACTIVE);
             trigger_error('User::init - tried to resume session "'.session_id().'" of user #'.$_SESSION['user'].' linked to session data for user #'.$session['userId'].' Kicked both!', E_USER_WARNING);
+            self::destroy();
+            return false;
+        }
+        else if (Cfg::get('ACC_AUTH_MODE') == AUTH_MODE_SELF &&
+            (!is_string($_SESSION['passwordVersion'] ?? null) ||
+             !hash_equals(hash('sha256', $userData['passHash']), $_SESSION['passwordVersion'])))
+        {
+            // Bind sessions to the password verified at signin, including signins racing with recovery.
+            DB::Aowow()->qry('UPDATE ::account_sessions SET `touched` = %i, `status` = %i WHERE `sessionId` = %s AND `status` = %i', time(), SESSION_FORCED_LOGOUT, session_id(), SESSION_ACTIVE);
             self::destroy();
             return false;
         }
@@ -231,11 +226,15 @@ class User
 
     public static function authenticate(string $login, #[\SensitiveParameter] string $password) : int
     {
+        if (!Util::validatePasswordInput($password))
+            return AUTH_WRONGPASS;
+
         $userId = 0;
+        $passwordVersion = null;
 
         $result = match (Cfg::get('ACC_AUTH_MODE'))
         {
-            AUTH_MODE_SELF     => self::authSelf($login, $password, $userId),
+            AUTH_MODE_SELF     => self::authSelf($login, $password, $userId, $passwordVersion),
             AUTH_MODE_REALM    => self::authRealm($login, $password, $userId),
             AUTH_MODE_EXTERNAL => self::authExtern($login, $password, $userId),
             default            => AUTH_INTERNAL_ERR
@@ -246,26 +245,18 @@ class User
         {
             session_unset();
             $_SESSION['user'] = $userId;
+            if ($passwordVersion !== null)
+                $_SESSION['passwordVersion'] = $passwordVersion;
             self::$id = $userId;
         }
 
         return $result;
     }
 
-    private static function authSelf(string $nameOrEmail, #[\SensitiveParameter] string $password, int &$userId) : int
+    private static function authSelf(string $nameOrEmail, #[\SensitiveParameter] string $password, int &$userId, ?string &$passwordVersion) : int
     {
         if (!self::$ip)
             return AUTH_INTERNAL_ERR;
-
-        // handle login try limitation
-        $ipBan = DB::Aowow()->selectRow('SELECT `ip`, `count`, IF(`unbanDate` > UNIX_TIMESTAMP(), 1, 0) AS "active" FROM ::account_bannedips WHERE `type` = %i AND `ip` = %s', IP_BAN_TYPE_LOGIN_ATTEMPT, self::$ip);
-        if (!$ipBan || !$ipBan['active'])                   // no entry exists or time expired; set count to 1
-            DB::Aowow()->qry('REPLACE INTO ::account_bannedips (`ip`, `type`, `count`, `unbanDate`) VALUES (%s, %i, 1, UNIX_TIMESTAMP() + %i)', self::$ip, IP_BAN_TYPE_LOGIN_ATTEMPT, Cfg::get('ACC_FAILED_AUTH_BLOCK'));
-        else                                                // entry already exists; increment count
-            DB::Aowow()->qry('UPDATE ::account_bannedips SET `count` = `count` + 1, `unbanDate` = UNIX_TIMESTAMP() + %i WHERE `ip` = %s', Cfg::get('ACC_FAILED_AUTH_BLOCK'), self::$ip);
-
-        if ($ipBan && $ipBan['count'] >= Cfg::get('ACC_FAILED_AUTH_COUNT') && $ipBan['active'])
-            return AUTH_IPBANNED;
 
         $email = filter_var($nameOrEmail, FILTER_VALIDATE_EMAIL);
 
@@ -279,14 +270,30 @@ class User
             ACC_STATUS_DELETED
         );
 
+        // Reserve durable peer/account work before any bcrypt operation, including successful attempts.
+        $budget = PasswordBudget::reserve($query ? (int)$query['id'] : null);
+        if ($budget !== PasswordBudget::OK)
+            return $budget === PasswordBudget::BLOCKED ? AUTH_IPBANNED : AUTH_INTERNAL_ERR;
+
         if (!$query)
             return AUTH_WRONGUSER;
 
         if (!self::verifyCrypt($password, $query['passHash']))
             return AUTH_WRONGPASS;
 
-        // successfull auth; clear bans for this IP
-        DB::Aowow()->qry('DELETE FROM ::account_bannedips WHERE `type` = %i AND `ip` = %s', IP_BAN_TYPE_LOGIN_ATTEMPT, self::$ip);
+        // Upgrade weaker bcrypt work factors with a compare-and-swap; never downgrade existing cost 15 hashes.
+        $info = password_get_info($query['passHash']);
+        if (($info['algoName'] ?? '') === 'bcrypt' && ($info['options']['cost'] ?? 0) < self::BCRYPT_COST &&
+            password_needs_rehash($query['passHash'], PASSWORD_BCRYPT, ['cost' => self::BCRYPT_COST]) && Util::validatePassword($password))
+        {
+            $newHash = self::hashCrypt($password);
+            $changed = DB::Aowow()->qry('UPDATE ::account SET `passHash` = %s WHERE `id` = %i AND BINARY `passHash` = BINARY %s', $newHash, $query['id'], $query['passHash']);
+            if ($changed !== 1)
+                return $changed === 0 ? AUTH_WRONGPASS : AUTH_INTERNAL_ERR;
+            $query['passHash'] = $newHash;
+        }
+
+        $passwordVersion = hash('sha256', $query['passHash']);
 
         if ($query['bans'] & (ACC_BAN_PERM | ACC_BAN_TEMP))
             return AUTH_BANNED;
@@ -379,15 +386,21 @@ class User
         return $newId ?: 0;
     }
 
+    public const int BCRYPT_COST = 12;
+
     // crypt used by us
     public static function hashCrypt(#[\SensitiveParameter] string $pass) : string
     {
-        return password_hash($pass, PASSWORD_BCRYPT, ['cost' => 15]);
+        if (!Util::validatePassword($pass) || strlen($pass) > Util::PASSWORD_MAX_BYTES)
+            throw new \InvalidArgumentException('Invalid new password.');
+
+        return password_hash($pass, PASSWORD_BCRYPT, ['cost' => self::BCRYPT_COST]);
     }
 
     public static function verifyCrypt(#[\SensitiveParameter] string $pass, string $hash) : bool
     {
-        return password_verify($pass, $hash);
+        // Retain legacy bcrypt truncation only for bounded existing credentials; new passwords never truncate.
+        return Util::validatePasswordInput($pass) !== '' && password_verify($pass, $hash);
     }
 
     // SRP6 used by TC

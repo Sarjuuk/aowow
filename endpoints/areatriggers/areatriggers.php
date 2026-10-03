@@ -89,12 +89,12 @@ class AreatriggersBaseResponse extends TemplateResponse implements ICache
             // create note if search limit was exceeded; overwriting 'note' is intentional
             if ($trigger->getMatches() > Listview::DEFAULT_SIZE)
             {
-                $tabData['note'] = sprintf(Util::$tryFilteringEntityString, $trigger->getMatches(), '"'.Lang::game('areatriggers').'"', Listview::DEFAULT_SIZE);
+                $tabData['note'] = new JsExpression(substr(sprintf(Util::$tryFilteringEntityString, $trigger->getMatches(), '"'.Lang::game('areatriggers').'"', Listview::DEFAULT_SIZE), 1));
                 $tabData['_truncated'] = 1;
             }
         }
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")]);
 
         $this->lvTabs->addListviewTab(new Listview($tabData, AreaTriggerList::$brickFile, 'areatrigger'));
 

@@ -41,11 +41,10 @@ class UploadImagecropResponse extends TemplateResponse
 
         $this->h1 = Lang::account('avatarSubmit');
 
-        $fileBase   = User::$username.'-avatar-'.$this->nextId.'-'.$this->imgHash;
         $dimensions = AvatarMgr::calcImgDimensions();
 
         $this->cropper = $dimensions + array(
-            'url'        => Cfg::get('STATIC_URL').'/uploads/temp/'.$fileBase.'.jpg',
+            'url'        => PrivateUpload::tempUrl('avatar', $this->imgHash),
             'parent'     => 'av-container',
             'minCrop'    => ICON_SIZE_LARGE,                // optional; defaults to 150 - min selection size (a square)
             'type'       => Type::NPC,                      // NPC: 15384 [OLDWorld Trigger (DO NOT DELETE)]
@@ -58,6 +57,9 @@ class UploadImagecropResponse extends TemplateResponse
 
     private function handleUpload() : string
     {
+        if (!ContributionBudget::reserve('avatar'))
+            return ContributionBudget::error();
+
         if (!AvatarMgr::init())
             return Lang::main('intError');
 

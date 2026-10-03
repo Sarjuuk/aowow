@@ -224,6 +224,10 @@ $lang = array(
         'pm'            => "p.m.",
 
         // error
+        'contributionLimit' => 'Has alcanzado el límite de contribuciones. Inténtalo más tarde o contacta con un moderador.',
+        'commentsPage' => 'Página de comentarios %d de %d',
+        'previousComments' => 'Comentarios anteriores',
+        'nextComments' => 'Comentarios siguientes',
         'intError'      => "Un error interno ha ocurrido.",
         'intError2'     => "Un error interno ha ocurrido. (%s)",
         'genericError'  => "Ha ocurrido un error; refresca la página e inténtalo de nuevo. Si el error persiste manda un correo a <a href='#contact'>feedback</a>", # LANG.genericerror
@@ -1044,7 +1048,7 @@ $lang = array(
      // 'accInactive'   => "That account has not yet been confirmed active.",
         'errNameLength' => "Tu nombre de usuario tiene que tener por lo menos cuatro caracteres.", // message_usernamemin
         'errNameChars'  => "Tu nombre de usuario solo puede contener números y letras.", // message_usernamenotvalid
-        'errPassLength' => "Tu contraseña tiene que tener por lo menos seis caracteres.", // message_passwordmin
+        'errPassLength' => "Usa al menos 15 caracteres y como máximo 72 bytes UTF-8 (algunos caracteres usan varios bytes).", // message_passwordmin
         'passMismatch'  => "La contraseña que ingresó no concuerdan.",
         'nameInUse'     => "El nombre de usuario ya se encuentra utilzado",
         'mailInUse'     => "El correo electrónico ya se encuentra registrado a una cuenta",
@@ -1082,6 +1086,7 @@ $lang = array(
         'purge'         => "Purgar",
         'curPass'       => "Contraseña actual:",
         'globalLogout'  => "Cerrar sesión en todos los otros navegadores/dispositivos",
+        'passwordLogoutNote' => "Al confirmar el cambio de contraseña, se cerrará la sesión en todos los navegadores/dispositivos, incluido este.",
         'curEmail'      => "Dirección de correo electrónico actual",
         'newEmail'      => "Dirección de correo electrónico nueva",
         'userPage'      => "Página de usuario",

@@ -1204,16 +1204,13 @@ qq.extend(qq.UploadHandlerForm.prototype, {
         var doc = iframe.contentDocument ? iframe.contentDocument: iframe.contentWindow.document,
             response;
 
-        var innerHTML = doc.body.innerHTML;
-        this.log("converting iframe's innerHTML to JSON");
-        this.log("innerHTML = " + innerHTML);
-        //plain text response may be wrapped in <pre> tag
-        if (innerHTML.slice(0, 5).toLowerCase() == '<pre>' && innerHTML.slice(-6).toLowerCase() == '</pre>') {
-          innerHTML = doc.body.firstChild.firstChild.nodeValue;
-        }
+        // Plain JSON responses can be wrapped in a browser-generated PRE with attributes.
+        // Read text rather than serialized HTML so wrappers/entities and filenames remain data.
+        var body = doc.body;
+        var json = body.textContent !== undefined ? body.textContent : body.innerText;
 
         try {
-            response = eval("(" + innerHTML + ")");
+            response = JSON.parse(json);
         } catch(err){
             response = {};
         }
@@ -1386,7 +1383,7 @@ qq.extend(qq.UploadHandlerXhr.prototype, {
             var response;
 
             try {
-                response = eval("(" + xhr.responseText + ")");
+                response = JSON.parse(xhr.responseText);
             } catch(err){
                 response = {};
             }
@@ -1438,4 +1435,3 @@ qq.DisposeSupport = {
     this.addDisposer(qq.attach.apply(this, arguments));
   }
 };
-

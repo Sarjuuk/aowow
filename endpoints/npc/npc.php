@@ -359,7 +359,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         /* Extra Tabs */
         /**************/
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")], 'tabsRelated', true);
 
         // tab: abilities / tab_controlledabilities (dep: VehicleId)
         $tplSpells  = [];
@@ -448,14 +448,14 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                 if ($normal)
                     $this->lvTabs->addListviewTab(new Listview(array(
                         'data' => $normal,
-                        'name' => '$LANG.tab_abilities',
+                        'name' => new JsExpression('LANG.tab_abilities'),
                         'id'   => 'abilities'
                     ), SpellList::$brickFile));
 
                 if ($controled)
                     $this->lvTabs->addListviewTab(new Listview(array(
                         'data'      => $controled,
-                        'name'      => '$LANG.tab_controlledabilities',
+                        'name'      => new JsExpression('LANG.tab_controlledabilities'),
                         'id'        => 'controlled-abilities',
                         'extraCols' => $extraCols ?: null
                     ), SpellList::$brickFile));
@@ -477,7 +477,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
 
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $sbSpell->getListviewData(),
-                'name' => '$LANG.tab_summonedby',
+                'name' => new JsExpression('LANG.tab_summonedby'),
                 'id'   => 'summoned-by-spell'
             ), SpellList::$brickFile));
         }
@@ -494,7 +494,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                 $this->addDataLoader('zones');
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data' => $sbNPC->getListviewData(),
-                    'name' => '$LANG.tab_summonedby',
+                    'name' => new JsExpression('LANG.tab_summonedby'),
                     'id'   => 'summoned-by-npc'
                 ), CreatureList::$brickFile));
             }
@@ -511,7 +511,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                 $this->addDataLoader('zones');
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data' => $sbGO->getListviewData(),
-                    'name' => '$LANG.tab_summonedby',
+                    'name' => new JsExpression('LANG.tab_summonedby'),
                     'id'   => 'summoned-by-object'
                 ), GameObjectList::$brickFile));
             }
@@ -552,7 +552,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                         if ($_ = $train['reqLevel'])
                         {
                             if (!isset($extraCols[1]))
-                                $extraCols[1] = "\$Listview.funcBox.createSimpleCol('reqLevel', LANG.tooltip_reqlevel, '7%', 'reqLevel')";
+                                $extraCols[1] = new JsExpression("Listview.funcBox.createSimpleCol('reqLevel', LANG.tooltip_reqlevel, '7%', 'reqLevel')");
 
                             $data[$sId]['reqLevel'] = $_;
                         }
@@ -566,7 +566,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
 
                     $this->lvTabs->addListviewTab(new Listview(array(
                         'data'        => $data,
-                        'name'        => '$LANG.tab_teaches',
+                        'name'        => new JsExpression('LANG.tab_teaches'),
                         'id'          => 'teaches',
                         'visibleCols' => ['trainingcost'],
                         'extraCols'   => $extraCols ?: null
@@ -589,16 +589,16 @@ class NpcBaseResponse extends TemplateResponse implements ICache
             if (!$soldItems->error)
             {
                 $colAddIn  = '';
-                $extraCols = ["\$Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", '$Listview.extraCols.cost'];
+                $extraCols = [new JsExpression("Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')"), new JsExpression('Listview.extraCols.cost')];
 
                 $lvData = $soldItems->getListviewData(LISTVIEWINFO_VENDOR, [Type::NPC => [$this->typeId]]);
 
                 if (array_column($lvData, 'condition'))
-                    $extraCols[] = '$Listview.extraCols.condition';
+                    $extraCols[] = new JsExpression('Listview.extraCols.condition');
 
                 if (array_filter(array_column($lvData, 'restock')))
                 {
-                    $extraCols[] = '$_';
+                    $extraCols[] = new JsExpression('_');
                     $colAddIn = 'vendorRestockCol';
                 }
 
@@ -611,7 +611,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
 
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data'      => $lvData,
-                    'name'      => '$LANG.tab_sells',
+                    'name'      => new JsExpression('LANG.tab_sells'),
                     'id'        => 'currency-for',
                     'extraCols' => array_unique($extraCols)
                 ), ItemList::$brickFile, $colAddIn));
@@ -622,18 +622,18 @@ class NpcBaseResponse extends TemplateResponse implements ICache
 
         // tabs: this creature contains..
         if ($this->subject->isGatherable())
-            $skinTab = ['$LANG.tab_herbalism',   'herbalism',   SKILL_HERBALISM];
+            $skinTab = [new JsExpression('LANG.tab_herbalism'),   'herbalism',   SKILL_HERBALISM];
         else if ($this->subject->isMineable())
-            $skinTab = ['$LANG.tab_mining',      'mining',      SKILL_MINING];
+            $skinTab = [new JsExpression('LANG.tab_mining'),      'mining',      SKILL_MINING];
         else if ($this->subject->isSalvageable())
-            $skinTab = ['$LANG.tab_engineering', 'engineering', SKILL_ENGINEERING];
+            $skinTab = [new JsExpression('LANG.tab_engineering'), 'engineering', SKILL_ENGINEERING];
         else
-            $skinTab = ['$LANG.tab_skinning',    'skinning',    SKILL_SKINNING];
+            $skinTab = [new JsExpression('LANG.tab_skinning'),    'skinning',    SKILL_SKINNING];
 
         $sourceFor = array(
-            0 => [Loot::CREATURE,   [4 => $this->subject->getField('lootId')],           '$LANG.tab_drops',         'drops',         [                          ], ''],
-            1 => [Loot::GAMEOBJECT, [],                                                  '$LANG.tab_drops',         'drops-object',  [                          ], ''],
-            2 => [Loot::PICKPOCKET, [4 => $this->subject->getField('pickpocketLootId')], '$LANG.tab_pickpocketing', 'pickpocketing', ['side', 'slot', 'reqlevel'], ''],
+            0 => [Loot::CREATURE,   [4 => $this->subject->getField('lootId')],           new JsExpression('LANG.tab_drops'),         'drops',         [                          ], ''],
+            1 => [Loot::GAMEOBJECT, [],                                                  new JsExpression('LANG.tab_drops'),         'drops-object',  [                          ], ''],
+            2 => [Loot::PICKPOCKET, [4 => $this->subject->getField('pickpocketLootId')], new JsExpression('LANG.tab_pickpocketing'), 'pickpocketing', ['side', 'slot', 'reqlevel'], ''],
             3 => [Loot::SKINNING,   [4 => $this->subject->getField('skinLootId')],       $skinTab[0],               $skinTab[1],     ['side', 'slot', 'reqlevel'], '']
         );
 
@@ -659,7 +659,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         foreach (DB::Aowow()->selectAssoc('SELECT l.`difficulty` AS ARRAY_KEY, o.`id`, o.`lootId`, o.`name_loc0`, o.`name_loc2`, o.`name_loc3`, o.`name_loc4`, o.`name_loc6`, o.`name_loc8` FROM ::loot_link l JOIN ::objects o ON o.`id` = l.`objectId` WHERE l.`npcId` = %i ORDER BY `difficulty` ASC', $this->typeId) as $difficulty => $lgo)
         {
             $sourceFor[1][1][$getBit($mapType, $difficulty)] = $lgo['lootId'];
-            $sourceFor[1][5] = $sourceFor[1][5] ?: '$$WH.sprintf(LANG.lvnote_npcobjectsource, '.$lgo['id'].', "'.Util::localizedString($lgo, 'name').'")';
+            $sourceFor[1][5] = $sourceFor[1][5] ?: JsExpression::call('$WH.sprintf', new JsExpression('LANG.lvnote_npcobjectsource'), (int)$lgo['id'], Util::localizedString($lgo, 'name'));
         }
 
         if ($_altIds)
@@ -682,7 +682,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                 foreach (DB::Aowow()->selectAssoc('SELECT l.`difficulty` AS ARRAY_KEY, o.`id`, o.`lootId`, o.`name_loc0`, o.`name_loc2`, o.`name_loc3`, o.`name_loc4`, o.`name_loc6`, o.`name_loc8` FROM ::loot_link l JOIN ::objects o ON o.`id` = l.`objectId` WHERE l.`npcId` = %i ORDER BY `difficulty` ASC', $id) as $difficulty => $lgo)
                 {
                     $sourceFor[1][1][$getBit($mapType, $difficulty)] = $lgo['lootId'];
-                    $sourceFor[1][5] = $sourceFor[1][5] ?: '$$WH.sprintf(LANG.lvnote_npcobjectsource, '.$lgo['id'].', "'.Util::localizedString($lgo, 'name').'")';
+                    $sourceFor[1][5] = $sourceFor[1][5] ?: JsExpression::call('$WH.sprintf', new JsExpression('LANG.lvnote_npcobjectsource'), (int)$lgo['id'], Util::localizedString($lgo, 'name'));
                 }
 
                 if ($lootId = $this->altNPCs->getField('lootId'))
@@ -700,9 +700,9 @@ class NpcBaseResponse extends TemplateResponse implements ICache
             if ($creatureLoot->formatListview($lootEntries))
             {
                 $extraCols   = $creatureLoot->extraCols;
-                array_push($extraCols, '$Listview.extraCols.count', '$Listview.extraCols.percent');
+                array_push($extraCols, new JsExpression('Listview.extraCols.count'), new JsExpression('Listview.extraCols.percent'));
                 if (count($lootEntries) > 1)
-                    $extraCols[] = '$Listview.extraCols.mode';
+                    $extraCols[] = new JsExpression('Listview.extraCols.mode');
 
                 $hiddenCols[] = 'count';
 
@@ -716,8 +716,8 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                     'hiddenCols'      => $hiddenCols ?: null,
                     'sort'            => ['-percent', 'name'],
                     '_totalCount'     => 10000,
-                    'computeDataFunc' => '$Listview.funcBox.initLootTable',
-                    'onAfterCreate'   => '$Listview.funcBox.addModeIndicator',
+                    'computeDataFunc' => new JsExpression('Listview.funcBox.initLootTable'),
+                    'onAfterCreate'   => new JsExpression('Listview.funcBox.addModeIndicator'),
                 );
 
                 if ($note)
@@ -749,14 +749,14 @@ class NpcBaseResponse extends TemplateResponse implements ICache
             if ($start)
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data' => $start,
-                    'name' => '$LANG.tab_starts',
+                    'name' => new JsExpression('LANG.tab_starts'),
                     'id'   => 'starts'
                 ), QuestList::$brickFile));
 
             if ($end)
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data' => $end,
-                    'name' => '$LANG.tab_ends',
+                    'name' => new JsExpression('LANG.tab_ends'),
                     'id'   => 'ends'
                 ), QuestList::$brickFile));
         }
@@ -781,7 +781,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
 
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $objectiveOf->getListviewData(),
-                'name' => '$LANG.tab_objectiveof',
+                'name' => new JsExpression('LANG.tab_objectiveof'),
                 'id'   => 'objective-of'
             ), QuestList::$brickFile));
         }
@@ -809,7 +809,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
 
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $data,
-                'name' => '$LANG.tab_criteriaof',
+                'name' => new JsExpression('LANG.tab_criteriaof'),
                 'id'   => 'criteria-of'
             ), AchievementList::$brickFile));
         }
@@ -825,7 +825,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                 $this->addDataLoader('zones');
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data'        => $sameModel->getListviewData(LISTVIEWINFO_TAMEABLE),
-                    'name'        => '$LANG.tab_samemodelas',
+                    'name'        => new JsExpression('LANG.tab_samemodelas'),
                     'id'          => 'same-model-as',
                     'visibleCols' => ['skin']
                 ), CreatureList::$brickFile));
@@ -853,7 +853,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                 );
 
                 if (User::isInGroup(U_GROUP_STAFF))
-                    $tabData['extraCols'] = ["\$Listview.funcBox.createSimpleCol('seat', '".Lang::npc('seat')."', '10%', 'seat')"];
+                    $tabData['extraCols'] = [JsExpression::call('Listview.funcBox.createSimpleCol', 'seat', Lang::npc('seat'), '10%', 'seat')];
 
                 $this->addDataLoader('zones');
                 $this->lvTabs->addListviewTab(new Listview($tabData, CreatureList::$brickFile));

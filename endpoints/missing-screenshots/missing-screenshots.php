@@ -29,7 +29,7 @@ class MissingscreenshotsBaseResponse extends TemplateResponse
         /* Main Content */
         /****************/
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")]);
 
         // limit to 200 entries each (it generates faster, consumes less memory and should be enough options)
         // meta description says it must have at least 1 comment

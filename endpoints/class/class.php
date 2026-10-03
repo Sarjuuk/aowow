@@ -141,7 +141,7 @@ class ClassBaseResponse extends TemplateResponse implements ICache
         /* Extra Tabs */
         /**************/
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")], 'tabsRelated', true);
 
         // tab: spells (grouped)
         //     '$LANG.tab_armorproficiencies',
@@ -181,12 +181,12 @@ class ClassBaseResponse extends TemplateResponse implements ICache
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data'            => $data,
                 'id'              => 'spells',
-                'name'            => '$LANG.tab_spells',
+                'name'            => new JsExpression('LANG.tab_spells'),
                 'visibleCols'     => ['level', 'schools', 'type', 'classes'],
                 'hiddenCols'      => ['reagents', 'skill'],
                 'sort'            => ['-level', 'type', 'name'],
-                'computeDataFunc' => '$Listview.funcBox.initSpellFilter',
-                'onAfterCreate'   => '$Listview.funcBox.addSpellIndicator'
+                'computeDataFunc' => new JsExpression('Listview.funcBox.initSpellFilter'),
+                'onAfterCreate'   => new JsExpression('Listview.funcBox.addSpellIndicator')
             ), SpellList::$brickFile));
         }
 
@@ -217,7 +217,7 @@ class ClassBaseResponse extends TemplateResponse implements ICache
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $trainer->getListviewData(),
                 'id'   => 'trainers',
-                'name' => '$LANG.tab_trainers'
+                'name' => new JsExpression('LANG.tab_trainers')
             ), CreatureList::$brickFile));
         }
 
@@ -240,12 +240,12 @@ class ClassBaseResponse extends TemplateResponse implements ICache
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data'            => $items->getListviewData(),
                 'id'              => 'items',
-                'name'            => '$LANG.tab_items',
+                'name'            => new JsExpression('LANG.tab_items'),
                 'visibleCols'     => ['dps', 'armor', 'slot'],
                 'hiddenCols'      => $hiddenCols,
-                'computeDataFunc' => '$Listview.funcBox.initSubclassFilter',
-                'onAfterCreate'   => '$Listview.funcBox.addSubclassIndicator',
-                'note'            => sprintf(Util::$filterResultString, '?items&filter=cr=152;crs='.$this->typeId.';crv=0'),
+                'computeDataFunc' => new JsExpression('Listview.funcBox.initSubclassFilter'),
+                'onAfterCreate'   => new JsExpression('Listview.funcBox.addSubclassIndicator'),
+                'note'            => new JsExpression(substr(sprintf(Util::$filterResultString, '?items&filter=cr=152;crs='.$this->typeId.';crv=0'), 1)),
                 '_truncated'      => 1
             ), ItemList::$brickFile));
         }
@@ -258,7 +258,7 @@ class ClassBaseResponse extends TemplateResponse implements ICache
 
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data'       => $sets->getListviewData(),
-                'note'       => sprintf(Util::$filterResultString, '?itemsets&filter=cl='.$this->typeId),
+                'note'       => new JsExpression(substr(sprintf(Util::$filterResultString, '?itemsets&filter=cl='.$this->typeId), 1)),
                 'hiddenCols' => ['classes'],
                 'sort'       => ['-level', 'name']
             ), ItemsetList::$brickFile));
@@ -299,7 +299,7 @@ class ClassBaseResponse extends TemplateResponse implements ICache
 
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $crtOf->getListviewData(),
-                'name' => '$LANG.tab_criteriaof',
+                'name' => new JsExpression('LANG.tab_criteriaof'),
                 'id'   => 'criteria-of'
             ), AchievementList::$brickFile));
         }
@@ -307,7 +307,7 @@ class ClassBaseResponse extends TemplateResponse implements ICache
         // tab: condition-for
         $cnd = new Conditions();
         $cnd->getByCondition(Type::CHR_CLASS, $this->typeId)->prepare();
-        if ($tab = $cnd->toListviewTab('condition-for', '$LANG.tab_condition_for'))
+        if ($tab = $cnd->toListviewTab('condition-for', new JsExpression('LANG.tab_condition_for')))
         {
             $this->extendGlobalData($cnd->getJSGlobals());
             $this->lvTabs->addDataTab(...$tab);

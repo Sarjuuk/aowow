@@ -5,6 +5,9 @@
 
     /** @var PageTemplate $this */
 
+    // Escape only at the HTML boundary; a textarea's initial newline is consumed
+    // by the HTML parser, so emit one before its value to preserve leading newlines.
+
     $this->brick('header');
 ?>
 
@@ -33,14 +36,14 @@
         <form id="guide-form" method="post" action="?guide=edit&id=<?=$this->typeId;?>" onsubmit="leavePage(1)">
             <table class="responsive-collapse guide-form-main">
                 <tr class="guide-form-guide-link">
-                    <td colspan="2"><h2 style="margin:0" class="heading-size-2"><a href="?guide=<?=$this->typeId;?>" target="_blank"><?=$this->editTitle;?></a></h2></td>
+                    <td colspan="2"><h2 style="margin:0" class="heading-size-2"><a href="?guide=<?=$this->typeId;?>" target="_blank"><?=$this->escHTML($this->editTitle);?></a></h2></td>
                 </tr>
 
                 <tr>
                     <th><label for="title"><dfn title="<?=Lang::guide('editor', 'fullTitleTip');?>"><?=Lang::guide('editor', 'fullTitle');?></dfn></label></th>
                     <td>
                         <input required="required" type="text" maxlength="100" name="title" id="title"
-                               value="<?=$this->editTitle;?>"
+                               value="<?=$this->escHTML($this->editTitle);?>"
                                placeholder="<?=Lang::guide('editor', 'fullTitleTip');?>"
                                data-charwarning="title-char-warning">
                         <small id="title-char-warning" class="char-warning"></small>
@@ -52,7 +55,7 @@
                     <th><label for="name"><dfn title="<?=Lang::guide('editor', 'nameTip');?>"><?=Lang::guide('editor', 'name');?></dfn></label></th>
                     <td>
                         <input required="required" type="text" maxlength="100" name="name" id="name"
-                               value="<?=$this->editName;?>"
+                               value="<?=$this->escHTML($this->editName);?>"
                                placeholder="<?=Lang::guide('editor', 'nameTip');?>"
                                data-charwarning="name-char-warning">
                         <small id="name-char-warning" class="char-warning"></small>
@@ -200,7 +203,8 @@
                     <th><label for="description">
                         <dfn title="<?=Lang::guide('editor', 'descriptionTip');?>"><?=Lang::guide('editor', 'description');?></dfn></label></th>
                     <td colspan="3">
-                        <textarea rows="1" name="description" cols="100" id="description" style="height:69px"><?=$this->editDescription;?></textarea>
+                        <textarea rows="1" name="description" cols="100" id="description" style="height:69px">
+<?=$this->escHTML($this->editDescription);?></textarea>
                         <script>g_enhanceTextarea('#description')</script>
                     </td>
                 </tr>
@@ -260,7 +264,8 @@ endif;
                     onchange="updatePreview(false, this)"
                     rows="8"
                     cols="40"
-                    style="width:95%"><?=$this->editText;?></textarea>
+                    style="width:95%">
+<?=$this->escHTML($this->editText);?></textarea>
                 <script>
                     g_enhanceTextarea('#editBox', {
                         markup: true,
@@ -294,6 +299,7 @@ endif;
 
             <img src="<?=$this->gStaticUrl;?>/images/icons/ajax.gif" style="display:none" class="spinning-circle">
             <span id="save-status"></span>
+            <?=$this->csrfField();?>
         </form>
     </div>
 

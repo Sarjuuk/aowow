@@ -74,16 +74,16 @@ class ProfileLoadResponse extends TextResponse
             'features'          => $pBase['features'],
             'title'             => $pBase['title'],
             'name'              => $pBase['name'],
-            'guild'             => "$'".$pBase['guildname']."'",
+            'guild'             => JsExpression::literal($pBase['guildname'] ?? ''),
             'published'         => !!($pBase['cuFlags'] & PROFILER_CU_PUBLISHED),
             'pinned'            => !!($pBase['cuFlags'] & PROFILER_CU_PINNED),
             'nomodel'           => $pBase['nomodelMask'],
             'playedtime'        => $pBase['playedtime'],
             'lastupdated'       => $pBase['lastupdated'] * 1000,
             'talents'           => array(
-                'builds' => array(                          // notice the bullshit to prevent the talent-string from becoming a float! NOTICE IT!!
-                    ['talents' => '$"'.$pBase['talentbuild1'].'"', 'glyphs' => $pBase['glyphs1']],
-                    ['talents' => '$"'.$pBase['talentbuild2'].'"', 'glyphs' => $pBase['glyphs2']]
+                'builds' => array(                          // retain leading zeros in talent strings
+                    ['talents' => JsExpression::literal($pBase['talentbuild1']), 'glyphs' => $pBase['glyphs1']],
+                    ['talents' => JsExpression::literal($pBase['talentbuild2']), 'glyphs' => $pBase['glyphs2']]
                 ),
                 'active' => $pBase['activespec']
             ),
@@ -131,8 +131,15 @@ class ProfileLoadResponse extends TextResponse
             $profile['arenateams'] = $at;
 
         // pets if hunter fields: [name:name, family:petFamily, npc:npcId, displayId:modelId, talents:talentString]
-        if ($pets = DB::Aowow()->selectAssoc('SELECT `name`, `family`, `npc`, `displayId`, CONCAT(\'$"\', `talents`, \'"\') AS "talents" FROM ::profiler_pets WHERE `owner` = %i', $pBase['id']))
+        if ($pets = DB::Aowow()->selectAssoc('SELECT `name`, `family`, `npc`, `displayId`, `talents` FROM ::profiler_pets WHERE `owner` = %i', $pBase['id']))
+        {
+            foreach ($pets as &$pet)
+                if ($pet['talents'] !== null)
+                    $pet['talents'] = JsExpression::literal($pet['talents']);
+            unset($pet);
+
             $profile['pets'] = $pets;
+        }
 
         // source for custom profiles; profileId => [name, ownerId, iconString(optional)]
         if ($customs = DB::Aowow()->selectAssoc('SELECT `id` AS ARRAY_KEY, `name`, `user`, `icon` FROM ::profiler_profiles WHERE `sourceId` = %i AND `sourceId` <> `id` AND `deleted` IN %in', $pBase['id'], User::isInGroup(U_GROUP_STAFF) ? [0, 1] : [0]))
@@ -176,7 +183,10 @@ class ProfileLoadResponse extends TextResponse
         $profile['titles'] = DB::Aowow()->selectCol('SELECT `titleId` AS ARRAY_KEY, 1 FROM ::profiler_completion_titles WHERE `id` = %i', $pBase['id']);
 
         // achievementId => js date object
-        $profile['achievements'] = DB::Aowow()->selectCol('SELECT `achievementId` AS ARRAY_KEY, CONCAT("$new Date(", `date` * 1000, ")") FROM ::profiler_completion_achievements WHERE `id` = %i', $pBase['id']);
+        $profile['achievements'] = DB::Aowow()->selectCol('SELECT `achievementId` AS ARRAY_KEY, `date` FROM ::profiler_completion_achievements WHERE `id` = %i', $pBase['id']);
+        foreach ($profile['achievements'] as &$date)
+            $date = new JsExpression('new Date('.((int)$date * 1000).')');
+        unset($date);
 
         // just points
         $profile['achievementpoints'] = $profile['achievements'] ? DB::Aowow()->selectCell('SELECT SUM(`points`) FROM ::achievement WHERE `id` IN %in', array_keys($profile['achievements'])) : 0;
@@ -250,7 +260,7 @@ class ProfileLoadResponse extends TextResponse
 
         $buff = '';
         foreach ($gItems as $id => $item)
-            $buff .= 'g_items.add('.$id.', '.Util::toJSON($item, JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE).");\n";
+            $buff .= 'g_items.add('.$id.', '.Util::toJavaScript($item, JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE).");\n";
 
 
         // if ($au = $char->getField('auras'))
@@ -274,7 +284,7 @@ class ProfileLoadResponse extends TextResponse
                     // }
                 // }
 
-                // $buff .= 'g_spells.add('.$id.", {id:".$id.", name:'".Util::jsEscape(mb_substr($data['name'], 1))."', icon:'".$data['icon']."', callback:".Util::toJSON($mods)."});\n";
+                // $buff .= 'g_spells.add('.$id.", {id:".$id.", name:'".Util::jsEscape(mb_substr($data['name'], 1))."', icon:'".$data['icon']."', callback:".Util::toJavaScript($mods)."});\n";
             // }
             // $buff .= "\n";
         // }
@@ -284,7 +294,7 @@ class ProfileLoadResponse extends TextResponse
         Util::loadStaticFile('p-titles-'.$pBase['gender'], $buff, true);
 
         // add profile to buffer
-        $buff .= "\n\n\$WowheadProfiler.registerProfile(".Util::toJSON($profile).");";
+        $buff .= "\n\n\$WowheadProfiler.registerProfile(".Util::toJavaScript($profile).");";
 
         $this->result = $buff."\n";
     }

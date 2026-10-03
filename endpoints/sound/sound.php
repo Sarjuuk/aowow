@@ -101,7 +101,7 @@ class SoundBaseResponse extends TemplateResponse implements ICache
         /* Extra Tabs */
         /**************/
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")], 'tabsRelated', true);
 
         // tab: Spells
         // skipping (always empty): ready, castertargeting, casterstate, targetstate
@@ -213,7 +213,7 @@ class SoundBaseResponse extends TemplateResponse implements ICache
 
                 if ($worldStates = array_filter($zoneIds, fn($x) => $x['worldStateId'] > 0))
                 {
-                    $tabData['extraCols']  = ['$Listview.extraCols.condition'];
+                    $tabData['extraCols']  = [new JsExpression('Listview.extraCols.condition')];
 
                     foreach ($worldStates as $state)
                     {

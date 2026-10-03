@@ -166,6 +166,7 @@ if ($this->typeList):
 
                     <div class="pad"></div>
 
+                    <?=$this->csrfField();?>
                 </form>
                 <div class="pad"></div>
             </div>

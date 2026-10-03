@@ -3000,7 +3000,7 @@ var LANG = {
     message_noscreenshot:         "Выберите изображение для загрузки.",
     message_novideo:              "Введите корректную информацию о видео.",
     message_nothingtoviewin3d:    "Вы не выбрали предметы, которые можно просмотреть в 3D.",
-    message_passwordmin:          "Ваш пароль должен состоять минимум из 6 знаков.",
+    message_passwordmin:          "Используйте не менее 15 символов и не более 72 байт UTF-8 (некоторые символы занимают несколько байт).",
     message_passwordsdonotmatch:  "Пароли не совпадают.",
     message_savebeforeexit:       "Вы потеряете все не сохраненные изменения.",
     message_startedpost:          "Вы начали составление сообщения.",

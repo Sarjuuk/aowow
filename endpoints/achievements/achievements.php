@@ -145,16 +145,16 @@ class AchievementsBaseResponse extends TemplateResponse implements ICache
                 $tabData['visibleCols'] = ['category'];
 
             if ($this->filter->fiExtraCols)
-                $tabData['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
+                $tabData['extraCols'] = new JsExpression('fi_getExtraCols(fi_extraCols, 0, 0)');
 
             // create note if search limit was exceeded
             if ($acvList->getMatches() > Listview::DEFAULT_SIZE)
             {
-                $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_achievementsfound', $acvList->getMatches(), Listview::DEFAULT_SIZE);
+                $tabData['note'] = new JsExpression(substr(sprintf(Util::$tryFilteringString, 'LANG.lvnote_achievementsfound', $acvList->getMatches(), Listview::DEFAULT_SIZE), 1));
                 $tabData['_truncated'] = 1;
             }
         }
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")]);
 
         $this->lvTabs->addListviewTab(new Listview($tabData, AchievementList::$brickFile));
 

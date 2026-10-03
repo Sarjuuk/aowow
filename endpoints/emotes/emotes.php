@@ -45,7 +45,7 @@ class EmotesBaseResponse extends TemplateResponse implements ICache
         if (!User::isInGroup(U_GROUP_STAFF))
             $cnd[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")]);
 
         $tabData = array(
             'data' => (new EmoteList($cnd))->getListviewData(),

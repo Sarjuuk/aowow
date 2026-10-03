@@ -36,10 +36,11 @@ class GuideChangelogResponse extends TemplateResponse
             $this->forward('?guides='.$this->subject->getField('category'));
 
 
-        $this->h1 = Lang::guide('clTitle', [$this->subject->id, $this->subject->getField('title') ?: $this->subject->getField('name')]);
+        // Keep the localized link markup, but treat all contributor text as HTML data.
+        $this->h1 = Lang::guide('clTitle', [$this->subject->id, Util::htmlEscape($this->subject->getField('title') ?: $this->subject->getField('name'))]);
 
 
-        array_unshift($this->title, strip_tags($this->h1), Lang::game('guide'));
+        array_unshift($this->title, html_entity_decode(strip_tags($this->h1), ENT_QUOTES | ENT_HTML5, 'utf-8'), Lang::game('guide'));
 
 
         $this->gPageInfo += ['name' => $this->subject->getField('name')];
@@ -105,9 +106,9 @@ class GuideChangelogResponse extends TemplateResponse
             if ($log['status'] != GuideMgr::STATUS_NONE)
                 $buff .= '<li class="guide-changelog-status-change">'.$inp($log['rev']).$status($log['status']).$now->formatDate($log['date'], true).'</li>'.PHP_EOL;
             else if ($log['msg'])
-                $buff .= '<li>'.$inp($log['rev']).'<b>'.$now->formatDate($log['date'], true).Lang::main('colon').'</b>'.$log['msg'].' <i class="q0">'.Lang::main('byUser', [$log['name'], 'style="text-decoration:underline"']).'</i></li>'.PHP_EOL;
+                $buff .= '<li>'.$inp($log['rev']).'<b>'.$now->formatDate($log['date'], true).Lang::main('colon').'</b>'.Util::htmlEscape($log['msg']).' <i class="q0">'.Lang::main('byUser', [Util::htmlEscape($log['name']), 'style="text-decoration:underline"']).'</i></li>'.PHP_EOL;
             else
-                $buff .= '<li class="guide-changelog-minor-edit">'.$inp($log['rev']).'<b>'.$now->formatDate($log['date'], true).Lang::main('colon').'</b><i class="q3">'.Lang::guide('clMinorEdit').'</i> <i class="q0">'.Lang::main('byUser', [$log['name'], 'style="text-decoration:underline"']).'</i></li>'.PHP_EOL;
+                $buff .= '<li class="guide-changelog-minor-edit">'.$inp($log['rev']).'<b>'.$now->formatDate($log['date'], true).Lang::main('colon').'</b><i class="q3">'.Lang::guide('clMinorEdit').'</i> <i class="q0">'.Lang::main('byUser', [Util::htmlEscape($log['name']), 'style="text-decoration:underline"']).'</i></li>'.PHP_EOL;
         }
 
         // append creation

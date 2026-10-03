@@ -35,14 +35,14 @@ class MyguidesBaseResponse extends TemplateResponse
 
         $guides = new GuideList(array(['userId', User::$id]));
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")]);
 
         $this->lvTabs->addListviewTab(new Listview(array(
             'data'        => $guides->getListviewData(),
             'name'        => Util::ucFirst(Lang::game('guides')),
             'hiddenCols'  => ['patch', 'author'],
             'visibleCols' => ['status'],
-            'extraCols'   => ['$Listview.extraCols.date']
+            'extraCols'   => [new JsExpression('Listview.extraCols.date')]
         ), GuideList::$brickFile));
 
         parent::generate();

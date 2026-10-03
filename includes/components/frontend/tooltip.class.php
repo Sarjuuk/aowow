@@ -12,7 +12,7 @@ class Tooltip implements \JsonSerializable
     private ?string    $tooltip    = null;
     private ?string    $tooltip2   = null;
     private ?\StdClass $map        = null;                  // secondary tooltip
-    private ?string    $icon       = null;
+    private null|string|JsExpression $icon = null;
     private ?int       $quality    = null;                  // icon border color coded
     private ?bool      $daily      = null;
     private ?array     $spells     = null;
@@ -45,7 +45,7 @@ class Tooltip implements \JsonSerializable
                 continue;
 
             if ($k == 'icon')
-                $out[$k] = rawurldecode($v);
+                $out[$k] = $v instanceof JsExpression ? $v : rawurldecode($v);
             else if ($k == 'quality' || $k == 'map' || $k == 'daily')
                 $out[$k] = $v;
             else
@@ -57,7 +57,7 @@ class Tooltip implements \JsonSerializable
 
     public function __toString() : string
     {
-        return sprintf($this->__powerTpl, $this->__subject, Lang::getLocale()->value, Util::toJSON($this, JSON_AOWOW_POWER))."\n";
+        return sprintf($this->__powerTpl, $this->__subject, Lang::getLocale()->value, Util::toJavaScript($this, JSON_AOWOW_POWER))."\n";
     }
 }
 

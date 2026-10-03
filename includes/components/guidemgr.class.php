@@ -11,6 +11,10 @@ class GuideMgr
     private const string IMG_DEST_DIR = 'static/uploads/guide/images/';
     private const string IMG_TMP_DIR  = 'static/uploads/temp/';
 
+    public const int IMG_MAX_BYTES = 10 * 1024 * 1024;
+    public const int IMG_MAX_DIMENSION = 4096;
+    public const int IMG_MAX_PIXELS = 12_000_000;
+
     public const int    STATUS_NONE      = 0;
     public const int    STATUS_DRAFT     = 1;
     public const int    STATUS_REVIEW    = 2;
@@ -28,7 +32,6 @@ class GuideMgr
     );
 
     private static  array $ratingsStore = [];
-    private static ?int   $imgUploadIdx = null;
 
     public static function createDescription(string $text) : string
     {
@@ -57,47 +60,103 @@ class GuideMgr
         return self::$ratingsStore;
     }
 
+    /** Validate bounded image bytes, re-encode pixels and publish a new exclusive numeric file; always clean staging. */
     public static function handleUpload() : array
     {
+        if (!ContributionBudget::reserve('guide-image'))
+            return ['error' => ContributionBudget::error()];
         require_once('includes/libs/qqFileUploader.class.php');
-
-        $tmpFile  = User::$username.'-'.Type::GUIDE.'-0-'.Util::createHash(16);
-
-        $uploader = new \qqFileUploader(['jpg', 'jpeg', 'png'], 10 * 1024 * 1024);
-        $result   = $uploader->handleUpload(self::IMG_TMP_DIR, $tmpFile, true);
-
-        if (isset($result['error']))
-            return $result;
-
-        $mime = (new \finfo(FILEINFO_MIME))?->file(self::IMG_TMP_DIR . $result['newFilename']);
-
-        if (!preg_match('/^image\/(png|jpe?g)/i', $mime, $m))
-            return ['error' => Lang::screenshot('error', 'unkFormat')];
-
-        // find next empty image name (an int)
-        if (is_null(self::$imgUploadIdx))
+        $source = null;
+        try
         {
-            if ($files = scandir(self::IMG_DEST_DIR, SCANDIR_SORT_DESCENDING))
-                if (rsort($files, SORT_NATURAL) && $files[0] != '.' && $files[0] != '..')
-                    $i = explode('.', $files[0])[0] + 1;
+            $uploader = new \qqFileUploader(['jpg', 'jpeg', 'png'], self::IMG_MAX_BYTES);
+            $result = $uploader->handleUpload(self::IMG_TMP_DIR, 'guide-'.Util::createHash(24));
+            if (isset($result['error']))
+                return $result;
+            $source = self::IMG_TMP_DIR.$result['newFilename'];
+            $size = filesize($source);
+            if (!$size || $size > self::IMG_MAX_BYTES)
+                return ['error' => Lang::main('intError')];
 
-            self::$imgUploadIdx = $i ?? 1;
+            $mime = (new \finfo(FILEINFO_MIME_TYPE))->file($source);
+            $dimensions = getimagesize($source);
+            if (!$dimensions || !in_array($mime, ['image/jpeg', 'image/png'], true) ||
+                $dimensions[2] !== ($mime === 'image/png' ? IMAGETYPE_PNG : IMAGETYPE_JPEG))
+                return ['error' => Lang::screenshot('error', 'unkFormat')];
+            [$width, $height, $type] = $dimensions;
+            // Reject compressed image bombs before GD allocates a decoded canvas.
+            if ($width <= 0 || $height <= 0 || $width > self::IMG_MAX_DIMENSION || $height > self::IMG_MAX_DIMENSION ||
+                $width > intdiv(self::IMG_MAX_PIXELS, $height))
+                return ['error' => Lang::screenshot('error', 'unkFormat')];
+
+            $image = $type === IMAGETYPE_PNG ? imagecreatefrompng($source) : imagecreatefromjpeg($source);
+            if (!$image)
+                return ['error' => Lang::screenshot('error', 'unkFormat')];
+            if ($type === IMAGETYPE_PNG)
+                imagesavealpha($image, true);
+
+            $id = self::saveImage($image, $type);
+            if (!$id)
+                return ['error' => Lang::main('intError')];
+            return ['success' => true, 'id' => $id, 'type' => $type === IMAGETYPE_PNG ? 3 : 2];
         }
-
-        $targetFile = self::$imgUploadIdx . ($m[1] == 'png' ? '.png' : '.jpg');
-
-        // move to final location
-        if (!rename(self::IMG_TMP_DIR.$result['newFilename'], self::IMG_DEST_DIR.$targetFile))
+        catch (\Throwable)
         {
-            trigger_error('GuideMgr::handleUpload - failed to move file', E_USER_WARNING);
             return ['error' => Lang::main('intError')];
         }
+        finally
+        {
+            if ($source && is_file($source) && !unlink($source))
+                trigger_error('GuideMgr::handleUpload - staging cleanup failed', E_USER_WARNING);
+        }
+    }
 
-        return array(
-            'success' => true,
-            'id'      => self::$imgUploadIdx,
-            'type'    => $m[1] == 'png' ? 3 : 2
-        );
+    /** Only fresh GD output reaches public storage; exclusive creation never replaces an existing image or link. */
+    private static function saveImage(\GdImage $image, int $type) : ?int
+    {
+        $encoded = tmpfile();
+        if (!$encoded)
+            return null;
+        $target = null;
+        $output = null;
+        $complete = false;
+        try
+        {
+            $written = $type === IMAGETYPE_PNG ? imagepng($image, $encoded, 6) : imagejpeg($image, $encoded, 85);
+            $size = fstat($encoded)['size'];
+            if (!$written || !$size || $size > self::IMG_MAX_BYTES)
+                return null;
+
+            for ($attempt = 0; $attempt < 16; ++$attempt)
+            {
+                // Keep the response ID exactly representable by the existing JavaScript URL builder.
+                $id = random_int(1, min(PHP_INT_MAX, 9_007_199_254_740_991));
+                $candidate = self::IMG_DEST_DIR.$id.($type === IMAGETYPE_PNG ? '.png' : '.jpg');
+                $output = @fopen($candidate, 'xb');
+                if ($output)
+                {
+                    $target = $candidate;
+                    break;
+                }
+                if (!file_exists($candidate) && !is_link($candidate))
+                    return null;
+            }
+            if (!$output)
+                return null;
+
+            rewind($encoded);
+            if (stream_copy_to_stream($encoded, $output, self::IMG_MAX_BYTES + 1) !== $size || !fflush($output))
+                return null;
+            $complete = true;
+            return $id;
+        }
+        finally
+        {
+            if (is_resource($output)) fclose($output);
+            fclose($encoded);
+            if (!$complete && $target && is_file($target) && !unlink($target))
+                trigger_error('GuideMgr::saveImage - output cleanup failed', E_USER_WARNING);
+        }
     }
 }
 

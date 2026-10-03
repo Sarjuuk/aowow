@@ -9,25 +9,23 @@
             <script type="text/javascript">
                 function inputBoxValidate(f)
                 {
-                    var _ = f.elements[0];
-                    if (_.value.length == 0)
+                    var password = f.elements.password;
+                    if (password.value.length == 0)
                     {
                         $WH.ge('inputbox-error').innerHTML = LANG.message_enternewpass;
-                        _.focus();
+                        password.focus();
                         return false;
                     }
-                    else if (_.value.length < 4)
+                    if (!g_isNewPasswordValid(password.value))
                     {
                         $WH.ge('inputbox-error').innerHTML = LANG.message_passwordmin;
-                        _.focus();
+                        password.focus();
                         return false;
                     }
-
-                    _ = f.elements[1];
-                    if (_.value.length == 0 || f.elements[2].value != _.value)
+                    if (f.elements.c_password.value !== password.value)
                     {
                         $WH.ge('inputbox-error').innerHTML = LANG.message_passwordsdonotmatch;
-                        _.focus();
+                        f.elements.c_password.focus();
                         return false;
                     }
 
@@ -74,6 +72,7 @@
 
                     <input type="hidden" name="key" value="<?=$token ?? ''; ?>" />
                 </div>
+                <?=$this->csrfField();?>
             </form>
 
-            <script type="text/javascript">$WH.ge('username-generic').focus()</script>
+            <script type="text/javascript">document.querySelector('input[name=email]').focus()</script>

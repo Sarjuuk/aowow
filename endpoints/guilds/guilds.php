@@ -134,14 +134,14 @@ class GuildsBaseResponse extends TemplateResponse implements IProfilerList
             // create note if search limit was exceeded
             if ($this->filter->query && $guilds->getMatches() > Listview::DEFAULT_SIZE)
             {
-                $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_guildsfound2', $this->sumSubjects, $guilds->getMatches());
+                $tabData['note'] = new JsExpression(substr(sprintf(Util::$tryFilteringString, 'LANG.lvnote_guildsfound2', $this->sumSubjects, $guilds->getMatches()), 1));
                 $tabData['_truncated'] = 1;
             }
             else if ($guilds->getMatches() > Listview::DEFAULT_SIZE)
-                $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_guildsfound', $this->sumSubjects, 0);
+                $tabData['note'] = new JsExpression(substr(sprintf(Util::$tryFilteringString, 'LANG.lvnote_guildsfound', $this->sumSubjects, 0), 1));
         }
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated');
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")], 'tabsRelated');
 
         $this->lvTabs->addListviewTab(new Listview($tabData, GuildList::$brickFile, 'membersCol'));
 

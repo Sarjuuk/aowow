@@ -10,15 +10,15 @@ class Tabs implements \JsonSerializable, \Countable
 {
     private array $__tabs   = [];
 
-    private  string $parent      = '';                      // HTMLNode
+    private string|JsExpression $parent      = '';                      // HTMLNode
     private ?int    $poundable   = null;                    // js:bool
     private ?int    $forceScroll = null;                    // js:bool
     private ?int    $noScroll    = null;                    // js:bool
     private ?string $trackable   = null;                    // String to track in Google Analytics .. often a DB Type
 
-    private ?string $onLoad = null;                         // js::callable
-    private ?string $onShow = null;                         // js::callable
-    private ?string $onHide = null;                         // js::callable
+    private null|string|JsExpression $onLoad = null;                         // js::callable
+    private null|string|JsExpression $onShow = null;                         // js::callable
+    private null|string|JsExpression $onHide = null;                         // js::callable
 
     public function __construct(array $opts, public readonly string $__tabVar = 'myTabs', private bool $__forceTabs = false)
     {
@@ -47,7 +47,7 @@ class Tabs implements \JsonSerializable, \Countable
         $this->__tabs[] = $lv;
     }
 
-    public function addDataTab(string $id, string $name, string $data) : void
+    public function addDataTab(string $id, string|JsExpression $name, string $data) : void
     {
         $this->__tabs[] = ['id' => $id, 'name' => $name, 'data' => $data];
         $this->__forceTabs = true;                          // otherwise a single DataTab could not be accessed
@@ -77,7 +77,7 @@ class Tabs implements \JsonSerializable, \Countable
     {
         if ($id && !is_null($k = array_find_key($this->__tabs, fn($x) => (is_array($x) ? $x['name'] : $x->getId()) === $id)))
             return $this->__tabs[$k];
-        if ($name && !is_null($k = array_find_key($this->__tabs, fn($x) => mb_strpos(is_array($x) ? $x['name'] : $x->getName(), $name) !== false)))
+        if ($name && !is_null($k = array_find_key($this->__tabs, fn($x) => mb_strpos(is_array($x) ? ($x['name'] instanceof JsExpression ? $x['name']->expression : $x['name']) : $x->getName(), $name) !== false)))
             return $this->__tabs[$k];
 
         return null;
@@ -130,14 +130,14 @@ class Tabs implements \JsonSerializable, \Countable
         $result = '';
 
         if ($this->isTabbed())
-            $result .= "var ".$this->__tabVar." = new Tabs(".Util::toJSON($this).");\n";
+            $result .= "var ".$this->__tabVar." = new Tabs(".Util::toJavaScript($this).");\n";
 
         foreach ($this->__tabs as $tab)
         {
             if (is_array($tab))
             {
-                $n = $tab['name'][0] == '$' ? substr($tab['name'], 1) : "'".$tab['name']."'";
-                $result .= $this->__tabVar.".add(".$n.", { id: '".$tab['id']."' });\n";
+                $n = Util::toJavaScript($tab['name'], JSON_UNESCAPED_UNICODE);
+                $result .= $this->__tabVar.".add(".$n.", { id: ".Util::toJavaScript($tab['id'], JSON_UNESCAPED_UNICODE)." });\n";
             }
             else
             {

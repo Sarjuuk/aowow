@@ -75,14 +75,16 @@ class AccountResendResponse extends TemplateResponse
         if ($timeout && $timeout > time())
             return Cfg::get('DEBUG') ? 'resend on cooldown: '.DateTime::formatTimeElapsed($timeout * 1000).' remaining' : Lang::account('inputbox', 'error', 'emailNotFound');
 
-        // check email and account status
-        if ($token = DB::Aowow()->selectCell('SELECT `token` FROM ::account WHERE `email` = %s AND `status` = %i', $this->_post['email'], ACC_STATUS_NEW))
-        {
-            if (!Util::sendMail($this->_post['email'], 'activate-account', [$token]))
-                return Lang::main('intError');
+        $rotation = AccountActivation::resend($this->_post['email'], User::$ip);
+        if ($rotation['status'] === AccountActivation::BLOCKED)
+            return Lang::account('inputbox', 'error', 'emailNotFound');
+        if ($rotation['status'] === AccountActivation::FAILED)
+            return Lang::main('intError');
 
-            DB::Aowow()->qry('INSERT INTO ::account_bannedips (`ip`, `type`, `count`, `unbanDate`) VALUES (%s, %i, %i, UNIX_TIMESTAMP() + %i) ON DUPLICATE KEY UPDATE `count` = `count` + %i, `unbanDate` = UNIX_TIMESTAMP() + %i',
-                User::$ip, IP_BAN_TYPE_REGISTRATION_ATTEMPT, Cfg::get('ACC_FAILED_AUTH_COUNT') + 1, Cfg::get('ACC_FAILED_AUTH_COUNT'), Cfg::get('ACC_FAILED_AUTH_BLOCK'), Cfg::get('ACC_FAILED_AUTH_BLOCK'));
+        if ($rotation['status'] === AccountActivation::OK)
+        {
+            if (!Util::sendMail($this->_post['email'], 'activate-account', [$rotation['token']], Cfg::get('ACC_CREATE_SAVE_DECAY')))
+                return Lang::main('intError');
 
             $this->success = true;
             return Lang::account('inputbox', 'message', 'createAccSent', [$this->_post['email']]);

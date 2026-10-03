@@ -3047,7 +3047,7 @@ var LANG = {
     message_noscreenshot:         "请选择要上传的截屏。",
     message_novideo:              "请输入有效的视频信息。",
     message_nothingtoviewin3d:    "没有选中可以3D浏览的物品。",
-    message_passwordmin:          "您的密码长度至少为6个字符。",
+    message_passwordmin:          "请使用至少15个字符且不超过72个UTF-8字节（某些字符占用多个字节）。",
     message_passwordsdonotmatch:  "密码不匹配",
     message_savebeforeexit:       "您将失去所有未保存的修改。",
     message_startedpost:          "您已经开始输入信息了。",

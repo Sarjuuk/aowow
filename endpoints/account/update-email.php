@@ -17,7 +17,8 @@ class AccountUpdateemailResponse extends TextResponse
     protected  bool   $requiresLogin = true;
 
     protected  array  $expectedPOST  = array(
-        'newemail' => ['filter' => FILTER_VALIDATE_EMAIL, 'flags' => FILTER_FLAG_STRIP_AOWOW]
+        'newemail' => ['filter' => FILTER_VALIDATE_EMAIL, 'flags' => FILTER_FLAG_STRIP_AOWOW],
+        'currentPassword' => ['filter' => FILTER_CALLBACK, 'options' => [Util::class, 'validatePasswordInput']]
     );
 
     private bool $success = false;
@@ -47,6 +48,16 @@ class AccountUpdateemailResponse extends TextResponse
         // truncated due to validation fail
         if (!$this->_post['newemail'])
             return Lang::account('emailInvalid');
+
+        if (!$this->assertPOST('currentPassword'))
+            return Lang::account('wrongPass');
+
+        if (PasswordBudget::reserve(User::$id) !== PasswordBudget::OK)
+            return Lang::main('intError');
+
+        // A stolen session alone must not authorize replacing the recovery address.
+        if (!User::verifyCrypt($this->_post['currentPassword'], DB::Aowow()->selectCell('SELECT `passHash` FROM ::account WHERE `id` = %i', User::$id)))
+            return Lang::account('wrongPass');
 
         if (DB::Aowow()->selectCell('SELECT 1 FROM ::account WHERE `email` = %s AND `id` <> %i', $this->_post['newemail'], User::$id))
             return Lang::account('mailInUse');

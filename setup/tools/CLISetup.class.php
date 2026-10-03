@@ -9,6 +9,8 @@ if (!CLI)
     die('not in cli mode');
 
 
+require_once __DIR__.'/../../includes/setup/sqlupdate.class.php';
+
 class CLISetup
 {
     public const int SQL_BATCH     = 1000;                  // max. n items per sql insert
@@ -242,9 +244,12 @@ class CLISetup
     }
 
     // called from Setup
-    public static function runInitial() : void
+    public static function runInitial() : bool
     {
         global $argc, $argv;                                // todo .. find better way? argv, argc are effectivley already global
+
+        if (CLI::errorCount())
+            return false;                                   // initialization/dependency errors must prevent mutations
 
         // get arguments present in argGroup 1 or 2, if set. Pick first.
         $cmd   = self::getOpt(1 << self::OPT_GRP_SETUP | 1 << self::OPT_GRP_UTIL)[0];
@@ -265,52 +270,45 @@ class CLISetup
                     break;
             }
 
-        if ($dbError = array_filter($us::REQUIRED_DB, fn($x) => !DB::isConnected($x)))
+        $db = null;
+        $lease = null;
+        try
         {
-            CLI::write('Database on index '.implode(', ', $dbError).' not yet set up!', CLI::LOG_ERROR);
-            CLI::write('Please use '.CLI::bold('"php aowow --db"').' for setup', CLI::LOG_BLANK);
-            CLI::write();
-            return;
+            // Acquire before changing maintenance; a losing concurrent command must never reopen the site.
+            if ($us::LOCK_SITE != self::LOCK_OFF && DB::isConnected(DB_AOWOW))
+            {
+                $db = DB::holdConnection(DB_AOWOW);
+                $lease = SqlUpdate::acquire($db);
+            }
+            if ($us::LOCK_SITE != self::LOCK_OFF && !self::siteLock(self::LOCK_ON, $cmd === 'setup'))
+                return false;
+            if ($us::NOTE_START)
+                CLI::write($us::NOTE_START);
+            $allOk = self::run($cmd, $inOut, true) && CLI::errorCount() === 0;
+            if ($allOk && $us::LOCK_SITE != self::LOCK_OFF)
+                $allOk = self::siteLock($us::LOCK_SITE == self::LOCK_RESTORE ? self::LOCK_RESTORE : self::LOCK_OFF);
+            if ($us::NOTE_END_OK && $allOk)
+                CLI::write($us::NOTE_END_OK, CLI::LOG_OK);
+            else if ($us::NOTE_END_FAIL && !$allOk)
+                CLI::write($us::NOTE_END_FAIL, CLI::LOG_ERROR);
+            return $allOk;
         }
-
-        if ($us::LOCK_SITE != self::LOCK_OFF)
-            self::siteLock(self::LOCK_ON);
-
-        if ($us::NOTE_START)
-            CLI::write($us::NOTE_START);
-
-        if (!$us->run($inOut))
-            $allOk = false;
-
-        $error = [];
-        if ($allOk && !$us->test($error))
+        catch (\Throwable $e)
         {
-            if ($us::NOTE_ERROR)
-                CLI::write($us::NOTE_ERROR, CLI::LOG_ERROR);
-
-            foreach ($error as $e)
-                CLI::write($e, CLI::LOG_BLANK);
-
-            CLI::write();
-            $allOk = false;
+            CLI::write('Setup command failed (code '.(int)$e->getCode().'). Verify maintenance and inspect the update journal before retrying.', CLI::LOG_ERROR);
+            return false;
         }
-
-        if ($allOk)
-            if ($ff = $us->followupFn)
-                if (array_filter($inOut))
-                    self::run($ff, $inOut);
-
-        self::siteLock($us::LOCK_SITE == self::LOCK_RESTORE ? self::LOCK_RESTORE : self::LOCK_OFF);
-
-        // end
-        if ($us::NOTE_END_OK && $allOk)
-            CLI::write($us::NOTE_END_OK, CLI::LOG_OK);
-        else if($us::NOTE_END_FAIL && !$allOk)
-            CLI::write($us::NOTE_END_FAIL, CLI::LOG_ERROR);
+        finally
+        {
+            if ($lease !== null)
+                try { SqlUpdate::release($db, $lease); }
+                catch (\Throwable) { CLI::write('Could not release the setup database lock.', CLI::LOG_ERROR); }
+            if ($db !== null) DB::releaseConnection(DB_AOWOW);
+        }
     }
 
     // consecutive calls
-    public static function run(string $cmd, array &$args) : bool
+    public static function run(string $cmd, array &$args, bool $initial = false) : bool
     {
         if (!isset(self::$utilScriptRefs[$cmd]))
             return false;
@@ -325,7 +323,7 @@ class CLISetup
             return false;
         }
 
-        if ($us::PROMPT)
+        if ($us::PROMPT && !$initial)
         {
             CLI::write($us::PROMPT, -1, false);
             CLI::write();
@@ -336,26 +334,52 @@ class CLISetup
 
         $args = array_pad($args, 4, null);
 
-        $success = $us->run($args);
-
-        $error = [];
-        if ($us::NOTE_ERROR && $success && !$us->test($error))
+        $errors = CLI::errorCount();
+        $db = null;
+        $lease = null;
+        try
         {
-            CLI::write($us::NOTE_ERROR, CLI::LOG_ERROR);
-            foreach ($error as $e)
-                CLI::write($e, CLI::LOG_BLANK);
+            // Nested setup/update calls retain the lease until their sync follow-up completes.
+            if ($cmd === 'update')
+            {
+                $db = DB::holdConnection(DB_AOWOW);
+                $lease = SqlUpdate::acquire($db);
+            }
+            $success = $us->run($args) && CLI::errorCount() === $errors;
 
-            CLI::write();
+            $error = [];
+            if ($success && !$us->test($error))
+            {
+                CLI::write($us::NOTE_ERROR ?: 'Setup command verification failed.', CLI::LOG_ERROR);
+                foreach ($error as $e)
+                    CLI::write($e, CLI::LOG_BLANK);
+
+                CLI::write();
+                return false;
+            }
+
+            $success = $success && CLI::errorCount() === $errors;
+            if ($success)
+                if ($ff = $us->followupFn)
+                    if (array_filter($args))
+                        if (!self::run($ff, $args))
+                            $success = false;
+
+            return $success && CLI::errorCount() === $errors;
+        }
+        catch (\Throwable $e)
+        {
+            $message = $e instanceof \RuntimeException && $cmd === 'update' && str_starts_with($e->getMessage(), '[update] failed at ') ? $e->getMessage() : 'Setup command failed (code '.(int)$e->getCode().').';
+            CLI::write($message, CLI::LOG_ERROR);
             return false;
         }
-
-        if ($success)
-            if ($ff = $us->followupFn)
-                if (array_filter($args))
-                    if (!self::run($ff, $args))
-                        $success = false;
-
-        return $success;
+        finally
+        {
+            if ($lease !== null)
+                try { SqlUpdate::release($db, $lease); }
+                catch (\Throwable) { CLI::write('Could not release the update database lock.', CLI::LOG_ERROR); }
+            if ($db !== null) DB::releaseConnection(DB_AOWOW);
+        }
     }
 
 
@@ -459,12 +483,44 @@ class CLISetup
     /* web page access */
     /*******************/
 
-    private static function siteLock(int $mode = self::LOCK_RESTORE) : void
+    private static function siteLock(int $mode = self::LOCK_RESTORE, bool $initialSetup = false) : bool
     {
-        if (DB::isConnected(DB_AOWOW))
-            Cfg::set('MAINTENANCE', $mode == self::LOCK_RESTORE ? self::$lock : $mode);
+        if (!DB::isConnected(DB_AOWOW))
+            return true;                                    // initial setup has no database yet
+        $value = $mode == self::LOCK_RESTORE ? self::$lock : $mode;
+        try
+        {
+            $db = DB::Aowow();
+            if ($initialSetup)
+            {
+                $prefix = $db->getConfig('substitutes')[''] ?? '';
+                if (!(int)$db->query('SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME IN (%s, %s)', $prefix.'config', $prefix.'dbversion')->fetchSingle())
+                    return true;                            // a provisioned empty database has no public site to lock
+            }
+            if ($mode === self::LOCK_ON)
+            {
+                // Read under the lease: bootstrap's cached mode may predate another command's failure.
+                $rows = $db->query("SELECT `value` FROM ::config WHERE `key` = 'maintenance'")->fetchAll();
+                if (count($rows) !== 1 || !in_array((string)$rows[0]->value, ['0', '1'], true))
+                    throw new \RuntimeException();
+                self::$lock = (int)$rows[0]->value;
+            }
+            if (Cfg::set('MAINTENANCE', $value) !== '')
+                throw new \RuntimeException();
+            $rows = DB::Aowow()->query("SELECT `value` FROM ::config WHERE `key` = 'maintenance'")->fetchAll();
+            if (count($rows) !== 1 || (string)$rows[0]->value !== (string)$value)
+                throw new \RuntimeException();
+            return true;
+        }
+        catch (\Throwable)
+        {
+            // An unlock may have reached the server before its acknowledgement failed.
+            if ($value === self::LOCK_OFF)
+                try { Cfg::set('MAINTENANCE', self::LOCK_ON); } catch (\Throwable) { }
+            CLI::write('Could not verify maintenance mode in the database.', CLI::LOG_ERROR);
+            return false;
+        }
     }
-
 
     /*******************/
     /* MPQ-file access */
@@ -643,9 +699,9 @@ class CLISetup
     /* file handling */
     /*****************/
 
-    public static function writeFile(string $file, string $content) : bool
+    public static function writeFile(string $file, string $content, ?int $access = null) : bool
     {
-        if (Util::writeFile($file, $content))
+        if (Util::writeFile($file, $content, $access))
         {
             CLI::write('created file '. CLI::bold($file), CLI::LOG_OK, true, true);
             return true;

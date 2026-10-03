@@ -135,7 +135,7 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
             $infoMask |= LISTVIEWINFO_VENDOR;
 
         if ($xCols)
-            $this->sharedLV['extraCols'] = '$fi_getExtraCols(fi_extraCols, '.($fiForm['gm'] ?? 0).', '.(array_intersect([63], $xCols) ? 1 : 0).')';
+            $this->sharedLV['extraCols'] = new JsExpression('fi_getExtraCols(fi_extraCols, '.($fiForm['gm'] ?? 0).', '.(array_intersect([63], $xCols) ? 1 : 0).')');
 
         $this->createExtraMenus();                          // right side panels in search form
 
@@ -228,7 +228,7 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
             {
                 $fiForm['gb'] = ItemListFilter::GROUP_BY_SLOT;
                 $maxResults = 25;
-                $this->sharedLV['customFilter'] = '$fi_filterUpgradeListview';
+                $this->sharedLV['customFilter'] = new JsExpression('fi_filterUpgradeListview');
             }
         }
 
@@ -349,7 +349,7 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
             // if sold by vendor; append cost column
             if ($this->filter->getSetCriteria(92) && is_array($this->sharedLV['extraCols']))
             {
-                $this->sharedLV['extraCols']['cost'] = '$Listview.extraCols.cost';
+                $this->sharedLV['extraCols']['cost'] = new JsExpression('Listview.extraCols.cost');
                 $data = $items->getListviewData($infoMask | LISTVIEWINFO_VENDOR);
             }
             else
@@ -394,7 +394,7 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
                 };
 
                 $tabData['name'] = $nameSource[$group];
-                $tabData['tabs'] = '$tabsGroups';
+                $tabData['tabs'] = new JsExpression('tabsGroups');
             }
 
             if ($this->filter->fiSetWeights)
@@ -415,7 +415,7 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
                 {
                     case ItemListFilter::GROUP_BY_SLOT:
                         $override['sl'] = $group;
-                        $tabData['note'] = '$$WH.sprintf(LANG.lvnote_viewmoreslot, \''.$catg.'\', \''.$this->filter->buildGETParam($override).'\')';
+                $tabData['note'] = JsExpression::call('$WH.sprintf', new JsExpression('LANG.lvnote_viewmoreslot'), $catg, $this->filter->buildGETParam($override));
                         break;
                     case ItemListFilter::GROUP_BY_LEVEL:
                         if ($group > 0)
@@ -426,18 +426,18 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
                         else
                             $override['maxle'] = abs($group) - 1;
 
-                        $tabData['note'] = '$$WH.sprintf(LANG.lvnote_viewmorelevel, \''.$catg.'\', \''.$this->filter->buildGETParam($override).'\')';
+                $tabData['note'] = JsExpression::call('$WH.sprintf', new JsExpression('LANG.lvnote_viewmorelevel'), $catg, $this->filter->buildGETParam($override));
                         break;
                     case ItemListFilter::GROUP_BY_SOURCE:
                         if ($_ = [null, 3, 4, 5, 6, 7, 9, 10, 11][$group])
-                            $tabData['note'] = '$$WH.sprintf(LANG.lvnote_viewmoresource, \''.$catg.'\', \''.$this->filter->buildGETParam($override, [[128, $_, 0]]).'\')';
+                $tabData['note'] = JsExpression::call('$WH.sprintf', new JsExpression('LANG.lvnote_viewmoresource'), $catg, $this->filter->buildGETParam($override, [[128, $_, 0]]));
 
                         break;
                 }
             }
             else if ($items->getMatches() > $maxResults)
             {
-                $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_itemsfound', $items->getMatches(), Listview::DEFAULT_SIZE);
+                $tabData['note'] = new JsExpression(substr(sprintf(Util::$tryFilteringString, 'LANG.lvnote_itemsfound', $items->getMatches(), Listview::DEFAULT_SIZE), 1));
                 $tabData['_truncated'] = 1;
             }
 
@@ -455,7 +455,7 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
             $tabs[] = $tabData;
         }
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsGroups', $forceTabs && $tabs);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")], 'tabsGroups', $forceTabs && $tabs);
 
         // whoops, we have no data? create emergency content
         if (!count($tabs))
@@ -482,8 +482,8 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
         if (!$this->filter->fiSetWeights)
             return;
 
-        $this->sharedLV['onBeforeCreate'] = '$fi_initWeightedListview';
-        $this->sharedLV['onAfterCreate']  = '$fi_addUpgradeIndicator';
+        $this->sharedLV['onBeforeCreate'] = new JsExpression('fi_initWeightedListview');
+        $this->sharedLV['onAfterCreate']  = new JsExpression('fi_addUpgradeIndicator');
         $this->sharedLV['sort']           = ['-score', 'name'];
 
         array_push($this->sharedLV['hiddenCols'], 'type', 'source');
@@ -491,7 +491,7 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
         if (!$this->filter->values['gm'])
             return;
 
-        $this->sharedLV['computeDataFunc'] = '$fi_scoreSockets';
+        $this->sharedLV['computeDataFunc'] = new JsExpression('fi_scoreSockets');
 
         $q    = $this->filter->values['gm'];
         $mask = 0xE;

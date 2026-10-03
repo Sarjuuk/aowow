@@ -30,9 +30,9 @@ class TopusersBaseResponse extends TemplateResponse
         array_unshift($this->title, $this->h1);
 
         $tabs = array(
-            [0,              'top-users-alltime', '$LANG.alltime_stc'  ],
-            [time() - MONTH, 'top-users-monthly', '$LANG.lastmonth_stc'],
-            [time() - WEEK,  'top-users-weekly',  '$LANG.lastweek_stc' ]
+            [0,              'top-users-alltime', new JsExpression('LANG.alltime_stc')  ],
+            [time() - MONTH, 'top-users-monthly', new JsExpression('LANG.lastmonth_stc')],
+            [time() - WEEK,  'top-users-weekly',  new JsExpression('LANG.lastweek_stc') ]
         );
 
         // expected by javascript but metrics are not used by us
@@ -44,7 +44,7 @@ class TopusersBaseResponse extends TemplateResponse
             'copper'  => 0
         );
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], __forceTabs: true);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")], __forceTabs: true);
 
         foreach ($tabs as [$time, $tabId, $tabName])
         {

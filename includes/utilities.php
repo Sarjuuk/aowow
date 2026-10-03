@@ -36,14 +36,10 @@ class SimpleXML extends \SimpleXMLElement
 /** dumping ground for functions that don't really have a home, so to speak */
 abstract class Util
 {
-    /* NOTE!
-     * FILE_ACCESS should be 0755 or less, but CLI and web interface both access the same files. While in CLI php is executed with the current users perms,
-     * while the web interface is always executed by www-data (or whoever runs the web server) who does not own the files previously created via CLI.
-     * And thus web interface actions fail with permission denied, unless the files are flagged +wx for everyone.
-     * This probably has to be solved on the system level by having www-data and the CLI user share a group or something.
-     */
-    public const int FILE_ACCESS = 0777;
-    public const int DIR_ACCESS  = 0777;
+    // New public assets use ordinary modes. Deployment must grant only the intended CLI/FPM owners access;
+    // existing directory/file modes are preserved, and private cache uses its own stricter helpers.
+    public const int FILE_ACCESS = 0644;
+    public const int DIR_ACCESS  = 0755;
 
     private const int GEM_SCORE_BASE_WOTLK = 16;            // rare quality wotlk gem score
     private const int GEM_SCORE_BASE_BC    = 8;             // rare quality bc gem score
@@ -413,26 +409,34 @@ abstract class Util
         return $errCode ? '' : ($nameMatch[0] ?: $name);
     }
 
-    public static function validatePassword(?string $pass, ?int &$errCode = 0) : string
+    public const int PASSWORD_MIN_CHARACTERS = 15;
+    public const int PASSWORD_MAX_BYTES = 72;
+    public const int PASSWORD_INPUT_MAX_BYTES = 4096;
+
+    /** Check raw credentials without applying the new-password minimum to existing accounts. */
+    public static function validatePasswordInput(#[\SensitiveParameter] ?string $pass) : string
     {
-        if (is_null($pass) || $pass === '')
+        if ($pass === null || $pass === '' || strlen($pass) > self::PASSWORD_INPUT_MAX_BYTES ||
+            !preg_match('/^[^[:cntrl:]]+$/uD', $pass))
             return '';
 
-        $errCode   = 0;
-        $passMatch = '';
-        [$min, $max, $pattern] = match(Cfg::get('ACC_AUTH_MODE'))
-        {
-            AUTH_MODE_SELF  => [6, 0, '/^[^[:cntrl:]]+$/'],
-            AUTH_MODE_REALM => [0, 0, '/^[^[:cntrl:]]+$/'],
-            default         => [0, 0, '/^[^[:cntrl:]]+$/']
-        };
+        return $pass;
+    }
 
-        if (($min && mb_strlen($pass) < $min) || ($max && mb_strlen($pass) > $max))
+    /** New local passwords must fit bcrypt in bytes; preserve spaces and Unicode without normalization. */
+    public static function validatePassword(#[\SensitiveParameter] ?string $pass, ?int &$errCode = 0) : string
+    {
+        $errCode = 0;
+        if ($pass === null || $pass === '')
+            return '';
+
+        if (Cfg::get('ACC_AUTH_MODE') == AUTH_MODE_SELF &&
+            (strlen($pass) > self::PASSWORD_MAX_BYTES || mb_strlen($pass, 'UTF-8') < self::PASSWORD_MIN_CHARACTERS))
             $errCode = 1;
-        else if ($pattern && !preg_match($pattern, $pass, $passMatch))
+        else if (!self::validatePasswordInput($pass))
             $errCode = 2;
 
-        return $errCode ? '' : ($passMatch[0] ?: $pass);
+        return $errCode ? '' : $pass;
     }
 
     public static function validateEmail(?string $email) : string
@@ -468,14 +472,14 @@ abstract class Util
         return true;
     }
 
-    // just some random numbers for unsafe identification purpose
+    // Cryptographically secure, unbiased tokens retain the existing alphabet and wire lengths.
     public static function createHash(int $length = 40) : string
     {
-        static $seed = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        static $alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         $hash = '';
 
         for ($i = 0; $i < $length; $i++)
-            $hash .= substr($seed, mt_rand(0, 61), 1);
+            $hash .= $alphabet[random_int(0, 61)];
 
         return $hash;
     }
@@ -592,6 +596,7 @@ abstract class Util
         return DB::Aowow()->qry('INSERT IGNORE INTO ::account_reputation %v', $x);
     }
 
+    /** Encodes data as JSON, including safe embedding in HTML scripts; strings are always data. */
     public static function toJSON(mixed $data, int $forceFlags = 0) : string
     {
         $flags = $forceFlags ?: (JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE);
@@ -601,9 +606,7 @@ abstract class Util
 
         try
         {
-            // handle strings prefixed with $ as js-variables
-            // literal: match everything (lazy) between first pair of unescaped double quotes. First character must be $.
-            return preg_replace_callback('/(?<!\\\\)"\$(.+?)(?<!\\\\)"/i', fn($m) => str_replace('\"', '"', $m[1]), json_encode($data, $flags | JSON_THROW_ON_ERROR)) ?? '';
+            return json_encode($data, $flags | JSON_HEX_TAG | JSON_THROW_ON_ERROR);
         }
         catch (\JsonException $e)
         {
@@ -612,24 +615,122 @@ abstract class Util
         }
     }
 
+    /** Encodes JavaScript configuration; only explicit JsExpression instances bypass JSON quoting. */
+    public static function toJavaScript(mixed $data, int $forceFlags = 0) : string
+    {
+        $flags = $forceFlags ?: (JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE);
+
+        if (Cfg::get('DEBUG') && !$forceFlags)
+            $flags |= JSON_PRETTY_PRINT;
+
+        try
+        {
+            return self::encodeJavaScript($data, $flags | JSON_HEX_TAG | JSON_THROW_ON_ERROR, 0, new \SplObjectStorage);
+        }
+        catch (\JsonException $e)
+        {
+            trigger_error(__METHOD__.' - '.$e->getMessage(), E_USER_WARNING);
+            return '';
+        }
+    }
+
+    /** Serializes structural values without textual substitutions that could promote user strings to code. */
+    private static function encodeJavaScript(mixed $data, int $flags, int $depth, \SplObjectStorage $ancestors) : string
+    {
+        if ($data instanceof JsExpression)
+            return $data->expression;
+
+        if ((!is_array($data) && !is_object($data)) || $data instanceof \UnitEnum)
+            return json_encode($data, $flags);
+
+        if ($depth >= 512)
+            throw new \JsonException('Maximum stack depth exceeded', JSON_ERROR_DEPTH);
+
+        $object = is_object($data) ? $data : null;
+        if ($object)
+        {
+            if ($ancestors->offsetExists($object))
+                throw new \JsonException('Recursion detected', JSON_ERROR_RECURSION);
+
+            $ancestors->offsetSet($object);
+        }
+
+        try
+        {
+            if ($data instanceof \JsonSerializable)
+            {
+                $serialized = $data->jsonSerialize();
+                // json_encode serializes public properties when jsonSerialize returns the same object.
+                return self::encodeJavaScript($serialized === $data ? (object)get_object_vars($data) : $serialized, $flags, $depth, $ancestors);
+            }
+
+            $list   = is_array($data) && array_is_list($data) && !($flags & JSON_FORCE_OBJECT);
+            $values = is_array($data) ? $data : get_object_vars($data);
+            $pretty = (bool)($flags & JSON_PRETTY_PRINT);
+            $parts  = [];
+
+            foreach ($values as $key => $value)
+            {
+                // Object keys must remain strings even when numeric values are converted.
+                $part = $list ? '' : json_encode((string)$key, $flags & ~JSON_NUMERIC_CHECK).($pretty ? ': ' : ':');
+                $part .= self::encodeJavaScript($value, $flags, $depth + 1, $ancestors);
+                $parts[] = ($pretty ? str_repeat('    ', $depth + 1) : '').$part;
+            }
+
+            $open  = $list ? '[' : '{';
+            $close = $list ? ']' : '}';
+
+            return $open.($pretty && $parts ? "\n" : '').implode($pretty ? ",\n" : ',', $parts).
+                ($pretty && $parts ? "\n".str_repeat('    ', $depth) : '').$close;
+        }
+        finally
+        {
+            if ($object)
+                $ancestors->offsetUnset($object);
+        }
+    }
+
 
     /*****************/
     /* file handling */
     /*****************/
 
-    public static function writeFile(string $file, string $content) : bool
+    public static function writeFile(string $file, string $content, ?int $access = null) : bool
     {
         $success = false;
 
-        $parentDir = mb_substr($file, 0, mb_strrpos($file, DIRECTORY_SEPARATOR));
-        if (!self::writeDir($parentDir))
+        if (is_link($file))
+            return false;
+        $exists = is_file($file);
+
+        // Private callers may narrow existing modes; the public default never changes them.
+        if ($exists && $access !== null && !@chmod($file, fileperms($file) & $access & 0666))
             return false;
 
-        if ($handle = @fOpen($file, "w"))
+        $parentDir = mb_substr($file, 0, mb_strrpos($file, DIRECTORY_SEPARATOR));
+        // Existing approved assets can be writable while their PHP-containing parent remains immutable.
+        if (!$exists && !self::writeDir($parentDir))
+            return false;
+
+        // New contents stay owner-only until the complete file is ready for its intended readers.
+        $oldMask = umask(0077);
+        try { $handle = @fOpen($file, $exists ? 'r+b' : 'xb'); }
+        finally { umask($oldMask); }
+        if ($handle)
         {
-            if (fWrite($handle, $content))
-                $success = true;
-            else
+            if (ftruncate($handle, 0))
+            {
+                $offset = 0;
+                while ($offset < strlen($content))
+                {
+                    $written = fwrite($handle, substr($content, $offset, 65536));
+                    if ($written === false || $written === 0)
+                        break;
+                    $offset += $written;
+                }
+                $success = $offset === strlen($content) && fflush($handle);
+            }
+            if (!$success)
                 trigger_error('could not write to file', E_USER_WARNING);
 
             fClose($handle);
@@ -637,8 +738,9 @@ abstract class Util
         else
             trigger_error('could not create file', E_USER_WARNING);
 
-        if ($success)
-            @chmod($file, self::FILE_ACCESS);
+        // Respect operator-selected access modes on existing assets; never reopen world-write access.
+        if ($success && !$exists)
+            $success = @chmod($file, ($access ?? self::FILE_ACCESS) & 0666);
 
         return $success;
     }
@@ -650,18 +752,7 @@ abstract class Util
         $exist = is_dir($dir);
 
         if ($exist)
-        {
-            if (fileperms($dir) != self::DIR_ACCESS && !@chmod($dir, self::DIR_ACCESS))
-                trigger_error(CLI::bold($dir) . ' may be inaccessible to the web service.', E_USER_WARNING);
-
             return is_writable($dir);
-        }
-
-        // apparently chmod can't edit a whole path at once
-        $path = '';
-        foreach(explode('/', $dir) as $segment)
-            if (is_dir($path .= $segment.'/') && fileperms($path) != self::DIR_ACCESS)
-                @chmod($path, self::DIR_ACCESS);
 
         if (@mkdir($dir, self::DIR_ACCESS, true))
             return true;
@@ -961,9 +1052,9 @@ abstract class Util
             if (isset($menu[$p['areaId']]))
                 continue;
             else if ($p['areaId'] == $parentArea)
-                $menu[$p['areaId']] = [$p['areaId'], '$g_zones['.$p['areaId'].']', '', null, ['class' => 'checked q0']];
+                $menu[$p['areaId']] = [$p['areaId'], new JsExpression('g_zones['.$p['areaId'].']'), '', null, ['class' => 'checked q0']];
             else
-                $menu[$p['areaId']] = [$p['areaId'], '$g_zones['.$p['areaId'].']', '$spawnposfix.bind(null, '.$type.', '.$guid.', '.$p['areaId'].', 0)', null, null];
+                $menu[$p['areaId']] = [$p['areaId'], new JsExpression('g_zones['.$p['areaId'].']'), new JsExpression('spawnposfix.bind(null, '.$type.', '.$guid.', '.$p['areaId'].', 0)'), null, null];
         }
 
         foreach ($floors as $area => $f)
@@ -976,9 +1067,9 @@ abstract class Util
             foreach ($f as $n)
             {
                 if ($n == $parentFloor)
-                    $menu[$area][MENU_IDX_SUB][] = [$n, '$g_zone_areas['.$area.']['.($n - 1).']', '', null, ['class' => 'checked q0']];
+                    $menu[$area][MENU_IDX_SUB][] = [$n, new JsExpression('g_zone_areas['.$area.']['.($n - 1).']'), '', null, ['class' => 'checked q0']];
                 else
-                    $menu[$area][MENU_IDX_SUB][] = [$n, '$g_zone_areas['.$area.']['.($n - 1).']', '$spawnposfix.bind(null, '.$type.', '.$guid.', '.$area.', '.$n.')'];
+                    $menu[$area][MENU_IDX_SUB][] = [$n, new JsExpression('g_zone_areas['.$area.']['.($n - 1).']'), new JsExpression('spawnposfix.bind(null, '.$type.', '.$guid.', '.$area.', '.$n.')')];
             }
         }
 

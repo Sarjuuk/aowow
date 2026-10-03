@@ -17,5 +17,6 @@
         <p class="account-delete-box-confirm">
             <input type="submit" name="proceed" value="Continuer" />
         </p>
+        <?=$this->csrfField();?>
     </form>
 </div>

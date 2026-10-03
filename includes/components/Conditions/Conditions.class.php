@@ -334,7 +334,7 @@ class Conditions
     /* OUT */
     /*******/
 
-    public function toListviewTab(string $id = 'conditions', string $name = '') : array
+    public function toListviewTab(string $id = 'conditions', string|JsExpression $name = '') : array
     {
         if (!$this->result)
             return [];
@@ -360,14 +360,14 @@ class Conditions
         }
 
         $data = "<script type=\"text/javascript\">\n" .
-                "    var markup = ConditionList.createTab(".Util::toJSON($out).");\n" .
+                "    var markup = ConditionList.createTab(".Util::toJavaScript($out).");\n" .
                 "    Markup.printHtml(markup, 'tab-".$id."', { allow: Markup.CLASS_STAFF })\n" .
                 "</script>";
 
         $tab = array(
             'data' => $data,
             'id'   => $id,
-            'name' => ($name ?: '$LANG.tab_conditions') . '+" ('.$nCnd.')"'
+            'name' => new JsExpression(($name instanceof JsExpression ? $name->expression : ($name ? Util::toJSON($name, JSON_UNESCAPED_UNICODE) : 'LANG.tab_conditions')) . '+" ('.$nCnd.')"')
         );
 
         return $tab;
@@ -406,7 +406,7 @@ class Conditions
         }
 
         if ($success)
-            $extraCols[] = '$Listview.extraCols.condition';
+            $extraCols[] = new JsExpression('Listview.extraCols.condition');
 
         return $success;
     }

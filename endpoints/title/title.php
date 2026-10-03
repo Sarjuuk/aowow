@@ -135,7 +135,7 @@ class TitleBaseResponse extends TemplateResponse implements ICache
         /* Extra Tabs */
         /**************/
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")], 'tabsRelated', true);
 
         // tab: reward-from-quest
         $quests = new QuestList(array(['rewardTitleId', $this->typeId]));
@@ -146,7 +146,7 @@ class TitleBaseResponse extends TemplateResponse implements ICache
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data'        => $quests->getListviewData(),
                 'id'          => 'reward-from-quest',
-                'name'        => '$LANG.tab_rewardfrom',
+                'name'        => new JsExpression('LANG.tab_rewardfrom'),
                 'hiddenCols'  => ['experience', 'money'],
                 'visibleCols' => ['category']
             ), QuestList::$brickFile));
@@ -163,7 +163,7 @@ class TitleBaseResponse extends TemplateResponse implements ICache
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data'        => $acvs->getListviewData(),
                     'id'          => 'reward-from-achievement',
-                    'name'        => '$LANG.tab_rewardfrom',
+                    'name'        => new JsExpression('LANG.tab_rewardfrom'),
                     'visibleCols' => ['category'],
                     'sort'        => ['reqlevel', 'name']
                 ), AchievementList::$brickFile));
@@ -181,7 +181,7 @@ class TitleBaseResponse extends TemplateResponse implements ICache
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data'        => $acvs->getListviewData(),
                     'id'          => 'criteria-of',
-                    'name'        => '$LANG.tab_criteriaof',
+                    'name'        => new JsExpression('LANG.tab_criteriaof'),
                     'visibleCols' => ['category']
                 ), AchievementList::$brickFile));
             }
@@ -190,7 +190,7 @@ class TitleBaseResponse extends TemplateResponse implements ICache
         // tab: condition-for
         $cnd = new Conditions();
         $cnd->getByCondition(Type::TITLE, $this->typeId)->prepare();
-        if ($tab = $cnd->toListviewTab('condition-for', '$LANG.tab_condition_for'))
+        if ($tab = $cnd->toListviewTab('condition-for', new JsExpression('LANG.tab_condition_for')))
         {
             $this->extendGlobalData($cnd->getJSGlobals());
             $this->lvTabs->addDataTab(...$tab);

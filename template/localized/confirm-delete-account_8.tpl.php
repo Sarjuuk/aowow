@@ -28,5 +28,6 @@
             <input type="submit" class="button" name="submit" value="Забыть мою учетную запись навсегда" />
             <input type="submit" class="button" name="cancel" value="Отмена процесса «Забыть меня»" />
         </p>
+        <?=$this->csrfField();?>
     </form>
 </div>

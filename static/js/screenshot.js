@@ -1,3 +1,10 @@
+// Private/deleted previews use the application session; approved images keep their public static URLs.
+function ssm_ImageUrl(screenshot, thumbnail) {
+    if (screenshot.pending || screenshot.status == 999)
+        return '?upload=preview&kind=pending&id=' + encodeURIComponent(screenshot.id);
+    return g_staticUrl + '/uploads/screenshots/' + (thumbnail ? 'thumb' : 'normal') + '/' + screenshot.id + '.jpg';
+}
+
 var ss_managedRow       = null;
 var ss_getAll           = false;                            // never changed (maybe with ?admin=screenshots&amp;all)
 var ssm_ViewedRow       = null;
@@ -265,7 +272,7 @@ function ssm_UpdateList(openNext) {
         td.align = 'center';
 
         var a = $WH.ce('a');
-        a.href = g_staticUrl + '/uploads/screenshots/' + (screenshot.status != 999 && !screenshot.pending ? 'normal' : 'pending') + '/' + screenshot.id + '.jpg';
+        a.href = ssm_ImageUrl(screenshot, false);
         a.target = '_blank';
         a.onclick = function (id, e) {
             $WH.sp(e);
@@ -274,7 +281,7 @@ function ssm_UpdateList(openNext) {
         }.bind(tr, screenshot.id);
 
         var img = $WH.ce('img');
-        img.src = g_staticUrl + '/uploads/screenshots/' + (screenshot.status != 999 && !screenshot.pending ? 'thumb' : 'pending') + '/' + screenshot.id + '.jpg';
+        img.src = ssm_ImageUrl(screenshot, true);
         img.height = 50;
         $WH.ae(a, img);
 
@@ -756,7 +763,7 @@ var ScreenshotManager = new function () {
 
         computeDimensions(0);
 
-        var url = g_staticUrl + '/uploads/screenshots/' + (screenshot.pending ? 'pending' : 'normal') + '/' + screenshot.id + '.jpg';
+        var url = ssm_ImageUrl(screenshot, false);
 
         var html = '<img src="' + url + '" width="' + imgWidth + '" height="' + imgHeight + '"';
         html += '>';
@@ -764,7 +771,7 @@ var ScreenshotManager = new function () {
         imgDiv.innerHTML = html;
 
         if (!resizing) {
-            aOriginal.href = g_staticUrl + '/uploads/screenshots/' + (screenshot.pending ? 'pending' : 'normal') + '/' + screenshot.id + '.jpg';
+            aOriginal.href = ssm_ImageUrl(screenshot, false);
             var hasFrom = screenshot.date && screenshot.user;
             if (hasFrom) {
                 var
@@ -1061,7 +1068,7 @@ var ScreenshotManager = new function () {
                 restoreLightbox();
             }).bind(loadingImage, lightboxTimer);
 
-            loadingImage.src = (screenshot.url ? screenshot.url : g_staticUrl + '/uploads/screenshots/' + (screenshot.pending ? 'pending' : 'normal') + '/' + screenshot.id + '.jpg');
+            loadingImage.src = (screenshot.url ? screenshot.url : ssm_ImageUrl(screenshot, false));
         }
         else
             render();

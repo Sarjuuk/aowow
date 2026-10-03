@@ -20,6 +20,10 @@ class AccountActivateResponse extends TemplateResponse
         'key' => ['filter' => FILTER_VALIDATE_REGEXP, 'options' => ['regexp' => '/^[a-zA-Z0-9]{40}$/']]
     );
 
+    protected array $expectedPOST = array(
+        'key' => ['filter' => FILTER_VALIDATE_REGEXP, 'options' => ['regexp' => '/^[a-zA-Z0-9]{40}$/']]
+    );
+
     private bool $success = false;
 
     public function __construct()
@@ -35,6 +39,18 @@ class AccountActivateResponse extends TemplateResponse
 
     protected function generate() : void
     {
+        // Email scanners and link prefetches must not consume bearer tokens.
+        if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST')
+        {
+            $this->inputbox = ['inputbox-form-confirm', [
+                'head' => Lang::account('title'),
+                'action' => '?account=activate',
+                'key' => $this->_get['key'] ?: ''
+            ]];
+            parent::generate();
+            return;
+        }
+
         $this->title[] = Lang::account('title');
 
         $msg = $this->activate();
@@ -52,20 +68,19 @@ class AccountActivateResponse extends TemplateResponse
 
     private function activate() : string
     {
-        if (!$this->assertGET('key'))
+        if (!$this->assertPOST('key'))
             return Lang::main('intError');
 
-        if (DB::Aowow()->selectCell('SELECT `id` FROM ::account WHERE `status` IN %in AND `token` = %s', [ACC_STATUS_NONE, ACC_STATUS_NEW], $this->_get['key']))
+        $activation = AccountActivation::activate($this->_post['key'], User::$ip);
+        if ($activation['status'] === AccountActivation::OK)
         {
-            // don't remove the token yet. It's needed on signin page.
-            DB::Aowow()->qry('UPDATE ::account SET `status` = %i, `statusTimer` = 0, `userGroups` = %i WHERE `token` = %s', ACC_STATUS_NONE, U_GROUP_NONE, $this->_get['key']);
-
-            // fully apply block for further registration attempts from this ip
-            DB::Aowow()->qry('REPLACE INTO ::account_bannedips (`ip`, `type`, `count`, `unbanDate`) VALUES (%s, %i, %i + 1, UNIX_TIMESTAMP() + %i)',
-                User::$ip, IP_BAN_TYPE_REGISTRATION_ATTEMPT, Cfg::get('ACC_FAILED_AUTH_COUNT'), Cfg::get('ACC_FAILED_AUTH_BLOCK'));
+            $_SESSION['activationSignin'] = [
+                'key' => $this->_post['key'], 'login' => $activation['login'], 'rememberMe' => $activation['rememberMe'],
+                'expires' => time() + 5 * MINUTE
+            ];
 
             $this->success = true;
-            return Lang::account('inputbox', 'message', 'accActivated', [$this->_get['key']]);
+            return Lang::account('inputbox', 'message', 'accActivated', [$this->_post['key']]);
         }
 
         // grace period expired and other user claimed name

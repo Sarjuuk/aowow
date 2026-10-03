@@ -565,7 +565,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
         /* Extra Tabs */
         /**************/
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")], 'tabsRelated', true);
 
         // tab: drops
         if (in_array($this->subject->getField('category'), [MAP_TYPE_DUNGEON, MAP_TYPE_RAID]))
@@ -595,14 +595,14 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
             $tabData = array(
                 'data'            => $data,
                 'id'              => 'drops',
-                'name'            => '$LANG.tab_drops',
-                'extraCols'       => $subTabs ? ['$Listview.extraCols.mode'] : null,
-                'computeDataFunc' => '$Listview.funcBox.initLootTable',
-                'onAfterCreate'   => $subTabs ? '$Listview.funcBox.addModeIndicator' : null
+                'name'            => new JsExpression('LANG.tab_drops'),
+                'extraCols'       => $subTabs ? [new JsExpression('Listview.extraCols.mode')] : null,
+                'computeDataFunc' => new JsExpression('Listview.funcBox.initLootTable'),
+                'onAfterCreate'   => $subTabs ? new JsExpression('Listview.funcBox.addModeIndicator') : null
             );
 
             if (!is_null(ItemListFilter::getCriteriaIndex(16, $this->typeId)))
-                $tabData['note'] = sprintf(Util::$filterResultString, '?items&filter=cr=16;crs='.$this->typeId.';crv=0');
+                $tabData['note'] = new JsExpression(substr(sprintf(Util::$filterResultString, '?items&filter=cr=16;crs='.$this->typeId.';crv=0'), 1));
 
             $this->extendGlobalData($items->getJSGlobals(GLOBALINFO_SELF));
 
@@ -615,7 +615,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
             $tabData = ['data' => $creatureSpawns->getListviewData()];
 
             if (!is_null(CreatureListFilter::getCriteriaIndex(6, $this->typeId)))
-                $tabData['note'] = sprintf(Util::$filterResultString, '?npcs&filter=cr=6;crs='.$this->typeId.';crv=0');
+                $tabData['note'] = new JsExpression(substr(sprintf(Util::$filterResultString, '?npcs&filter=cr=6;crs='.$this->typeId.';crv=0'), 1));
 
             if ($creatureSpawns->getMatches() > Listview::DEFAULT_SIZE)
                 $tabData['_truncated'] = 1;
@@ -631,7 +631,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
             $tabData = ['data' => $objectSpawns->getListviewData()];
 
             if (!is_null(GameObjectListFilter::getCriteriaIndex(1, $this->typeId)))
-                $tabData['note'] = sprintf(Util::$filterResultString, '?objects&filter=cr=1;crs='.$this->typeId.';crv=0');
+                $tabData['note'] = new JsExpression(substr(sprintf(Util::$filterResultString, '?objects&filter=cr=1;crs='.$this->typeId.';crv=0'), 1));
 
             if ($objectSpawns->getMatches() > Listview::DEFAULT_SIZE)
                 $tabData['_truncated'] = 1;
@@ -668,9 +668,9 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
                     continue;
 
                 if (!is_null(ItemListFilter::getCriteriaIndex(126, $this->typeId)))
-                    $tabData['note'] = '$$WH.sprintf(LANG.lvnote_zonequests, '.$parent.', '.$this->typeId.',"'.$this->subject->getField('name', true).'", '.$this->typeId.')';
+                    $tabData['note'] = JsExpression::call('$WH.sprintf', new JsExpression('LANG.lvnote_zonequests'), (int)$parent, $this->typeId, $this->subject->getField('name', true), $this->typeId);
                 else
-                    $tabData['note'] = '$$WH.sprintf(LANG.lvnote_questsind, '.$parent.', '.$this->typeId.',"'.$this->subject->getField('name', true).'")';
+                    $tabData['note'] = JsExpression::call('$WH.sprintf', new JsExpression('LANG.lvnote_questsind'), (int)$parent, $this->typeId, $this->subject->getField('name', true));
                 break;
             }
 
@@ -695,7 +695,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
             {
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data' => $qsiList->getListviewData(),
-                    'name' => '$LANG.tab_startsquest',
+                    'name' => new JsExpression('LANG.tab_startsquest'),
                     'id'   => 'starts-quest'
                 ), ItemList::$brickFile));
 
@@ -711,11 +711,11 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
             {
                 $note = null;
                 if (!is_null(ItemListFilter::getCriteriaIndex(126, $this->typeId)))
-                    $note = sprintf(Util::$filterResultString, '?items&filter=cr=126;crs='.$this->typeId.';crv=0');
+                    $note = new JsExpression(substr(sprintf(Util::$filterResultString, '?items&filter=cr=126;crs='.$this->typeId.';crv=0'), 1));
 
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data' => $rewards->getListviewData(),
-                    'name' => '$LANG.tab_questrewards',
+                    'name' => new JsExpression('LANG.tab_questrewards'),
                     'id'   => 'quest-rewards',
                     'note' => $note
                 ), ItemList::$brickFile));
@@ -761,7 +761,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
 
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $crtOf->getListviewData(),
-                'name' => '$LANG.tab_criteriaof',
+                'name' => new JsExpression('LANG.tab_criteriaof'),
                 'id'   => 'criteria-of'
             ), AchievementList::$brickFile));
         }
@@ -771,7 +771,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
         if ($fish->formatListview())
         {
             $this->extendGlobalData($fish->jsGlobals);
-            $xCols = array_merge(['$Listview.extraCols.percent'], $fish->extraCols);
+            $xCols = array_merge([new JsExpression('Listview.extraCols.percent')], $fish->extraCols);
 
             $note = null;
             if ($skill = DB::World()->selectCell('SELECT `skill` FROM skill_fishing_base_level WHERE `entry` = %i', $this->typeId))
@@ -781,12 +781,12 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
 
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data'            => $fish->getResult(),
-                'name'            => '$LANG.tab_fishing',
+                'name'            => new JsExpression('LANG.tab_fishing'),
                 'id'              => 'fishing',
                 'extraCols'       => array_unique($xCols),
                 'hiddenCols'      => ['side'],
                 'note'            => $note,
-                'computeDataFunc' => '$Listview.funcBox.initLootTable'
+                'computeDataFunc' => new JsExpression('Listview.funcBox.initLootTable')
             ), ItemList::$brickFile));
         }
 
@@ -838,7 +838,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
         {
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data'       => $subZones->getListviewData(),
-                'name'       => '$LANG.tab_zones',
+                'name'       => new JsExpression('LANG.tab_zones'),
                 'id'         => 'subzones',
                 'hiddenCols' => ['territory', 'instancetype']
             ), ZoneList::$brickFile));
@@ -882,7 +882,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
 
                 if (array_filter(array_column($zoneMusic, 'worldStateId')))
                 {
-                    $tabData['extraCols'] = ['$Listview.extraCols.condition'];
+                    $tabData['extraCols'] = [new JsExpression('Listview.extraCols.condition')];
 
                     foreach ($soundIds as $sId)
                         if (!empty($zoneMusic[$sId]['worldStateId']))
@@ -920,7 +920,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
         // tab: condition-for
         $cnd = new Conditions();
         $cnd->getByCondition(Type::ZONE, $this->typeId)->prepare();
-        if ($tab = $cnd->toListviewTab('condition-for', '$LANG.tab_condition_for'))
+        if ($tab = $cnd->toListviewTab('condition-for', new JsExpression('LANG.tab_condition_for')))
         {
             $this->extendGlobalData($cnd->getJSGlobals());
             $this->lvTabs->addDataTab(...$tab);

@@ -224,6 +224,10 @@ $lang = array(
         'pm'            => "p.m.",
 
         // error
+        'contributionLimit' => 'Достигнут лимит публикаций. Повторите попытку позже или обратитесь к модератору.',
+        'commentsPage' => 'Страница комментариев %d из %d',
+        'previousComments' => 'Предыдущие комментарии',
+        'nextComments' => 'Следующие комментарии',
         'intError'      => "[An internal error occured.]",
         'intError2'     => "[An internal error occured. (%s)]",
         'genericError'  => "Произошла ошибка; обновите страницу и попробуйте снова. Если ситуация повторяется, отправьте сообщение на <a href='#contact'>feedback</a>", # LANG.genericerror
@@ -1044,7 +1048,7 @@ $lang = array(
      // 'accInactive'   => "That account has not yet been confirmed active.",
         'errNameLength' => "Имя пользователя не должно быть короче 4 символов.", // message_usernamemin
         'errNameChars'  => "Имя пользователя может содержать только буквы и цифры.", // message_usernamenotvalid
-        'errPassLength' => "Ваш пароль должен состоять минимум из 6 знаков.", // message_passwordmin
+        'errPassLength' => "Используйте не менее 15 символов и не более 72 байт UTF-8 (некоторые символы занимают несколько байт).", // message_passwordmin
         'passMismatch'  => "The passwords you entered do not match.",
         'nameInUse'     => "That username is already in use.",
         'mailInUse'     => "That email is already registered to an account.",
@@ -1082,6 +1086,7 @@ $lang = array(
         'purge'         => "Сбросить",
         'curPass'       => "Текущий пароль:",
         'globalLogout'  => "Выйти на всех устройствах и/или браузерах 	",
+        'passwordLogoutNote' => "После подтверждения смены пароля все браузеры и устройства, включая это, будут отключены от аккаунта.",
         'curEmail'      => "Текущий адрес email:",
         'newEmail'      => "Новый адрес email:",
         'userPage'      => "Профиль пользователя",

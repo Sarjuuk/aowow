@@ -20,7 +20,7 @@ class GuildList extends DBTypeList
         foreach ($this->iterate() as $__)
         {
             $data[$this->id] = array(
-                'name'              => '$"'.str_replace ('"', '', $this->curTpl['name']).'"',   // MUST be a string, omit any quotes in name
+                'name'              => JsExpression::literal($this->curTpl['name']), // preserve numeric names without changing their text
                 'members'           => $this->curTpl['members'],
                 'faction'           => $this->curTpl['faction'],
                 'achievementpoints' => $this->getField('achievementpoints'),

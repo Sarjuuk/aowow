@@ -66,13 +66,13 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
         foreach (CLISetup::$locales as $loc)
             $result[$loc->value] = array(
-                'id'          => '$LOCALE_' . strtoupper($loc->json()),
+                'id'          => new JsExpression('LOCALE_' . strtoupper($loc->json())),
                 'name'        => $loc->json(),
                 'domain'      => $loc->domain(),
                 'description' => $loc->title()
             );
 
-        return Util::toJSON($result);
+        return Util::toJavaScript($result);
     }
 });
 

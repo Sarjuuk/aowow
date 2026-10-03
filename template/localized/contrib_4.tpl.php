@@ -46,6 +46,7 @@
     endif;
 ?>
 
+                <?=$this->csrfField();?>
             </form>
         </div>
         <div id="tab-submit-a-screenshot" style="display: none">
@@ -90,6 +91,7 @@
     endif;
 ?>
 
+                <?=$this->csrfField();?>
             </form>
         </div>
         <div id="tab-suggest-a-video" style="display: none">
@@ -129,5 +131,6 @@
     endif;
 ?>
 
+                <?=$this->csrfField();?>
             </form>
         </div>

@@ -36,7 +36,7 @@ class GotocommentBaseResponse extends TextResponse
             return;
         }
 
-        $this->redirectTo = sprintf('?%s=%d#comments:id=%d', Type::getFileString($comment['type']), $comment['typeId'], $comment['id']);
+        $this->redirectTo = sprintf('?%s=%d&coPage=%d#comments:id=%d', Type::getFileString($comment['type']), $comment['typeId'], CommunityContent::commentPage((int)$comment['id']), $comment['id']);
         if ($comment['id'] != $this->_get['id'])     // i am reply
             $this->redirectTo .= ':reply='.$this->_get['id'];
     }

@@ -165,7 +165,7 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
         /* Extra Tabs */
         /**************/
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")], 'tabsRelated', true);
 
         // used by gem
         $gemList = new ItemList(array(['gemEnchantmentId', $this->typeId]));
@@ -174,7 +174,7 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
             $this->extendGlobalData($gemList->getJSGlobals());
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $gemList->getListviewData(),
-                'name' => '$LANG.tab_usedby + \' \' + LANG.gems',
+                'name' => new JsExpression('LANG.tab_usedby + \' \' + LANG.gems'),
                 'id'   => 'used-by-gem',
             ), ItemList::$brickFile));
         }
@@ -186,7 +186,7 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
             $this->extendGlobalData($socketsList->getJSGlobals());
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $socketsList->getListviewData(),
-                'name' => '$LANG.tab_socketbonus',
+                'name' => new JsExpression('LANG.tab_socketbonus'),
                 'id'   => 'used-by-socketbonus',
             ), ItemList::$brickFile));
         }
@@ -221,7 +221,7 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
                 $this->extendGlobalData($ubItems->getJSGlobals(GLOBALINFO_SELF));
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data' => $ubItems->getListviewData(),
-                    'name' => '$LANG.tab_usedby + \' \' + LANG.types[3][0]',
+                    'name' => new JsExpression('LANG.tab_usedby + \' \' + LANG.types[3][0]'),
                     'id'   => 'used-by-item',
                 ), ItemList::$brickFile));
             }
@@ -253,7 +253,7 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
             if ($spellData)
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data' => $spellData,
-                    'name' => '$LANG.tab_usedby + \' \' + LANG.types[6][0]',
+                    'name' => new JsExpression('LANG.tab_usedby + \' \' + LANG.types[6][0]'),
                     'id'   => 'used-by-spell',
                 ), SpellList::$brickFile));
         }
@@ -289,8 +289,8 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
                     $this->lvTabs->addListviewTab(new Listview(array(
                         'data'      => $data,
                         'id'        => 'used-by-rand',
-                        'name'      => '$LANG.tab_usedby + \' \' + \''.Lang::item('_rndEnchants').'\'',
-                        'extraCols' => ['$Listview.extraCols.percent']
+                        'name'      => new JsExpression('LANG.tab_usedby + " " + '.Util::toJSON(Lang::item('_rndEnchants'), JSON_UNESCAPED_UNICODE)),
+                        'extraCols' => [new JsExpression('Listview.extraCols.percent')]
                     ), ItemList::$brickFile));
                 }
             }

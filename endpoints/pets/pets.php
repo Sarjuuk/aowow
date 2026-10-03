@@ -77,12 +77,12 @@ class PetsBaseResponse extends TemplateResponse implements ICache
             $tabData = array(
                 'data'            => $pets->getListviewData(),
                 'visibleCols'     => $visCols,
-                'computeDataFunc' => '$_',
+                'computeDataFunc' => new JsExpression('_'),
                 'hiddenCols'      => !$pets->hasDiffFields('type') ? ['type'] : null
             );
         };
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")]);
 
         $this->lvTabs->addListviewTab(new Listview($tabData, PetList::$brickFile, 'petFoodCol'));
 

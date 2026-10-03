@@ -90,7 +90,7 @@ class FactionsBaseResponse extends TemplateResponse implements ICache
         if (!$factions->error)
             $data = $factions->getListviewData();
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")]);
 
         $this->lvTabs->addListviewTab(new Listview(['data' => $data], FactionList::$brickFile));
 

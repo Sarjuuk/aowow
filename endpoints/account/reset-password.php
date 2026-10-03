@@ -30,8 +30,8 @@ class AccountresetpasswordResponse extends TemplateResponse
     protected array  $expectedPOST = array(
         'key'        => ['filter' => FILTER_VALIDATE_REGEXP, 'options' => ['regexp' => '/^[a-zA-Z0-9]{40}$/']],
         'email'      => ['filter' => FILTER_VALIDATE_EMAIL,  'flags'   => FILTER_FLAG_STRIP_AOWOW            ],
-        'password'   => ['filter' => FILTER_CALLBACK,        'options' => [self::class, 'checkTextLine']     ],
-        'c_password' => ['filter' => FILTER_CALLBACK,        'options' => [self::class, 'checkTextLine']     ]
+        'password'   => ['filter' => FILTER_CALLBACK,        'options' => [Util::class, 'validatePasswordInput']     ],
+        'c_password' => ['filter' => FILTER_CALLBACK,        'options' => [Util::class, 'validatePasswordInput']     ]
     );
 
     private bool $success = false;
@@ -99,19 +99,18 @@ class AccountresetpasswordResponse extends TemplateResponse
         if ($this->_post['password'] != $this->_post['c_password'])
             return Lang::account('passCheckFail');
 
-        $userData = DB::Aowow()->selectRow('SELECT `id`, `passHash` FROM ::account WHERE `token` = %s AND `email` = %s AND `status` = %i AND `statusTimer` > UNIX_TIMESTAMP()',
-            $this->_post['key'],
-            $this->_post['email'],
-            ACC_STATUS_RECOVER_PASS
-        );
-        if (!$userData)
-            return Lang::account('inputbox', 'error', 'emailNotFound');
+        // Use the same server policy as signup/change; never let a direct POST bypass it.
+        if (!Util::validatePassword($this->_post['password'], $e))
+            return $e == 1 ? Lang::account('errPassLength') : Lang::main('intError');
 
-        if (User::verifyCrypt($this->_post['c_password'], $userData['passHash']))
-            return Lang::account('newPassDiff');
-
-        if (!DB::Aowow()->qry('UPDATE ::account SET `passHash` = %s, `status` = %i WHERE `id` = %i', User::hashCrypt($this->_post['c_password']), ACC_STATUS_NONE, $userData['id']))
-            return Lang::main('intError');
+        $result = PasswordRecovery::reset($this->_post['key'], $this->_post['email'], $this->_post['password']);
+        if ($result !== PasswordRecovery::OK)
+            return match ($result)
+            {
+                PasswordRecovery::INVALID_TOKEN => Lang::account('inputbox', 'error', 'passTokenUsed'),
+                PasswordRecovery::SAME_PASSWORD => Lang::account('newPassDiff'),
+                default => Lang::main('intError')
+            };
 
         $this->success = true;
         return '';

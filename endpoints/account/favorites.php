@@ -19,7 +19,6 @@ class AccountFavoritesResponse extends TextResponse
         'add'        => ['filter' => FILTER_VALIDATE_INT],
         'remove'     => ['filter' => FILTER_VALIDATE_INT],
         'id'         => ['filter' => FILTER_VALIDATE_INT],
-     // 'sessionKey' => ['filter' => FILTER_VALIDATE_REGEXP, 'options' => ['regexp' => '/^[a-zA-Z0-9]{40}$/']] // usage of sessionKey omitted
     );
 
     protected function generate() : void

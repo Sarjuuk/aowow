@@ -41,6 +41,12 @@ class CommentEditResponse extends TextResponse
         if (!User::isInGroup(U_GROUP_MODERATOR))
             $this->_post['body'] = mb_substr($this->_post['body'], 0, (CommunityContent::COMMENT_LENGTH_MAX * (User::isPremium() ? 3 : 1)));
 
+        if (!ContributionBudget::reserve('comment', strlen($this->_post['body']) + strlen($this->_post['response'] ?? '')))
+        {
+            $_SESSION['error']['co'] = ContributionBudget::error();
+            return;
+        }
+
         $update = array(
             'body'       => $this->_post['body'],
             'editUserId' => User::$id,

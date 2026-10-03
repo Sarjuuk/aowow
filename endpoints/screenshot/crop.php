@@ -58,14 +58,21 @@ class ScreenshotCropResponse extends TemplateResponse
 
     protected function generate() : void
     {
+        if (!User::canUploadScreenshot())
+        {
+            $_SESSION['error']['ss'] = Lang::screenshot('error', 'notAllowed');
+            $this->forward('?'.Type::getFileString($this->destType).'='.$this->destTypeId.'#submit-a-screenshot');
+        }
+
         $this->h1 = Lang::screenshot('submission');
-        $fileBase = User::$username.'-'.$this->destType.'-'.$this->destTypeId.'-'.$this->imgHash;
 
         array_unshift($this->title, $this->h1);
 
         ScreenshotMgr::init();
 
-        if (!ScreenshotMgr::loadFile(ScreenshotMgr::PATH_TEMP, $fileBase.'_original'))
+        $preview = PrivateUpload::tempUrl('screenshot', $this->imgHash);
+        if (!($stage = PrivateUpload::screenshotStage($this->imgHash, $this->destType, $this->destTypeId)) ||
+            !$preview || !ScreenshotMgr::loadFile('%s', $stage['original']))
         {
             $_SESSION['error']['ss'] = Lang::main('intError');
             $this->forward('?'.Type::getFileString($this->destType).'='.$this->destTypeId.'#submit-a-screenshot');
@@ -74,7 +81,7 @@ class ScreenshotCropResponse extends TemplateResponse
         $dims = ScreenshotMgr::calcImgDimensions();
 
         $this->cropper = $dims + array(
-            'url'     => Cfg::get('STATIC_URL').'/uploads/screenshots/temp/'.$fileBase.'.jpg',
+            'url'     => $preview,
             'parent'  => 'ss-container',
             'minCrop' => ScreenshotMgr::$minSize,           // optional; defaults to 150 - min selection size (a square)
             'type'    => $this->destType,                   // only used to check against NPC: 15384 [OLDWorld Trigger (DO NOT DELETE)] for U_GROUP_MODERATOR | U_GROUP_EDITOR. If successful drops minCrop constraint

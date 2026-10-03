@@ -210,7 +210,7 @@ class FactionBaseResponse extends TemplateResponse implements ICache
         /* Extra Tabs */
         /**************/
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")], 'tabsRelated', true);
 
         // tab: items
         $items = new ItemList(array(Listview::DEFAULT_SIZE, ['requiredFaction', $this->typeId]), ['calcTotal' => true]);
@@ -220,13 +220,13 @@ class FactionBaseResponse extends TemplateResponse implements ICache
 
             $tabData = array(
                 'data'      => $items->getListviewData(),
-                'extraCols' => '$_',
+                'extraCols' => new JsExpression('_'),
                 'sort'      => ['standing', 'name']
             );
 
             if ($items->getMatches() > Listview::DEFAULT_SIZE)
                 if (!is_null(ItemListFilter::getCriteriaIndex(17, $this->typeId)))
-                    $tabData['note'] = sprintf(Util::$filterResultString, '?items&filter=cr=17;crs='.$this->typeId.';crv=0');
+                    $tabData['note'] = new JsExpression(substr(sprintf(Util::$filterResultString, '?items&filter=cr=17;crs='.$this->typeId.';crv=0'), 1));
 
             $this->lvTabs->addListviewTab(new Listview($tabData, ItemList::$brickFile, 'itemStandingCol'));
         }
@@ -255,13 +255,13 @@ class FactionBaseResponse extends TemplateResponse implements ICache
 
                     $tabData = array(
                         'data'      => $data,
-                        'extraCols' => '$_',
+                        'extraCols' => new JsExpression('_'),
                         'sort'      => ['-reputation', 'name']
                     );
 
                     if ($killCreatures->getMatches() > Listview::DEFAULT_SIZE)
                         if (!is_null(CreatureListFilter::getCriteriaIndex(42, $this->typeId)))
-                            $tabData['note'] = sprintf(Util::$filterResultString, '?npcs&filter=cr=42;crs='.$this->typeId.';crv=0');
+                            $tabData['note'] = new JsExpression(substr(sprintf(Util::$filterResultString, '?npcs&filter=cr=42;crs='.$this->typeId.';crv=0'), 1));
 
                     $this->addDataLoader('zones');
                     $this->lvTabs->addListviewTab(new Listview($tabData, CreatureList::$brickFile, 'npcRepCol'));
@@ -278,12 +278,12 @@ class FactionBaseResponse extends TemplateResponse implements ICache
                 $tabData = array(
                     'data' => $members->getListviewData(),
                     'id'   => 'member',
-                    'name' => '$LANG.tab_members'
+                    'name' => new JsExpression('LANG.tab_members')
                 );
 
                 if ($members->getMatches() > Listview::DEFAULT_SIZE)
                     if (!is_null(CreatureListFilter::getCriteriaIndex(3, $this->typeId)))
-                        $tabData['note'] = sprintf(Util::$filterResultString, '?npcs&filter=cr=3;crs='.$this->typeId.';crv=0');
+                        $tabData['note'] = new JsExpression(substr(sprintf(Util::$filterResultString, '?npcs&filter=cr=3;crs='.$this->typeId.';crv=0'), 1));
 
                 $this->addDataLoader('zones');
                 $this->lvTabs->addListviewTab(new Listview($tabData, CreatureList::$brickFile));
@@ -318,12 +318,12 @@ class FactionBaseResponse extends TemplateResponse implements ICache
 
             $tabData = array(
                 'data'      => $quests->getListviewData($this->typeId),
-                'extraCols' => '$_'
+                'extraCols' => new JsExpression('_')
             );
 
             if ($quests->getMatches() > Listview::DEFAULT_SIZE)
                 if (!is_null(QuestListFilter::getCriteriaIndex(1, $this->typeId)))
-                    $tabData['note'] = sprintf(Util::$filterResultString, '?quests&filter=cr=1;crs='.$this->typeId.';crv=0');
+                    $tabData['note'] = new JsExpression(substr(sprintf(Util::$filterResultString, '?quests&filter=cr=1;crs='.$this->typeId.';crv=0'), 1));
 
             $this->lvTabs->addListviewTab(new Listview($tabData, QuestList::$brickFile, 'questRepCol'));
         }
@@ -341,7 +341,7 @@ class FactionBaseResponse extends TemplateResponse implements ICache
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data'        => $acvs->getListviewData(),
                 'id'          => 'criteria-of',
-                'name'        => '$LANG.tab_criteriaof',
+                'name'        => new JsExpression('LANG.tab_criteriaof'),
                 'visibleCols' => ['category']
             ), AchievementList::$brickFile));
         }
@@ -349,7 +349,7 @@ class FactionBaseResponse extends TemplateResponse implements ICache
         // tab: condition-for
         $cnd = new Conditions();
         $cnd->getByCondition(Type::FACTION, $this->typeId)->prepare();
-        if ($tab = $cnd->toListviewTab('condition-for', '$LANG.tab_condition_for'))
+        if ($tab = $cnd->toListviewTab('condition-for', new JsExpression('LANG.tab_condition_for')))
         {
             $this->extendGlobalData($cnd->getJSGlobals());
             $this->lvTabs->addDataTab(...$tab);

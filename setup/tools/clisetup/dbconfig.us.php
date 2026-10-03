@@ -170,7 +170,7 @@ CLISetup::registerUtility(new class extends UtilityScript
                             }
                             $buff .= "?>\n";
                             CLI::write();
-                            CLISetup::writeFile(self::CONFIG_FILE, $buff);
+                            CLISetup::writeFile(self::CONFIG_FILE, $buff, 0640); // credentials: deployment owner + private PHP group only
                             continue 2;
                         }
                         else

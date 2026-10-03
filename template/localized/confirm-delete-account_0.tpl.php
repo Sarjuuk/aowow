@@ -28,5 +28,6 @@
             <input type="submit" class="button" name="submit" value="Permanently Forget My Account" />
             <input type="submit" class="button" name="cancel" value="Cancel Forget Me Process" />
         </p>
+        <?=$this->csrfField();?>
     </form>
 </div>

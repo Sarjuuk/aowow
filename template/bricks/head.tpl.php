@@ -7,6 +7,11 @@
 ?>
     <title><?=$this->concat('title', ' - '); ?></title>
     <meta charset="UTF-8">
+    <meta name="csrf-token" content="<?=\Aowow\Csrf::token();?>">
+    <script>var g_csrfRoutes = <?=json_encode(\Aowow\Csrf::POST_ROUTES, JSON_HEX_TAG);?>;
+        var g_csrfAdminActions = <?=json_encode(\Aowow\Csrf::ADMIN_ACTIONS, JSON_HEX_TAG);?>;</script>
+    <script src="<?=$this->gStaticUrl;?>/js/csrf.js?v=<?=AOWOW_REVISION;?>"></script>
+    <script src="<?=$this->gStaticUrl;?>/js/password-policy.js?v=<?=AOWOW_REVISION;?>"></script>
 <?=$this->renderMetaTags(4);?>
     <link rel="canonical" href="<?=PageTemplate::buildQuery(); ?>">
     <link rel="alternate" hreflang="x-default" href="<?=PageTemplate::buildQuery(add: ['locale' => Lang::getLocale()->getFallback()->value]); ?>">

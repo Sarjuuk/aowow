@@ -99,11 +99,11 @@ class IconsBaseResponse extends TemplateResponse implements ICache
 
         if ($icons->getMatches() > $conditions[0])          // LIMIT
         {
-            $tabData['note'] = sprintf(Util::$tryFilteringEntityString, $icons->getMatches(), 'LANG.types[29][3]', $conditions[0]);
+            $tabData['note'] = new JsExpression(substr(sprintf(Util::$tryFilteringEntityString, $icons->getMatches(), 'LANG.types[29][3]', $conditions[0]), 1));
             $tabData['_truncated'] = 1;
         }
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")]);
 
         $this->lvTabs->addListviewTab(new Listview($tabData, IconList::$brickFile));
 

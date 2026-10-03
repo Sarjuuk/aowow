@@ -28,5 +28,6 @@
             <input type="submit" class="button" name="submit" value="Mein Konto dauerhaft vergessen" />
             <input type="submit" class="button" name="cancel" value="„Vergessen“-Vorgang abbrechen" />
         </p>
+        <?=$this->csrfField();?>
     </form>
 </div>

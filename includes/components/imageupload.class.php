@@ -8,6 +8,8 @@ if (!defined('AOWOW_REVISION'))
 
 abstract class ImageUpload
 {
+    public const int MAX_BYTES = 10485760;
+
     public const int MIME_UNK  = 0;
     public const int MIME_JPG  = 1;
     public const int MIME_PNG  = 2;
@@ -77,6 +79,13 @@ abstract class ImageUpload
         {
             trigger_error('ImageUpload::validateUpload - uploaded file not in upload directory', E_USER_WARNING);
             self::$error    = Lang::main('intError');
+            self::$fileName = '';
+            return false;
+        }
+
+        if (filesize(self::$fileName) > self::MAX_BYTES)
+        {
+            self::$error = Lang::main('intError');
             self::$fileName = '';
             return false;
         }
@@ -181,7 +190,17 @@ abstract class ImageUpload
         self::$img = $res;
         unset($res);
 
-        return self::writeImage(static::$tmpPath, $nameBase);
+        if (!self::writeImage(static::$tmpPath, $nameBase))
+            return false;
+
+        // Bind the resized preview to this account/session; originals never receive a browser URL.
+        $kind = match (static::class)
+        {
+            ScreenshotMgr::class => 'screenshot',
+            AvatarMgr::class => 'avatar',
+            default => ''
+        };
+        return PrivateUpload::registerTemp($kind, $uid, sprintf(static::$tmpPath, $nameBase));
     }
 
     public static function cropImg(float $scaleX, float $scaleY, float $scaleW, float $scaleH) : bool
@@ -212,11 +231,17 @@ abstract class ImageUpload
         if (!self::$img)
             return false;
 
-        if (imagejpeg(self::$img, sprintf($path, $file), self::JPEG_QUALITY))
-            return true;
-
-        trigger_error('ImageUpload::writeImage - write failed', E_USER_WARNING);
-        return false;
+        $encoded = tmpfile();
+        if (!$encoded) return false;
+        try
+        {
+            if (!imagejpeg(self::$img, $encoded, self::JPEG_QUALITY) || fstat($encoded)['size'] > self::MAX_BYTES)
+                return false;
+            rewind($encoded);
+            $bytes = stream_get_contents($encoded, self::MAX_BYTES + 1);
+            return $bytes !== false && Util::writeFile(sprintf($path, $file), $bytes);
+        }
+        finally { fclose($encoded); }
     }
 
     private static function setMimeType() : bool

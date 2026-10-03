@@ -9,6 +9,8 @@ if (!defined('AOWOW_REVISION'))
 class AdminSiteconfigActionUpdateResponse extends TextResponse
 {
     protected int   $requiredUserGroup = U_GROUP_DEV | U_GROUP_ADMIN;
+    protected bool  $requiresLogin     = true;
+    protected bool  $requiresOperator  = true;
 
     protected array $expectedGET       = array(
         'key' => ['filter' => FILTER_VALIDATE_REGEXP, 'options' => ['regexp' => Cfg::PATTERN_CONF_KEY_FULL]],
@@ -19,7 +21,7 @@ class AdminSiteconfigActionUpdateResponse extends TextResponse
     {
         if (!$this->assertGET('key', 'val'))
         {
-            trigger_error('AdminSiteconfigActionUpdateResponse - malformed request received', E_USER_EE_USER_WARNINGRROR);
+            trigger_error('AdminSiteconfigActionUpdateResponse - malformed request received', E_USER_WARNING);
             $this->result = Lang::main('intError');
             return;
         }

@@ -76,27 +76,20 @@ class VideoAddResponse extends TextResponse
         }
 
         $videoId = '';
-        if (preg_match('/^https?:\/\/(www\.)?youtu(\.be|be\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/', $this->_post['videourl'], $m))
-            $videoId = $m[3];
+        if (strlen($this->_post['videourl']) <= 2048 && preg_match('~^https?://(?:www\.)?(?:youtube\.com/watch\?v=|youtu\.be/)([a-zA-Z0-9_-]{11})(?:[?&#].*)?$~D', $this->_post['videourl'], $m))
+            $videoId = $m[1];
         else
         {
             $_SESSION['error']['vi'] = Lang::video('error', 'selectVI');
             return false;
         }
 
-        $curl = curl_init('https://youtube.com/oembed?format=json&url=https://www.youtube.com/watch?v='.$videoId);
-        if (!$curl)
+        if (!ContributionBudget::reserve('video'))
         {
-            trigger_error('VideoAddResponse - curl_init fail', E_USER_WARNING);
-            $_SESSION['error']['vi'] = Lang::main('intError');
+            $_SESSION['error']['vi'] = ContributionBudget::error();
             return false;
         }
-
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        $ytOembed = curl_exec($curl);
-        $status   = curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
-        curl_close($curl);
-
+        $videoInfo = Youtube::fetch($videoId, $status);
         if ($status == 401)
         {
             $_SESSION['error']['vi'] = Lang::video('error', 'isPrivate');
@@ -108,12 +101,15 @@ class VideoAddResponse extends TextResponse
             return false;
         }
 
-        $videoInfo = json_decode($ytOembed);
-        $videoInfo->id = $videoId;
+        if (!$videoInfo)
+        {
+            $_SESSION['error']['vi'] = Lang::main('intError');
+            return false;
+        }
 
         if (!VideoMgr::saveSuggestion($videoInfo, $this->destType, $this->destTypeId, $this->videoHash))
         {
-            $_SESSION['error']['ss'] = Lang::main('intError');
+            $_SESSION['error']['vi'] = Lang::main('intError');
             return false;
         }
 

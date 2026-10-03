@@ -20,7 +20,7 @@ class LocaleBaseResponse extends TextResponse
             User::save(true);
         }
 
-        $this->redirectTo = $_SERVER['HTTP_REFERER'] ?? '.';
+        $this->redirectTo = ReturnTarget::fromReferer();
     }
 }
 

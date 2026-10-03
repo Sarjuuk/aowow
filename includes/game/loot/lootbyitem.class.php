@@ -30,24 +30,24 @@ class LootByItem extends Loot
     private array  $chanceMods    = [];
     private array  $listviewTabs  = array(
     //  [fileName, tabData, tabName, tabId, extraCols, hiddenCols, visibleCols]
-        self::NPC_DROPPED        => [Type::NPC,         [], '$LANG.tab_droppedby',        'dropped-by',              [], [], []],
-        self::QUEST_REWARD       => [Type::QUEST,       [], '$LANG.tab_rewardfrom',       'reward-from-quest',       [], [], []],
-        self::ITEM_CONTAINED     => [Type::ITEM,        [], '$LANG.tab_containedin',      'contained-in-item',       [], [], []],
-        self::OBJECT_CONTAINED   => [Type::OBJECT,      [], '$LANG.tab_containedin',      'contained-in-object',     [], [], []],
-        self::NPC_PICKPOCKETED   => [Type::NPC,         [], '$LANG.tab_pickpocketedfrom', 'pickpocketed-from',       [], [], []],
-        self::NPC_SKINNED        => [Type::NPC,         [], '$LANG.tab_skinnedfrom',      'skinned-from',            [], [], []],
-        self::ITEM_DISENCHANTED  => [Type::ITEM,        [], '$LANG.tab_disenchantedfrom', 'disenchanted-from',       [], [], []],
-        self::ITEM_PROSPECTED    => [Type::ITEM,        [], '$LANG.tab_prospectedfrom',   'prospected-from',         [], [], []],
-        self::ITEM_MILLED        => [Type::ITEM,        [], '$LANG.tab_milledfrom',       'milled-from',             [], [], []],
-        self::NPC_MINED          => [Type::NPC,         [], '$LANG.tab_minedfromnpc',     'mined-from-npc',          [], [], []],
-        self::NPC_SALVAGED       => [Type::NPC,         [], '$LANG.tab_salvagedfrom',     'salvaged-from',           [], [], []],
-        self::NPC_GATHERED       => [Type::NPC,         [], '$LANG.tab_gatheredfromnpc',  'gathered-from-npc',       [], [], []],
-        self::OBJECT_MINED       => [Type::OBJECT,      [], '$LANG.tab_minedfrom',        'mined-from-object',       [], [], []],
-        self::OBJECT_GATHERED    => [Type::OBJECT,      [], '$LANG.tab_gatheredfrom',     'gathered-from-object',    [], [], []],
-        self::ZONE_FISHED        => [Type::ZONE,        [], '$LANG.tab_fishedin',         'fished-in-zone',          [], [], []],
-        self::OBJECT_FISHED      => [Type::OBJECT,      [], '$LANG.tab_fishedin',         'fished-in-object',        [], [], []],
-        self::SPELL_CREATED      => [Type::SPELL,       [], '$LANG.tab_createdby',        'created-by',              [], [], []],
-        self::ACHIEVEMENT_REWARD => [Type::ACHIEVEMENT, [], '$LANG.tab_rewardfrom',       'reward-from-achievement', [], [], []]
+        self::NPC_DROPPED        => [Type::NPC,         [], 'LANG.tab_droppedby',        'dropped-by',              [], [], []],
+        self::QUEST_REWARD       => [Type::QUEST,       [], 'LANG.tab_rewardfrom',       'reward-from-quest',       [], [], []],
+        self::ITEM_CONTAINED     => [Type::ITEM,        [], 'LANG.tab_containedin',      'contained-in-item',       [], [], []],
+        self::OBJECT_CONTAINED   => [Type::OBJECT,      [], 'LANG.tab_containedin',      'contained-in-object',     [], [], []],
+        self::NPC_PICKPOCKETED   => [Type::NPC,         [], 'LANG.tab_pickpocketedfrom', 'pickpocketed-from',       [], [], []],
+        self::NPC_SKINNED        => [Type::NPC,         [], 'LANG.tab_skinnedfrom',      'skinned-from',            [], [], []],
+        self::ITEM_DISENCHANTED  => [Type::ITEM,        [], 'LANG.tab_disenchantedfrom', 'disenchanted-from',       [], [], []],
+        self::ITEM_PROSPECTED    => [Type::ITEM,        [], 'LANG.tab_prospectedfrom',   'prospected-from',         [], [], []],
+        self::ITEM_MILLED        => [Type::ITEM,        [], 'LANG.tab_milledfrom',       'milled-from',             [], [], []],
+        self::NPC_MINED          => [Type::NPC,         [], 'LANG.tab_minedfromnpc',     'mined-from-npc',          [], [], []],
+        self::NPC_SALVAGED       => [Type::NPC,         [], 'LANG.tab_salvagedfrom',     'salvaged-from',           [], [], []],
+        self::NPC_GATHERED       => [Type::NPC,         [], 'LANG.tab_gatheredfromnpc',  'gathered-from-npc',       [], [], []],
+        self::OBJECT_MINED       => [Type::OBJECT,      [], 'LANG.tab_minedfrom',        'mined-from-object',       [], [], []],
+        self::OBJECT_GATHERED    => [Type::OBJECT,      [], 'LANG.tab_gatheredfrom',     'gathered-from-object',    [], [], []],
+        self::ZONE_FISHED        => [Type::ZONE,        [], 'LANG.tab_fishedin',         'fished-in-zone',          [], [], []],
+        self::OBJECT_FISHED      => [Type::OBJECT,      [], 'LANG.tab_fishedin',         'fished-in-object',        [], [], []],
+        self::SPELL_CREATED      => [Type::SPELL,       [], 'LANG.tab_createdby',        'created-by',              [], [], []],
+        self::ACHIEVEMENT_REWARD => [Type::ACHIEVEMENT, [], 'LANG.tab_rewardfrom',       'reward-from-achievement', [], [], []]
     );
     private string $queryTemplate =
        'SELECT    lt1.`entry`                                          AS ARRAY_KEY,
@@ -70,7 +70,9 @@ class LootByItem extends Loot
      */
     public function __construct(private int $entry)
     {
-
+        // The tab-name column is fixed developer-owned metadata, separate from loot row text.
+        foreach ($this->listviewTabs as &$tab)
+            $tab[2] = new JsExpression($tab[2]);
     }
 
     /**
@@ -278,7 +280,7 @@ class LootByItem extends Loot
         $srcData = $srcObj->getListviewData();
         $this->storeJSGlobals($srcObj->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
-        $extraCols[] = '$Listview.extraCols.percent';
+        $extraCols[] = new JsExpression('Listview.extraCols.percent');
 
         foreach ($srcObj->iterate() as $__)
             $data[] = array_merge($srcData[$srcObj->id], $result[$srcObj->getField($dbField)]);
@@ -328,7 +330,7 @@ class LootByItem extends Loot
             [, &$data, , , &$extraCols, ,] = $this->listviewTabs[$tabRef ?? $tabId];
 
             $data[]      = array_merge($parentData[$npc->getField('parentId')] ?? $srcData[$npc->id], $result[$npc->getField($dbField)]);
-            $extraCols[] = '$Listview.extraCols.percent';
+            $extraCols[] = new JsExpression('Listview.extraCols.percent');
         }
 
         return true;
@@ -353,7 +355,7 @@ class LootByItem extends Loot
         [, &$data, , , &$extraCols, , &$visibleCols] = $this->listviewTabs[self::SPELL_CREATED];
 
         if (!empty($result))
-            $extraCols[] = '$Listview.extraCols.percent';
+            $extraCols[] = new JsExpression('Listview.extraCols.percent');
 
         if ($srcObj->hasSetFields('reagent1', 'reagent2', 'reagent3', 'reagent4', 'reagent5', 'reagent6', 'reagent7', 'reagent8'))
             $visibleCols[] = 'reagents';
@@ -427,7 +429,7 @@ class LootByItem extends Loot
             [, &$tabData, , , &$extraCols, , &$visibleCols] = $this->listviewTabs[$tabId];
 
             $tabData[]   = array_merge($row, $result[$srcObj->getEntry($id)['lootId']]);
-            $extraCols[] = '$Listview.extraCols.percent';
+            $extraCols[] = new JsExpression('Listview.extraCols.percent');
             if ($tabId != 15)
                 $visibleCols[] = 'skill';
         }

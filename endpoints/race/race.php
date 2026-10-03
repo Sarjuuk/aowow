@@ -150,7 +150,7 @@ class RaceBaseResponse extends TemplateResponse implements ICache
         /* Extra Tabs */
         /**************/
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")], 'tabsRelated', true);
 
         // tab: classes
         $classes = new CharClassList(array(['racemask', $ra->toMask(), '&']));
@@ -173,7 +173,7 @@ class RaceBaseResponse extends TemplateResponse implements ICache
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data'       => $tongues->getListviewData(),
                 'id'         => 'languages',
-                'name'       => '$LANG.tab_languages',
+                'name'       => new JsExpression('LANG.tab_languages'),
                 'hiddenCols' => ['reagents']
             ), SpellList::$brickFile));
         }
@@ -191,7 +191,7 @@ class RaceBaseResponse extends TemplateResponse implements ICache
             $tabData = array(
                 'data'       => $racials->getListviewData(),
                 'id'         => 'racial-traits',
-                'name'       => '$LANG.tab_racialtraits',
+                'name'       => new JsExpression('LANG.tab_racialtraits'),
                 'hiddenCols' => ['reagents']
             );
             if ($racials->hasDiffFields('reqClassMask'))
@@ -233,7 +233,7 @@ class RaceBaseResponse extends TemplateResponse implements ICache
                     $this->lvTabs->addListviewTab(new Listview(array(
                         'data'       => $mounts->getListviewData(),
                         'id'         => 'mounts',
-                        'name'       => '$LANG.tab_mounts',
+                        'name'       => new JsExpression('LANG.tab_mounts'),
                         'hiddenCols' => ['slot', 'type']
                     ), ItemList::$brickFile));
                 }
@@ -253,7 +253,7 @@ class RaceBaseResponse extends TemplateResponse implements ICache
 
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data' => $data,
-                    'extraCols' => ['$Listview.templates.title.columns[1]']
+                    'extraCols' => [new JsExpression('Listview.templates.title.columns[1]')]
                 ), SoundList::$brickFile));
             }
         }
@@ -275,7 +275,7 @@ class RaceBaseResponse extends TemplateResponse implements ICache
 
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $crtOf->getListviewData(),
-                'name' => '$LANG.tab_criteriaof',
+                'name' => new JsExpression('LANG.tab_criteriaof'),
                 'id'   => 'criteria-of'
             ), AchievementList::$brickFile));
         }
@@ -283,7 +283,7 @@ class RaceBaseResponse extends TemplateResponse implements ICache
         // tab: condition-for
         $cnd = new Conditions();
         $cnd->getByCondition(Type::CHR_RACE, $this->typeId)->prepare();
-        if ($tab = $cnd->toListviewTab('condition-for', '$LANG.tab_condition_for'))
+        if ($tab = $cnd->toListviewTab('condition-for', new JsExpression('LANG.tab_condition_for')))
         {
             $this->extendGlobalData($cnd->getJSGlobals());
             $this->lvTabs->addDataTab(...$tab);

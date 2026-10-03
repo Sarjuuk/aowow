@@ -123,7 +123,7 @@ class UserBaseResponse extends TemplateResponse
                 null,                                       // url: (always null)
                 $this->user['avatarborder'],                // premiumLevel: affixes css class ['-premium', '-gold', '', '-premiumred', '-red']
                 false,                                      // noBorder: always false
-                '$Icon.getPrivilegeBorder('.$this->user['sumRep'].')' // reputationLevel: calculated in js from passed rep points
+                new JsExpression('Icon.getPrivilegeBorder('.$this->user['sumRep'].')') // reputationLevel: calculated in js from passed rep points
             );
         }
 
@@ -137,7 +137,7 @@ class UserBaseResponse extends TemplateResponse
         /* Extra Tabs */
         /**************/
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")], 'tabsRelated', true);
 
         // [unused] Site Achievements
 
@@ -155,14 +155,14 @@ class UserBaseResponse extends TemplateResponse
             $tabData = array(
                 'data'           => $_,
                 'hiddenCols'     => ['author'],
-                'onBeforeCreate' => '$Listview.funcBox.beforeUserComments',
+                'onBeforeCreate' => new JsExpression('Listview.funcBox.beforeUserComments'),
                 '_totalCount'    => $nFound
             );
 
             if ($nFound > Listview::DEFAULT_SIZE)
             {
-                $tabData['name'] = '$LANG.tab_latestcomments';
-                $tabData['note'] = '$$WH.sprintf(LANG.lvnote_usercomments, '.$nFound.')';
+                $tabData['name'] = new JsExpression('LANG.tab_latestcomments');
+                $tabData['note'] = new JsExpression('$WH.sprintf(LANG.lvnote_usercomments, '.$nFound.')');
             }
 
             $this->lvTabs->addListviewTab(new Listview($tabData, 'commentpreview'));
@@ -174,14 +174,14 @@ class UserBaseResponse extends TemplateResponse
             $tabData = array(
                 'data'           => $_,
                 'hiddenCols'     => ['author'],
-                'onBeforeCreate' => '$Listview.funcBox.beforeUserComments',
+                'onBeforeCreate' => new JsExpression('Listview.funcBox.beforeUserComments'),
                 '_totalCount'    => $nFound
             );
 
             if ($nFound > Listview::DEFAULT_SIZE)
             {
-                $tabData['name'] = '$LANG.tab_latestreplies';
-                $tabData['note'] = '$$WH.sprintf(LANG.lvnote_userreplies, '.$nFound.')';
+                $tabData['name'] = new JsExpression('LANG.tab_latestreplies');
+                $tabData['note'] = new JsExpression('$WH.sprintf(LANG.lvnote_userreplies, '.$nFound.')');
             }
 
             $this->lvTabs->addListviewTab(new Listview($tabData, 'replypreview'));
@@ -197,8 +197,8 @@ class UserBaseResponse extends TemplateResponse
 
             if ($nFound > Listview::DEFAULT_SIZE)
             {
-                $tabData['name'] = '$LANG.tab_latestscreenshots';
-                $tabData['note'] = '$$WH.sprintf(LANG.lvnote_userscreenshots, '.$nFound.')';
+                $tabData['name'] = new JsExpression('LANG.tab_latestscreenshots');
+                $tabData['note'] = new JsExpression('$WH.sprintf(LANG.lvnote_userscreenshots, '.$nFound.')');
             }
 
             $this->lvTabs->addListviewTab(new Listview($tabData, 'screenshot'));
@@ -214,8 +214,8 @@ class UserBaseResponse extends TemplateResponse
 
             if ($nFound > Listview::DEFAULT_SIZE)
             {
-                $tabData['name'] = '$LANG.tab_latestvideos';
-                $tabData['note'] = '$$WH.sprintf(LANG.lvnote_uservideos, '.$nFound.')';
+                $tabData['name'] = new JsExpression('LANG.tab_latestvideos');
+                $tabData['note'] = new JsExpression('$WH.sprintf(LANG.lvnote_uservideos, '.$nFound.')');
             }
 
             $this->lvTabs->addListviewTab(new Listview($tabData, 'video'));

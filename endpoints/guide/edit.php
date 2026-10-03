@@ -83,7 +83,7 @@ class GuideEditResponse extends TemplateResponse
         if ($this->_post['save'] || $this->_post['submit'])
         {
             if (!$this->saveGuide())
-                $this->error = Lang::main('intError');
+                $this->error = $this->error ?: Lang::main('intError');
             else if ($this->_get['id'] === 0)
                 $this->forward('?guide=edit&id='.$this->typeId);
         }
@@ -124,6 +124,17 @@ class GuideEditResponse extends TemplateResponse
         // test required fields context
         if (!$this->_post['locale']->validate())
             return false;
+
+        $bytes = 0;
+        foreach (['body', 'title', 'name', 'description', 'changelog'] as $field)
+            $bytes += strlen($this->_post[$field] ?? '');
+        if ($bytes > 1048576)
+            return false;
+        if (!ContributionBudget::reserve('guide', $bytes))
+        {
+            $this->error = ContributionBudget::error();
+            return false;
+        }
 
         // sanitize: spec / class
         if ($this->_post['category'] == 1)              // Classes

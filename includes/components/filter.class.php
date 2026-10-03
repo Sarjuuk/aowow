@@ -838,10 +838,7 @@ abstract class Filter
             // for nonsensical values; compare against 0
             if ($this->int2Op($crs) && Util::checkNumeric($crv))
             {
-                if ($crs == '=')
-                    $crs = '==';
-
-                return eval('return ('.$crv.' '.$crs.' 0);') ? [1] : [0];
+                return NumericExpression::operation($crs === '=' ? '==' : $crs, $crv, 0) ? [1] : [0];
             }
             else
                 return [0];

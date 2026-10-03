@@ -108,7 +108,7 @@ class PetBaseResponse extends TemplateResponse implements ICache
         /* Extra Tabs */
         /**************/
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")], 'tabsRelated', true);
 
         // tab: tameable & gallery
         $condition = array(
@@ -126,10 +126,10 @@ class PetBaseResponse extends TemplateResponse implements ICache
         $this->addDataLoader('zones');
         $this->lvTabs->addListviewTab(new Listview(array(
             'data'        => $tng->getListviewData(LISTVIEWINFO_TAMEABLE),
-            'name'        => '$LANG.tab_tameable',
+            'name'        => new JsExpression('LANG.tab_tameable'),
             'hiddenCols'  => ['type'],
             'visibleCols' => ['skin'],
-            'note'        => sprintf(Util::$filterResultString, '?npcs=1&filter=fa=38'),
+            'note'        => new JsExpression(substr(sprintf(Util::$filterResultString, '?npcs=1&filter=fa=38'), 1)),
             'id'          => 'tameable'
         ), CreatureList::$brickFile));
 
@@ -141,7 +141,7 @@ class PetBaseResponse extends TemplateResponse implements ICache
 
         $this->lvTabs->addListviewTab(new Listview(array(
             'data'       => $food->getListviewData(),
-            'name'       => '$LANG.diet',
+            'name'       => new JsExpression('LANG.diet'),
             'hiddenCols' => ['source', 'slot', 'side'],
             'sort'       => ['level'],
             'id'         => 'diet'
@@ -175,7 +175,7 @@ class PetBaseResponse extends TemplateResponse implements ICache
 
         $this->lvTabs->addListviewTab(new Listview(array(
             'data'        => $spells->getListviewData(),
-            'name'        => '$LANG.tab_abilities',
+            'name'        => new JsExpression('LANG.tab_abilities'),
             'visibleCols' => ['schools', 'level'],
             'id'          => 'abilities'
         ), SpellList::$brickFile));
@@ -203,7 +203,7 @@ class PetBaseResponse extends TemplateResponse implements ICache
         $this->lvTabs->addListviewTab(new Listview(array(
             'data'        => $talents->getListviewData(),
             'visibleCols' => ['tier', 'level'],
-            'name'        => '$LANG.tab_talents',
+            'name'        => new JsExpression('LANG.tab_talents'),
             'id'          => 'talents',
             'sort'        => ['tier', 'name'],
             '_petTalents' => 1

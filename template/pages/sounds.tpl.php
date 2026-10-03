@@ -57,6 +57,7 @@
                         <input type="reset" value="<?=Lang::main('resetForm'); ?>" />
                     </div>
 
+                    <?=$this->csrfField();?>
                 </form>
             </div>
             <div class="pad clear"></div>

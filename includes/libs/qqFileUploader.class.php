@@ -31,36 +31,45 @@ class qqUploadedFileXhr
      * Save the file to the specified path
      * @return boolean TRUE on success
      */
-    function save(string $path) : bool
+    function save(string $path, int $sizeLimit = 10485760) : bool
     {
         $input    = fopen("php://input", "r");
-        $temp     = tmpfile();
-        $realSize = stream_copy_to_stream($input, $temp);
-        fclose($input);
-
-        if ($realSize != $this->getSize())
+        if (!$input)
             return false;
+        try { return self::saveStream($input, $path, $this->getSize(), $sizeLimit); }
+        finally { fclose($input); }
+    }
 
-        $target = fopen($path, "w");
-        fseek($temp, 0, SEEK_SET);
-        stream_copy_to_stream($temp, $target);
-        fclose($target);
-
-        return true;
+    /** Bound actual bytes and exclusively own staging; failures remove only the file created by this request. */
+    public static function saveStream($input, string $path, int $expectedSize, int $sizeLimit) : bool
+    {
+        if ($expectedSize <= 0 || $expectedSize > $sizeLimit)
+            return false;
+        $target = fopen($path, 'xb');
+        if (!$target)
+            return false;
+        $complete = false;
+        try
+        {
+            $size = stream_copy_to_stream($input, $target, $sizeLimit + 1);
+            $complete = $size === $expectedSize && $size <= $sizeLimit && fflush($target);
+            return $complete;
+        }
+        finally
+        {
+            fclose($target);
+            if (!$complete && is_file($path)) unlink($path);
+        }
     }
 
     function getName() : string
     {
-        return $_GET['qqfile'];
+        return is_string($_GET['qqfile'] ?? null) ? $_GET['qqfile'] : '';
     }
 
     function getSize(): int
     {
-        if (isset($_SERVER["CONTENT_LENGTH"]))
-            return (int)$_SERVER["CONTENT_LENGTH"];
-
-        throw new Exception('Getting content length is not supported.');
-        return 0;
+        return filter_var($_SERVER['CONTENT_LENGTH'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]) ?: 0;
     }
 }
 
@@ -73,22 +82,26 @@ class qqUploadedFileForm
      * Save the file to the specified path
      * @return boolean TRUE on success
      */
-    function save(string $path) : bool
+    function save(string $path, int $sizeLimit = 10485760) : bool
     {
-        if(!move_uploaded_file($_FILES['qqfile']['tmp_name'], $path))
+        $source = $_FILES['qqfile']['tmp_name'] ?? null;
+        if (($_FILES['qqfile']['error'] ?? null) !== UPLOAD_ERR_OK || !is_string($source) || !is_uploaded_file($source))
             return false;
-
-        return true;
+        $input = fopen($source, 'rb');
+        if (!$input)
+            return false;
+        try { return qqUploadedFileXhr::saveStream($input, $path, $this->getSize(), $sizeLimit); }
+        finally { fclose($input); }
     }
 
     function getName() : string
     {
-        return $_FILES['qqfile']['name'];
+        return is_string($_FILES['qqfile']['name'] ?? null) ? $_FILES['qqfile']['name'] : '';
     }
 
     function getSize() : int
     {
-        return $_FILES['qqfile']['size'];
+        return filter_var($_FILES['qqfile']['size'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]) ?: 0;
     }
 }
 
@@ -97,18 +110,21 @@ class qqFileUploader
     private $allowedExtensions = array();
     private $sizeLimit = 10485760;
     private $file;
+    private ?string $settingsError;
 
     public function __construct(array $allowedExtensions = array(), $sizeLimit = 10485760)
     {
         $this->allowedExtensions = array_map("strtolower", $allowedExtensions);
         $this->sizeLimit = $sizeLimit;
 
-        $this->checkServerSettings();
+        $this->settingsError = $this->checkServerSettings();
 
-        if (isset($_GET['qqfile']))
-            $this->file = new qqUploadedFileXhr();
-        else if (isset($_FILES['qqfile']))
+        // Multipart XHR also carries a query filename; the parsed uploaded file takes precedence.
+        if (isset($_FILES['qqfile']) && is_array($_FILES['qqfile']))
             $this->file = new qqUploadedFileForm();
+        else if (isset($_GET['qqfile']) && is_string($_GET['qqfile']) &&
+            !str_starts_with(strtolower($_SERVER['CONTENT_TYPE'] ?? ''), 'multipart/form-data'))
+            $this->file = new qqUploadedFileXhr();
         else
             $this->file = null;
     }
@@ -118,30 +134,22 @@ class qqFileUploader
         return $this->file?->getName() ?? '';
     }
 
-    private function checkServerSettings() : void
+    private function checkServerSettings() : ?string
     {
         $postSize   = $this->toBytes(ini_get('post_max_size'));
         $uploadSize = $this->toBytes(ini_get('upload_max_filesize'));
 
-        if ($postSize < $this->sizeLimit || $uploadSize < $this->sizeLimit)
+        if (($postSize !== 0 && $postSize <= $this->sizeLimit) || $uploadSize < $this->sizeLimit)
         {
-            $size = max(1, $this->sizeLimit / 1024 / 1024) . 'M';
-            die("{'error':'increase post_max_size and upload_max_filesize to $size'}");
+            trigger_error('qqFileUploader - upload settings below supported limit', E_USER_WARNING);
+            return 'Server error. Uploads are temporarily unavailable.';
         }
+        return null;
     }
 
     private function toBytes(string $str) : int
     {
-        $val  = substr(trim($str), 0, -1);
-        $last = strtolower(substr($str, -1, 1));
-        switch ($last)
-        {
-            case 'g': $val *= 1024;
-            case 'm': $val *= 1024;
-            case 'k': $val *= 1024;
-        }
-
-        return $val;
+        return ini_parse_quantity($str);
     }
 
     /**
@@ -149,15 +157,21 @@ class qqFileUploader
      */
     function handleUpload(string $uploadDirectory, string $newName = '', bool $replaceOldFile = FALSE) : array
     {
+        if ($this->settingsError)
+            return ['error' => $this->settingsError];
+
         if (!is_writable($uploadDirectory))
             return ['error' => "Server error. Upload directory isn't writable."];
 
         if (!$this->file)
             return ['error' => 'No files were uploaded.'];
 
+        if ($this->file instanceof qqUploadedFileForm && ($_FILES['qqfile']['error'] ?? null) !== UPLOAD_ERR_OK)
+            return ['error' => in_array($_FILES['qqfile']['error'] ?? null, [UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE], true) ? 'File is too large' : 'Could not receive uploaded file.'];
+
         $size = $this->file->getSize();
 
-        if ($size == 0)
+        if ($size <= 0)
             return ['error' => 'File is empty'];
 
         if ($size > $this->sizeLimit)
@@ -166,7 +180,7 @@ class qqFileUploader
         $pathinfo = pathinfo($this->getName());
         $filename = $newName ?: $pathinfo['filename'];
         //$filename = md5(uniqid());
-        $ext = @$pathinfo['extension'];        // hide notices if extension is empty
+        $ext = $pathinfo['extension'] ?? '';
 
         if ($this->allowedExtensions && !in_array(strtolower($ext), $this->allowedExtensions))
         {
@@ -179,7 +193,8 @@ class qqFileUploader
             while (file_exists($uploadDirectory . $filename . '.' . $ext))
                 $filename .= rand(10, 99);
 
-        if ($this->file->save($uploadDirectory . $filename . '.' . $ext))
+        // save() always uses exclusive creation, including legacy callers requesting replacement.
+        if ($this->file->save($uploadDirectory . $filename . '.' . $ext, $this->sizeLimit))
             return ['success' => true, 'newFilename' => $filename . '.' . $ext];
         else
             return ['error' => 'Could not save uploaded file. The upload was cancelled, or server error encountered'];

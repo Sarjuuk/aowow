@@ -9,6 +9,8 @@ if (!defined('AOWOW_REVISION'))
 class AdminSiteconfigActionAddResponse extends TextResponse
 {
     protected int   $requiredUserGroup = U_GROUP_DEV | U_GROUP_ADMIN;
+    protected bool  $requiresLogin     = true;
+    protected bool  $requiresOperator  = true;
 
     protected array $expectedGET       = array(
         'key' => ['filter' => FILTER_VALIDATE_REGEXP, 'options' => ['regexp' => Cfg::PATTERN_CONF_KEY_FULL]],

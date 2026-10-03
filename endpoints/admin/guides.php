@@ -20,7 +20,7 @@ class AdminGuidesResponse extends TemplateResponse
         $this->h1 = 'Pending Guides';
         array_unshift($this->title, $this->h1);
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")]);
 
         parent::generate();
 
@@ -38,7 +38,7 @@ class AdminGuidesResponse extends TemplateResponse
         $this->lvTabs->addListviewTab(new Listview(array(
             'data'       => array_values($data),
             'hiddenCols' => ['patch', 'comments', 'views', 'rating'],
-            'extraCols'  => '$_'
+            'extraCols'  => new JsExpression('_')
         ), GuideList::$brickFile, 'guideAdminCol'));
     }
 }

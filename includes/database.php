@@ -143,6 +143,7 @@ class DB
 
     private static array $interfaceCache = [];
     private static array $interfaceTimes = [];
+    private static array $connectionHolds = [];
     private static array $optionsCache   = [];
     private static array $logs           = [];
 
@@ -214,20 +215,7 @@ class DB
         if (!$evt->result instanceof \Exception)
             return;
 
-        $msg = <<<MSG
-        DB ERROR
-          code:    {$evt->result->getCode()}
-          message: {$evt->result->getMessage()}
-          query:   {$evt->sql}
-          context: {$evt->source[0]} line {$evt->source[1]}
-        MSG;
-
-        if (CLI)
-            fwrite(STDERR, $msg);
-        else if (User::isInGroup(U_GROUP_ADMIN) && Cfg::get('DEBUG') >= LOG_LEVEL_INFO)
-            echo PHP_EOL . '<pre>' . $msg . '</pre>' . PHP_EOL;
-
-        trigger_error($evt->result->getMessage(), E_USER_WARNING);
+        ErrorLog::record((int)$evt->result->getCode(), 'DATABASE_ERROR', $evt->source[0] ?? '', (int)($evt->source[1] ?? 0), LOG_LEVEL_WARN);
     }
 
     public static function profiler(\Dibi\Event $evt/* mixed $self, string $query, mixed $trace */) : void
@@ -235,7 +223,7 @@ class DB
         $query = \dibi::$sql;
         $time  = \dibi::$elapsedTime;
 
-        self::$logs[] = [str_replace("\n", ' ', $query), $time];
+        self::$logs[] = [ErrorLog::sqlOperation($query), $time];
     }
 
     public static function getProfiles() : string
@@ -314,9 +302,24 @@ class DB
         return self::getDB(DB_AOWOW);
     }
 
+    /** Keep a CLI lease on the same session even when a long build exceeds the reconnect timer. */
+    public static function holdConnection(int $idx) : DibiConnection
+    {
+        if (!self::isConnected($idx) || !($db = self::getDB($idx)))
+            throw new \RuntimeException('Database connection is unavailable.');
+        self::$connectionHolds[$idx] = (self::$connectionHolds[$idx] ?? 0) + 1;
+        return $db;
+    }
+
+    public static function releaseConnection(int $idx) : void
+    {
+        if (!empty(self::$connectionHolds[$idx]))
+            self::$connectionHolds[$idx]--;
+    }
+
     private static function getDB(int $idx) : ?DibiConnection
     {
-        if (self::$interfaceTimes[$idx][0] < time())
+        if (empty(self::$connectionHolds[$idx]) && self::$interfaceTimes[$idx][0] < time())
         {
             self::$interfaceCache[$idx]->disconnect();
             if (!self::connect($idx))

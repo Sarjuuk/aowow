@@ -227,7 +227,7 @@ class Search
 
             if ($classes->getMatches() > $this->maxResults)
             {
-                // $lvData['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_', $classes->getMatches(), $this->maxResults);
+                // $lvData['note'] = new JsExpression(substr(sprintf(Util::$tryNarrowingString, 'LANG.lvnote_', $classes->getMatches(), $this->maxResults), 1));
                 $lvData['_truncated'] = 1;
             }
 
@@ -266,7 +266,7 @@ class Search
 
             if ($races->getMatches() > $this->maxResults)
             {
-                // $lvData['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_', $races->getMatches(), $this->maxResults);
+                // $lvData['note'] = new JsExpression(substr(sprintf(Util::$tryNarrowingString, 'LANG.lvnote_', $races->getMatches(), $this->maxResults), 1));
                 $lvData['_truncated'] = 1;
             }
 
@@ -305,7 +305,7 @@ class Search
 
             if ($titles->getMatches() > $this->maxResults)
             {
-                // $lvData['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_', $titles->getMatches(), $this->maxResults);
+                // $lvData['note'] = new JsExpression(substr(sprintf(Util::$tryNarrowingString, 'LANG.lvnote_', $titles->getMatches(), $this->maxResults), 1));
                 $lvData['_truncated'] = 1;
             }
 
@@ -353,7 +353,7 @@ class Search
 
             if ($wEvents->getMatches() > $this->maxResults)
             {
-                // $lvData['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_', $wEvents->getMatches(), $this->maxResults);
+                // $lvData['note'] = new JsExpression(substr(sprintf(Util::$tryNarrowingString, 'LANG.lvnote_', $wEvents->getMatches(), $this->maxResults), 1));
                 $lvData['_truncated'] = 1;
             }
 
@@ -389,7 +389,7 @@ class Search
 
             if ($money->getMatches() > $this->maxResults)
             {
-                $lvData['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_currenciesfound', $money->getMatches(), $this->maxResults);
+                $lvData['note'] = new JsExpression(substr(sprintf(Util::$tryNarrowingString, 'LANG.lvnote_currenciesfound', $money->getMatches(), $this->maxResults), 1));
                 $lvData['_truncated'] = 1;
             }
 
@@ -430,14 +430,14 @@ class Search
 
             if ($sets->getMatches() > $this->maxResults)
             {
-                $lvData['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_itemsetsfound', $sets->getMatches(), $this->maxResults);
+                $lvData['note'] = new JsExpression(substr(sprintf(Util::$tryNarrowingString, 'LANG.lvnote_itemsetsfound', $sets->getMatches(), $this->maxResults), 1));
                 $lvData['_truncated'] = 1;
             }
 
             if (isset($lvData['note']))
                 $lvData['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?itemsets&filter=na='.urlencode($this->query).'\')';
             else
-                $lvData['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?itemsets&filter=na='.urlencode($this->query).'\')';
+                $lvData['note'] = new JsExpression('$WH.sprintf(LANG.lvnote_filterresults, \'?itemsets&filter=na='.urlencode($this->query).'\')');
 
             return [$lvData, ItemsetList::$brickFile];
         }
@@ -512,14 +512,14 @@ class Search
 
             if ($items->getMatches() > $this->maxResults)
             {
-                $lvData['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_itemsfound', $items->getMatches(), $this->maxResults);
+                $lvData['note'] = new JsExpression(substr(sprintf(Util::$tryNarrowingString, 'LANG.lvnote_itemsfound', $items->getMatches(), $this->maxResults), 1));
                 $lvData['_truncated'] = 1;
             }
 
             if (isset($lvData['note']))
                 $lvData['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?items&filter=na='.urlencode($this->query).'\')';
             else
-                $lvData['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?items&filter=na='.urlencode($this->query).'\')';
+                $lvData['note'] = new JsExpression('$WH.sprintf(LANG.lvnote_filterresults, \'?items&filter=na='.urlencode($this->query).'\')');
 
             return [$lvData, ItemList::$brickFile];
         }
@@ -584,20 +584,20 @@ class Search
             $lvData = array(
                 'data'        => $data,
                 'id'          => 'abilities',
-                'name'        => '$LANG.tab_abilities',
+                'name'        => new JsExpression('LANG.tab_abilities'),
                 'visibleCols' => $vis
             );
 
             if ($abilities->getMatches() > $this->maxResults)
             {
-                $lvData['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_abilitiesfound', $abilities->getMatches(), $this->maxResults);
+                $lvData['note'] = new JsExpression(substr(sprintf(Util::$tryNarrowingString, 'LANG.lvnote_abilitiesfound', $abilities->getMatches(), $this->maxResults), 1));
                 $lvData['_truncated'] = 1;
             }
 
             if (isset($lvData['note']))
                 $lvData['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?spells=7&filter=na='.urlencode($this->query).'\')';
             else
-                $lvData['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=7&filter=na='.urlencode($this->query).'\')';
+                $lvData['note'] = new JsExpression('$WH.sprintf(LANG.lvnote_filterresults, \'?spells=7&filter=na='.urlencode($this->query).'\')');
 
             return [$lvData, SpellList::$brickFile];
         }
@@ -644,20 +644,20 @@ class Search
             $lvData = array(
                 'data'        => $data,
                 'id'          => 'talents',
-                'name'        => '$LANG.tab_talents',
+                'name'        => new JsExpression('LANG.tab_talents'),
                 'visibleCols' => $vis
             );
 
             if ($talents->getMatches() > $this->maxResults)
             {
-                $lvData['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_talentsfound', $talents->getMatches(), $this->maxResults);
+                $lvData['note'] = new JsExpression(substr(sprintf(Util::$tryNarrowingString, 'LANG.lvnote_talentsfound', $talents->getMatches(), $this->maxResults), 1));
                 $lvData['_truncated'] = 1;
             }
 
             if (isset($lvData['note']))
                 $lvData['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?spells=-2&filter=na='.urlencode($this->query).'\')';
             else
-                $lvData['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-2&filter=na='.urlencode($this->query).'\')';
+                $lvData['note'] = new JsExpression('$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-2&filter=na='.urlencode($this->query).'\')');
 
             return [$lvData, SpellList::$brickFile];
         }
@@ -700,20 +700,20 @@ class Search
             $lvData = array(
                 'data'        => $data,
                 'id'          => 'glyphs',
-                'name'        => '$LANG.tab_glyphs',
+                'name'        => new JsExpression('LANG.tab_glyphs'),
                 'visibleCols' => ['singleclass', 'glyphtype']
             );
 
             if ($glyphs->getMatches() > $this->maxResults)
             {
-                $lvData['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_glyphsfound', $glyphs->getMatches(), $this->maxResults);
+                $lvData['note'] = new JsExpression(substr(sprintf(Util::$tryNarrowingString, 'LANG.lvnote_glyphsfound', $glyphs->getMatches(), $this->maxResults), 1));
                 $lvData['_truncated'] = 1;
             }
 
             if (isset($lvData['note']))
                 $lvData['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?spells=-13&filter=na='.urlencode($this->query).'\')';
             else
-                $lvData['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-13&filter=na='.urlencode($this->query).'\')';
+                $lvData['note'] = new JsExpression('$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-13&filter=na='.urlencode($this->query).'\')');
 
             return [$lvData, SpellList::$brickFile];
         }
@@ -755,20 +755,20 @@ class Search
             $lvData = array(
                 'data'        => $data,
                 'id'          => 'proficiencies',
-                'name'        => '$LANG.tab_proficiencies',
+                'name'        => new JsExpression('LANG.tab_proficiencies'),
                 'visibleCols' => ['classes']
             );
 
             if ($prof->getMatches() > $this->maxResults)
             {
-                $lvData['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_spellsfound', $prof->getMatches(), $this->maxResults);
+                $lvData['note'] = new JsExpression(substr(sprintf(Util::$tryNarrowingString, 'LANG.lvnote_spellsfound', $prof->getMatches(), $this->maxResults), 1));
                 $lvData['_truncated'] = 1;
             }
 
             if (isset($lvData['note']))
                 $lvData['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?spells=-11&filter=na='.urlencode($this->query).'\')';
             else
-                $lvData['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-11&filter=na='.urlencode($this->query).'\')';
+                $lvData['note'] = new JsExpression('$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-11&filter=na='.urlencode($this->query).'\')');
 
             return [$lvData, SpellList::$brickFile];
         }
@@ -810,20 +810,20 @@ class Search
             $lvData = array(
                 'data'        => $data,
                 'id'          => 'professions',
-                'name'        => '$LANG.tab_professions',
+                'name'        => new JsExpression('LANG.tab_professions'),
                 'visibleCols' => ['source', 'reagents']
             );
 
             if ($prof->getMatches() > $this->maxResults)
             {
-                $lvData['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_professionfound', $prof->getMatches(), $this->maxResults);
+                $lvData['note'] = new JsExpression(substr(sprintf(Util::$tryNarrowingString, 'LANG.lvnote_professionfound', $prof->getMatches(), $this->maxResults), 1));
                 $lvData['_truncated'] = 1;
             }
 
             if (isset($lvData['note']))
                 $lvData['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?spells=11&filter=na='.urlencode($this->query).'\')';
             else
-                $lvData['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=11&filter=na='.urlencode($this->query).'\')';
+                $lvData['note'] = new JsExpression('$WH.sprintf(LANG.lvnote_filterresults, \'?spells=11&filter=na='.urlencode($this->query).'\')');
 
             return [$lvData, SpellList::$brickFile];
         }
@@ -865,20 +865,20 @@ class Search
             $lvData = array(
                 'data'        => $data,
                 'id'          => 'companions',
-                'name'        => '$LANG.tab_companions',
+                'name'        => new JsExpression('LANG.tab_companions'),
                 'visibleCols' => ['reagents']
             );
 
             if ($vPets->getMatches() > $this->maxResults)
             {
-                $lvData['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_companionsfound', $vPets->getMatches(), $this->maxResults);
+                $lvData['note'] = new JsExpression(substr(sprintf(Util::$tryNarrowingString, 'LANG.lvnote_companionsfound', $vPets->getMatches(), $this->maxResults), 1));
                 $lvData['_truncated'] = 1;
             }
 
             if (isset($lvData['note']))
                 $lvData['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?spells=-6&filter=na='.urlencode($this->query).'\')';
             else
-                $lvData['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-6&filter=na='.urlencode($this->query).'\')';
+                $lvData['note'] = new JsExpression('$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-6&filter=na='.urlencode($this->query).'\')');
 
             return [$lvData, SpellList::$brickFile];
         }
@@ -920,19 +920,19 @@ class Search
             $lvData = array(
                 'data' => $data,
                 'id'   => 'mounts',
-                'name' => '$LANG.tab_mounts',
+                'name' => new JsExpression('LANG.tab_mounts'),
             );
 
             if ($mounts->getMatches() > $this->maxResults)
             {
-                $lvData['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_mountsfound', $mounts->getMatches(), $this->maxResults);
+                $lvData['note'] = new JsExpression(substr(sprintf(Util::$tryNarrowingString, 'LANG.lvnote_mountsfound', $mounts->getMatches(), $this->maxResults), 1));
                 $lvData['_truncated'] = 1;
             }
 
             if (isset($lvData['note']))
                 $lvData['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?spells=-5&filter=na='.urlencode($this->query).'\')';
             else
-                $lvData['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-5&filter=na='.urlencode($this->query).'\')';
+                $lvData['note'] = new JsExpression('$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-5&filter=na='.urlencode($this->query).'\')');
 
             return [$lvData, SpellList::$brickFile];
         }
@@ -976,19 +976,19 @@ class Search
             $lvData = array(
                 'data' => $data,
                 'id'   => 'npcs',
-                'name' => '$LANG.tab_npcs',
+                'name' => new JsExpression('LANG.tab_npcs'),
             );
 
             if ($npcs->getMatches() > $this->maxResults)
             {
-                $lvData['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_npcsfound', $npcs->getMatches(), $this->maxResults);
+                $lvData['note'] = new JsExpression(substr(sprintf(Util::$tryNarrowingString, 'LANG.lvnote_npcsfound', $npcs->getMatches(), $this->maxResults), 1));
                 $lvData['_truncated'] = 1;
             }
 
             if (isset($lvData['note']))
                 $lvData['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?npcs&filter=na='.urlencode($this->query).'\')';
             else
-                $lvData['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?npcs&filter=na='.urlencode($this->query).'\')';
+                $lvData['note'] = new JsExpression('$WH.sprintf(LANG.lvnote_filterresults, \'?npcs&filter=na='.urlencode($this->query).'\')');
 
             return [$lvData, CreatureList::$brickFile];
         }
@@ -1039,14 +1039,14 @@ class Search
 
             if ($quests->getMatches() > $this->maxResults)
             {
-                $lvData['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_questsfound', $quests->getMatches(), $this->maxResults);
+                $lvData['note'] = new JsExpression(substr(sprintf(Util::$tryNarrowingString, 'LANG.lvnote_questsfound', $quests->getMatches(), $this->maxResults), 1));
                 $lvData['_truncated'] = 1;
             }
 
             if (isset($lvData['note']))
                 $lvData['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?quests&filter=na='.urlencode($this->query).'\')';
             else
-                $lvData['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?quests&filter=na='.urlencode($this->query).'\')';
+                $lvData['note'] = new JsExpression('$WH.sprintf(LANG.lvnote_filterresults, \'?quests&filter=na='.urlencode($this->query).'\')');
 
             return [$lvData, QuestList::$brickFile];
         }
@@ -1091,14 +1091,14 @@ class Search
 
             if ($acvs->getMatches() > $this->maxResults)
             {
-                $lvData['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_achievementsfound', $acvs->getMatches(), $this->maxResults);
+                $lvData['note'] = new JsExpression(substr(sprintf(Util::$tryNarrowingString, 'LANG.lvnote_achievementsfound', $acvs->getMatches(), $this->maxResults), 1));
                 $lvData['_truncated'] = 1;
             }
 
             if (isset($lvData['note']))
                 $lvData['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?achievements&filter=na='.urlencode($this->query).'\')';
             else
-                $lvData['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?achievements&filter=na='.urlencode($this->query).'\')';
+                $lvData['note'] = new JsExpression('$WH.sprintf(LANG.lvnote_filterresults, \'?achievements&filter=na='.urlencode($this->query).'\')');
 
             return [$lvData, AchievementList::$brickFile];
         }
@@ -1140,20 +1140,20 @@ class Search
                 'data'        => $data,
                 'visibleCols' => ['category'],
                 'hiddenCols'  => ['side', 'points', 'rewards'],
-                'name'        => '$LANG.tab_statistics',
+                'name'        => new JsExpression('LANG.tab_statistics'),
                 'id'          => 'statistics'
             );
 
             if ($stats->getMatches() > $this->maxResults)
             {
-                $lvData['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_statisticsfound', $stats->getMatches(), $this->maxResults);
+                $lvData['note'] = new JsExpression(substr(sprintf(Util::$tryNarrowingString, 'LANG.lvnote_statisticsfound', $stats->getMatches(), $this->maxResults), 1));
                 $lvData['_truncated'] = 1;
             }
 
             if (isset($lvData['note']))
                 $lvData['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?achievements=1&filter=na='.urlencode($this->query).'\')';
             else
-                $lvData['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?achievements=1&filter=na='.urlencode($this->query).'\')';
+                $lvData['note'] = new JsExpression('$WH.sprintf(LANG.lvnote_filterresults, \'?achievements=1&filter=na='.urlencode($this->query).'\')');
 
             return [$lvData, AchievementList::$brickFile];
         }
@@ -1192,14 +1192,14 @@ class Search
 
             if ($zones->getMatches() > $this->maxResults)
             {
-                $lvData['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_zonesfound', $zones->getMatches(), $this->maxResults);
+                $lvData['note'] = new JsExpression(substr(sprintf(Util::$tryNarrowingString, 'LANG.lvnote_zonesfound', $zones->getMatches(), $this->maxResults), 1));
                 $lvData['_truncated'] = 1;
             }
 
             if (isset($lvData['note']))
                 $lvData['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?achievements&filter=na='.urlencode($this->query).'\')';
             else
-                $lvData['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?achievements&filter=na='.urlencode($this->query).'\')';
+                $lvData['note'] = new JsExpression('$WH.sprintf(LANG.lvnote_filterresults, \'?achievements&filter=na='.urlencode($this->query).'\')');
 
             return [$lvData, ZoneList::$brickFile];
         }
@@ -1239,14 +1239,14 @@ class Search
 
             if ($objects->getMatches() > $this->maxResults)
             {
-                $lvData['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_objectsfound', $objects->getMatches(), $this->maxResults);
+                $lvData['note'] = new JsExpression(substr(sprintf(Util::$tryNarrowingString, 'LANG.lvnote_objectsfound', $objects->getMatches(), $this->maxResults), 1));
                 $lvData['_truncated'] = 1;
             }
 
             if (isset($lvData['note']))
                 $lvData['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?objects&filter=na='.urlencode($this->query).'\')';
             else
-                $lvData['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?objects&filter=na='.urlencode($this->query).'\')';
+                $lvData['note'] = new JsExpression('$WH.sprintf(LANG.lvnote_filterresults, \'?objects&filter=na='.urlencode($this->query).'\')');
 
             return [$lvData, GameObjectList::$brickFile];
         }
@@ -1280,7 +1280,7 @@ class Search
 
             if ($factions->getMatches() > $this->maxResults)
             {
-                $lvData['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_factionsfound', $factions->getMatches(), $this->maxResults);
+                $lvData['note'] = new JsExpression(substr(sprintf(Util::$tryNarrowingString, 'LANG.lvnote_factionsfound', $factions->getMatches(), $this->maxResults), 1));
                 $lvData['_truncated'] = 1;
             }
 
@@ -1316,7 +1316,7 @@ class Search
 
             if ($skills->getMatches() > $this->maxResults)
             {
-                $lvData['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_skillsfound', $skills->getMatches(), $this->maxResults);
+                $lvData['note'] = new JsExpression(substr(sprintf(Util::$tryNarrowingString, 'LANG.lvnote_skillsfound', $skills->getMatches(), $this->maxResults), 1));
                 $lvData['_truncated'] = 1;
             }
 
@@ -1353,12 +1353,12 @@ class Search
         {
             $lvData = array(
                 'data'            => $data,
-                'computeDataFunc' => '$_'
+                'computeDataFunc' => new JsExpression('_')
             );
 
             if ($pets->getMatches() > $this->maxResults)
             {
-                $lvData['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_petsfound', $pets->getMatches(), $this->maxResults);
+                $lvData['note'] = new JsExpression(substr(sprintf(Util::$tryNarrowingString, 'LANG.lvnote_petsfound', $pets->getMatches(), $this->maxResults), 1));
                 $lvData['_truncated'] = 1;
             }
 
@@ -1402,21 +1402,21 @@ class Search
             $lvData = array(
                 'data'        => $data,
                 'id'          => 'npc-abilities',
-                'name'        => '$LANG.tab_npcabilities',
+                'name'        => new JsExpression('LANG.tab_npcabilities'),
                 'visibleCols' => ['level'],
                 'hiddenCols'  => ['skill']
             );
 
             if ($npcAbilities->getMatches() > $this->maxResults)
             {
-                $lvData['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_spellsfound', $npcAbilities->getMatches(), $this->maxResults);
+                $lvData['note'] = new JsExpression(substr(sprintf(Util::$tryNarrowingString, 'LANG.lvnote_spellsfound', $npcAbilities->getMatches(), $this->maxResults), 1));
                 $lvData['_truncated'] = 1;
             }
 
             if (isset($lvData['note']))
                 $lvData['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?spells=-8&filter=na='.urlencode($this->query).'\')';
             else
-                $lvData['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-8&filter=na='.urlencode($this->query).'\')';
+                $lvData['note'] = new JsExpression('$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-8&filter=na='.urlencode($this->query).'\')');
 
             return [$lvData, SpellList::$brickFile];
         }
@@ -1466,21 +1466,21 @@ class Search
 
             $lvData = array(
                 'data'        => $data,
-                'name'        => '$LANG.tab_uncategorizedspells',
+                'name'        => new JsExpression('LANG.tab_uncategorizedspells'),
                 'visibleCols' => ['level'],
                 'hiddenCols'  => ['skill']
             );
 
             if ($misc->getMatches() > $this->maxResults)
             {
-                $lvData['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_spellsfound', $misc->getMatches(), $this->maxResults);
+                $lvData['note'] = new JsExpression(substr(sprintf(Util::$tryNarrowingString, 'LANG.lvnote_spellsfound', $misc->getMatches(), $this->maxResults), 1));
                 $lvData['_truncated'] = 1;
             }
 
             if (isset($lvData['note']))
                 $lvData['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?spells=0&filter=na='.urlencode($this->query).'\')';
             else
-                $lvData['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=0&filter=na='.urlencode($this->query).'\')';
+                $lvData['note'] = new JsExpression('$WH.sprintf(LANG.lvnote_filterresults, \'?spells=0&filter=na='.urlencode($this->query).'\')');
 
             return [$lvData, SpellList::$brickFile];
         }
@@ -1522,7 +1522,7 @@ class Search
 
             if ($emote->getMatches() > $this->maxResults)
             {
-                // $lvData['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_emotesfound', $emote->getMatches(), $this->maxResults);
+                // $lvData['note'] = new JsExpression(substr(sprintf(Util::$tryNarrowingString, 'LANG.lvnote_emotesfound', $emote->getMatches(), $this->maxResults), 1));
                 $lvData['_truncated'] = 1;
             }
 
@@ -1569,7 +1569,7 @@ class Search
 
             if ($enchantment->getMatches() > $this->maxResults)
             {
-                $lvData['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_enchantmentsfound', $enchantment->getMatches(), $this->maxResults);
+                $lvData['note'] = new JsExpression(substr(sprintf(Util::$tryNarrowingString, 'LANG.lvnote_enchantmentsfound', $enchantment->getMatches(), $this->maxResults), 1));
                 $lvData['_truncated'] = 1;
             }
 
@@ -1609,7 +1609,7 @@ class Search
 
             if ($sounds->getMatches() > $this->maxResults)
             {
-                $lvData['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_soundsfound', $sounds->getMatches(), $this->maxResults);
+                $lvData['note'] = new JsExpression(substr(sprintf(Util::$tryNarrowingString, 'LANG.lvnote_soundsfound', $sounds->getMatches(), $this->maxResults), 1));
                 $lvData['_truncated'] = 1;
             }
 

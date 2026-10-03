@@ -46,7 +46,7 @@ class ProfileList extends DBTypeList
                 'talenttree3'       => $this->getField('talenttree3'),
                 'talentspec'        => $this->getField('activespec') + 1,                       // 0 => 1; 1 => 2
                 'achievementpoints' => $this->getField('achievementpoints'),
-                'guild'             => $this->curTpl['guildname'] ? '$"'.str_replace ('"', '', $this->curTpl['guildname']).'"' : '', // force this to be a string
+                'guild'             => JsExpression::literal($this->curTpl['guildname'] ?? ''), // preserve numeric guild names as strings
                 'guildrank'         => $this->getField('guildrank'),
                 'realm'             => Profiler::urlize($this->getField('realmName'), true),
                 'realmname'         => $this->getField('realmName'),

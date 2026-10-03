@@ -587,7 +587,13 @@ class TemplateResponse extends BaseResponse
         // we cannot blanket NUMERIC_CHECK the data as usernames of deleted users are their id which does not support String.lower()
 
         if ($this->contribute & CONTRIBUTE_CO)
-            $community['co'] = Util::toJSON(CommunityContent::getComments($this->type, $this->typeId), JSON_UNESCAPED_UNICODE);
+        {
+            $page = filter_var($_GET['coPage'] ?? 1, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 1000000]]) ?: 1;
+            $total = 0;
+            $community['co'] = Util::toJSON(CommunityContent::getComments($this->type, $this->typeId, $page, $total), JSON_UNESCAPED_UNICODE);
+            $community['coPage'] = $page;
+            $community['coPages'] = (int)ceil($total / CommunityContent::COMMENT_PAGE_SIZE);
+        }
 
         if ($this->contribute & CONTRIBUTE_SS)
         {

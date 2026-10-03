@@ -129,7 +129,7 @@ class ArenateamBaseResponse extends TemplateResponse
         /* Extra Tabs */
         /**************/
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated');
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")], 'tabsRelated');
 
         // tab: members
         $member = new LocalProfileList(array(['atm.arenaTeamId', $this->typeId]));

@@ -3048,7 +3048,7 @@ var LANG = {
     message_noscreenshot:         "Please select the screenshot to upload.",
     message_novideo:              "Please enter valid video information.",
     message_nothingtoviewin3d:    "No items were selected that can be viewed in 3D.",
-    message_passwordmin:          "Your password must be at least 6 characters long.",
+    message_passwordmin:          "Use at least 15 characters and no more than 72 UTF-8 bytes (some characters use multiple bytes).",
     message_passwordsdonotmatch:  "Passwords do not match.",
     message_savebeforeexit:       "You will lose any unsaved changes you have made.",
     message_startedpost:          "You have started to write a message.",

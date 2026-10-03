@@ -31,7 +31,7 @@ class LatestcommentsBaseResponse extends TemplateResponse
         /* Main Content */
         /****************/
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")]);
 
         $comments = CommunityContent::getCommentPreviews(['comments' => true, 'replies' => false], resultLimit: Listview::DEFAULT_SIZE);
         $this->lvTabs->addListviewTab(new Listview(['data' => $comments], 'commentpreview'));

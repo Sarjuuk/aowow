@@ -2,19 +2,22 @@
 
 namespace Aowow;
 
+define('AOWOW_REVISION', 68);
+require_once __DIR__.'/components/errorlog.class.php';
+ErrorLog::configurePhp();                                   // enforce native-output settings in PHP-FPM too
+
 mb_internal_encoding('UTF-8');
 mb_substitute_character('none');                            // drop invalid chars entirely instead of replacing them with '?'
 error_reporting(E_ALL);
 mysqli_report(MYSQLI_REPORT_ERROR);
 
-define('AOWOW_REVISION', 52);
 define('OS_WIN', substr(PHP_OS, 0, 3) == 'WIN');            // OS_WIN as per compile info of php
 define('CLI', PHP_SAPI === 'cli');
 define('CLI_HAS_E', CLI &&                                  // WIN10 and later usually support ANSI escape sequences
     (!OS_WIN || (function_exists('sapi_windows_vt100_support') && sapi_windows_vt100_support(STDOUT))));
 
 
-$reqExt = ['SimpleXML', 'gd', 'mysqli', 'mbstring', 'fileinfo', 'intl'/*, 'gmp'*/];
+$reqExt = ['curl', 'SimpleXML', 'gd', 'mysqli', 'mbstring', 'fileinfo', 'intl'/*, 'gmp'*/];
 $badExt = [];
 $error  = '';
 if ($ext = array_filter($reqExt, fn($x) => !extension_loaded($x)))
@@ -27,7 +30,14 @@ if (version_compare(PHP_VERSION, '8.4.0') < 0)
     $error .= 'PHP Version <b>8.4</b> or higher required! Your version is <b>'.PHP_VERSION.'</b>.'.PHP_EOL.'Core functions are unavailable!';
 
 if ($error)
-    die(CLI ? strip_tags($error).PHP_EOL.PHP_EOL : $error);
+{
+    if (CLI)
+    {
+        fwrite(STDERR, strip_tags($error).PHP_EOL.PHP_EOL);
+        exit(1);
+    }
+    die($error);
+}
 
 
 require_once 'includes/defines.php';
@@ -127,103 +137,7 @@ spl_autoload_register(function (string $class) : void
         throw new \Exception('could not register type class: '.$cl);
 });
 
-set_error_handler(function(int $errNo, string $errStr, string $errFile, int $errLine) : bool
-{
-    // either from test function or handled separately
-    if (strstr($errStr, 'mysqli_connect') && $errNo == E_WARNING)
-        return true;
-
-    // do not log XDebug shenanigans
-    if (strstr($errFile, 'xdebug://'))
-        return true;
-
-    // we do not log deprecation notices
-    if ($errNo & (E_DEPRECATED | E_USER_DEPRECATED))
-        return true;
-
-    $logLevel = match($errNo)
-    {
-        E_RECOVERABLE_ERROR       => LOG_LEVEL_ERROR,
-        E_WARNING, E_USER_WARNING => LOG_LEVEL_WARN,
-        E_NOTICE,  E_USER_NOTICE  => LOG_LEVEL_INFO,
-        default => 0
-    };
-    $errName = match($errNo)
-    {
-        E_RECOVERABLE_ERROR       => 'RECOVERABLE_ERROR',
-        E_USER_WARNING, E_WARNING => 'WARNING',
-        E_USER_NOTICE,  E_NOTICE  => 'NOTICE',
-        default                   => 'UNKNOWN_ERROR'        // errors not in this list can not be handled by set_error_handler (as per documentation) or are ignored
-    };
-
-    if (!empty($_POST['password']))
-        $_POST['password'] = '******';
-    if (!empty($_POST['c_password']))
-        $_POST['c_password'] = '******';
-
-    if (DB::isConnected(DB_AOWOW))
-        DB::Aowow()->qry('INSERT INTO ::errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `post`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), %i, %i, %s, %i, %s, %s, %i, %s) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
-            AOWOW_REVISION, $errNo, $errFile, $errLine, CLI ? 'CLI' : substr($_SERVER['QUERY_STRING'] ?? '', 0, 250), empty($_POST) ? '' : http_build_query($_POST), User::$groups, $errStr
-        );
-
-    $logMsg = $errName.' - '.$errStr.' @ '.$errFile. ':'.$errLine;
-    if (CLI && class_exists(__NAMESPACE__.'\CLI'))
-        CLI::write($logMsg, $logLevel);
-    else if (CLI)
-        fwrite(STDERR, $logMsg);
-    else if (Cfg::get('DEBUG') >= $logLevel)
-        Util::addNote($logMsg, U_GROUP_EMPLOYEE, $logLevel);
-
-    return true;
-}, E_ALL);
-
-// handle exceptions
-set_exception_handler(function (\Throwable $e) : void
-{
-    if (!empty($_POST['password']))
-        $_POST['password'] = '******';
-    if (!empty($_POST['c_password']))
-        $_POST['c_password'] = '******';
-
-    if (DB::isConnected(DB_AOWOW))
-        DB::Aowow()->qry('INSERT INTO ::errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `post`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), %i, %i, %s, %i, %s, %s, %i, %s) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
-            AOWOW_REVISION, $e->getCode(), $e->getFile(), $e->getLine(), CLI ? 'CLI' : substr($_SERVER['QUERY_STRING'] ?? '', 0, 250), empty($_POST) ? '' : http_build_query($_POST), User::$groups, $e->getMessage()
-        );
-
-    if (CLI)
-        fwrite(STDERR, "\nException - ".$e->getMessage()."\n   ".$e->getFile(). '('.$e->getLine().")\n".$e->getTraceAsString()."\n\n");
-    else
-    {
-        Util::addNote('Exception - '.$e->getMessage().' @ '.$e->getFile(). ':'.$e->getLine()."\n".$e->getTraceAsString(), U_GROUP_EMPLOYEE, LOG_LEVEL_ERROR);
-        (new TemplateResponse())->generateError();
-    }
-});
-
-// handle fatal errors
-register_shutdown_function(function() : void
-{
-    // defer undisplayed error/exception notes
-    if (!CLI && ($n = Util::getNotes()))
-        $_SESSION['notes'][] = [$n[0], $n[1], 'Deferred issues from previous request'];
-
-    if ($e = error_get_last())
-    {
-        if (!empty($_POST['password']))
-            $_POST['password'] = '******';
-        if (!empty($_POST['c_password']))
-            $_POST['c_password'] = '******';
-
-        if (DB::isConnected(DB_AOWOW))
-            DB::Aowow()->qry('INSERT INTO ::errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `post`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), %i, %i, %s, %i, %s, %s, %i, %s) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
-                AOWOW_REVISION, $e['type'], $e['file'], $e['line'], CLI ? 'CLI' : substr($_SERVER['QUERY_STRING'] ?? '', 0, 250), empty($_POST) ? '' : http_build_query($_POST), User::$groups, $e['message']
-            );
-
-        if (CLI)
-            fwrite(STDERR, "\nFatal Error - ".$e['message'].' @ '.$e['file']. ':'.$e['line']."\n\n");
-        else if (User::isInGroup(U_GROUP_EMPLOYEE))
-            echo "\nFatal Error - ".$e['message'].' @ '.$e['file']. ':'.$e['line']."\n\n";
-    }
-});
+ErrorLog::install();
 
 // Setup DB-Wrapper
 if (file_exists('config/config.php'))
@@ -247,6 +161,10 @@ if (!empty($AoWoWconf['characters']))
 
 $AoWoWconf = null;                                          // empty auths
 
+// Deployment-owned cache keys and operator allowlists must remain outside DB/cache configuration.
+if (file_exists('config/security.php'))
+    require_once 'config/security.php';
+
 
 // for CLI and early errors in erb context
 Lang::load(Locale::EN);
@@ -266,13 +184,22 @@ if (!CLI)
     if ($cacheDir && Util::writeDir($cacheDir))
         session_save_path(getcwd().'/'.$cacheDir);
 
-    session_set_cookie_params(15 * YEAR, '/', '', (($_SERVER['HTTPS'] ?? 'off') != 'off') || Cfg::get('FORCE_SSL'), true);
+    session_set_cookie_params([
+        'lifetime' => 15 * YEAR,
+        'path' => '/',
+        'domain' => '',
+        'secure' => (($_SERVER['HTTPS'] ?? 'off') != 'off') || Cfg::get('FORCE_SSL'),
+        'httponly' => true,
+        'samesite' => 'Lax'
+    ]);
     session_cache_limiter('private');
     if (!session_start())
     {
         trigger_error('failed to start session', E_USER_WARNING);
         (new TemplateResponse())->generateError();
     }
+
+    Csrf::assertRequest();                                  // reject unsafe requests before session/account writes
 
     if (User::init())
         User::save();                                       // save user-variables in session

@@ -16,6 +16,7 @@
     "require": {
         "dibi/dibi": "^5.1",
         "php": "^8.4",
+        "ext-curl": "*",
         "ext-mbstring": "*",
         "ext-simplexml": "*",
         "ext-gd": "*",

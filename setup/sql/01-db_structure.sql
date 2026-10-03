@@ -100,6 +100,20 @@ CREATE TABLE `aowow_account_banned` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `aowow_account_password_budget`
+--
+
+DROP TABLE IF EXISTS `aowow_account_password_budget`;
+CREATE TABLE `aowow_account_password_budget` (
+  `scope` varchar(16) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `subject` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `count` smallint unsigned NOT NULL DEFAULT 0,
+  `expires` int unsigned NOT NULL,
+  PRIMARY KEY (`scope`, `subject`),
+  KEY `expires` (`expires`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
 -- Table structure for table `aowow_account_bannedips`
 --
 
@@ -485,9 +499,20 @@ CREATE TABLE `aowow_comments` (
   PRIMARY KEY (`id`),
   KEY `type_typeId` (`type`,`typeId`),
   KEY `FK_acc_co` (`userId`),
+  KEY `comment_page` (`type`,`typeId`,`replyTo`,`date`,`id`),
+  KEY `reply_page` (`replyTo`,`type`,`typeId`,`date`,`id`),
   CONSTRAINT `FK_acc_co` FOREIGN KEY (`userId`) REFERENCES `aowow_account` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+CREATE TABLE IF NOT EXISTS `aowow_contribution_budget` (
+  `owner` int unsigned NOT NULL,
+  `bucket` varchar(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `used` bigint unsigned NOT NULL DEFAULT 0,
+  `expires` int unsigned NOT NULL DEFAULT 0,
+  PRIMARY KEY (`owner`, `bucket`),
+  KEY `expires` (`expires`)
+) ENGINE=InnoDB;
 
 --
 -- Table structure for table `aowow_config`
@@ -753,6 +778,16 @@ CREATE TABLE `aowow_dbversion` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+-- Durable migration accounting; existing installations bootstrap this before applying SQL updates.
+CREATE TABLE IF NOT EXISTS `aowow_sql_update_journal` (
+  `date` int unsigned NOT NULL,
+  `part` tinyint unsigned NOT NULL,
+  `checksum` char(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `status` varchar(16) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `statements` int unsigned NOT NULL DEFAULT 0,
+  PRIMARY KEY (`date`, `part`)
+) ENGINE=InnoDB;
+
 --
 -- Table structure for table `aowow_declinedword`
 --
@@ -885,6 +920,7 @@ CREATE TABLE `aowow_errors` (
   `post` text NOT NULL,
   `userGroups` smallint(5) unsigned NOT NULL,
   `message` text DEFAULT NULL,
+  KEY `retention_date` (`date`),
   PRIMARY KEY (`file`,`line`,`phpError`,`version`,`userGroups`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -2554,6 +2590,19 @@ CREATE TABLE `aowow_screeneffect_sounds` (
   KEY `id` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `aowow_screenshot_uploads`
+--
+
+DROP TABLE IF EXISTS `aowow_screenshot_uploads`;
+CREATE TABLE `aowow_screenshot_uploads` (
+  `uploadKey` char(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `userIdOwner` int unsigned NOT NULL,
+  `expires` int unsigned NOT NULL,
+  PRIMARY KEY (`uploadKey`),
+  KEY `expires` (`expires`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Table structure for table `aowow_screenshots`

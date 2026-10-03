@@ -4,7 +4,10 @@
 if (PHP_SAPI !== 'cli')
     die('this script must be run from CLI'.PHP_EOL);
 if (PHP_SAPI === 'cli' && getcwd().DIRECTORY_SEPARATOR.'aowow' != __FILE__)
-    die('this script must be run from the aowow root directory'.PHP_EOL);
+{
+    fwrite(STDERR, 'this script must be run from the aowow root directory'.PHP_EOL);
+    exit(1);
+}
 
 require_once 'includes/kernel.php';
 

@@ -34,7 +34,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             $this->success = false;
         }
 
-        $toFile = 'g_statistics = '.preg_replace('/"\$([^$"]+)"/', '\1', Util::toJSON($out)).';';
+        $toFile = 'g_statistics = '.Util::toJavaScript($out).';';
 
         if (!CLISetup::writeFile('datasets/statistics', $toFile))
             $this->success = false;

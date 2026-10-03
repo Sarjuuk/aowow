@@ -210,14 +210,20 @@ class PageTemplate
     private function json(mixed $var, int $jsonFlags = 0x0, bool $varRef = false) : string
     {
         if (!is_string($var))
-            return Util::toJSON($var, $jsonFlags | JSON_HEX_TAG | JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE) ?: "{}";
+            return Util::toJavaScript($var, $jsonFlags | JSON_HEX_TAG | JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE) ?: "{}";
 
-        return Util::toJSON($varRef ? $this->$var : $var, $jsonFlags | JSON_HEX_TAG | JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE) ?: "{}";
+        return Util::toJavaScript($varRef ? $this->$var : $var, $jsonFlags | JSON_HEX_TAG | JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE) ?: "{}";
     }
 
     private function escHTML(string $var, bool $varRef = false) : string|array
     {
         return Util::htmlEscape($varRef ? $this->$var : $var);
+    }
+
+    // Read at render time, including cached templates, so tokens remain session-specific.
+    private function csrfField() : string
+    {
+        return '<input type="hidden" name="csrfToken" value="'.\Aowow\Csrf::token().'">';
     }
 
     private function escJS(string $var, bool $varRef = false) : string|array
@@ -292,7 +298,7 @@ class PageTemplate
             $buff .= str_repeat(' ', $lpad).'var _ = '.$jsVar.';';
 
             foreach ($data as $key => $var)
-                $buff .= ' _['.(is_numeric($key) ? $key : "'".$key."'")."]=".Util::toJSON($var).';';
+                $buff .= ' _['.(is_numeric($key) ? $key : "'".$key."'")."]=".Util::toJavaScript($var).';';
 
             $buff .= PHP_EOL;
 
@@ -301,7 +307,7 @@ class PageTemplate
                 $buff .= PHP_EOL;
                 foreach ($extraData[$this->gPageInfo['typeId']] as $k => $v)
                     if ($v)
-                        $buff .= str_repeat(' ', $lpad).'_['.$this->gPageInfo['typeId'].'].'.$k.' = '.Util::toJSON($v).';'.PHP_EOL;
+                        $buff .= str_repeat(' ', $lpad).'_['.$this->gPageInfo['typeId'].'].'.$k.' = '.Util::toJavaScript($v).';'.PHP_EOL;
                 $buff .= PHP_EOL;
             }
         }

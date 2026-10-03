@@ -9,6 +9,8 @@ if (!defined('AOWOW_REVISION'))
 class AdminPhpinfoResponse extends TemplateResponse
 {
     protected  int    $requiredUserGroup = U_GROUP_ADMIN | U_GROUP_DEV;
+    protected  bool   $requiresLogin     = true;
+    protected  bool   $requiresOperator  = true;
 
     protected  string $template          = 'list-page-generic';
     protected  string $pageName          = 'phpinfo';
@@ -20,7 +22,7 @@ class AdminPhpinfoResponse extends TemplateResponse
         $this->h1 = 'PHP Information';
         array_unshift($this->title, $this->h1);
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")]);
 
         parent::generate();
 

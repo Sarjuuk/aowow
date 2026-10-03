@@ -340,10 +340,10 @@ class LootByContainer extends Loot
                     break;
             }
 
-            $this->extraCols[] = "\$Listview.funcBox.createSimpleCol('group', 'Group', '7%', 'group')";
+            $this->extraCols[] = new JsExpression("Listview.funcBox.createSimpleCol('group', 'Group', '7%', 'group')");
             foreach ($fields as $idx => [$field, $title])
                 if ($set & (1 << $idx))
-                    $this->extraCols[] = "\$Listview.funcBox.createSimpleCol('".$field."', '".$title."', '7%', '".$field."')";
+                    $this->extraCols[] = new JsExpression("Listview.funcBox.createSimpleCol('".$field."', '".$title."', '7%', '".$field."')");
         }
 
         foreach ($this->results as &$row)

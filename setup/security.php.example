@@ -1,0 +1,20 @@
+<?php
+
+// Copy to config/security.php; keep that file and its directory deployment-owned,
+// readable by PHP-FPM but not writable by PHP-FPM or neighboring sites.
+if (!defined('AOWOW_REVISION'))
+    die('illegal access');
+
+// Generate a unique per-installation value with: php -r 'echo bin2hex(random_bytes(32)), PHP_EOL;'
+// Never commit the generated value. Missing/invalid keys disable response caching.
+define('AOWOW_CACHE_KEY', 'REPLACE_WITH_64_RANDOM_HEXADECIMAL_CHARACTERS');
+
+// Optional: absolute, deployment-owned PHP >= 8.4 CLI binary matching the site's extensions/config.
+// The default is PHP_BINDIR/php (PHP_BINDIR/php.exe on Windows); no PATH search is performed.
+// define('AOWOW_PHP_CLI', '/absolute/path/to/php');
+
+// Required only for browser PHP diagnostics and site configuration (including add/remove/update).
+// Empty/missing/malformed policies deny those routes. Existing login/role/CSRF checks still apply.
+// List up to 64 exact operator IPv4/IPv6 addresses, without CIDRs, wildcards, ports or forwarded headers.
+// Replace this empty list in config/security.php; do not enable access for a shared reverse proxy's IP.
+define('AOWOW_OPERATOR_IPS', []);

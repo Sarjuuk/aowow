@@ -28,6 +28,12 @@ abstract class CLI
     private static ?bool $hasReadline   = null;
 
     private static  bool $overwriteLast = false;
+    private static int $errors = 0;
+
+    public static function errorCount() : int
+    {
+        return self::$errors;
+    }
 
     /********************/
     /* formatted output */
@@ -147,6 +153,7 @@ abstract class CLI
 
     public static function write(string $txt = '', int $lvl = self::LOG_BLANK, bool $timestamp = true, bool $tmpRow = false) : void
     {
+        if ($lvl === self::LOG_ERROR) self::$errors++;
         $msg = '';
         if ($txt)
         {

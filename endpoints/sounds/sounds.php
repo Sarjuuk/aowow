@@ -97,12 +97,12 @@ class SoundsBaseResponse extends TemplateResponse implements ICache
             // create note if search limit was exceeded; overwriting 'note' is intentional
             if ($sounds->getMatches() > Listview::DEFAULT_SIZE)
             {
-                $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_soundsfound', $sounds->getMatches(), Listview::DEFAULT_SIZE);
+                $tabData['note'] = new JsExpression(substr(sprintf(Util::$tryFilteringString, 'LANG.lvnote_soundsfound', $sounds->getMatches(), Listview::DEFAULT_SIZE), 1));
                 $tabData['_truncated'] = 1;
             }
         }
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")]);
 
         $this->lvTabs->addListviewTab(new Listview($tabData, SoundList::$brickFile));
 

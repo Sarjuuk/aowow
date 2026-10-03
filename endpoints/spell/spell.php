@@ -277,7 +277,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         /* Extra Tabs */
         /**************/
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")], 'tabsRelated', true);
 
         $ubSAI = SmartAI::getOwnerOfSpellCast($this->typeId);
 
@@ -419,7 +419,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         return new Listview(array(
             'data'        => $abilities->getListviewData(),
             'id'          => 'controlledabilities',
-            'name'        => '$LANG.tab_controlledabilities',
+            'name'        => new JsExpression('LANG.tab_controlledabilities'),
             'visibleCols' => ['level'],
             'hiddenCols'  => $abilities->hasSetFields('skillLines') ? null : ['skill']
         ), SpellList::$brickFile);
@@ -500,7 +500,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         return new Listview(array(
             'data'        => $modifiesData,
             'id'          => 'modifies',
-            'name'        => '$LANG.tab_modifies',
+            'name'        => new JsExpression('LANG.tab_modifies'),
             'visibleCols' => ['level'],
             'hiddenCols'  => $hideSkillCol ? ['skill'] : null
         ), SpellList::$brickFile);
@@ -547,7 +547,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         return new Listview(array(
             'data'        => $modsSpell->getListviewData(),
             'id'          => 'modified-by',
-            'name'        => '$LANG.tab_modifiedby',
+            'name'        => new JsExpression('LANG.tab_modifiedby'),
             'visibleCols' => ['level'],
             'hiddenCols'  => $modsSpell->hasSetFields('skillLines') ? null : ['skill']
         ), SpellList::$brickFile);
@@ -575,7 +575,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
         return new Listview(array(
             'data' => $cdSpells->getListviewData(),
-            'name' => '$LANG.tab_sharedcooldown',
+            'name' => new JsExpression('LANG.tab_sharedcooldown'),
             'id'   => 'shared-cooldown'
         ), SpellList::$brickFile);
     }
@@ -590,11 +590,11 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
         return new Listview(array(
             'data'            => $spellLoot->getResult(),
-            'name'            => '$LANG.tab_contains',
+            'name'            => new JsExpression('LANG.tab_contains'),
             'id'              => 'contains',
             'hiddenCols'      => ['side', 'slot', 'source', 'reqlevel'],
-            'extraCols'       => array_unique([...$spellLoot->extraCols, '$Listview.extraCols.percent']),
-            'computeDataFunc' => '$Listview.funcBox.initLootTable'
+            'extraCols'       => array_unique([...$spellLoot->extraCols, new JsExpression('Listview.extraCols.percent')]),
+            'computeDataFunc' => new JsExpression('Listview.funcBox.initLootTable')
         ), ItemList::$brickFile);
     }
 
@@ -648,10 +648,10 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
         return new Listview(array(
             'data'       => $lvItems,
-            'name'       => '$LANG.tab_bonusloot',
+            'name'       => new JsExpression('LANG.tab_bonusloot'),
             'id'         => 'bonusloot',
             'hiddenCols' => ['side', 'reqlevel'],
-            'extraCols'  => ['$Listview.extraCols.percent']
+            'extraCols'  => [new JsExpression('Listview.extraCols.percent')]
         ), SpellList::$brickFile);
     }
 
@@ -676,7 +676,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             'data'        => $glyphSpells->getListviewData(),
             'visibleCols' => ['singleclass', 'glyphtype'],
             'id'          => 'glyphs',
-            'name'        => '$LANG.tab_glyphs'
+            'name'        => new JsExpression('LANG.tab_glyphs')
         ), SpellList::$brickFile);
     }
 
@@ -700,7 +700,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         return new Listview(array(
             'data' => $ubSpells->getListviewData(),
             'id'   => 'used-by-spell',
-            'name' => '$LANG.tab_usedby'
+            'name' => new JsExpression('LANG.tab_usedby')
         ), SpellList::$brickFile);
     }
 
@@ -720,7 +720,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         return new Listview(array(
             'data' => $ubSets->getListviewData(),
             'id'   => 'used-by-itemset',
-            'name' => '$LANG.tab_usedby'
+            'name' => new JsExpression('LANG.tab_usedby')
         ), ItemsetList::$brickFile);
     }
 
@@ -743,7 +743,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         return new Listview(array(
             'data' => $ubItems->getListviewData(),
             'id'   => 'used-by-item',
-            'name' => '$LANG.tab_usedby'
+            'name' => new JsExpression('LANG.tab_usedby')
         ), ItemList::$brickFile);
     }
 
@@ -772,7 +772,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         return new Listview(array(
             'data' => $ubCreature->getListviewData(),
             'id'   => 'used-by-npc',
-            'name' => '$LANG.tab_usedby'
+            'name' => new JsExpression('LANG.tab_usedby')
         ), CreatureList::$brickFile);
     }
 
@@ -795,7 +795,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         return new Listview(array(
             'data' => $ubObjects->getListviewData(),
             'id'   => 'used-by-object',
-            'name' => '$LANG.tab_usedby'
+            'name' => new JsExpression('LANG.tab_usedby')
         ), GameObjectList::$brickFile);
     }
 
@@ -813,7 +813,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         return new Listview(array(
             'data' => $ubTriggers->getListviewData(),
             'id'   => 'used-by-areatrigger',
-            'name' => '$LANG.tab_usedby'
+            'name' => new JsExpression('LANG.tab_usedby')
         ), AreaTriggerList::$brickFile, 'areatrigger');
     }
 
@@ -966,7 +966,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         return new Listview(array(
             'data' => $coAchievemnts->getListviewData(),
             'id'   => 'criteria-of',
-            'name' => '$LANG.tab_criteriaof'
+            'name' => new JsExpression('LANG.tab_criteriaof')
         ), AchievementList::$brickFile);
     }
 
@@ -1093,7 +1093,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         return new Listview(array(
             'data' => $trigger->getListviewData(),
             'id'   => 'triggered-by',
-            'name' => '$LANG.tab_triggeredby'
+            'name' => new JsExpression('LANG.tab_triggeredby')
         ), SpellList::$brickFile);
     }
 
@@ -1120,7 +1120,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         return new Listview(array(
             'data'        => $teaches->getListviewData(),
             'id'          => 'teaches-spell',
-            'name'        => '$LANG.tab_teaches',
+            'name'        => new JsExpression('LANG.tab_teaches'),
             'visibleCols' => $vis,
             'hiddenCols'  => $teaches->hasSetFields('skillLines') ? null : ['skill']
         ), SpellList::$brickFile);
@@ -1173,7 +1173,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         return new Listview(array(
             'data'      => $lvData,
             'id'        => 'taught-by-npc',
-            'name'      => '$LANG.tab_taughtby',
+            'name'      => new JsExpression('LANG.tab_taughtby'),
             'extraCols' => $extraCols ?: null
         ), CreatureList::$brickFile);
     }
@@ -1195,7 +1195,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         return new Listview(array(
             'data' => $tbSpell->getListviewData(),
             'id'   => 'taught-by-spell',
-            'name' => '$LANG.tab_taughtby'
+            'name' => new JsExpression('LANG.tab_taughtby')
         ), SpellList::$brickFile);
     }
 
@@ -1219,7 +1219,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         return new Listview(array(
             'data' => $tbItem->getListviewData(),
             'id'   => 'taught-by-item',
-            'name' => '$LANG.tab_taughtby'
+            'name' => new JsExpression('LANG.tab_taughtby')
         ), ItemList::$brickFile);
     }
 
@@ -1249,7 +1249,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         return new Listview(array(
             'data' => $tbQuest->getListviewData(),
             'id'   => 'reward-from-quest',
-            'name' => '$LANG.tab_rewardfrom'
+            'name' => new JsExpression('LANG.tab_rewardfrom')
         ), QuestList::$brickFile);
     }
 
@@ -1315,7 +1315,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
             $listviews[0] = new Listview(array(
                 'data'        => $lockedObj->getListviewData(),
-                'name'        => '$LANG.tab_unlocks',
+                'name'        => new JsExpression('LANG.tab_unlocks'),
                 'id'          => 'unlocks-object',
                 'visibleCols' => $lockedObj->hasSetFields('reqSkill') ? ['skill'] : null
             ), GameObjectList::$brickFile);
@@ -1327,7 +1327,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $lockedItm->getListviewData(),
-                'name' => '$LANG.tab_unlocks',
+                'name' => new JsExpression('LANG.tab_unlocks'),
                 'id'   => 'unlocks-item'
             ), ItemList::$brickFile));
         }
@@ -1358,7 +1358,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
         if ($this->difficulties)
         {
-            $saE = ['$Listview.extraCols.mode'];
+            $saE = [new JsExpression('Listview.extraCols.mode')];
 
             foreach ($data as $id => &$d)
             {
@@ -1377,7 +1377,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         return new Listview(array(
             'data'        => $data,
             'id'          => 'see-also',
-            'name'        => '$LANG.tab_seealso',
+            'name'        => new JsExpression('LANG.tab_seealso'),
             'visibleCols' => ['level'],
             'hiddenCols'  => $saSpells->hasSetFields('skillLines') ? null : ['skill'],
             'extraCols'   => $saE ?? null
@@ -1406,8 +1406,8 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
         if (!([$goCatg, $lvId, $lvName] = match($this->subject->getField('effect1MiscValue'))
         {
-            LOCK_PROPERTY_HERBALISM => [-3, 'gathered-from-object', '$LANG.tab_gatheredfrom'],
-            LOCK_PROPERTY_MINING    => [-4, 'mined-from-object',    '$LANG.tab_minedfrom'],
+            LOCK_PROPERTY_HERBALISM => [-3, 'gathered-from-object', new JsExpression('LANG.tab_gatheredfrom')],
+            LOCK_PROPERTY_MINING    => [-4, 'mined-from-object',    new JsExpression('LANG.tab_minedfrom')],
             default                 => null
         }))
             return null;
@@ -1457,11 +1457,11 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             'id'              => $lvId,
             'name'            => $lvName,
             'hiddenCols'      => ['type', 'location'],
-            'extraCols'       => ['$Listview.extraCols.yield', '$Listview.extraCols.reqskill', '$Listview.extraCols.percent'],
+            'extraCols'       => [new JsExpression('Listview.extraCols.yield'), new JsExpression('Listview.extraCols.reqskill'), new JsExpression('Listview.extraCols.percent')],
             'sort'            => ['reqskill', '-percent', 'name'],
             '_totalCount'     => 10000,
-            'computeDataFunc' => '$Listview.funcBox.initLootTable',
-            'getItemLink'     => "\$function(object) { return object.id ? '?object=' + object.id : '?objects=".$goCatg."&filter=na=' + object.name.slice(1, -1) }"
+            'computeDataFunc' => new JsExpression('Listview.funcBox.initLootTable'),
+            'getItemLink'     => new JsExpression("function(object) { return object.id ? '?object=' + object.id : '?objects=".$goCatg."&filter=na=' + object.name.slice(1, -1) }")
         ), GameobjectList::$brickFile);
     }
 
@@ -1472,8 +1472,8 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         {
             if (!([$typeFlags, $lvId, $lvName] = match($this->subject->getField('effect1MiscValue'))
             {
-                LOCK_PROPERTY_HERBALISM => [NPC_TYPEFLAG_SKIN_WITH_HERBALISM, 'gathered-from-npc', '$LANG.tab_gatheredfromnpc'],
-                LOCK_PROPERTY_MINING    => [NPC_TYPEFLAG_SKIN_WITH_MINING,    'mined-from-npc',    '$LANG.tab_minedfromnpc'   ],
+                LOCK_PROPERTY_HERBALISM => [NPC_TYPEFLAG_SKIN_WITH_HERBALISM, 'gathered-from-npc', new JsExpression('LANG.tab_gatheredfromnpc')],
+                LOCK_PROPERTY_MINING    => [NPC_TYPEFLAG_SKIN_WITH_MINING,    'mined-from-npc',    new JsExpression('LANG.tab_minedfromnpc')   ],
                 // there is no engineering equivalent :(
                 default                 => null
             }))
@@ -1483,9 +1483,9 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         {
             if (!([$typeFlags, $lvId, $lvName] = match($this->subject->getField('effect1MiscValue'))
             {
-                1       => [ NPC_TYPEFLAG_SKIN_WITH_HERBALISM,   'gathered-from-npc', '$LANG.tab_gatheredfromnpc'],
-                2       => [ NPC_TYPEFLAG_SKIN_WITH_MINING,      'mined-from-npc',    '$LANG.tab_minedfromnpc'   ],
-                3       => [ NPC_TYPEFLAG_SKIN_WITH_ENGINEERING, 'salvaged-from',     '$LANG.tab_salvagedfrom'   ],
+                1       => [ NPC_TYPEFLAG_SKIN_WITH_HERBALISM,   'gathered-from-npc', new JsExpression('LANG.tab_gatheredfromnpc')],
+                2       => [ NPC_TYPEFLAG_SKIN_WITH_MINING,      'mined-from-npc',    new JsExpression('LANG.tab_minedfromnpc')   ],
+                3       => [ NPC_TYPEFLAG_SKIN_WITH_ENGINEERING, 'salvaged-from',     new JsExpression('LANG.tab_salvagedfrom')   ],
                 default => null
             }))
                 return $this->tabSkinnedFrom();             // special handling since skinning is entirely grouped and the rest is not
@@ -1543,10 +1543,10 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             'id'              => $lvId,
             'name'            => $lvName,
             'hiddenCols'      => ['type', 'react'],
-            'extraCols'       => ['$Listview.extraCols.yield', '$Listview.extraCols.reqskill', '$Listview.extraCols.percent'],
+            'extraCols'       => [new JsExpression('Listview.extraCols.yield'), new JsExpression('Listview.extraCols.reqskill'), new JsExpression('Listview.extraCols.percent')],
             'sort'            => ['reqskill', '-percent', 'name'],
             '_totalCount'     => 10000,
-            'computeDataFunc' => '$Listview.funcBox.initLootTable',
+            'computeDataFunc' => new JsExpression('Listview.funcBox.initLootTable'),
         ), CreatureList::$brickFile, 'getNpcListUrl');
     }
 
@@ -1610,19 +1610,19 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         return new Listview(array(
             'data'            => $lvData,
             'id'              => 'skinned-from',
-            'name'            => '$LANG.tab_skinnedfrom',
+            'name'            => new JsExpression('LANG.tab_skinnedfrom'),
             'hiddenCols'      => ['type', 'react', 'location'],
-            'extraCols'       => ['$Listview.extraCols.yield', '$Listview.extraCols.reqskill', '$Listview.extraCols.percent'],
+            'extraCols'       => [new JsExpression('Listview.extraCols.yield'), new JsExpression('Listview.extraCols.reqskill'), new JsExpression('Listview.extraCols.percent')],
             'sort'            => ['reqskill', '-percent', 'name'],
             '_totalCount'     => 10000,
-            'computeDataFunc' => '$Listview.funcBox.initLootTable',
-            'getItemLink'     => '$$WH.PageSpell.getNpcListUrl.bind(null, \'cr=10;crs=1;crv=0\')' // WH.Page.Spell.getNpcListUrl.bind(null, '10;1;0')
+            'computeDataFunc' => new JsExpression('Listview.funcBox.initLootTable'),
+            'getItemLink'     => new JsExpression('$WH.PageSpell.getNpcListUrl.bind(null, \'cr=10;crs=1;crv=0\')') // WH.Page.Spell.getNpcListUrl.bind(null, '10;1;0')
         ), CreatureList::$brickFile, 'getNpcListUrl');
     }
 
     private function tabDisenchantedFrom() : ?Listview
     {
-        $lvBase   = ['getItemLink' => "\$function(item) { return '?items&filter=minle=' + item.minlevel + ';maxle=' + item.maxlevel + ';qu=' + item.quality + ';cr=163;crs=' + item.yield + ';crv=0' }"];
+        $lvBase   = ['getItemLink' => new JsExpression("function(item) { return '?items&filter=minle=' + item.minlevel + ';maxle=' + item.maxlevel + ';qu=' + item.quality + ';cr=163;crs=' + item.yield + ';crv=0' }")];
         $lootKey  = 'disenchantId';
         $skillKey = 'requiredDisenchantSkill';
         $lootIds  = DB::Aowow()->selectCol(
@@ -1647,12 +1647,12 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             return true;
         };
 
-        return $this->gathererProfessionTabBuilder('disenchanted-from', '$LANG.tab_disenchantedfrom', Loot::DISENCHANT, $lvBase, $lootKey, $skillKey, $mergeFN, $lootIds, $srcItemIds);
+        return $this->gathererProfessionTabBuilder('disenchanted-from', new JsExpression('LANG.tab_disenchantedfrom'), Loot::DISENCHANT, $lvBase, $lootKey, $skillKey, $mergeFN, $lootIds, $srcItemIds);
     }
 
     private function tabMilledFrom() : ?Listview
     {
-        $lvBase   = ['getItemLink' => "\$function(item) { return item.id ? '?item=' + item.id : '?items&filter=minle=' + item.minlevel + ';maxle=' + item.maxlevel + ';qu=' + item.quality + ';cr=159;crs=1;crv=0' }"];
+        $lvBase   = ['getItemLink' => new JsExpression("function(item) { return item.id ? '?item=' + item.id : '?items&filter=minle=' + item.minlevel + ';maxle=' + item.maxlevel + ';qu=' + item.quality + ';cr=159;crs=1;crv=0' }")];
         $lootKey  = 'id';
         $skillKey = 'requiredSkillRank';
         $lootIds  = DB::World()->selectCol('SELECT DISTINCT `entry` FROM %n', Loot::MILLING);
@@ -1670,7 +1670,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             return true;
         };
 
-        return $this->gathererProfessionTabBuilder('milled-from', '$LANG.tab_milledfrom', Loot::MILLING, $lvBase, $lootKey, $skillKey, $mergeFN, $lootIds);
+        return $this->gathererProfessionTabBuilder('milled-from', new JsExpression('LANG.tab_milledfrom'), Loot::MILLING, $lvBase, $lootKey, $skillKey, $mergeFN, $lootIds);
     }
 
     private function tabProspectedFrom() : ?Listview
@@ -1687,10 +1687,10 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             return true;
         };
 
-        return $this->gathererProfessionTabBuilder('prospected-from', '$LANG.tab_prospectedfrom', Loot::PROSPECTING, [], $lootKey, $skillKey, $mergeFN, $lootIds);
+        return $this->gathererProfessionTabBuilder('prospected-from', new JsExpression('LANG.tab_prospectedfrom'), Loot::PROSPECTING, [], $lootKey, $skillKey, $mergeFN, $lootIds);
     }
 
-    private function gathererProfessionTabBuilder(string $lvId, string $lvName, string $lootTbl, array $lvBase, string $lootKey, string $skillKey, callable $mergeFN, array $lootIds, array $srcItemIds = []) : ?Listview
+    private function gathererProfessionTabBuilder(string $lvId, string|JsExpression $lvName, string $lootTbl, array $lvBase, string $lootKey, string $skillKey, callable $mergeFN, array $lootIds, array $srcItemIds = []) : ?Listview
     {
         $srcItems = DB::Aowow()->selectAssoc(
             'SELECT IF(COUNT(`id`) > 1, NULL, `id`) AS "id", `quality`, MIN(`itemLevel`) AS "minlevel", MAX(`itemLevel`) AS "maxlevel", %n AS "lootId", %n AS "reqskill", `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8` FROM ::items WHERE `id` IN %in GROUP BY %n',
@@ -1744,10 +1744,10 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             'id'              => $lvId,
             'name'            => $lvName,
             'hiddenCols'      => ['side', 'slot', 'source', 'type', 'reqlevel'],
-            'extraCols'       => ['$Listview.extraCols.yield', '$Listview.extraCols.reqskill', '$Listview.extraCols.percent'],
+            'extraCols'       => [new JsExpression('Listview.extraCols.yield'), new JsExpression('Listview.extraCols.reqskill'), new JsExpression('Listview.extraCols.percent')],
             'sort'            => ['reqskill', 'level', '-percent', 'name'],
             '_totalCount'     => 10000,
-            'computeDataFunc' => '$Listview.funcBox.initLootTable',
+            'computeDataFunc' => new JsExpression('Listview.funcBox.initLootTable'),
         ), ItemList::$brickFile);
     }
 

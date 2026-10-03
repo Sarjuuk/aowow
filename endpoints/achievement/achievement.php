@@ -432,7 +432,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
         /* Extra Tabs */
         /**************/
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")], 'tabsRelated', true);
 
         // tab: see also
         $conditions = array(
@@ -447,7 +447,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data'        => $saList->getListviewData(),
                 'id'          => 'see-also',
-                'name'        => '$LANG.tab_seealso',
+                'name'        => new JsExpression('LANG.tab_seealso'),
                 'visibleCols' => ['category']
             ), AchievementList::$brickFile));
         }
@@ -468,7 +468,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data'        => $coList->getListviewData(),
                     'id'          => 'criteria-of',
-                    'name'        => '$LANG.tab_criteriaof',
+                    'name'        => new JsExpression('LANG.tab_criteriaof'),
                     'visibleCols' => ['category']
                 ), AchievementList::$brickFile));
             }
@@ -477,7 +477,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
         // tab: condition for
         $cnd = new Conditions();
         $cnd->getByCondition(Type::ACHIEVEMENT, $this->typeId)->prepare();
-        if ($tab = $cnd->toListviewTab('condition-for', '$LANG.tab_condition_for'))
+        if ($tab = $cnd->toListviewTab('condition-for', new JsExpression('LANG.tab_condition_for')))
         {
             $this->extendGlobalData($cnd->getJSGlobals());
             $this->lvTabs->addDataTab(...$tab);

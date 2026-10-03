@@ -46,5 +46,6 @@
                     </div>
 
                 </div>
+                <?=$this->csrfField();?>
             </form>
             <script type="text/javascript">$WH.ge('email-generic').focus()</script>

@@ -90,6 +90,7 @@ if ($this->bans):
 
                             <div class="pad3"></div>
                             <input value="<?=Lang::main('submit');?>" type="submit" name="do-general-settings-update" />
+                            <?=$this->csrfField();?>
                         </form>
                     </div>
 
@@ -109,9 +110,11 @@ if ($this->bans):
                             <table cellspacing="5" cellpadding="0" border="0">
                                 <tr><td nowrap="nowrap"><?=Lang::account('curEmail');?></td><td><input disabled="disabled" name="current-email" style="width: 15em" value="<?=$this->curEmail;?>" readonly="readonly" /></td></tr>
                                 <tr><td nowrap="nowrap"><?=Lang::account('newEmail');?></td><td><input name="newemail" style="width: 15em" value="" /></td></tr>
+                                <tr><td nowrap="nowrap"><?=Lang::account('curPass');?></td><td><input name="currentPassword" type="password" autocomplete="current-password" required style="width: 15em" /></td></tr>
                             </table>
                             <div class="pad"></div>
                             <input value="<?=Lang::main('submit');?>" type="submit" name="do-update-email" />
+                            <?=$this->csrfField();?>
                         </form>
 
                         <h2 id="change-username"><?=Lang::account('user');?></h2>
@@ -135,6 +138,7 @@ if ($this->bans):
                             </table>
                             <div class="pad"></div>
                             <input value="<?=Lang::main('submit');?>" type="submit" name="do-update-username" />
+                            <?=$this->csrfField();?>
                         </form>
 
                         <h2 id="change-password"><?=Lang::account('pass');?></h2>
@@ -154,6 +158,8 @@ if ($this->bans):
                             <div class="pad"></div>
                             <input value="<?=Lang::main('submit');?>" type="submit" name="do-update-password" />
                             <div style="padding-top:10px; font-size:0.8em"><?=Lang::account('passResetHint');?></div>
+                            <div style="padding-top:10px; font-size:0.8em"><?=Lang::account('passwordLogoutNote');?></div>
+                            <?=$this->csrfField();?>
                         </form>
                         <script type="text/javascript">pm()</script>
 
@@ -206,6 +212,7 @@ if ($this->bans):
 */
 ?>
 
+                            <?=$this->csrfField();?>
                         </form>
 
                         <h3 id="forum-avatar"><?=Lang::account('avatar');?></h3>
@@ -267,6 +274,7 @@ if ($this->bans):
                             <div class="pad"></div>
                             <input type="submit" value="<?=Lang::main('submit');?>" />
 
+                            <?=$this->csrfField();?>
                         </form>
 
                     </div>
@@ -297,6 +305,7 @@ if ($this->bans):
                             </div>
                             <input type="submit" value="<?=Lang::main('submit');?>">
                             <div class="pad2"></div>
+                            <?=$this->csrfField();?>
                         </form>
                         <script type="text/javascript">
                             [2, 1, 0, 4, 3].forEach((i, k) => {

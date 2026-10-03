@@ -28,5 +28,6 @@
             <input type="submit" class="button" name="submit" value="永久忘记我的账户" />
             <input type="submit" class="button" name="cancel" value="取消“忘记我”流程" />
         </p>
+        <?=$this->csrfField();?>
     </form>
 </div>

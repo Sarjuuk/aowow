@@ -658,7 +658,7 @@ trait spawnHelper
                         if ($p['wait'])
                             $label[] = Lang::npc('wait').Lang::main('colon').DateTime::formatTimeElapsedFloat($p['wait']);
 
-                        $opts = array(                      // \0 doesn't get printed and tricks Util::toJSON() into handling this as a string .. i feel slightly dirty now
+                        $opts = array(                      // NUL precedes the client-side dollar marker for waypoint labels.
                             'label' => "\0$<br /><span class=\"q0\">".implode('<br />', $label).'</span>',
                             'type'  => $wpIdx
                         );

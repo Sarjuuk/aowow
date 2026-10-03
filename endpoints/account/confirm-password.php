@@ -21,10 +21,26 @@ class AccountConfirmpasswordResponse extends TemplateResponse
         'key' => ['filter' => FILTER_VALIDATE_REGEXP, 'options' => ['regexp' => '/^[a-zA-Z0-9]{40}$/']]
     );
 
+    protected array $expectedPOST = array(
+        'key' => ['filter' => FILTER_VALIDATE_REGEXP, 'options' => ['regexp' => '/^[a-zA-Z0-9]{40}$/']]
+    );
+
     private bool $success = false;
 
     protected function generate() : void
     {
+        // Email scanners and link prefetches must not consume bearer tokens.
+        if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST')
+        {
+            $this->inputbox = ['inputbox-form-confirm', [
+                'head' => Lang::account('title'),
+                'action' => '?account=confirm-password',
+                'key' => $this->_get['key'] ?: ''
+            ]];
+            parent::generate();
+            return;
+        }
+
         parent::generate();
 
         if (User::isBanned())
@@ -41,15 +57,14 @@ class AccountConfirmpasswordResponse extends TemplateResponse
 
     private function confirm() : string
     {
-        if (!$this->assertGET('key'))
+        if (!$this->assertPOST('key'))
             return Lang::main('intError');
 
-        $acc = DB::Aowow()->selectRow('SELECT `updateValue`, `status`, `statusTimer` FROM ::account WHERE `token` = %s', $this->_get['key']);
-        if (!$acc || $acc['status'] != ACC_STATUS_CHANGE_PASS || $acc['statusTimer'] < time())
+        $result = PasswordRecovery::confirm($this->_post['key']);
+        if ($result === PasswordRecovery::INVALID_TOKEN)
             return Lang::account('inputbox', 'error', 'passTokenUsed');
 
-        // 0 changes == error
-        if (!DB::Aowow()->qry('UPDATE ::account SET `passHash` = `updateValue`, `status` = %i, `statusTimer` = 0, `token` = "", `updateValue` = "" WHERE `token` = %s', ACC_STATUS_NONE, $this->_get['key']))
+        if ($result !== PasswordRecovery::OK)
             return Lang::main('intError');
 
         $this->success = true;

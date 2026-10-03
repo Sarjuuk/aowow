@@ -72,7 +72,7 @@ class EventsBaseResponse extends TemplateResponse implements ICache
         $events = new WorldEventList($condition);
         $this->extendGlobalData($events->getJSGlobals());
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")]);
 
         $this->lvTabs->addListviewTab(new Listview(['data' => $events->getListviewData()], WorldEventList::$brickFile));
 

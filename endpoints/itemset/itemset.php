@@ -233,7 +233,7 @@ class ItemsetBaseResponse extends TemplateResponse implements ICache
             $rel[] = ['skillId', 0];
         }
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")], 'tabsRelated', true);
 
         if ($rel)
         {
@@ -243,7 +243,7 @@ class ItemsetBaseResponse extends TemplateResponse implements ICache
                 $tabData = array(
                     'data' => $relSets->getListviewData(),
                     'id'   => 'see-also',
-                    'name' => '$LANG.tab_seealso'
+                    'name' => new JsExpression('LANG.tab_seealso')
                 );
 
                 if (!$relSets->hasDiffFields('classMask'))

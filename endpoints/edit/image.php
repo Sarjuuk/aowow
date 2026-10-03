@@ -8,6 +8,7 @@ if (!defined('AOWOW_REVISION'))
 
 class EditImageResponse extends TextResponse
 {
+    protected string $contentType = MIME_TYPE_TEXT;         // Both XHR and the legacy iframe parse plain JSON text.
     protected bool  $requiresLogin = true;
 
     protected array $expectedGET   = array(
@@ -24,6 +25,10 @@ class EditImageResponse extends TextResponse
     */
     protected function generate() : void
     {
+        // The legacy multipart form provides the name in $_FILES rather than the query string.
+        if (!isset($_GET['qqfile']) && is_string($_FILES['qqfile']['name'] ?? null))
+            $this->_get['qqfile'] = self::checkTextLine($_FILES['qqfile']['name']);
+
         if (!$this->assertGET('qqfile', 'guide'))
         {
             $this->result = Util::toJSON(['success' => false, 'error' => Lang::main('genericError')]);

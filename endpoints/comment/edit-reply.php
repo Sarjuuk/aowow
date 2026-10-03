@@ -40,6 +40,9 @@ class CommentEditreplyResponse extends TextResponse
         if (mb_strlen($this->_post['body']) < CommunityContent::REPLY_LENGTH_MIN || mb_strlen($this->_post['body']) > CommunityContent::REPLY_LENGTH_MAX)
             $this->generate404(Lang::main('textLength', [mb_strlen($this->_post['body']), CommunityContent::REPLY_LENGTH_MIN, CommunityContent::REPLY_LENGTH_MAX]));
 
+        if (!ContributionBudget::reserve('reply', strlen($this->_post['body'])))
+            $this->generate404(ContributionBudget::error());
+
         $update = array(
             'body'       => $this->_post['body'],
             'editUserId' => User::$id,
@@ -58,7 +61,8 @@ class CommentEditreplyResponse extends TextResponse
             $this->generate404(Lang::main('intError'));
         }
 
-        $this->result = Util::toJSON(CommunityContent::getCommentReplies($this->_post['commentId']));
+        $total = 0;
+        $this->result = Util::toJSON(CommunityContent::getCommentReplies($this->_post['commentId'], CommunityContent::COMMENT_PAGE_SIZE, $total, 0, $this->_post['replyId']));
     }
 }
 

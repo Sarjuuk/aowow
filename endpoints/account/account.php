@@ -156,7 +156,7 @@ class AccountBaseResponse extends TemplateResponse
         $this->avatarManager = new Listview([
             'template' => 'avatar',
             'id'       => 'avatar',
-            'name'     => '$LANG.tab_avatars',
+            'name'     => new JsExpression('LANG.tab_avatars'),
             'parent'   => 'avatar-manage',
             'hideNav'  => 1 | 2,                            // top | bottom
             'data'     => $cuAvatars ?? [],

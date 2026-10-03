@@ -108,9 +108,9 @@ class NpcsBaseResponse extends TemplateResponse implements ICache
         {
             $tabData['data'] = $npcs->getListviewData($fiRepCols ? LISTVIEWINFO_REPUTATION : 0x0);
             if ($fiRepCols)                                 // never use pretty-print
-                $tabData['extraCols'] = '$fi_getReputationCols('.Util::toJSON($fiRepCols, JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE).')';
+                $tabData['extraCols'] = new JsExpression('fi_getReputationCols('.Util::toJSON($fiRepCols, JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE).')');
             else if ($this->filter->fiExtraCols)
-                $tabData['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
+                $tabData['extraCols'] = new JsExpression('fi_getExtraCols(fi_extraCols, 0, 0)');
 
             if ($this->category)
                 $tabData['hiddenCols'] = ['type'];
@@ -118,12 +118,12 @@ class NpcsBaseResponse extends TemplateResponse implements ICache
             // create note if search limit was exceeded
             if ($npcs->getMatches() > Listview::DEFAULT_SIZE)
             {
-                $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_npcsfound', $npcs->getMatches(), Listview::DEFAULT_SIZE);
+                $tabData['note'] = new JsExpression(substr(sprintf(Util::$tryFilteringString, 'LANG.lvnote_npcsfound', $npcs->getMatches(), Listview::DEFAULT_SIZE), 1));
                 $tabData['_truncated'] = 1;
             }
         }
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")]);
 
         $this->lvTabs->addListviewTab(new Listview($tabData, CreatureList::$brickFile));
 

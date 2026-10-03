@@ -223,6 +223,10 @@ $lang = array(
         'pm'            => "nachmittags",
 
         // error
+        'contributionLimit' => 'Dein Beitragslimit wurde erreicht. Versuche es später erneut oder kontaktiere einen Moderator.',
+        'commentsPage' => 'Kommentarseite %d von %d',
+        'previousComments' => 'Vorherige Kommentare',
+        'nextComments' => 'Weitere Kommentare',
         'intError'      => "Ein interner Fehler ist aufgetreten.",
         'intError2'     => "Ein interner Fehler ist aufgetreten. (%s)",
         'genericError'  => "Ein Fehler trat auf; aktualisiert die Seite und versucht es nochmal. Wenn der Fehler bestehen bleibt, bitte meldet es bei <a href='#contact'>feedback</a>", # LANG.genericerror
@@ -1043,7 +1047,7 @@ $lang = array(
      // 'accInactive'   => "Dieses Konto wurde bisher nicht aktiviert.",
         'errNameLength' => "Euer Benutzername muss mindestens 4 Zeichen lang sein.", // message_usernamemin
         'errNameChars'  => "Euer Benutzername kann nur aus Buchstaben und Zahlen bestehen.", // message_usernamenotvalid
-        'errPassLength' => "Euer Kennwort muss mindestens 6 Zeichen lang sein.", // message_passwordmin
+        'errPassLength' => "Verwendet mindestens 15 Zeichen und höchstens 72 UTF-8-Bytes (manche Zeichen benötigen mehrere Bytes).", // message_passwordmin
         'passMismatch'  => "Die eingegebenen Kennworte stimmen nicht überein.",
         'nameInUse'     => "Es existiert bereits ein Konto mit diesem Namen.",
         'mailInUse'     => "Diese E-Mail-Adresse ist bereits mit einem Konto verbunden.",
@@ -1081,6 +1085,7 @@ $lang = array(
         'purge'         => "Löschen",
         'curPass'       => "Derzeitiges Kennwort:",
         'globalLogout'  => "Von allen Browsern/Geräten abmelden",
+        'passwordLogoutNote' => "Nach Bestätigung der Passwortänderung werden alle Browser/Geräte abgemeldet, auch dieses.",
         'curEmail'      => "Momentane E-Mail-Adresse:",
         'newEmail'      => "Neue E-Mail-Adresse:",
         'userPage'      => "Benutzerseite",

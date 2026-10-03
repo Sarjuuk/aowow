@@ -35,11 +35,11 @@ class ReputationBaseResponse extends TemplateResponse
             array_walk($repData, fn(&$x) => $x['when'] = date(Util::$dateFormatInternal, $x['when']));
 
             $this->tabsTitle = Lang::main('yourRepHistory');
-            $this->lvTabs    = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], __forceTabs: true);
+            $this->lvTabs    = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")], __forceTabs: true);
 
             $this->lvTabs->addListviewTab(new Listview(array(
                 'id'   => 'reputation-history',
-                'name' => '$LANG.reputationhistory',
+                'name' => new JsExpression('LANG.reputationhistory'),
                 'data' => $repData
             ), 'reputationhistory'));
         }

@@ -224,6 +224,10 @@ $lang = array(
         'pm'            => "PM",
 
         // error
+        'contributionLimit' => 'Votre limite de contributions est atteinte. Réessayez plus tard ou contactez un modérateur.',
+        'commentsPage' => 'Page de commentaires %d sur %d',
+        'previousComments' => 'Commentaires précédents',
+        'nextComments' => 'Commentaires suivants',
         'intError'      => "[An internal error occured.]",
         'intError2'     => "[An internal error occured. (%s)]",
         'genericError'  => "Une erreur est survenue; Actualisez la page et essayez à nouveau. Si l'erreur persiste, envoyez un email à <a href='#contact'>feedback</a>", # LANG.genericerror
@@ -1044,7 +1048,7 @@ $lang = array(
      // 'accInactive'   => "Ce compte n'a pas encore été activé.",
         'errNameLength' => "Votre nom d'utilisateur doit faire au moins 4 caractères de long.", // message_usernamemin
         'errNameChars'  => "Votre nom d'utilisateur doit contenir seulement des lettres et des chiffres.", // message_usernamenotvalid
-        'errPassLength' => "Votre mot de passe doit faire au moins 6 caractères de long.", // message_passwordmin
+        'errPassLength' => "Utilisez au moins 15 caractères et au maximum 72 octets UTF-8 (certains caractères utilisent plusieurs octets).", // message_passwordmin
         'passMismatch'  => "Les mots de passe que vous avez saisis ne correspondent pas.",
         'nameInUse'     => "Ce nom d'utilisateur est déjà utilisé.",
         'mailInUse'     => "Cette addresse email est déjà liée à un compte.",
@@ -1082,6 +1086,7 @@ $lang = array(
         'purge'         => "Effacer",
         'curPass'       => "Mot de passe actuel :",
         'globalLogout'  => "Me déconnecter de tous les autres navigateurs/appareils",
+        'passwordLogoutNote' => "La confirmation du changement de mot de passe déconnectera tous les navigateurs/appareils, y compris celui-ci.",
         'curEmail'      => "Adresse courriel actuelle :",
         'newEmail'      => "Nouvelle adresse e-mail :",
         'userPage'      => "Page d'utilisateur",

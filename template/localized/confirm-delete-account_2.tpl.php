@@ -28,5 +28,6 @@
             <input type="submit" class="button" name="submit" value="Oublier définitivement mon compte" />
             <input type="submit" class="button" name="cancel" value="Annuler la procédure « Oublier mon compte »" />
         </p>
+        <?=$this->csrfField();?>
     </form>
 </div>

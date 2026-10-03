@@ -612,7 +612,14 @@ class Markup implements \JsonSerializable
 
         foreach ($this as $prop => $val)
             if ($val !== null && $prop[0] != '_')
+            {
+                // These exact constants are developer-owned; prepend/append and other text stay data.
+                if (($prop == 'mode' && in_array($val, [self::MODE_COMMENT, self::MODE_ARTICLE, self::MODE_QUICKFACTS, self::MODE_SIGNATURE, self::MODE_REPLY], true)) ||
+                    ($prop == 'allow' && in_array($val, [self::CLASS_ADMIN, self::CLASS_STAFF, self::CLASS_PREMIUM, self::CLASS_USER, self::CLASS_PENDING], true)))
+                    $val = new JsExpression(substr($val, 1));
+
                 $result[$prop] = $val;
+            }
 
         return $result;
     }
@@ -620,7 +627,7 @@ class Markup implements \JsonSerializable
     public function __toString() : string
     {
         if ($attr = $this->jsonSerialize())
-            return 'Markup.printHtml('.$this->cleanText().', "'.$this->__parent.'", '.Util::toJSON($attr).');'.PHP_EOL;
+            return 'Markup.printHtml('.$this->cleanText().', "'.$this->__parent.'", '.Util::toJavaScript($attr).');'.PHP_EOL;
 
         return 'Markup.printHtml('.$this->cleanText().', "'.$this->__parent.'");'.PHP_EOL;
     }

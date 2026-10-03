@@ -37,6 +37,7 @@
                     <div class="pad3"></div>
 
                     <input type="submit" value="<?=Lang::main('submit'); ?>" />
+                    <?=$this->csrfField();?>
                 </form>
 
                 <script type="text/javascript">//<![CDATA[

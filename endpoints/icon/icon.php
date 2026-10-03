@@ -95,7 +95,7 @@ class IconBaseResponse extends TemplateResponse implements ICache
         /* Extra Tabs */
         /**************/
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")], 'tabsRelated', true);
 
         // used by: spell
         $ubSpells = new SpellList(array(['iconId', $this->typeId]), ['calcTotal' => true]);

@@ -57,6 +57,12 @@ class CommentAddResponse extends TextResponse
             return;
         }
 
+        if (!ContributionBudget::reserve('comment', strlen($this->_post['commentbody'])))
+        {
+            $_SESSION['error']['co'] = ContributionBudget::error();
+            return;
+        }
+
         if ($postId = DB::Aowow()->qry('INSERT INTO ::comments (`type`, `typeId`, `userId`, `roles`, `body`, `date`) VALUES (%i, %i, %i, %i, %s, UNIX_TIMESTAMP())', $this->_get['type'], $this->_get['typeid'], User::$id, User::$groups, $this->_post['commentbody']))
         {
             Util::gainSiteReputation(User::$id, SITEREP_ACTION_COMMENT, ['id' => $postId]);

@@ -109,7 +109,7 @@ class EnchantmentsBaseResponse extends TemplateResponse implements ICache
             $this->filter->fiExtraCols = array_merge($this->filter->fiExtraCols, $xCols);
 
         if ($this->filter->fiExtraCols)
-            $tabData['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
+            $tabData['extraCols'] = new JsExpression('fi_getExtraCols(fi_extraCols, 0, 0)');
 
         if (array_filter(array_column($tabData['data'], 'spells')))
             $tabData['visibleCols'] = ['trigger'];
@@ -119,11 +119,11 @@ class EnchantmentsBaseResponse extends TemplateResponse implements ICache
 
         if ($ench->getMatches() > Listview::DEFAULT_SIZE)
         {
-            $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_enchantmentsfound', $ench->getMatches(), Listview::DEFAULT_SIZE);
+            $tabData['note'] = new JsExpression(substr(sprintf(Util::$tryFilteringString, 'LANG.lvnote_enchantmentsfound', $ench->getMatches(), Listview::DEFAULT_SIZE), 1));
             $tabData['_truncated'] = 1;
         }
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")]);
 
         $this->lvTabs->addListviewTab(new Listview($tabData, EnchantmentList::$brickFile, 'enchantment'));
 

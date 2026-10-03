@@ -17,9 +17,9 @@ class AccountUpdatepasswordResponse extends TextResponse
     protected  bool   $requiresLogin = true;
 
     protected  array  $expectedPOST  = array(
-        'currentPassword' => ['filter' => FILTER_CALLBACK, 'options' => [self::class, 'checkTextLine']],
-        'newPassword'     => ['filter' => FILTER_CALLBACK, 'options' => [self::class, 'checkTextLine']],
-        'confirmPassword' => ['filter' => FILTER_CALLBACK, 'options' => [self::class, 'checkTextLine']],
+        'currentPassword' => ['filter' => FILTER_CALLBACK, 'options' => [Util::class, 'validatePasswordInput']],
+        'newPassword'     => ['filter' => FILTER_CALLBACK, 'options' => [Util::class, 'validatePasswordInput']],
+        'confirmPassword' => ['filter' => FILTER_CALLBACK, 'options' => [Util::class, 'validatePasswordInput']],
         'globalLogout'    => ['filter' => FILTER_CALLBACK, 'options' => [self::class, 'checkCheckbox']]
     );
 
@@ -53,6 +53,9 @@ class AccountUpdatepasswordResponse extends TextResponse
         if ($this->_post['newPassword'] !== $this->_post['confirmPassword'])
             return Lang::account('passMismatch');
 
+        if (PasswordBudget::reserve(User::$id) !== PasswordBudget::OK)
+            return Lang::main('intError');
+
         $userData = DB::Aowow()->selectRow('SELECT `status`, `passHash`, `statusTimer` FROM ::account WHERE `id` = %i', User::$id);
         if ($userData['status'] != ACC_STATUS_NONE && $userData['status'] != ACC_STATUS_CHANGE_PASS && $userData['statusTimer'] > time())
             return Lang::account('inputbox', 'error', 'isRecovering', [DateTime::formatTimeElapsedFloat(Cfg::get('ACC_RECOVERY_DECAY') * 1000)]);
@@ -74,7 +77,7 @@ class AccountUpdatepasswordResponse extends TextResponse
         if (!Util::sendMail($email, 'update-password', [$token, $email], Cfg::get('ACC_RECOVERY_DECAY')))
             return Lang::main('intError2', ['send mail']);
 
-        // logout all other active sessions
+        // Optional immediate logout; confirming the password change always revokes every session.
         if ($this->_post['globalLogout'])
             DB::Aowow()->qry('UPDATE ::account_sessions SET `status` = %i, `touched` = %i WHERE `userId` = %i AND `sessionId` <> ? AND `status` = %i', SESSION_FORCED_LOGOUT, time(), User::$id, session_id(), SESSION_ACTIVE);
 

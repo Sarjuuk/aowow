@@ -2999,7 +2999,7 @@ var LANG = {
     message_noscreenshot:         "Por favor seleccione la captura de pantalla para subir.",
     message_novideo:              "Por favor, introduce información válida del vídeo.",
     message_nothingtoviewin3d:    "No se han seleccionado objetos que se puedan ver en 3D.",
-    message_passwordmin:          "Tu contraseña tiene que tener por lo menos seis caracteres.",
+    message_passwordmin:          "Usa al menos 15 caracteres y como máximo 72 bytes UTF-8 (algunos caracteres usan varios bytes).",
     message_passwordsdonotmatch:  "Las contraseñas no son iguales.",
     message_savebeforeexit:       "Perderás cualquier cambio realizado que no hayas guardado.",
     message_startedpost:          "Empezaste a escribir un mensaje.",

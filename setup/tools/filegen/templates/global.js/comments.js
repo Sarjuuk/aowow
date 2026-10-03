@@ -1,3 +1,14 @@
+// Merge bounded reply batches without losing an edited/new/focused reply already displayed.
+function MergeCommentReplies(comment, replies)
+{
+    var byId = {};
+    (comment.replies || []).concat(replies).forEach(function (reply) { byId[reply.id] = reply; });
+    comment.replies = Object.keys(byId).map(function (id) { return byId[id]; }).sort(function (a, b) {
+        return a.creationdate.localeCompare(b.creationdate) || a.id - b.id;
+    });
+    if (replies.length && Number.isInteger(replies[0].totalReplies)) comment.nreplies = replies[0].totalReplies;
+}
+
 /* Note: comment replies are called "comments" because part of this code was taken from another project of mine. */
 
 function SetupReplies(post, comment)
@@ -189,7 +200,8 @@ function SetupAddEditComment(post, comment, edit)
 
     function OnSubmitSuccess(newReplies)
     {
-        comment.replies = newReplies;
+        if (comment.replyOffset === undefined) comment.replyOffset = comment.replies.length;
+        MergeCommentReplies(comment, newReplies);
         Listview.templates.comment.updateReplies(comment);
     }
 
@@ -242,8 +254,12 @@ function SetupShowMoreComments(post, comment)
         $.ajax({
             type: 'GET',
             url: '?comment=show-replies',
-            data: { id: comment.id },
-            success: function (replies) { comment.replies = replies; Listview.templates.comment.updateReplies(comment); },
+            data: { id: comment.id, offset: comment.replyOffset === undefined ? comment.replies.length : comment.replyOffset },
+            success: function (replies) {
+                comment.replyOffset = (comment.replyOffset === undefined ? comment.replies.length : comment.replyOffset) + replies.length;
+                MergeCommentReplies(comment, replies);
+                Listview.templates.comment.updateReplies(comment);
+            },
             dataType: 'json',
             error: function () { OnFetchFail(); }
         });

@@ -70,6 +70,11 @@ class Cfg
         foreach ($sets as $key => [$value, $flags, $catg, $default, $comment])
         {
             $php = $flags & self::FLAG_PHP;
+            if ($php && self::unsafeErrorOption($key))
+            {
+                self::throwError('Native error output is controlled by the safe error logger; PHP option skipped.');
+                continue;
+            }
 
             if ($err = self::validate($value, $flags, $comment))
             {
@@ -115,6 +120,9 @@ class Cfg
             return 'empty option name given';
 
         $key = strtolower($key);
+
+        if (self::unsafeErrorOption($key))
+            return 'native error output is controlled by the safe error logger';
 
         if (!preg_match(self::PATTERN_CONF_KEY_FULL, $key))
             return 'invalid chars in option name: [a-z 0-9 _ . -] are allowed';
@@ -194,6 +202,9 @@ class Cfg
         if (!isset(self::$store[$key]))
             return 'configuration option not found';
 
+        if (self::unsafeErrorOption($key))
+            return 'native error output is controlled by the safe error logger';
+
         [$oldValue, $flags, , , $comment] = self::$store[$key];
 
         if ($flags & self::FLAG_INTERNAL)
@@ -249,17 +260,29 @@ class Cfg
         if (!isset(self::$store[$key]))
             return 'configuration option not found';
 
-        [$oldValue, $flags, , $default, ] = self::$store[$key];
+        [$oldValue, $flags, , $default, $comment] = self::$store[$key];
 
         if ($flags & self::FLAG_INTERNAL)
             return 'can\'t set an internal option directly';
 
-        if (!$default)
+        if ($default === null)
             return 'config option has no default value';
 
-        // @eval .. some dafault values are supplied as bitmask or the likes
+        // Database defaults may use numeric arithmetic/bitmasks, but must never execute PHP.
         if (!($flags & Cfg::FLAG_TYPE_STRING))
-            $default = @eval('return ('.$default.');');
+        {
+            try
+            {
+                $default = NumericExpression::evaluate((string)$default);
+                $default = (string)(is_bool($default) ? (int)$default : $default);
+            }
+            catch (\Throwable) { return 'config option has an invalid numeric default'; }
+        }
+
+        if ($errMsg = self::validate($default, $flags, $comment))
+            return $errMsg;
+        if (self::unsafeErrorOption($key) && $default)
+            return 'native diagnostic output must remain disabled';
 
         DB::Aowow()->qry('UPDATE ::config SET `value` = %s WHERE `key` = %s', $default, $key);
         self::$store[$key][self::IDX_VALUE] = $default;
@@ -314,6 +337,12 @@ class Cfg
     /* internal */
     /************/
 
+    // Database-backed INI options must not reopen the native diagnostic bypass.
+    private static function unsafeErrorOption(string $key) : bool
+    {
+        return in_array(strtolower($key), ['display_errors', 'display_startup_errors', 'log_errors'], true);
+    }
+
     private static function validate(&$value, int $flags = self::FLAG_TYPE_STRING | self::FLAG_PHP, string $comment = ' - ') : string
     {
         $value = preg_replace(self::PATTERN_INVALID_CHARS, '', $value);
@@ -359,21 +388,16 @@ class Cfg
         if (!isset(self::$rebuildScripts[$key]))
             return '';
 
-        $msg = '';
-
         if (CLI)
         {
             $rebuildFiles = array_merge($rebuildFiles, self::$rebuildScripts[$key]);
             return '';
         }
 
-        // not in CLI mode and build() can only be run from CLI. .. todo: other options..?
-        exec('php aowow --build='.implode(',', self::$rebuildScripts[$key]), $out);
-        foreach ($out as $o)
-            if (strstr($o, 'ERR'))
-                $msg .= explode('0m]', $o)[1]."<br />\n";
-
-        return $msg;
+        if (BuildRunner::run(self::$rebuildScripts[$key]))
+            return '';
+        trigger_error('Cfg::handleFileBuild - dataset build failed', E_USER_WARNING);
+        return 'dataset build failed; check the CLI configuration and server log';
     }
 
     private static function throwError($msg) : void

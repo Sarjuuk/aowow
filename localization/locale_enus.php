@@ -224,6 +224,10 @@ $lang = array(
         'pm'            => "PM",
 
         // error
+        'contributionLimit' => 'Your contribution limit has been reached. Please try again later or contact a moderator.',
+        'commentsPage' => 'Comments page %d of %d',
+        'previousComments' => 'Previous comments',
+        'nextComments' => 'Next comments',
         'intError'      => "An internal error has occurred.",
         'intError2'     => "An internal error has occurred. (%s)",
         'genericError'  => "An error has occurred; refresh the page and try again. If the error persists email <a href=\"#contact\">feedback</a>", # LANG.genericerror
@@ -1044,7 +1048,7 @@ $lang = array(
      // 'accInactive'   => "That account has not yet been confirmed active.",
         'errNameLength' => "Your username must be at least 4 characters long.", // message_usernamemin
         'errNameChars'  => "Your username can only contain letters and numbers.", // message_usernamenotvalid
-        'errPassLength' => "Your password must be at least 6 characters long.", // message_passwordmin
+        'errPassLength' => "Use at least 15 characters and no more than 72 UTF-8 bytes (some characters use multiple bytes).", // message_passwordmin
         'passMismatch'  => "The passwords you entered do not match.",
         'nameInUse'     => "This username is already in use.",
         'mailInUse'     => "That email is already registered to an account.",
@@ -1082,6 +1086,7 @@ $lang = array(
         'purge'         => "Purge",
         'curPass'       => "Current password:",
         'globalLogout'  => "Log me out of all other browsers/devices",
+        'passwordLogoutNote' => "All browsers/devices, including this one, will be signed out when the password change is confirmed.",
         'curEmail'      => "Current email address:",
         'newEmail'      => "New email address:",
         'userPage'      => "User Page",

@@ -241,7 +241,7 @@ class SpellsBaseResponse extends TemplateResponse implements ICache
                 case -9:                                    // GM Spells
                     array_push($visibleCols, 'level');
                 case -5:                                    // Mounts
-                    array_push($extraCols, "\$Listview.funcBox.createSimpleCol('speed', 'speed', '90px', 'speed')");
+                    array_push($extraCols, new JsExpression("Listview.funcBox.createSimpleCol('speed', 'speed', '90px', 'speed')"));
 
                     if (isset($this->category[1]))
                     {
@@ -292,7 +292,7 @@ class SpellsBaseResponse extends TemplateResponse implements ICache
                                 break;
                         }
 
-                        $tabData['note'] = '$$WH.sprintf(LANG.lvnote_pettalents, "'.$url.'")';
+                        $tabData['note'] = JsExpression::call('$WH.sprintf', new JsExpression('LANG.lvnote_pettalents'), $url);
                     }
 
                     $tabData['_petTalents'] = 1;
@@ -444,7 +444,7 @@ class SpellsBaseResponse extends TemplateResponse implements ICache
         $tabData['data'] = $lvData;
 
         if ($this->filter->fiExtraCols)
-            $tabData['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
+            $tabData['extraCols'] = new JsExpression('fi_getExtraCols(fi_extraCols, 0, 0)');
         else if ($extraCols)
             $tabData['extraCols'] = $extraCols;
 
@@ -455,7 +455,7 @@ class SpellsBaseResponse extends TemplateResponse implements ICache
         // create note if search limit was exceeded; overwriting 'note' is intentional
         if ($spells->getMatches() > Listview::DEFAULT_SIZE)
         {
-            $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_spellsfound', $spells->getMatches(), Listview::DEFAULT_SIZE);
+            $tabData['note'] = new JsExpression(substr(sprintf(Util::$tryFilteringString, 'LANG.lvnote_spellsfound', $spells->getMatches(), Listview::DEFAULT_SIZE), 1));
             $tabData['_truncated'] = 1;
         }
 
@@ -476,7 +476,7 @@ class SpellsBaseResponse extends TemplateResponse implements ICache
         if ($hiddenCols)
             $tabData['hiddenCols'] = array_unique($hiddenCols);
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")]);
         $this->lvTabs->addListviewTab(new Listview($tabData, SpellList::$brickFile));
 
         parent::generate();

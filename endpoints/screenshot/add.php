@@ -67,6 +67,12 @@ class ScreenshotAddResponse extends TextResponse
             return false;
         }
 
+        if (!ContributionBudget::reserve('screenshot'))
+        {
+            $_SESSION['error']['ss'] = ContributionBudget::error();
+            return false;
+        }
+
         if (!ScreenshotMgr::init())
         {
             $_SESSION['error']['ss'] = Lang::main('intError');

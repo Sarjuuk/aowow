@@ -92,7 +92,7 @@ class ZonesBaseResponse extends TemplateResponse implements ICache
         if (!$zones->hasSetFields('type'))
             $hiddenCols[] = 'instancetype';
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")]);
 
         $this->lvTabs->addListviewTab(new Listview(array(
             'data'       => $zones->getListviewData(),

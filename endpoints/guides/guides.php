@@ -57,13 +57,13 @@ class GuidesBaseResponse extends TemplateResponse // implements ICache
 
         $guides = new GuideList($conditions);
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")]);
 
         $this->lvTabs->addListviewTab(new Listview(array(
             'data'       => $guides->getListviewData(),
             'name'       => Util::ucFirst(Lang::game('guides')),
             'hiddenCols' => ['patch'],                      // pointless: display date instead
-            'extraCols'  => ['$Listview.extraCols.date']    // ok
+            'extraCols'  => [new JsExpression('Listview.extraCols.date')]    // ok
         ), GuideList::$brickFile));
 
         parent::generate();

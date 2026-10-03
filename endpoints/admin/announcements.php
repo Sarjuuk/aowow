@@ -26,7 +26,7 @@ class AdminAnnouncementsResponse extends TemplateResponse
         if ($this->_get['id'] && isset($this->_get['status']))
         {
             $this->updateStatus();
-            $this->forward($_SERVER['HTTP_REFERER'] ?? '.');
+            $this->forward(ReturnTarget::fromReferer('?admin=announcements'));
         }
         else if ($this->_get['edit'])
             $this->displayEditor();

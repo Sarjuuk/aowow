@@ -860,7 +860,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         /* Extra Tabs */
         /**************/
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")], 'tabsRelated', true);
 
         // tab: see also
         $seeAlso = new QuestList(array(['name_loc'.Lang::getLocale()->value, Util::htmlEscape($this->subject->getField('name', true))], ['id', $this->typeId, '!']));
@@ -869,7 +869,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
             $this->extendGlobalData($seeAlso->getJSGlobals());
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $seeAlso->getListviewData(),
-                'name' => '$LANG.tab_seealso',
+                'name' => new JsExpression('LANG.tab_seealso'),
                 'id'   => 'see-also'
             ), QuestList::$brickFile));
         }
@@ -881,7 +881,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
             $this->extendGlobalData($criteriaOf->getJSGlobals());
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $criteriaOf->getListviewData(),
-                'name' => '$LANG.tab_criteriaof',
+                'name' => new JsExpression('LANG.tab_criteriaof'),
                 'id'   => 'criteria-of'
             ), AchievementList::$brickFile));
         }

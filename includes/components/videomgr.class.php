@@ -26,30 +26,40 @@ class VideoMgr
 
         self::$tmpFile = sprintf(self::PATH_TEMP, User::$username.'-'.$destType.'-'.$destTypeId.'-'.$uid);
 
-        $tmpFile = fopen(self::$tmpFile, 'w');
+        $mask = umask(0077);
+        try { $tmpFile = fopen(self::$tmpFile, 'xb'); }
+        finally { umask($mask); }
         if (!$tmpFile)
         {
             trigger_error('VideoMrg::saveSuggestion - failed to create temp file');
             return false;
         }
 
-        fwrite($tmpFile, $videoInfo->id               . PHP_EOL);
-        fwrite($tmpFile, $videoInfo->title            . PHP_EOL);
-        fwrite($tmpFile, $videoInfo->thumbnail_url    . PHP_EOL);
-        fwrite($tmpFile, $videoInfo->thumbnail_height . PHP_EOL);
-        fwrite($tmpFile, $videoInfo->thumbnail_width  . PHP_EOL);
-
-        return fclose($tmpFile);
+        $payload = implode(PHP_EOL, [$videoInfo->id, $videoInfo->title, $videoInfo->thumbnail_url,
+            $videoInfo->thumbnail_height, $videoInfo->thumbnail_width]).PHP_EOL;
+        $written = strlen($payload) <= 8192 && fwrite($tmpFile, $payload) === strlen($payload);
+        $closed = fclose($tmpFile);
+        if (!$written || !$closed)
+        {
+            unlink(self::$tmpFile);
+            return false;
+        }
+        return true;
     }
 
     public static function loadSuggestion(?\stdClass &$videoInfo, int $destType, int $destTypeId, ?string $uid) : bool
     {
         self::$tmpFile = sprintf(self::PATH_TEMP, User::$username.'-'.$destType.'-'.$destTypeId.'-'.$uid);
 
-        if (!file_exists(self::$tmpFile))
+        if (!file_exists(self::$tmpFile) || is_link(self::$tmpFile) || filesize(self::$tmpFile) > 8192 || filemtime(self::$tmpFile) <= time() - DAY)
             return false;
 
-        if ($info = file(self::$tmpFile, FILE_IGNORE_NEW_LINES))
+        if (($info = file(self::$tmpFile, FILE_IGNORE_NEW_LINES)) && count($info) === 5 &&
+            preg_match('/^[a-zA-Z0-9_-]{11}$/D', $info[0]) && mb_strlen($info[1]) <= 64 && trim($info[1]) !== '' &&
+            !preg_match('/[\x00-\x1f\x7f]/', $info[1]) && strlen($info[2]) <= 64 &&
+            preg_match('~^https://(?:i\.ytimg\.com|img\.youtube\.com)/[a-zA-Z0-9_./?=&%-]+$~D', $info[2]) &&
+            ctype_digit($info[3]) && ctype_digit($info[4]) && (int)$info[3] > 0 && (int)$info[3] <= 4096 &&
+            (int)$info[4] > 0 && (int)$info[4] <= 4096)
         {
             $videoInfo = new \stdClass;
             $videoInfo->id               = $info[0];

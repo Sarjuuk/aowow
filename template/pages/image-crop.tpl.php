@@ -41,6 +41,7 @@
 
                     <input type="submit" value="<?=Lang::main('submit'); ?>" />
                     <input type="hidden" name="coords" />
+                    <?=$this->csrfField();?>
                 </form>
             </div>
         </div><!-- main-contents -->

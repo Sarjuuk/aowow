@@ -111,7 +111,7 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
         /* Extra Tabs */
         /**************/
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")], 'tabsRelated', true);
 
         if ($this->typeId != CURRENCY_HONOR_POINTS && $this->typeId != CURRENCY_ARENA_POINTS)
         {
@@ -133,7 +133,7 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
                             if (!empty($row['stack']))
                                 $row['currency'] = [[$this->typeId, $row['stack'][0]]];
 
-                        $tabData['extraCols'][] = '$Listview.extraCols.currency';
+                        $tabData['extraCols'][] = new JsExpression('Listview.extraCols.currency');
                     }
 
                     $this->lvTabs->addListviewTab(new Listview($tabData, $template));
@@ -151,7 +151,7 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
                 if (!$soldBy->error)
                 {
                     $sbData    = $soldBy->getListviewData();
-                    $extraCols = ['$Listview.extraCols.stock', "\$Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", '$Listview.extraCols.cost', '$Listview.extraCols.condition'];
+                    $extraCols = [new JsExpression('Listview.extraCols.stock'), new JsExpression("Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')"), new JsExpression('Listview.extraCols.cost'), new JsExpression('Listview.extraCols.condition')];
                     foreach ($sbData as $k => &$row)
                     {
                         $items  = [];
@@ -188,7 +188,7 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
                     $this->addDataLoader('zones');
                     $this->lvTabs->addListviewTab(new Listview(array(
                         'data'       => $sbData,
-                        'name'       => '$LANG.tab_soldby',
+                        'name'       => new JsExpression('LANG.tab_soldby'),
                         'id'         => 'sold-by-npc',
                         'extraCols'  => $extraCols,
                         'hiddenCols' => ['level', 'type']
@@ -207,7 +207,7 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
 
                 $tabData = array(
                     'data' => $createdBy->getListviewData(),
-                    'name' => '$LANG.tab_createdby',
+                    'name' => new JsExpression('LANG.tab_createdby'),
                     'id'   => 'created-by',
                 );
 
@@ -245,13 +245,13 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
             {
                 $tabData = array(
                     'data'      => $boughtBy->getListviewData(LISTVIEWINFO_VENDOR, [Type::CURRENCY => $this->typeId]),
-                    'name'      => '$LANG.tab_currencyfor',
+                    'name'      => new JsExpression('LANG.tab_currencyfor'),
                     'id'        => 'currency-for',
-                    'extraCols' => ["\$Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", '$Listview.extraCols.cost']
+                    'extraCols' => [new JsExpression("Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')"), new JsExpression('Listview.extraCols.cost')]
                 );
 
                 if ($n)
-                    $tabData['note'] = sprintf(Util::$filterResultString, $n);
+                    $tabData['note'] = new JsExpression(substr(sprintf(Util::$filterResultString, $n), 1));
 
                 $this->lvTabs->addListviewTab(new Listview($tabData, ItemList::$brickFile));
 

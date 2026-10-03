@@ -23,6 +23,9 @@ RewriteRule ^$ index.php [L]
 RewriteRule ^(index\.php|crossdomain\.xml|robots\.txt)$ - [L,NC]
 
 # Allow static assets
+# Staging files are served only through the authenticated upload preview route.
+# This must precede the broad static allowlist, including on a separate static host.
+RewriteRule ^static/uploads/(screenshots/(pending|temp)|temp)(/|$) - [F,L,NC]
 RewriteRule ^static/.*$ - [L,NC]
 
 # Block everything else

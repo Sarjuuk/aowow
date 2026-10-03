@@ -224,6 +224,10 @@ $lang = array(
         'pm'            => "PM",
 
         // error
+        'contributionLimit' => '已达到投稿限制。请稍后重试或联系版主。',
+        'commentsPage' => '评论第 %d 页，共 %d 页',
+        'previousComments' => '上一页评论',
+        'nextComments' => '下一页评论',
         'intError'      => "发生内部错误。",
         'intError2'     => "发生内部错误。(%s)",
         'genericError'  => "发生错误，请刷新页面再试一次。如果错误持续存在，请联系<a href=\"#contact\">反馈</a>。", # LANG.genericerror
@@ -1044,7 +1048,7 @@ $lang = array(
      // 'accInactive'   => "该帐户尚未确认激活。",
         'errNameLength' => "你的用户名必须至少4个字符长度。", // message_usernamemin
         'errNameChars'  => "你的用户名只能包含字母和数字。", // message_usernamenotvalid
-        'errPassLength' => "你的密码必须至少6个字符长度。", // message_passwordmin
+        'errPassLength' => "请使用至少15个字符且不超过72个UTF-8字节（某些字符占用多个字节）。", // message_passwordmin
         'passMismatch'  => "你输入的密码不匹配。",
         'nameInUse'     => "用户名已被占用。",
         'mailInUse'     => "该电子邮件已注册到一个帐户。",
@@ -1082,6 +1086,7 @@ $lang = array(
         'purge'         => "清除",
         'curPass'       => "当前密码：",
         'globalLogout'  => "从所有其他浏览器/设备中登出当前账户",
+        'passwordLogoutNote' => "确认密码更改后，所有浏览器和设备（包括此设备）都将退出登录。",
         'curEmail'      => "当前邮箱地址：",
         'newEmail'      => "新邮箱地址：",
         'userPage'      => "用户页",

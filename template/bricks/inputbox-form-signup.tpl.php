@@ -36,7 +36,7 @@
                         _.focus();
                         return false;
                     }
-                    else if (_.value.length < 4)
+                    else if (!g_isNewPasswordValid(_.value))
                     {
                         $WH.ge('inputbox-error').innerHTML = LANG.message_passwordmin;
                         _.focus();
@@ -101,6 +101,7 @@
                     </table>
 
                 </div>
+                <?=$this->csrfField();?>
             </form>
 
             <script type="text/javascript">$WH.ge('username-generic').focus()</script>

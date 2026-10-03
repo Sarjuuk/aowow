@@ -49,14 +49,12 @@ class AdminWeightpresetsActionSaveResponse extends TextResponse
         }
 
         // write dataset
-        exec('php aowow --build=weightPresets', $out);
-        foreach ($out as $o)
-            if (strstr($o, 'ERR'))
-            {
-                trigger_error('AdminWeightpresetsActionSaveResponse - failed to write dataset' . $o, E_USER_WARNING);
-                $this->result = self::ERR_WRITE_FILE;
-                return;
-            }
+        if (!BuildRunner::run(['weightPresets']))
+        {
+            trigger_error('AdminWeightpresetsActionSaveResponse - failed to write dataset', E_USER_WARNING);
+            $this->result = self::ERR_WRITE_FILE;
+            return;
+        }
 
         // all done
         $this->result = self::ERR_NONE;

@@ -23,7 +23,7 @@ CLISetup::registerUtility(new class extends UtilityScript
     public const string NOTE_END_OK   = 'setup finished successfully';
     public const string NOTE_END_FAIL = 'setup finished with errors';
 
-    public const int    SITE_LOCK     = CLISetup::LOCK_ON;
+    public const int    LOCK_SITE     = CLISetup::LOCK_ON;
 
     private const string STEP_FILE = 'cache/setup/firstrun';
 
@@ -136,6 +136,12 @@ CLISetup::registerUtility(new class extends UtilityScript
                 {
                     $this->saveProgress($idx);
                     break;
+                }
+
+                if ($usName === 'update')
+                {
+                    CLI::write('Migration failed: restore or reconcile the update journal before resuming setup.', CLI::LOG_ERROR);
+                    return false;
                 }
 
                 if (CLI::read(['x' => ['['.CLI::bold('c').']ontinue anyway? ['.CLI::bold('r').']etry? ['.CLI::bold('a').']bort?', true, true, '/c|r|a/i']], $uiCRA) && $uiCRA)

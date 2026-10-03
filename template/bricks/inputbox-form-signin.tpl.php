@@ -60,6 +60,7 @@
 <?php endif; ?>
 
                 </div>
+                <?=$this->csrfField();?>
             </form>
 
             <div class="pad3"></div>

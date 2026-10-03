@@ -66,9 +66,6 @@ Interface ICache
 
 trait TrCache
 {
-    private const int STORE_METHOD_OBJECT = 0;
-    private const int STORE_METHOD_STRING = 1;
-
     private  int        $_cacheType    = CACHE_TYPE_NONE;
     private  int        $skipCache     = 0x0;
     private ?int        $decay         = null;
@@ -79,126 +76,61 @@ trait TrCache
 
     public static array $cacheStats = [];                   // load info for page footer
 
-    // visible properties or given strings are cached
+    // Cache storage is untrusted; only deployment-key-authenticated entries may restore objects/hooks.
     public function saveCache(string|object $toCache) : void
     {
         $this->initCache();
-
-        if ($this->_cacheType == CACHE_TYPE_NONE)
+        if ($this->_cacheType == CACHE_TYPE_NONE || !Cfg::get('CACHE_MODE') || !$this->decay || !CacheEnvelope::enabled())
             return;
 
-        if (!Cfg::get('CACHE_MODE') /* || Cfg::get('DEBUG') */)
+        $cKey = $this->formatCacheKey();
+        $data = CacheEnvelope::seal($cKey[2], $toCache, $this->onCacheLoaded, $this->decay);
+        if ($data === null)
             return;
-
-        if (!$this->decay)
-            return;
-
-        $cKey   = $this->formatCacheKey();
-        $method = is_object($toCache) ? self::STORE_METHOD_OBJECT : self::STORE_METHOD_STRING;
-
-        if ($method == self::STORE_METHOD_OBJECT)
-            $toCache = serialize($toCache);
-        else
-            $toCache = (string)$toCache;
-
-        if (is_callable($this->onCacheLoaded[0]))
-            $postCache = serialize($this->onCacheLoaded);
 
         if (Cfg::get('CACHE_MODE') & CACHE_MODE_MEMCACHED)
         {
-            // on &refresh also clear related
             if ($this->skipCache & CACHE_MODE_MEMCACHED)
                 $this->deleteCache(CACHE_MODE_MEMCACHED);
-
-            $data = array(
-                'timestamp' => time(),
-                'lifetime'  => $this->decay,
-                'revision'  => AOWOW_REVISION,
-                'method'    => $method,
-                'postCache' => $postCache ?? null,
-                'data'      => $toCache
-            );
-
-            $this->memcached()?->set($cKey[2], $data);
+            $this->memcached()?->set(CacheEnvelope::memcachedKey($cKey[2]), $data, time() + $this->decay);
         }
 
         if (Cfg::get('CACHE_MODE') & CACHE_MODE_FILECACHE)
         {
-            $data  = time()." ".$this->decay." ".AOWOW_REVISION." ".$method."\n";
-            $data .= ($postCache ?? '')."\n";
-            $data .= gzcompress($toCache, 9);
-
-            // on &refresh also clear related
             if ($this->skipCache & CACHE_MODE_FILECACHE)
                 $this->deleteCache(CACHE_MODE_FILECACHE);
-
-            if (Util::writeDir($this->cacheDir . implode(DIRECTORY_SEPARATOR, array_slice($cKey, 0, 2))))
-                file_put_contents($this->cacheDir . implode(DIRECTORY_SEPARATOR, $cKey), $data);
+            CacheEnvelope::writeBoundedFile($this->cacheDir, $cKey[2], $data);
         }
     }
 
     public function loadCache(mixed &$fromCache) : bool
     {
         $this->initCache();
-
-        if ($this->_cacheType == CACHE_TYPE_NONE)
-            return false;
-
-        if (!Cfg::get('CACHE_MODE') /* || Cfg::get('DEBUG') */)
+        if ($this->_cacheType == CACHE_TYPE_NONE || !Cfg::get('CACHE_MODE') || !CacheEnvelope::enabled())
             return false;
 
         $cKey = $this->formatCacheKey();
-        $rev = $method = $data = $postCache = null;
-
+        $cache = null;
+        $mode = CACHE_MODE_MEMCACHED;
         if ((Cfg::get('CACHE_MODE') & CACHE_MODE_MEMCACHED) && !($this->skipCache & CACHE_MODE_MEMCACHED))
-        {
-            if ($cache = $this->memcached()?->get($cKey[2]))
-            {
-                $method    = $cache['method'];
-                $data      = $cache['data'];
-                $postCache = $cache['postCache'];
+            $cache = CacheEnvelope::open($cKey[2], CacheEnvelope::fetchMemcached(CacheEnvelope::memcachedKey($cKey[2])));
 
-                if (($cache['timestamp'] + $cache['lifetime']) > time() && $cache['revision'] == AOWOW_REVISION)
-                    self::$cacheStats = [CACHE_MODE_MEMCACHED, $cache['timestamp'], $cache['lifetime']];
-            }
+        if ($cache === null && (Cfg::get('CACHE_MODE') & CACHE_MODE_FILECACHE) && !($this->skipCache & CACHE_MODE_FILECACHE))
+        {
+            $mode = CACHE_MODE_FILECACHE;
+            $file = CacheEnvelope::filePath($this->cacheDir, $cKey[2]);
+            if (!is_file($file) || is_link($file))
+                return false;
+            $data = @file_get_contents($file, false, null, 0, CacheEnvelope::FILE_MAX_BYTES + 1);
+            $cache = CacheEnvelope::open($cKey[2], $data);
         }
 
-        if (!$data && (Cfg::get('CACHE_MODE') & CACHE_MODE_FILECACHE) && !($this->skipCache & CACHE_MODE_FILECACHE))
-        {
-            $file = $this->cacheDir . implode(DIRECTORY_SEPARATOR, $cKey);
-            if (!file_exists($file))
-                return false;
-
-            $content = file_get_contents($file);
-            if (!$content)
-                return false;
-
-            [$head, $postCache, $data] = explode("\n", $content, 3);
-            if (substr_count($head, ' ') != 3)
-                return false;
-
-            [$time, $lifetime, $rev, $method] = explode(' ', $head);
-
-            if (($time + $lifetime) < time() || $rev != AOWOW_REVISION)
-                return false;
-
-            self::$cacheStats = [CACHE_MODE_FILECACHE, $time, $lifetime];
-            $data = gzuncompress($data);
-        }
-
-        if (!$data)
+        // Validate hooks in the responder's scope: existing item/spell hooks are protected methods.
+        if ($cache === null || ($cache[1][0] !== null && !is_callable($cache[1][0])))
             return false;
-
-        if ($postCache)
-            $this->onCacheLoaded = unserialize($postCache);
-
-        $fromCache = false;
-        if ($method == self::STORE_METHOD_OBJECT)
-            $fromCache = unserialize($data);
-        else if ($method == self::STORE_METHOD_STRING)
-            $fromCache = $data;
-
-        return $fromCache !== false;
+        [$fromCache, $this->onCacheLoaded, $timestamp, $lifetime] = $cache;
+        self::$cacheStats = [$mode, $timestamp, $lifetime];
+        return true;
     }
 
     public function deleteCache(int $modeMask = 0x3) : void
@@ -211,12 +143,11 @@ trait TrCache
 
         if ($modeMask & CACHE_MODE_MEMCACHED)
             foreach ($this->memcached()?->getAllKeys() ?? [] as $k)
-                if (strpos($k, $cKey[2]) === 0)
+                if (strpos($k, CacheEnvelope::memcachedKey($cKey[2])) === 0)
                     $this->memcached()?->delete($k);
 
         if ($modeMask & CACHE_MODE_FILECACHE)
-            foreach (glob(implode(DIRECTORY_SEPARATOR, $cKey).'*') as $file)
-                unlink($file);
+            CacheEnvelope::clearFiles($this->cacheDir);
     }
 
     private function memcached() : ?\Memcached
@@ -230,6 +161,7 @@ trait TrCache
         if (!$this->memcached && (Cfg::get('CACHE_MODE') & CACHE_MODE_MEMCACHED))
         {
             $this->memcached = new \Memcached();
+            $this->memcached->setOption(\Memcached::OPT_COMPRESSION, false); // raw string flags for authenticated reads
             $this->memcached->addServer('localhost', 11211);
         }
 
@@ -260,7 +192,7 @@ trait TrCache
         $this->decay ??= Cfg::get('CACHE_DECAY');
 
         $cacheDir = Cfg::get('CACHE_DIR');
-        if ($cacheDir && Util::writeDir($cacheDir))
+        if ($cacheDir && CacheEnvelope::writeDirectory($cacheDir))
             $this->cacheDir = mb_substr($cacheDir, -1) != '/' ? $cacheDir.'/' : $cacheDir;
 
         $this->cacheInited = true;
@@ -474,10 +406,14 @@ abstract class BaseResponse
 
     protected int   $requiredUserGroup = U_GROUP_NONE;      // by default accessible to everone
     protected bool  $requiresLogin     = false;             // normal users and guests are both U_GROUP_NONE, soooo.....
+    protected bool  $requiresOperator  = false;
     protected mixed $result            = null;
 
     public function __construct()
     {
+        Csrf::assertRequest();
+        if ($this->requiresOperator)
+            OperatorAccess::assertRequest();
         $this->initRequestData();
 
         if (!User::isInGroup($this->requiredUserGroup))

@@ -2999,7 +2999,7 @@ var LANG = {
     message_noscreenshot:         "Wählt bitte den Screenshot aus, den Ihr hochladen möchtet.",
     message_novideo:              "Bitte gebt gültige Videoinformationen ein.",
     message_nothingtoviewin3d:    "Es wurden keine Gegenstände ausgewählt, die in 3D angezeigt werden können.",
-    message_passwordmin:          "Euer Kennwort muss mindestens 6 Zeichen lang sein.",
+    message_passwordmin:          "Verwendet mindestens 15 Zeichen und höchstens 72 UTF-8-Bytes (manche Zeichen benötigen mehrere Bytes).",
     message_passwordsdonotmatch:  "Die Kennwörter stimmen nicht überein.",
     message_savebeforeexit:       "Ihr werdet alle ungespeicherten Änderungen verlieren.",
     message_startedpost:          "Ihr schreibt gerade eine Mitteilung.",

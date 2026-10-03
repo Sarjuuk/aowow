@@ -108,7 +108,7 @@ class SkillBaseResponse extends TemplateResponse implements ICache
 
         parent::generate();
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")], 'tabsRelated', true);
 
         if (in_array($_cat, [-5, 9, 11]))
         {
@@ -125,9 +125,9 @@ class SkillBaseResponse extends TemplateResponse implements ICache
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data'        => $recipes->getListviewData(),
                     'id'          => 'recipes',
-                    'name'        => '$LANG.tab_recipes',
+                    'name'        => new JsExpression('LANG.tab_recipes'),
                     'visibleCols' => ['reagents', 'source'],
-                    'note'        =>  sprintf(Util::$filterResultString, '?spells='.$_cat.'.'.$this->typeId.'&filter=cr=20;crs=1;crv=0')
+                    'note'        =>  new JsExpression(substr(sprintf(Util::$filterResultString, '?spells='.$_cat.'.'.$this->typeId.'&filter=cr=20;crs=1;crv=0'), 1))
                 ), SpellList::$brickFile));
             }
 
@@ -146,11 +146,11 @@ class SkillBaseResponse extends TemplateResponse implements ICache
                 $tabData = array(
                     'data' => $recipeItems->getListviewData(),
                     'id'   => 'recipe-items',
-                    'name' => '$LANG.tab_recipeitems',
+                    'name' => new JsExpression('LANG.tab_recipeitems'),
                 );
 
                 if ($_ = array_search($this->typeId, $filterRecipe))
-                    $tabData['note'] = sprintf(Util::$filterResultString, "?items=9.".$_);
+                    $tabData['note'] = new JsExpression(substr(sprintf(Util::$filterResultString, "?items=9.".$_), 1));
 
                 $this->lvTabs->addListviewTab(new Listview($tabData, ItemList::$brickFile));
             }
@@ -172,11 +172,11 @@ class SkillBaseResponse extends TemplateResponse implements ICache
                     $tabData = array(
                         'data' => $created->getListviewData(),
                         'id'   => 'crafted-items',
-                        'name' => '$LANG.tab_crafteditems',
+                        'name' => new JsExpression('LANG.tab_crafteditems'),
                     );
 
                     if (!is_null($_ = ItemListFilter::getCriteriaIndex(86, $this->typeId)))
-                        $tabData['note'] = sprintf(Util::$filterResultString, "?items&filter=cr=86;crs=".$_.";crv=0");
+                        $tabData['note'] = new JsExpression(substr(sprintf(Util::$filterResultString, "?items&filter=cr=86;crs=".$_.";crv=0"), 1));
 
                     $this->lvTabs->addListviewTab(new Listview($tabData, ItemList::$brickFile));
                 }
@@ -196,11 +196,11 @@ class SkillBaseResponse extends TemplateResponse implements ICache
                 $tabData = array(
                     'data' => $reqBy->getListviewData(),
                     'id'   => 'required-by',
-                    'name' => '$LANG.tab_requiredby',
+                    'name' => new JsExpression('LANG.tab_requiredby'),
                 );
 
                 if (!is_null($_ = ItemListFilter::getCriteriaIndex(99, $this->typeId)))
-                    $tabData['note'] = sprintf(Util::$filterResultString, "?items&filter=cr=99:168;crs=".$_.":2;crv=0:0");
+                    $tabData['note'] = new JsExpression(substr(sprintf(Util::$filterResultString, "?items&filter=cr=99:168;crs=".$_.":2;crv=0:0"), 1));
 
                 $this->lvTabs->addListviewTab(new Listview($tabData, ItemList::$brickFile));
             }
@@ -214,7 +214,7 @@ class SkillBaseResponse extends TemplateResponse implements ICache
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data' => $reqBy->getListviewData(),
                     'id'   => 'required-by-set',
-                    'name' => '$LANG.tab_requiredby'
+                    'name' => new JsExpression('LANG.tab_requiredby')
                 ), ItemsetList::$brickFile));
             }
         }
@@ -234,7 +234,7 @@ class SkillBaseResponse extends TemplateResponse implements ICache
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data'       => $modBy->getListviewData(),
                 'id'         => 'modified-by',
-                'name'       => '$LANG.tab_modifiedby',
+                'name'       => new JsExpression('LANG.tab_modifiedby'),
                 'hiddenCols' => ['skill'],
             ), SpellList::$brickFile));
         }
@@ -274,9 +274,9 @@ class SkillBaseResponse extends TemplateResponse implements ICache
             if ($this->typeId != 769)               // Internal
                 $tabData['note'] = match ($_cat)
                 {
-                    -4      => sprintf(Util::$filterResultString, '?spells=-4'),
-                     7      => sprintf(Util::$filterResultString, '?spells=7.'.ChrClass::fromMask($reqClass)[0].'.'.$this->typeId), // doesn't matter what spell; reqClass should be identical for all Class Spells
-                     9, 11  => sprintf(Util::$filterResultString, '?spells='.$_cat.'.'.$this->typeId),
+                    -4      => new JsExpression(substr(sprintf(Util::$filterResultString, '?spells=-4'), 1)),
+                     7      => new JsExpression(substr(sprintf(Util::$filterResultString, '?spells=7.'.ChrClass::fromMask($reqClass)[0].'.'.$this->typeId), 1)), // doesn't matter what spell; reqClass should be identical for all Class Spells
+                     9, 11  => new JsExpression(substr(sprintf(Util::$filterResultString, '?spells='.$_cat.'.'.$this->typeId), 1)),
                     default => null
                 };
 
@@ -310,7 +310,7 @@ class SkillBaseResponse extends TemplateResponse implements ICache
                     $this->lvTabs->addListviewTab(new Listview(array(
                         'data' => $trainer->getListviewData(),
                         'id'   => 'trainer',
-                        'name' => '$LANG.tab_trainers',
+                        'name' => new JsExpression('LANG.tab_trainers'),
                     ), CreatureList::$brickFile));
                 }
             }
@@ -363,7 +363,7 @@ class SkillBaseResponse extends TemplateResponse implements ICache
         // tab: condition-for
         $cnd = new Conditions();
         $cnd->getByCondition(Type::SKILL, $this->typeId)->prepare();
-        if ($tab = $cnd->toListviewTab('condition-for', '$LANG.tab_condition_for'))
+        if ($tab = $cnd->toListviewTab('condition-for', new JsExpression('LANG.tab_condition_for')))
         {
             $this->extendGlobalData($cnd->getJSGlobals());
             $this->lvTabs->addDataTab(...$tab);

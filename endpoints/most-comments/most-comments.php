@@ -57,10 +57,10 @@ class MostcommentsBaseResponse extends TemplateResponse
         /* Main Content */
         /****************/
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], __forceTabs: true);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")], __forceTabs: true);
 
         $tabBase = array(
-            'extraCols' => ["\$Listview.funcBox.createSimpleCol('ncomments', 'tab_comments', '10%', 'ncomments')"],
+            'extraCols' => [new JsExpression("Listview.funcBox.createSimpleCol('ncomments', 'tab_comments', '10%', 'ncomments')")],
             'sort'      => ['-ncomments']
         );
 
@@ -92,7 +92,7 @@ class MostcommentsBaseResponse extends TemplateResponse
             if (in_array($type, [Type::AREATRIGGER, Type::ENCHANTMENT, Type::ENCHANTMENT, Type::EMOTE]))
             {
                 $addIn = Type::getFileString($type);
-                $tabBase['name'] = '$LANG.types['.$type.'][2]';
+                $tabBase['name'] = new JsExpression('LANG.types['.$type.'][2]');
             }
 
             $this->extendGlobalData($typeClass->getJSGlobals(GLOBALINFO_ANY));

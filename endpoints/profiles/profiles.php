@@ -115,7 +115,7 @@ class ProfilesBaseResponse extends TemplateResponse implements IProfilerList
         $this->getRegions();
 
         foreach ($fiExtraCols as $skill => $idx)
-            $lvExtraCols[] = "\$Listview.funcBox.createSimpleCol('skill-' + ".$skill.", g_spell_skills[".$skill."], '7%', 'skill-' + ".$skill.")";
+            $lvExtraCols[] = new JsExpression("Listview.funcBox.createSimpleCol('skill-' + ".$skill.", g_spell_skills[".$skill."], '7%', 'skill-' + ".$skill.")");
 
         if (!$this->filter->useLocalList)
         {
@@ -182,11 +182,11 @@ class ProfilesBaseResponse extends TemplateResponse implements IProfilerList
             // create note if search limit was exceeded
             if ($this->filter->query && $profiles->getMatches() > Listview::DEFAULT_SIZE)
             {
-                $lvNote = sprintf(Util::$tryFilteringString, 'LANG.lvnote_charactersfound2', $this->sumSubjects, $profiles->getMatches());
+                $lvNote = new JsExpression(substr(sprintf(Util::$tryFilteringString, 'LANG.lvnote_charactersfound2', $this->sumSubjects, $profiles->getMatches()), 1));
                 $lv_truncated = 1;
             }
             else if ($profiles->getMatches() > Listview::DEFAULT_SIZE)
-                $lvNote = sprintf(Util::$tryFilteringString, 'LANG.lvnote_charactersfound', $this->sumSubjects, 0);
+                $lvNote = new JsExpression(substr(sprintf(Util::$tryFilteringString, 'LANG.lvnote_charactersfound', $this->sumSubjects, 0), 1));
 
             if ($this->filter->useLocalList)
             {
@@ -197,13 +197,13 @@ class ProfilesBaseResponse extends TemplateResponse implements IProfilerList
             }
         }
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated');
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")], 'tabsRelated');
 
         $this->lvTabs->addListviewTab(new Listview(array(
             'id'             => 'characters',
             'data'           => $lvData,
             'hideCount'      => 1,
-            'onBeforeCreate' => '$pr_initRosterListview',   // puts a resync button on the lv
+            'onBeforeCreate' => new JsExpression('pr_initRosterListview'),   // puts a resync button on the lv
             'extraCols'      => $lvExtraCols   ?: null,
             'visibleCols'    => $lvVisibleCols,
             'hiddenCols'     => $lvHiddenCols  ?: null,

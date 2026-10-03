@@ -64,7 +64,7 @@ class ProfilePowerResponse extends TextResponse implements ICache
             $opts = array(
                 'name'    => $n,
                 'tooltip' => $profile->renderTooltip(),
-                'icon'    => '$$WH.g_getProfileIcon('.$r.', '.$c.', '.$g.', '.$l.', \''.$profile->getIcon().'\')'
+                'icon'    => JsExpression::call('$WH.g_getProfileIcon', (int)$r, (int)$c, (int)$g, (int)$l, $profile->getIcon())
             );
         }
 

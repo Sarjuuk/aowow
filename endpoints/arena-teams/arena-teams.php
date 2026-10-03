@@ -109,7 +109,7 @@ class ArenateamsBaseResponse extends TemplateResponse implements IProfilerList
             'data'        => [],
             'hideCount'   => 1,
             'sort'        => [-16],
-            'extraCols'   => ['$Listview.extraCols.members'],
+            'extraCols'   => [new JsExpression('Listview.extraCols.members')],
             'visibleCols' => ['rank', 'wins', 'losses', 'rating'],
             'hiddenCols'  => ['arenateam', 'guild']
         );
@@ -136,14 +136,14 @@ class ArenateamsBaseResponse extends TemplateResponse implements IProfilerList
             // create note if search limit was exceeded
             if ($this->filter->query && $teams->getMatches() > Listview::DEFAULT_SIZE)
             {
-                $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_arenateamsfound2', $this->sumSubjects, $teams->getMatches());
+                $tabData['note'] = new JsExpression(substr(sprintf(Util::$tryFilteringString, 'LANG.lvnote_arenateamsfound2', $this->sumSubjects, $teams->getMatches()), 1));
                 $tabData['_truncated'] = 1;
             }
             else if ($teams->getMatches() > Listview::DEFAULT_SIZE)
-                $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_arenateamsfound', $this->sumSubjects, 0);
+                $tabData['note'] = new JsExpression(substr(sprintf(Util::$tryFilteringString, 'LANG.lvnote_arenateamsfound', $this->sumSubjects, 0), 1));
         }
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated');
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")], 'tabsRelated');
 
         $this->lvTabs->addListviewTab(new Listview($tabData, ArenaTeamList::$brickFile, 'membersCol'));
 

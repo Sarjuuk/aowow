@@ -25,16 +25,22 @@ CLISetup::init();
 CLISetup::loadScripts();
 
 if (CLISetup::getOpt('help'))
-    die(CLISetup::writeCLIHelp(true));
+{
+    CLISetup::writeCLIHelp(true);
+    exit(CLI::errorCount() ? 1 : 0);
+}
 else if (!CLISetup::getOpt(1 << CLISetup::OPT_GRP_SETUP | 1 << CLISetup::OPT_GRP_UTIL))
-    die(CLISetup::writeCLIHelp());
+{
+    CLISetup::writeCLIHelp();
+    exit(CLI::errorCount() ? 1 : 0);
+}
 
 if (CLISetup::getOpt('delete'))                             // generated with TEMPORARY keyword. Manual deletion is not needed
     CLI::write('generated dbc_* - tables have been deleted.', CLI::LOG_INFO);
 
-CLISetup::runInitial();
+$success = CLISetup::runInitial();
 
 fwrite(STDOUT, "\n");
-exit;
+exit($success && CLI::errorCount() === 0 ? 0 : 1);
 
 ?>

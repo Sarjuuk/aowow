@@ -178,7 +178,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         /* Extra Tabs */
         /**************/
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")], 'tabsRelated', true);
 
         // is contained in..
        [$tabContainedInItem,   $tabDisenchantedFrom,     $tabProspectedFrom,     $tabMilledFrom,
@@ -253,16 +253,16 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         if ($tabGatheredFromObject)
             $this->lvTabs->addListviewTab($tabGatheredFromObject);
 
-        if ($tab = $this->tabContains(Loot::ITEM, $this->typeId, '$LANG.tab_contains', 'contains', ['$Listview.extraCols.percent']))
+        if ($tab = $this->tabContains(Loot::ITEM, $this->typeId, new JsExpression('LANG.tab_contains'), 'contains', [new JsExpression('Listview.extraCols.percent')]))
             $this->lvTabs->addListviewTab($tab);
 
-        if ($tab = $this->tabContains(Loot::PROSPECTING, $this->typeId, '$LANG.tab_prospecting', 'prospecting', ['$Listview.extraCols.percent'], ['side', 'slot', 'reqlevel']))
+        if ($tab = $this->tabContains(Loot::PROSPECTING, $this->typeId, new JsExpression('LANG.tab_prospecting'), 'prospecting', [new JsExpression('Listview.extraCols.percent')], ['side', 'slot', 'reqlevel']))
             $this->lvTabs->addListviewTab($tab);
 
-        if ($tab = $this->tabContains(Loot::MILLING, $this->typeId, '$LANG.tab_milling', 'milling', ['$Listview.extraCols.percent'], ['side', 'slot', 'reqlevel']))
+        if ($tab = $this->tabContains(Loot::MILLING, $this->typeId, new JsExpression('LANG.tab_milling'), 'milling', [new JsExpression('Listview.extraCols.percent')], ['side', 'slot', 'reqlevel']))
             $this->lvTabs->addListviewTab($tab);
 
-        if ($tab = $this->tabContains(Loot::DISENCHANT, $this->subject->getField('disenchantId'), '$LANG.tab_disenchanting', 'disenchanting', ['$Listview.extraCols.percent'], ['side', 'slot', 'reqlevel']))
+        if ($tab = $this->tabContains(Loot::DISENCHANT, $this->subject->getField('disenchantId'), new JsExpression('LANG.tab_disenchanting'), 'disenchanting', [new JsExpression('Listview.extraCols.percent')], ['side', 'slot', 'reqlevel']))
             $this->lvTabs->addListviewTab($tab);
 
         if ($tab = $this->tabContainsSpell())               // custom tab: contains - but we append spell loot mimicking item opening
@@ -622,7 +622,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
             $listviews[0] = new Listview(array(
                 'data' => $lockedObj->getListviewData(),
-                'name' => '$LANG.tab_unlocks',
+                'name' => new JsExpression('LANG.tab_unlocks'),
                 'id'   => 'unlocks-object',
             ), GameObjectList::$brickFile);
         }
@@ -635,7 +635,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
             $listviews[1] = new Listview(array(
                 'data' => $lockedItm->getListviewData(),
-                'name' => '$LANG.tab_unlocks',
+                'name' => new JsExpression('LANG.tab_unlocks'),
                 'id'   => 'unlocks-item'
             ), ItemList::$brickFile);
         }
@@ -655,18 +655,18 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         foreach ($lootTabs->iterate() as $idx => [$template, $tabData])
         {
             if ($idx == LootByItem::ITEM_DISENCHANTED)
-                $tabData['note'] = sprintf(Util::$filterResultString, '?items&filter=cr=163;crs='.$this->typeId.';crv=0');
+                $tabData['note'] = new JsExpression(substr(sprintf(Util::$filterResultString, '?items&filter=cr=163;crs='.$this->typeId.';crv=0'), 1));
 
             if ($idx == LootByItem::NPC_DROPPED && $this->subject->getSources($s, $sm) && $s[0] == SRC_DROP && isset($sm[0]['dd']))
                 $tabData['note'] = match($sm[0]['dd'])
                 {
-                    -1      => '$LANG.lvnote_itemdropsinnormalonly',
-                    -2      => '$LANG.lvnote_itemdropsinheroiconly',
-                    -3      => '$LANG.lvnote_itemdropsinnormalheroic',
-                     1      => '$LANG.lvnote_itemdropsinnormal10only',
-                     2      => '$LANG.lvnote_itemdropsinnormal25only',
-                     3      => '$LANG.lvnote_itemdropsinheroic10only',
-                     4      => '$LANG.lvnote_itemdropsinheroic25only',
+                    -1      => new JsExpression('LANG.lvnote_itemdropsinnormalonly'),
+                    -2      => new JsExpression('LANG.lvnote_itemdropsinheroiconly'),
+                    -3      => new JsExpression('LANG.lvnote_itemdropsinnormalheroic'),
+                     1      => new JsExpression('LANG.lvnote_itemdropsinnormal10only'),
+                     2      => new JsExpression('LANG.lvnote_itemdropsinnormal25only'),
+                     3      => new JsExpression('LANG.lvnote_itemdropsinheroic10only'),
+                     4      => new JsExpression('LANG.lvnote_itemdropsinheroic25only'),
                     default => null
                 };
 
@@ -713,7 +713,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
             'data'            => $lootTab->getResult(),
             'name'            => $tabName,
             'id'              => $tabId,
-            'computeDataFunc' => '$Listview.funcBox.initLootTable'
+            'computeDataFunc' => new JsExpression('Listview.funcBox.initLootTable')
         );
 
         if ($extraCols = array_merge($extraCols, $lootTab->extraCols))
@@ -743,10 +743,10 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
         return new Listview(array(
             'data'            => $spellLoot->getResult(),
-            'name'            => '$LANG.tab_contains',
+            'name'            => new JsExpression('LANG.tab_contains'),
             'id'              => 'contains',
-            'computeDataFunc' => '$Listview.funcBox.initLootTable',
-            'extraCols'       => array_merge(['$Listview.extraCols.percent'], $spellLoot->extraCols)
+            'computeDataFunc' => new JsExpression('Listview.funcBox.initLootTable'),
+            'extraCols'       => array_merge([new JsExpression('Listview.extraCols.percent')], $spellLoot->extraCols)
         ), ItemList::$brickFile);
     }
 
@@ -770,9 +770,9 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
         return new Listview(array(
             'data'      => $lvData,
-            'name'      => '$LANG.tab_createdby',
+            'name'      => new JsExpression('LANG.tab_createdby'),
             'id'        => 'created-by',            // should by exclusive with created-by from spell_loot
-            'extraCols' => ['$Listview.extraCols.percent', '$Listview.extraCols.condition']
+            'extraCols' => [new JsExpression('Listview.extraCols.percent'), new JsExpression('Listview.extraCols.condition')]
         ), SpellList::$brickFile);
     }
 
@@ -823,7 +823,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
             $listviews[1] = new Listview(array(
                 'data' => $tbItems->getListviewData(),
                 'id'   => 'taught-by-item',
-                'name' => '$LANG.tab_taughtby',
+                'name' => new JsExpression('LANG.tab_taughtby'),
             ), ItemList::$brickFile);
         }
 
@@ -839,7 +839,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
             $listviews[2] = new Listview(array(
                 'data' => $tbQuests->getListviewData(),
                 'id'   => 'taught-by-quest',
-                'name' => '$LANG.tab_taughtby',
+                'name' => new JsExpression('LANG.tab_taughtby'),
             ), QuestList::$brickFile);
         }
 
@@ -881,7 +881,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
             $tabData = array(
                 'data' => $lvData,
                 'id'   => 'taught-by-npc',
-                'name' => '$LANG.tab_taughtby',
+                'name' => new JsExpression('LANG.tab_taughtby'),
             );
 
             if ($extraCols)
@@ -911,7 +911,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
         return new Listview(array(
             'data'       => $contains->getListviewData(),
-            'name'       => '$LANG.tab_cancontain',
+            'name'       => new JsExpression('LANG.tab_cancontain'),
             'id'         => 'can-contain',
             'hiddenCols' => $hCols
         ), ItemList::$brickFile);
@@ -929,7 +929,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
         return new Listview(array(
             'data'       => $contains->getListviewData(),
-            'name'       => '$LANG.tab_canbeplacedin',
+            'name'       => new JsExpression('LANG.tab_canbeplacedin'),
             'id'         => 'can-be-placed-in',
             'hiddenCols' => ['side']
         ), ItemList::$brickFile);
@@ -949,7 +949,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
         return new Listview(array(
             'data'        => $criteriaOf->getListviewData(),
-            'name'        => '$LANG.tab_criteriaof',
+            'name'        => new JsExpression('LANG.tab_criteriaof'),
             'id'          => 'criteria-of',
             'visibleCols' => ['category'],
             'hiddenCols'  => $criteriaOf->hasSetFields('reward_loc0') ? null : ['rewards']
@@ -971,7 +971,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
         return new Listview(array(
             'data'        => $reagent->getListviewData(),
-            'name'        => '$LANG.tab_reagentfor',
+            'name'        => new JsExpression('LANG.tab_reagentfor'),
             'id'          => 'reagent-for',
             'visibleCols' => ['reagents']
         ), SpellList::$brickFile);
@@ -989,7 +989,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
         return new Listview(array(
             'data' => $starts->getListviewData(),
-            'name' => '$LANG.tab_starts',
+            'name' => new JsExpression('LANG.tab_starts'),
             'id'   => 'starts-quest'
         ), QuestList::$brickFile);
     }
@@ -1010,7 +1010,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
         return new Listview(array(
             'data' => $toolSpells->getListviewData(),
-            'name' => '$LANG.tab_toolfor',
+            'name' => new JsExpression('LANG.tab_toolfor'),
             'id'   => 'tool-for'
         ), SpellList::$brickFile);
     }
@@ -1030,7 +1030,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
         return new Listview(array(
             'data' => $objective->getListviewData(),
-            'name' => '$LANG.tab_objectiveof',
+            'name' => new JsExpression('LANG.tab_objectiveof'),
             'id'   => 'objective-of-quest'
         ), QuestList::$brickFile);
     }
@@ -1051,7 +1051,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
         return new Listview(array(
             'data' => $provided->getListviewData(),
-            'name' => '$LANG.tab_providedfor',
+            'name' => new JsExpression('LANG.tab_providedfor'),
             'id'   => 'provided-for-quest'
         ), QuestList::$brickFile);
     }
@@ -1083,7 +1083,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         $this->extendGlobalData($soldBy->getJSGlobals(GLOBALINFO_SELF));
         $this->addDataLoader('zones');
 
-        $extraCols = ['$Listview.extraCols.stock', "\$Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", '$Listview.extraCols.cost'];
+        $extraCols = [new JsExpression('Listview.extraCols.stock'), new JsExpression("Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')"), new JsExpression('Listview.extraCols.cost')];
 
         $cnd = new Conditions();
         $cnd->getBySource(Conditions::SRC_NPC_VENDOR, entry: $this->typeId)->prepare();
@@ -1131,7 +1131,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
         return new Listview(array(
             'data'       => $sbData,
-            'name'       => '$LANG.tab_soldby',
+            'name'       => new JsExpression('LANG.tab_soldby'),
             'id'         => 'sold-by-npc',
             'extraCols'  => $extraCols,
             'hiddenCols' => ['level', 'type']
@@ -1169,10 +1169,10 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
         return new Listview(array(
             'data'      => $boughtBy->getListviewData(LISTVIEWINFO_VENDOR, $filter),
-            'name'      => '$LANG.tab_currencyfor',
+            'name'      => new JsExpression('LANG.tab_currencyfor'),
             'id'        => 'currency-for',
-            'extraCols' => ["\$Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", '$Listview.extraCols.cost'],
-            'note'      => $note ? sprintf(Util::$filterResultString, $note) : null
+            'extraCols' => [new JsExpression("Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')"), new JsExpression('Listview.extraCols.cost')],
+            'note'      => $note ? JsExpression::call('$WH.sprintf', new JsExpression('LANG.lvnote_filterresults'), $note) : null
         ), ItemList::$brickFile);
     }
 
@@ -1213,7 +1213,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
         return new Listview(array(
             'data'        => $taughtSpells->getListviewData(),
-            'name'        => '$LANG.tab_teaches',
+            'name'        => new JsExpression('LANG.tab_teaches'),
             'id'          => 'teaches',
             'visibleCols' => $visCols
         ), SpellList::$brickFile);
@@ -1276,7 +1276,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
         return new Listview(array(
             'data' => $lvData,
-            'name' => '$LANG.tab_seealso',
+            'name' => new JsExpression('LANG.tab_seealso'),
             'id'   => 'see-also'
         ), ItemList::$brickFile);
     }
@@ -1296,7 +1296,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
         return new Listview(array(
             'data'            => $sameModel->getListviewData(LISTVIEWINFO_MODEL),
-            'name'            => '$LANG.tab_samemodelas',
+            'name'            => new JsExpression('LANG.tab_samemodelas'),
             'id'              => 'same-model-as',
             'genericlinktype' => 'item'
         ));
@@ -1344,7 +1344,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
         return new Listview(array(
             'data' => $cdItems->getListviewData(),
-            'name' => '$LANG.tab_sharedcooldown',
+            'name' => new JsExpression('LANG.tab_sharedcooldown'),
             'id'   => 'shared-cooldown'
         ), ItemList::$brickFile);
     }
@@ -1393,7 +1393,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
     {
         $cnd = new Conditions();
         $cnd->getByCondition(Type::ITEM, $this->typeId)->prepare();
-        if (!($tab = $cnd->toListviewTab('condition-for', '$LANG.tab_condition_for')))
+        if (!($tab = $cnd->toListviewTab('condition-for', new JsExpression('LANG.tab_condition_for'))))
             return null;
 
         $this->extendGlobalData($cnd->getJSGlobals());

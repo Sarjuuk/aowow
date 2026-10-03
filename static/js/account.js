@@ -5,7 +5,7 @@ function pm() {
         bracket = '',
         buff    = '';
 
-    if (pass1 != '' && $WH.trim(pass1).length < 6)
+    if (pass1 != '' && !g_isNewPasswordValid(pass1))
         buff = '<span class="q10">' + LANG.message_passwordmin + '</span>';
 
     if (pass1 != '' && pass2 != '') {
@@ -73,20 +73,20 @@ $(document).ready(function () {
             return false;
         }
 
-        if (newPass.val() || checkPass.val()) {
+        if (curPass.val() || newPass.val() || checkPass.val()) {
             if (!curPass.val()) {
                 alert(LANG.message_enterpassword);
                 curPass[0].focus();
                 return false;
             }
 
-            if ($WH.trim(newPass.val()).length < 6) {
+            if (!g_isNewPasswordValid(newPass.val())) {
                 alert(LANG.message_passwordmin);
                 newPass[0].focus();
                 return false;
             }
 
-            if ($WH.trim(newPass.val()) === $WH.trim(curPass.val())) {
+            if (newPass.val() === curPass.val()) {
                 alert(LANG.message_newpassdifferent);
                 newPass[0].focus();
                 return false;

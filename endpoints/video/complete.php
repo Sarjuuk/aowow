@@ -60,6 +60,9 @@ class VideoCompleteResponse extends TextResponse
         if (!VideoMgr::loadSuggestion($videoInfo, $this->destType, $this->destTypeId, $this->videoHash))
             $this->generate404();
 
+        if (!User::canSuggestVideo() || !ContributionBudget::reserve('video-complete'))
+            return false;
+
         $pos = DB::Aowow()->selectCell('SELECT MAX(`pos`) FROM ::videos WHERE `type` = %i AND `typeId` = %i AND (`status` & %i) = 0', $this->destType, $this->destTypeId, CC_FLAG_DELETED);
         if (!is_int($pos))
             $pos = -1;

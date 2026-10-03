@@ -1,0 +1,128 @@
+name: Security tests
+
+on:
+  push:
+    branches: ['**']
+    paths:
+      - '.github/workflows/**'
+      - '.htaccess'
+      - 'aowow'
+      - 'prQueue'
+      - 'index.php'
+      - 'composer.json'
+      - 'composer.lock'
+      - 'crossdomain.xml'
+      - 'config/**'
+      - 'datasets/**'
+      - 'includes/**'
+      - 'endpoints/**'
+      - 'localization/**'
+      - 'template/**'
+      - 'static/**'
+      - 'setup/**'
+      - 'tests/**'
+  pull_request:
+    paths:
+      - '.github/workflows/**'
+      - '.htaccess'
+      - 'aowow'
+      - 'prQueue'
+      - 'index.php'
+      - 'composer.json'
+      - 'composer.lock'
+      - 'crossdomain.xml'
+      - 'config/**'
+      - 'datasets/**'
+      - 'includes/**'
+      - 'endpoints/**'
+      - 'localization/**'
+      - 'template/**'
+      - 'static/**'
+      - 'setup/**'
+      - 'tests/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-tests-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  regression:
+    name: PHP ${{ matrix.php }} / Node 24 / MySQL 8.4
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.4', '8.5']
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+          MYSQL_ROOT_HOST: '%'
+        ports:
+          - '127.0.0.1:3306:3306'
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=30
+    env:
+      AOWOW_TEST_DB_HOST: '127.0.0.1'
+      AOWOW_TEST_DB_PORT: '3306'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Set up PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+        with:
+          php-version: ${{ matrix.php }}
+          # The cache fixture defines its own Memcached writer; disable an inherited native class.
+          extensions: curl, fileinfo, gd, intl, mbstring, mysqli, openssl, simplexml, zlib, :memcached
+          coverage: none
+          tools: composer:v2
+          ini-values: memory_limit=512M
+      - name: Set up Node
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Install locked dependencies
+        run: |
+          composer validate --no-check-publish
+          composer install --no-interaction --prefer-dist --no-progress --no-plugins --no-scripts
+          composer check-platform-reqs
+      - name: Syntax checks
+        run: bash tests/ci/run.sh lint
+      - name: PHP and HTTP regressions
+        run: bash tests/ci/run.sh php
+      - name: JavaScript regressions
+        run: bash tests/ci/run.sh javascript
+      - name: Headless browser fixtures
+        run: bash tests/ci/run.sh browser
+      - name: SQL, sessions, uploads and migration regressions
+        run: bash tests/ci/run.sh sql
+      - name: Synthetic password timing diagnostic
+        run: php tests/benchmark-password.php 1
+
+  apache:
+    name: Apache 2.4 policies
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Upload denials, public assets and legacy policy
+        run: bash tests/ci/run.sh apache

@@ -3000,7 +3000,7 @@ var LANG = {
     message_noscreenshot:         "Veuillez sélectionner la capture d'écran à envoyer.",
     message_novideo:              "Veuillez entrer des informations valide pour le vidéo.",
     message_nothingtoviewin3d:    "Aucun objets qui ont été sélectionnés ne peuvent être vus en 3D.",
-    message_passwordmin:          "Votre mot de passe doit faire au moins 6 caractères de long.",
+    message_passwordmin:          "Utilisez au moins 15 caractères et au maximum 72 octets UTF-8 (certains caractères utilisent plusieurs octets).",
     message_passwordsdonotmatch:  "Les mots de passe ne correspondent pas.",
     message_savebeforeexit:       "Vous allez perdre tous les changements non sauvegarder que vous avez fait.",
     message_startedpost:          "Vous avez commencé d'écrire un message.",

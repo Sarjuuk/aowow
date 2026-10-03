@@ -18,49 +18,49 @@ class Listview implements \JsonSerializable
     public const int DEFAULT_SIZE  = 300;
 
     private const array TEMPLATES = array(
-        'achievement'       => ['template' => 'achievement',       'id' => 'achievements',    'name' => '$LANG.tab_achievements'  ],
+        'achievement'       => ['template' => 'achievement',       'id' => 'achievements',    'name' => 'LANG.tab_achievements'  ],
         'areatrigger'       => ['template' => 'areatrigger',       'id' => 'areatrigger',                                         ],
-        'calendar'          => ['template' => 'holidaycal',        'id' => 'calendar',        'name' => '$LANG.tab_calendar'      ],
-        'class'             => ['template' => 'classs',            'id' => 'classes',         'name' => '$LANG.tab_classes'       ],
-        'commentpreview'    => ['template' => 'commentpreview',    'id' => 'comments',        'name' => '$LANG.tab_comments'      ],
-        'npc'               => ['template' => 'npc',               'id' => 'npcs',            'name' => '$LANG.tab_npcs'          ],
-        'currency'          => ['template' => 'currency',          'id' => 'currencies',      'name' => '$LANG.tab_currencies'    ],
+        'calendar'          => ['template' => 'holidaycal',        'id' => 'calendar',        'name' => 'LANG.tab_calendar'      ],
+        'class'             => ['template' => 'classs',            'id' => 'classes',         'name' => 'LANG.tab_classes'       ],
+        'commentpreview'    => ['template' => 'commentpreview',    'id' => 'comments',        'name' => 'LANG.tab_comments'      ],
+        'npc'               => ['template' => 'npc',               'id' => 'npcs',            'name' => 'LANG.tab_npcs'          ],
+        'currency'          => ['template' => 'currency',          'id' => 'currencies',      'name' => 'LANG.tab_currencies'    ],
         'emote'             => ['template' => 'emote',             'id' => 'emotes',                                              ],
         'enchantment'       => ['template' => 'enchantment',       'id' => 'enchantments',                                        ],
-        'event'             => ['template' => 'holiday',           'id' => 'holidays',        'name' => '$LANG.tab_holidays'      ],
-        'faction'           => ['template' => 'faction',           'id' => 'factions',        'name' => '$LANG.tab_factions'      ],
-        'genericmodel'      => ['template' => 'genericmodel',      'id' => 'same-model-as',   'name' => '$LANG.tab_samemodelas'   ],
+        'event'             => ['template' => 'holiday',           'id' => 'holidays',        'name' => 'LANG.tab_holidays'      ],
+        'faction'           => ['template' => 'faction',           'id' => 'factions',        'name' => 'LANG.tab_factions'      ],
+        'genericmodel'      => ['template' => 'genericmodel',      'id' => 'same-model-as',   'name' => 'LANG.tab_samemodelas'   ],
         'icongallery'       => ['template' => 'icongallery',       'id' => 'icons',                                               ],
-        'item'              => ['template' => 'item',              'id' => 'items',           'name' => '$LANG.tab_items'         ],
-        'itemset'           => ['template' => 'itemset',           'id' => 'itemsets',        'name' => '$LANG.tab_itemsets'      ],
+        'item'              => ['template' => 'item',              'id' => 'items',           'name' => 'LANG.tab_items'         ],
+        'itemset'           => ['template' => 'itemset',           'id' => 'itemsets',        'name' => 'LANG.tab_itemsets'      ],
         'mail'              => ['template' => 'mail',              'id' => 'mails',                                               ],
-        'model'             => ['template' => 'model',             'id' => 'gallery',         'name' => '$LANG.tab_gallery'       ],
-        'object'            => ['template' => 'object',            'id' => 'objects',         'name' => '$LANG.tab_objects'       ],
-        'pet'               => ['template' => 'pet',               'id' => 'hunter-pets',     'name' => '$LANG.tab_pets'          ],
-        'profile'           => ['template' => 'profile',           'id' => 'profiles',        'name' => '$LANG.tab_profiles'      ],
-        'quest'             => ['template' => 'quest',             'id' => 'quests',          'name' => '$LANG.tab_quests'        ],
-        'race'              => ['template' => 'race',              'id' => 'races',           'name' => '$LANG.tab_races'         ],
-        'replypreview'      => ['template' => 'replypreview',      'id' => 'comment-replies', 'name' => '$LANG.tab_commentreplies'],
-        'reputationhistory' => ['template' => 'reputationhistory', 'id' => 'reputation',      'name' => '$LANG.tab_reputation'    ],
-        'screenshot'        => ['template' => 'screenshot',        'id' => 'screenshots',     'name' => '$LANG.tab_screenshots'   ],
-        'skill'             => ['template' => 'skill',             'id' => 'skills',          'name' => '$LANG.tab_skills'        ],
-        'sound'             => ['template' => 'sound',             'id' => 'sounds',          'name' => '$LANG.types[19][2]'      ],
-        'spell'             => ['template' => 'spell',             'id' => 'spells',          'name' => '$LANG.tab_spells'        ],
-        'title'             => ['template' => 'title',             'id' => 'titles',          'name' => '$LANG.tab_titles'        ],
-        'topusers'          => ['template' => 'topusers',          'id' => 'topusers',        'name' => '$LANG.topusers'          ],
-        'video'             => ['template' => 'video',             'id' => 'videos',          'name' => '$LANG.tab_videos'        ],
-        'zone'              => ['template' => 'zone',              'id' => 'zones',           'name' => '$LANG.tab_zones'         ],
+        'model'             => ['template' => 'model',             'id' => 'gallery',         'name' => 'LANG.tab_gallery'       ],
+        'object'            => ['template' => 'object',            'id' => 'objects',         'name' => 'LANG.tab_objects'       ],
+        'pet'               => ['template' => 'pet',               'id' => 'hunter-pets',     'name' => 'LANG.tab_pets'          ],
+        'profile'           => ['template' => 'profile',           'id' => 'profiles',        'name' => 'LANG.tab_profiles'      ],
+        'quest'             => ['template' => 'quest',             'id' => 'quests',          'name' => 'LANG.tab_quests'        ],
+        'race'              => ['template' => 'race',              'id' => 'races',           'name' => 'LANG.tab_races'         ],
+        'replypreview'      => ['template' => 'replypreview',      'id' => 'comment-replies', 'name' => 'LANG.tab_commentreplies'],
+        'reputationhistory' => ['template' => 'reputationhistory', 'id' => 'reputation',      'name' => 'LANG.tab_reputation'    ],
+        'screenshot'        => ['template' => 'screenshot',        'id' => 'screenshots',     'name' => 'LANG.tab_screenshots'   ],
+        'skill'             => ['template' => 'skill',             'id' => 'skills',          'name' => 'LANG.tab_skills'        ],
+        'sound'             => ['template' => 'sound',             'id' => 'sounds',          'name' => 'LANG.types[19][2]'      ],
+        'spell'             => ['template' => 'spell',             'id' => 'spells',          'name' => 'LANG.tab_spells'        ],
+        'title'             => ['template' => 'title',             'id' => 'titles',          'name' => 'LANG.tab_titles'        ],
+        'topusers'          => ['template' => 'topusers',          'id' => 'topusers',        'name' => 'LANG.topusers'          ],
+        'video'             => ['template' => 'video',             'id' => 'videos',          'name' => 'LANG.tab_videos'        ],
+        'zone'              => ['template' => 'zone',              'id' => 'zones',           'name' => 'LANG.tab_zones'         ],
         'guide'             => ['template' => 'guide',             'id' => 'guides',                                              ]
     );
 
     private  string $id       = '';
-    private ?string $name     = null;
+    private null|string|JsExpression $name = null;
     private ?array  $data     = null;                       // js:array of object <RowDefinitions>
-    private ?string $tabs     = null;                       // js:Object; instance of "Tabs"
+    private null|string|JsExpression $tabs = null;                                  // js:Object; instance of "Tabs"
     private ?string $parent   = 'lv-generic';               // HTMLNode.id; can be null but is pretty much always 'lv-generic'
     private ?string $template = null;
     private ?int    $mode     = null;                       // js:int; defaults to MODE_DEFAULT
-    private ?string $note     = null;                       // text in top band
+    private null|string|JsExpression $note = null;                                  // text in top band
 
     private ?int $poundable   = null;                       // 0 (no); 1 (always); 2 (yes, w/o sorting); defaults to 1
     private ?int $searchable  = null;                       // js:bool; defaults to FALSE
@@ -84,20 +84,20 @@ class Listview implements \JsonSerializable
     private ?string $genericlinktype = null;                // sometimes set when expecting to display model
     private ?array  $_upgradeIds     = null;                // js:array of int (itemIds)
 
-    private null|array|string $extraCols   = null;          // js:callable or js:array of object <ColumnDefinition>
-    private null|array|string $visibleCols = null;          // js:callable or js:array of string <colIds>
-    private null|array|string $hiddenCols  = null;          // js:callable or js:array of string <colIds>
-    private null|array|string $sort        = null;          // js:callable or js:array of colIndizes
+    private null|array|string|JsExpression $extraCols = null;                       // js:callable or js:array of object <ColumnDefinition>
+    private null|array|string|JsExpression $visibleCols = null;                     // js:callable or js:array of string <colIds>
+    private null|array|string|JsExpression $hiddenCols = null;                      // js:callable or js:array of string <colIds>
+    private null|array|string|JsExpression $sort = null;                            // js:callable or js:array of colIndizes
 
-    private ?string $onBeforeCreate   = null;               // js:callable
-    private ?string $onAfterCreate    = null;               // js:callable
-    private ?string $onNoData         = null;               // js:callable
-    private ?string $computeDataFunc  = null;               // js:callable
-    private ?string $onSearchSubmit   = null;               // js:callable
-    private ?string $createNote       = null;               // js:callable
-    private ?string $createCbControls = null;               // js:callable
-    private ?string $customFilter     = null;               // js:callable
-    private ?string $getItemLink      = null;               // js:callable
+    private null|string|JsExpression $onBeforeCreate = null;                        // js:callable
+    private null|string|JsExpression $onAfterCreate = null;                         // js:callable
+    private null|string|JsExpression $onNoData = null;                              // js:callable
+    private null|string|JsExpression $computeDataFunc = null;                       // js:callable
+    private null|string|JsExpression $onSearchSubmit = null;                        // js:callable
+    private null|string|JsExpression $createNote = null;                            // js:callable
+    private null|string|JsExpression $createCbControls = null;                      // js:callable
+    private null|string|JsExpression $customFilter = null;                          // js:callable
+    private null|string|JsExpression $getItemLink = null;                           // js:callable
     private ?array  $sortOptions      = null;               // js:array of object {id:<colId>, name:<name>, hidden:<bool>, type:"text", sortFunc:<callable>}
 
     private string $__addIn = '';
@@ -106,7 +106,7 @@ class Listview implements \JsonSerializable
     {
         if ($template && isset(self::TEMPLATES[$template]))
             foreach (self::TEMPLATES[$template] as $k => $v)
-                $this->$k = $v;
+                $this->$k = $k == 'name' ? new JsExpression($v) : $v;
 
         foreach ($opts as $k => $v)
         {
@@ -156,15 +156,13 @@ class Listview implements \JsonSerializable
 
     public function getName() : string
     {
-        return $this->name;
+        return $this->name instanceof JsExpression ? '$'.$this->name->expression : $this->name;
     }
 
     public function setTabs(string $tabVar) : void
     {
-        if ($tabVar[0] !== '$')                             // expects a jsVar, which we denote with a prefixed $
-            $tabVar = '$' . $tabVar;
-
-        $this->tabs = $tabVar;
+        // Only the Tabs component supplies this developer-owned variable reference.
+        $this->tabs = new JsExpression($tabVar[0] == '$' ? substr($tabVar, 1) : $tabVar);
     }
 
     public function setError(bool $enable) : void
@@ -189,7 +187,7 @@ class Listview implements \JsonSerializable
         if ($this->__addIn)
             $addIn = file_get_contents($this->__addIn).PHP_EOL;
 
-        return $addIn.'new Listview('.Util::toJSON($this).');'.PHP_EOL;
+        return $addIn.'new Listview('.Util::toJavaScript($this).');'.PHP_EOL;
     }
 }
 

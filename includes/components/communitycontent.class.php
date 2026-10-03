@@ -28,6 +28,8 @@ class CommunityContent
     public const int REPORT_THRESHOLD_AUTO_DELETE      = 10;
     public const int REPORT_THRESHOLD_AUTO_OUT_OF_DATE = 5;
 
+    public const int COMMENT_PAGE_SIZE = 100;
+
     private static array $jsGlobals = [];
     private static array $subjCache = [];
 
@@ -51,7 +53,7 @@ class CommunityContent
         LEFT JOIN ::reports r ON r.`subject` = c.`id` AND r.`mode` = %i AND r.`userId` = %i
         WHERE     %and
         GROUP BY  c.`id`
-        ORDER BY  c.`date` ASC
+        ORDER BY  c.`date` ASC, c.`id` ASC
                   %lmt';
 
     private static string $ssQuery =
@@ -161,7 +163,7 @@ class CommunityContent
         return array_values($comments);
     }
 
-    public static function getCommentReplies(int $commentId, int $resultLimit = PHP_INT_MAX, ?int &$nFound = 0) : array
+    public static function getCommentReplies(int $commentId, int $resultLimit = self::COMMENT_PAGE_SIZE, ?int &$nFound = 0, int $offset = 0, int $focus = 0) : array
     {
         $where   = array(
             ['c.`replyTo` = %i', $commentId],
@@ -172,18 +174,33 @@ class CommunityContent
         if (!User::isInGroup(U_GROUP_COMMENTS_MODERATOR))
             $where[] = [DB::OR, [['(c.`flags` & %i) = 0', CC_FLAG_DELETED], ['c.`userId` = %i', User::$id]]];
 
-        // get replies
-        $replies = [];
-        if ($results = DB::Aowow()->selectAssoc(self::$coQuery, User::$id, RATING_COMMENT, Report::MODE_COMMENT, User::$id, $where, $resultLimit))
+        $where[] = ['c.`userId` IS NOT NULL'];
+        $resultLimit = max(1, min(self::COMMENT_PAGE_SIZE, $resultLimit));
+        $nFound = (int)DB::Aowow()->selectCell(self::$coCountQuery, $where);
+        $offset = max(0, min($offset, $nFound));
+        if ($focus > 0)
         {
-            $nFound = DB::Aowow()->selectCell(self::$coCountQuery, $where);
-
+            $target = DB::Aowow()->selectRow('SELECT c.`date`, c.`id` FROM ::comments c WHERE %and AND c.`id` = %i', $where, $focus);
+            if ($target)
+            {
+                $rank = (int)DB::Aowow()->selectCell(self::$coCountQuery.' AND (c.`date` < %i OR (c.`date` = %i AND c.`id` < %i))', $where, $target['date'], $target['date'], $target['id']);
+                $offset = intdiv($rank, self::COMMENT_PAGE_SIZE) * self::COMMENT_PAGE_SIZE;
+            }
+        }
+        $replies = [];
+        // Limit IDs before aggregation so a long thread never joins/renders every body at once.
+        $ids = DB::Aowow()->selectCol('SELECT c.`id` FROM ::comments c WHERE %and ORDER BY c.`date`, c.`id` %lmt %ofs', $where, $resultLimit, $offset);
+        if ($ids)
+        {
+            $where[] = ['c.`id` IN %in', $ids];
+            $results = DB::Aowow()->selectAssoc(self::$coQuery, User::$id, RATING_COMMENT, Report::MODE_COMMENT, User::$id, $where, $resultLimit) ?: [];
             foreach ($results as $r)
             {
                 Util::mergeJsGlobals(self::$jsGlobals, Markup::parseTags($r['body']));
 
                 $reply = array(
                     'commentid'    => $commentId,
+                    'totalReplies' => $nFound,
                     'id'           => $r['id'],
                     'body'         => $r['body'],
                     'username'     => $r['user'],
@@ -208,7 +225,7 @@ class CommunityContent
         return $replies;
     }
 
-    public static function getComments(int $type, int $typeId) : array
+    public static function getComments(int $type, int $typeId, int &$page = 1, int &$total = 0) : array
     {
 
         $where   = array(
@@ -220,8 +237,13 @@ class CommunityContent
         if (!User::isInGroup(U_GROUP_COMMENTS_MODERATOR))
             $where[] = [DB::OR, [['(c.`flags` & %i) = 0', CC_FLAG_DELETED], ['c.`userId` = %i', User::$id]]];
 
-        // get replies
-        $results  = DB::Aowow()->selectAssoc(self::$coQuery, User::$id, RATING_COMMENT, Report::MODE_COMMENT, User::$id, $where, PHP_INT_MAX);
+        $where[] = ['c.`userId` IS NOT NULL'];
+        $total = (int)DB::Aowow()->selectCell(self::$coCountQuery, $where);
+        $page = max(1, min($page, max(1, (int)ceil($total / self::COMMENT_PAGE_SIZE))));
+        $ids = DB::Aowow()->selectCol('SELECT c.`id` FROM ::comments c WHERE %and ORDER BY c.`date`, c.`id` %lmt %ofs', $where, self::COMMENT_PAGE_SIZE, ($page - 1) * self::COMMENT_PAGE_SIZE);
+        if (!$ids) return [];
+        $where[] = ['c.`id` IN %in', $ids];
+        $results = DB::Aowow()->selectAssoc(self::$coQuery, User::$id, RATING_COMMENT, Report::MODE_COMMENT, User::$id, $where, self::COMMENT_PAGE_SIZE) ?: [];
         $comments = [];
 
         // additional informations
@@ -275,6 +297,25 @@ class CommunityContent
         }
 
         return $comments;
+    }
+
+    /** Resolve legacy anchors to the page containing their visible parent comment. */
+    public static function commentPage(int $id) : int
+    {
+        $target = DB::Aowow()->selectRow('SELECT `date`, `type`, `typeId` FROM ::comments WHERE `id` = %i AND `replyTo` = 0', $id);
+        if (!$target) return 1;
+        $where = [['c.`replyTo` = 0'], ['c.`type` = %i', $target['type']], ['c.`typeId` = %i', $target['typeId']], ['c.`userId` IS NOT NULL']];
+        if (!User::isInGroup(U_GROUP_COMMENTS_MODERATOR))
+            $where[] = [DB::OR, [['(c.`flags` & %i) = 0', CC_FLAG_DELETED], ['c.`userId` = %i', User::$id]]];
+        $before = (int)DB::Aowow()->selectCell(self::$coCountQuery.' AND (c.`date` < %i OR (c.`date` = %i AND c.`id` < %i))', $where, $target['date'], $target['date'], $id);
+        return intdiv($before, self::COMMENT_PAGE_SIZE) + 1;
+    }
+
+    public static function commentPageUrl(int $page) : string
+    {
+        $query = $_GET;
+        $query['coPage'] = max(1, $page);
+        return '?'.http_build_query($query).'#comments';
     }
 
     public static function getVideos(int $typeOrUser = 0, int $typeId = 0, ?int &$nFound = 0, bool $dateFmt = true, int $resultLimit = PHP_INT_MAX) : array

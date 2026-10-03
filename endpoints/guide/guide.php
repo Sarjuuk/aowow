@@ -82,6 +82,9 @@ class GuideBaseResponse extends TemplateResponse implements ICache
             'author' => $this->subject->getField('author')
         );
 
+        // The generic template accepts HTML headings; guide names are plain text.
+        $this->h1 = Util::htmlEscape($this->h1);
+
 
         /*************/
         /* Menu Path */
@@ -125,7 +128,7 @@ class GuideBaseResponse extends TemplateResponse implements ICache
         $this->redButtons[BUTTON_GUIDE_LOG]    = true;
         $this->redButtons[BUTTON_GUIDE_REPORT] = $this->subject->canBeReported();
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], __forceTabs: true);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")], __forceTabs: true);
 
         // the article text itself is added by TemplateResponse::addArticle()
         parent::generate();
@@ -211,7 +214,7 @@ class GuideBaseResponse extends TemplateResponse implements ICache
 
     protected function generateMetadata(bool $useArticle = true) : void
     {
-        $this->metaTags[] = ['property' => 'og:title', 'content' => strip_tags($this->h1)];
+        $this->metaTags[] = ['property' => 'og:title', 'content' => $this->subject->getField('name')];
         $this->metaTags[] = ['property' => 'og:type',  'content' => 'article'];
 
         $keywords = array(
@@ -232,6 +235,7 @@ class GuideBaseResponse extends TemplateResponse implements ICache
         $this->buildBasicMetadata($this->subject->getField('description'), useArticle: false);
 
         $this->buildLdJson();
+        $this->ldIntangible['name'] = $this->subject->getField('name');
     }
 
     public static function infoboxHook(Template\PageTemplate &$pt, ?InfoboxMarkup &$infobox) : void

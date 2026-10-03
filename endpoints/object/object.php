@@ -365,7 +365,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         /* Extra Tabs */
         /**************/
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")], 'tabsRelated', true);
 
         // tab: summoned by
         $summonEffects = array(
@@ -391,7 +391,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $summons->getListviewData(),
                 'id'   => 'summoned-by',
-                'name' => '$LANG.tab_summonedby'
+                'name' => new JsExpression('LANG.tab_summonedby')
             ), SpellList::$brickFile));
         }
 
@@ -410,9 +410,9 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data'       => $data,
                     'id'         => 'spells',
-                    'name'       => '$LANG.tab_spells',
+                    'name'       => new JsExpression('LANG.tab_spells'),
                     'hiddenCols' => ['skill'],
-                    'extraCols'  => ["\$Listview.funcBox.createSimpleCol('trigger', 'Condition', '10%', 'trigger')"]
+                    'extraCols'  => [new JsExpression("Listview.funcBox.createSimpleCol('trigger', 'Condition', '10%', 'trigger')")]
                 ), SpellList::$brickFile));
             }
         }
@@ -426,7 +426,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $acvs->getListviewData(),
                 'id'   => 'criteria-of',
-                'name' => '$LANG.tab_criteriaof'
+                'name' => new JsExpression('LANG.tab_criteriaof')
             ), AchievementList::$brickFile));
         }
 
@@ -450,14 +450,14 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
             if ($start)
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data' => $start,
-                    'name' => '$LANG.tab_starts',
+                    'name' => new JsExpression('LANG.tab_starts'),
                     'id'   => 'starts'
                 ), QuestList::$brickFile));
 
             if ($end)
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data' => $end,
-                    'name' => '$LANG.tab_ends',
+                    'name' => new JsExpression('LANG.tab_ends'),
                     'id'   => 'ends'
                 ), QuestList::$brickFile));
         }
@@ -472,7 +472,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
 
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data' => $relQuest->getListviewData(),
-                    'name' => '$LANG.tab_quests',
+                    'name' => new JsExpression('LANG.tab_quests'),
                     'id'   => 'quests'
                 ), QuestList::$brickFile));
             }
@@ -507,9 +507,9 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
             if ($goLoot->formatListview($lootEntries))
             {
                 $extraCols  = $goLoot->extraCols;
-                array_push($extraCols, '$Listview.extraCols.count', '$Listview.extraCols.percent');
+                array_push($extraCols, new JsExpression('Listview.extraCols.count'), new JsExpression('Listview.extraCols.percent'));
                 if (count($lootEntries) > 1)
-                    $extraCols[] = '$Listview.extraCols.mode';
+                    $extraCols[] = new JsExpression('Listview.extraCols.mode');
 
                 $hiddenCols = ['source', 'side', 'slot', 'reqlevel', 'count'];
 
@@ -527,13 +527,13 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data'            => $lootResult,
                     'id'              => 'contains',
-                    'name'            => '$LANG.tab_contains',
+                    'name'            => new JsExpression('LANG.tab_contains'),
                     'sort'            => ['-percent', 'name'],
                     'extraCols'       => array_unique($extraCols),
                     'hiddenCols'      => $hiddenCols ?: null,
                     '_totalCount'     => 10000,
-                    'computeDataFunc' => '$Listview.funcBox.initLootTable',
-                    'onAfterCreate'   => '$Listview.funcBox.addModeIndicator',
+                    'computeDataFunc' => new JsExpression('Listview.funcBox.initLootTable'),
+                    'onAfterCreate'   => new JsExpression('Listview.funcBox.addModeIndicator'),
                 ), ItemList::$brickFile));
             }
         }
@@ -555,7 +555,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                 // create note if search limit was exceeded
                 if ($focusSpells->getMatches() > Listview::DEFAULT_SIZE)
                 {
-                    $tabData['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_spellsfound', $focusSpells->getMatches(), Listview::DEFAULT_SIZE);
+                    $tabData['note'] = new JsExpression(substr(sprintf(Util::$tryNarrowingString, 'LANG.lvnote_spellsfound', $focusSpells->getMatches(), Listview::DEFAULT_SIZE), 1));
                     $tabData['_truncated'] = 1;
                 }
 
@@ -574,7 +574,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                 'data' => $trigger->getListviewData(),
                 'name' => Lang::gameObject('triggeredBy'),
                 'id'   => 'triggerd-by',
-                'note' => sprintf(Util::$filterResultString, '?objects=6')
+                'note' => new JsExpression(substr(sprintf(Util::$filterResultString, '?objects=6'), 1))
             ), GameObjectList::$brickFile));
         }
 
@@ -593,7 +593,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                 $data = $saObjects->getListviewData();
                 if ($this->difficulties)
                 {
-                    $saE = ['$Listview.extraCols.mode'];
+                    $saE = [new JsExpression('Listview.extraCols.mode')];
 
                     foreach ($data as $id => &$d)
                     {
@@ -612,7 +612,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                 $tabData = array(
                     'data'        => $data,
                     'id'          => 'see-also',
-                    'name'        => '$LANG.tab_seealso',
+                    'name'        => new JsExpression('LANG.tab_seealso'),
                     'visibleCols' => ['level'],
                 );
 
@@ -632,7 +632,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
             $this->addDataLoader('zones');
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $sameModel->getListviewData(),
-                'name' => '$LANG.tab_samemodelas',
+                'name' => new JsExpression('LANG.tab_samemodelas'),
                 'id'   => 'same-model-as'
             ), GameObjectList::$brickFile));
         }
@@ -640,7 +640,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         // tab: condition-for
         $cnd = new Conditions();
         $cnd->getByCondition(Type::OBJECT, $this->typeId)->prepare();
-        if ($tab = $cnd->toListviewTab('condition-for', '$LANG.tab_condition_for'))
+        if ($tab = $cnd->toListviewTab('condition-for', new JsExpression('LANG.tab_condition_for')))
         {
             $this->extendGlobalData($cnd->getJSGlobals());
             $this->lvTabs->addDataTab(...$tab);

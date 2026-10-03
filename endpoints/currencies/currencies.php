@@ -65,7 +65,7 @@ class CurrenciesBaseResponse extends TemplateResponse implements ICache
 
         $money = new CurrencyList($conditions);
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")]);
 
         $this->lvTabs->addListviewTab(new Listview(['data' => $money->getListviewData()], CurrencyList::$brickFile));
 

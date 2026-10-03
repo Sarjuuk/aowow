@@ -1,0 +1,3 @@
+# Enforce staging privacy when static/ is served from its own document root.
+RewriteEngine On
+RewriteRule ^(screenshots/(pending|temp)|temp)(/|$) - [F,L,NC]

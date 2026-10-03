@@ -20,8 +20,8 @@ class AccountSignupResponse extends TemplateResponse
     protected array  $expectedPOST = array(
         'username'    => ['filter' => FILTER_SANITIZE_SPECIAL_CHARS, 'flags' => FILTER_FLAG_STRIP_AOWOW         ],
         'email'       => ['filter' => FILTER_SANITIZE_EMAIL,         'flags' => FILTER_FLAG_STRIP_AOWOW         ],
-        'password'    => ['filter' => FILTER_CALLBACK,             'options' => [self::class, 'checkTextLine']  ],
-        'c_password'  => ['filter' => FILTER_CALLBACK,             'options' => [self::class, 'checkTextLine']  ],
+        'password'    => ['filter' => FILTER_CALLBACK,             'options' => [Util::class, 'validatePasswordInput']  ],
+        'c_password'  => ['filter' => FILTER_CALLBACK,             'options' => [Util::class, 'validatePasswordInput']  ],
         'remember_me' => ['filter' => FILTER_CALLBACK,             'options' => [self::class, 'checkRememberMe']]
     );
 
@@ -111,16 +111,22 @@ class AccountSignupResponse extends TemplateResponse
         // limit account creation
         if (DB::Aowow()->selectRow('SELECT 1 FROM ::account_bannedips WHERE `type` = %i AND `ip` = %s AND `count` >= %i AND `unbanDate` >= UNIX_TIMESTAMP()', IP_BAN_TYPE_REGISTRATION_ATTEMPT, User::$ip, Cfg::get('ACC_FAILED_AUTH_COUNT')))
         {
-            DB::Aowow()->qry('UPDATE ::account_bannedips SET `count` = `count` + 1, `unbanDate` = UNIX_TIMESTAMP() + %i WHERE `ip` = %s AND `type` = %i', Cfg::get('ACC_FAILED_AUTH_BLOCK'), User::$ip, IP_BAN_TYPE_REGISTRATION_ATTEMPT);
             return Lang::account('inputbox', 'error', 'signupExceeded', [DateTime::formatTimeElapsedFloat(Cfg::get('ACC_FAILED_AUTH_BLOCK') * 1000)]);
         }
+
+        if (PasswordBudget::reserve() !== PasswordBudget::OK)
+            return Lang::account('inputbox', 'error', 'signupExceeded', [DateTime::formatTimeElapsedFloat(Cfg::get('ACC_FAILED_AUTH_BLOCK') * 1000)]);
+
+        // Charge registration attempts before hashing and mail; failures still consume their budget.
+        if (!is_int(DB::Aowow()->qry('INSERT INTO ::account_bannedips (`ip`, `type`, `count`, `unbanDate`) VALUES (%s, %i, 1, UNIX_TIMESTAMP() + %i) ON DUPLICATE KEY UPDATE `count` = IF(`unbanDate` <= UNIX_TIMESTAMP(), 1, LEAST(`count` + 1, 32767)), `unbanDate` = UNIX_TIMESTAMP() + %i',
+            User::$ip, IP_BAN_TYPE_REGISTRATION_ATTEMPT, Cfg::get('ACC_FAILED_AUTH_BLOCK'), Cfg::get('ACC_FAILED_AUTH_BLOCK'))))
+            return Lang::main('intError');
 
         // username / email taken
         if ($inUseData = DB::Aowow()->SelectRow('SELECT `id`, `username`, `status` = %i AND `statusTimer` < UNIX_TIMESTAMP() AS "expired" FROM ::account WHERE (LOWER(`username`) = LOWER(%s) OR LOWER(`email`) = LOWER(%s))', ACC_STATUS_NEW, $this->_post['username'], $this->_post['email']))
         {
-            if ($inUseData['expired'])
-                DB::Aowow()->qry('DELETE FROM ::account WHERE `id` = %i', $inUseData['id']);
-            else
+            // A resend may renew expiry after the lookup; do not reclaim a renewed or activated account.
+            if (!$inUseData['expired'] || DB::Aowow()->qry('DELETE FROM ::account WHERE `id` = %i AND `status` = %i AND `statusTimer` < UNIX_TIMESTAMP()', $inUseData['id'], ACC_STATUS_NEW) !== 1)
                 return Util::lower($inUseData['username']) == Util::lower($this->_post['username']) ? Lang::account('nameInUse') : Lang::account('mailInUse');
         }
 
@@ -148,10 +154,6 @@ class AccountSignupResponse extends TemplateResponse
 
         if (!Util::sendMail($this->_post['email'], 'activate-account', [$token], Cfg::get('ACC_CREATE_SAVE_DECAY')))
             return Lang::main('intError2', ['send mail']);
-
-        // success: update ip-bans
-        DB::Aowow()->qry('INSERT INTO ::account_bannedips (`ip`, `type`, `count`, `unbanDate`) VALUES (%s, %i, 1, UNIX_TIMESTAMP() + %i) ON DUPLICATE KEY UPDATE `count` = `count` + 1, `unbanDate` = UNIX_TIMESTAMP() + %i',
-            User::$ip, IP_BAN_TYPE_REGISTRATION_ATTEMPT, Cfg::get('ACC_FAILED_AUTH_BLOCK'), Cfg::get('ACC_FAILED_AUTH_BLOCK'));
 
         Util::gainSiteReputation($userId, SITEREP_ACTION_REGISTER);
 

@@ -101,22 +101,22 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 {
                     $buff = "var _ = g_gatheredcurrencies;\n";
                     foreach ($relCurr->getListviewData() as $id => $data)
-                        $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
+                        $buff .= '_['.$id.'] = '.Util::toJavaScript($data).";\n";
                 }
 
                 $buff .= "var _ = g_quests;\n";
                 foreach ($questz->getListviewData() as $id => $data)
-                    $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
+                    $buff .= '_['.$id.'] = '.Util::toJavaScript($data).";\n";
 
                 if (!CLISetup::writeFile('datasets/'.$loc->json().'/p-quests-'.$cat2, $buff))
                     $this->success = false;
             }
         }
 
-        $buff  = "g_quest_catorder = ".Util::toJSON($questorder).";\n";
+        $buff  = "g_quest_catorder = ".Util::toJavaScript($questorder).";\n";
         $buff .= "g_quest_catorder_total = {};\n";
         foreach ($questtotal as $cat => $totals)
-            $buff .= "g_quest_catorder_total[".$cat."] = ".Util::toJSON($totals).";\n";
+            $buff .= "g_quest_catorder_total[".$cat."] = ".Util::toJavaScript($totals).";\n";
 
         if (!CLISetup::writeFile('datasets/p-quests', $buff))
             $this->success = false;
@@ -144,7 +144,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 {
                     $data['name'] = Util::localizedString($titlez->getEntry($id), $g ? 'female' : 'male');
                     unset($data['namefemale']);
-                    $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
+                    $buff .= '_['.$id.'] = '.Util::toJavaScript($data).";\n";
                 }
 
                 if (!CLISetup::writeFile('datasets/'.$loc->json().'/p-titles-'.$g, $buff))
@@ -193,7 +193,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 $data['side']    = $this->spellFactions[$id] ?? SIDE_BOTH;
                 $data['quality'] = $data['name'][0];
                 $data['name']    = mb_substr($data['name'], 1);
-                $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
+                $buff .= '_['.$id.'] = '.Util::toJavaScript($data).";\n";
             }
 
             if (!CLISetup::writeFile('datasets/'.$loc->json().'/p-mounts', $buff))
@@ -229,7 +229,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 $data['side']    = $this->spellFactions[$id] ?? SIDE_BOTH;
                 $data['quality'] = $data['name'][0];
                 $data['name']    = mb_substr($data['name'], 1);
-                $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
+                $buff .= '_['.$id.'] = '.Util::toJavaScript($data).";\n";
             }
 
             if (!CLISetup::writeFile('datasets/'.$loc->json().'/p-companions', $buff))
@@ -249,7 +249,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
             $buff = "var _ = g_factions;\n";
             foreach ($factionz->getListviewData() as $id => $data)
-                $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
+                $buff .= '_['.$id.'] = '.Util::toJavaScript($data).";\n";
 
             $buff .= "\ng_faction_order = [0, 469, 891, 1037, 1118, 67, 1052, 892, 936, 1117, 169, 980, 1097];\n";
 
@@ -304,7 +304,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 foreach ($recipez->getListviewData() as $id => $data)
                 {
                     $data['side'] = $this->spellFactions[$id] ?? SIDE_BOTH;
-                    $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
+                    $buff .= '_['.$id.'] = '.Util::toJavaScript($data).";\n";
                 }
 
                 if (!$buff)
@@ -346,7 +346,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 if ($data['side'] & SIDE_ALLIANCE)          // both sides have the same point total
                     $sumPoints += $data['points'];
 
-                $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
+                $buff .= '_['.$id.'] = '.Util::toJavaScript($data).";\n";
             }
 
             // categories to sort by
@@ -378,7 +378,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 if ($ids = array_keys(array_filter($data, fn($x) => $x & (1 << $i))))
                     $excludes[$type][$i + 1] = $ids;
 
-        $buff = "g_excludes = ".Util::toJSON($excludes ?: (new \StdClass)).";\n";
+        $buff = "g_excludes = ".Util::toJavaScript($excludes ?: (new \StdClass)).";\n";
 
         if (!CLISetup::writeFile('datasets/quick-excludes', $buff))
             $this->success = false;

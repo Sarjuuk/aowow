@@ -23,7 +23,7 @@ class AccountSigninResponse extends TemplateResponse
 
     protected array  $expectedPOST = array(
         'username'    => ['filter' => FILTER_CALLBACK, 'options' => [Util::class, 'validateLogin']   ],
-        'password'    => ['filter' => FILTER_CALLBACK, 'options' => [Util::class, 'validatePassword']],
+        'password'    => ['filter' => FILTER_CALLBACK, 'options' => [Util::class, 'validatePasswordInput']],
         'remember_me' => ['filter' => FILTER_CALLBACK, 'options' => [self::class, 'checkRememberMe'] ]
     );
     protected array  $expectedGET  = array(
@@ -51,7 +51,9 @@ class AccountSigninResponse extends TemplateResponse
         $this->title = [Lang::account('title')];
 
         // coming from user recovery or creation, prefill username
-        if ($this->_get['key'] && ($userData = DB::Aowow()->selectRow('SELECT a.`login` AS "0", IF(s.`expires`, 0, 1) AS "1" FROM ::account a LEFT JOIN ::account_sessions s ON a.`id` = s.`userId` AND a.`token` = s.`sessionId` WHERE a.`status` IN %in AND a.`token` = %s',
+        if ($prefill = AccountActivation::signinPrefill($this->_get['key']))
+            [$username, $rememberMe] = $prefill;
+        else if ($this->_get['key'] && ($userData = DB::Aowow()->selectRow('SELECT a.`login` AS "0", IF(s.`expires`, 0, 1) AS "1" FROM ::account a LEFT JOIN ::account_sessions s ON a.`id` = s.`userId` AND a.`token` = s.`sessionId` WHERE a.`status` IN %in AND a.`token` = %s',
             [ACC_STATUS_RECOVER_USER, ACC_STATUS_NONE], $this->_get['key'])))
         {
             [$username, $rememberMe] = $userData;
@@ -139,6 +141,8 @@ class AccountSigninResponse extends TemplateResponse
 
         if (User::init())                                   // reinitialize the user
             User::save();
+        else if (Cfg::get('ACC_AUTH_MODE') == AUTH_MODE_SELF)
+            return Lang::account('wrongPass');              // a concurrent password change invalidated this signin
 
         return '';
     }

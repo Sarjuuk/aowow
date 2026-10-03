@@ -23,6 +23,17 @@ if (($this->lvTabs && count($this->lvTabs)) || $this->charactersLvData || $this-
 ?>
 
             </div>
+<?php if (($this->community['coPages'] ?? 0) > 1): ?>
+            <nav aria-label="<?=\Aowow\Util::htmlEscape(\Aowow\Lang::main('comments')); ?>">
+                <?=\Aowow\Lang::main('commentsPage', [$this->community['coPage'], $this->community['coPages']]); ?>
+<?php if ($this->community['coPage'] > 1): ?>
+                <a href="<?=\Aowow\Util::htmlEscape(\Aowow\CommunityContent::commentPageUrl($this->community['coPage'] - 1)); ?>"><?=\Aowow\Lang::main('previousComments'); ?></a>
+<?php endif; ?>
+<?php if ($this->community['coPage'] < $this->community['coPages']): ?>
+                <a href="<?=\Aowow\Util::htmlEscape(\Aowow\CommunityContent::commentPageUrl($this->community['coPage'] + 1)); ?>"><?=\Aowow\Lang::main('nextComments'); ?></a>
+<?php endif; ?>
+            </nav>
+<?php endif; ?>
             <script type="text/javascript">//<![CDATA[
 
 <?php
@@ -43,6 +54,10 @@ if (($this->lvTabs && count($this->lvTabs)) || $this->charactersLvData || $this-
     endif;
     if ($this->contribute & CONTRIBUTE_CO):
         echo "                new Listview({template: 'comment', id: 'comments', name: LANG.tab_comments".($this->lvTabs ? ", tabs: ".$this->lvTabs->__tabVar : '').", parent: 'lv-generic', data: lv_comments});".PHP_EOL;
+    endif;
+    if ($this->contribute & CONTRIBUTE_CO):
+        echo "                var commentAnchor = location.hash.match(/^#comments:id=(\\d+)(?::reply=(\\d+))?/);".PHP_EOL;
+        echo "                if (commentAnchor && !/[?&]coPage=/.test(location.search) && !lv_comments.some(function (c) { return c.id == commentAnchor[1]; })) location.replace('?go-to-comment&id=' + (commentAnchor[2] || commentAnchor[1]));".PHP_EOL;
     endif;
     if ($this->contribute & CONTRIBUTE_SS):
         echo "                new Listview({template: 'screenshot', id: 'screenshots', name: LANG.tab_screenshots".($this->lvTabs ? ", tabs: ".$this->lvTabs->__tabVar : '').", parent: 'lv-generic', data: lv_screenshots});".PHP_EOL;

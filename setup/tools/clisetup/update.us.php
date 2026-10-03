@@ -24,87 +24,23 @@ CLISetup::registerUtility(new class extends UtilityScript
 
     public const array  REQUIRED_DB = [DB_AOWOW];
 
-    public const int    SITE_LOCK   = CLISetup::LOCK_RESTORE;
+    public const int    LOCK_SITE   = CLISetup::LOCK_RESTORE;
 
-    private int $date = 0;
-    private int $part = 0;
-
-    public function __construct()
-    {
-        if (DB::isConnected(DB_AOWOW))
-            [$this->date, $this->part] = array_values(DB::Aowow()->selectRow('SELECT `date`, `part` FROM ::dbversion'));
-    }
-
-    // args: null, null, sqlToDo, buildToDo // nnoo
+    // args: null, null, sqlToDo, buildToDo
     public function run(array &$args) : bool
     {
-        $sql   = &$args['doSql'];
-        $build = &$args['doBuild'];
-
         CLI::write('[update] checking for sql updates...');
+        $version = SqlUpdate::apply(DB::Aowow());
+        foreach (['sql' => 'doSql', 'build' => 'doBuild'] as $column => $argument)
+            $args[$argument] = trim((string)$version[$column]) ? array_values(array_unique(explode(' ', trim(preg_replace('/[^a-z_\-]+/i', ' ', $version[$column]))))) : [];
 
-        $nFiles = 0;
-        foreach (glob('setup/sql/updates/*.sql') as $file)
+        if ($args['doSql'])
+            CLI::write('[update] SQL scripts scheduled: '.implode(', ', $args['doSql']));
+        if ($args['doBuild'])
         {
-            $pi = pathinfo($file);
-
-            // invalid file
-            if (!preg_match('/(\d{10})_(\d{2})/', $pi['filename'], $m))
-                continue;
-
-            $fDate = intVal($m[1]);
-            $fPart = intVal($m[2]);
-
-            if ($this->date && $fDate < $this->date)
-                continue;
-            else if ($this->part && $this->date && $fDate == $this->date && $fPart <= $this->part)
-                continue;
-
-            $nFiles++;
-
-            $updQuery = '';
-            $nQuerys  = 0;
-            foreach (file($file) as $line)
-            {
-                // skip comments
-                if (substr($line, 0, 2) == '--' || $line == '')
-                    continue;
-
-                $updQuery .= $line;
-
-                // semicolon at the end -> end of query
-                if (substr(trim($line), -1, 1) == ';')
-                {
-                    if (DB::Aowow()->qry($updQuery))
-                        $nQuerys++;
-
-                    $updQuery = '';
-                }
-            }
-
-            DB::Aowow()->qry('UPDATE ::dbversion SET `date`= %i, `part` = %i', $fDate, $fPart);
-            CLI::write(' -> '.date('d.m.Y', $fDate).' #'.$fPart.': '.$nQuerys.' queries applied', CLI::LOG_OK);
+            CLISetup::setOpt('force', true);
+            CLI::write('[update] Build scripts scheduled: '.implode(', ', $args['doBuild']));
         }
-
-        CLI::write('[update] ' . ($nFiles ? 'applied '.$nFiles.' update(s)' : 'db is already up to date'), CLI::LOG_OK);
-
-        // fetch sql/build after applying updates, as they may contain sync-prompts
-        [$sql, $build] = DB::Aowow()->selectRow('SELECT `sql` AS "0", `build` AS "1" FROM ::dbversion');
-
-        $sql   = trim($sql)   ? array_unique(explode(' ', trim(preg_replace('/[^a-z_\-]+/i', ' ', $sql))))   : [];
-        $build = trim($build) ? array_unique(explode(' ', trim(preg_replace('/[^a-z_\-]+/i', ' ', $build)))) : [];
-
-        sleep(1);
-
-        if ($sql)
-            CLI::write('[update] The following sql scripts have been scheduled: '.implode(', ', $sql));
-
-        if ($build)
-        {
-            CLISetup::setOpt('force', true);                // overwrite existing images if demanded by update
-            CLI::write('[update] The following build scripts have been scheduled: '.implode(', ', $build));
-        }
-
         return true;
     }
 
@@ -114,12 +50,6 @@ CLISetup::registerUtility(new class extends UtilityScript
         CLI::write();
         CLI::write('  Checks /setup/sql/updates for new *.sql files and applies them. If required by an applied update, the --sql and --build command are triggered afterwards.', -1, false);
         CLI::write('  Use this after fetching the latest rev. from Github.', -1, false);
-
-        if ($this->date)
-        {
-            CLI::write();
-            CLI::write('  Last Update: '.date(Util::$dateFormatInternal, $this->date).' (Part #'.$this->part.')', -1, false);
-        }
 
         CLI::write();
         CLI::write();

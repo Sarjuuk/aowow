@@ -169,7 +169,7 @@ class EmoteBaseResponse extends TemplateResponse implements ICache
         /* Extra Tabs */
         /**************/
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")], 'tabsRelated', true);
 
         // tab: achievement
         $condition = array(
@@ -208,7 +208,7 @@ class EmoteBaseResponse extends TemplateResponse implements ICache
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data'      => $data,
                     //               gender                                  races
-                    'extraCols' => ['$Listview.templates.title.columns[1]', '$Listview.templates.classs.columns[1]']
+                    'extraCols' => [new JsExpression('Listview.templates.title.columns[1]'), new JsExpression('Listview.templates.classs.columns[1]')]
                 ), SoundList::$brickFile));
             }
         }

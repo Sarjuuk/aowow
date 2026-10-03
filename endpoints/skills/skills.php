@@ -55,7 +55,7 @@ class SkillsBaseResponse extends TemplateResponse implements ICache
         if (!$skills->error)
             $tabData['data'] = $skills->getListviewData();
 
-        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
+        $this->lvTabs = new Tabs(['parent' => new JsExpression("\$WH.ge('tabs-generic')")]);
 
         $this->lvTabs->addListviewTab(new Listview($tabData, SkillList::$brickFile));
 

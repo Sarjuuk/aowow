@@ -4256,8 +4256,8 @@ Listview.templates = {
                 $.ajax({
                     type: 'GET',
                     url: '?comment=show-replies',
-                    data: { id: comment.id },
-                    success: function (replies) { comment.replies = replies; Listview.templates.comment.updateReplies(comment); Listview.templates.comment.highlightReply(comment, replyId, true); },
+                    data: { id: comment.id, focus: replyId },
+                    success: function (replies) { if (comment.replyOffset === undefined) comment.replyOffset = comment.replies.length; MergeCommentReplies(comment, replies); Listview.templates.comment.updateReplies(comment); Listview.templates.comment.highlightReply(comment, replyId, true); },
                     dataType: 'json'
                 });
 

@@ -225,7 +225,7 @@ class SpellList extends DBTypeList
     public function getProfilerMods() : array
     {
         // weapon hand check: param: slot, class, subclass, value
-        $whCheck = '$function() { var j, w = _inventory.getInventory()[%d]; if (!w[0] || !g_items[w[0]]) { return 0; } j = g_items[w[0]].jsonequip; return (j.classs == %d && (%d & (1 << (j.subclass)))) ? %d : 0; }';
+        $whCheck = 'function() { var j, w = _inventory.getInventory()[%d]; if (!w[0] || !g_items[w[0]]) { return 0; } j = g_items[w[0]].jsonequip; return (j.classs == %d && (%d & (1 << (j.subclass)))) ? %d : 0; }';
 
         $data = [];                       // flat gains
         foreach ($this->getStatGain() as $id => $spellData)
@@ -241,7 +241,7 @@ class SpellList extends DBTypeList
                 continue;
 
             foreach ($data[$id] as $key => $amt)
-                $data[$id][$key] = [1, 'functionOf', sprintf($whCheck, $slot, $class, $subClass, $amt)];
+                $data[$id][$key] = [1, 'functionOf', new JsExpression(sprintf($whCheck, $slot, $class, $subClass, $amt))];
         }
 
         // 4 possible modifiers found
@@ -376,10 +376,10 @@ class SpellList extends DBTypeList
                         break;
                     case SPELL_AURA_MOD_WEAPON_CRIT_PERCENT:
                         if ($class < 1 || ($class == ITEM_CLASS_WEAPON && ($subClass & 0x5000C)))
-                            $data[$id]['rgdcritstrkpct'] = [1, 'functionOf', sprintf($whCheck, 18, $class, $subClass, $pts)];
+                            $data[$id]['rgdcritstrkpct'] = [1, 'functionOf', new JsExpression(sprintf($whCheck, 18, $class, $subClass, $pts))];
                             // $data[$id]['rgdcritstrkpct'] = [$pts, 'add'];
                         if ($class < 1 || ($class == ITEM_CLASS_WEAPON && ($subClass & 0xA5F3)))
-                            $data[$id]['mlecritstrkpct'] = [1, 'functionOf', sprintf($whCheck, 16, $class, $subClass, $pts)];
+                            $data[$id]['mlecritstrkpct'] = [1, 'functionOf', new JsExpression(sprintf($whCheck, 16, $class, $subClass, $pts))];
                             // $data[$id]['mlecritstrkpct'] = [$pts, 'add'];
                         break;
                     case SPELL_AURA_MOD_PARRY_PERCENT:
@@ -407,7 +407,7 @@ class SpellList extends DBTypeList
                         $data[$id]['health'] = [$pts / 100, 'percentOf', 'health'];
                         break;
                     case SPELL_AURA_MOD_BASE_HEALTH_PCT:    // only Tauren - Endurance (20550) ... if you are looking for something elegant, look away!
-                        $data[$id]['health'] = [$pts / 100, 'functionOf', '$(x) => g_statistics.combo[x.classs][x.level][5]'];
+                        $data[$id]['health'] = [$pts / 100, 'functionOf', new JsExpression('(x) => g_statistics.combo[x.classs][x.level][5]')];
                         break;
                     case SPELL_AURA_MOD_SHIELD_BLOCKVALUE_PCT:
                         $data[$id]['block'] = [$pts / 100, 'percentOf', 'block'];
@@ -1123,46 +1123,23 @@ class SpellList extends DBTypeList
         $rwb            = $this->dfnText('LANG.traits.rgddmgmin[0]',   'rwb');
         $RWB            = $this->dfnText('LANG.traits.rgddmgmax[0]',   'RWB');
 
-        $abs   = $ABS   = fn($a)         => abs($a);
-        $ceil  = $CEIL  = fn($a)         => ceil($a);
-        $floor = $FLOOR = fn($a)         => floor($a);
-        $min   = $MIN   = fn($a, $b)     => min($a, $b);
-        $max   = $MAX   = fn($a, $b)     => max($a, $b);
-        $gt    = $GT    = fn($a, $b)     => $a > $b;
-        $lt    = $LT    = fn($a, $b)     => $a < $b;
-        $gte   = $GTE   = fn($a, $b)     => $a >= $b;
-        $lte   = $LTE   = fn($a, $b)     => $a <= $b;
-        $eq    = $EQ    = fn($a, $b)     => $a == $b;
-        $cond  = $COND  = fn($a, $b, $c) => $a ? $b : $c;
-        $clamp = $CLAMP = fn($a, $b, $c) => clamp($a, $b, $c);
+        $variables = get_defined_vars();                  // only the source-defined character labels above
+        unset($variables['formula']);
 
         if (preg_match_all('/\$\w+\b/i', $formula, $vars))
         {
-
             $evalable = true;
-
-            foreach ($vars[0] as $var)                      // oh lord, forgive me this sin .. but is_callable seems to bug out and function_exists doesn't find lambda-functions >.<
-            {
-                $var = substr($var, 1);
-
-                if (isset($$var))
+            $functions = ['abs', 'ceil', 'floor', 'min', 'max', 'gt', 'lt', 'gte', 'lte', 'eq', 'cond', 'clamp'];
+            foreach ($vars[0] as $var)
+                if (!in_array(strtolower(substr($var, 1)), $functions, true))
                 {
-                    $eval = eval('return @$'.$var.';');     // attention: error suppression active here (will be logged anyway)
-                    if (getType($eval) == 'object')
-                        continue;
-                    else if (is_numeric($eval))
-                        continue;
+                    $evalable = false;
+                    break;
                 }
-                else
-                    $$var = '<UNK: $'.$var.'>';
-
-                $evalable = false;
-                break;
-            }
 
             if (!$evalable)
             {
-                // can't eval constructs because of strings present. replace constructs with strings
+                // Character stats are unknown here; retain the existing explanatory function labels.
                 $abs   = $ABS   = $this->dfnText('ABS(<span class=\'q1\'>a</span>)', 'ABS');
                 $ceil  = $CEIL  = $this->dfnText('CEIL(<span class=\'q1\'>a</span>)', 'CEIL');
                 $floor = $FLOOR = $this->dfnText('FLOOR(<span class=\'q1\'>a</span>)', 'FLOOR');
@@ -1178,14 +1155,31 @@ class SpellList extends DBTypeList
                 $clamp = $CLAMP = $this->dfnText('CLAMP(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>, <span class=\'q1\'>c</span>)', 'CLAMP');
              // $pl    = $PL    = $this->dfnText('LANG.level', 'PL');
 
-                // space out operators for better readability
-                $formula = preg_replace('/(\+|-|\*|\/)/', ' \1 ', $formula);
-
-                // note the " !
-                return eval('return "('.$formula.')";');
+                $variables += array_intersect_key(get_defined_vars(),
+                    array_fill_keys(array_merge($functions, array_map('strtoupper', $functions)), true));
+                // Display character-dependent expressions as text; substitutions never enter PHP interpolation.
+                // Preserve labels previously produced by this renderer while escaping other literal formula text.
+                $labels = [];
+                foreach ($variables as $value)
+                    if (is_string($value) && str_starts_with($value, '<dfn ') && str_ends_with($value, '</dfn>'))
+                        $labels[$value] = $value;
+                $pattern = '/(\\$\\w+\\b'.($labels ? '|'.implode('|', array_map(fn($label) => preg_quote($label, '/'), array_keys($labels))) : '').')/';
+                $parts = preg_split($pattern, $formula, -1, PREG_SPLIT_DELIM_CAPTURE);
+                foreach ($parts as &$part)
+                    if (isset($labels[$part]))
+                        continue;
+                    else if (preg_match('/^\\$(\\w+)$/D', $part, $m))
+                        $part = isset($variables[$m[1]]) && is_string($variables[$m[1]]) ? $variables[$m[1]] : '&lt;UNK: $'.$m[1].'&gt;';
+                    else
+                        $part = htmlspecialchars(preg_replace('/(\+|-|\*|\/)/', ' \1 ', $part), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+                unset($part);
+                return '('.implode('', $parts).')';
             }
             else
-                return eval('return '.$formula.';');
+            {
+                try { return (string)NumericExpression::evaluate($formula, true); }
+                catch (\Throwable) { return htmlspecialchars($formula, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); }
+            }
         }
 
         // since this function may be called recursively, there are cases, where the already evaluated string is tried to be evaled again, throwing parse errors
@@ -1193,15 +1187,19 @@ class SpellList extends DBTypeList
         if (strstr($formula, '</dfn>') || strstr($formula, '<!--'))
             return $formula;
 
-        // hm, minor eval-issue. eval doesnt understand two operators without a space between them (eg. spelll: 18126)
-        $formula = preg_replace('/(\+|-|\*|\/)(\+|-|\*|\/)/i', '\1 \2', $formula);
-
-        // there should not be any letters without a leading $
-        try { $formula =  eval('return '.$formula.';'); }
+        // Adjacent unary operators are part of the numeric grammar (e.g. spell 18126).
+        try { $formula = (string)NumericExpression::evaluate($formula, true); }
         // but there can be if we are non-interactive
-        catch (\Throwable $e) { }
+        catch (\Throwable $e) { $formula = htmlspecialchars($formula, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); }
 
         return $formula;
+    }
+
+    // Invalid modifiers keep the original display value instead of executing input or aborting the tooltip.
+    private static function modifyFormulaValue(mixed $value, string $op, mixed $operand) : mixed
+    {
+        try { return NumericExpression::operation($op, $value, $operand); }
+        catch (\Throwable) { return $value; }
     }
 
     // a variables structure is pretty .. flexile. match in steps
@@ -1335,7 +1333,7 @@ class SpellList extends DBTypeList
                 $base ??= $srcSpell->getField('effect'.$effIdx.'BonusMultiplier');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    eval("\$base = $base $op $oparg;");
+                    $base = self::modifyFormulaValue($base, $op, $oparg);
 
                 $minPoints = $base;
                 break;
@@ -1346,7 +1344,7 @@ class SpellList extends DBTypeList
                 $fmtStringMin = Lang::formatTime($base, 'spell', 'duration');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    eval("\$base = $base $op $oparg;");
+                    $base = self::modifyFormulaValue($base, $op, $oparg);
 
                 $minPoints = max(0, $base);
                 break;
@@ -1359,8 +1357,8 @@ class SpellList extends DBTypeList
 
                 if (in_array($op, $signs) && is_numeric($oparg))
                 {
-                    eval("\$min = $min $op $oparg;");
-                    eval("\$max = $max $op $oparg;");
+                    $min = self::modifyFormulaValue($min, $op, $oparg);
+                    $max = self::modifyFormulaValue($max, $op, $oparg);
                 }
 
                 // Aura giving combat ratings
@@ -1404,8 +1402,8 @@ class SpellList extends DBTypeList
 
                 if (in_array($op, $signs) && is_numeric($oparg))
                 {
-                    eval("\$min = $min $op $oparg;");
-                    eval("\$max = $max $op $oparg;");
+                    $min = self::modifyFormulaValue($min, $op, $oparg);
+                    $max = self::modifyFormulaValue($max, $op, $oparg);
                 }
 
                 if ($this->interactive >= self::INTERACTIVE_EMBEDDED && ($modStrMin || $modStrMax))
@@ -1427,8 +1425,8 @@ class SpellList extends DBTypeList
 
                 if (in_array($op, $signs) && is_numeric($oparg))
                 {
-                    eval("\$min = $min $op $oparg;");
-                    eval("\$max = $max $op $oparg;");
+                    $min = self::modifyFormulaValue($min, $op, $oparg);
+                    $max = self::modifyFormulaValue($max, $op, $oparg);
                 }
                 // Aura giving combat ratings
                 $stats = [];
