@@ -389,7 +389,7 @@ class QuestList extends DBTypeList
     {
         $data = [];
 
-        foreach ($this->iterate() as $__)
+        foreach ($this->iterate() as $_)
         {
             if ($addMask & GLOBALINFO_REWARDS)
             {
@@ -587,7 +587,7 @@ class QuestListFilter extends Filter
         ];
     }
 
-    protected function cbQuestRelation(int $cr, int $crs, string $crv, $flags) : ?array
+    protected function cbQuestRelation(int $cr, int $crs, string $crv, int $flags) : ?array
     {
         return match ($crs)
         {
