@@ -46,13 +46,9 @@ trait TrCustomData
         $ok = true;
         foreach ((DB::Aowow()->selectCol('SELECT `entry` AS ARRAY_KEY, `field` AS ARRAY_KEY2, `value` FROM ::setup_custom_data WHERE `command` = %s', $this->getName()) ?: []) as $id => $data)
         {
-            try
+            if (DB::Aowow()->qry('UPDATE %n SET %a WHERE id = %i', '::'.$this->getName(), $data, $id) === null)
             {
-                DB::Aowow()->qry('UPDATE %n SET %a WHERE id = %i', '::'.$this->getName(), $data, $id);
-            }
-            catch (\Exception $e)
-            {
-                trigger_error('custom data for entry #'.$id.': '.$e->getMessage(), E_USER_WARNING);
+                trigger_error('applying custom data to aowow_'.$this->getName().' entry #'.$id.' failed', E_USER_WARNING);
                 $ok = false;
             }
         }

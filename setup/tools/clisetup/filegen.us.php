@@ -66,7 +66,6 @@ CLISetup::registerUtility(new class extends UtilityScript
         if (!$this->inited)
             return false;
 
-
         // check passed subscript names; limit to real scriptNames
         if (($buildArgs = CLISetup::getOpt('build')) !== false)
         {
@@ -103,7 +102,6 @@ CLISetup::registerUtility(new class extends UtilityScript
             return false;
         }
 
-        $done  = [];
         $allOk = true;
 
         // start file generation
@@ -126,14 +124,6 @@ CLISetup::registerUtility(new class extends UtilityScript
             CLI::write();
 
             set_time_limit($this->defaultExecTime);         // reset to default for the next script
-
-            // try to free memory
-            unset($scriptRef, $this->generators[$cmd]);
-            if (gc_enabled())
-            {
-                gc_collect_cycles();
-                gc_mem_caches();
-            }
         }
 
         return $allOk;
