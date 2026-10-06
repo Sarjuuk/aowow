@@ -758,7 +758,7 @@ class TemplateResponse extends BaseResponse
         array_unshift($this->metaTags, ['name' => 'keywords', 'content' => implode(', ', Lang::meta('tags', 'error'))]);
 
         // TemplateResponse: this got called directly to create a 404 page here-and-now > error
-        // other cases: we are regular page just without result > homeDesc
+        // other cases: we are regular page just without result > home
         $this->buildBasicMetadata(Lang::meta('description', get_class($this) == self::class ? 'error' : 'home'), useArticle: false);
 
         $this->display(true);
@@ -777,7 +777,7 @@ class TemplateResponse extends BaseResponse
         $this->metaTags[] = ['property' => 'og:type',  'content' => 'website'];
         array_unshift($this->metaTags, ['name' => 'keywords', 'content' => 'Maintenance']);
 
-        $this->buildBasicMetadata(Lang::meta('homeDesc'), useArticle: false);
+        $this->buildBasicMetadata(Lang::meta('description', 'home'), useArticle: false);
 
         $this->display(true);
         exit;
