@@ -1865,6 +1865,32 @@ define('SPELL_ATTR7_REFLECTION_ONLY_DEFENDS',                       0x20000000);
 define('SPELL_ATTR7_CAN_PROC_FROM_SUPPRESSED_TARGET_PROCS',         0x40000000); // [WoWDev Wiki]
 define('SPELL_ATTR7_CLIENT_INDICATOR',                              0x80000000); // Client indicator (client only)
 
+define('SPELL_ATTR0_CU_ENCHANT_PROC',                   0x00000001); // Triggered by an on-hit weapon enchant
+define('SPELL_ATTR0_CU_CONE_BACK',                      0x00000002); // Cone targeting faces away from the caster
+define('SPELL_ATTR0_CU_CONE_LINE',                      0x00000004); // Cone is a narrow line instead of a wide arc
+define('SPELL_ATTR0_CU_SHARE_DAMAGE',                   0x00000008); // Damage/healing is divided evenly among all targets
+define('SPELL_ATTR0_CU_NO_INITIAL_THREAT',              0x00000010); // Initial cast generates no threat
+define('SPELL_ATTR0_CU_AURA_CC',                        0x00000020); // Aura counts as crowd control (diminishing returns / PvP trinkets)
+define('SPELL_ATTR0_CU_DONT_BREAK_STEALTH',             0x00000040); // Does not break the caster's stealth
+define('SPELL_ATTR0_CU_CAN_CRIT',                       0x00000080); // Can roll a critical strike
+define('SPELL_ATTR0_CU_DIRECT_DAMAGE',                  0x00000100); // Effect deals direct (non-periodic) damage
+define('SPELL_ATTR0_CU_CHARGE',                         0x00000200); // Caster charges to the target before the effect fires
+define('SPELL_ATTR0_CU_PICKPOCKET',                     0x00000400); // Pickpocket-style effect
+define('SPELL_ATTR0_CU_ROLLING_PERIODIC',               0x00000800); // Periodic tick amount is rerolled on refresh instead of snapshotted
+define('SPELL_ATTR0_CU_NEGATIVE_EFF0',                  0x00001000); // Effect slot 1 is treated as harmful
+define('SPELL_ATTR0_CU_NEGATIVE_EFF1',                  0x00002000); // Effect slot 2 is treated as harmful
+define('SPELL_ATTR0_CU_NEGATIVE_EFF2',                  0x00004000); // Effect slot 3 is treated as harmful
+define('SPELL_ATTR0_CU_IGNORE_ARMOR',                   0x00008000); // Damage ignores the target's armor
+define('SPELL_ATTR0_CU_REQ_TARGET_FACING_CASTER',       0x00010000); // Target must be facing the caster
+define('SPELL_ATTR0_CU_REQ_CASTER_BEHIND_TARGET',       0x00020000); // Caster must be behind the target
+define('SPELL_ATTR0_CU_ALLOW_INFLIGHT_TARGET',          0x00040000); // May target a unit that is currently in flight/falling
+define('SPELL_ATTR0_CU_NEEDS_AMMO_DATA',                0x00080000); // Requires ranged ammo data to calculate damage
+define('SPELL_ATTR0_CU_BINARY_SPELL',                   0x00100000); // Binary spell - fully hits or fully resists, no partial resist
+define('SPELL_ATTR0_CU_SCHOOLMASK_NORMAL_WITH_MAGIC',   0x00200000); // Physical school is also treated as magic for resistance calculation
+define('SPELL_ATTR0_CU_DEPRECATED_LIQUID_AURA',         0x00400000); // Unused; bit retained so it is never reassigned (DO NOT REUSE)
+define('SPELL_ATTR0_CU_IS_TALENT',                      0x00800000); // Is a talent (reserved for master branch)
+define('SPELL_ATTR0_CU_AURA_CANNOT_BE_SAVED',           0x01000000); // Aura is not saved to the database across logout
+define('SPELL_ATTR0_CU_CAN_TARGET_ANY_PRIVATE_OBJECT',  0x02000000); // May target any private (phased-only-visible) object (reserved for master branch)
 
 // (some) Skill ids
 define('SKILL_FIRST_AID',      129);

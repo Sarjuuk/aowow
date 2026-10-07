@@ -2760,7 +2760,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
                 $listItem = Lang::spell('attributes'.$i, $j);
                 if (!$listItem && User::isInGroup(U_GROUP_STAFF))
-                    $listItem = '<span class="q0">Unknown SpellAttribute'.$i.'</span>';
+                    $listItem = '<span class="q0">Unknown SpellAttribute'.$i.': '.Util::asHex($j).'</span>';
                 else if (!$listItem)
                     continue;
 
@@ -2768,6 +2768,26 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                     $listItem = sprintf('<a href="?spells&filter=cr=%2$d;crs=%3$d;crv=0">%1$s</a>', $listItem, abs($crId), $crId > 0 ? 1 : 2);
 
                 $list[] = $this->fmtStaffTip($listItem, 'Attributes'.$i.': '.Util::asHex($j));
+            }
+        }
+
+        if ($customAttr = DB::World()->selectCell('SELECT `attributes` FROM spell_custom_attr WHERE `entry` = %i', $this->typeId))
+        {
+            if ($list)
+                $list[] = null;                             // add <hr> between lists
+
+            for ($j = 1; $j <= (1 << 31); $j <<= 1)
+            {
+                if (!($customAttr & $j))
+                    continue;
+
+                $listItem = Lang::spell('attributesCu', $j);
+                if (!$listItem && User::isInGroup(U_GROUP_STAFF))
+                    $listItem = '<span class="q0">Unknown CustomAttribute: '.Util::asHex($j).'</span>';
+                else if (!$listItem)
+                    continue;
+
+                $list[] = $this->fmtStaffTip($listItem, 'AttributesCu: '.Util::asHex($j));
             }
         }
 

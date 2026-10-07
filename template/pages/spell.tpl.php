@@ -328,7 +328,7 @@ if ($this->attributes):
                             <td colspan="3" style="line-height:17px">
                                 <ul style="margin:0"><?php
     foreach ($this->attributes as $a):
-        echo '<li>'.$a.'</li>';
+        echo $a ? '<li>'.$a.'</li>' : '</ul><hr style="margin: 10px 25px"><ul style="margin:0">';
     endforeach;
 ?></ul>
                         </td>
