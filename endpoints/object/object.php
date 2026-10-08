@@ -374,7 +374,8 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
             SPELL_EFFECT_SUMMON_OBJECT_SLOT1,
             SPELL_EFFECT_SUMMON_OBJECT_SLOT2,
             SPELL_EFFECT_SUMMON_OBJECT_SLOT3,
-            SPELL_EFFECT_SUMMON_OBJECT_SLOT4
+            SPELL_EFFECT_SUMMON_OBJECT_SLOT4,
+            SPELL_EFFECT_DUEL
         );
         $conditions = array(
             DB::OR,

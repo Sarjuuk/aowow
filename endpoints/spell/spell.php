@@ -2283,6 +2283,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 case SPELL_EFFECT_SUMMON_OBJECT_SLOT2:
                 case SPELL_EFFECT_SUMMON_OBJECT_SLOT3:
                 case SPELL_EFFECT_SUMMON_OBJECT_SLOT4:
+                case SPELL_EFFECT_DUEL:
                     if ($a = GameobjectList::makeLink($effMV))
                         $_nameMV = $a;
                     else
