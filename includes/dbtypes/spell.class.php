@@ -59,7 +59,7 @@ class SpellList extends DBTypeList
     );
     public const array EFFECTS_MODEL_OBJECT     = array(
         SPELL_EFFECT_TRANS_DOOR,            SPELL_EFFECT_SUMMON_OBJECT_WILD,                SPELL_EFFECT_SUMMON_OBJECT_SLOT1,               SPELL_EFFECT_SUMMON_OBJECT_SLOT2,               SPELL_EFFECT_SUMMON_OBJECT_SLOT3,
-        SPELL_EFFECT_SUMMON_OBJECT_SLOT4
+        SPELL_EFFECT_SUMMON_OBJECT_SLOT4,   SPELL_EFFECT_DUEL
     );
     public const array EFFECTS_MODEL_NPC        = array(
         SPELL_EFFECT_SUMMON,                SPELL_EFFECT_SUMMON_PET,                        SPELL_EFFECT_SUMMON_DEMON,                      SPELL_EFFECT_KILL_CREDIT,                       SPELL_EFFECT_KILL_CREDIT2
