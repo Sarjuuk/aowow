@@ -24,7 +24,7 @@
 
 <?php $this->brick('redButtons'); ?>
 
-                <h1 class="h1-icon"><?=$this->h1; ?></h1>
+                <h1><?=$this->h1; ?></h1>
 
                 <div class="clear"></div>
 
