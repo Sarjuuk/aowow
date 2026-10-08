@@ -2649,6 +2649,14 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                         case SPELL_AURA_MOD_SPEED_NOT_STACK:
                         case SPELL_AURA_MOD_INCREASE_SPEED:
                         case SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED:
+                        case SPELL_AURA_MOD_MOUNTED_SPEED_ALWAYS:
+                        case SPELL_AURA_MOD_MOUNTED_SPEED_NOT_STACK:
+                        case SPELL_AURA_MOD_INCREASE_VEHICLE_FLIGHT_SPEED:
+                        case SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED:
+                        case SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED:
+                        case SPELL_AURA_MOD_MOUNTED_FLIGHT_SPEED_ALWAYS:
+                        case SPELL_AURA_MOD_VEHICLE_SPEED_ALWAYS:
+                        case SPELL_AURA_MOD_FLIGHT_SPEED_NOT_STACK:
                         case SPELL_AURA_MOD_DECREASE_SPEED:
                         case SPELL_AURA_MOD_INCREASE_SWIM_SPEED:
                         case SPELL_AURA_MOD_PARRY_PERCENT:
