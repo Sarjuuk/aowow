@@ -23,7 +23,7 @@ class CommentFlagreplyResponse extends TextResponse
             $this->generate404(User::isInGroup(U_GROUP_STAFF) ? 'request malformed' : '');
         }
 
-        $replyOwner = DB::Aowow()->selectCell('SELECT `userId` FROM ::commments WHERE `id` = %i', $this->_post['id']);
+        $replyOwner = DB::Aowow()->selectCell('SELECT `userId` FROM ::comments WHERE `id` = %i', $this->_post['id']);
         if (!$replyOwner)
         {
             trigger_error('CommentFlagreplyResponse - reply not found', E_USER_WARNING);
