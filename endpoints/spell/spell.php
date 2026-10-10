@@ -1296,14 +1296,14 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
         // we know this spell effect is only in use on index 1
         if ($this->subject->getField('effect1Id') == SPELL_EFFECT_OPEN_LOCK && ($lockId = $this->subject->getField('effect1MiscValue')))
-            $lockIds += DB::Aowow()->selectCol(
+            $lockIds = array_unique(array_merge($lockIds, DB::Aowow()->selectCol(
                'SELECT `id` FROM ::lock WHERE            (`type1` = %i AND `properties1` = %i) OR
                 (`type2` = %i AND `properties2` = %i) OR (`type3` = %i AND `properties3` = %i) OR
                 (`type4` = %i AND `properties4` = %i) OR (`type5` = %i AND `properties5` = %i)',
                 LOCK_TYPE_SKILL, $lockId, LOCK_TYPE_SKILL, $lockId,
                 LOCK_TYPE_SKILL, $lockId, LOCK_TYPE_SKILL, $lockId,
                 LOCK_TYPE_SKILL, $lockId
-            );
+            )));
 
         if (!$lockIds)
             return [null, null];
