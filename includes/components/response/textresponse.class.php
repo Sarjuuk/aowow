@@ -85,7 +85,7 @@ trait TrCommunityHelper
         $caption = trim(preg_replace('/\s{2,}/', ' ', $caption));
 
         // shorten to fit db
-        return substr($caption, 0, 200);
+        return mb_substr($caption, 0, 200);
     }
 }
 

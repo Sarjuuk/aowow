@@ -13,7 +13,7 @@ class AdminVideosActionEdittitleResponse extends TextResponse
     protected int   $requiredUserGroup = U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_VIDEO;
 
     protected array $expectedGET       = array(
-        'id'    => ['filter' => FILTER_CALLBACK, 'options' => [self::class, 'checkIdListUnsigned']]
+        'id'    => ['filter' => FILTER_VALIDATE_INT]
     );
     protected array $expectedPOST      = array(
         'title' => ['filter' => FILTER_CALLBACK, 'options' => [self::class, 'checkTextLine']]
@@ -24,8 +24,9 @@ class AdminVideosActionEdittitleResponse extends TextResponse
         if (!$this->assertGET('id'))
             return;
 
-        $caption = $this->handleCaption($this->_post['title']);
-
-        DB::Aowow()->qry('UPDATE ::videos SET `caption` = %s WHERE `id` = %i', $caption, $this->_get['id'][0]);
+        DB::Aowow()->qry('UPDATE ::videos SET `caption` = %s WHERE `id` = %i',
+            $this->handleCaption($this->_post['title']),
+            $this->_get['id']
+        );
     }
 }

@@ -11,7 +11,7 @@ class AdminVideosActionDeleteResponse extends TextResponse
     protected int   $requiredUserGroup = U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_VIDEO;
 
     protected array $expectedGET       = array(
-        'all'    => ['filter' => FILTER_CALLBACK,    'options' => [self::class, 'checkEmptySet']]
+        'id' => ['filter' => FILTER_CALLBACK, 'options' => [self::class, 'checkIdListUnsigned']]
     );
 
     // 2 steps: 1) remove from sight, 2) remove from disk
