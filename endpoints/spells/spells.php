@@ -282,14 +282,14 @@ class SpellsBaseResponse extends TemplateResponse implements ICache
                                 $conditions[] = ['s.cuFlags', SPELL_CU_PET_TALENT_TYPE1, '&'];
                                 $url          = '?pets=1';
                                 break;
-                            case 410:                       // TalentTab - Cunning
-                                $conditions[] = ['s.cuFlags', SPELL_CU_PET_TALENT_TYPE2, '&'];
-                                $url          = '?pets=2';
-                               break;
-                            case 411:                       // TalentTab - Ferocity
+                            case 410:                       // TalentTab - Ferocity
                                 $conditions[] = ['s.cuFlags', SPELL_CU_PET_TALENT_TYPE0, '&'];
                                 $url          = '?pets=0';
                                 break;
+                            case 411:                       // TalentTab - Cunning
+                                $conditions[] = ['s.cuFlags', SPELL_CU_PET_TALENT_TYPE2, '&'];
+                                $url          = '?pets=2';
+                               break;
                         }
 
                         $tabData['note'] = '$$WH.sprintf(LANG.lvnote_pettalents, "'.$url.'")';

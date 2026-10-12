@@ -689,16 +689,16 @@ class SpellList extends DBTypeList
 
     public function createCastTimeForCurrent(bool $short = true, bool $noInstant = true) : string
     {
+        // passives (talents, equip spells) don't have a cast time
+        if ($noInstant && $this->curTpl['attributes0'] & SPELL_ATTR0_PASSIVE)
+            return '';
         if (!$this->curTpl['castTime'] && $this->isChanneledSpell())
             return Lang::spell('channeled');
         // SPELL_ATTR0_ABILITY instant ability.. yeah, wording thing only (todo (low): rule is imperfect)
-        else if (!$this->curTpl['castTime'] && ($this->curTpl['damageClass'] != SPELL_DAMAGE_CLASS_MAGIC || $this->curTpl['attributes0'] & SPELL_ATTR0_ABILITY))
+        if (!$this->curTpl['castTime'] && ($this->curTpl['damageClass'] != SPELL_DAMAGE_CLASS_MAGIC || $this->curTpl['attributes0'] & SPELL_ATTR0_ABILITY))
             return Lang::spell('instantPhys');
-        // show instant only for player/pet/npc abilities (todo (low): unsure when really hidden (like talent-case))
-        else if ($noInstant && !in_array($this->curTpl['typeCat'], [11, 7, -3, -6, -8, 0]) && !($this->curTpl['cuFlags'] & SPELL_CU_TALENTSPELL))
-            return '';
-        else
-            return $short ? Lang::formatTime($this->curTpl['castTime'] * 1000, 'spell', 'castTime') : DateTime::formatTimeElapsedFloat($this->curTpl['castTime'] * 1000);
+
+        return $short ? Lang::formatTime($this->curTpl['castTime'] * 1000, 'spell', 'castTime') : DateTime::formatTimeElapsedFloat($this->curTpl['castTime'] * 1000);
     }
 
     private function createCooldownForCurrent() : string
@@ -2082,6 +2082,7 @@ class SpellList extends DBTypeList
                 'reagents'     => array_values($this->getReagentsForCurrent()),
                 'source'       => []
              // 'talentspec'   => $this->curTpl['skillLines'][0]      not used: g_chr_specs has the wrong structure for it; also setting .cat and .type does the same
+             // 'nskillup'     => 1,                        // not sure what that was used for. At least as old as 3.3.0, but back then skillups where always 1 point? Also sent whith all spells not just trandeskills.
             );
 
             // Sources
@@ -2117,6 +2118,18 @@ class SpellList extends DBTypeList
                     $data[$this->id]['learnedat'] = $la;
 
                 $data[$this->id]['colors'] = $this->getColorsForCurrent();
+            }
+
+            // pet types
+            if ($this->curTpl['typeCat'] == -7)
+            {
+                $data[$this->id]['pettype'] = [];
+                if ($this->curTpl['cuFlags'] & SPELL_CU_PET_TALENT_TYPE0)
+                    $data[$this->id]['pettype'][] = PET_TALENT_TYPE_FEROCITY;
+                if ($this->curTpl['cuFlags'] & SPELL_CU_PET_TALENT_TYPE1)
+                    $data[$this->id]['pettype'][] = PET_TALENT_TYPE_TENACITY;
+                if ($this->curTpl['cuFlags'] & SPELL_CU_PET_TALENT_TYPE2)
+                    $data[$this->id]['pettype'][] = PET_TALENT_TYPE_CUNNING;
             }
 
             // glyph

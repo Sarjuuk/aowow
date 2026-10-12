@@ -2858,11 +2858,11 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 break;
             case  -7:                                       // only spells unique in skillLineAbility will always point to the right skillLine :/
                 if ($cf & SPELL_CU_PET_TALENT_TYPE0)
-                    $path[] = 411;                          // Ferocity
+                    $path[] = 410;                          // Ferocity
                 else if ($cf & SPELL_CU_PET_TALENT_TYPE1)
                     $path[] = 409;                          // Tenacity
                 else if ($cf & SPELL_CU_PET_TALENT_TYPE2)
-                    $path[] = 410;                          // Cunning
+                    $path[] = 411;                          // Cunning
                 break;
             case -5:
                 if ($this->subject->getField('effect2AuraId') == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED ||

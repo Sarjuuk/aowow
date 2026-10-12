@@ -466,47 +466,51 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         // triggered by spell
         DB::Aowow()->qry(
            'UPDATE ::spell a
-            JOIN   ( SELECT effect1TriggerSpell as id FROM ::spell WHERE effect1Id NOT IN (36, 57, 133) AND effect1TriggerSpell <> 0 UNION
-                     SELECT effect2TriggerSpell as id FROM ::spell WHERE effect2Id NOT IN (36, 57, 133) AND effect2TriggerSpell <> 0 UNION
-                     SELECT effect3TriggerSpell as id FROM ::spell WHERE effect3Id NOT IN (36, 57, 133) AND effect3TriggerSpell <> 0  ) as b
-            SET    cuFlags = cuFlags | %i
-            WHERE  a.id = b.id',
-        SPELL_CU_TRIGGERED);
+            JOIN   ( SELECT `effect1TriggerSpell` AS "id" FROM ::spell WHERE `effect1Id` NOT IN %in AND `effect1TriggerSpell` <> 0 UNION
+                     SELECT `effect2TriggerSpell` AS "id" FROM ::spell WHERE `effect2Id` NOT IN %in AND `effect2TriggerSpell` <> 0 UNION
+                     SELECT `effect3TriggerSpell` AS "id" FROM ::spell WHERE `effect3Id` NOT IN %in AND `effect3TriggerSpell` <> 0  ) AS b
+            SET    `cuFlags` = `cuFlags` | %i
+            WHERE  a.`id` = b.`id`',
+            [SPELL_EFFECT_LEARN_SPELL, SPELL_EFFECT_LEARN_PET_SPELL, SPELL_EFFECT_UNLEARN_SPECIALIZATION],
+            [SPELL_EFFECT_LEARN_SPELL, SPELL_EFFECT_LEARN_PET_SPELL, SPELL_EFFECT_UNLEARN_SPECIALIZATION],
+            [SPELL_EFFECT_LEARN_SPELL, SPELL_EFFECT_LEARN_PET_SPELL, SPELL_EFFECT_UNLEARN_SPECIALIZATION],
+            SPELL_CU_TRIGGERED
+        );
 
         // altIcons and quality for craftSpells
         $itemSpells = DB::Aowow()->selectCol(
-           'SELECT    s.id AS ARRAY_KEY, effect1CreateItemId
+           'SELECT    s.`id` AS ARRAY_KEY, `effect1CreateItemId`
             FROM      dbc_spell s
-            LEFT JOIN dbc_talent t1 ON t1.rank1 = s.id
-            LEFT JOIN dbc_talent t2 ON t2.rank2 = s.id
-            LEFT JOIN dbc_talent t3 ON t3.rank3 = s.id
-            WHERE     effect1CreateItemId > 0 AND (effect1Id IN %in OR effect1AuraId IN %in) AND t1.id IS NULL AND t2.id IS NULL AND t3.id IS NULL
+            LEFT JOIN dbc_talent t1 ON t1.`rank1` = s.`id`
+            LEFT JOIN dbc_talent t2 ON t2.`rank2` = s.`id`
+            LEFT JOIN dbc_talent t3 ON t3.`rank3` = s.`id`
+            WHERE     `effect1CreateItemId` > 0 AND (`effect1Id` IN %in OR `effect1AuraId` IN %in) AND t1.`id` IS NULL AND t2.`id` IS NULL AND t3.`id` IS NULL
             UNION
-            SELECT    s.id AS ARRAY_KEY, effect2CreateItemId
+            SELECT    s.`id` AS ARRAY_KEY, `effect2CreateItemId`
             FROM      dbc_spell s
-            LEFT JOIN dbc_talent t1 ON t1.rank1 = s.id
-            LEFT JOIN dbc_talent t2 ON t2.rank2 = s.id
-            LEFT JOIN dbc_talent t3 ON t3.rank3 = s.id
-            WHERE     effect2CreateItemId > 0 AND (effect2Id IN %in OR effect2AuraId IN %in) AND t1.id IS NULL AND t2.id IS NULL AND t3.id IS NULL
+            LEFT JOIN dbc_talent t1 ON t1.`rank1` = s.`id`
+            LEFT JOIN dbc_talent t2 ON t2.`rank2` = s.`id`
+            LEFT JOIN dbc_talent t3 ON t3.`rank3` = s.`id`
+            WHERE     `effect2CreateItemId` > 0 AND (`effect2Id` IN %in OR `effect2AuraId` IN %in) AND t1.`id` IS NULL AND t2.`id` IS NULL AND t3.`id` IS NULL
             UNION
-            SELECT    s.id AS ARRAY_KEY, effect3CreateItemId
+            SELECT    s.`id` AS ARRAY_KEY, `effect3CreateItemId`
             FROM      dbc_spell s
-            LEFT JOIN dbc_talent t1 ON t1.rank1 = s.id
-            LEFT JOIN dbc_talent t2 ON t2.rank2 = s.id
-            LEFT JOIN dbc_talent t3 ON t3.rank3 = s.id
-            WHERE     effect3CreateItemId > 0 AND (effect3Id IN %in OR effect3AuraId IN %in) AND t1.id IS NULL AND t2.id IS NULL AND t3.id IS NULL',
+            LEFT JOIN dbc_talent t1 ON t1.`rank1` = s.`id`
+            LEFT JOIN dbc_talent t2 ON t2.`rank2` = s.`id`
+            LEFT JOIN dbc_talent t3 ON t3.`rank3` = s.`id`
+            WHERE     `effect3CreateItemId` > 0 AND (`effect3Id` IN %in OR `effect3AuraId` IN %in) AND t1.`id` IS NULL AND t2.`id` IS NULL AND t3.`id` IS NULL',
         SpellList::EFFECTS_ITEM_CREATE, SpellList::AURAS_ITEM_CREATE,
         SpellList::EFFECTS_ITEM_CREATE, SpellList::AURAS_ITEM_CREATE,
         SpellList::EFFECTS_ITEM_CREATE, SpellList::AURAS_ITEM_CREATE);
 
-        $itemInfo = DB::World()->selectAssoc('SELECT entry AS ARRAY_KEY, displayId AS d, Quality AS q FROM item_template WHERE entry IN %in', $itemSpells);
+        $itemInfo = DB::World()->selectAssoc('SELECT `entry` AS ARRAY_KEY, `displayId` AS d, `Quality` AS q FROM item_template WHERE `entry` IN %in', $itemSpells);
         foreach ($itemSpells as $sId => $itemId)
             if (isset($itemInfo[$itemId]))
-                DB::Aowow()->qry('UPDATE ::spell s, ::icons ic, dbc_itemdisplayinfo idi SET s.iconIdAlt = ic.id, s.cuFlags = s.cuFlags | %i WHERE ic.name_source = LOWER(idi.inventoryIcon1) AND idi.id = %i AND s.id = %i', ((7 - $itemInfo[$itemId]['q']) << 8), $itemInfo[$itemId]['d'], $sId);
+                DB::Aowow()->qry('UPDATE ::spell s, ::icons ic, dbc_itemdisplayinfo idi SET s.`iconIdAlt` = ic.`id`, s.`cuFlags` = s.`cuFlags` | %i WHERE ic.`name_source` = LOWER(idi.`inventoryIcon1`) AND idi.`id` = %i AND s.`id` = %i', ((7 - $itemInfo[$itemId]['q']) << 8), $itemInfo[$itemId]['d'], $sId);
 
-        $itemReqs = DB::World()->selectCol('SELECT entry AS ARRAY_KEY, requiredSpell FROM item_template WHERE requiredSpell NOT IN %in', [0, 34090, 34091]); // not riding
+        $itemReqs = DB::World()->selectCol('SELECT `entry` AS ARRAY_KEY, `requiredSpell` FROM item_template WHERE `requiredSpell` NOT IN %in', [0, 34090, 34091]); // not riding
         foreach ($itemReqs AS $itemId => $req)
-            DB::Aowow()->qry('UPDATE ::spell SET reqSpellId = %i WHERE skillLine1 IN %in AND effect1CreateItemId = %i', $req, [SKILL_BLACKSMITHING, SKILL_LEATHERWORKING, SKILL_TAILORING, SKILL_ENGINEERING], $itemId);
+            DB::Aowow()->qry('UPDATE ::spell SET `reqSpellId` = %i WHERE `skillLine1` IN %in AND `effect1CreateItemId` = %i', $req, [SKILL_BLACKSMITHING, SKILL_LEATHERWORKING, SKILL_TAILORING, SKILL_ENGINEERING], $itemId);
 
         // setting icons
         DB::Aowow()->qry('UPDATE ::spell s, ::icons ic, dbc_spellicon si SET s.`iconId` = ic.`id` WHERE s.`iconIdBak` = si.`id` AND ic.`name_source` = LOWER(SUBSTRING_INDEX(si.`iconPath`, "\\", -1))');
@@ -514,7 +518,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         // hide internal stuff from listviews
         // QA*; *DND*; square brackets anything; *(NYI)*; *(TEST)*
         // cant catch raw: NYI (uNYIelding); PH (PHasing)
-        DB::Aowow()->qry('UPDATE ::spell SET cuFlags = cuFlags | %i WHERE name_loc0 LIKE "QA%" OR name_loc0 LIKE "%DND%" OR name_loc0 LIKE "%[%" OR name_loc0 LIKE "%(NYI)%" OR name_loc0 LIKE "%(TEST)%"', CUSTOM_EXCLUDE_FOR_LISTVIEW);
+        DB::Aowow()->qry('UPDATE ::spell SET `cuFlags` = `cuFlags` | %i WHERE `name_loc0` LIKE "QA%" OR `name_loc0` LIKE "%DND%" OR `name_loc0` LIKE "%[%" OR `name_loc0` LIKE "%(NYI)%" OR `name_loc0` LIKE "%(TEST)%"', CUSTOM_EXCLUDE_FOR_LISTVIEW);
 
 
         /**************/
@@ -524,10 +528,11 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         CLI::write('[spell] - applying categories');
 
         // player talents (-2)
-        DB::Aowow()->qry('UPDATE ::spell s, dbc_talent t SET s.typeCat = -2 WHERE t.tabId NOT IN (409, 410, 411) AND (s.id = t.rank1 OR s.id = t.rank2 OR s.id = t.rank3 OR s.id = t.rank4 OR s.id = t.rank5)');
+        DB::Aowow()->qry('UPDATE ::spell s, dbc_talent t SET s.`typeCat` = -2 WHERE t.`tabId` NOT IN (409, 410, 411) AND (s.`id` = t.`rank1` OR s.`id` = t.`rank2` OR s.`id` = t.`rank3` OR s.`id` = t.`rank4` OR s.`id` = t.`rank5`)');
 
         // pet spells (-3)
-        DB::Aowow()->qry('UPDATE ::spell s SET s.typeCat = -3 WHERE (s.cuFlags & 0x3) = 0 AND s.skillline1 IN %in',
+        DB::Aowow()->qry('UPDATE ::spell s SET s.`typeCat` = -3 WHERE (s.`cuFlags` & %i) = 0 AND s.`skillline1` IN %in',
+            SPELL_CU_TALENT | SPELL_CU_TALENTSPELL,
             array_merge(
                 array_column(Game::$skillLineMask[-1], 1),  // hunter pets
                 array_column(Game::$skillLineMask[-2], 1),  // warlock pets
@@ -537,41 +542,45 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         );
 
         // racials (-4)
-        DB::Aowow()->qry('UPDATE ::spell s SET s.typeCat = -4 WHERE s.skillLine1 IN (101, 124, 125, 126, 220, 733, 753, 754, 756, 760)');
+        DB::Aowow()->qry('UPDATE ::spell s SET s.`typeCat` = -4 WHERE s.`skillLine1` IN (101, 124, 125, 126, 220, 733, 753, 754, 756, 760)');
 
         // mounts (-5)
-        DB::Aowow()->qry('UPDATE ::spell s SET s.typeCat = -5 WHERE s.effect1AuraId = 78 AND (s.skillLine1 IN (354, 594, 772, 777) OR (s.skillLine1 > 0 AND s.skillLine2OrMask = 777))');
+        DB::Aowow()->qry('UPDATE ::spell s SET s.`typeCat` = -5 WHERE s.`effect1AuraId` = 78 AND (s.`skillLine1` IN (354, 594, 772, 777) OR (s.`skillLine1` > 0 AND s.`skillLine2OrMask` = 777))');
 
         // companions (-6)
-        DB::Aowow()->qry('UPDATE ::spell s SET s.typeCat = -6 WHERE s.skillLine1 = 778');
+        DB::Aowow()->qry('UPDATE ::spell s SET s.`typeCat` = -6 WHERE s.`skillLine1` = 778');
 
         // pet talents (-7)
-        DB::Aowow()->qry('UPDATE ::spell s, dbc_talent t SET s.typeCat = -7, s.cuFlags = s.cuFlags | 0x10 WHERE t.tabId = 409 AND (s.id = t.rank1 OR s.id = t.rank2 OR s.id = t.rank3)');
-        DB::Aowow()->qry('UPDATE ::spell s, dbc_talent t SET s.typeCat = -7, s.cuFlags = s.cuFlags | 0x08 WHERE t.tabId = 410 AND (s.id = t.rank1 OR s.id = t.rank2 OR s.id = t.rank3)');
-        DB::Aowow()->qry('UPDATE ::spell s, dbc_talent t SET s.typeCat = -7, s.cuFlags = s.cuFlags | 0x20 WHERE t.tabId = 411 AND (s.id = t.rank1 OR s.id = t.rank2 OR s.id = t.rank3)');
+        $pairs = array(
+            409 => SPELL_CU_PET_TALENT_TYPE1,
+            410 => SPELL_CU_PET_TALENT_TYPE0,
+            411 => SPELL_CU_PET_TALENT_TYPE2
+        );
+        foreach ($pairs as $tabId => $cuFlags)
+            DB::Aowow()->qry('UPDATE ::spell s, dbc_talent t SET s.`typeCat` = -7, s.`cuFlags` = s.`cuFlags` | %i WHERE t.`tabId` = %i AND (s.`id` = t.`rank1` OR s.`id` = t.`rank2` OR s.`id` = t.`rank3`)', $cuFlags, $tabId);
 
         // internal (-9) by faaaaaar not complete
-        DB::Aowow()->qry('UPDATE ::spell s SET s.typeCat = -9 WHERE s.skillLine1 = 769');
-        DB::Aowow()->qry('UPDATE ::spell s SET s.typeCat = -9 WHERE s.typeCat = 0 AND s.cuFlags = 0 AND (
-            s.name_loc0 LIKE "%qa%"       OR
-            s.name_loc0 LIKE "%debug%"    OR
-            s.name_loc0 LIKE "%internal%" OR
-            s.name_loc0 LIKE "%(NYI)%"    OR
-            s.name_loc0 LIKE "%(TEST)%"   OR
-            s.name_loc0 LIKE "%(OLD)%")'
+        DB::Aowow()->qry('UPDATE ::spell s SET s.`typeCat` = -9 WHERE s.`skillLine1` = 769');
+        DB::Aowow()->qry('UPDATE ::spell s SET s.`typeCat` = -9 WHERE s.`typeCat` = 0 AND s.`cuFlags` = 0 AND (
+            s.`name_loc0` LIKE "%qa%"       OR
+            s.`name_loc0` LIKE "%debug%"    OR
+            s.`name_loc0` LIKE "%internal%" OR
+            s.`name_loc0` LIKE "%(NYI)%"    OR
+            s.`name_loc0` LIKE "%(TEST)%"   OR
+            s.`name_loc0` LIKE "%(OLD)%")'
         );
 
         // proficiencies (-11)
-        DB::Aowow()->qry('UPDATE ::spell s, dbc_skillline sl SET s.typeCat = -11 WHERE s.skillLine1 = sl.id AND sl.categoryId IN (6, 8, 10)');
+        DB::Aowow()->qry('UPDATE ::spell s, dbc_skillline sl SET s.`typeCat` = -11 WHERE s.`skillLine1` = sl.`id` AND sl.`categoryId` IN (6, 8, 10)');
 
         // glyphs (-13)
-        DB::Aowow()->qry('UPDATE ::spell s, dbc_glyphproperties gp SET s.cuFlags = s.cuFlags | IF(gp.typeFlags, %i, %i), s.typeCat = -13 WHERE gp.typeFlags IN (0, 1) AND gp.id = s.effect1MiscValue AND s.effect1Id = 74', SPELL_CU_GLYPH_MINOR, SPELL_CU_GLYPH_MAJOR);
-        $glyphs = DB::World()->selectCol('SELECT it.spellid_1 AS ARRAY_KEY, it.AllowableClass FROM item_template it WHERE it.class = 16');
+        DB::Aowow()->qry('UPDATE ::spell s, dbc_glyphproperties gp SET s.`cuFlags` = s.`cuFlags` | IF(gp.`typeFlags`, %i, %i), s.`typeCat` = -13 WHERE gp.`typeFlags` IN (0, 1) AND gp.`id` = s.`effect1MiscValue` AND s.`effect1Id` = %i', SPELL_CU_GLYPH_MINOR, SPELL_CU_GLYPH_MAJOR, SPELL_EFFECT_APPLY_GLYPH);
+        $glyphs = DB::World()->selectCol('SELECT it.`spellid_1` AS ARRAY_KEY, it.`AllowableClass` FROM item_template it WHERE it.`class` = %i', ITEM_CLASS_GLYPH);
         foreach ($glyphs as $spell => $classMask)
-            DB::Aowow()->qry('UPDATE ::spell s, dbc_glyphproperties gp SET s.reqClassMask = %i WHERE gp.typeFlags IN (0, 1) AND gp.id = s.effect1MiscValue AND s.effect1Id = 74 AND s.id = %i', $classMask, $spell);
+            DB::Aowow()->qry('UPDATE ::spell s, dbc_glyphproperties gp SET s.`reqClassMask` = %i WHERE gp.`typeFlags` IN (0, 1) AND gp.`id` = s.`effect1MiscValue` AND s.`effect1Id` = %i AND s.`id` = %i', $classMask, SPELL_EFFECT_APPLY_GLYPH, $spell);
 
         // class Spells (7)
-        DB::Aowow()->qry('UPDATE ::spell s, dbc_skillline sl SET s.typeCat = 7 WHERE s.typeCat = 0 AND s.skillLine1 = sl.id AND sl.categoryId = 7');
+        DB::Aowow()->qry('UPDATE ::spell s, dbc_skillline sl SET s.`typeCat` = 7 WHERE s.`typeCat` = 0 AND s.`skillLine1` = sl.`id` AND sl.`categoryId` = 7');
 
         // hide some internal/unused stuffs
         DB::Aowow()->qry('UPDATE ::spell s SET s.cuFlags = %i WHERE s.typeCat = 7 AND (

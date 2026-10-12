@@ -696,8 +696,8 @@ var mn_spells = [
         [204,"虚空行者",,,{tinyIcon:"Spell_Shadow_SummonVoidwalker"}]
     ]],
     [-7,"宠物天赋",,[
-        [410,"狡诈",,,{tinyIcon:"Ability_Hunter_CombatExperience"}],
-        [411,"狂野",,,{tinyIcon:"Ability_Druid_Swipe"}],
+        [411,"狡诈",,,{tinyIcon:"Ability_Hunter_CombatExperience"}],
+        [410,"狂野",,,{tinyIcon:"Ability_Druid_Swipe"}],
         [409,"坚韧",,,{tinyIcon:"Ability_Hunter_Pet_Bear"}]
     ]],
     [,"专业和生活技能"],

@@ -696,8 +696,8 @@ var mn_spells = [
         [188,"Wichtel",,,{tinyIcon:"Spell_Shadow_SummonImp"}]
     ]],
     [-7,"Begleitertalente",,[
-        [410,"Gerissenheit",,,{tinyIcon:"Ability_Hunter_CombatExperience"}],
-        [411,"Wildheit",,,{tinyIcon:"Ability_Druid_Swipe"}],
+        [411,"Gerissenheit",,,{tinyIcon:"Ability_Hunter_CombatExperience"}],
+        [410,"Wildheit",,,{tinyIcon:"Ability_Druid_Swipe"}],
         [409,"Hartnäckigkeit",,,{tinyIcon:"Ability_Hunter_Pet_Bear"}]
     ]],
     [,"Berufe & Fertigkeiten"],

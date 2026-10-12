@@ -696,8 +696,8 @@ var mn_spells = [
         [204,"Voidwalker",,,{tinyIcon:"Spell_Shadow_SummonVoidwalker"}]
     ]],
     [-7,"Pet Talents",,[
-        [410,"Cunning",,,{tinyIcon:"Ability_Hunter_CombatExperience"}],
-        [411,"Ferocity",,,{tinyIcon:"Ability_Druid_Swipe"}],
+        [411,"Cunning",,,{tinyIcon:"Ability_Hunter_CombatExperience"}],
+        [410,"Ferocity",,,{tinyIcon:"Ability_Druid_Swipe"}],
         [409,"Tenacity",,,{tinyIcon:"Ability_Hunter_Pet_Bear"}]
     ]],
     [,"Professions & Skills"],
