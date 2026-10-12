@@ -714,7 +714,7 @@ class SpellList extends DBTypeList
     }
 
     // formulae base from TC
-    private function calculateAmountForCurrent(int $effIdx, int $nTicks = 1) : array
+    private function calculateAmountForCurrent(int $effIdx, ?string $op = null, ?int $oparg = null, int $nTicks = 1) : array
     {
         $level    = $this->charLevel;
         $maxBase  = 0;
@@ -727,6 +727,16 @@ class SpellList extends DBTypeList
         $LDSEffs  = $this->canLevelDamageScale();
         $modMin   =
         $modMax   = null;
+
+        $min = $nTicks * ($add ? $base + 1 : $base);
+        $max = $nTicks * ($add + $base);
+
+        if ($op !== null && $oparg !== null)
+        {
+            eval("\$min  = floor($min $op $oparg);");
+            eval("\$max  = ceil($max $op $oparg);");
+            eval("\$rppl = $rppl $op $oparg;");
+        }
 
         if ($rppl)
         {
@@ -741,15 +751,8 @@ class SpellList extends DBTypeList
             $maxBase += (int)(($level - $baseLvl) * $rppl);
             $maxBase *= $nTicks;
 
-        }
-
-        $min = $nTicks * ($add ? $base + 1 : $base);
-        $max = $nTicks * ($add + $base);
-
-        if ($rppl)
-        {
-            $modMin = '<!--ppl'.$baseLvl.':'.($maxLvl ?: $level).':'.abs($min).':'.(abs($rppl) * 100 * $nTicks).'-->';
-            $modMax = '<!--ppl'.$baseLvl.':'.($maxLvl ?: $level).':'.abs($max).':'.(abs($rppl) * 100 * $nTicks).'-->';
+            $modMin = '<!--ppl'.$baseLvl.':'.($maxLvl ?: $level).':'.abs($min).':'.floor(abs($rppl) * 100 * $nTicks).'-->';
+            $modMax = '<!--ppl'.$baseLvl.':'.($maxLvl ?: $level).':'.abs($max).':'.floor(abs($rppl) * 100 * $nTicks).'-->';
         }
         else if ($this->getField('attributes0') & SPELL_ATTR0_LEVEL_DAMAGE_CALCULATION && in_array($effIdx, $LDSEffs) && $spellLvl)
         {
@@ -1352,16 +1355,13 @@ class SpellList extends DBTypeList
                 break;
             case 'm':                                       // BasePoints (minValue)
             case 'M':                                       // BasePoints (maxValue)
-                [$min, $max, $modStrMin, $modStrMax] = $srcSpell->calculateAmountForCurrent($effIdx);
+                if (!in_array($op, $signs) || !is_numeric($oparg))
+                    $op = $oparg = null;
+
+                [$min, $max, $modStrMin, $modStrMax] = $srcSpell->calculateAmountForCurrent($effIdx, $op, $oparg);
 
                 $mv   = $srcSpell->getField('effect'.$effIdx.'MiscValue');
                 $aura = $srcSpell->getField('effect'.$effIdx.'AuraId');
-
-                if (in_array($op, $signs) && is_numeric($oparg))
-                {
-                    eval("\$min = $min $op $oparg;");
-                    eval("\$max = $max $op $oparg;");
-                }
 
                 // Aura giving combat ratings
                 $stats = [];
@@ -1400,13 +1400,10 @@ class SpellList extends DBTypeList
                         $periode = 3000;
                 }
 
-                [$min, $max, $modStrMin, $modStrMax] = $srcSpell->calculateAmountForCurrent($effIdx, intVal($duration / $periode));
+                if (!in_array($op, $signs) || !is_numeric($oparg))
+                    $op = $oparg = null;
 
-                if (in_array($op, $signs) && is_numeric($oparg))
-                {
-                    eval("\$min = $min $op $oparg;");
-                    eval("\$max = $max $op $oparg;");
-                }
+                [$min, $max, $modStrMin, $modStrMax] = $srcSpell->calculateAmountForCurrent($effIdx, $op, $oparg, intVal($duration / $periode));
 
                 if ($this->interactive >= self::INTERACTIVE_EMBEDDED && ($modStrMin || $modStrMax))
                 {
@@ -1421,15 +1418,14 @@ class SpellList extends DBTypeList
                 break;
             case 's':                                       // BasePoints (with variance)
             case 'S':
-                [$min, $max, $modStrMin, $modStrMax] = $srcSpell->calculateAmountForCurrent($effIdx);
                 $mv   = $srcSpell->getField('effect'.$effIdx.'MiscValue');
                 $aura = $srcSpell->getField('effect'.$effIdx.'AuraId');
 
-                if (in_array($op, $signs) && is_numeric($oparg))
-                {
-                    eval("\$min = $min $op $oparg;");
-                    eval("\$max = $max $op $oparg;");
-                }
+                if (!in_array($op, $signs) || !is_numeric($oparg))
+                    $op = $oparg = null;
+
+                [$min, $max, $modStrMin, $modStrMax] = $srcSpell->calculateAmountForCurrent($effIdx, $op, $oparg);
+
                 // Aura giving combat ratings
                 $stats = [];
                 if ($aura == SPELL_AURA_MOD_RATING)
