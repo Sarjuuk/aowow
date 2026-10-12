@@ -159,20 +159,27 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         DB::Aowow()->qry('UPDATE ::items i, dbc_itemdisplayinfo idi, ::icons ic SET i.iconId = ic.id WHERE i.displayId = idi.id AND LOWER(idi.inventoryIcon1) = ic.name_source');
 
         // unify slots:  Robes => Chest; Ranged (right) => Ranged
-        DB::Aowow()->qry('UPDATE ::items SET slot = %i WHERE slotbak = %i', INVTYPE_RANGED, INVTYPE_RANGEDRIGHT);
-        DB::Aowow()->qry('UPDATE ::items SET slot = %i WHERE slotbak = %i', INVTYPE_CHEST, INVTYPE_ROBE);
+        DB::Aowow()->qry('UPDATE ::items SET `slot` = %i WHERE `slotbak` = %i', INVTYPE_RANGED, INVTYPE_RANGEDRIGHT);
+        DB::Aowow()->qry('UPDATE ::items SET `slot` = %i WHERE `slotbak` = %i', INVTYPE_CHEST, INVTYPE_ROBE);
+
+        // recategorize misc equipables as armor (offhand meat)
+        DB::Aowow()->qry(
+           'UPDATE ::items SET `class` = %i, `subclass` = %i WHERE `slotbak` <> %i AND `class` NOT IN (%i)',
+            ITEM_CLASS_ARMOR, ITEM_SUBCLASS_MISC_ARMOR, INVTYPE_NON_EQUIP, [ITEM_CLASS_ARMOR, ITEM_CLASS_WEAPON, ITEM_CLASS_CONSUMABLE]
+        );
 
         // custom sub-classes
         DB::Aowow()->qry(
-           'UPDATE ::items SET subclass = IF(
-                slotbak = 4, -8, IF(                                  -- shirt
-                    slotbak = 19, -7, IF(                             -- tabard
-                        slotbak = 16, -6, IF(                         -- cloak
-                            slotbak = 23, -5, IF(                     -- held in offhand
-                                slotbak = 12, -4, IF(                 -- trinket
-                                    slotbak = 2, -3, IF(              -- amulet
-                                        slotbak = 11, -2, subClassBak -- ring
-            ))))))) WHERE class = 4'
+           'UPDATE ::items SET `subclass` = CASE
+                WHEN `slotbak` =  4 THEN -8                 -- shirt
+                WHEN `slotbak` = 19 THEN -7                 -- tabard
+                WHEN `slotbak` = 16 THEN -6                 -- cloak
+                WHEN `slotbak` = 23 THEN -5                 -- held in offhand
+                WHEN `slotbak` = 12 THEN -4                 -- trinket
+                WHEN `slotbak` =  2 THEN -3                 -- amulet
+                WHEN `slotbak` = 11 THEN -2                 -- ring
+                ELSE `subClassBak`
+            END WHERE `class` = 4'
         );
 
         // move alchemist stones to trinkets (Armor)

@@ -732,7 +732,7 @@ abstract class Util
                 $score -= $nSockets * self::GEM_SCORE_BASE_BC;
         }
 
-        return round($score, 4);
+        return max(0, round($score, 4));
     }
 
     public static function getGemScore(int $itemLevel, int $quality, bool $profSpec = false, int $itemId = 0) : float
