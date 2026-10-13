@@ -767,8 +767,13 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: fishing
-        $fish = new LootByContainer(Loot::FISHING, $this->typeId);
-        if ($fish->formatListview())
+        $fish = $fishLootTabs = null;
+        if (($fish = new LootByContainer(Loot::FISHING, $this->typeId))->getItems())
+            $fishLootTabs = $fish->formatListview();
+        else if ($_parentArea && ($fish = new LootByContainer(Loot::FISHING, $_parentArea))->getItems())
+            $fishLootTabs = $fish->formatListview();
+
+        if ($fishLootTabs)
         {
             $this->extendGlobalData($fish->jsGlobals);
             $xCols = array_merge(['$Listview.extraCols.percent'], $fish->extraCols);
@@ -780,7 +785,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
                 $note = sprintf(Util::$lvTabNoteString, Lang::zone('fishingSkill'), Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill(SKILL_FISHING, $skill), Lang::FMT_HTML));
 
             $this->lvTabs->addListviewTab(new Listview(array(
-                'data'            => $fish->getResult(),
+                'data'            => $fishLootTabs,
                 'name'            => '$LANG.tab_fishing',
                 'id'              => 'fishing',
                 'extraCols'       => array_unique($xCols),
