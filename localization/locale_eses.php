@@ -770,7 +770,7 @@ $lang = array(
         'actionTT'      => '[b class=q1]Tipo de Acción %d[/b][br][table][tr][td]Parámetro1[/td][td=header]%d[/td][/tr][tr][td]Parámetro2[/td][td=header]%d[/td][/tr][tr][td]Parámetro3[/td][td=header]%d[/td][/tr][tr][td]Parámetro4[/td][td=header]%d[/td][/tr][tr][td]Parámetro5[/td][td=header]%d[/td][/tr][tr][td]Parámetro6[/td][td=header]%d[/td][/tr][/table]',
         'actions'       => array(                           // [body, footer]
             null,
-            SmartAction::ACTION_TALK                               => ['(%3$d)?Decir:#target# dice; (%%11$d)?Grupo de texto:[span class=q10]texto desconocido[/span]; #[b]%1$d[/b] a (%3$d)?#target#:invocador;%11$s', 'Duración: %s'],
+            SmartAction::ACTION_TALK                               => ['(%3$d)?Decir:#target# dice; (%11$s)?Grupo de texto:[span class=q10]texto desconocido[/span]; #[b]%1$d[/b] a (%3$d)?#target#:invocador;%11$s', 'Duración: %s'],
             SmartAction::ACTION_SET_FACTION                        => ['(%1$d)?Establecer la facción de #target# a [faction=%11$d]:Restablecer la facción de #target#;.', ''],
             SmartAction::ACTION_MORPH_TO_ENTRY_OR_MODEL            => ['(%11$d)?Restablecer apariencia.:Tomar la apariencia de;(%1$d)? [npc=%1$d].:;(%2$d)?[model npc=%2$d border=1 float=right][/model]:;', ''],
             SmartAction::ACTION_SOUND                              => ['Reproducir sonido a (%2$d)?jugador invocador:todos los jugadores a la vista;:[div][sound=%1$d][/div]', 'Reproducido por el entorno.'],
