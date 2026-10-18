@@ -310,12 +310,12 @@ final class UIText
                 switch ($fmt)
                 {
                     case Lang::FMT_HTML:
-                        return sprintf('<a href="?%s=%d">%s</a>', $spfVars);
+                        return vsprintf('<a href="?%s=%d">%s</a>', $spfVars);
                     case Lang::FMT_MARKUP:
-                        return sprintf('[%s=%d]', $spfVars);
+                        return vsprintf('[%s=%d]', $spfVars);
                     case Lang::FMT_RAW:
                     default:
-                        return sprintf('(%s #%d) %s', $spfVars);
+                        return vsprintf('(%s #%d) %s', $spfVars);
                 }
             }, $text);
 
