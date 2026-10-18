@@ -769,7 +769,7 @@ $lang = array(
         'actionTT'      => '[b class=q1]ActionType %d[/b][br][table][tr][td]Param1[/td][td=header]%d[/td][/tr][tr][td]Param2[/td][td=header]%d[/td][/tr][tr][td]Param3[/td][td=header]%d[/td][/tr][tr][td]Param4[/td][td=header]%d[/td][/tr][tr][td]Param5[/td][td=header]%d[/td][/tr][tr][td]Param6[/td][td=header]%d[/td][/tr][/table]',
         'actions'       => array(                           // [body, footer]
             null,
-            SmartAction::ACTION_TALK                               => ['(%3$d)?Gib:#target# gibt; (%11$s)?TextGroup:[span class=q10]unbekannten Text[/span]; #[b]%1$d[/b] (3$d)?für #target#:für den Auslöser; wieder%11$s', 'Dauer: %s'],
+            SmartAction::ACTION_TALK                               => ['(%3$d)?Gib:#target# gibt; (%11$s)?TextGroup:[span class=q10]unbekannten Text[/span]; #[b]%1$d[/b] (%3$d)?für #target#:für den Auslöser; wieder%11$s', 'Dauer: %s'],
             SmartAction::ACTION_SET_FACTION                        => ['Setze Fraktion von #target# (%1$d)?auf [faction=%11$d]:zurück;.', ''],
             SmartAction::ACTION_MORPH_TO_ENTRY_OR_MODEL            => ['(%11$d)?Setze Aussehen zurück.:Nimm Erscheinungsbild an:;(%1$d)? [npc=%1$d]:;(%2$d)?[model npc=%2$d border=1 float=right][/model]:;', ''],
             SmartAction::ACTION_SOUND                              => ['Spiele Audio für (%2$d)?auslösenden Spieler:alle Spieler im Sichtfeld;:[div][sound=%1$d][/div]', 'Wiedergabe durch Umwelt'],
