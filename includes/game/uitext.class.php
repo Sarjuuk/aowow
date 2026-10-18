@@ -149,7 +149,7 @@ final class UIText
         $to[Lang::FMT_MARKUP] = array(
             '<\1/\2>',
             '<'.implode('/', Lang::game('pvpRank', 1)).'>',
-            '[span class=q0>WorldState #\1[/span]',
+            '[span class=q0]WorldState #\1[/span]',
             '<'.Lang::game('class').'>',
             '<'.Lang::game('race').'>',
             '<'.Lang::main('name').'>',
