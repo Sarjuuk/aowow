@@ -122,7 +122,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                     if ($dist > 1000)
                         continue;
 
-                    if (!isset($n['_dist']) || $n['_dist'] < $dist)
+                    if (!isset($n['_dist']) || $n['_dist'] > $dist)
                     {
                         $n['_dist']  = $dist;
                         $n['typeId'] = $c['entry'];
