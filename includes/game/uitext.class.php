@@ -228,7 +228,7 @@ final class UIText
                     case Lang::FMT_HTML:
                         return sprintf('<span style="color: #%1$s%2$s;">%3$s</span>', $rgb, $a, $text);
                     case Lang::FMT_MARKUP:
-                        return sprintf('[span color=#%1$s]%3$s[/span]', $rgb, $a, $text); // doesn't support alpha
+                        return sprintf('[color=#%1$s]%3$s[/color]', $rgb, $a, $text); // doesn't support alpha
                     case Lang::FMT_RAW:
                     default:
                         return $text;
@@ -254,7 +254,7 @@ final class UIText
                     case Lang::FMT_HTML:
                         return '<span class="icontiny" style="background-image: url('.Cfg::get('STATIC_URL').'/images/wow/icons/tiny/'.Util::lower($iconName).'.gif)">';
                     case Lang::FMT_MARKUP:
-                        return '[icon name='.Util::lower($iconName).']';
+                        return '[icon name='.Util::lower($iconName).'][/icon]';
                     case Lang::FMT_RAW:
                     default:
                         return '';
