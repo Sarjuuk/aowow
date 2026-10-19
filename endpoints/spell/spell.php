@@ -220,7 +220,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         $this->mechanic  = $this->subject->getField('mechanic') ? Lang::game('me', $this->subject->getField('mechanic')) : null;
         $this->tooltip   = array(
             $this->subject->getField('iconString'),
-            $this->subject->getField('stackAmount') ?: ($this->subject->getField('procCharges') > 1 ? $this->subject->getField('procCharges') : 0),
+            $this->getIconNo(),
             $this->subject->getField('buff', true, true) ? 1 : 0
         );
         $this->gcdCat    = match((int)$this->subject->getField('startRecoveryCategory'))
@@ -2811,6 +2811,35 @@ class SpellBaseResponse extends TemplateResponse implements ICache
     private function createNumRange(int $bp, int $ds, int $mult = 1) : string
     {
         return Util::createNumRange($bp + 1, ($bp + $ds) * $mult, '-');
+    }
+
+    private function getIconNo() : int
+    {
+        $aurEffects = array(
+            SPELL_EFFECT_APPLY_AURA,                SPELL_EFFECT_PERSISTENT_AREA_AURA,
+            SPELL_EFFECT_APPLY_AREA_AURA_PARTY,     SPELL_EFFECT_APPLY_AREA_AURA_RAID,
+            SPELL_EFFECT_APPLY_AREA_AURA_PET,       SPELL_EFFECT_APPLY_AREA_AURA_FRIEND,
+            SPELL_EFFECT_APPLY_AREA_AURA_ENEMY,     SPELL_EFFECT_APPLY_AREA_AURA_OWNER
+        );
+
+        $stack = $this->subject->getField('stackAmount');
+        $proc  = $this->subject->getField('procCharges');
+        if ($proc < 2)
+            $proc = 0;
+
+        for ($i = 1; $i <= 3; $i++)
+        {
+            if (!in_array($this->subject->getField('effect'.$i.'Id'), $aurEffects))
+                continue;
+
+            // todo - test if aura can actually proc
+            if (!$this->subject->getField('effect'.$i.'AuraId'))
+                continue;
+
+            return $stack ?: $proc;
+        }
+
+        return 0;
     }
 
     private function followBreadcrumbPath()
