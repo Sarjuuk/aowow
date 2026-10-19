@@ -2098,7 +2098,8 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             $_icon = $_perfItem = $_footer = [];
 
             $_footer['value'] = [0, 0, null];
-            $valueFmt = '%s';
+            $valueFmt  = '%s';
+            $valueTime = 0;                                 // factor to milliseconds, when the value is a time
 
             // Icons:
             // .. from item
@@ -2415,6 +2416,9 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
                             if ($effMV == POWER_RAGE || $effMV == POWER_RUNIC_POWER)
                                 array_walk($_footer['value'], fn(&$x) => $x /= 10);
+
+                            if ($effAura == SPELL_AURA_MOD_POWER_REGEN)
+                                $valueFmt = '%s'.Lang::spell('_per5Sec');
                             break;
                         case SPELL_AURA_MOD_PERCENT_STAT:
                         case SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE:
@@ -2537,9 +2541,22 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                             else
                                 $_nameMV = Util::ucFirst(Lang::game('skill')).' #'.$effMV;
                             break;
+                        case SPELL_AURA_MOD_COOLDOWN:                         // flat seconds on the caster's own spells' cooldowns
+                            $valueTime = 1000;
+                            break;
+                        case SPELL_AURA_MOD_DETECT_RANGE:                     // yards, added to the aggro radius
+                        case SPELL_AURA_MOD_DETECTED_RANGE:
+                            $valueFmt = '%s'.Lang::spell('_distUnit');
+                            break;
+                        case SPELL_AURA_MOD_REGEN:                            // health per 5 sec
+                            $valueFmt = '%s'.Lang::spell('_per5Sec');
+                            break;
                         case SPELL_AURA_ADD_PCT_MODIFIER:
                             $valueFmt = '%s%%';
                         case SPELL_AURA_ADD_FLAT_MODIFIER:
+                            // flat durations, casting times, cooldowns and tick intervals are in ms
+                            if ($effAura == SPELL_AURA_ADD_FLAT_MODIFIER)       // the percent case falls through to here
+                                $valueTime = in_array($effMV, SpellList::SPELLMOD_MSEC) ? 1 : 0;
                             if ($_ = Lang::spell('spellModOp', $effMV))
                                 $_nameMV = $this->fmtStaffTip($_, 'MiscValue: '.$effMV);
                             break;
@@ -2673,6 +2690,26 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                         case SPELL_AURA_MOD_SPELL_CRIT_CHANCE:
                         case SPELL_AURA_MOD_MELEE_RANGED_HASTE:
                         case SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK:
+                        case SPELL_AURA_MOD_REGEN_DURING_COMBAT:
+                        case SPELL_AURA_MOD_MANA_REGEN_INTERRUPT:
+                        case SPELL_AURA_MOD_MELEE_HASTE:
+                        case SPELL_AURA_MOD_RANGED_HASTE:
+                        case SPELL_AURA_MOD_RANGED_AMMO_HASTE:
+                        case SPELL_AURA_HASTE_SPELLS:
+                        case SPELL_AURA_HASTE_RANGED:
+                        case SPELL_AURA_MOD_ATTACK_POWER_PCT:
+                        case SPELL_AURA_MOD_RANGED_ATTACK_POWER_PCT:
+                        case SPELL_AURA_MOD_WATER_BREATHING:
+                        case SPELL_AURA_MOD_SHIELD_BLOCKVALUE_PCT:
+                        case SPELL_AURA_PERIODIC_DAMAGE_PERCENT:
+                        case SPELL_AURA_MOD_RANGED_DAMAGE_TAKEN_PCT:
+                        case SPELL_AURA_MOD_MELEE_DAMAGE_TAKEN_PCT:
+                        case SPELL_AURA_MOD_OFFHAND_DAMAGE_PCT:
+                        case SPELL_AURA_MOD_CRIT_PERCENT_VERSUS:
+                        case SPELL_AURA_MOD_BASE_HEALTH_PCT:
+                        case SPELL_AURA_MOD_XP_PCT:
+                        case SPELL_AURA_MOD_XP_QUEST_PCT:
+                        case SPELL_AURA_MOD_HONOR_GAIN_PCT:
                             $valueFmt = '%s%%';
                             break;
                     }
@@ -2693,16 +2730,21 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             {
                 [$min, $max, $staffTT] = $_footer['value'];
 
+                // time values as time, signed
+                $fmtVal = $valueTime
+                    ? fn($v) => ($v < 0 ? '-' : '').DateTime::formatTimeElapsedFloat((int)($v * $valueTime))
+                    : fn($v) => sprintf($valueFmt, $v);
+
                 $buffer = Lang::spell('_value').Lang::main('colon');
                 if ($min && $max && $min != $max)
-                    $buffer .= Lang::spell('pointsSpread', [sprintf($valueFmt, $min), sprintf($valueFmt, $max)]);
+                    $buffer .= Lang::spell('pointsSpread', [$fmtVal($min), $fmtVal($max)]);
                 else
-                    $buffer .= sprintf($valueFmt, $min ?: $max);
+                    $buffer .= $fmtVal($min ?: $max);
 
                 if ($effRPPL != 0)
-                    $buffer .= Lang::spell('costPerLevel', [sprintf($valueFmt, $effRPPL)]);
+                    $buffer .= Lang::spell('costPerLevel', [$fmtVal($effRPPL)]);
                 if ($effPPCP != 0)
-                    $buffer .= Lang::spell('pointsPerCP', [sprintf($valueFmt, $effPPCP)]);
+                    $buffer .= Lang::spell('pointsPerCP', [$fmtVal($effPPCP)]);
                 if ($staffTT)
                     $buffer .= $staffTT;
 

@@ -193,7 +193,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         // lootinfo: [min, max, restock]
         if (([$min, $max, $restock] = $this->subject->getField('lootStack')) && $min)
         {
-            $buff = Lang::spell('spellModOp', 4).Lang::main('colon').Util::createNumRange($min, $max);
+            $buff = Lang::spell('spellModOp', SPELLMOD_CHARGES).Lang::main('colon').Util::createNumRange($min, $max);
 
             // ore veins don't have charges in 335a, but the functionality is still there
             $infobox[] = $restock > 1 ? '[tooltip name=restock]'.Lang::gameObject('restock', [DateTime::formatTimeElapsed($restock * 1000)]).'[/tooltip][span class=tip tooltip=restock]'.$buff.'[/span]' : $buff;

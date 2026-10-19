@@ -1748,6 +1748,7 @@ $lang = array(
         '_castTime'     => "Cast time",
         '_cooldown'     => "Cooldown",
         '_distUnit'     => " yards",
+        '_per5Sec'      => " per 5 sec",
         '_forms'        => "Forms",
         '_aura'         => "Aura",
         '_effect'       => "Effect",

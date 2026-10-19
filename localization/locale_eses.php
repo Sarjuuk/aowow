@@ -1748,6 +1748,7 @@ $lang = array(
         '_castTime'     => "Tiempo de lanzamiento",
         '_cooldown'     => "Reutilización",
         '_distUnit'     => " metros",
+        '_per5Sec'      => " cada 5 s",
         '_forms'        => "Formas",
         '_aura'         => "Aura",
         '_effect'       => "Efecto",

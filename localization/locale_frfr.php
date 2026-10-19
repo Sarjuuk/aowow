@@ -1748,6 +1748,7 @@ $lang = array(
         '_castTime'     => "Incantation",
         '_cooldown'     => "Recharge",
         '_distUnit'     => " mètres",
+        '_per5Sec'      => " par 5 sec.",
         '_forms'        => "Formes",
         '_aura'         => "Aura",
         '_effect'       => "Effet",

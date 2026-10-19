@@ -1748,6 +1748,7 @@ $lang = array(
         '_castTime'     => "施法时间",
         '_cooldown'     => "冷却时间",
         '_distUnit'     => "码",
+        '_per5Sec'      => "/5秒",
         '_forms'        => "形态",
         '_aura'         => "光环",
         '_effect'       => "效果",
