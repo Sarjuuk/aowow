@@ -468,6 +468,8 @@ var fi_filters = {
         { id: 21,  name: 'wearingitem',             type: 'str-small' },
         { id: 22,  name: 'wearingpermenchant',      type: 'str-small' },
         { id: 23,  name: 'completedachievement',    type: 'str-small' },
+        { id: 80,  name: 'ownsmount',               type: 'str-small' },
+        { id: 81,  name: 'ownspet',                 type: 'str-small' },
 
         { id: 24,  name: 'sepprofession' },
         { id: 25,  name: 'alchemy',             type: 'num' },

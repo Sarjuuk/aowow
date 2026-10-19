@@ -276,7 +276,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         // id
         $infobox[] = Lang::quest('id') . $this->typeId;
 
-        // profiler relateed (note that this is part of the cache. I don't think this is important enough to calc for every view)
+        // profiler related (note that this is part of the cache. I don't think this is important enough to calc for every view)
         if (Cfg::get('PROFILER_ENABLE') && $hasCompletion)
         {
             $x = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ::profiler_completion_quests WHERE `questId` = %i', $this->typeId);

@@ -4549,6 +4549,8 @@ var LANG = {
         wearingitem:          "В экипировке предмет #...",
         wearingpermenchant:   "Использует улучшение #...",
         completedachievement: "Получено достижение #...",
+        ownsmount:            "Владеет средством передвижения #...",
+        ownspet:              "Владеет спутником #...",
 
         sepprofession:        "Профессии",
         alchemy:              "Уровень навыка в алхимии",

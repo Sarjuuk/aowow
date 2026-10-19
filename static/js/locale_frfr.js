@@ -4548,6 +4548,8 @@ var LANG = {
         wearingitem:          "Porte l'objet #...",
         wearingpermenchant:   "Porte l'enchantement #...",
         completedachievement: "Haut-fait complété #...",
+        ownsmount:            "Possède la monture #...",
+        ownspet:              "Possède le compagnon #...",
 
         sepprofession:        "Métiers",
         alchemy:              "Niveau d'Alchimie",

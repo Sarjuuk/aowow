@@ -117,7 +117,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
             $this->extendGlobalIds(Type::ICON, $_);
         }
 
-        // profiler relateed (note that this is part of the cache. I don't think this is important enough to calc for every view)
+        // profiler related (note that this is part of the cache. I don't think this is important enough to calc for every view)
         if (Cfg::get('PROFILER_ENABLE') && !($this->subject->getField('flags') & ACHIEVEMENT_FLAG_COUNTER))
         {
             $x = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ::profiler_completion_achievements WHERE `achievementId` = %i', $this->typeId);

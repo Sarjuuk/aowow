@@ -245,11 +245,13 @@ class ProfileListFilter extends Filter
         33 => [parent::CR_CALLBACK, 'cbProfession',       SKILL_MINING,         null         ], // mining [num]
         34 => [parent::CR_CALLBACK, 'cbProfession',       SKILL_SKINNING,       null         ], // skinning [num]
         35 => [parent::CR_CALLBACK, 'cbProfession',       SKILL_TAILORING,      null         ], // tailoring [num]
-        36 => [parent::CR_CALLBACK, 'cbHasGuild',         null,                 null         ]  // hasguild [yn]
+        36 => [parent::CR_CALLBACK, 'cbHasGuild',         null,                 null         ], // hasguild [yn]
+        80 => [parent::CR_CALLBACK, 'cbCollectibleSpell', -5,                   null         ], // ownsmount [str] - aowow custom
+        81 => [parent::CR_CALLBACK, 'cbCollectibleSpell', -6,                   null         ]  // ownspet [str] - aowow custom
     );
 
     protected static array $inputFields = array(
-        'cr'    => [parent::V_RANGE,    [1, 36],                                          true ], // criteria ids
+        'cr'    => [parent::V_LIST,     [[1, 36], 80, 81],                                true ], // criteria ids
         'crs'   => [parent::V_LIST,     [parent::ENUM_NONE, parent::ENUM_ANY, [0, 5000]], true ], // criteria operators
         'crv'   => [parent::V_REGEX,    parent::PATTERN_CRV,                              true ], // criteria values
         'ex'    => [parent::V_EQUAL,    'on',                                             false], // only match exact - must be defined before 'na' as it's test relies on 'ex's value
@@ -267,6 +269,8 @@ class ProfileListFilter extends Filter
 
     public bool  $useLocalList = false;
     public array $extraOpts    = [];
+
+    private array $spellBuffer = [];
 
     /*  heads up!
         a couple of filters are too complex to be run against the characters database
@@ -333,7 +337,7 @@ class ProfileListFilter extends Filter
         return $parts;
     }
 
-    protected function cbProfession(int $cr, int $crs, string $crv, $skillId) : ?array
+    protected function cbProfession(int $cr, int $crs, string $crv, int $skillId) : ?array
     {
         if (!Util::checkNumeric($crv, NUM_CAST_INT) || !$this->int2Op($crs))
             return null;
@@ -358,6 +362,35 @@ class ProfileListFilter extends Filter
                 's' => [', '.$k.'.`value` AS "'.$col.'"']
             );
             return [$k.'.skill', null, '!'];
+        }
+    }
+
+    protected function cbCollectibleSpell(int $cr, int $crs, string $crv, int $catg) : ?array
+    {
+        if (!Util::checkNumeric($crv, NUM_CAST_INT))
+            return null;
+
+        if (!($this->spellBuffer[$catg] ??= DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, 1 FROM ::spell WHERE `typeCat` = %i', $catg)))
+            return null;
+
+        if (!isset($this->spellBuffer[$catg][$crv]))
+            return [0];
+
+        $k = 'sp_'.Util::createHash(12);
+
+        if ($this->useLocalList)
+        {
+            $this->extraOpts[$k] = array(
+                'j' => [sprintf('::profiler_completion_spells %1$s ON `%1$s`.`id` = p.`id` AND `%1$s`.`spellId` = %2$d', $k, $crv), true]
+            );
+            return [$k.'.spellId', null, '!'];
+        }
+        else
+        {
+            $this->extraOpts[$k] = array(
+                'j' => [sprintf('character_spell %1$s ON `%1$s`.`guid` = c.`guid` AND `%1$s`.`spell` = %2$d AND `%1$s`.`active` = 1 AND `%1$s`.`disabled` = 0', $k, $crv), true]
+            );
+            return [$k.'.spell', null, '!'];
         }
     }
 

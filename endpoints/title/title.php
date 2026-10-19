@@ -87,7 +87,7 @@ class TitleBaseResponse extends TemplateResponse implements ICache
         // id
         $infobox[] = Lang::title('id') . $this->typeId;
 
-        // profiler relateed (note that this is part of the cache. I don't think this is important enough to calc for every view)
+        // profiler related (note that this is part of the cache. I don't think this is important enough to calc for every view)
         if (Cfg::get('PROFILER_ENABLE'))
         {
             $x = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ::profiler_completion_titles WHERE `titleId` = %i', $this->typeId);

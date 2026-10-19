@@ -4589,6 +4589,8 @@ var LANG = {
         wearingitem:          "穿戴的物品#...",
         wearingpermenchant:   "已附魔物品#...",
         completedachievement: "完成的成就#...",
+        ownsmount:            "拥有坐骑#...",
+        ownspet:              "拥有伙伴#...",
 
         sepprofession:        "专业",
         alchemy:              "炼金技能",
