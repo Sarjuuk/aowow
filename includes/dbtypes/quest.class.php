@@ -316,6 +316,8 @@ class QuestList extends DBTypeList
 
         if ($_ = $this->parseText('objectives', false))
             $text = '<br />'.$_;
+        else if ($_ = $this->parseText('requestItems', false))
+            $text = '<br />'.$_;
         else if ($_ = $this->parseText('offerReward', false))
             $text = '<br />'.$_;
 
