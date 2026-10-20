@@ -2099,7 +2099,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
             $_footer['value'] = [0, 0, null];
             $valueFmt  = '%s';
-            $valueTime = 0;                                 // factor to milliseconds, when the value is a time
+            $valueTime = 0;                                 // units per second, when the value is a time
 
             // Icons:
             // .. from item
@@ -2542,7 +2542,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                                 $_nameMV = Util::ucFirst(Lang::game('skill')).' #'.$effMV;
                             break;
                         case SPELL_AURA_MOD_COOLDOWN:                         // flat seconds on the caster's own spells' cooldowns
-                            $valueTime = 1000;
+                            $valueTime = 1;
                             break;
                         case SPELL_AURA_MOD_DETECT_RANGE:                     // yards, added to the aggro radius
                         case SPELL_AURA_MOD_DETECTED_RANGE:
@@ -2556,7 +2556,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                         case SPELL_AURA_ADD_FLAT_MODIFIER:
                             // flat durations, casting times, cooldowns and tick intervals are in ms
                             if ($effAura == SPELL_AURA_ADD_FLAT_MODIFIER)       // the percent case falls through to here
-                                $valueTime = in_array($effMV, SpellList::SPELLMOD_MSEC) ? 1 : 0;
+                                $valueTime = in_array($effMV, SpellList::SPELLMOD_MSEC) ? 1000 : 0;
                             if ($_ = Lang::spell('spellModOp', $effMV))
                                 $_nameMV = $this->fmtStaffTip($_, 'MiscValue: '.$effMV);
                             break;
@@ -2732,7 +2732,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
                 // time values as time, signed
                 $fmtVal = $valueTime
-                    ? fn($v) => ($v < 0 ? '-' : '').DateTime::formatTimeElapsedFloat((int)($v * $valueTime))
+                    ? fn($v) => round($v / $valueTime, 3).' '.Lang::timeUnits('ab', 6)
                     : fn($v) => sprintf($valueFmt, $v);
 
                 $buffer = Lang::spell('_value').Lang::main('colon');
