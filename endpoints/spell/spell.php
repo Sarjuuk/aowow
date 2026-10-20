@@ -2417,8 +2417,8 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                             if ($effMV == POWER_RAGE || $effMV == POWER_RUNIC_POWER)
                                 array_walk($_footer['value'], fn(&$x) => $x /= 10);
 
-                            if ($effAura == SPELL_AURA_MOD_POWER_REGEN)
-                                $valueFmt = '%s'.Lang::spell('_per5Sec');
+                            if ($effAura == SPELL_AURA_MOD_POWER_REGEN && ($_ = Lang::spell('_regenPer5Sec', $effMV)))
+                                $valueFmt = $_;
                             break;
                         case SPELL_AURA_MOD_PERCENT_STAT:
                         case SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE:
@@ -2549,7 +2549,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                             $valueFmt = '%s'.Lang::spell('_distUnit');
                             break;
                         case SPELL_AURA_MOD_REGEN:                            // health per 5 sec
-                            $valueFmt = '%s'.Lang::spell('_per5Sec');
+                            $valueFmt = Lang::spell('_regenPer5Sec', POWER_HEALTH);
                             break;
                         case SPELL_AURA_ADD_PCT_MODIFIER:
                             $valueFmt = '%s%%';
