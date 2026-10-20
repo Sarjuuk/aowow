@@ -737,8 +737,8 @@ class SpellList extends DBTypeList
 
         if ($op !== null && $oparg !== null)
         {
-            eval("\$min  = floor($min $op $oparg);");
-            eval("\$max  = ceil($max $op $oparg);");
+            eval("\$min  = $min  $op $oparg;");
+            eval("\$max  = $max  $op $oparg;");
             eval("\$rppl = $rppl $op $oparg;");
         }
 
@@ -755,13 +755,13 @@ class SpellList extends DBTypeList
             $maxBase += (int)(($level - $baseLvl) * $rppl);
             $maxBase *= $nTicks;
 
-            $modMin = '<!--ppl'.$baseLvl.':'.($maxLvl ?: $level).':'.abs($min).':'.floor(abs($rppl) * 100 * $nTicks).'-->';
-            $modMax = '<!--ppl'.$baseLvl.':'.($maxLvl ?: $level).':'.abs($max).':'.floor(abs($rppl) * 100 * $nTicks).'-->';
+            $modMin = '<!--ppl'.$baseLvl.':'.($maxLvl ?: $level).':'.abs(floor($min)).':'.floor(abs($rppl) * 100 * $nTicks).'-->';
+            $modMax = '<!--ppl'.$baseLvl.':'.($maxLvl ?: $level).':'.abs(ceil($max)).':'.floor(abs($rppl) * 100 * $nTicks).'-->';
         }
         else if ($this->getField('attributes0') & SPELL_ATTR0_LEVEL_DAMAGE_CALCULATION && in_array($effIdx, $LDSEffs) && $spellLvl)
         {
-            $modMin = '<!--pts'.$spellLvl.':'.abs($min).'-->';
-            $modMax = '<!--pts'.$spellLvl.':'.abs($max).'-->';
+            $modMin = '<!--pts'.$spellLvl.':'.abs(floor($min)).'-->';
+            $modMax = '<!--pts'.$spellLvl.':'.abs(ceil($max)).'-->';
         }
 
         return [$min + $maxBase, $max + $maxBase, $modMin, $modMax];
@@ -1267,7 +1267,9 @@ class SpellList extends DBTypeList
         if (!$var)
             return [null, null, null, null, null];
 
-        $effIdx ??= 1;                                      // if EffectIdx is omitted, assume EffectIdx: 1
+        $effIdx     ??= 1;                                  // if EffectIdx is omitted, assume EffectIdx: 1
+        $outputFmtMin =
+        $outputFmtMax = '%d';
 
         // cache at least some lookups.. should be moved to single spellList :/
         if ($lookup && $lookup != $this->id && !isset($this->refSpells[$lookup]))
@@ -1292,6 +1294,14 @@ class SpellList extends DBTypeList
                 $fmtStringMin = '$l'.$switch[0].':'.$switch[1].';';
                 break;
             // simple cases
+            case 'e':                                       // EffectValueMultiplier
+            case 'E':
+                $base ??= $srcSpell->getField('effect'.$effIdx.'ValueMultiplier');
+                $outputFmtMin = '%.1f';
+            case 'f':                                       // EffectDamageMultiplier
+            case 'F':
+                $base ??= $srcSpell->getField('effect'.$effIdx.'DamageMultiplier');
+                $outputFmtMin = '%.1f';
             case 'a':                                       // EffectRadiusMin
             case 'A':                                       // EffectRadiusMax
                 $base ??= $srcSpell->getField('effect'.$effIdx.'RadiusMax');
@@ -1301,12 +1311,6 @@ class SpellList extends DBTypeList
             case 'c':                                       // powerCost
             case 'C':
                 $base ??= $srcSpell->getField('powerCost');
-            case 'e':                                       // EffectValueMultiplier
-            case 'E':
-                $base ??= $srcSpell->getField('effect'.$effIdx.'ValueMultiplier');
-            case 'f':                                       // EffectDamageMultiplier
-            case 'F':
-                $base ??= $srcSpell->getField('effect'.$effIdx.'DamageMultiplier');
             case 'h':                                       // ProcChance
             case 'H':
                 $base ??= $srcSpell->getField('procChance');
@@ -1327,7 +1331,9 @@ class SpellList extends DBTypeList
                 $base ??= $srcSpell->getField('rangeMaxHostile');
             case 't':                                       // Periode
             case 'T':
+                // note: periode = (procFlags & 0x1) ? 5000 : getField('effectXPeriode');
                 $base ??= $srcSpell->getField('effect'.$effIdx.'Periode') / 1000;
+                // if ($base fraction < 0.01f) ? %d : %.2f
             case 'u':                                       // StackCount
             case 'U':
                 $base ??= $srcSpell->getField('stackAmount');
@@ -1391,18 +1397,8 @@ class SpellList extends DBTypeList
                 break;
             case 'o':                                       // TotalAmount for periodic auras (with variance)
             case 'O':
-                $periode  = $srcSpell->getField('effect'.$effIdx.'Periode');
+                $periode  = $srcSpell->getField('effect'.$effIdx.'Periode') ?: 5000;
                 $duration = $srcSpell->getField('duration');
-
-                if (!$periode)
-                {
-                    // Mod Power Regeneration & Mod Health Regeneration have an implicit periode of 5sec
-                    $aura = $srcSpell->getField('effect'.$effIdx.'AuraId');
-                    if ($aura == SPELL_AURA_MOD_REGEN || $aura == SPELL_AURA_MOD_POWER_REGEN)
-                        $periode = 5000;
-                    else
-                        $periode = 3000;
-                }
 
                 if (!in_array($op, $signs) || !is_numeric($oparg))
                     $op = $oparg = null;
@@ -1449,16 +1445,18 @@ class SpellList extends DBTypeList
                     $fmtStringMax = $modStrMax.'%s';
                 }
 
+                if (ctype_upper($var))
+                    $outputFmtMax = $outputFmtMin = '%.1f';
+
                 $minPoints = $min;
                 $maxPoints = $max;
                 break;
         }
 
-        // handle excessively precise floats
-        if (is_float($minPoints))
-            $minPoints = round($minPoints, 2);
-        if (is_float($maxPoints))
-            $maxPoints = round($maxPoints, 2);
+        if ($minPoints !== null)
+            sprintf($outputFmtMin, $minPoints);
+        if ($maxPoints !== null)
+            sprintf($outputFmtMax, $maxPoints);
 
         return [$minPoints, $maxPoints, $fmtStringMin, $fmtStringMax, $statId];
     }
