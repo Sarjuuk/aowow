@@ -142,7 +142,7 @@ class SoundBaseResponse extends TemplateResponse implements ICache
         $spells = new SpellList($cnd);
         if (!$spells->error)
         {
-            $this->extendGlobalData($spells->getJSGlobals(GLOBALINFO_SELF));
+            $this->extendGlobalData($spells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
             $this->lvTabs->addListviewTab(new Listview(['data' => $spells->getListviewData()], SpellList::$brickFile));
         }
 
