@@ -1590,6 +1590,39 @@ define('SPELL_AURA_UNDERWATER_WALKING',                        315);
 define('SPELL_AURA_PERIODIC_HASTE',                            316);
 
 
+// SpellModOp - the MiscValue of SPELL_AURA_ADD_FLAT_MODIFIER / SPELL_AURA_ADD_PCT_MODIFIER (SpellDefines.h)
+define('SPELLMOD_DAMAGE',                   0);
+define('SPELLMOD_DURATION',                 1);
+define('SPELLMOD_THREAT',                   2);
+define('SPELLMOD_EFFECT1',                  3);
+define('SPELLMOD_CHARGES',                  4);
+define('SPELLMOD_RANGE',                    5);
+define('SPELLMOD_RADIUS',                   6);
+define('SPELLMOD_CRITICAL_CHANCE',          7);
+define('SPELLMOD_ALL_EFFECTS',              8);
+define('SPELLMOD_NOT_LOSE_CASTING_TIME',    9);
+define('SPELLMOD_CASTING_TIME',            10);
+define('SPELLMOD_COOLDOWN',                11);
+define('SPELLMOD_EFFECT2',                 12);
+define('SPELLMOD_IGNORE_ARMOR',            13);
+define('SPELLMOD_COST',                    14);
+define('SPELLMOD_CRIT_DAMAGE_BONUS',       15);
+define('SPELLMOD_RESIST_MISS_CHANCE',      16);
+define('SPELLMOD_JUMP_TARGETS',            17);
+define('SPELLMOD_CHANCE_OF_SUCCESS',       18);
+define('SPELLMOD_ACTIVATION_TIME',         19);
+define('SPELLMOD_DAMAGE_MULTIPLIER',       20);
+define('SPELLMOD_GLOBAL_COOLDOWN',         21);
+define('SPELLMOD_DOT',                     22);
+define('SPELLMOD_EFFECT3',                 23);
+define('SPELLMOD_BONUS_MULTIPLIER',        24);
+// 25 is unused
+define('SPELLMOD_PROC_PER_MINUTE',         26);
+define('SPELLMOD_VALUE_MULTIPLIER',        27);
+define('SPELLMOD_RESIST_DISPEL_CHANCE',    28);
+define('SPELLMOD_CRIT_DAMAGE_BONUS_2',     29);
+define('SPELLMOD_SPELL_COST_REFUND_ON_FAIL', 30);
+
 // item trigger and recipe handling
 define('SPELL_TRIGGER_USE',         0);
 define('SPELL_TRIGGER_EQUIP',       1);

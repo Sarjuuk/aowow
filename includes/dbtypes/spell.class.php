@@ -35,6 +35,10 @@ class SpellList extends DBTypeList
         SPELL_AURA_MOD_DAMAGE_FROM_CASTER, SPELL_AURA_ADD_TARGET_TRIGGER,               SPELL_AURA_IGNORE_COMBAT_RESULT,     /* SPELL_AURA_DUMMY ? */
     );
 
+    public const array SPELLMOD_MSEC            = array( // a flat modifier of these is a number of milliseconds
+        SPELLMOD_DURATION,                  SPELLMOD_CASTING_TIME,                          SPELLMOD_COOLDOWN,                              SPELLMOD_ACTIVATION_TIME,
+        SPELLMOD_GLOBAL_COOLDOWN
+    );
     public const array EFFECTS_SCALING_HEAL     = array( // as per Unit::SpellHealingBonusDone() calls in TC
         SPELL_EFFECT_HEAL,                  SPELL_EFFECT_HEAL_PCT,                          SPELL_EFFECT_HEAL_MECHANICAL,                   SPELL_EFFECT_HEALTH_LEECH
     );
