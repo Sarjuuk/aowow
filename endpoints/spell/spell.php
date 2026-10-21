@@ -2098,8 +2098,9 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             $_icon = $_perfItem = $_footer = [];
 
             $_footer['value'] = [0, 0, null];
-            $valueFmt  = '%s';
-            $valueTime = 0;                                 // units per second, when the value is a time
+            $valueFmt   = '%s';
+            $valueTime  = 0;                                // units per second, when the value is a time
+            $valueLabel = Lang::spell('_value');
 
             // Icons:
             // .. from item
@@ -2724,6 +2725,17 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 case SPELL_EFFECT_HEAL_PCT:
                     $valueFmt = '%s%%';
                     break;
+                // MiscValue and value are the horizontal and vertical speed x10 (Spell::EffectKnockBack, Spell::EffectLeapBack)
+                case SPELL_EFFECT_KNOCK_BACK:
+                case SPELL_EFFECT_KNOCK_BACK_DEST:
+                case SPELL_EFFECT_LEAP_BACK:
+                    $valueFmt   = '%s'.Lang::spell('_speedUnit');
+                    $valueLabel = Lang::spell('_speedZ');
+                    array_walk($_footer['value'], fn(&$x) => $x /= 10);
+                    if ($effMV)
+                        $_footer = ['speedXY' => Lang::spell('_speedXY').Lang::main('colon').sprintf($valueFmt, $effMV / 10)] + $_footer;
+                    $effMV = 0;                             // shown as horizontal speed, not in the header
+                    break;
             }
 
             if ($_footer['value'][1])
@@ -2735,7 +2747,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                     ? fn($v) => round($v / $valueTime, 3).' '.Lang::timeUnits('ab', 6)
                     : fn($v) => sprintf($valueFmt, $v);
 
-                $buffer = Lang::spell('_value').Lang::main('colon');
+                $buffer = $valueLabel.Lang::main('colon');
                 if ($min && $max && $min != $max)
                     $buffer .= Lang::spell('pointsSpread', [$fmtVal($min), $fmtVal($max)]);
                 else
