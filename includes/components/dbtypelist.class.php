@@ -237,7 +237,7 @@ abstract class DBTypeList
             // basic formulas ex: [((minGold + maxGold) / 2), 0, '>']
             if (is_string($expOrField) && preg_match('/^\([\s\+\-\*\/\w\(\)\.]+\)$/i', strtr($expOrField, ['`' => '', '´' => '', '--' => ''])))
             {
-                $field   = preg_replace_callback('/[\w\]*\.?[\w]+/i', $this->setColPrefix(...), $expOrField);
+                $field   = preg_replace_callback('/[\w\]*\.?[\w]+/i', fn($m) => $this->setColPrefix($m[0]), $expOrField);
                 $literal = true;
             }
             else
@@ -271,10 +271,10 @@ abstract class DBTypeList
         return [$literal ? '%SQL' : '%n', $field, $expr, $value];
     }
 
-    private function setColPrefix(mixed $colName) : ?string
+    private function setColPrefix(mixed $colName) : null|array|string
     {
         if (is_array($colName))
-            $colName = $colName[0];
+            return array_filter(array_map($this->setColPrefix(...), $colName)) ?: null;
 
         // numeric allows for formulas e.g. (1 < 3)
         if (Util::checkNumeric($colName))
