@@ -399,9 +399,9 @@ class Lang
         $tmp  = array_intersect_key($strs, Util::mask2bits($mask));
 
         if (!$tmp && $class == ITEM_CLASS_ARMOR)
-            return self::spell('cat', -11, 8);
+            return self::spell('cat', -11, 1, 8);
         else if (!$tmp && $class == ITEM_CLASS_WEAPON)
-            return self::spell('cat', -11, 6);
+            return self::spell('cat', -11, 1, 6);
         else
             return implode(self::main('comma'), $tmp);
     }
