@@ -652,7 +652,7 @@ abstract class Util
         if ($exist)
         {
             if (fileperms($dir) != self::DIR_ACCESS && !@chmod($dir, self::DIR_ACCESS))
-                trigger_error(CLI::bold($dir) . ' may be inaccessible to the web service.', E_USER_WARNING);
+                trigger_error($dir . ' may be inaccessible to the web service.', E_USER_WARNING);
 
             return is_writable($dir);
         }

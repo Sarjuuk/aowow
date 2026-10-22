@@ -259,9 +259,12 @@ trait TrCache
 
         $this->decay ??= Cfg::get('CACHE_DECAY');
 
-        $cacheDir = Cfg::get('CACHE_DIR');
-        if ($cacheDir && Util::writeDir($cacheDir))
-            $this->cacheDir = mb_substr($cacheDir, -1) != '/' ? $cacheDir.'/' : $cacheDir;
+        if ((Cfg::get('CACHE_MODE') & CACHE_MODE_FILECACHE))
+        {
+            $cacheDir = Cfg::get('CACHE_DIR');
+            if ($cacheDir && Util::writeDir($cacheDir))
+                $this->cacheDir = mb_substr($cacheDir, -1) != '/' ? $cacheDir.'/' : $cacheDir;
+        }
 
         $this->cacheInited = true;
     }
