@@ -2037,7 +2037,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 $invType |=  (1 << INVTYPE_RANGED);
             }
 
-            $tip .= '<br />'.Lang::item('slot').Lang::main('colon').Util::asHex($invType);
+            $tip .= '<br />'.Lang::item('slot').Util::asHex($invType);
             if ($_ = array_filter(array_intersect_key(Lang::item('inventoryType'), Util::mask2bits($invType))))
                 $text .= ' '.Lang::spell('_inSlot').implode(', ', $_);
         }
