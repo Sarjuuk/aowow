@@ -1786,6 +1786,7 @@ $lang = array(
         'special'       => "特殊",
 
         'currentArea'   => '&lt;当前区域&gt;',
+        'durabilityItems' => [-2 => '&lt;所有物品，已装备及背包中&gt;', -1 => '&lt;所有已装备物品&gt;'], // SPELL_EFFECT_DURABILITY_DAMAGE(_PCT) MiscValue < 0
         'discovered'    => "通过发现学习",
         'ppm'           => "%.1f每分钟触发几率",
         'procChance'    => "触发几率：%.4g%%",

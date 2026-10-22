@@ -1786,6 +1786,7 @@ $lang = array(
         'special'       => "Особый",
 
         'currentArea'   => '&lt;current area&gt;',
+        'durabilityItems' => [-2 => '&lt;все предметы, надетые и в сумках&gt;', -1 => '&lt;все надетые предметы&gt;'], // SPELL_EFFECT_DURABILITY_DAMAGE(_PCT) MiscValue < 0
         'discovered'    => "Изучается путём освоения местности",
         'ppm'           => "(Срабатывает %.1f раз в минуту)",
         'procChance'    => "Шанс срабатывания: %.4g%%",
