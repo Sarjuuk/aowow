@@ -1785,6 +1785,7 @@ $lang = array(
         'special'       => "Besonders",
 
         'currentArea'   => '&lt;Momentanes Gebiet&gt;',
+        'durabilityItems' => [-2 => '&lt;Alle Gegenstände, angelegt und in Taschen&gt;', -1 => '&lt;Alle angelegten Gegenstände&gt;'],
         'discovered'    => "Durch Geistesblitz erlernt",
         'ppm'           => "(%.1f Auslösungen pro Minute)",
         'procChance'    => "Procchance: %.4g%%",

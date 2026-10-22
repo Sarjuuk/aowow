@@ -1786,6 +1786,7 @@ $lang = array(
         'special'       => "Special",
 
         'currentArea'   => '&lt;current area&gt;',
+        'durabilityItems' => [-2 => '&lt;all items, equipped and in bags&gt;', -1 => '&lt;all equipped items&gt;'],
         'discovered'    => "Learned via discovery",
         'ppm'           => "(%.1f procs per minute)",
         'procChance'    => "Proc chance: %.4g%%",

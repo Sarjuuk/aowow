@@ -563,7 +563,11 @@ define('SLOT_MAIN_HAND',                    15);
 define('SLOT_OFF_HAND',                     16);
 define('SLOT_RANGED',                       17);
 define('SLOT_TABARD',                       18);
-define('SLOT_EMPTY',                        19);
+
+define('SLOT_BAG1',                         19);
+define('SLOT_BAG2',                         20);
+define('SLOT_BAG3',                         21);
+define('SLOT_BAG4',                         22);
 
 // Language
 define('LANG_UNIVERSAL',                    0);

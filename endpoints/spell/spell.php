@@ -2373,6 +2373,26 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                         $_nameMV = $this->fmtStaffTip('<span class="breadcrumb-arrow">'.$start.'</span>'.$end, 'MiscValue: '.$effMV);
                     }
                     break;
+                case SPELL_EFFECT_DURABILITY_DAMAGE_PCT:
+                    $valueFmt = '%s%%';
+                    // DO NOT BREAK !
+                case SPELL_EFFECT_DURABILITY_DAMAGE:
+                    $slotMap = array(
+                        SLOT_HEAD      => [INVTYPE_HEAD,           ''  ], SLOT_NECK     => [INVTYPE_NECK,          ''  ], SLOT_SHOULDERS => [INVTYPE_SHOULDERS, ''  ],
+                        SLOT_SHIRT     => [INVTYPE_BODY,           ''  ], SLOT_CHEST    => [INVTYPE_CHEST,         ''  ], SLOT_WAIST     => [INVTYPE_WAIST,     ''  ],
+                        SLOT_LEGS      => [INVTYPE_LEGS,           ''  ], SLOT_FEET     => [INVTYPE_FEET,          ''  ], SLOT_WRISTS    => [INVTYPE_WRISTS,    ''  ],
+                        SLOT_HANDS     => [INVTYPE_HANDS,          ''  ], SLOT_FINGER1  => [INVTYPE_FINGER,        ' 1'], SLOT_FINGER2   => [INVTYPE_FINGER,    ' 2'],
+                        SLOT_TRINKET1  => [INVTYPE_TRINKET,        ' 1'], SLOT_TRINKET2 => [INVTYPE_TRINKET,       ' 2'], SLOT_BACK      => [INVTYPE_CLOAK,     ''  ],
+                        SLOT_MAIN_HAND => [INVTYPE_WEAPONMAINHAND, ''  ], SLOT_OFF_HAND => [INVTYPE_WEAPONOFFHAND, ''  ], SLOT_RANGED    => [INVTYPE_RANGED,    ''  ],
+                        SLOT_TABARD    => [INVTYPE_TABARD,         ''  ], SLOT_BAG1     => [INVTYPE_BAG,           ' 1'], SLOT_BAG2      => [INVTYPE_BAG,       ' 2'],
+                        SLOT_BAG3      => [INVTYPE_BAG,            ' 3'], SLOT_BAG4     => [INVTYPE_BAG,           ' 4']
+                    );
+
+                    if ($effMV < 0)
+                        $_nameMV = $this->fmtStaffTip(Lang::spell('durabilityItems', $effMV < -1 ? -2 : -1), 'MiscValue: '.$effMV);
+                    else if ([$invType, $slotSuffix] = ($slotMap[$effMV] ?? null))
+                        $_nameMV = $this->fmtStaffTip(Lang::item('inventoryType', $invType).$slotSuffix, 'MiscValue: '.$effMV);
+                    break;
                 case SPELL_EFFECT_TITAN_GRIP:
                     $effMV = 0;                             // effMV is trigger spell and was handled earlier
                     break;
@@ -2719,7 +2739,6 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 case SPELL_EFFECT_RESURRECT:
                 case SPELL_EFFECT_SPIRIT_HEAL:
                 case SPELL_EFFECT_WEAPON_PERCENT_DAMAGE:
-                case SPELL_EFFECT_DURABILITY_DAMAGE_PCT:
                 case SPELL_EFFECT_MODIFY_THREAT_PERCENT:
                 case SPELL_EFFECT_REDIRECT_THREAT:
                 case SPELL_EFFECT_HEAL_PCT:
