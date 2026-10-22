@@ -2379,16 +2379,26 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                     $valueFmt = '%s%%';
                     // DO NOT BREAK !
                 case SPELL_EFFECT_DURABILITY_DAMAGE:
-                    $_ = match (true)
-                    {
-                        $effMV < -1  => Lang::spell('durabilityItems', -2),
-                        $effMV < 0   => Lang::spell('durabilityItems', -1),
-                        $effMV < 10  => Lang::item('inventoryType', $effMV + 1),             // head .. hands
-                        $effMV < 12  => Lang::item('inventoryType', INVTYPE_FINGER).' '.($effMV - 9),
-                        $effMV < 14  => Lang::item('inventoryType', INVTYPE_TRINKET).' '.($effMV - 11),
-                        $effMV < 23  => Lang::item('inventoryType', [INVTYPE_CLOAK, INVTYPE_WEAPONMAINHAND, INVTYPE_WEAPONOFFHAND, INVTYPE_RANGED, INVTYPE_TABARD, INVTYPE_BAG, INVTYPE_BAG, INVTYPE_BAG, INVTYPE_BAG][$effMV - 14]),
-                        default      => ''
-                    };
+                    // CharacterSlot => [InventoryType, ordinal of a paired slot]
+                    $slots = array(
+                        SLOT_HEAD      => [INVTYPE_HEAD],            SLOT_NECK      => [INVTYPE_NECK],           SLOT_SHOULDERS => [INVTYPE_SHOULDERS],
+                        SLOT_SHIRT     => [INVTYPE_BODY],            SLOT_CHEST     => [INVTYPE_CHEST],          SLOT_WAIST     => [INVTYPE_WAIST],
+                        SLOT_LEGS      => [INVTYPE_LEGS],            SLOT_FEET      => [INVTYPE_FEET],           SLOT_WRISTS    => [INVTYPE_WRISTS],
+                        SLOT_HANDS     => [INVTYPE_HANDS],           SLOT_FINGER1   => [INVTYPE_FINGER, 1],      SLOT_FINGER2   => [INVTYPE_FINGER, 2],
+                        SLOT_TRINKET1  => [INVTYPE_TRINKET, 1],      SLOT_TRINKET2  => [INVTYPE_TRINKET, 2],     SLOT_BACK      => [INVTYPE_CLOAK],
+                        SLOT_MAIN_HAND => [INVTYPE_WEAPONMAINHAND],  SLOT_OFF_HAND  => [INVTYPE_WEAPONOFFHAND],  SLOT_RANGED    => [INVTYPE_RANGED],
+                        SLOT_TABARD    => [INVTYPE_TABARD],
+                        19             => [INVTYPE_BAG, 1],          20             => [INVTYPE_BAG, 2],         21             => [INVTYPE_BAG, 3],    // bag slots
+                        22             => [INVTYPE_BAG, 4]
+                    );
+
+                    if ($effMV < 0)
+                        $_ = Lang::spell('durabilityItems', $effMV < -1 ? -2 : -1);
+                    else if ($slot = $slots[$effMV] ?? null)
+                        $_ = Lang::item('inventoryType', $slot[0]).(isset($slot[1]) ? ' '.$slot[1] : '');
+                    else
+                        $_ = '';
+
                     if ($_)
                         $_nameMV = $this->fmtStaffTip($_, 'MiscValue: '.$effMV);
                     break;
