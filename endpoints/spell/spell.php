@@ -2760,14 +2760,14 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 if ($staffTT)
                     $buffer .= $staffTT;
 
-                if (in_array($effId, SpellList::EFFECTS_SCALING_DAMAGE))
+                if (in_array($effId, SpellList::EFFECTS_SCALING_DAMAGE) || in_array($effId, SpellList::EFFECTS_SCALING_HEAL))
                 {
                     if ($scaling[2])
                         $buffer .= Lang::spell('apMod', [$scaling[2]]);
                     if ($scaling[0])
                         $buffer .= Lang::spell('spMod', [$scaling[0]]);
                 }
-                if (in_array($effAura, SpellList::AURAS_SCALING_DAMAGE))
+                if (in_array($effAura, SpellList::AURAS_SCALING_DAMAGE) || in_array($effAura, SpellList::AURAS_SCALING_HEAL))
                 {
                     if ($scaling[3])
                         $buffer .= Lang::spell('apMod', [$scaling[3]]);
