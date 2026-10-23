@@ -3124,7 +3124,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         $keywords = [$this->h1, Util::ucFirst(Lang::game('spell'))];
 
         $c = array_slice($this->breadcrumb, 2);
-        if (isset($c[2]))
+        if (isset($c[2]) && $c[0] != -13)
         {
             if (!in_array($c[0], [7, -2]))
                 $keywords[] = Lang::spell('cat', $c[0], 1, $c[1], 1, $c[2]);
