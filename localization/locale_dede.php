@@ -38,7 +38,7 @@ $lang = array(
             'quest'       => 'Ein%s%s Quest%s.',
             'guild'       => '%s von %s ist eine %s-Gilde mit %d Mitgliedern.',
             'arena-team'  => '%s von %s ist ein %dvs%3$d Arena-Team.',
-            'profile'     => 'World of Warcraft Profil von %s: Level %d %s %s von %s auf %s %s.'
+            'profile'     => 'World of Warcraft Profil von %s: Level %d %s %s auf %s %s.'
         ),
         'inCategory'    => 'In der Kategorie %s.',
         'eventEndsFmt'  => "'Endet am' d. MMMM 'um' HH:mm.", // intl
