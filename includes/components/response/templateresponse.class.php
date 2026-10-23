@@ -598,16 +598,16 @@ class TemplateResponse extends BaseResponse
             if ($sticky = array_find($screenshots, fn($x) => $x['sticky'] ?? 0))
             {
                 // amend keywords tag
-                if ($idx = array_find_key($this->metaTags, fn($x) => $x['name'] == 'keywords'))
+                if (($idx = array_find_key($this->metaTags, fn($x) => ($x['name'] ?? '') == 'keywords')) !== null)
                     $this->metaTags[$idx]['content'][] = Lang::main('screenshots');
 
                 // replace og:image tag
-                if ($idx = array_find_key($this->metaTags, fn($x) => $x['property'] == 'og:image'))
+                if (($idx = array_find_key($this->metaTags, fn($x) => ($x['property'] ?? '') == 'og:image')) !== null)
                     $this->metaTags[$idx]['content'] = Cfg::get('STATIC_URL') . '/uploads/screenshots/normal/'.$sticky['id'].'.jpg';
 
                 if ($this->ldIntangible)
                 {
-                    $this->ldIntangible['keywords'][] = Lang::main('screenshots');
+                    $this->ldIntangible['keywords'] .= ', '.Lang::main('screenshots');
 
                     $this->ldIntangible['image']['url']    = Cfg::get('STATIC_URL') . '/uploads/screenshots/normal/'.$sticky['id'].'.jpg';
                     $this->ldIntangible['image']['width']  = $sticky['width'];
@@ -623,11 +623,11 @@ class TemplateResponse extends BaseResponse
 
             if ($sticky = array_find($videos, fn($x) => $x['sticky'] ?? 0))
             {
-                if ($idx = array_find_key($this->metaTags, fn($x) => $x['name'] == 'keywords'))
+                if (($idx = array_find_key($this->metaTags, fn($x) => ($x['name'] ?? '') == 'keywords')) !== null)
                     $this->metaTags[$idx]['content'][] = Lang::main('videos');
 
                 if ($this->ldIntangible)
-                    $this->ldIntangible['keywords'][] = Lang::main('videos');
+                    $this->ldIntangible['keywords'] .= ', '.Lang::main('videos');
             }
         }
 
