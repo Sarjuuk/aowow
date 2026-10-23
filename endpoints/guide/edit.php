@@ -46,9 +46,9 @@ class GuideEditResponse extends TemplateResponse
         'changelog'   => ['filter' => FILTER_CALLBACK,     'options' => [self::class, 'checkTextBlob']                         ],
         'body'        => ['filter' => FILTER_CALLBACK,     'options' => [self::class, 'checkTextBlob']                         ],
         'locale'      => ['filter' => FILTER_CALLBACK,     'options' => [self::class, 'checkLocale']                           ],
-        'category'    => ['filter' => FILTER_VALIDATE_INT, 'options' => ['min_value' =>  1, 'max_value' => 9]                  ],
-        'specId'      => ['filter' => FILTER_VALIDATE_INT, 'options' => ['min_value' => -1, 'max_value' => 2,  'default' => -1]],
-        'classId'     => ['filter' => FILTER_VALIDATE_INT, 'options' => ['min_value' =>  1, 'max_value' => 11, 'default' =>  0]]
+        'category'    => ['filter' => FILTER_VALIDATE_INT, 'options' => ['min_range' =>  1, 'max_range' => 9]                  ],
+        'specId'      => ['filter' => FILTER_VALIDATE_INT, 'options' => ['min_range' => -1, 'max_range' => 2,  'default' => -1]],
+        'classId'     => ['filter' => FILTER_VALIDATE_INT, 'options' => ['min_range' =>  1, 'max_range' => 11, 'default' =>  0]]
     );
     protected  array  $expectedGET = array(
         'id'  => ['filter' => FILTER_VALIDATE_INT],

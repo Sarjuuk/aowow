@@ -14,7 +14,7 @@ class SitemapBaseResponse extends TextResponse implements ICache
     protected int    $cacheType   = CACHE_TYPE_XML;
 
     protected array $expectedGET = array(
-        'page' => ['filter' => FILTER_VALIDATE_INT, 'options' => ['min_value' => 1]]
+        'page' => ['filter' => FILTER_VALIDATE_INT, 'options' => ['min_range' => 1]]
     );
 
     private string $page;
