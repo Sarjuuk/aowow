@@ -224,6 +224,7 @@ class Markup implements \JsonSerializable
 
             foreach ($matches as [, $tag, $id, $attrString])
             {
+                $tag   = strtolower($tag);
                 $fn    = self::TAGS[$tag][self::IDX_CONTENT_POLICY];
                 $attr  = self::parseTagAttributes($attrString);
                 $attr += ['unnamed' => $id];
@@ -247,6 +248,7 @@ class Markup implements \JsonSerializable
         {
             [, $tag, $id, $attrString] = $match;
 
+            $tag        = strtolower($tag);
             $stripOrFn  = self::TAGS[$tag][self::IDX_CONTENT_POLICY];
             $type       = self::TAGS[$tag][self::IDX_DBTYPE];
             $attributes = self::parseTagAttributes($attrString) + ['unnamed' => $id];
