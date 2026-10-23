@@ -11,15 +11,16 @@ if (CLI)
 $pageCall  = 'home';                                        // default to Homepage unless specified otherwise
 $pageParam = '';
 parse_str(parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY), $query);
-foreach ($query as $page => $param)
-{
-    // could be an array
-    if (!is_string($param))
-    {
-        $pageCall = '';                                     // just .. fail
-        break;
-    }
 
+// we do not expect arrays via $_GET .. just discard everything
+if (array_find($query, fn($x) => !is_string($x)))
+{
+    header('Location: .', true, 302);
+    exit;
+}
+
+if (($page = array_key_first($query)) !== null)
+{
     // fix page calls - pages like search use the page call directly and expect it as lower case
     if (preg_match('/[A-Z]/', $page))
     {
@@ -30,8 +31,7 @@ foreach ($query as $page => $param)
     }
 
     $pageCall  = preg_replace('/[^\w\-]/i', '', $page);
-    $pageParam = $param ?? '';
-    break;                                                  // only use first k/v-pair to determine page
+    $pageParam = $query[$page] ?? '';
 }
 
 // remove wh seo (type=typeId/urlized-name)
