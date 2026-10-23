@@ -44,9 +44,19 @@ trait TrCustomData
     public function applyCustomData() : bool
     {
         $ok = true;
-        foreach ((DB::Aowow()->selectCol('SELECT `entry` AS ARRAY_KEY, `field` AS ARRAY_KEY2, `value` FROM ::setup_custom_data WHERE `command` = %s', $this->getName()) ?: []) as $id => $data)
+        foreach ((DB::Aowow()->selectCol('SELECT `entry` AS ARRAY_KEY, `field` AS ARRAY_KEY2, `value` FROM ::setup_custom_data WHERE `field` <> "cuFlags" AND `command` = %s', $this->getName()) ?: []) as $id => $data)
         {
             if (DB::Aowow()->qry('UPDATE %n SET %a WHERE id = %i', '::'.$this->getName(), $data, $id) === null)
+            {
+                trigger_error('applying custom data to aowow_'.$this->getName().' entry #'.$id.' failed', E_USER_WARNING);
+                $ok = false;
+            }
+        }
+
+        // note: might need to differentiate between SET and ADD modes in the future. For now just handling cuFlags separately is enough.
+        foreach ((DB::Aowow()->selectCol('SELECT `entry` AS ARRAY_KEY, `value` FROM ::setup_custom_data WHERE `field` = "cuFlags" AND `command` = %s', $this->getName()) ?: []) as $id => $data)
+        {
+            if (DB::Aowow()->qry('UPDATE %n SET `cuFlags` = `cuFlags` | %i WHERE id = %i', '::'.$this->getName(), $data, $id) === null)
             {
                 trigger_error('applying custom data to aowow_'.$this->getName().' entry #'.$id.' failed', E_USER_WARNING);
                 $ok = false;
