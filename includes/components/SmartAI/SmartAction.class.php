@@ -374,8 +374,10 @@ class SmartAction
                 if (!$this->param[1])
                     $footer = $this->param;
                 break;
-            case self::ACTION_UPDATE_TEMPLATE:              // 36
             case self::ACTION_SET_CORPSE_DELAY:             // 116
+                if (!$this->param[0])                       // formatTime() yields '' for 0, but a 0s delay is a valid (instant) despawn
+                    $this->param[10] = DateTime::formatTimeElapsedFloat(0);
+            case self::ACTION_UPDATE_TEMPLATE:              // 36
                 if ($this->param[1])
                     $footer = $this->param;
                 break;
