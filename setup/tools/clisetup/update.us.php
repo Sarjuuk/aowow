@@ -66,12 +66,15 @@ CLISetup::registerUtility(new class extends UtilityScript
             $queries  = [];
             foreach (file($file) as $line)
             {
-                // skip line comments
-                if (is_int($len = strpos($line, '--')))
-                    $line = substr($line, 0, $len);
-
                 if (($line = trim($line)) === '')
                     continue;
+
+                // skip line comments entirely
+                if (str_starts_with($line, '--'))
+                    continue;
+
+                if (preg_match('/\)[,;] *--/', $line, $m, PREG_OFFSET_CAPTURE))
+                    $line = substr($line, 0, $m[0][1] + 2);
 
                 $updQuery .= ' ' . $line;
 
@@ -89,7 +92,7 @@ CLISetup::registerUtility(new class extends UtilityScript
 
                 foreach ($queries as $i => $q)
                 {
-                    if (DB::Aowow()->qry($q) === null)
+                    if (DB::Aowow()->nativeQuery($q) === null)
                     {
                         DB::Aowow()->rollback();
                         CLI::write('[update] failed to apply query #'.(++$i).' from file '.CLI::bold($file), CLI::LOG_ERROR);
