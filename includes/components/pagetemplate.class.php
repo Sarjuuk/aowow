@@ -452,7 +452,19 @@ class PageTemplate
             return $host;
 
         // http_build_query uses unset values e.g.: "/?items="
-        array_walk($queryVars, fn(&$v, $k) => $v = $k . (strlen($v) ? '=' . $v : ''));
+        array_walk($queryVars, function(mixed &$val, string $key) {
+            if (!is_array($val))
+                return $val = $key . (strlen($val) ? '=' . $val : '');
+
+            $isVector = ($k = array_keys($val)) === array_keys($k);
+
+            $_ = '';
+            foreach ($val as $i => $v)                            // not sure .. arrays are not expected to be used in PageTemplate
+                $_ .= sprintf('&%s[%s]', $key, $isVector ? '' : $i) . (strlen($v) ? '=' . $v : '');
+
+            $val = substr($_, 1);
+        });
+
         return $host.'/?'.implode('&', $queryVars);
     }
 

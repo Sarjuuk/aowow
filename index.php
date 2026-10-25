@@ -12,25 +12,23 @@ $pageCall  = 'home';                                        // default to Homepa
 $pageParam = '';
 parse_str(parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY), $query);
 
-// we do not expect arrays via $_GET .. just discard everything
-if (array_find($query, fn($x) => !is_string($x)))
-{
-    header('Location: .', true, 302);
-    exit;
-}
-
 if (($page = array_key_first($query)) !== null)
 {
-    // fix page calls - pages like search use the page call directly and expect it as lower case
-    if (preg_match('/[A-Z]/', $page))
+    // could be an array, could be invald chars for page call
+    if (!is_string($query[$page]) || preg_match('/[^a-z-]/i', $page))
     {
-        $url  = explode('=', $_SERVER['REQUEST_URI'], 2);
-        $page = Util::lower(array_shift($url)).($url ? '=' . $url[0] : '');
-        header('Location: '.$page, true, 302);
+        header('Location: .', true, 302);                   // discard request and go home
         exit;
     }
 
-    $pageCall  = preg_replace('/[^\w\-]/i', '', $page);
+    // fix page calls - pages like search use the page call directly and expect it as lower case
+    if (preg_match('/[A-Z]/', $page))
+    {
+        header('Location: '.str_replace('?'.$page, '?'.Util::lower($page), $_SERVER['REQUEST_URI']), true, 302);
+        exit;
+    }
+
+    $pageCall  = strtr($page, '-', '');
     $pageParam = $query[$page] ?? '';
 }
 
