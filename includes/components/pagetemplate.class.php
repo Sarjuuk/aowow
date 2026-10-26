@@ -566,10 +566,11 @@ class PageTemplate
         unset(                                              // must be recreated on __wakeup
             $this->gStaticUrl,
             $this->gHost,
-            $this->hasAnalytics,
             $this->gServerTime,
             $this->gUser,
-            $this->gFavorites
+            $this->gFavorites,
+            $this->hasAnalytics,
+            $this->dbProfiles
         );
 
         if ($this->lvTabs)                                  // do not store lvErrors in cache
