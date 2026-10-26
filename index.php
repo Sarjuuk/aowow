@@ -12,10 +12,17 @@ $pageCall  = 'home';                                        // default to Homepa
 $pageParam = '';
 parse_str(parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY), $query);
 
+// we do not expect arrays via $_GET .. just discard everything
+if (array_find($query, fn($x) => !is_string($x)))
+{
+    header('Location: .', true, 302);
+    exit;
+}
+
 if (($page = array_key_first($query)) !== null)
 {
-    // could be an array, could be invald chars for page call
-    if (!is_string($query[$page]) || preg_match('/[^a-z-]/i', $page))
+    // invald chars in page call
+    if (preg_match('/[^a-z-]/i', $page))
     {
         header('Location: .', true, 302);                   // discard request and go home
         exit;

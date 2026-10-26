@@ -451,15 +451,16 @@ class PageTemplate
         if (!$queryVars)
             return $host;
 
-        // http_build_query uses unset values e.g.: "/?items="
+        // http_build_query uses unset values for trailing equals signs e.g.: "/?items="
         array_walk($queryVars, function(mixed &$val, string $key) {
             if (!is_array($val))
                 return $val = $key . (strlen($val) ? '=' . $val : '');
 
+            // just in case; currently GET requests with arrays are discarded
             $isVector = ($k = array_keys($val)) === array_keys($k);
 
             $_ = '';
-            foreach ($val as $i => $v)                            // not sure .. arrays are not expected to be used in PageTemplate
+            foreach ($val as $i => $v)
                 $_ .= sprintf('&%s[%s]', $key, $isVector ? '' : $i) . (strlen($v) ? '=' . $v : '');
 
             $val = substr($_, 1);
