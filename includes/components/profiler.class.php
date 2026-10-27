@@ -824,7 +824,7 @@ class Profiler
                             (`reqRaceMask`  = 0 OR `reqRaceMask`  & %i) AND
                             (`reqClassMask` = 0 OR `reqClassMask` & %i)',
                 $profileId,
-                array_column($skills, 'skillId'),
+                array_column($skills, 'skill'),
                 $ra->toMask(),
                 $cl->toMask()
             );
