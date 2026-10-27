@@ -47,7 +47,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         $this->gPageInfo += array(
             'type'   => $this->type,
             'typeId' => $this->typeId,
-            'name'   => $this->h1
+            'name'   => UIText::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_RAW)
         );
 
 
@@ -643,10 +643,12 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
 
     protected function generateMetadata(bool $useArticle = true) : void
     {
-        $this->metaTags[] = ['property' => 'og:title', 'content' => $this->h1];
+        $title = UIText::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_RAW);
+
+        $this->metaTags[] = ['property' => 'og:title', 'content' => $title];
         $this->metaTags[] = ['property' => 'og:type',  'content' => 'article'];
 
-        $keywords = [$this->h1, Util::ucFirst(Lang::game('object'))];
+        $keywords = [$title, Util::ucFirst(Lang::game('object'))];
 
         $desc = '';
         if ($zSpawns = $this->subject->getSpawns(SPAWNINFO_ZONES))
@@ -661,7 +663,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                 if ($zSpawns)
                     $zones[] = Lang::meta('foundInExt', [count($zSpawns)]);
 
-                $desc = Lang::meta('objFoundIn', [$this->h1, Lang::concat($zones)]);
+                $desc = Lang::meta('objFoundIn', [$title, Lang::concat($zones)]);
             }
         }
 

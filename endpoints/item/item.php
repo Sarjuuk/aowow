@@ -53,7 +53,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         $this->gPageInfo += array(
             'type'   => $this->type,
             'typeId' => $this->typeId,
-            'name'   => $this->h1
+            'name'   => UIText::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_RAW)
         );
 
         $_flags     = $this->subject->getField('flags');
@@ -1402,10 +1402,12 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
     protected function generateMetadata(bool $useArticle = true) : void
     {
-        $this->metaTags[] = ['property' => 'og:title', 'content' => $this->h1];
+        $title = UIText::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_RAW);
+
+        $this->metaTags[] = ['property' => 'og:title', 'content' => $title];
         $this->metaTags[] = ['property' => 'og:type',  'content' => 'article'];
 
-        $keywords     = [$this->h1, Lang::game('items')];
+        $keywords     = [$title, Lang::game('items')];
         $_class       = $this->subject->getField('class');
         $_subClass    = $this->subject->getField('subClass');
         $_subSubClass = $this->subject->getField('subSubClass');
@@ -1446,7 +1448,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         {
             case ITEM_CLASS_CONTAINER:
             case ITEM_CLASS_QUIVER:
-                $desc = Lang::meta('itemCatDesc', ITEM_CLASS_CONTAINER, [$this->h1, $this->subject->getField('slots'), Lang::item('subClass', $_class, $_subClass)]);
+                $desc = Lang::meta('itemCatDesc', ITEM_CLASS_CONTAINER, [$title, $this->subject->getField('slots'), Lang::item('subClass', $_class, $_subClass)]);
                 break;
             case ITEM_CLASS_WEAPON:
                 $desc = Lang::meta('itemCatDesc', ITEM_CLASS_WEAPON, [Lang::item('quality', $_quality), Lang::item('inventoryType', $_slot).' '.Lang::item('subClass', $_class, $_subClass), $_itemLevel]);
@@ -1463,18 +1465,18 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                 $desc = Lang::meta('itemCatDesc', 4, [Lang::item('quality', $_quality), $asc, $_itemLevel, Lang::item('inventoryType', $_slot)]);
                 break;
             case ITEM_CLASS_KEY:
-                $desc = Lang::meta('itemCatDesc', ITEM_CLASS_KEY, [$this->h1]);
+                $desc = Lang::meta('itemCatDesc', ITEM_CLASS_KEY, [$title]);
                 break;
             case ITEM_CLASS_GLYPH:
                 $desc = Lang::meta('itemCatDesc', ITEM_CLASS_GLYPH, [Lang::game('gl', $_subSubClass), Lang::game('cl', $_subClass)]);
                 break;
             case ITEM_CLASS_AMMUNITION:
-                $desc = Lang::meta('itemCatDesc', ITEM_CLASS_AMMUNITION, [$this->h1, $this->subject->json[$this->typeId]['dps']]);
+                $desc = Lang::meta('itemCatDesc', ITEM_CLASS_AMMUNITION, [$title, $this->subject->json[$this->typeId]['dps']]);
                 break;
             case ITEM_CLASS_TRADEGOOD:
                 if ($_subClass != 2)                        // treat explosives as consumables
                 {
-                    $desc = Lang::meta('itemCatDesc', ITEM_CLASS_TRADEGOOD, [$this->h1]);
+                    $desc = Lang::meta('itemCatDesc', ITEM_CLASS_TRADEGOOD, [$title]);
                     break;
                 }
             default:
@@ -1490,7 +1492,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                         $type = $type[1][$_subSubClass];
                 }
 
-                $desc = Lang::meta('itemCatDesc', ITEM_CLASS_CONSUMABLE, [$this->h1, $lvl, is_array($type) ? $type[0] : $type]);
+                $desc = Lang::meta('itemCatDesc', ITEM_CLASS_CONSUMABLE, [$title, $lvl, is_array($type) ? $type[0] : $type]);
         }
 
         // source.. (glyph sources are an appendix to description)

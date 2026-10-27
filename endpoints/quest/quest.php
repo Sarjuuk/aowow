@@ -56,7 +56,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         $this->gPageInfo += array(
             'type'   => $this->type,
             'typeId' => $this->typeId,
-            'name'   => UIText::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_HTML)
+            'name'   => UIText::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_RAW)
         );
 
         $_level        = $this->subject->getField('level');
@@ -1293,10 +1293,12 @@ class QuestBaseResponse extends TemplateResponse implements ICache
 
     protected function generateMetadata(bool $useArticle = true) : void
     {
-        $this->metaTags[] = ['property' => 'og:title', 'content' => $this->h1];
+        $title = UIText::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_RAW);
+
+        $this->metaTags[] = ['property' => 'og:title', 'content' => $title];
         $this->metaTags[] = ['property' => 'og:type',  'content' => 'article'];
 
-        $keywords = [$this->h1, Util::ucFirst(Lang::game('quest'))];
+        $keywords = [$title, Util::ucFirst(Lang::game('quest'))];
         $zone = '';
 
         $c0 = $this->subject->getField('cat2');

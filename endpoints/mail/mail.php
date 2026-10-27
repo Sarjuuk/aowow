@@ -181,12 +181,12 @@ class MailBaseResponse extends TemplateResponse implements ICache
 
     protected function generateMetadata(bool $useArticle = true) : void
     {
-        $this->metaTags[] = ['property' => 'og:title', 'content' => $this->h1];
+        $this->metaTags[] = ['property' => 'og:title', 'content' => $this->subject->getField('name', true)];
         $this->metaTags[] = ['property' => 'og:type',  'content' => 'article'];
 
-        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [$this->h1, Util::ucFirst(Lang::game('mails')), ...Lang::meta('tags', 'generic')]]);
+        array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [$this->subject->getField('name', true), Util::ucFirst(Lang::game('mails')), ...Lang::meta('tags', 'generic')]]);
 
-        $desc = Lang::meta('description', 'genPage', [$this->h1, Util::ucFirst(Lang::game('mail'))]);
+        $desc = Lang::meta('description', 'genPage', [$this->subject->getField('name', true), Util::ucFirst(Lang::game('mail'))]);
         if ($txt = Lang::trimTextClean($this->extraText->fillJSGlobals(), 250))
             $desc .= ' '.$txt;
 

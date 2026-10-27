@@ -3118,10 +3118,10 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
     protected function generateMetadata(bool $useArticle = true) : void
     {
-        $this->metaTags[] = ['property' => 'og:title', 'content' => $this->h1];
+        $this->metaTags[] = ['property' => 'og:title', 'content' => $this->subject->getField('name', true)];
         $this->metaTags[] = ['property' => 'og:type',  'content' => 'article'];
 
-        $keywords = [$this->h1, Util::ucFirst(Lang::game('spell'))];
+        $keywords = [$this->subject->getField('name', true), Util::ucFirst(Lang::game('spell'))];
 
         $c = array_slice($this->breadcrumb, 2);
         if (isset($c[2]) && $c[0] != -13)
@@ -3142,7 +3142,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             $keywords[] = Lang::spell('cat', $c[0], 0);
 
         $desc  = $this->subject->parseText('description', MAX_LEVEL, SpellList::INTERACTIVE_NONE)[0];
-        $desc .= ($desc ? ' ' : '').Lang::meta('description', 'genPage', [$this->h1, $keywords[2].' '.$keywords[1]]);
+        $desc .= ($desc ? ' ' : '').Lang::meta('description', 'genPage', [$this->subject->getField('name', true), $keywords[2].' '.$keywords[1]]);
 
         // parsedDescription. This is a Druid Glyph Item. A spell from World of Warcraft: Mists of Pandaria
         array_unshift($this->metaTags, ['name' => 'keywords', 'content' => [...$keywords, ...Lang::meta('tags', 'generic')]]);

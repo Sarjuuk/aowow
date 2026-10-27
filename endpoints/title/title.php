@@ -201,20 +201,19 @@ class TitleBaseResponse extends TemplateResponse implements ICache
 
     protected function generateMetadata(bool $useArticle = true) : void
     {
+        $title = Util::ucFirst($this->subject->getField('name'));
 
-        $nameFixed = Util::ucFirst($this->subject->getField('name'));
-
-        $this->metaTags[] = ['property' => 'og:title', 'content' => $nameFixed];
+        $this->metaTags[] = ['property' => 'og:title', 'content' => $title];
         $this->metaTags[] = ['property' => 'og:type',  'content' => 'article'];
 
-        $desc = Lang::meta('description', 'genPage', [$nameFixed, Util::ucFirst(Lang::game('title'))]);
+        $desc = Lang::meta('description', 'genPage', [$title, Util::ucFirst(Lang::game('title'))]);
 
         if (!empty($this->subject->sources[SRC_ACHIEVEMENT]))
             $desc .= ' '.Lang::meta('itemSource', 0, [Lang::meta('itemSource', 1, SRC_ACHIEVEMENT)]);
         else if (!empty($this->subject->sources[SRC_QUEST]))
             $desc .= ' '.Lang::meta('itemSource', 0, [Lang::meta('itemSource', 1, SRC_QUEST)]);
 
-        $keywords = [$nameFixed, Util::ucFirst(Lang::game('title'))];
+        $keywords = [$title, Util::ucFirst(Lang::game('title'))];
         if ($c = $this->subject->getField('category'))
         {
             $desc .= ' '.Lang::meta('inCategory', [Lang::title('cat', $c)]);
