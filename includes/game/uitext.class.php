@@ -11,6 +11,9 @@ if (!defined('AOWOW_REVISION'))
  */
 final class UIText
 {
+    private const array LETTER_HAS_FINAL_CONSONANT = [0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    private const array DIGIT_HAS_FINAL_CONSONANT  = [1, 1, 0, 1, 0, 0, 1, 1, 1, 0];
+
     private const array LINE_BREAK = array(
         -1               => ' ',
         Lang::FMT_RAW    => "\n",
@@ -114,6 +117,57 @@ final class UIText
         }, $text);
 
         return $text;
+    }
+
+    /**
+     * Validates a parsed UI tag against the supported tag set and required attributes.
+     *
+     * @param string $full     Full tag text. (not used, required to spread regex match into function)
+     * @param string $closing  Whether the tag is a closing tag.
+     * @param string $tag      Tag name to validate.
+     * @param string $attrStr  Raw attribute string for the tag.
+     *
+     * @return bool True when the tag is allowed and valid, otherwise false.
+     */
+    private static function validateTag(string $full, string $closing, string $tag, string $attrStr) : bool
+    {
+        if ($closing && trim($attrStr))
+            return false;
+
+        $tag = strtolower($tag);
+
+        switch ($tag)
+        {
+            case 'h1':
+            case 'h2':
+            case 'h3':
+            case 'span':
+            case 'br':
+            case 'p':
+                return true;
+        }
+
+        /*
+         * i.e. quest 13081 reward text:
+         * <A gentle ringing fills your head as you approach the naaru.> [...]
+         * looks like an anchor but SimpleXMLElement throws an exception as intended
+         */
+
+        try
+        {
+            $node = new SimpleXML($full);
+        }
+        catch (\Exception $e)
+        {
+            return false;
+        }
+
+        return match ($tag)
+        {
+            'a'     => $closing || !empty($node->attributes()['href']),
+            'img'   => !empty($node->attributes()['src']),
+            default => false
+        };
     }
 
     /**
@@ -319,133 +373,159 @@ final class UIText
                 }
             }, $text);
 
-        // |1 - digit singular/plural          <number>|1<singular;<plural>; - Will choose a word depending on whether the digit preceding it is 0/1 or not (i.e. 1,11,21 return the first string, as will 0,10,40). Note that unlike |4 singular and plural forms are separated by semi-colon.
-        $text = preg_replace_callback('/(\d+) *(?<!\|)\|1([^;]+);([^;]+);/is', function ($m)
+        // |1 - particle selector: <lastChar> <padding> |1 <consonant> ; <vowel> ;
+        // Will choose a word depending on the last character
+        $text = preg_replace_callback('/(\p{L})(\P{L}*(?: *<[^>]+> *)*)(?<!\|)\|1(\D[^;]+);([^;]+);/uis', function ($m)
             {
-                [$_, $num, $singular, $plural] = $m;
+                [, $char, $pad, $cf, $vf] = $m;
 
-                switch ($num[-1])
-                {
-                    case 0:
-                    case 1:
-                        return $num . ' ' . $singular;
-                    default:
-                        return $num . ' ' . $plural;
-                }
+                return $char . $pad . self::languageRule1ChooseParticle(mb_ord($char), $cf, $vf);
             }, $text);
 
-        // |2 - frFR preposition: de            |2 <word> - Before vowels outputs d' (with apostrophe) and removes any leading spaces from text, otherwise outputs de (with trailing space)
-        $text = preg_replace_callback('/(?<!\|)\|2 ?(.)/i', function ($m)
+        // |2 - frFR preposition (de): |2 <padding> <word>
+        $text = preg_replace_callback('/(?<!\|)\|2((?: *<[^>]+> *)*)([^ ]{4})/i', function ($m)
             {
-                [$_, $char] = $m;
+                [, $pad, $word] = $m;
 
-                switch (strtolower($char))
-                {
-                    case 'h':
-                        if (Lang::getLocale() != Locale::FR)
-                            return 'de ' . $char;
-                    case 'a':
-                    case 'e':
-                    case 'i':
-                    case 'o':
-                    case 'u':
-                        return "d'" . $char;
-                    default:
-                        return 'de ' . $char;
-                }
+                $pairs = array(
+                    "L'"   => "de l'",  "Le "  => "du ",
+                    "La "  => "de la ", "Les " => "des ",
+                );
+
+                foreach ($pairs as $find => $replace)
+                    if (str_starts_with($word, $find))
+                        return $pad . substr_replace($word, $replace, 0, strlen($find));
+
+                if (self::languageRule2IsVowel($word[0]) || $word[0] == 'h' || $word[0] == 'H' ||
+                    ($word[0] == 'y' && self::languageRule2IsVowel($word[1])) ||
+                    ($word[0] == 'Y' && self::languageRule2IsVowel($word[1])))
+                    return "d'" . $pad . $word;
+
+                return "de " . $pad . $word;
             }, $text);
 
-        // |3 - ruRU declinations               |3-<caseIdx>(<word>) - Displays text declined to the specified form (index ranges from 1 to GetNumDeclensionSets()).
-        $text = preg_replace_callback('/(?<!\|)\|3-(\d+)\(([^\)]+)\)/iu', function ($m)
+        // |3 - ruRU declinations: |3- <caseIdx> ( <padding> <word> <padding> )
+        // Displays text declined to the specified form (index ranges from 1 to GetNumDeclensionSets()).
+        $text = preg_replace_callback('/(?<!\|)\|3-(\d+)\((.*?)([ \p{Cyrillic}]+)(.*?)\)/iu', function ($m)
             {
-                [$_, $caseIdx, $word] = $m;
+                [, $caseIdx, $padPre, $word, $padPost] = $m;
 
                 if ($caseIdx > 11 || $caseIdx < 1)          // max caseIdx seen in DeclinedWordCases.dbc
-                    return $word;
-
-                if (preg_match('/\P{Cyrillic}/iu', $word))  // not in cyrillic script
-                    return $word;
+                    return $padPre . $word . $padPost;
 
                 if ($declWord = DB::Aowow()->selectCell('SELECT dwc.`word` FROM ::declinedwordcases dwc JOIN ::declinedword dc ON dwc.`wordId` = dc.`id` WHERE dwc.`caseIdx` = %i AND dc.`word` = %s', $caseIdx, $word))
-                    return $declWord;
+                    return $padPre . $declWord . $padPost;
 
-                return $word;
+                return $padPre . $word . $padPost;
             }, $text);
 
-        // |4 - numeric switch           <number>                  |4<singular>:<plural>[:<plural2>]; - Will choose a form based on the number preceding it. More than two forms (separated by colons) may be required by locale 8 (ruRU).
-        $text = preg_replace_callback('/([\d\.\,]+)([^\d]*)(?<!\|)\|4([^:]*):([^:;]+)(?::([^;]+))?;/is', function ($m)
+        // |4 - numeric switch: <number> <padding> |4 <singular> : <plural>[ : <plural2>] ;
+        // Will choose a form based on the number preceding it. More than two forms (separated by colons) may be required by locale 8 (ruRU).
+        $text = preg_replace_callback('/\b([\d\.\,]*?\d+)\b([^\|]*)(?<!\|)\|4([^:]*):([^:;]+)(?::([^;]+))?;/is', function ($m)
             {
-                [$_, $num, $pad, $singular, $plural1, $plural2] = array_pad($m, 6, null);
+                [, $num, $pad, $singular, $plural1, $plural2] = array_pad($m, 6, null);
 
-                if (Lang::getLocale() != Locale::RU || !$plural2)
-                    return $num . $pad . ($num == 1 ? $singular : $plural1);
-
-                // singular - ends in 1, but not teen number
-                if ($num[-1] == 1 && $num != 11)
-                    return $num . $pad . $singular;
-
-                // genitive singular - ends in 2, 3, 4, but not teen number
-                if (($num[-1] == 2 && $num != 12) || ($num[-1] == 3 && $num != 13) || ($num[-1] == 4 && $num != 14))
-                    return $num . $pad . $plural1;
-
-                // genitive plural - everything else
-                return $num . $pad . $plural2;
+                return $num . $pad . match(self::getPluralIndex($num))
+                {
+                    0 => $singular,
+                    1 => $plural1,                          // ruRU: genitive singular
+                    2 => $plural2                           // ruRU: genitive plural
+                };
             }, $text);
 
         // unescape escaped ui sequences
         return strtr($text, ['||' => '|']);
     }
 
-    /**
-     * Validates a parsed UI tag against the supported tag set and required attributes.
-     *
-     * @param string $full     Full tag text. (not used, required to spread regex match into function)
-     * @param string $closing  Whether the tag is a closing tag.
-     * @param string $tag      Tag name to validate.
-     * @param string $attrStr  Raw attribute string for the tag.
-     *
-     * @return bool True when the tag is allowed and valid, otherwise false.
-     */
-    private static function validateTag(string $full, string $closing, string $tag, string $attrStr) : bool
+
+    private static function getPluralIndex(int $num) : int
     {
-        if ($closing && trim($attrStr))
-            return false;
-
-        $tag = strtolower($tag);
-
-        switch ($tag)
+        $pluralRule = match (Lang::getLocale())
         {
-            case 'h1':
-            case 'h2':
-            case 'h3':
-            case 'span':
-            case 'br':
-            case 'p':
+            Locale::KR, Locale::FR,
+            Locale::CN, Locale::TW => 1,
+            Locale::RU             => 2,
+            default                => 0
+        };
+
+        if ($pluralRule == 0)
+            return $num != 1;
+
+        if ($pluralRule == 1)
+            return $num > 1;
+
+        if ($num % 100 >= 11 && $num % 100 <= 14)
+            return 2;
+
+        if ($num % 10 == 1)
+            return 0;
+
+        if ($num % 10 >= 2 && $num % 10 <= 4)
+            return 1;
+
+        return 2;
+    }
+
+    private static function languageRule1ChooseParticle(int $lastChar, string $consonantForm, string $vowelForm) : string
+    {
+        if ($lastChar & 0xFF00)
+        {
+            // CN/TW characters
+            if ((($lastChar + 0x5400) & 0xFFFF) > 0x2BA3)
+                return $consonantForm;
+
+            $syllable = $lastChar & 0xFFFF;
+
+            // KR
+            if (($syllable - 0xAC08) % 28 == 0 && $consonantForm == '으')
+                return $vowelForm;
+
+            return ($syllable - 0xAC00) % 28 ? $consonantForm : $vowelForm;
+        }
+
+        // ASCII number offset
+        if ($lastChar - 48 <= 9)
+            return self::DIGIT_HAS_FINAL_CONSONANT[$lastChar - 48] ? $consonantForm : $vowelForm;
+
+        // ASCII letter offsets lc
+        if ($lastChar >= 97 && $lastChar <= 122)
+            return self::LETTER_HAS_FINAL_CONSONANT[$lastChar - 97] ? $consonantForm : $vowelForm;
+
+        // ASCII letter offsets uc
+        if ($lastChar >= 65 && $lastChar <= 90)
+            return self::LETTER_HAS_FINAL_CONSONANT[$lastChar - 65] ? $consonantForm : $vowelForm;
+
+        return $consonantForm;
+    }
+
+    private static function languageRule2IsVowel(string $char) : bool
+    {
+        switch ($char)
+        {
+            case 'A':
+            case 'E':
+            case 'I':
+            case 'O':
+            case 'U':
+            case 'a':
+            case 'e':
+            case 'i':
+            case 'o':
+            case 'u':
                 return true;
         }
 
-        /*
-         * i.e. quest 13081 reward text:
-         * <A gentle ringing fills your head as you approach the naaru.> [...]
-         * looks like an anchor but SimpleXMLElement throws an exception as intended
-         */
-
-        try
-        {
-            $node = new SimpleXML($full);
-        }
-        catch (\Exception $e)
-        {
-            return false;
-        }
-
-        return match ($tag)
-        {
-            'a'     => $closing || !empty($node->attributes()['href']),
-            'img'   => !empty($node->attributes()['src']),
-            default => false
-        };
+        $ch = mb_ord($char);
+        return ($ch >= 0xC0 && $ch <= 0xC6) ||              // À Á Â Ã Ä Å Æ
+               ($ch >= 0xC8 && $ch <= 0xCF) ||              // È É Ê Ë Ì Í Î Ï
+               ($ch >= 0xD2 && $ch <= 0xD6) ||              // Ò Ó Ô Õ Ö
+               ($ch >= 0xD8 && $ch <= 0xDC) ||              // Ø Ù Ú Û Ü
+               ($ch >= 0xE0 && $ch <= 0xE6) ||              // à á â ã ä å æ
+               ($ch >= 0xE8 && $ch <= 0xEF) ||              // è é ê ë ì í î ï
+               ($ch >= 0xF2 && $ch <= 0xF6) ||              // ò ó ô õ ö
+               ((($ch - 0xF8) & 0xFFFF)) <= 4;              // ø ù ú û ü
     }
+
 }
 
 ?>
