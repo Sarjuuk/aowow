@@ -272,6 +272,7 @@ class UserBaseResponse extends TemplateResponse
         if (!$guides->error)
         {
             $this->lvTabs->addListviewTab(new Listview(array(
+                'name'       => Lang::game('guides'),
                 'data'       => $guides->getListviewData(),
                 'hiddenCols' => ['patch']
             ), GuideList::$brickFile));
