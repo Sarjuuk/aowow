@@ -590,12 +590,12 @@ abstract class Filter
         $lenTest = fn($x) => $x !== '' && (mb_strlen($x) > 2 || $allowShort || Lang::getLocale()->isLogographic());
         $string  = trim($string);
 
-        if ($string === '')
-            return null;
-
         // \ % - invalid chars for both LIKE and MATCH
         // otherwise escaped by \Dibi
         $str = str_replace(['\\', '%'], '', $string);
+
+        if ($string === '')
+            return null;
 
         if ($neg = ($str[0] === '-'))
             $str = mb_substr($str, 1);
