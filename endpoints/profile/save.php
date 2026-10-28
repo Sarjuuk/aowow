@@ -100,7 +100,7 @@ class ProfileSaveResponse extends TextResponse
         if (!empty($cuProfile['sourceId']))
             $cuProfile['sourceName'] = DB::Aowow()->selectCell('SELECT `name` FROM ::profiler_profiles WHERE `id` = %i', $cuProfile['sourceId']);
 
-        $charId = -1;
+        $charId = null;
         if ($this->_get['id'])                              // update
         {
             if ($charId = DB::Aowow()->selectCell('SELECT `id` FROM ::profiler_profiles WHERE `id` = %i AND `user` = %i AND `deleted` = 0  AND `custom` = 1', $this->_get['id'], User::$id))
@@ -110,80 +110,79 @@ class ProfileSaveResponse extends TextResponse
         {
             $nProfiles = DB::Aowow()->selectCell('SELECT COUNT(*) FROM ::profiler_profiles WHERE `user` = %i AND `deleted` = 0 AND `custom` = 1', User::$id);
             if ($nProfiles < 10 || User::isPremium())
-                if ($newId = DB::Aowow()->qry('INSERT INTO ::profiler_profiles %v', $cuProfile))
-                    $charId = $newId;
+                $charId = DB::Aowow()->qry('INSERT INTO ::profiler_profiles %v', $cuProfile);
         }
+
+        $this->result = $charId ?? -1;
+
+        if (is_null($charId))
+            return;
 
         // update items
-        if ($charId != -1)
+
+        // ok, 'funny' thing: whether an item has en extra prismatic socket is determined contextually
+        // either the socket is -1 or it has an itemId on an index where there shouldn't be one
+        $keys  = ['id', 'slot', 'item', 'subitem', 'permEnchant', 'tempEnchant', 'gem1', 'gem2', 'gem3', 'gem4'];
+
+        // validate Enchantments
+        $enchIds = array_merge(
+            array_column($this->_post['inv'], 3),       // perm enchantments
+            array_column($this->_post['inv'], 4)        // temp enchantments (not used..?)
+        );
+        $enchs = new EnchantmentList(array(['id', $enchIds]));
+
+        // validate items
+        $itemIds = array_merge(
+            array_column($this->_post['inv'], 1),       // base item
+            array_column($this->_post['inv'], 5),       // gem slot 1
+            array_column($this->_post['inv'], 6),       // gem slot 2
+            array_column($this->_post['inv'], 7),       // gem slot 3
+            array_column($this->_post['inv'], 8)        // gem slot 4
+        );
+
+        if (!($items = new ItemList(array(['id', $itemIds])))->error)
         {
-            // ok, 'funny' thing: whether an item has en extra prismatic socket is determined contextually
-            // either the socket is -1 or it has an itemId on an index where there shouldn't be one
-            $keys  = ['id', 'slot', 'item', 'subitem', 'permEnchant', 'tempEnchant', 'gem1', 'gem2', 'gem3', 'gem4'];
-
-            // validate Enchantments
-            $enchIds = array_merge(
-                array_column($this->_post['inv'], 3),       // perm enchantments
-                array_column($this->_post['inv'], 4)        // temp enchantments (not used..?)
-            );
-            $enchs = new EnchantmentList(array(['id', $enchIds]));
-
-            // validate items
-            $itemIds = array_merge(
-                array_column($this->_post['inv'], 1),       // base item
-                array_column($this->_post['inv'], 5),       // gem slot 1
-                array_column($this->_post['inv'], 6),       // gem slot 2
-                array_column($this->_post['inv'], 7),       // gem slot 3
-                array_column($this->_post['inv'], 8)        // gem slot 4
-            );
-
-            $items = new ItemList(array(['id', $itemIds]));
-            if (!$items->error)
+            foreach ($this->_post['inv'] as $slot => $itemData)
             {
-                foreach ($this->_post['inv'] as $slot => $itemData)
+                if (!$itemData)
                 {
-                    if (!$itemData)
-                    {
-                        trigger_error('ProfileSaveResponse::generate - skipping malformed inventory definition for slot #'.$slot.': '.Util::toString($itemData), E_USER_NOTICE);
-                        continue;
-                    }
-
-                    if ($slot + 1 == array_sum($itemData))  // only slot definition set => empty slot
-                    {
-                        DB::Aowow()->qry('DELETE FROM ::profiler_items WHERE `id` = %i AND `slot` = %i', $charId, $itemData[0]);
-                        continue;
-                    }
-
-                    // item does not exist
-                    if (!$items->getEntry($itemData[1]))
-                        continue;
-
-                    // sub-item check
-                    if (!$items->getRandEnchantForItem($itemData[1]))
-                        $itemData[2] = 0;
-
-                    // item sockets are fubar
-                    $nSockets = $items->json[$itemData[1]]['nsockets'] ?? 0;
-                    $nSockets += in_array($slot, [SLOT_WAIST, SLOT_WRISTS, SLOT_HANDS]) ? 1 : 0;
-                    for ($i = 5; $i < 9; $i++)
-                        if ($itemData[$i] > 0 && (!$items->getEntry($itemData[$i]) || $i >= (5 + $nSockets)))
-                            $itemData[$i] = 0;
-
-                    // item enchantments are borked
-                    if ($itemData[3] && !$enchs->getEntry($itemData[3]))
-                        $itemData[3] = 0;
-
-                    if ($itemData[4] && !$enchs->getEntry($itemData[4]))
-                        $itemData[4] = 0;
-
-                    // looks good
-                    array_unshift($itemData, $charId);
-                    DB::Aowow()->qry('REPLACE INTO ::profiler_items %v', array_combine($keys, $itemData));
+                    trigger_error('ProfileSaveResponse::generate - skipping malformed inventory definition for slot #'.$slot.': '.Util::toString($itemData), E_USER_NOTICE);
+                    continue;
                 }
+
+                if ($slot + 1 == array_sum($itemData))  // only slot definition set => empty slot
+                {
+                    DB::Aowow()->qry('DELETE FROM ::profiler_items WHERE `id` = %i AND `slot` = %i', $charId, $itemData[0]);
+                    continue;
+                }
+
+                // item does not exist
+                if (!$items->getEntry($itemData[1]))
+                    continue;
+
+                // sub-item check
+                if (!$items->getRandEnchantForItem($itemData[1]))
+                    $itemData[2] = 0;
+
+                // item sockets are fubar
+                $nSockets = $items->json[$itemData[1]]['nsockets'] ?? 0;
+                $nSockets += in_array($slot, [SLOT_WAIST, SLOT_WRISTS, SLOT_HANDS]) ? 1 : 0;
+                for ($i = 5; $i < 9; $i++)
+                    if ($itemData[$i] > 0 && (!$items->getEntry($itemData[$i]) || $i >= (5 + $nSockets)))
+                        $itemData[$i] = 0;
+
+                // item enchantments are borked
+                if ($itemData[3] && !$enchs->getEntry($itemData[3]))
+                    $itemData[3] = 0;
+
+                if ($itemData[4] && !$enchs->getEntry($itemData[4]))
+                    $itemData[4] = 0;
+
+                // looks good
+                array_unshift($itemData, $charId);
+                DB::Aowow()->qry('REPLACE INTO ::profiler_items %v', array_combine($keys, $itemData));
             }
         }
-
-        $this->result = $charId;
     }
 
     protected static function checkTalentString(string $val) : string
