@@ -8,6 +8,8 @@ if (!defined('AOWOW_REVISION'))
 
 class ProfileSaveResponse extends TextResponse
 {
+    protected bool  $requiresLogin = true;
+
     protected array $expectedGET  = array(
         'id'           => ['filter' => FILTER_VALIDATE_INT, 'options' => ['min_range' => 0]],
     );
@@ -101,7 +103,7 @@ class ProfileSaveResponse extends TextResponse
         $charId = -1;
         if ($this->_get['id'])                              // update
         {
-            if ($charId = DB::Aowow()->selectCell('SELECT `id` FROM ::profiler_profiles WHERE `id` = %i', $this->_get['id']))
+            if ($charId = DB::Aowow()->selectCell('SELECT `id` FROM ::profiler_profiles WHERE `id` = %i AND `user` = %i AND `deleted` = 0  AND `custom` = 1', $this->_get['id'], User::$id))
                 DB::Aowow()->qry('UPDATE ::profiler_profiles SET %a WHERE `id` = %i', $cuProfile, $this->_get['id']);
         }
         else                                                // new
