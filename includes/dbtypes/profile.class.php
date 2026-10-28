@@ -580,6 +580,12 @@ class RemoteProfileList extends ProfileList
             $curTpl['cuFlags'] = 0;
         }
 
+        if (!$this->templates)
+        {
+            $this->error = true;
+            return;
+        }
+
         foreach ($talentLookup as $realm => $chars)
             $talentLookup[$realm] = DB::Characters($realm)->selectCol('SELECT `guid` AS ARRAY_KEY, `spell` AS ARRAY_KEY2, `talentGroup` FROM character_talent ct WHERE `guid` IN %in', array_keys($chars));
 
@@ -762,7 +768,9 @@ class LocalProfileList extends ProfileList
 
             if (!isset($realms[$curTpl['realm']]))
             {
-                unset($this->templates[$id]);
+                if (!$curTpl['custom'])
+                    unset($this->templates[$id]);
+
                 continue;
             }
 
@@ -770,6 +778,9 @@ class LocalProfileList extends ProfileList
             $curTpl['region']      = $realms[$curTpl['realm']]['region'];
             $curTpl['battlegroup'] = Cfg::get('BATTLEGROUP');
         }
+
+        if (!$this->templates)
+            $this->error = true;
     }
 
     public function getProfileUrl() : string
