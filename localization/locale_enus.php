@@ -1772,6 +1772,7 @@ $lang = array(
         '_radius'       => "Radius: ",
         '_powerType'    => "Power type",   // prevent power regeneration
         '_maxTargetLevel' => "Max. target level",   // charm / possess level cap
+        '_seat'         => "Seat",   // control vehicle
         '_interval'     => "Interval: ",
         '_inSlot'       => "in slot: ",
         '_collapseAll'  => "Collapse All",

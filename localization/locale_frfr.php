@@ -1772,6 +1772,7 @@ $lang = array(
         '_radius'       => "Rayon : ",
         '_powerType'    => "Type de ressource",   // prevent power regeneration
         '_maxTargetLevel' => "Niveau max. de la cible",   // charm / possess level cap
+        '_seat'         => "Siège",   // control vehicle
         '_interval'     => "Intervalle : ",
         '_inSlot'       => "dans l'emplacement : ",
         '_collapseAll'  => "Replier Tout",
