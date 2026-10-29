@@ -1948,6 +1948,13 @@ $lang = array(
         'summonControl' => ["Sin control", "Guardián", "Mascota", "Embelesado", "Vehículo poseído", "Vehículo sin control"],
         'summonSlot'    => ["Mascota", "Tótem de Fuego", "Tótem de Tierra", "Tótem de Agua", "Tótem de Aire", "Mascota mansa", "Misión"],
         'unkEffect'     => 'Efecto desconocido (%1$d)',
+        // AuraStateType, as checked by SPELL_AURA_MOD_DAMAGE_DONE_VERSUS_AURASTATE; labels are English in all locales
+        'auraStates'    => array(
+             1 => "Dodged, parried or blocked",     2 => "Health below 20%",               3 => "Berserking",                     4 => "Frozen",
+             5 => "Judgement",                      7 => "Hunter parry",                  10 => "Victory Rush",                  12 => "Faerie Fire",
+            13 => "Health below 35%",              14 => "Immolate (Conflagrate)",        15 => "Rejuvenation / Regrowth (Swiftmend)", 16 => "Deadly Poison",
+            17 => "Enraged",                       18 => "Bleeding",                      23 => "Health above 75%"
+        ),
         'effects'       => array(
 /*0-5    */ "Ninguno",                       "Matar al instante",                    "Daño de escuela",                   "Ficticio",                       "Teletransporte por portal", "Teletransportar unidades",
 /*6+     */ "Aplicar aura",                  "Daño ambiental",                       "Drenar poder",                      "Drenar salud",                   "Sanar",                     "Vincular",

@@ -2468,6 +2468,11 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                         case SPELL_AURA_SAFE_FALL:                            // yards of fall height ignored (Player::HandleFall)
                             $valueFmt = '%s'.Lang::spell('_distUnit');
                             break;
+                        case SPELL_AURA_MOD_DAMAGE_DONE_VERSUS_AURASTATE:     // MiscValue is the aura state the victim must have
+                            $valueFmt = '%s%%';
+                            if ($_ = Lang::exist('spell', 'auraStates', $effMV))
+                                $_nameMV = $this->fmtStaffTip($_, 'MiscValue: '.$effMV);
+                            break;
                         case SPELL_AURA_MOD_PERCENT_STAT:
                         case SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE:
                         case SPELL_AURA_MOD_SPELL_HEALING_OF_STAT_PERCENT:
