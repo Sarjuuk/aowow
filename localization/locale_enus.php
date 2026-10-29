@@ -1770,6 +1770,7 @@ $lang = array(
         '_speedZ'       => "Vertical speed",
         '_speedUnit'    => " yd/s",
         '_radius'       => "Radius: ",
+        '_powerType'    => "Power type",   // prevent power regeneration
         '_interval'     => "Interval: ",
         '_inSlot'       => "in slot: ",
         '_collapseAll'  => "Collapse All",

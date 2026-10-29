@@ -1770,6 +1770,7 @@ $lang = array(
         '_speedZ'       => "Velocidad vertical",
         '_speedUnit'    => " m/s",
         '_radius'       => "Radio: ",
+        '_powerType'    => "Tipo de poder",   // prevent power regeneration
         '_interval'     => "Intérvalo: ",
         '_inSlot'       => "en la casilla: ",
         '_collapseAll'  => "Contraer todo",

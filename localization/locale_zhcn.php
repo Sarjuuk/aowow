@@ -1770,6 +1770,7 @@ $lang = array(
         '_speedZ'       => "垂直速度",
         '_speedUnit'    => "码/秒",
         '_radius'       => "半径：",
+        '_powerType'    => "能量类型",   // prevent power regeneration
         '_interval'     => "间隔：", //Interval
         '_inSlot'       => "在插槽中：",
         '_collapseAll'  => "折叠全部",

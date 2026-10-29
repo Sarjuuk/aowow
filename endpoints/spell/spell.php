@@ -2442,6 +2442,11 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                             if ($effAura == SPELL_AURA_MOD_POWER_REGEN && ($_ = Lang::spell('_regenPer5Sec', $effMV)))
                                 $valueFmt = $_;
                             break;
+                        case SPELL_AURA_PREVENT_REGENERATE_POWER:             // the value is the power type (Unit::HasAuraTypeWithValue)
+                            $valueLabel = Lang::spell('_powerType');
+                            $pt = $effBP + ($effDS ? 1 : 0);
+                            $_footer['value'] = [null, $this->fmtStaffTip(Lang::exist('spell', 'powerTypes', $pt) ?? (string)$pt, 'Value: '.$pt), null];
+                            break;
                         case SPELL_AURA_MOD_PERCENT_STAT:
                         case SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE:
                         case SPELL_AURA_MOD_SPELL_HEALING_OF_STAT_PERCENT:

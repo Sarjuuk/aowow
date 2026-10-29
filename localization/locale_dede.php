@@ -1769,6 +1769,7 @@ $lang = array(
         '_speedZ'       => "Vertikale Geschwindigkeit",
         '_speedUnit'    => " m/s",
         '_radius'       => "Radius: ",
+        '_powerType'    => "Energieart",   // prevent power regeneration
         '_interval'     => "Interval: ",
         '_inSlot'       => "im Platz: ",
         '_collapseAll'  => "Alle einklappen",

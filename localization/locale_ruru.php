@@ -1770,6 +1770,7 @@ $lang = array(
         '_speedZ'       => "Вертикальная скорость",
         '_speedUnit'    => " м/с",
         '_radius'       => "Радиус действия: ",
+        '_powerType'    => "Тип энергии",   // prevent power regeneration
         '_interval'     => "Интервал: ",
         '_inSlot'       => "в слот: ",
         '_collapseAll'  => "Свернуть все",

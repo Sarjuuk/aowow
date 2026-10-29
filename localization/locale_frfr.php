@@ -1770,6 +1770,7 @@ $lang = array(
         '_speedZ'       => "Vitesse verticale",
         '_speedUnit'    => " m/s",
         '_radius'       => "Rayon : ",
+        '_powerType'    => "Type de ressource",   // prevent power regeneration
         '_interval'     => "Intervalle : ",
         '_inSlot'       => "dans l'emplacement : ",
         '_collapseAll'  => "Replier Tout",
