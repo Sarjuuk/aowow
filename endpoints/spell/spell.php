@@ -2253,6 +2253,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 case SPELL_EFFECT_SUMMON_DEMON:
                 case SPELL_EFFECT_KILL_CREDIT:
                 case SPELL_EFFECT_KILL_CREDIT2:
+                case SPELL_EFFECT_CREATE_TAMED_PET:
                     if ($a = CreatureList::makeLink($effMV))
                         $_nameMV = $a;
                     else
