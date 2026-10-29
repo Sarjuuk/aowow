@@ -1774,6 +1774,7 @@ $lang = array(
         '_maxTargetLevel' => "Niveau max. de la cible",   // charm / possess level cap
         '_seat'         => "Siège",   // control vehicle
         '_ppmUnit'      => " déclenchements par minute",   // flat procs per minute modifier
+        '_totemBarSlots' => "Emplacements de la barre des totems",   // cast button
         '_interval'     => "Intervalle : ",
         '_inSlot'       => "dans l'emplacement : ",
         '_collapseAll'  => "Replier Tout",

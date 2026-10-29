@@ -1774,6 +1774,7 @@ $lang = array(
         '_maxTargetLevel' => "Макс. уровень цели",   // charm / possess level cap
         '_seat'         => "Место",   // control vehicle
         '_ppmUnit'      => " срабатываний в минуту",   // flat procs per minute modifier
+        '_totemBarSlots' => "Ячейки панели тотемов",   // cast button
         '_interval'     => "Интервал: ",
         '_inSlot'       => "в слот: ",
         '_collapseAll'  => "Свернуть все",

@@ -2398,8 +2398,9 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 case SPELL_EFFECT_TITAN_GRIP:
                     $effMV = 0;                             // effMV is trigger spell and was handled earlier
                     break;
-                case SPELL_EFFECT_CAST_BUTTON:
-                    $_nameMV = $effMV;                      // has a valid 0 value
+                case SPELL_EFFECT_CAST_BUTTON:              // casts the totems placed on MiscValueB totem bar slots from MiscValue on (action buttons MiscValue + 132 ..)
+                    $_footer = ['totemSlots' => Lang::spell('_totemBarSlots').Lang::main('colon').$this->fmtStaffTip(($effMV + 1).' &ndash; '.($effMV + $effMVB), 'MiscValue: '.$effMV.' / MiscValueB: '.$effMVB)] + $_footer;
+                    $effMV = $effMVB = 0;                   // shown as slots, not in the header
                     break;
                 // Aura
                 case SPELL_EFFECT_APPLY_AURA:
