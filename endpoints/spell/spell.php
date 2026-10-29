@@ -2465,6 +2465,9 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                         case SPELL_AURA_PHASE:                                // MiscValue is a phase mask, written in hex
                             $_nameMV = $this->fmtStaffTip('0x'.strtoupper(dechex($effMV)), 'MiscValue: '.$effMV);
                             break;
+                        case SPELL_AURA_SAFE_FALL:                            // yards of fall height ignored (Player::HandleFall)
+                            $valueFmt = '%s'.Lang::spell('_distUnit');
+                            break;
                         case SPELL_AURA_MOD_PERCENT_STAT:
                         case SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE:
                         case SPELL_AURA_MOD_SPELL_HEALING_OF_STAT_PERCENT:
