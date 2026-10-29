@@ -1773,6 +1773,7 @@ $lang = array(
         '_powerType'    => "Тип энергии",   // prevent power regeneration
         '_maxTargetLevel' => "Макс. уровень цели",   // charm / possess level cap
         '_seat'         => "Место",   // control vehicle
+        '_ppmUnit'      => " срабатываний в минуту",   // flat procs per minute modifier
         '_interval'     => "Интервал: ",
         '_inSlot'       => "в слот: ",
         '_collapseAll'  => "Свернуть все",

@@ -2616,7 +2616,16 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                         case SPELL_AURA_ADD_FLAT_MODIFIER:
                             // flat durations, casting times, cooldowns and tick intervals are in ms
                             if ($effAura == SPELL_AURA_ADD_FLAT_MODIFIER)       // the percent case falls through to here
+                            {
                                 $valueTime = in_array($effMV, SpellList::SPELLMOD_MSEC) ? 1000 : 0;
+                                // flat chances / coefficient are percentage points, range / radius yards
+                                if (in_array($effMV, SpellList::SPELLMOD_PCT_POINTS))
+                                    $valueFmt = '%s%%';
+                                else if (in_array($effMV, SpellList::SPELLMOD_YARDS))
+                                    $valueFmt = '%s'.Lang::spell('_distUnit');
+                                else if ($effMV == SPELLMOD_PROC_PER_MINUTE)
+                                    $valueFmt = '%s'.Lang::spell('_ppmUnit');
+                            }
                             if ($_ = Lang::spell('spellModOp', $effMV))
                                 $_nameMV = $this->fmtStaffTip($_, 'MiscValue: '.$effMV);
                             break;

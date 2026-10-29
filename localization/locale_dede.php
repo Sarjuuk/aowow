@@ -1772,6 +1772,7 @@ $lang = array(
         '_powerType'    => "Energieart",   // prevent power regeneration
         '_maxTargetLevel' => "Max. Zielstufe",   // charm / possess level cap
         '_seat'         => "Sitz",   // control vehicle
+        '_ppmUnit'      => " Auslösungen pro Minute",   // flat procs per minute modifier
         '_interval'     => "Interval: ",
         '_inSlot'       => "im Platz: ",
         '_collapseAll'  => "Alle einklappen",

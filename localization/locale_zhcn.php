@@ -1773,6 +1773,7 @@ $lang = array(
         '_powerType'    => "能量类型",   // prevent power regeneration
         '_maxTargetLevel' => "目标最高等级",   // charm / possess level cap
         '_seat'         => "座位",   // control vehicle
+        '_ppmUnit'      => "次触发/分钟",   // flat procs per minute modifier
         '_interval'     => "间隔：", //Interval
         '_inSlot'       => "在插槽中：",
         '_collapseAll'  => "折叠全部",

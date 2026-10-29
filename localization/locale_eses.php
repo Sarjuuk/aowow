@@ -1773,6 +1773,7 @@ $lang = array(
         '_powerType'    => "Tipo de poder",   // prevent power regeneration
         '_maxTargetLevel' => "Nivel máx. del objetivo",   // charm / possess level cap
         '_seat'         => "Asiento",   // control vehicle
+        '_ppmUnit'      => " activaciones por minuto",   // flat procs per minute modifier
         '_interval'     => "Intérvalo: ",
         '_inSlot'       => "en la casilla: ",
         '_collapseAll'  => "Contraer todo",
