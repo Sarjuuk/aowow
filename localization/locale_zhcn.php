@@ -1957,6 +1957,7 @@ $lang = array(
             13 => "Health below 35%",              14 => "Immolate (Conflagrate)",        15 => "Rejuvenation / Regrowth (Swiftmend)", 16 => "Deadly Poison",
             17 => "Enraged",                       18 => "Bleeding",                      23 => "Health above 75%"
         ),
+        'destructibleState' => ["完好", "受损", "被摧毁", "重建中"], // GameObjectDestructibleState
         'effects'       => array(
 /*0-5    */ '无',                     '杀死',                '类型伤害',            'Dummy',                    '传送门',          '传送单位',
 /*6+     */ '应用光环',               '环境伤害',     'Drain Power',              'Drain Health',             'Heal',                     'Bind',

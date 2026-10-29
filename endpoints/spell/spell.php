@@ -2411,6 +2411,10 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                         $_nameMV = $this->fmtStaffTip($node, 'MiscValue: '.$effMV);
                     }
                     break;
+                case SPELL_EFFECT_GAMEOBJECT_SET_DESTRUCTION_STATE:
+                    if ($_ = Lang::exist('spell', 'destructibleState', $effMV))
+                        $_nameMV = $this->fmtStaffTip($_, 'MiscValue: '.$effMV);
+                    break;
                 // Aura
                 case SPELL_EFFECT_APPLY_AURA:
                 case SPELL_EFFECT_PERSISTENT_AREA_AURA:

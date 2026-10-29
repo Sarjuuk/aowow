@@ -1957,6 +1957,7 @@ $lang = array(
             13 => "Health below 35%",              14 => "Immolate (Conflagrate)",        15 => "Rejuvenation / Regrowth (Swiftmend)", 16 => "Deadly Poison",
             17 => "Enraged",                       18 => "Bleeding",                      23 => "Health above 75%"
         ),
+        'destructibleState' => ["Intacto", "Dañado", "Destruido", "En reconstrucción"], // GameObjectDestructibleState
         'effects'       => array(
 /*0-5    */ "Ninguno",                       "Matar al instante",                    "Daño de escuela",                   "Ficticio",                       "Teletransporte por portal", "Teletransportar unidades",
 /*6+     */ "Aplicar aura",                  "Daño ambiental",                       "Drenar poder",                      "Drenar salud",                   "Sanar",                     "Vincular",
