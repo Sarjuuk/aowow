@@ -1779,6 +1779,7 @@ $lang = array(
         '_maxArcHeight' => "最高弧线高度",
         'honorItem'     => "由物品施放：荣誉点数为该值的十分之一",   // give honor (Spell::EffectAddHonor)
         'honorKills'    => "相当于目标等级下%d次荣誉击杀的荣誉",
+        '_skillTier'    => "技能等级",   // learn skill (step)
         '_interval'     => "间隔：", //Interval
         '_inSlot'       => "在插槽中：",
         '_collapseAll'  => "折叠全部",

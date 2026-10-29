@@ -2324,6 +2324,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                     break;
                 case SPELL_EFFECT_SKILL_STEP:
                 case SPELL_EFFECT_SKILL:
+                    $valueLabel = Lang::spell('_skillTier'); // the value is the step into SkillTiers.dbc (Spell::EffectLearnSkill)
                     if ($a = SkillList::makeLink($effMV))
                         $_nameMV = $a;
                     else

@@ -1779,6 +1779,7 @@ $lang = array(
         '_maxArcHeight' => "Max. arc height",
         'honorItem'     => "cast from an item: tenth of this in honor points",   // give honor (Spell::EffectAddHonor)
         'honorKills'    => "honor of %d honorable kills at the target's level",
+        '_skillTier'    => "Skill tier",   // learn skill (step)
         '_interval'     => "Interval: ",
         '_inSlot'       => "in slot: ",
         '_collapseAll'  => "Collapse All",

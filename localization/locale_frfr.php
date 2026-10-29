@@ -1779,6 +1779,7 @@ $lang = array(
         '_maxArcHeight' => "Hauteur max. de l'arc",
         'honorItem'     => "lancé depuis un objet : un dixième en points d'honneur",   // give honor (Spell::EffectAddHonor)
         'honorKills'    => "honneur de %d victoires honorables au niveau de la cible",
+        '_skillTier'    => "Palier de compétence",   // learn skill (step)
         '_interval'     => "Intervalle : ",
         '_inSlot'       => "dans l'emplacement : ",
         '_collapseAll'  => "Replier Tout",

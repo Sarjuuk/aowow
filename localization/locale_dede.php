@@ -1778,6 +1778,7 @@ $lang = array(
         '_maxArcHeight' => "Max. Bogenhöhe",
         'honorItem'     => "von einem Gegenstand gewirkt: ein Zehntel davon als Ehrenpunkte",   // give honor (Spell::EffectAddHonor)
         'honorKills'    => "Ehre von %d ehrenhaften Siegen auf Stufe des Ziels",
+        '_skillTier'    => "Fertigkeitsstufe",   // learn skill (step)
         '_interval'     => "Interval: ",
         '_inSlot'       => "im Platz: ",
         '_collapseAll'  => "Alle einklappen",

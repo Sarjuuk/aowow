@@ -1779,6 +1779,7 @@ $lang = array(
         '_maxArcHeight' => "Макс. высота дуги",
         'honorItem'     => "применено с предмета: десятая часть в очках чести",   // give honor (Spell::EffectAddHonor)
         'honorKills'    => "честь за %d почетных побед на уровне цели",
+        '_skillTier'    => "Ступень навыка",   // learn skill (step)
         '_interval'     => "Интервал: ",
         '_inSlot'       => "в слот: ",
         '_collapseAll'  => "Свернуть все",
