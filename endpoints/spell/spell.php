@@ -2459,7 +2459,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 case SPELL_EFFECT_ADD_HONOR:                // a tenth from items, up to 50 is a number of kills scaled to the target level (Spell::EffectAddHonor)
                     $fromItem = DB::Aowow()->selectCell('SELECT 1 FROM ::items WHERE %i IN (`spellId1`, `spellId2`, `spellId3`, `spellId4`, `spellId5`)', $this->typeId);
                     if ($fromItem)
-                        $_footer['value'][2] = sprintf(Util::$dfnString, Lang::spell('honorItem'), Lang::main('parensFmt', ['', round($_footer['value'][1] / 10, 1)]));
+                        array_walk($_footer['value'], fn(&$x) => $x = is_null($x) ? null : $x / 10);
                     else if ($_footer['value'][1] && $_footer['value'][1] <= 50)
                         $_footer['value'][2] = Lang::main('parensFmt', ['', sprintf(Lang::spell('honorKills'), $_footer['value'][1])]);
                     break;
