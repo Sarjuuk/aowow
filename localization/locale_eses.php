@@ -1770,6 +1770,15 @@ $lang = array(
         '_speedZ'       => "Velocidad vertical",
         '_speedUnit'    => " m/s",
         '_radius'       => "Radio: ",
+        '_powerType'    => "Tipo de poder",   // prevent power regeneration
+        '_maxTargetLevel' => "Nivel máx. del objetivo",   // charm / possess level cap
+        '_seat'         => "Asiento",   // control vehicle
+        '_ppmUnit'      => " activaciones por minuto",   // flat procs per minute modifier
+        '_totemBarSlots' => "Huecos de la barra de tótems",   // cast button
+        '_minArcHeight' => "Altura mín. del arco",   // jump effects
+        '_maxArcHeight' => "Altura máx. del arco",
+        'honorKills'    => "honor de %d muertes con honor al nivel del objetivo",   // give honor (Spell::EffectAddHonor)
+        '_skillTier'    => "Rango de habilidad",   // learn skill (step)
         '_interval'     => "Intérvalo: ",
         '_inSlot'       => "en la casilla: ",
         '_collapseAll'  => "Contraer todo",
@@ -1945,6 +1954,14 @@ $lang = array(
         'summonControl' => ["Sin control", "Guardián", "Mascota", "Embelesado", "Vehículo poseído", "Vehículo sin control"],
         'summonSlot'    => ["Mascota", "Tótem de Fuego", "Tótem de Tierra", "Tótem de Agua", "Tótem de Aire", "Mascota mansa", "Misión"],
         'unkEffect'     => 'Efecto desconocido (%1$d)',
+        // AuraStateType, as checked by SPELL_AURA_MOD_DAMAGE_DONE_VERSUS_AURASTATE; labels are English in all locales
+        'auraStates'    => array(
+             1 => "Dodged, parried or blocked",     2 => "Health below 20%",               3 => "Berserking",                     4 => "Frozen",
+             5 => "Judgement",                      7 => "Hunter parry",                  10 => "Victory Rush",                  12 => "Faerie Fire",
+            13 => "Health below 35%",              14 => "Immolate (Conflagrate)",        15 => "Rejuvenation / Regrowth (Swiftmend)", 16 => "Deadly Poison",
+            17 => "Enraged",                       18 => "Bleeding",                      23 => "Health above 75%"
+        ),
+        'destructibleState' => ["Intacto", "Dañado", "Destruido", "En reconstrucción"], // GameObjectDestructibleState
         'effects'       => array(
 /*0-5    */ "Ninguno",                       "Matar al instante",                    "Daño de escuela",                   "Ficticio",                       "Teletransporte por portal", "Teletransportar unidades",
 /*6+     */ "Aplicar aura",                  "Daño ambiental",                       "Drenar poder",                      "Drenar salud",                   "Sanar",                     "Vincular",
@@ -2030,7 +2047,7 @@ $lang = array(
 /*250+ */   "Modificar salud máxima - Fijo (acumulable)",               "Modificar probabilidad de esquiva enemiga",                         "Modificar celeridad % (pérdida)",                                "Modificar probabilidad de bloqueo crítico",                  "Desarmar mano secundaria",
             "Modificar daño de mecánica %",                             "Sin coste de reagente",                                             "Modificar resistencia objetivo por clase de hechizo",            "Modificar visual de hechizo",                                "Modificar sanación periódica recibida %",
             "Efecto de pantalla",                                       "Fase",                                                              "Ignorar estado de aura de habilidad",                            "Permitir solo habilidad",                                    "",
-            "",                                                         "",                                                                  "Cancelar buffer de aura al % de salud del lanzador",             "Modificar poder de ataque con % de estadística",             "Ignorar resistencia del objetivo",
+            "",                                                         "",                                                                  "Inmunidad a auras perjudiciales de la escuela",                  "Modificar poder de ataque con % de estadística",             "Ignorar resistencia del objetivo",
             "Ignorar resistencia del objetivo para habilidad",          "Modificar daño recibido % del lanzador",                            "Ignorar reinicio de temporizador de golpe",                      "Rayos X",                                                    "Habilidad no consume munición",
 /*275+ */   "Ignorar cambio de forma para habilidad",                   "Modificar daño de mecánica hecho %",                                "Modificar máximo de objetivos afectados",                        "Desarmar arma a distancia",                                  "Efecto de aparición",
             "Modificar penetración de armadura %",                      "Modificar ganancia de honor %",                                     "Modificar salud base %",                                         "Modificar sanación recibida % del lanzador",                 "Aura vinculada",

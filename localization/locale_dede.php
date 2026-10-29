@@ -1769,6 +1769,15 @@ $lang = array(
         '_speedZ'       => "Vertikale Geschwindigkeit",
         '_speedUnit'    => " m/s",
         '_radius'       => "Radius: ",
+        '_powerType'    => "Energieart",   // prevent power regeneration
+        '_maxTargetLevel' => "Max. Zielstufe",   // charm / possess level cap
+        '_seat'         => "Sitz",   // control vehicle
+        '_ppmUnit'      => " Auslösungen pro Minute",   // flat procs per minute modifier
+        '_totemBarSlots' => "Totemleistenplätze",   // cast button
+        '_minArcHeight' => "Min. Bogenhöhe",   // jump effects
+        '_maxArcHeight' => "Max. Bogenhöhe",
+        'honorKills'    => "Ehre von %d ehrenhaften Siegen auf Stufe des Ziels",   // give honor (Spell::EffectAddHonor)
+        '_skillTier'    => "Fertigkeitsstufe",   // learn skill (step)
         '_interval'     => "Interval: ",
         '_inSlot'       => "im Platz: ",
         '_collapseAll'  => "Alle einklappen",
@@ -1944,6 +1953,14 @@ $lang = array(
         'summonControl' => ["Ungesteuert", "Wächter", "Begleiter", "Bezaubert", "Gesteuertes Fahrzeug", "Ungesteuertes Fahrzeug"],
         'summonSlot'    => ["Begleiter", "Feuertotem", "Erdtotem", "Wassertotem", "Lufttotem", "Haustier", "Quest"],
         'unkEffect'     => 'Unknown Effect (%1$d)',
+        // AuraStateType, as checked by SPELL_AURA_MOD_DAMAGE_DONE_VERSUS_AURASTATE; labels are English in all locales
+        'auraStates'    => array(
+             1 => "Dodged, parried or blocked",     2 => "Health below 20%",               3 => "Berserking",                     4 => "Frozen",
+             5 => "Judgement",                      7 => "Hunter parry",                  10 => "Victory Rush",                  12 => "Faerie Fire",
+            13 => "Health below 35%",              14 => "Immolate (Conflagrate)",        15 => "Rejuvenation / Regrowth (Swiftmend)", 16 => "Deadly Poison",
+            17 => "Enraged",                       18 => "Bleeding",                      23 => "Health above 75%"
+        ),
+        'destructibleState' => ["Intakt", "Beschädigt", "Zerstört", "Im Wiederaufbau"], // GameObjectDestructibleState
         'effects'       => array(
 /*0-5    */ 'None',                     'Instakill',                'School Damage',            'Dummy',                    'Portal Teleport',          'Teleport Units',
 /*6+     */ 'Apply Aura',               'Environmental Damage',     'Drain Power',              'Drain Health',             'Heal',                     'Bind',
@@ -2029,7 +2046,7 @@ $lang = array(
 /*250+ */   'Mod Maximum Health - Flat (stacking)', 'Mod Enemy Dodge Chance',               'Mod Haste % (loss)',                   'Mod Critical Block Chance',            'Disarm Offhand',
             'Mod Mechanic Damage Taken %',          'No Reagent Cost',                      'Mod Target Resistance by Spell Class', 'Mod Spell Visual',                     'Mod Periodic Healing Taken %',
             'Screen Effect',                        'Phase',                                'Ability Ignore Aurastate',             'Allow Only Ability',                   '',
-            '',                                     '',                                     'Cancel Aura Buffer at % of Caster Health','Mod Attack Power by % of Stat',     'Ignore Target Resistance',
+            '',                                     '',                                     'Immune to Harmful Auras of School','Mod Attack Power by % of Stat',     'Ignore Target Resistance',
             'Ignore Target Resistance for Ability', 'Mod Damage Taken % from Caster',       'Ignore Swing Timer Reset',             'X-Ray',                                'Ability Consume No Ammo',
 /*275+ */   'Mod Ability Ignore Shapeshift',        'Mod Mechanic Damage Done %',           'Mod Max Affected Targets',             'Disarm Ranged Weapon',                 'Spawn Effect',
             'Mod Armor Penetration %',              'Mod Honor Gain %',                     'Mod Base Health %',                    'Mod Healing Taken % from Caster',      'Linked Aura',
