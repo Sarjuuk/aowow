@@ -2747,6 +2747,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                         case SPELL_AURA_MOD_RAGE_FROM_DAMAGE_DEALT:
                         case SPELL_AURA_MOD_DISPEL_RESIST:
                         case SPELL_AURA_MOD_ENEMY_DODGE:
+                        case SPELL_AURA_MOD_HEALING_RECEIVED:
                             $valueFmt = '%s%%';
                             break;
                     }
