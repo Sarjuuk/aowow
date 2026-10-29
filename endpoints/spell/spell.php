@@ -2402,6 +2402,15 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                     $_footer = ['totemSlots' => Lang::spell('_totemBarSlots').Lang::main('colon').$this->fmtStaffTip(($effMV + 1).' &ndash; '.($effMV + $effMVB), 'MiscValue: '.$effMV.' / MiscValueB: '.$effMVB)] + $_footer;
                     $effMV = $effMVB = 0;                   // shown as slots, not in the header
                     break;
+                case SPELL_EFFECT_DISCOVER_TAXI:
+                    if ($_ = DB::Aowow()->selectRow('SELECT `areaId`, `areaX`, `areaY`, `name_loc0`, name_loc%i FROM ::taxinodes WHERE `id` = %i', Lang::getLocale()->value, $effMV))
+                    {
+                        $node = Util::localizedString($_, 'name');
+                        if ($_['areaId'])
+                            $node = sprintf('<a href="?maps=%d:%03d%03d">%s</a>', $_['areaId'], $_['areaX'] * 10, $_['areaY'] * 10, $node);
+                        $_nameMV = $this->fmtStaffTip($node, 'MiscValue: '.$effMV);
+                    }
+                    break;
                 // Aura
                 case SPELL_EFFECT_APPLY_AURA:
                 case SPELL_EFFECT_PERSISTENT_AREA_AURA:
