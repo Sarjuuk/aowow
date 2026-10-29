@@ -2449,6 +2449,12 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                     }
                     $effMV = 0;                             // shown as mana, not in the header
                     break;
+                case SPELL_EFFECT_RESURRECT_NEW:            // flat health, MiscValue is flat mana (Spell::EffectResurrectNew)
+                    $valueLabel = Lang::spell('powerTypes', POWER_HEALTH);
+                    if ($effMV)
+                        $_footer = array_slice($_footer, 0, 1, true) + ['mana' => Lang::spell('powerTypes', POWER_MANA).Lang::main('colon').$this->fmtStaffTip($effMV, 'MiscValue: '.$effMV)] + $_footer;
+                    $effMV = 0;                             // shown as mana, not in the header
+                    break;
                 // Aura
                 case SPELL_EFFECT_APPLY_AURA:
                 case SPELL_EFFECT_PERSISTENT_AREA_AURA:
