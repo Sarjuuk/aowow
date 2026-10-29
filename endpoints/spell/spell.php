@@ -2554,6 +2554,9 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                         case SPELL_AURA_MOD_IGNORE_TARGET_RESIST:
                         case SPELL_AURA_MOD_ATTACK_POWER_OF_ARMOR:            // ? Mod Attack Power by School Resistance
                         case SPELL_AURA_SCHOOL_HEAL_ABSORB:
+                            // MiscValueB of power cost mods is a mask of power types (SpellInfo::CalcPowerCost)
+                            if (in_array($effAura, [SPELL_AURA_MOD_POWER_COST_SCHOOL_PCT, SPELL_AURA_MOD_POWER_COST_SCHOOL]) && ($_ = array_intersect_key(Lang::spell('powerTypes'), Util::mask2bits($effMVB))))
+                                $_nameMVB = $this->fmtStaffTip(implode(', ', $_), 'MiscValueB: '.Util::asHex($effMVB));
                             if ($_ = Lang::getMagicSchools($effMV))
                                 $_nameMV = $this->fmtStaffTip($_, 'MiscValue: '.Util::asHex($effMV));
                             break;
