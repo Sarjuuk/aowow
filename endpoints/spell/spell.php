@@ -2223,7 +2223,8 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                     if ($_ = Lang::spell('powerTypes', $effMV))
                         $_nameMV = $this->fmtStaffTip($_, 'MiscValue: '.$effMV);
 
-                    if ($effMV == POWER_RAGE || $effMV == POWER_RUNIC_POWER)
+                    // rage and runic power are stored x10, a percentage of them is not
+                    if (($effMV == POWER_RAGE || $effMV == POWER_RUNIC_POWER) && $effId != SPELL_EFFECT_ENERGIZE_PCT)
                         array_walk($_footer['value'], fn(&$x) => $x /= 10);
                     break;
                 case SPELL_EFFECT_BIND:
@@ -2435,7 +2436,8 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                             if ($_ = Lang::spell('powerTypes', $effMV))
                                 $_nameMV = $this->fmtStaffTip($_, 'MiscValue: '.$effMV);
 
-                            if ($effMV == POWER_RAGE || $effMV == POWER_RUNIC_POWER)
+                            // rage and runic power are stored x10, a percentage of them is not
+                            if (($effMV == POWER_RAGE || $effMV == POWER_RUNIC_POWER) && !in_array($effAura, [SPELL_AURA_MOD_POWER_REGEN_PERCENT, SPELL_AURA_MOD_INCREASE_ENERGY_PERCENT, SPELL_AURA_OBS_MOD_POWER]))
                                 array_walk($_footer['value'], fn(&$x) => $x /= 10);
 
                             if ($effAura == SPELL_AURA_MOD_POWER_REGEN && ($_ = Lang::spell('_regenPer5Sec', $effMV)))
