@@ -2432,6 +2432,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                         case SPELL_AURA_PERIODIC_ENERGIZE:
                         case SPELL_AURA_MOD_INCREASE_ENERGY:
                         case SPELL_AURA_MOD_POWER_REGEN:
+                        case SPELL_AURA_POWER_BURN:
                             if ($_ = Lang::spell('powerTypes', $effMV))
                                 $_nameMV = $this->fmtStaffTip($_, 'MiscValue: '.$effMV);
 
