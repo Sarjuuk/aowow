@@ -2425,6 +2425,12 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                     $_footer = $arc + $_footer;
                     $effMV = $effMVB = 0;                   // shown as heights, not in the header
                     break;
+                case SPELL_EFFECT_PULL_TOWARDS:             // MiscValue is the horizontal speed x10, the vertical one is calculated (Spell::EffectPullTowards)
+                case SPELL_EFFECT_PULL_TOWARDS_DEST:
+                    if ($effMV)
+                        $_footer = ['speedXY' => Lang::spell('_speedXY').Lang::main('colon').$this->fmtStaffTip(($effMV / 10).Lang::spell('_speedUnit'), 'MiscValue: '.$effMV)] + $_footer;
+                    $effMV = 0;                             // shown as horizontal speed, not in the header
+                    break;
                 // Aura
                 case SPELL_EFFECT_APPLY_AURA:
                 case SPELL_EFFECT_PERSISTENT_AREA_AURA:
