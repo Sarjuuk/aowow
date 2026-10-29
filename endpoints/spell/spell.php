@@ -2455,6 +2455,13 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                         $_footer = array_slice($_footer, 0, 1, true) + ['mana' => Lang::spell('powerTypes', POWER_MANA).Lang::main('colon').$this->fmtStaffTip($effMV, 'MiscValue: '.$effMV)] + $_footer;
                     $effMV = 0;                             // shown as mana, not in the header
                     break;
+                case SPELL_EFFECT_ADD_HONOR:                // a tenth from items, up to 50 is a number of kills scaled to the target level (Spell::EffectAddHonor)
+                    $fromItem = DB::Aowow()->selectCell('SELECT 1 FROM ::items WHERE %i IN (`spellId1`, `spellId2`, `spellId3`, `spellId4`, `spellId5`)', $this->typeId);
+                    if ($fromItem)
+                        $_footer['value'][2] = sprintf(Util::$dfnString, Lang::spell('honorItem'), Lang::main('parensFmt', ['', round($_footer['value'][1] / 10, 1)]));
+                    else if ($_footer['value'][1] && $_footer['value'][1] <= 50)
+                        $_footer['value'][2] = Lang::main('parensFmt', ['', sprintf(Lang::spell('honorKills'), $_footer['value'][1])]);
+                    break;
                 // Aura
                 case SPELL_EFFECT_APPLY_AURA:
                 case SPELL_EFFECT_PERSISTENT_AREA_AURA:
