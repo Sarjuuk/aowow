@@ -2237,6 +2237,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 case SPELL_EFFECT_QUEST_COMPLETE:
                 case SPELL_EFFECT_CLEAR_QUEST:
                 case SPELL_EFFECT_QUEST_FAIL:
+                case SPELL_EFFECT_QUEST_START:
                     if ($a = QuestList::makeLink($effMV))
                         $_nameMV = $a;
                     else
