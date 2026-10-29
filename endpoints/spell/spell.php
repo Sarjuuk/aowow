@@ -2415,6 +2415,16 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                     if ($_ = Lang::exist('spell', 'destructibleState', $effMV))
                         $_nameMV = $this->fmtStaffTip($_, 'MiscValue: '.$effMV);
                     break;
+                case SPELL_EFFECT_JUMP:                     // MiscValue / MiscValueB bound the arc height in yards x10 (Spell::CalculateJumpSpeeds)
+                case SPELL_EFFECT_JUMP_DEST:
+                    $arc = [];
+                    if ($effMV)
+                        $arc['arcMin'] = Lang::spell('_minArcHeight').Lang::main('colon').$this->fmtStaffTip(($effMV / 10).Lang::spell('_distUnit'), 'MiscValue: '.$effMV);
+                    if ($effMVB)
+                        $arc['arcMax'] = Lang::spell('_maxArcHeight').Lang::main('colon').$this->fmtStaffTip(($effMVB / 10).Lang::spell('_distUnit'), 'MiscValueB: '.$effMVB);
+                    $_footer = $arc + $_footer;
+                    $effMV = $effMVB = 0;                   // shown as heights, not in the header
+                    break;
                 // Aura
                 case SPELL_EFFECT_APPLY_AURA:
                 case SPELL_EFFECT_PERSISTENT_AREA_AURA:
