@@ -2873,6 +2873,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 case SPELL_EFFECT_MODIFY_THREAT_PERCENT:
                 case SPELL_EFFECT_REDIRECT_THREAT:
                 case SPELL_EFFECT_HEAL_PCT:
+                case SPELL_EFFECT_RESURRECT_PET:            // % of max health (Spell::EffectResurrectPet)
                     $valueFmt = '%s%%';
                     break;
                 // MiscValue and value are the horizontal and vertical speed x10 (Spell::EffectKnockBack, Spell::EffectLeapBack)
