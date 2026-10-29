@@ -2447,6 +2447,11 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                             $pt = $effBP + ($effDS ? 1 : 0);
                             $_footer['value'] = [null, $this->fmtStaffTip(Lang::exist('spell', 'powerTypes', $pt) ?? (string)$pt, 'Value: '.$pt), null];
                             break;
+                        case SPELL_AURA_MOD_POSSESS:                          // the value caps the target level (Spell::CheckCast)
+                        case SPELL_AURA_MOD_CHARM:
+                        case SPELL_AURA_AOE_CHARM:
+                            $valueLabel = Lang::spell('_maxTargetLevel');
+                            break;
                         case SPELL_AURA_MOD_PERCENT_STAT:
                         case SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE:
                         case SPELL_AURA_MOD_SPELL_HEALING_OF_STAT_PERCENT:

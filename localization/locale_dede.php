@@ -1770,6 +1770,7 @@ $lang = array(
         '_speedUnit'    => " m/s",
         '_radius'       => "Radius: ",
         '_powerType'    => "Energieart",   // prevent power regeneration
+        '_maxTargetLevel' => "Max. Zielstufe",   // charm / possess level cap
         '_interval'     => "Interval: ",
         '_inSlot'       => "im Platz: ",
         '_collapseAll'  => "Alle einklappen",
