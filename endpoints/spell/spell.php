@@ -2535,6 +2535,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                         case SPELL_AURA_MOD_SPELL_DAMAGE_FROM_HEALING:        // ? Mod Spell & Healing Power by % of Int
                         case SPELL_AURA_MOD_ATTACKER_SPELL_CRIT_CHANCE:
                         case SPELL_AURA_MOD_CRITICAL_THREAT:
+                        case SPELL_AURA_MOD_SCHOOL_CRIT_DMG_TAKEN:
                             $valueFmt = '%s%%';
                         case SPELL_AURA_SCHOOL_ABSORB:
                         case SPELL_AURA_MOD_DAMAGE_DONE:
