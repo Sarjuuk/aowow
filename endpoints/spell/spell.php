@@ -2732,6 +2732,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                         case SPELL_AURA_MOD_XP_QUEST_PCT:
                         case SPELL_AURA_MOD_HONOR_GAIN_PCT:
                         case SPELL_AURA_MOD_ATTACKSPEED:
+                        case SPELL_AURA_MELEE_SLOW:
                             $valueFmt = '%s%%';
                             break;
                     }
