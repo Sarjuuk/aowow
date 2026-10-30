@@ -80,10 +80,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         }
 
         // returns self or firstRank
-        if ($fr = DB::World()->selectCell('SELECT `first_spell_id` FROM spell_ranks WHERE `spell_id` = %i', $this->typeId))
-            $this->firstRank = $fr;
-        else
-            $this->firstRank = $this->typeId;
+        $this->firstRank = self::getSpellRanks([$this->typeId])[$this->typeId][0] ?? $this->typeId;
 
         $this->h1 = Util::htmlEscape($this->subject->getField('name', true));
 
@@ -466,7 +463,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
                 if ($classSpells)
                 {
-                    foreach (DB::World()->selectAssoc('SELECT `spell_id` AS ARRAY_KEY, `first_spell_id` AS "0", `rank` AS "1" FROM spell_ranks WHERE `spell_id` IN %in', array_keys($classSpells)) as $spellId => [$firstSpellId, $rank])
+                    foreach (self::getSpellRanks(array_keys($classSpells)) as $spellId => [$firstSpellId, $rank])
                     {
                         $classSpells[$firstSpellId][1][0] = min($classSpells[$firstSpellId][1][0] ?? $rank, $rank);
                         $classSpells[$firstSpellId][1][1] = max($classSpells[$firstSpellId][1][1] ?? $rank, $rank);
@@ -2749,6 +2746,27 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 $infobox[] = 'Script'.Lang::main('colon').$_;
 
         return $infobox;
+    }
+
+    // spellId => [firstRank, rank]; talents are not in spell_ranks, the TC chains them from
+    // Talent.dbc first (SpellMgr::LoadSpellTalentRanks) and lets spell_ranks override that
+    private static function getSpellRanks(array $spellIds) : array
+    {
+        $ranks = DB::World()->selectAssoc('SELECT `spell_id` AS ARRAY_KEY, `first_spell_id` AS "0", `rank` AS "1" FROM spell_ranks WHERE `spell_id` IN %in', $spellIds) ?: [];
+
+        if (!($missing = array_diff($spellIds, array_keys($ranks))))
+            return $ranks;
+
+        $talents = DB::Aowow()->selectAssoc(
+           'SELECT rnk.`spell` AS ARRAY_KEY, r1.`spell` AS "0", rnk.`rank` AS "1"
+            FROM   ::talents rnk
+            JOIN   ::talents t  ON rnk.`id` = t.`id`
+            JOIN   ::talents r1 ON  r1.`id` = t.`id` AND r1.`rank` = 1
+            WHERE  t.`spell` IN %in',
+            $missing
+        );
+
+        return $ranks + $talents;
     }
 
 
