@@ -133,6 +133,14 @@ class Game
         'meta',                         'red',                          'yellow',                       'blue'
     );
 
+    private static array $honorPerKill = [];
+
+    public static function getHonorPerKill(int $level = MAX_LEVEL) : float
+    {
+        // default to 124.114 @ Level 80
+        return self::$honorPerKill[$level] ??= (DB::Aowow()->selectCell('SELECT `data` / 10 FROM ::teamcontributionpoints WHERE `id` = %i', $level) ?? 124.114);
+    }
+
     public static function getReputationLevelForPoints(int $pts) : int
     {
         return match (true) {

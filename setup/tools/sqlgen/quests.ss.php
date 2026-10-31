@@ -19,6 +19,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
     protected array $dbcSourceFiles  = ['questxp', 'questfactionreward'];
     protected array $worldDependency = ['quest_template', 'quest_template_addon', 'quest_template_locale', 'game_event', 'game_event_seasonal_questrelation', 'quest_request_items', 'quest_request_items_locale', 'quest_offer_reward', 'quest_offer_reward_locale',  'disables'];
+    protected array $setupAfter      = [['teamcontributionpoints'], []];
 
     public function generate() : bool
     {
@@ -60,7 +61,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                       RewardMoney,
                       RewardBonusMoney,
                       RewardDisplaySpell,                 RewardSpell,
-                      RewardHonor + (124 * RewardKillHonor),          -- 124 = 1HK @ L80 (real value per level in TeamContributionPoints.dbc)
+                      CAST(RewardHonor + (%f * RewardKillHonor) AS UNSIGNED),
                       IFNULL(qa.RewardMailTemplateId, 0), IFNULL(qa.RewardMailDelay, 0),
                       RewardTitle,
                       RewardTalents,
@@ -118,7 +119,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         DB::Aowow()->qry('TRUNCATE ::quests');
 
         $i = 0;
-        while ($quests = DB::World()->selectAssoc($baseQuery, CLISetup::SQL_BATCH * $i, CLISetup::SQL_BATCH))
+        while ($quests = DB::World()->selectAssoc($baseQuery, Game::getHonorPerKill(), CLISetup::SQL_BATCH * $i, CLISetup::SQL_BATCH))
         {
             CLI::write(' * batch #' . ++$i . ' (' . count($quests) . ')', CLI::LOG_BLANK, true, true);
 
