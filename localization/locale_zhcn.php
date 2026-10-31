@@ -1770,6 +1770,15 @@ $lang = array(
         '_speedZ'       => "垂直速度",
         '_speedUnit'    => "码/秒",
         '_radius'       => "半径：",
+        '_powerType'    => "能量类型",   // prevent power regeneration
+        '_maxTargetLevel' => "目标最高等级",   // charm / possess level cap
+        '_seat'         => "座位",   // control vehicle
+        '_ppmUnit'      => "次触发/分钟",   // flat procs per minute modifier
+        '_totemBarSlots' => "图腾栏位置",   // cast button
+        '_minArcHeight' => "最低弧线高度",   // jump effects
+        '_maxArcHeight' => "最高弧线高度",
+        'honorKills'    => "相当于目标等级下%d次荣誉击杀的荣誉",   // give honor (Spell::EffectAddHonor)
+        '_skillTier'    => "技能等级",   // learn skill (step)
         '_interval'     => "间隔：", //Interval
         '_inSlot'       => "在插槽中：",
         '_collapseAll'  => "折叠全部",
@@ -1945,6 +1954,14 @@ $lang = array(
         'summonControl' => ['[Uncontrolled]', "守护者", "宠物", "被魅惑", '[Possessed Vehicle]', '[Uncontrolled Vehicle]'],
         'summonSlot'    => ["宠物", "火焰图腾", "大地图腾", "水图腾", "空气图腾", "非战斗宠物", "任务"],
         'unkEffect'     => '未知效果 (%1$d)',
+        // AuraStateType, as checked by SPELL_AURA_MOD_DAMAGE_DONE_VERSUS_AURASTATE; labels are English in all locales
+        'auraStates'    => array(
+             1 => "Dodged, parried or blocked",     2 => "Health below 20%",               3 => "Berserking",                     4 => "Frozen",
+             5 => "Judgement",                      7 => "Hunter parry",                  10 => "Victory Rush",                  12 => "Faerie Fire",
+            13 => "Health below 35%",              14 => "Immolate (Conflagrate)",        15 => "Rejuvenation / Regrowth (Swiftmend)", 16 => "Deadly Poison",
+            17 => "Enraged",                       18 => "Bleeding",                      23 => "Health above 75%"
+        ),
+        'destructibleState' => ["完好", "受损", "被摧毁", "重建中"], // GameObjectDestructibleState
         'effects'       => array(
 /*0-5    */ '无',                     '杀死',                '类型伤害',            'Dummy',                    '传送门',          '传送单位',
 /*6+     */ '应用光环',               '环境伤害',     'Drain Power',              'Drain Health',             'Heal',                     'Bind',
@@ -2030,7 +2047,7 @@ $lang = array(
 /*250+ */   'Mod Maximum Health - Flat (stacking)', 'Mod Enemy Dodge Chance',               'Mod Haste % (loss)',                   'Mod Critical Block Chance',            'Disarm Offhand',
             'Mod Mechanic Damage Taken %',          'No Reagent Cost',                      'Mod Target Resistance by Spell Class', 'Mod Spell Visual',                     'Mod Periodic Healing Taken %',
             'Screen Effect',                        'Phase',                                'Ability Ignore Aurastate',             'Allow Only Ability',                   '',
-            '',                                     '',                                     'Cancel Aura Buffer at % of Caster Health','Mod Attack Power by % of Stat',     'Ignore Target Resistance',
+            '',                                     '',                                     'Immune to Harmful Auras of School','Mod Attack Power by % of Stat',     'Ignore Target Resistance',
             'Ignore Target Resistance for Ability', 'Mod Damage Taken % from Caster',       'Ignore Swing Timer Reset',             'X-Ray',                                'Ability Consume No Ammo',
 /*275+ */   'Mod Ability Ignore Shapeshift',        'Mod Mechanic Damage Done %',           'Mod Max Affected Targets',             'Disarm Ranged Weapon',                 'Spawn Effect',
             'Mod Armor Penetration %',              'Mod Honor Gain %',                     'Mod Base Health %',                    'Mod Healing Taken % from Caster',      'Linked Aura',

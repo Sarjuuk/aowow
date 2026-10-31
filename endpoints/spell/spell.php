@@ -2238,6 +2238,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 case SPELL_EFFECT_QUEST_COMPLETE:
                 case SPELL_EFFECT_CLEAR_QUEST:
                 case SPELL_EFFECT_QUEST_FAIL:
+                case SPELL_EFFECT_QUEST_START:
                     if ($a = QuestList::makeLink($effMV))
                         $_nameMV = $a;
                     else
@@ -2253,6 +2254,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 case SPELL_EFFECT_SUMMON_DEMON:
                 case SPELL_EFFECT_KILL_CREDIT:
                 case SPELL_EFFECT_KILL_CREDIT2:
+                case SPELL_EFFECT_CREATE_TAMED_PET:
                     if ($a = CreatureList::makeLink($effMV))
                         $_nameMV = $a;
                     else
@@ -2323,6 +2325,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                     break;
                 case SPELL_EFFECT_SKILL_STEP:
                 case SPELL_EFFECT_SKILL:
+                    $valueLabel = Lang::spell('_skillTier'); // the value is the step into SkillTiers.dbc (Spell::EffectLearnSkill)
                     if ($a = SkillList::makeLink($effMV))
                         $_nameMV = $a;
                     else
@@ -2397,8 +2400,69 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 case SPELL_EFFECT_TITAN_GRIP:
                     $effMV = 0;                             // effMV is trigger spell and was handled earlier
                     break;
-                case SPELL_EFFECT_CAST_BUTTON:
-                    $_nameMV = $effMV;                      // has a valid 0 value
+                case SPELL_EFFECT_CAST_BUTTON:              // casts the totems placed on MiscValueB totem bar slots from MiscValue on (action buttons MiscValue + 132 ..)
+                    $_footer = ['totemSlots' => Lang::spell('_totemBarSlots').Lang::main('colon').$this->fmtStaffTip(($effMV + 1).' &ndash; '.($effMV + $effMVB), 'MiscValue: '.$effMV.' / MiscValueB: '.$effMVB)] + $_footer;
+                    $effMV = $effMVB = 0;                   // shown as slots, not in the header
+                    break;
+                case SPELL_EFFECT_DISCOVER_TAXI:
+                    if ($_ = DB::Aowow()->selectRow('SELECT `areaId`, `areaX`, `areaY`, `name_loc0`, name_loc%i FROM ::taxinodes WHERE `id` = %i', Lang::getLocale()->value, $effMV))
+                    {
+                        $node = Util::localizedString($_, 'name');
+                        if ($_['areaId'])
+                            $node = sprintf('<a href="?maps=%d:%03d%03d">%s</a>', $_['areaId'], $_['areaX'] * 10, $_['areaY'] * 10, $node);
+                        $_nameMV = $this->fmtStaffTip($node, 'MiscValue: '.$effMV);
+                    }
+                    break;
+                case SPELL_EFFECT_GAMEOBJECT_SET_DESTRUCTION_STATE:
+                    if ($_ = Lang::exist('spell', 'destructibleState', $effMV))
+                        $_nameMV = $this->fmtStaffTip($_, 'MiscValue: '.$effMV);
+                    break;
+                case SPELL_EFFECT_JUMP:                     // MiscValue / MiscValueB bound the arc height in yards x10 (Spell::CalculateJumpSpeeds)
+                case SPELL_EFFECT_JUMP_DEST:
+                    $arc = [];
+                    if ($effMV)
+                        $arc['arcMin'] = Lang::spell('_minArcHeight').Lang::main('colon').$this->fmtStaffTip(($effMV / 10).Lang::spell('_distUnit'), 'MiscValue: '.$effMV);
+                    if ($effMVB)
+                        $arc['arcMax'] = Lang::spell('_maxArcHeight').Lang::main('colon').$this->fmtStaffTip(($effMVB / 10).Lang::spell('_distUnit'), 'MiscValueB: '.$effMVB);
+                    $_footer = $arc + $_footer;
+                    $effMV = $effMVB = 0;                   // shown as heights, not in the header
+                    break;
+                case SPELL_EFFECT_PULL_TOWARDS:             // MiscValue is the horizontal speed x10, the vertical one is calculated (Spell::EffectPullTowards)
+                case SPELL_EFFECT_PULL_TOWARDS_DEST:
+                    if ($effMV)
+                        $_footer = ['speedXY' => Lang::spell('_speedXY').Lang::main('colon').$this->fmtStaffTip(($effMV / 10).Lang::spell('_speedUnit'), 'MiscValue: '.$effMV)] + $_footer;
+                    $effMV = 0;                             // shown as horizontal speed, not in the header
+                    break;
+                case SPELL_EFFECT_DISTRACT:                 // seconds (MoveDistract(damage * IN_MILLISECONDS))
+                    $valueTime = 1;
+                    break;
+                case SPELL_EFFECT_SELF_RESURRECT:           // negative: flat health, MiscValue flat mana; positive: % of both (Spell::EffectSelfResurrect)
+                    $valueLabel = Lang::spell('powerTypes', POWER_HEALTH);
+                    if ($_footer['value'][1] < 0)
+                    {
+                        array_walk($_footer['value'], fn(&$x) => $x = is_null($x) ? null : -$x);
+                        if ($effMV)
+                            $_footer = array_slice($_footer, 0, 1, true) + ['mana' => Lang::spell('powerTypes', POWER_MANA).Lang::main('colon').$this->fmtStaffTip($effMV, 'MiscValue: '.$effMV)] + $_footer;
+                    }
+                    else if ($_footer['value'][1] > 0)
+                    {
+                        $valueFmt = '%s%%';
+                        $_footer  = array_slice($_footer, 0, 1, true) + ['mana' => Lang::spell('powerTypes', POWER_MANA).Lang::main('colon').sprintf('%s%%', $_footer['value'][1])] + $_footer;
+                    }
+                    $effMV = 0;                             // shown as mana, not in the header
+                    break;
+                case SPELL_EFFECT_RESURRECT_NEW:            // flat health, MiscValue is flat mana (Spell::EffectResurrectNew)
+                    $valueLabel = Lang::spell('powerTypes', POWER_HEALTH);
+                    if ($effMV)
+                        $_footer = array_slice($_footer, 0, 1, true) + ['mana' => Lang::spell('powerTypes', POWER_MANA).Lang::main('colon').$this->fmtStaffTip($effMV, 'MiscValue: '.$effMV)] + $_footer;
+                    $effMV = 0;                             // shown as mana, not in the header
+                    break;
+                case SPELL_EFFECT_ADD_HONOR:                // a tenth from items, up to 50 is a number of kills scaled to the target level (Spell::EffectAddHonor)
+                    $fromItem = DB::Aowow()->selectCell('SELECT 1 FROM ::items WHERE %i IN (`spellId1`, `spellId2`, `spellId3`, `spellId4`, `spellId5`)', $this->typeId);
+                    if ($fromItem)
+                        array_walk($_footer['value'], fn(&$x) => $x = is_null($x) ? null : $x / 10);
+                    else if ($_footer['value'][1] && $_footer['value'][1] <= 50)
+                        $_footer['value'][2] = Lang::main('parensFmt', ['', sprintf(Lang::spell('honorKills'), $_footer['value'][1])]);
                     break;
                 // Aura
                 case SPELL_EFFECT_APPLY_AURA:
@@ -2433,6 +2497,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                         case SPELL_AURA_PERIODIC_ENERGIZE:
                         case SPELL_AURA_MOD_INCREASE_ENERGY:
                         case SPELL_AURA_MOD_POWER_REGEN:
+                        case SPELL_AURA_POWER_BURN:
                             if ($_ = Lang::spell('powerTypes', $effMV))
                                 $_nameMV = $this->fmtStaffTip($_, 'MiscValue: '.$effMV);
 
@@ -2442,6 +2507,37 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
                             if ($effAura == SPELL_AURA_MOD_POWER_REGEN && ($_ = Lang::spell('_regenPer5Sec', $effMV)))
                                 $valueFmt = $_;
+                            break;
+                        case SPELL_AURA_PREVENT_REGENERATE_POWER:             // the value is the power type (Unit::HasAuraTypeWithValue)
+                            $valueLabel = Lang::spell('_powerType');
+                            $pt = $effBP + ($effDS ? 1 : 0);
+                            $_footer['value'] = [null, $this->fmtStaffTip(Lang::exist('spell', 'powerTypes', $pt) ?? (string)$pt, 'Value: '.$pt), null];
+                            break;
+                        case SPELL_AURA_MOD_POSSESS:                          // the value caps the target level (Spell::CheckCast)
+                        case SPELL_AURA_MOD_CHARM:
+                        case SPELL_AURA_AOE_CHARM:
+                            $valueLabel = Lang::spell('_maxTargetLevel');
+                            break;
+                        case SPELL_AURA_CONTROL_VEHICLE:                      // seat = value - 1 (AuraEffect::HandleAuraControlVehicle)
+                            $valueLabel = Lang::spell('_seat');
+                            $seat = $effBP + ($effDS ? 1 : 0) - 1;            // -1: the first free seat (Unit::_EnterVehicle)
+                            $_footer['value'] = [null, $this->fmtStaffTip($seat < 0 ? Lang::main('any') : (string)$seat, 'Value: '.($seat + 1)), null];
+                            break;
+                        case SPELL_AURA_MOD_FACTION:                          // MiscValue is a faction template
+                            if ($f = DB::Aowow()->selectCell('SELECT `factionId` FROM ::factiontemplate WHERE `id` = %i', $effMV))
+                                if ($a = FactionList::makeLink($f))
+                                    $_nameMV = $a;
+                            break;
+                        case SPELL_AURA_PHASE:                                // MiscValue is a phase mask, written in hex
+                            $_nameMV = $this->fmtStaffTip('0x'.strtoupper(dechex($effMV)), 'MiscValue: '.$effMV);
+                            break;
+                        case SPELL_AURA_SAFE_FALL:                            // yards of fall height ignored (Player::HandleFall)
+                            $valueFmt = '%s'.Lang::spell('_distUnit');
+                            break;
+                        case SPELL_AURA_MOD_DAMAGE_DONE_VERSUS_AURASTATE:     // MiscValue is the aura state the victim must have
+                            $valueFmt = '%s%%';
+                            if ($_ = Lang::exist('spell', 'auraStates', $effMV))
+                                $_nameMV = $this->fmtStaffTip($_, 'MiscValue: '.$effMV);
                             break;
                         case SPELL_AURA_MOD_PERCENT_STAT:
                         case SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE:
@@ -2535,6 +2631,9 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                         case SPELL_AURA_MOD_SPELL_DAMAGE_OF_ATTACK_POWER:
                         case SPELL_AURA_MOD_SPELL_HEALING_OF_ATTACK_POWER:
                         case SPELL_AURA_MOD_SPELL_DAMAGE_FROM_HEALING:        // ? Mod Spell & Healing Power by % of Int
+                        case SPELL_AURA_MOD_ATTACKER_SPELL_CRIT_CHANCE:
+                        case SPELL_AURA_MOD_CRITICAL_THREAT:
+                        case SPELL_AURA_MOD_SCHOOL_CRIT_DMG_TAKEN:
                             $valueFmt = '%s%%';
                         case SPELL_AURA_SCHOOL_ABSORB:
                         case SPELL_AURA_MOD_DAMAGE_DONE:
@@ -2553,6 +2652,10 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                         case SPELL_AURA_MOD_IGNORE_TARGET_RESIST:
                         case SPELL_AURA_MOD_ATTACK_POWER_OF_ARMOR:            // ? Mod Attack Power by School Resistance
                         case SPELL_AURA_SCHOOL_HEAL_ABSORB:
+                        case SPELL_AURA_SPLIT_DAMAGE_FLAT:
+                            // MiscValueB of power cost mods is a mask of power types (SpellInfo::CalcPowerCost)
+                            if (in_array($effAura, [SPELL_AURA_MOD_POWER_COST_SCHOOL_PCT, SPELL_AURA_MOD_POWER_COST_SCHOOL]) && ($_ = array_intersect_key(Lang::spell('powerTypes'), Util::mask2bits($effMVB))))
+                                $_nameMVB = $this->fmtStaffTip(implode(', ', $_), 'MiscValueB: '.Util::asHex($effMVB));
                             if ($_ = Lang::getMagicSchools($effMV))
                                 $_nameMV = $this->fmtStaffTip($_, 'MiscValue: '.Util::asHex($effMV));
                             break;
@@ -2579,7 +2682,16 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                         case SPELL_AURA_ADD_FLAT_MODIFIER:
                             // flat durations, casting times, cooldowns and tick intervals are in ms
                             if ($effAura == SPELL_AURA_ADD_FLAT_MODIFIER)       // the percent case falls through to here
+                            {
                                 $valueTime = in_array($effMV, SpellList::SPELLMOD_MSEC) ? 1000 : 0;
+                                // flat chances / coefficient are percentage points, range / radius yards
+                                if (in_array($effMV, SpellList::SPELLMOD_PCT_POINTS))
+                                    $valueFmt = '%s%%';
+                                else if (in_array($effMV, SpellList::SPELLMOD_YARDS))
+                                    $valueFmt = '%s'.Lang::spell('_distUnit');
+                                else if ($effMV == SPELLMOD_PROC_PER_MINUTE)
+                                    $valueFmt = '%s'.Lang::spell('_ppmUnit');
+                            }
                             if ($_ = Lang::spell('spellModOp', $effMV))
                                 $_nameMV = $this->fmtStaffTip($_, 'MiscValue: '.$effMV);
                             break;
@@ -2733,6 +2845,25 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                         case SPELL_AURA_MOD_XP_PCT:
                         case SPELL_AURA_MOD_XP_QUEST_PCT:
                         case SPELL_AURA_MOD_HONOR_GAIN_PCT:
+                        case SPELL_AURA_MOD_ATTACKSPEED:
+                        case SPELL_AURA_MELEE_SLOW:
+                        case SPELL_AURA_REFLECT_SPELLS:
+                        case SPELL_AURA_ADD_CASTER_HIT_TRIGGER:
+                        case SPELL_AURA_DEFLECT_SPELLS:
+                        case SPELL_AURA_MOD_REPUTATION_GAIN:
+                        case SPELL_AURA_MOD_ATTACKER_MELEE_HIT_CHANCE:
+                        case SPELL_AURA_MOD_ATTACKER_RANGED_HIT_CHANCE:
+                        case SPELL_AURA_MOD_ATTACKER_MELEE_CRIT_CHANCE:
+                        case SPELL_AURA_MOD_ATTACKER_RANGED_CRIT_CHANCE:
+                        case SPELL_AURA_MOD_ATTACKER_SPELL_AND_WEAPON_CRIT_CHANCE:
+                        case SPELL_AURA_MOD_ATTACKER_MELEE_CRIT_DAMAGE:
+                        case SPELL_AURA_MOD_ATTACKER_RANGED_CRIT_DAMAGE:
+                        case SPELL_AURA_MOD_RAGE_FROM_DAMAGE_DEALT:
+                        case SPELL_AURA_MOD_DISPEL_RESIST:
+                        case SPELL_AURA_MOD_ENEMY_DODGE:
+                        case SPELL_AURA_MOD_HEALING_RECEIVED:
+                        case SPELL_AURA_MOD_MINIMUM_SPEED:
+                        case SPELL_AURA_PET_DAMAGE_MULTI:                     // not read by the core, % per its name
                             $valueFmt = '%s%%';
                             break;
                     }
@@ -2744,6 +2875,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 case SPELL_EFFECT_MODIFY_THREAT_PERCENT:
                 case SPELL_EFFECT_REDIRECT_THREAT:
                 case SPELL_EFFECT_HEAL_PCT:
+                case SPELL_EFFECT_RESURRECT_PET:            // % of max health (Spell::EffectResurrectPet)
                     $valueFmt = '%s%%';
                     break;
                 // MiscValue and value are the horizontal and vertical speed x10 (Spell::EffectKnockBack, Spell::EffectLeapBack)
