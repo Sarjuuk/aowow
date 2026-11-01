@@ -406,7 +406,7 @@ final class UIText
 
         // |3 - ruRU declinations: |3- <caseIdx> ( <padding> <word> <padding> )
         // Displays text declined to the specified form (index ranges from 1 to GetNumDeclensionSets()).
-        $text = preg_replace_callback('/(?<!\|)\|3-(\d+)\((.*?)([ \p{Cyrillic}]+)(.*?)\)/iu', function ($m)
+        $text = preg_replace_callback('/(?<!\|)\|3-(\d+)\((.*?)(\p{Cyrillic}[ \p{Cyrillic}]+)(.*?)\)/iu', function ($m)
             {
                 [, $caseIdx, $padPre, $word, $padPost] = $m;
 
@@ -421,17 +421,22 @@ final class UIText
 
         // |4 - numeric switch: <number> <padding> |4 <singular> : <plural>[ : <plural2>] ;
         // Will choose a form based on the number preceding it. More than two forms (separated by colons) may be required by locale 8 (ruRU).
-        $text = preg_replace_callback('/\b([\d\.\,]*?\d+)\b([^\|]*)(?<!\|)\|4([^:]*):([^:;]+)(?::([^;]+))?;/is', function ($m)
-            {
-                [, $num, $pad, $singular, $plural1, $plural2] = array_pad($m, 6, null);
-
-                return $num . $pad . match(self::getPluralIndex($num))
+        $n = 0;
+        do
+        {
+            $text = preg_replace_callback('/\b([\d\.\,]*?\d+)\b([^\|]*)(?<!\|)\|4([^:]*):([^:;]+)(?::([^;]+))?;/is', function ($m)
                 {
-                    0 => $singular,
-                    1 => $plural1,                          // ruRU: genitive singular
-                    2 => $plural2                           // ruRU: genitive plural
-                };
-            }, $text);
+                    [, $num, $pad, $singular, $plural1, $plural2] = array_pad($m, 6, null);
+
+                    return $num . $pad . match(self::getPluralIndex($num))
+                    {
+                        0 => $singular,
+                        1 => $plural1,                          // ruRU: genitive singular
+                        2 => $plural2                           // ruRU: genitive plural
+                    };
+                }, $text, count: $n);
+        }
+        while ($n);
 
         // unescape escaped ui sequences
         return strtr($text, ['||' => '|']);
