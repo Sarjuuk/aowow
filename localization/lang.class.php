@@ -268,6 +268,21 @@ class Lang
         return $tmp;
     }
 
+    /**
+     * Preformat lock information from Lock.dbc.
+     *
+     * @param int       $lockId         lock entry
+     * @param ?array    $ids            js global ids referenced by the lock
+     * @param ?bool     $isEncrypted    sets whether the entity is encrypted (Inscription) or locked (everything else)
+     * @param bool      $interactive    whether to generate interactive links for HTML/markup output
+     * @param int       $fmt            set output format
+     *
+     * @return array{string, int, array|int}[]  [label, type, miscInfo]
+     *  miscInfo per type:
+     *  * `Type::SKILL` - required skill value
+     *  * `Type::SPELL` - required reagents as `[itemId, qty]` pairs
+     *  * `Type::ITEM`  - 0
+     */
     public static function getLocks(int $lockId, ?array &$ids = [], ?bool &$isEncrypted = false, bool $interactive = false, int $fmt = self::FMT_HTML) : array
     {
         $locks = [];
@@ -279,7 +294,6 @@ class Lang
         for ($i = 1; $i <= 5; $i++)                         // cols 6-8 are empty in default dbc and have been left out
         {
             $prop = $lock['properties'.$i];
-            $rank = $lock['reqSkill'.$i];
 
             switch ($lock['type'.$i])
             {
@@ -338,21 +352,21 @@ class Lang
                     else
                         break;
 
-                    $locks[] = [$name, Type::SKILL, $rank];
+                    $locks[] = [$name, Type::SKILL, $lock['reqSkill'.$i]];
                     break;
                 case LOCK_TYPE_SPELL:
-                    if (!($name = SpellList::getName($prop)))
+                    if (($spell = new SpellList(array(['id', $prop])))->error)
                         continue 2;
 
                     if ($fmt == self::FMT_HTML)
-                        $name = $interactive ? '<a class="q1" href="?spell='.$prop.'">'.$name.'</a>' : '<span class="q1">'.$name.'</span>';
+                        $name = $interactive ? '<a class="q1" href="?spell='.$prop.'">'.$spell->getField('name', true).'</a>' : '<span class="q1">'.$spell->getField('name', true).'</span>';
                     else if ($interactive && $fmt == self::FMT_MARKUP)
                     {
                         $name = '[spell='.$prop.']';
                         $ids[Type::SPELL][] = $prop;
                     }
 
-                    $locks[] = [$name, Type::SPELL, 0];
+                    $locks[] = [$name, Type::SPELL, $spell->getReagentsForCurrent()];
                     break;
             }
 

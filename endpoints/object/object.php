@@ -155,7 +155,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                 foreach ($ids as $type => $typeIds)
                     $this->extendGlobalIds($type, ...$typeIds);
 
-                foreach ($locks as [$str, $type, $reqSkill])
+                foreach ($locks as [$str, $type, ])
                 {
                     $l[] = match($type)
                     {

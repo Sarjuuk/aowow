@@ -669,16 +669,19 @@ class ItemList extends DBTypeList
         {
             $x .= '<span class="q0">'.Lang::item($encrypted ? 'encrypted' : 'locked');
 
-            foreach ($locks as [$str, $type, $reqSkill])
+            foreach ($locks as [$str, $type, $miscInfo])
                 $x .= '<br />'.match($type)
                 {
                     Type::ITEM  => Lang::item('lockedByItem',  [$str]),
                     TYPE::SPELL => Lang::item('lockedBySpell', [$str]),
-                    Type::SKILL => Lang::item('reqSkillValue', [$str, $reqSkill ?: ($_itemLevel * 5)])
+                    Type::SKILL => Lang::item('reqSkillValue', [$str, $miscInfo ?: ($_itemLevel * 5)])
                 };
 
             $x .= '</span><br />';
         }
+
+        // if type == Type:SPELL && miscInfo; export them as reqgents
+        // never seen that case in-game..?
 
 
         ####################
@@ -1199,8 +1202,9 @@ class ItemList extends DBTypeList
                 if ($reagentItems && !($reagents = new ItemList(array(['id', array_keys($reagentItems)])))->error)
                 {
                     $reqReag  = [];
-                    foreach ($reagents->iterate() as $__)
-                        $reqReag[] = Lang::main('parensFmt', ['<a href="?item='.$reagents->id.'">'.$reagents->getField('name', true).'</a>', $reagentItems[$reagents->id]]);
+                    foreach ($reagentItems as $itemId => $qty)
+                        if ($reagents->getEntry($itemId))
+                            $reqReag[] = Lang::main('parensFmt', ['<a href="?item='.$itemId.'">'.$reagents->getField('name', true).'</a>', $qty]);
 
                     $x .= '<div class="q1 whtt-reagents"><br />'.Lang::item('reqSkill', [Lang::concat($reqReag, Lang::CONCAT_NONE)]).'</div>';
                 }

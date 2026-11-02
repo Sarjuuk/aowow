@@ -98,15 +98,52 @@ class GameObjectList extends DBTypeList
             return null;
 
         $x  = '<table>';
+
+        # Name #
+
         $x .= '<tr><td><b class="q">'.UIText::unescapeUISequences($this->getField('name', true), Lang::FMT_HTML).'</b></td></tr>';
+
+        // WH - non standard
         if ($this->curTpl['typeCat'])
             if ($_ = Lang::gameObject('type', $this->curTpl['typeCat']))
                 $x .= '<tr><td>'.$_.'</td></tr>';
 
-        foreach (Lang::getLocks($this->curTpl['lockId'] ?? 0) as [$str, , ])
-            $x .= '<tr><td>'.Lang::game('requires', [$str]).'</td></tr>';
+        # Locked #
+
+        if ($this->curTpl['flags'] & GO_FLAG_LOCKED)
+            $x .= '<tr><td>'.Lang::item('locked').'</td></tr>';
+
+        foreach (Lang::getLocks($this->curTpl['lockId'] ?? 0) as [$str, $type, $miscInfo])
+        {
+            $x .= '<tr><td>'.match($type)
+            {
+                Type::ITEM  => Lang::item('lockedByItem',  [$str]),
+                TYPE::SPELL => Lang::item('lockedBySpell', [$str]),
+                Type::SKILL => Lang::item('reqSkillValue', [$str, $miscInfo])
+            }.'</td></tr>';
+
+            if ($type == Type::SPELL && $miscInfo && !($reagents = new ItemList(array(['id', array_keys($miscInfo)])))->error)
+            {
+                $reqReag  = [];
+                foreach ($miscInfo as [$itemId, $qty])
+                    if ($reagents->getEntry($itemId))
+                        $reqReag[] = Lang::main('parensFmt', ['<a href="?item='.$itemId.'">'.$reagents->getField('name', true).'</a>', $qty]);
+
+                $x .= '<tr class="q1 whtt-reagents"><td><br />'.Lang::item('reqSkill', [Lang::concat($reqReag, Lang::CONCAT_NONE)]).'</td></tr>';
+            }
+        }
+
+        # Quest Tracking Info #
+
+        // cannot display
 
         $x .= '</table>';
+
+        # Health Bar #
+
+        // should not display (also the tooltip BG is rendered behind the progress bar, which it shouldn't)
+        // if ($this->curTpl['type'] == OBJECT_DESTRUCTIBLE_BUILDING)
+        //     $x .= '<div><a href="javascript:;" class="progressbar" style="width:auto;"><div class="progressbar-text"></div><div class="progressbar-green" style="width:100%;"> </div></a></div>';
 
         return $x;
     }
