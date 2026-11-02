@@ -176,9 +176,6 @@ class AchievementList extends DBTypeList
         $i = 0;
         foreach ($rows as $crt)
         {
-            $obj = (int)$crt['value1'];
-            $qty = (int)$crt['value2'];
-
             // we could show them, but the tooltips are cluttered
             if (($crt['completionFlags'] & ACHIEVEMENT_CRITERIA_FLAG_HIDDEN) && User::isInGroup(U_GROUP_STAFF))
                 continue;
@@ -189,7 +186,7 @@ class AchievementList extends DBTypeList
                 // link to quest
                 case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST:
                     if (!$crtName)
-                        $crtName = QuestList::getName($obj);
+                        $crtName = QuestList::getName($crt['value1']);
                     break;
                 // link to spell (/w icon)
                 case ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET:
@@ -198,7 +195,7 @@ class AchievementList extends DBTypeList
                 case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL:
                 case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2:
                     if (!$crtName)
-                        $crtName = SpellList::getName($obj);
+                        $crtName = SpellList::getName($crt['value1']);
                     break;
                 // link to item (/w icon)
                 case ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM:
@@ -206,12 +203,12 @@ class AchievementList extends DBTypeList
                 case ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM:
                 case ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM:
                     if (!$crtName)
-                        $crtName = ItemList::getName($obj);
+                        $crtName = ItemList::getName($crt['value1']);
                     break;
                 // link to faction (/w target reputation)
                 case ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION:
                     if (!$crtName)
-                        $crtName = FactionList::getName($obj);
+                        $crtName = FactionList::getName($crt['value1']);
                     break;
             }
 
@@ -226,20 +223,31 @@ class AchievementList extends DBTypeList
                 $criteria .= '</small></td><th class="q0" style="white-space: nowrap; text-align: left"><small>';
         }
 
-        $x  = '<table><tr><td><b class="q">';
-        $x .= $name;
-        $x .= '</b></td></tr></table>';
+        # Name #
+
+        $x  = '<table><tr><td><b class="q">'.$name.'</b></td></tr></table>';
+
+        # Status #
+
+        // ACHIEVEMENT_TOOLTIP_COMPLETE / ACHIEVEMENT_TOOLTIP_IN_PROGRESS
+        // injected by js
+
         if ($description || $criteria)
             $x .= '<table><tr><td>';
+
+        # Description #
 
         if ($description)
             $x .= '<br />'.$description.'<br />';
 
+        # Criteria #
+
         if ($criteria)
         {
-            $x .= '<br /><span class="q">'.Lang::achievement('criteria').':</span>';
+            $x .= '<br /><span class="q">'.Lang::achievement('criteria').Lang::main('colon').'</span>';
             $x .= '<table width="100%"><tr><td class="q0" style="white-space: nowrap"><small>'.$criteria.'</small></th></tr></table>';
         }
+
         if ($description || $criteria)
             $x .= '</td></tr></table>';
 
