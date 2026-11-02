@@ -614,6 +614,11 @@ define('FACTION_FLAG_INACTIVE',         0x20);
 define('FACTION_FLAG_RIVAL',            0x40);
 define('FACTION_FLAG_SPECIAL',          0x80);
 
+// FactionTemplateFlags
+define('FACTION_TEMPLATE_FLAG_PVP',                0x0800); // flagged for PvP
+define('FACTION_TEMPLATE_FLAG_CONTESTED_GUARD',    0x1000); // faction will attack players that were involved in PvP combats
+define('FACTION_TEMPLATE_FLAG_HOSTILE_BY_DEFAULT', 0x2000);
+
 // Creature
 define('NPC_TYPE_NONE',          0);
 define('NPC_TYPE_BEAST',         1);
@@ -775,6 +780,15 @@ define('UNIT_FLAG2_UNK2',                   0x00010000);    //
 define('UNIT_FLAG2_PLAY_DEATH_ANIM',        0x00020000);    // Plays special death animation upon death
 define('UNIT_FLAG2_ALLOW_CHEAT_SPELLS',     0x00040000);    // allows casting spells with AttributesEx7 & SPELL_ATTR7_IS_CHEAT_SPELL
 define('UNIT_FLAG2_VALIDATE',               0x0006FDFF);    //
+
+define('UNIT_BYTE2_FLAG_PVP',                0x01);
+define('UNIT_BYTE2_FLAG_UNK1',               0x02);
+define('UNIT_BYTE2_FLAG_FFA_PVP',            0x04);
+define('UNIT_BYTE2_FLAG_SANCTUARY',          0x08);
+define('UNIT_BYTE2_FLAG_UNK4',               0x10);
+define('UNIT_BYTE2_FLAG_UNK5',               0x20);
+define('UNIT_BYTE2_FLAG_UNK6',               0x40);
+define('UNIT_BYTE2_FLAG_UNK7',               0x80);
 
 // UNIT_FIELD_BYTES_1 - idx 0 (UnitStandStateType)
 define('UNIT_STAND_STATE_STAND',            0);

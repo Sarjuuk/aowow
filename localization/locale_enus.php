@@ -458,7 +458,7 @@ $lang = array(
         'silver'        => "%d Silver",                     // SILVER_AMOUNT
         'gold'          => "%d Gold",                       // GOLD_AMOUNT
 
-        'pvp'           => "PvP",                           // PVP
+        'pvp'           => "PvP",                           // PVP_ENABLED
         'honorPoints'   => "Honor Points",                  // HONOR_POINTS
         'arenaPoints'   => "Arena Points",                  // ARENA_POINTS
         'acvmtPoints'   => "Achievement Points",            // ACHIEVEMENT_TITLE
@@ -1307,6 +1307,7 @@ $lang = array(
         'mechanicimmune'=> 'Not affected by mechanic: %s',
         '_extraFlags'   => 'Extra Flags: ',
         'versions'      => 'Difficulty Versions: ',
+        'pvpLeader'     => 'Leader',                        // PVP_RANK_LEADER
         'level'         => array(                           // type is creature rank; class is creature type
             "Level %s",                                     // TOOLTIP_UNIT_LEVEL
             "Level %s %s",                                  // TOOLTIP_UNIT_LEVEL_CLASS

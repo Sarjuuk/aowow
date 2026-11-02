@@ -16,7 +16,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
     );
 
     protected array $dbcSourceFiles  = ['creaturedisplayinfo', 'creaturedisplayinfoextra'];
-    protected array $worldDependency = ['creature_template', 'creature_template_locale', 'creature_template_resistance', 'creature_template_spell', 'creature_classlevelstats', 'creature_default_trainer', 'trainer', 'instance_encounters'];
+    protected array $worldDependency = ['creature_template', 'creature_template_addon', 'creature_template_locale', 'creature_template_resistance', 'creature_template_spell', 'creature_classlevelstats', 'creature_default_trainer', 'trainer', 'instance_encounters'];
 
     public function generate() : bool
     {
@@ -44,7 +44,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                       BaseVariance,
                       RangeVariance,
                       unit_class,
-                      unit_flags, unit_flags2, dynamicflags,
+                      unit_flags, unit_flags2, dynamicflags, IFNULL(cta.PvPFlags, 0),
                       family,
                       IFNULL(t.Type, 0),
                       IFNULL(t.Requirement, 0),
@@ -77,6 +77,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             FROM      creature_template ct
             JOIN      creature_classlevelstats min ON ct.unit_class = min.class AND ct.minlevel = min.level
             JOIN      creature_classlevelstats max ON ct.unit_class = max.class AND ct.maxlevel = max.level
+            LEFT JOIN creature_template_addon  cta ON cta.entry = ct.entry
             LEFT JOIN creature_default_trainer cdt ON cdt.CreatureId = ct.entry
             LEFT JOIN trainer t ON t.Id = cdt.TrainerId
             LEFT JOIN creature_template_locale ctl2 ON ct.entry = ctl2.entry AND ctl2.`locale` = "frFR"

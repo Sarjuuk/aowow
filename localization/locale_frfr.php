@@ -1307,6 +1307,7 @@ $lang = array(
         'mechanicimmune'=> '[Not affected by mechanic] : %s',
         '_extraFlags'   => '[Extra Flags] : ',
         'versions'      => '[Difficulty Versions] : ',
+        'pvpLeader'     => 'Chef',
         'level'         => array(
             'Niveau %s',
             '%2$s niveau %1$s',

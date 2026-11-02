@@ -558,6 +558,7 @@ CREATE TABLE `aowow_creature` (
   `unitFlags` int(10) unsigned NOT NULL DEFAULT 0,
   `unitFlags2` int(10) unsigned NOT NULL DEFAULT 0,
   `dynamicFlags` int(10) unsigned NOT NULL DEFAULT 0,
+  `pvpFlags` int(10) unsigned NOT NULL DEFAULT 0,
   `family` tinyint(4) NOT NULL DEFAULT 0,
   `trainerType` tinyint(4) NOT NULL DEFAULT 0,
   `trainerRequirement` smallint(5) unsigned NOT NULL DEFAULT 0,
@@ -962,6 +963,7 @@ DROP TABLE IF EXISTS `aowow_factiontemplate`;
 CREATE TABLE `aowow_factiontemplate` (
   `id` smallint(5) unsigned NOT NULL,
   `factionId` smallint(5) unsigned NOT NULL,
+  `flags` int(10) unsigned NOT NULL,
   `A` tinyint(4) NOT NULL COMMENT 'Aliance: -1 - hostile, 1 - friendly, 0 - neutral',
   `H` tinyint(4) NOT NULL COMMENT 'Horde: -1 - hostile, 1 - friendly, 0 - neutral',
   PRIMARY KEY (`id`)

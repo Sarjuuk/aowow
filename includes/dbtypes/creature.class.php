@@ -21,7 +21,7 @@ class CreatureList extends DBTypeList
                         'dct1' => ['j' => ['::creature dct1 ON ct.`cuFlags` & 0x02 AND dct1.`difficultyEntry1` = ct.`id`', true]],
                         'dct2' => ['j' => ['::creature dct2 ON ct.`cuFlags` & 0x02 AND dct2.`difficultyEntry2` = ct.`id`', true]],
                         'dct3' => ['j' => ['::creature dct3 ON ct.`cuFlags` & 0x02 AND dct3.`difficultyEntry3` = ct.`id`', true]],
-                        'ft'   => ['j' => '::factiontemplate ft ON ft.`id` = ct.`faction`', 's' => ', ft.`factionId`, IFNULL(ft.`A`, 0) AS "A", IFNULL(ft.`H`, 0) AS "H"'],
+                        'ft'   => ['j' => '::factiontemplate ft ON ft.`id` = ct.`faction`', 's' => ', ft.`factionId`, IFNULL(ft.`A`, 0) AS "A", IFNULL(ft.`H`, 0) AS "H", ft.`flags` AS "ftFlags"'],
                         'qse'  => ['j' => ['::quests_startend qse ON qse.`type` = 1 AND qse.`typeId` = ct.id', true], 's' => ', IF(MIN(qse.`method`) = 1 OR MAX(qse.`method`) = 3, 1, 0) AS "startsQuests", IF(MIN(qse.`method`) = 2 OR MAX(qse.`method`) = 3, 1, 0) AS "endsQuests"', 'g' => 'ct.`id`'],
                         'qt'   => ['j' => '::quests qt ON qse.`questId` = qt.`id`'],
                         's'    => ['j' => ['::spawns s ON s.`type` = 1 AND s.`typeId` = ct.`id`', true]]
@@ -59,17 +59,23 @@ class CreatureList extends DBTypeList
         if (!($this->curTpl['typeFlags'] & NPC_TYPEFLAG_BOSS_MOB))
             $level = Util::createNumRange($this->curTpl['minLevel'], $this->curTpl['maxLevel']);
 
-        // the client omits type for friendly targets and type 'Not Specified'
+        // the client omits type for friendly targets and type 10 ('Not Specified')
         $type = $this->curTpl['type'];
         if (($this->curTpl['A'] == 1 && $this->curTpl['H'] == 1) || $type == NPC_TYPE_NOT_SPECIFIED)
             $type = NPC_TYPE_NONE;
 
-        // 'rank' is also only ever displayed as 'Elite' or 'Boss'
-        $rank = $this->curTpl['rank'];
-        if ($rank == NPC_RANK_RARE_ELITE)
-            $rank = NPC_RANK_ELITE;
-        else if ($rank == NPC_RANK_RARE)
-            $rank = NPC_RANK_NORMAL;
+        // s_classificationTokens says: ELITE and RARE_ELITE are displayed as ELITE
+        // everything else is omitted
+        $rank = match($this->curTpl['rank'])
+        {
+            NPC_RANK_ELITE,
+            NPC_RANK_RARE_ELITE  => NPC_RANK_ELITE,
+            default              => NPC_RANK_NORMAL
+        };
+
+        // yes, the actual npc rank does not matter here. It's strictly by the typeFlags.
+        if ($this->curTpl['typeFlags'] & NPC_TYPEFLAG_BOSS_MOB)
+            $rank = NPC_RANK_BOSS;
 
         if ($rank && !$type)
             $row3 = Lang::npc('level', 3, [$level, Lang::npc('rank', $rank)]); // TOOLTIP_UNIT_LEVEL_TYPE
@@ -81,21 +87,76 @@ class CreatureList extends DBTypeList
             $row3 = Lang::npc('level', 0, [$level]); // TOOLTIP_UNIT_LEVEL
 
         $x  = '<table>';
+
+        # Name #
+
         $x .= '<tr><td><b class="q">'.Util::htmlEscape($this->getField('name', true)).'</b></td></tr>';
+
+        # Subname #
 
         if ($sn = $this->getField('subname', true))
             $x .= '<tr><td>'.Util::htmlEscape($sn).'</td></tr>';
 
+        # Summoned By #
+
+        // cannot use
+        // UNITNAME_SUMMON_TITLE\d
+
+        # Level / Class / Type #
+
         $x .= '<tr><td>'.$row3.'</td></tr>';
 
+        // WH non-standard
         if ($this->curTpl['type'] == NPC_TYPE_BEAST && ($fam = $this->curTpl['family']))
             $x .= '<tr><td>'.Lang::game('fa', $fam).'</td></tr>';
+
+        # Faction #
 
         $fac = new FactionList(array([['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0], ['id', $this->getField('factionId')]));
         if (!$fac->error)
             $x .= '<tr><td>'.$fac->getField('name', true).'</td></tr>';
 
+        # PvP #
+
+        // Bit is set from FactionTemplate.dbc/Flags & FACTION_TEMPLATE_FLAG_PVP and overridden by cta.PvPFlags which are weird.
+        // npcs being simultaneously flagged as civillian and for pvp.
+        $pvpFlags = $this->curTpl['pvpFlags'] ?: (($this->curTpl['ftFlags'] & FACTION_TEMPLATE_FLAG_PVP) ? 1 : 0);
+
+        if ($pvpFlags & UNIT_BYTE2_FLAG_PVP)
+            $x .= '<tr><td>'.Lang::game('pvp').'</td></tr>';
+
+        # AddEmpathyText #
+
+        // if dynFlags & 0x10 show more info (only set through TC, not TDB) (caused by Aura Effect: Beast Lore)
+        //     SINGLE_DAMAGE_TEMPLATE / DAMAGE_TEMPLATE
+        //     ARMOR_TEMPLATE
+        //     HP_TEMPLATE
+        //     RESISTANCE_TEMPLATE + RESISTANCE%d_NAME - per resistance
+        //     PET_DIET_TEMPLATE - concat food items
+        //     NOT_TAMEABLE / TAMEABLE_EXOTIC / TAMEABLE
+        //     PET_SPELLS_TEMPLATE - concat spells with attributes & 0xC0 && !supercededBySpell && acquireMethod == 2
+
+        # AddSkinnableText #
+
+        // $this->isGatherable()UNIT_SKINNABLE_HERB
+        // $this->isMineable() UNIT_SKINNABLE_ROCK
+        // $this->isSalvageable() UNIT_SKINNABLE_BOLTS
+        // else if skinLootId UNIT_SKINNABLE_LEATHER
+
+        # PvP Leader #
+
+        if ($this->curTpl['racialLeader'] && ($pvpFlags & UNIT_BYTE2_FLAG_PVP))
+            $x .= '<tr><td>'.Lang::npc('pvpLeader').'</td></tr>';
+
+        # Quest Tracking Info #
+
+        // cannot display
+
         $x .= '</table>';
+
+        # Health Bar #
+
+        // no!
 
         return $x;
     }
