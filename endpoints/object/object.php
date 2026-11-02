@@ -150,17 +150,18 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
             default:                                        // requires key .. maybe
             {
                 $ids = $l = [];
-                $locks = Lang::getLocks($this->subject->getField('lockId'), $ids, true, Lang::FMT_MARKUP);
+                $locks = Lang::getLocks($this->subject->getField('lockId'), $ids, $_, true, Lang::FMT_MARKUP);
 
                 foreach ($ids as $type => $typeIds)
                     $this->extendGlobalIds($type, ...$typeIds);
 
-                foreach ($locks as $idx => $str)
+                foreach ($locks as [$str, $type, $reqSkill])
                 {
-                    if ($idx > 0)
-                        $l[] = Lang::gameObject('key').Lang::main('colon').$str;
-                    else if ($idx < 0)
-                        $l[] = Lang::game('requires', [$str]);
+                    $l[] = match($type)
+                    {
+                        Type::ITEM => Lang::gameObject('key').Lang::main('colon').$str,
+                        default    => Lang::game('requires', [$str])
+                    };
                 }
 
                 if ($l)

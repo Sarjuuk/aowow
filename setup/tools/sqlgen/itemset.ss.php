@@ -210,7 +210,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
         $bonusSpells = new SpellList(array(['s.id', array_unique($spells)]), ['interactive' => SpellList::INTERACTIVE_NONE]);
 
-        $pieces = DB::World()->selectAssoc('SELECT `itemset` AS ARRAY_KEY, `entry` AS ARRAY_KEY2, `entry`, `name`, `class`, `subclass`, `Quality`, `AllowableClass`, `ItemLevel`, `RequiredLevel`, `itemset`, IF (`Flags` & %i, 1, 0) AS "heroic", IF(`InventoryType` = 15, 26, IF(`InventoryType` = 5, 20, `InventoryType`)) AS "slot" FROM item_template WHERE `itemset` > 0', ITEM_FLAG_HEROIC);
+        $pieces = DB::World()->selectAssoc('SELECT `itemset` AS ARRAY_KEY, `entry` AS ARRAY_KEY2, `entry`, `name`, `class`, `subclass`, `Quality`, `AllowableClass`, `ItemLevel`, `RequiredLevel`, `itemset`, IF (`Flags` & %i, 1, 0) AS "heroic", IF(`InventoryType` = 15, 26, IF(`InventoryType` = 5, 20, `InventoryType`)) AS "slot" FROM item_template WHERE `itemset` > 0', ITEM_FLAG_HEROIC_TOOLTIP);
 
         foreach ($sets as $setId => $setData)
         {

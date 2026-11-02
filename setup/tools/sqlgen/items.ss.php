@@ -186,7 +186,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         DB::Aowow()->qry('UPDATE ::items SET class = 4, subClass = -4 WHERE classBak = 7 AND subClassBak = 11 AND slotBak = %i', INVTYPE_TRINKET);
 
         // mark keys as key (if not quest items)
-        DB::Aowow()->qry('UPDATE ::items SET class = 13, subClass = 0 WHERE classBak IN (0, 15) AND bagFamily & 0x100');
+        DB::Aowow()->qry('UPDATE ::items SET class = 13, subClass = 0 WHERE classBak IN (0, 15) AND bagFamily & %i', BAG_FAMILY_MASK_KEYS);
 
         // set subSubClass for Glyphs (major/minor)
         DB::Aowow()->qry('UPDATE ::items i, dbc_spell s, dbc_glyphproperties gp SET i.subSubClass = IF(gp.typeFlags & 0x1, 2, 1) WHERE i.spellId1 = s.id AND s.effect1MiscValue = gp.id AND i.classBak = 16');

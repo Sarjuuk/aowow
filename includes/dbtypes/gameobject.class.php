@@ -103,10 +103,8 @@ class GameObjectList extends DBTypeList
             if ($_ = Lang::gameObject('type', $this->curTpl['typeCat']))
                 $x .= '<tr><td>'.$_.'</td></tr>';
 
-        if (isset($this->curTpl['lockId']))
-            if ($locks = Lang::getLocks($this->curTpl['lockId']))
-                foreach ($locks as $l)
-                    $x .= '<tr><td>'.Lang::game('requires', [$l]).'</td></tr>';
+        foreach (Lang::getLocks($this->curTpl['lockId'] ?? 0) as [$str, , ])
+            $x .= '<tr><td>'.Lang::game('requires', [$str]).'</td></tr>';
 
         $x .= '</table>';
 

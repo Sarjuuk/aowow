@@ -1071,21 +1071,56 @@ define('ITEM_SUBCLASS_TOTEM',               9);
 define('ITEM_SUBCLASS_SIGIL',               10);
 
 // ItemFlags
-define('ITEM_FLAG_CONJURED',                0x00000002);
-define('ITEM_FLAG_OPENABLE',                0x00000004);
-define('ITEM_FLAG_HEROIC',                  0x00000008);
-define('ITEM_FLAG_DEPRECATED',              0x00000010);
-define('ITEM_FLAG_INDESTRUCTIBLE',          0x00000020);
-define('ITEM_FLAG_NO_EQUIPCD',              0x00000080);
-define('ITEM_FLAG_PARTYLOOT',               0x00000800);
-define('ITEM_FLAG_REFUNDABLE',              0x00001000);
-define('ITEM_FLAG_PROSPECTABLE',            0x00040000);
-define('ITEM_FLAG_UNIQUEEQUIPPED',          0x00080000);
-define('ITEM_FLAG_USABLE_ARENA',            0x00200000);
-define('ITEM_FLAG_USABLE_SHAPED',           0x00800000);
-define('ITEM_FLAG_SMARTLOOT',               0x02000000);
-define('ITEM_FLAG_ACCOUNTBOUND',            0x08000000);
-define('ITEM_FLAG_MILLABLE',                0x20000000);
+define('ITEM_FLAG_NO_PICKUP',                         0x00000001);
+define('ITEM_FLAG_CONJURED',                          0x00000002); // Conjured item
+define('ITEM_FLAG_HAS_LOOT',                          0x00000004); // Item can be right clicked to open for loot
+define('ITEM_FLAG_HEROIC_TOOLTIP',                    0x00000008); // Makes green "Heroic" text appear on item
+define('ITEM_FLAG_DEPRECATED',                        0x00000010); // Cannot equip or use
+define('ITEM_FLAG_NO_USER_DESTROY',                   0x00000020); // Item can not be destroyed, except by using spell (item can be reagent for spell)
+define('ITEM_FLAG_PLAYERCAST',                        0x00000040); // Item's spells are castable by players
+define('ITEM_FLAG_NO_EQUIP_COOLDOWN',                 0x00000080); // No default 30 seconds cooldown when equipped
+define('ITEM_FLAG_LEGACY',                            0x00000100); // Effects are disabled
+define('ITEM_FLAG_IS_WRAPPER',                        0x00000200); // Item can wrap other items
+define('ITEM_FLAG_USES_RESOURCES',                    0x00000400);
+define('ITEM_FLAG_MULTI_DROP',                        0x00000800); // Looting this item does not remove it from available loot
+define('ITEM_FLAG_ITEM_PURCHASE_RECORD',              0x00001000); // Item can be returned to vendor for its original cost (extended cost)
+define('ITEM_FLAG_PETITION',                          0x00002000); // Item is guild or arena charter
+define('ITEM_FLAG_HAS_TEXT',                          0x00004000); // Only readable items have this (but not all)
+define('ITEM_FLAG_NO_DISENCHANT',                     0x00008000);
+define('ITEM_FLAG_REAL_DURATION',                     0x00010000);
+define('ITEM_FLAG_NO_CREATOR',                        0x00020000);
+define('ITEM_FLAG_IS_PROSPECTABLE',                   0x00040000); // Item can be prospected
+define('ITEM_FLAG_UNIQUE_EQUIPPABLE',                 0x00080000); // You can only equip one of these
+define('ITEM_FLAG_DISABLE_AUTO_QUOTES',               0x00100000); // Disables quotes around item description in tooltip
+define('ITEM_FLAG_IGNORE_DEFAULT_ARENA_RESTRICTIONS', 0x00200000); // Item can be used during arena match
+define('ITEM_FLAG_NO_DURABILITY_LOSS',                0x00400000); // Some Thrown weapons have it (and only Thrown) but not all
+define('ITEM_FLAG_USE_WHEN_SHAPESHIFTED',             0x00800000); // Item can be used in shapeshift forms
+define('ITEM_FLAG_HAS_QUEST_GLOW',                    0x01000000);
+define('ITEM_FLAG_HIDE_UNUSABLE_RECIPE',              0x02000000); // Profession recipes: can only be looted if you meet requirements and don't already know it
+define('ITEM_FLAG_NOT_USEABLE_IN_ARENA',              0x04000000); // Item cannot be used in arena
+define('ITEM_FLAG_IS_BOUND_TO_ACCOUNT',               0x08000000); // Item binds to account and can be sent only to your own characters
+define('ITEM_FLAG_NO_REAGENT_COST',                   0x10000000); // Spell is cast ignoring reagents
+define('ITEM_FLAG_IS_MILLABLE',                       0x20000000); // Item can be milled
+define('ITEM_FLAG_REPORT_TO_GUILD_CHAT',              0x40000000);
+define('ITEM_FLAG_NO_PROGRESSIVE_LOOT',               0x80000000);
+
+// ItemBagFamily
+define('BAG_FAMILY_MASK_NONE',                0x0000);
+define('BAG_FAMILY_MASK_ARROWS',              0x0001);
+define('BAG_FAMILY_MASK_BULLETS',             0x0002);
+define('BAG_FAMILY_MASK_SOUL_SHARDS',         0x0004);
+define('BAG_FAMILY_MASK_LEATHERWORKING_SUPP', 0x0008);
+define('BAG_FAMILY_MASK_INSCRIPTION_SUPP',    0x0010);
+define('BAG_FAMILY_MASK_HERBS',               0x0020);
+define('BAG_FAMILY_MASK_ENCHANTING_SUPP',     0x0040);
+define('BAG_FAMILY_MASK_ENGINEERING_SUPP',    0x0080);
+define('BAG_FAMILY_MASK_KEYS',                0x0100);
+define('BAG_FAMILY_MASK_GEMS',                0x0200);
+define('BAG_FAMILY_MASK_MINING_SUPP',         0x0400);
+define('BAG_FAMILY_MASK_SOULBOUND_EQUIPMENT', 0x0800);
+define('BAG_FAMILY_MASK_VANITY_PETS',         0x1000);
+define('BAG_FAMILY_MASK_CURRENCY_TOKENS',     0x2000);
+define('BAG_FAMILY_MASK_QUEST_ITEMS',         0x4000);
 
 // SpellItemEnchantmentCondition types
 define('ENCHANTMENT_TYPE_NONE',             0);
@@ -1099,14 +1134,14 @@ define('ENCHANTMENT_TYPE_USE_SPELL',        7);
 define('ENCHANTMENT_TYPE_PRISMATIC_SOCKET', 8);
 
 // SpellItemEnchantmentCondition operators - only 2, 3, 5 in use
-define('ENCHANT_CONDITION_EQUAL_COMPARE',      -9990);
-define('ENCHANT_CONDITION_EQUAL_VALUE',        -9991);
-define('ENCHANT_CONDITION_LESS_VALUE',             2);
-define('ENCHANT_CONDITION_MORE_COMPARE',           3);
-define('ENCHANT_CONDITION_MORE_EQUAL_COMPARE', -9992);
-define('ENCHANT_CONDITION_MORE_VALUE',             5);
-define('ENCHANT_CONDITION_NOT_EQUAL_COMPARE',  -9993);
-define('ENCHANT_CONDITION_NOT_EQUAL_VALUE',    -9994);
+define('ENCHANT_CONDITION_EQUAL_COMPARE',      0);
+define('ENCHANT_CONDITION_EQUAL_VALUE',        1);
+define('ENCHANT_CONDITION_LESS_VALUE',         2);
+define('ENCHANT_CONDITION_MORE_COMPARE',       3);
+define('ENCHANT_CONDITION_MORE_EQUAL_COMPARE', 4);
+define('ENCHANT_CONDITION_MORE_VALUE',         5);
+define('ENCHANT_CONDITION_NOT_EQUAL_COMPARE',  6);
+define('ENCHANT_CONDITION_NOT_EQUAL_VALUE',    7);
 
 // Spell Effects and Auras
 define('SPELL_EFFECT_NONE',                             0);

@@ -318,7 +318,7 @@ $lang = array(
         'customProfile' => " (Custom Profile)",
         'resync'        => "Resync",
         'guildRoster'   => "Guild Roster for &lt;%s&gt;",
-        'arenaRoster'   => "Arena Team Roster for &lt;%s&gt",
+        'arenaRoster'   => "Arena Team Roster for &lt;%s&gt;",
         'atCaptain'     => "Arena Team Captain",
         'atSize'        => "Size: ",
         'profiler'      => "Character Profiler",
@@ -504,9 +504,9 @@ $lang = array(
         ),
         'gl'            => [null, "Major", "Minor"],                                                                                                                                // MAJOR_GLYPH, MINOR_GLYPH
         'si'            => [1 => "Alliance", -1 => "Alliance only", 2 => "Horde", -2 => "Horde only", 3 => "Both"],
-        'resistances'   => [null, 'Holy Resistance', 'Fire Resistance', 'Nature Resistance', 'Frost Resistance', 'Shadow Resistance', 'Arcane Resistance'],                         // RESISTANCE?_NAME
-        'dt'            => [null, "Magic", "Curse", "Disease", "Poison", "Stealth", "Invisibility", "Magic, Curse, Disease, Poison", "Spell (NPC)", "Enrage"],                      // SpellDispalType.dbc
-        'sc'            => ["Physical", "Holy", "Fire", "Nature", "Frost", "Shadow", "Arcane"],                                                                                     // STRING_SCHOOL_*
+        'resistances'   => [null, 'Holy Resistance', 'Fire Resistance', 'Nature Resistance', 'Frost Resistance', 'Shadow Resistance', 'Arcane Resistance'],                         // RESISTANCE\d_NAME
+        'dt'            => [null, "Magic", "Curse", "Disease", "Poison", "Stealth", "Invisibility", "Magic, Curse, Disease, Poison", "Spell (NPC)", "Enrage"],                      // SpellDispelType.dbc
+        'sc'            => ["Physical", "Holy", "Fire", "Nature", "Frost", "Shadow", "Arcane"],                                                                                     // SPELL_SCHOOL_\d_CAP
         'cl'            => [null, "Warrior", "Paladin", "Hunter", "Rogue", "Priest", "Death Knight", "Shaman", "Mage", "Warlock", null, "Druid"],                                   // ChrClasses.dbc
         'ra'            => [-2 => "Horde", -1 => "Alliance", null, "Human", "Orc", "Dwarf", "Night Elf", "Undead", "Tauren", "Gnome", "Troll", null, "Blood Elf", "Draenei"],       // ChrRaces.dbc
         'rep'           => ["Hated", "Hostile", "Unfriendly", "Neutral", "Friendly", "Honored", "Revered", "Exalted"],                                                              // FACTION_STANDING_LABEL*
@@ -559,6 +559,17 @@ $lang = array(
             ["Stone Guard", "Knight"],                                      ["Blood Guard", "Knight-Lieutenant"],                           ["Legionnaire", "Knight-Captain"],
             ["Centurion", "Knight-Champion"],                               ["Champion", "Lieutenant Commander"],                           ["Lieutenant General", "Commander"],
             ["General", "Marshal"],                                         ["Warlord", "Field Marshal"],                                   ["High Warlord", "Grand Marshal"]
+        ),
+        'cityRank'      => array(                           // PVP_MEDAL\d
+            null,
+            "Protector of Stormwind",
+            "Overlord of Orgrimmar",
+            "Thane of Ironforge",
+            "High Sentinel of Darnassus",
+            "Deathlord of the Undercity",
+            "Chieftain of Thunderbluff",
+            "Avenger of Gnomeregan",
+            "Voodoo Boss of Sen'jin"
         ),
         'orientation'   => ['North', 'Northeast', 'East', 'Southeast', 'South', 'Southwest', 'West', 'Northwest']
     ),
@@ -2366,19 +2377,25 @@ $lang = array(
         'block'         => "%s Block",                      // SHIELD_BLOCK_TEMPLATE
         'charges'       => "%d |4Charge:Charges;",          // ITEM_SPELL_CHARGES
         'locked'        => "Locked",                        // LOCKED
+        'lockedByItem'  => "Requires %s",                   // LOCKED_WITH_ITEM
+        'lockedBySpell' => "Requires %s",                   // LOCKED_WITH_SPELL
+        'encrypted'     => "Encrypted",                     // ENCRYPTED
         'ratingString'  => '<!--rtg%%%1$d-->%2$s&nbsp;@&nbsp;L<!--lvl-->%3$d',
         'heroic'        => "Heroic",                        // ITEM_HEROIC
         'startQuest'    => "This Item Begins a Quest",      // ITEM_STARTS_QUEST
         'containerSlots'=> "%d Slot %s",                    // CONTAINER_SLOTS
-        'fap'           => "Feral Attack Power",
+     // 'fap'           => "Feral Attack Power",            // superseded by feralItemAP
+        'feralItemAP'   => "Increases attack power by <!--fap-->%d in Cat, Bear, Dire Bear, and Moonkin forms only.", // FERAL_DRUID_ITEM_AP
         'durability'    => "Durability %d / %d",            // DURABILITY_TEMPLATE
         'realTime'      => "real time",
         'conjured'      => "Conjured Item",                 // ITEM_CONJURED
         'sellPrice'     => "Sell Price",                    // SELL_PRICE
         'itemLevel'     => "Item Level %d",                 // ITEM_LEVEL
-        'randEnchant'   => "&lt;Random enchantment&gt",     // ITEM_RANDOM_ENCHANT
-        'readClick'     => "&lt;Right Click To Read&gt",    // ITEM_READABLE
-        'openClick'     => "&lt;Right Click To Open&gt",    // ITEM_OPENABLE
+        'randEnchant'   => "&lt;Random enchantment&gt;",    // ITEM_RANDOM_ENCHANT
+        'readClick'     => "&lt;Right Click To Read&gt;",   // ITEM_READABLE
+        'openClick'     => "&lt;Right Click To Open&gt;",   // ITEM_OPENABLE
+        'signClick'     => "&lt;Right Click for Details&gt;", // ITEM_SIGNABLE
+        'socketClick'   => "&lt;Shift Right Click to Socket&gt;", // ITEM_SOCKETABLE
         'setBonus'      => "(%d) Set: %s",                  // ITEM_SET_BONUS_GRAY
         'setName'       => "%s (%d/%d)",                    // ITEM_SET_NAME
         'partyLoot'     => "Party loot",
@@ -2413,8 +2430,11 @@ $lang = array(
         'buyout'        => "Buyout price",                  // BUYOUT_PRICE
         'each'          => "each",
         'tabOther'      => "Other",
+        'reqReputation' => "Requires %s - %s",              // ITEM_REQ_REPUTATION
         'reqMinLevel'   => "Requires Level %d",             // ITEM_MIN_LEVEL
         'reqLevelRange' => "Requires level %d to %d (%s)",  // ITEM_LEVEL_RANGE_CURRENT
+        'reqSkillValue' => "Requires %s (%d)",              // ITEM_MIN_SKILL
+        'reqSkill'      => "Requires %s",                   // ITEM_REQ_SKILL
         'unique'        => ["Unique",          "Unique (%d)", "Unique: %s (%d)"         ],   // ITEM_UNIQUE, ITEM_UNIQUE_MULTIPLE, ITEM_LIMIT_CATEGORY
         'uniqueEquipped'=> ["Unique-Equipped", null,          "Unique-Equipped: %s (%d)"],   // ITEM_UNIQUE_EQUIPPABLE, null, ITEM_LIMIT_CATEGORY_MULTIPLE
         'speed'         => "Speed",                         // SPEED
@@ -2424,6 +2444,9 @@ $lang = array(
         'purchasedIn'   => "This item can be purchased in",
         'fishingLoc'    => "Fishing Locations",
         'fishedIn'      => "This item can be fished in",
+        'resistAll'     => "%c%d to All Resistances",       // ITEM_RESIST_ALL
+        'resistSingle'  => "%c%d %s Resistance",            // ITEM_RESIST_SINGLE
+        'itemSuffixTpl' => '%s %s',                         // ITEM_SUFFIX_TEMPLATE
         'duration'      => array(                           // ITEM_DURATION_*
             '',
             "Duration: %d sec",
@@ -2450,7 +2473,7 @@ $lang = array(
             "Meta Socket",          "Red Socket",       "Yellow Socket",        "Blue Socket",          -1 => "Prismatic Socket"
         ),
         'gemColors'     => array(                           // *_GEM
-            "meta",                 "red",              "yellow",               "blue"
+            null,                   "Meta",             "Red",                      "Yellow",                   "Blue"
         ),
         'gemRequires'   => "Requires ",                     // ENCHANT_CONDITION_REQUIRES
         'gemConditions' => array(                           // ENCHANT_CONDITION_*
@@ -2490,23 +2513,23 @@ $lang = array(
             "Thrown",               null, /*Ranged2*/   "Quiver",               "Relic"
         ),
         'subClass'      => array(                           // ItemSubClass.dbc/name
-            ITEM_CLASS_CONSUMABLE => ["Consumable", "Potion", "Elixir", "Flask", "Scroll", "Food & Drink", "Item Enhancement", "Bandage", "Other"],
-            ITEM_CLASS_CONTAINER  => ["Bag", "Soul Bag", "Herb Bag", "Enchanting Bag", "Engineering Bag", "Gem Bag", "Mining Bag", "Leatherworking Bag", "Inscription Bag"],
-            ITEM_CLASS_WEAPON     => ["Axe", "Axe", "Bow", "Gun", "Mace", "Mace", "Polearm", "Sword", "Sword", "Obsolete", "Staff", "Exotic", "Exotic", "Fist Weapon", "Miscellaneous", "Dagger", "Thrown", "Spear", "Crossbow", "Wand", "Fishing Pole"],
-            ITEM_CLASS_GEM        => ["Red", "Blue", "Yellow", "Purple", "Green", "Orange", "Meta", "Simple", "Prismatic"],
-            ITEM_CLASS_ARMOR      => ["Miscellaneous", "Cloth", "Leather", "Mail", "Plate", "Buckler(OBSOLETE)", "Shield", "Libram", "Idol", "Totem", "Sigil"],
-            ITEM_CLASS_REAGENT    => ["Reagent"],
-            ITEM_CLASS_AMMUNITION => ["Wand(OBSOLETE)", "Bolt(OBSOLETE)", "Arrow", "Bullet", "Thrown(OBSOLETE)"],
-            ITEM_CLASS_TRADEGOOD  => ["Trade Goods", "Parts", "Explosives", "Devices", "Jewelcrafting", "Cloth", "Leather", "Metal & Stone", "Meat", "Herb", "Elemental", "Other", "Enchanting", "Materials", "Armor Enchantment", "Weapon Enchantment"],
-            ITEM_CLASS_GENERIC    => ["Generic(OBSOLETE)"],
-            ITEM_CLASS_RECIPE     => ["Book", "Leatherworking", "Tailoring", "Engineering", "Blacksmithing", "Cooking", "Alchemy", "First Aid", "Enchanting", "Fishing", "Jewelcrafting", "Inscription"],
-            ITEM_CLASS_MONEY      => ["Money(OBSOLETE)"],
-            ITEM_CLASS_QUIVER     => ["Quiver(OBSOLETE)", "Quiver(OBSOLETE)", "Quiver", "Ammo Pouch"],
-            ITEM_CLASS_QUEST      => ["Quest"],
-            ITEM_CLASS_KEY        => ["Key", "Lockpick"],
-            ITEM_CLASS_PERMANENT  => ["Permanent"],
-            ITEM_CLASS_MISC       => ["Junk", "Reagent", "Pet", "Holiday", "Other", "Mount"],
-            ITEM_CLASS_GLYPH      => [null, "Warrior", "Paladin", "Hunter", "Rogue", "Priest", "Death Knight", "Shaman", "Mage", "Warlock", null, "Druid"]
+            ITEM_CLASS_CONSUMABLE => ["Consumable",          ["Consumable", "Potion", "Elixir", "Flask", "Scroll", "Food & Drink", "Item Enhancement", "Bandage", "Other"]],
+            ITEM_CLASS_CONTAINER  => ["Container",           ["Bag", "Soul Bag", "Herb Bag", "Enchanting Bag", "Engineering Bag", "Gem Bag", "Mining Bag", "Leatherworking Bag", "Inscription Bag"]],
+            ITEM_CLASS_WEAPON     => ["Weapon",              ["Axe", "Axe", "Bow", "Gun", "Mace", "Mace", "Polearm", "Sword", "Sword", "Obsolete", "Staff", "Exotic", "Exotic", "Fist Weapon", "Miscellaneous", "Dagger", "Thrown", "Spear", "Crossbow", "Wand", "Fishing Pole"]],
+            ITEM_CLASS_GEM        => ["Gem",                 ["Red", "Blue", "Yellow", "Purple", "Green", "Orange", "Meta", "Simple", "Prismatic"]],
+            ITEM_CLASS_ARMOR      => ["Armor",               ["Miscellaneous", "Cloth", "Leather", "Mail", "Plate", "Buckler(OBSOLETE)", "Shield", "Libram", "Idol", "Totem", "Sigil"]],
+            ITEM_CLASS_REAGENT    => ["Reagent",             ["Reagent"]],
+            ITEM_CLASS_AMMUNITION => ["Projectile",          ["Wand(OBSOLETE)", "Bolt(OBSOLETE)", "Arrow", "Bullet", "Thrown(OBSOLETE)"]],
+            ITEM_CLASS_TRADEGOOD  => ["Trade Goods",         ["Trade Goods", "Parts", "Explosives", "Devices", "Jewelcrafting", "Cloth", "Leather", "Metal & Stone", "Meat", "Herb", "Elemental", "Other", "Enchanting", "Materials", "Armor Enchantment", "Weapon Enchantment"]],
+            ITEM_CLASS_GENERIC    => ["Generic(OBSOLETE)",   ["Generic(OBSOLETE)"]],
+            ITEM_CLASS_RECIPE     => ["Recipe",              ["Book", "Leatherworking", "Tailoring", "Engineering", "Blacksmithing", "Cooking", "Alchemy", "First Aid", "Enchanting", "Fishing", "Jewelcrafting", "Inscription"]],
+            ITEM_CLASS_MONEY      => ["Money",               ["Money(OBSOLETE)"]],
+            ITEM_CLASS_QUIVER     => ["Quiver",              ["Quiver(OBSOLETE)", "Quiver(OBSOLETE)", "Quiver", "Ammo Pouch"]],
+            ITEM_CLASS_QUEST      => ["Quest",               ["Quest"]],
+            ITEM_CLASS_KEY        => ["Key",                 ["Key", "Lockpick"]],
+            ITEM_CLASS_PERMANENT  => ["Permanent(OBSOLETE)", ["Permanent"]],
+            ITEM_CLASS_MISC       => ["Miscellaneous",       ["Junk", "Reagent", "Pet", "Holiday", "Other", "Mount"]],
+            ITEM_CLASS_GLYPH      => ["Glyph",               [null, "Warrior", "Paladin", "Hunter", "Rogue", "Priest", "Death Knight", "Shaman", "Mage", "Warlock", null, "Druid"]]
         ),
         'cat'           => array(                           // ordered by content first, then alphabeticaly; item menu from locale_enus.js
              2 => array("Weapons", []),                     // filled with self::$spell['weaponSubClass'] on load

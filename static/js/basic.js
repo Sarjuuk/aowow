@@ -1458,7 +1458,9 @@ $WH.g_setTooltipLevel = function(tooltip, level) {
             });
 
             // Update fap
-            tooltip = tooltip.replace(/<span class="c11"><!--fap-->(\D*?)(\d+)(\D*?)<\/span>(<br \/>)?/i, function(_all, prefix, value, statText, br) {
+            // aowow - moved separate fap line to greentext
+            // tooltip = tooltip.replace(/<span class="c11"><!--fap-->(\D*?)(\d+)(\D*?)<\/span>(<br \/>)?/i, function(_all, prefix, value, statText, br) {
+            tooltip = tooltip.replace(/<span class="q2">(\D*?)<!--fap-->(\d+)(\D*?)<\/span>(<br \/>)?/i, function(_all, prefix, value, statText, br) {
                 var style;
                 value = Math.floor((json.dps - 54.8) * 14);
                 if (json.dps > 54.8 && value > 0) {
@@ -1470,7 +1472,7 @@ $WH.g_setTooltipLevel = function(tooltip, level) {
                     style = ' style="display: none"';
                     br = (br ? '<!--br-->': '');
                 }
-                return '<span class="c11"' + style + '><!--fap-->' + prefix + value + statText + '</span>' + br;
+                return '<span class="q2"' + style + '><!--fap-->' + prefix + value + statText + '</span>' + br;
             });
 
             // Update armor

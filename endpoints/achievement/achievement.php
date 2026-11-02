@@ -389,17 +389,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
                             $extraData[] = $_;
                         break;
                     case ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_ID:
-                        $extraData[] = match((int)$xData['value1'])
-                        {
-                            0       => Lang::maps('EasternKingdoms'),
-                            1       => Lang::maps('Kalimdor'),
-                            530     => Lang::maps('Outland'),
-                            571     => Lang::maps('Northrend'),
-                            default => (function(int $mapId) {
-                                $z = new ZoneList(array(['mapId', $mapId]));
-                                return '<a href="?zone='.$z->id.'">'.$z->getField('name', true).'</a>';
-                            })($xData['value1'])
-                        };
+                        $extraData[] = Lang::zoneFromMap($xData['value1']);
                         break;
                     case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_EQUIPED_ITEM:
                         $_ = Lang::item('itemLevel', [$xData['value1']]);

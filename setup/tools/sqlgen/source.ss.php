@@ -476,7 +476,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             LEFT JOIN item_template itB ON itB.`entry` = ilt.`Item` AND ilt.`Reference` <= 0
             WHERE     itA.`flags` & %i
             GROUP BY  ARRAY_KEY',
-            ITEM_FLAG_OPENABLE
+            ITEM_FLAG_HAS_LOOT
         );
 
         // Clams are not item containers but have SpellLoot

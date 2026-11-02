@@ -317,7 +317,7 @@ $lang = array(
         'customProfile' => " (Benutzerprofil)",
         'resync'        => "Resynchronisieren",
         'guildRoster'   => "Gildenliste für &lt;%s&gt;",
-        'arenaRoster'   => "Arena-Teamliste für &lt;%s&gt",
+        'arenaRoster'   => "Arena-Teamliste für &lt;%s&gt;",
         'atCaptain'     => "Teamkapitän",
         'atSize'        => "Größe: ",
         'profiler'      => "Charakter-Profiler",
@@ -558,6 +558,17 @@ $lang = array(
             ["Steingardist", "Leutnant"],                                   ["Blutgardist", "Hauptmann"],                                   ["Zornbringer", "Kürassier"],
             ["Klinge der Horde", "Ritter der Allianz"],                     ["Feldherr", "Feldkommandant"],                                 ["Sturmreiter", "Rittmeister"],
             ["Kriegsherr", "Marschall"],                                    ["Kriegsfürst", "Feldmarschall"],                               ["Oberster Kriegsfürst", "Großmarschall"]
+        ),
+        'cityRank'      => array(                           // PVP_MEDAL\d
+            null,
+            "Beschützer von Sturmwind",
+            "Oberanführer von Orgrimmar",
+            "Than von Eisenschmiede",
+            "Hochschildwache von Darnassus",
+            "Todeslord von Unterstadt",
+            "Häuptling von Donnerfels",
+            "Rächer von Gnomeregan",
+            "Voodooboss von Senjin"
         ),
         'orientation'   => ['Nord', 'Nordost', 'Ost', 'Südost', 'Süd', 'Südwest', 'West', 'Nordwest']
     ),
@@ -2365,19 +2376,25 @@ $lang = array(
         'block'         => "%s Blocken",
         'charges'       => "%d |4Aufladung:Aufladungen;",
         'locked'        => "Verschlossen",
+        'lockedByItem'  => "Benötigt %s",
+        'lockedBySpell' => "Benötigt %s",
+        'encrypted'     => "Verschlüsselt",
         'ratingString'  => '<!--rtg%%%1$d-->%2$s&nbsp;@&nbsp;Lvl<!--lvl-->%3$d',
         'heroic'        => "Heroisch",
         'startQuest'    => "Dieser Gegenstand startet eine Quest",
         'containerSlots'=> '%1$d Platz %2$s',
-        'fap'           => "Angriffskraft in Tiergestalt",
+     // 'fap'           => "Angriffskraft in Tiergestalt",  // superseded by feralItemAP
+        'feralItemAP'   => "Erhöht die Angriffskraft um <!--fap-->%d nur in Katzen-, Bären-, Terrorbären- und Mondkingestalt.",
         'durability'    => 'Haltbarkeit %1$d / %2$d',
         'realTime'      => "Realzeit",
         'conjured'      => "Herbeigezauberter Gegenstand",
         'sellPrice'     => "Verkaufspreis",
         'itemLevel'     => "Gegenstandsstufe %d",
-        'randEnchant'   => "&lt;Zufällige Verzauberung&gt",
-        'readClick'     => "&lt;Zum Lesen rechtsklicken&gt",
-        'openClick'     => "&lt;Zum Öffnen rechtsklicken&gt",
+        'randEnchant'   => "&lt;Zufällige Verzauberung&gt;",
+        'readClick'     => "&lt;Zum Lesen rechtsklicken&gt;",
+        'openClick'     => "&lt;Zum Öffnen rechtsklicken&gt;",
+        'signClick'     => "&lt;Für Details rechtsklicken&gt;",
+        'socketClick'   => "&lt;Zum Sockeln Shift-Rechtsklick&gt;",
         'setBonus'      => "(%d) Set: %s",
         'setName'       => '%1$s (%2$d/%3$d)',
         'partyLoot'     => "Gruppenloot",
@@ -2412,8 +2429,11 @@ $lang = array(
         'buyout'        => "Sofortkaufpreis",
         'each'          => "Stück",
         'tabOther'      => "Anderes",
+        'reqReputation' => "Benötigt %s - %s",
         'reqMinLevel'   => "Benötigt Stufe %d",
         'reqLevelRange' => "Benötigt Stufe %d bis %d (%s)",
+        'reqSkillValue' => 'Benötigt %1$s (%2$d)',          // ITEM_MIN_SKILL
+        'reqSkill'      => 'Benötigt %1$s',                 // ITEM_REQ_SKILL
         'unique'        => ["Einzigartig",          "Limitiert (%d)", "Einzigartig: %s (%d)"         ],
         'uniqueEquipped'=> ["Einzigartig anlegbar", null,             "Einzigartig angelegt: %s (%d)"],
         'speed'         => "Tempo",
@@ -2423,6 +2443,9 @@ $lang = array(
         'purchasedIn'   => "Dieser Gegenstand kann gekauft werden in",
         'fishingLoc'    => "Angelplätze",
         'fishedIn'      => "Dieser Gegenstand kann geangelt werden in",
+        'resistAll'     => '%1$c%2$d zu allen Widerstandsarten',
+        'resistSingle'  => '%c%d %swiderstand',
+        'itemSuffixTpl' => '%1$s %2$s',                     // ITEM_SUFFIX_TEMPLATE
         'duration'      => array(                           // ITEM_DURATION_*
             '',
             "Dauer: %d Sek.",
@@ -2449,7 +2472,7 @@ $lang = array(
             "Metasockel",           "Roter Sockel",     "Gelber Sockel",        "Blauer Sockel",          -1 => "Prismatischer Sockel"
         ),
         'gemColors'     => array(                           // *_GEM
-            "Meta",                 "Rot",              "Gelb",                 "Blau"
+            null,                   "Meta",             "Rot",                      "Gelb",                     "Blau"
         ),
         'gemRequires'   => "Benötigt ",                     // ENCHANT_CONDITION_REQUIRES
         'gemConditions' => array(                           // ENCHANT_CONDITION_*
@@ -2480,11 +2503,6 @@ $lang = array(
             "Accountgebunden",                          "Wird beim Aufheben gebunden",                          "Wird beim Anlegen gebunden",
             "Wird bei Benutzung gebunden",              "Questgegenstand",                                      "Questgegenstand"
         ),
-        'bagFamily'     => array(
-            "Tasche",               "Köcher",           "Munitionsbeutel",      "Seelentasche",                 "Lederertasche",
-            "Schreibertasche",      "Kräutertasche",    "Verzauberertasche",    "Ingenieurstasche",             null, /*Schlüssel*/
-            "Edelsteintasche",      "Bergbautasche"
-        ),
         'inventoryType' => array(
             null,                   "Kopf",             "Hals",                 "Schulter",                     "Hemd",
             "Brust",                "Taille",           "Beine",                "Füße",                         "Handgelenke",
@@ -2494,23 +2512,23 @@ $lang = array(
             "Wurfwaffe",            null, /*Ranged2*/   "Köcher",               "Relikt"
         ),
         'subClass'      => array(
-            ITEM_CLASS_CONSUMABLE => ["Verbrauchbar", "Trank", "Elixier", "Fläschchen", "Rolle", "Speis & Trank", "Gegenstandsverbesserung", "Verband", "Sonstige"],
-            ITEM_CLASS_CONTAINER  => ["Behälter", "Seelentasche", "Kräutertasche", "Verzauberertasche", "Ingenieurstasche", "Edelsteintasche", "Bergbautasche", "Lederertasche", "Schreibertasche"],
-            ITEM_CLASS_WEAPON     => ["Axt", "Axt", "Bogen", "Schusswaffe", "Streitkolben", "Streitkolben", "Stangenwaffe", "Schwert", "Schwert", "Überflüssig", "Stab", "Exotika", "Exotika", "Faustwaffe", "Verschiedenes", "Dolch", "Wurfwaffe", "Speer", "Armbrust", "Zauberstab", "Angelrute"],
-            ITEM_CLASS_GEM        => ["Rot", "Blau", "Gelb", "Violett", "Grün", "Orange", "Meta", "Einfach", "Prismatisch"],
-            ITEM_CLASS_ARMOR      => ["Verschiedenes", "Stoff", "Leder", "Schwere Rüstung", "Platte", "Rundschild(OBSOLETE)", "Schild", "Buchbände", "Götze", "Totems", "Siegel"],
-            ITEM_CLASS_REAGENT    => ["Reagenz"],
-            ITEM_CLASS_AMMUNITION => ["Zauberstab(OBSOLETE)", "Bolzen(OBSOLETE)", "Pfeil", "Kugel", "Wurfwaffen (ÜBERFLÜSSIG)"],
-            ITEM_CLASS_TRADEGOOD  => ["Handwerkswaren", "Teile", "Sprengstoff", "Geräte", "Juwelenschleifen", "Stoff", "Leder", "Metall & Stein", "Fleisch", "Kräuter", "Elementar", "Sonstige", "Verzauberkunst", "Materialien", "Rüstungsverzauberung", "Waffenverzauberung"],
-            ITEM_CLASS_GENERIC    => ["Generic(OBSOLETE)"],
-            ITEM_CLASS_RECIPE     => ["Buch", "Lederverarbeitung", "Schneiderei", "Ingenieurskunst", "Schmiedekunst", "Kochkunst", "Alchemie", "Erste Hilfe", "Verzauberkunst", "Angeln", "Juwelenschleifen", "Inschrift"],
-            ITEM_CLASS_MONEY      => ["Money(OBSOLETE)"],
-            ITEM_CLASS_QUIVER     => ["Quiver(OBSOLETE)", "Quiver(OBSOLETE)", "Köcher", "Munitionsbeutel"],
-            ITEM_CLASS_QUEST      => ["Quest"],
-            ITEM_CLASS_KEY        => ["Schlüssel", "Nachschlüssel"],
-            ITEM_CLASS_PERMANENT  => ["Dauerhaft"],
-            ITEM_CLASS_MISC       => ["Plunder", "Reagenz", "Haustier", "Festtag", "Sonstige", "Reittier"],
-            ITEM_CLASS_GLYPH      => [null, "Krieger", "Paladin", "Jäger", "Schurke", "Priester", "Todesritter", "Schamane", "Magier", "Hexenmeister", null, "Druide"]
+            ITEM_CLASS_CONSUMABLE => ["Verbrauchbar",           ["Verbrauchbar", "Trank", "Elixier", "Fläschchen", "Rolle", "Speis & Trank", "Gegenstandsverbesserung", "Verband", "Sonstige"]],
+            ITEM_CLASS_CONTAINER  => ["Behälter",               ["Behälter", "Seelentasche", "Kräutertasche", "Verzauberertasche", "Ingenieurstasche", "Edelsteintasche", "Bergbautasche", "Lederertasche", "Schreibertasche"]],
+            ITEM_CLASS_WEAPON     => ["Waffe",                  ["Axt", "Axt", "Bogen", "Schusswaffe", "Streitkolben", "Streitkolben", "Stangenwaffe", "Schwert", "Schwert", "Überflüssig", "Stab", "Exotika", "Exotika", "Faustwaffe", "Verschiedenes", "Dolch", "Wurfwaffe", "Speer", "Armbrust", "Zauberstab", "Angelrute"]],
+            ITEM_CLASS_GEM        => ["Edelstein",              ["Rot", "Blau", "Gelb", "Violett", "Grün", "Orange", "Meta", "Einfach", "Prismatisch"]],
+            ITEM_CLASS_ARMOR      => ["Rüstung",                ["Verschiedenes", "Stoff", "Leder", "Schwere Rüstung", "Platte", "Rundschild(OBSOLETE)", "Schild", "Buchbände", "Götze", "Totems", "Siegel"]],
+            ITEM_CLASS_REAGENT    => ["Reagenz",                ["Reagenz"]],
+            ITEM_CLASS_AMMUNITION => ["Projektil",              ["Zauberstab(OBSOLETE)", "Bolzen(OBSOLETE)", "Pfeil", "Kugel", "Wurfwaffen (ÜBERFLÜSSIG)"]],
+            ITEM_CLASS_TRADEGOOD  => ["Handwerkswaren",         ["Handwerkswaren", "Teile", "Sprengstoff", "Geräte", "Juwelenschleifen", "Stoff", "Leder", "Metall & Stein", "Fleisch", "Kräuter", "Elementar", "Sonstige", "Verzauberkunst", "Materialien", "Rüstungsverzauberung", "Waffenverzauberung"]],
+            ITEM_CLASS_GENERIC    => ["Generic(OBSOLETE)",      ["Generic(OBSOLETE)"]],
+            ITEM_CLASS_RECIPE     => ["Rezept",                 ["Buch", "Lederverarbeitung", "Schneiderei", "Ingenieurskunst", "Schmiedekunst", "Kochkunst", "Alchemie", "Erste Hilfe", "Verzauberkunst", "Angeln", "Juwelenschleifen", "Inschrift"]],
+            ITEM_CLASS_MONEY      => ["Money",                  ["Money(OBSOLETE)"]],
+            ITEM_CLASS_QUIVER     => ["Köcher",                 ["Quiver(OBSOLETE)", "Quiver(OBSOLETE)", "Köcher", "Munitionsbeutel"]],
+            ITEM_CLASS_QUEST      => ["Quest",                  ["Quest"]],
+            ITEM_CLASS_KEY        => ["Schlüssel",              ["Schlüssel", "Nachschlüssel"]],
+            ITEM_CLASS_PERMANENT  => ["Dauerhaft(ÜBERFLÜSSIG)", ["Dauerhaft"]],
+            ITEM_CLASS_MISC       => ["Verschiedenes",          ["Plunder", "Reagenz", "Haustier", "Festtag", "Sonstige", "Reittier"]],
+            ITEM_CLASS_GLYPH      => ["Glyphe",                 [null, "Krieger", "Paladin", "Jäger", "Schurke", "Priester", "Todesritter", "Schamane", "Magier", "Hexenmeister", null, "Druide"]]
         ),
         'cat'           => array(
              2 => array("Waffen", []),                      // filled with self::$spell['weaponSubClass'] on load

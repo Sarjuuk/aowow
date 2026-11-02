@@ -268,19 +268,18 @@ class Lang
         return $tmp;
     }
 
-    public static function getLocks(int $lockId, ?array &$ids = [], bool $interactive = false, int $fmt = self::FMT_HTML) : array
+    public static function getLocks(int $lockId, ?array &$ids = [], ?bool &$isEncrypted = false, bool $interactive = false, int $fmt = self::FMT_HTML) : array
     {
         $locks = [];
         $ids   = [];
-        $lock  = DB::Aowow()->selectRow('SELECT * FROM ::lock WHERE `id` = %i', $lockId);
-        if (!$lock)
-            return $locks;
 
-        for ($i = 1; $i <= 5; $i++)
+        if (!$lockId || !($lock  = DB::Aowow()->selectRow('SELECT * FROM ::lock WHERE `id` = %i', $lockId)))
+            return [];
+
+        for ($i = 1; $i <= 5; $i++)                         // cols 6-8 are empty in default dbc and have been left out
         {
             $prop = $lock['properties'.$i];
             $rank = $lock['reqSkill'.$i];
-            $name = '';
 
             switch ($lock['type'.$i])
             {
@@ -296,6 +295,7 @@ class Lang
                         $ids[Type::ITEM][] = $prop;
                     }
 
+                    $locks[] = [$name, Type::ITEM, 0];
                     break;
                 case LOCK_TYPE_SKILL:
                     if (!($name = self::spell('lockType', $prop)))
@@ -307,6 +307,9 @@ class Lang
                          3 => SKILL_MINING,
                         20 => SKILL_INSCRIPTION
                     );
+
+                    if ($prop == 20)
+                        $isEncrypted = true;
 
                     // resolve as skill
                     if (isset($skills[$prop]))
@@ -333,11 +336,9 @@ class Lang
                         }
                     }
                     else
-                        continue 2;
+                        break;
 
-                    if ($rank > 0)
-                        $name = self::main('parensFmt', [$name, $rank]);
-
+                    $locks[] = [$name, Type::SKILL, $rank];
                     break;
                 case LOCK_TYPE_SPELL:
                     if (!($name = SpellList::getName($prop)))
@@ -351,12 +352,13 @@ class Lang
                         $ids[Type::SPELL][] = $prop;
                     }
 
+                    $locks[] = [$name, Type::SPELL, 0];
                     break;
-                default:
-                    continue 2;
             }
 
-            $locks[$lock['type'.$i] == LOCK_TYPE_ITEM ? $prop : -$prop] = $name;
+            // return first result for regular users
+            if (!User::isInGroup(U_GROUP_STAFF) && $locks)
+                return $locks;
         }
 
         return $locks;
@@ -507,6 +509,21 @@ class Lang
             self::FMT_MARKUP => '[url=?'.Type::getFileString($type).'='.$typeId.($cssClass ? ' class='.$cssClass : '').']'.$name.'[/url]',
             self::FMT_RAW    => $name,
             default          => $name
+        };
+    }
+
+    public static function zoneFromMap(int $mapId) : string
+    {
+        return match($mapId)
+        {
+            0       => self::maps('EasternKingdoms'),
+            1       => self::maps('Kalimdor'),
+            530     => self::maps('Outland'),
+            571     => self::maps('Northrend'),
+            default => (function(int $mapId) {
+                $z = DB::Aowow()->selectRow('SELECT `id`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8` FROM ::zones WHERE `mapId` = %i', $mapId);
+                return $z ? '<a href="?zone='.$z['id'].'">'.Util::localizedString($z, 'name', true).'</a>' : '';
+            })($mapId)
         };
     }
 

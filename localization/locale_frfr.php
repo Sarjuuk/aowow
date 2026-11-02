@@ -317,7 +317,7 @@ $lang = array(
         'complexFilter' => "[Complex filter selected! Search results are limited to cached Characters.]",
         'customProfile' => " ([Custom Profile])",
         'resync'        => "Resynchronisation",
-        'guildRoster'   => "Liste des membres pour la guilde de  &lt;%s&gt",
+        'guildRoster'   => "Liste des membres pour la guilde de  &lt;%s&gt;",
         'arenaRoster'   => "[Arena Team Roster for &lt;%s&gt]",     // string probably lost
         'atCaptain'     => "Capitaine d'équipe",
         'atSize'        => "Type : ",
@@ -559,6 +559,17 @@ $lang = array(
             ["Garde de pierre", "Chevalier"],                               ["Garde de sang", "Chevalier-lieutenant"],                      ["Légionnaire", "Chevalier-capitaine"],
             ["Centurion", "Chevalier-champion"],                            ["Champion", "Lieutenant-commandant"],                          ["Lieutenant-général", "Commandant"],
             ["Général", "Maréchal"],                                        ["Seigneur de guerre", "Grand maréchal"],                       ["Grand seigneur de guerre", "Connétable"]
+        ),
+        'cityRank'      => array(                           // PVP_MEDAL\d
+            null,
+            "Protecteur de Hurlevent",
+            "Haut-Seigneur d'Orgrimmar",
+            "Thane de Forgefer",
+            "Haute-Sentinelle de Darnassus",
+            "Nécroprince de Fossoyeuse",
+            "Sachem des Pitons du Tonnerre",
+            "Vengeur de Gnomeregan",
+            "Chef Vaudou de Sen'jin"
         ),
         'orientation'   => ['North', 'Northeast', 'East', 'Southeast', 'South', 'Southwest', 'West', 'Northwest']
     ),
@@ -2366,19 +2377,25 @@ $lang = array(
         'block'         => "Bloquer : %s",
         'charges'       => "%d |4charge:charges;",
         'locked'        => "Verrouillé",
+        'lockedByItem'  => "Requiert %s",
+        'lockedBySpell' => "Requiert %s",
+        'encrypted'     => "Codé",
         'ratingString'  => '<!--rtg%%%1$d-->%2$s&nbsp;au&nbsp;niveau&nbsp;<!--lvl-->%3$d',
         'heroic'        => "Héroïque",
         'startQuest'    => "Cet objet permet de lancer une quête",
         'containerSlots'=> '%2$s %1$d |4emplacement:emplacements;',
-        'fap'           => "puissance d'attaque en combat farouche",
+     // 'fap'           => "puissance d'attaque en combat farouche",
+        'feralItemAP'   => "Augmente la puissance d'attaque de <!--fap-->%d seulement en forme de félin, ours, ours redoutable ou sélénien.",
         'durability'    => "Durabilité %d / %d",
         'realTime'      => "temps réel",
         'conjured'      => "Objet invoqué",
         'sellPrice'     => "Prix de Vente",
         'itemLevel'     => "Niveau d'objet %d",
-        'randEnchant'   => "&lt;Enchantement aléatoire&gt",
-        'readClick'     => "&lt;Clique Droit pour Lire&gt",
-        'openClick'     => "&lt;Clic Droit pour Ouvrir&gt",
+        'randEnchant'   => "&lt;Enchantement aléatoire&gt;",
+        'readClick'     => "&lt;Clic droit pour lire&gt;",
+        'openClick'     => "&lt;Clic droit pour ouvrir&gt;",
+        'signClick'     => "&lt;Clic droit pour plus de renseignements&gt;",
+        'socketClick'   => "&lt;Maj clic-droit pour sertir&gt;",
         'setBonus'      => "(%d) Ensemble : %s",
         'setName'       => "%s (%d/%d)",
         'partyLoot'     => "Butin de groupe",
@@ -2413,8 +2430,11 @@ $lang = array(
         'buyout'        => "Vente immédiate",
         'each'          => "chacun",
         'tabOther'      => "Autre",
+        'reqReputation' => "Requiert %s - %s",
         'reqMinLevel'   => "Niveau %d requis",
         'reqLevelRange' => "Niveau %d à %d (%s) requis",
+        'reqSkillValue' => "%s (%d) requis",
+        'reqSkill'      => "Requiert %s",
         'unique'        => ["Unique",          "Unique (%d)", "Unique: %s (%d)"         ],   // ITEM_UNIQUE, ITEM_UNIQUE_MULTIPLE, ITEM_LIMIT_CATEGORY
         'uniqueEquipped'=> ["Unique - Equipé", null,          "Unique - Equipé: %s (%d)"],   // ITEM_UNIQUE_EQUIPPABLE, null, ITEM_LIMIT_CATEGORY_MULTIPLE
         'speed'         => "Vitesse",
@@ -2424,6 +2444,9 @@ $lang = array(
         'purchasedIn'   => "Cet objet peut être acheté dans",
         'fishingLoc'    => "Lieux de pêche",
         'fishedIn'      => "Cet objet peut être pêché dans",
+        'resistAll'     => "%c%d à toutes les résistances",
+        'resistSingle'  => '%1$c%2$d à la résistance %3$s',
+        'itemSuffixTpl' => '%s %$s',
         'duration'      => array(
             '',
             "Durée : %d sec",
@@ -2450,7 +2473,7 @@ $lang = array(
             "Méta-châsse",          "Châsse rouge",     "Châsse jaune",         "Châsse bleue",           -1 => "Châsse prismatique"
         ),
         'gemColors'     => array(                           // *_GEM
-            "Méta",                 "rouge(s)",         "jaune(s)",             "bleue(s)"
+            null,                   "Méta",             "rouge(s)",                 "jaune(s)",                 "bleue(s)"
         ),
         'gemRequires'   => "Nécessite ",                    // ENCHANT_CONDITION_REQUIRES
         'gemConditions' => array(                           // ENCHANT_CONDITION_*
@@ -2490,23 +2513,23 @@ $lang = array(
             "Armes de jet",         null, /*Ranged2*/   "Carquois",             "Relique"
         ),
         'subClass'      => array(
-            ITEM_CLASS_CONSUMABLE => ["Consommables", "Potion", "Élixir", "Flacon", "Parchemin", "Nourriture & boissons", "Amélioration d'objet", "Bandage", "Autre"],
-            ITEM_CLASS_CONTAINER  => ["Sac", "Sac d'âme", "Sac d'herbes", "Sac d'enchanteur", "Sac d'ingénieur", "Sac de gemmes", "Sac de mineur", "Sac de travail du cuir", "Sac de calligraphie"],
-            ITEM_CLASS_WEAPON     => ["Hache", "Hache", "Arc", "Arme à feu", "Masse", "Masse", "Arme d'hast", "Epée", "Epée", "Obsolète", "Bâton", "Spéciale", "Spéciale", "Arme de pugilat", "Divers", "Dague", "Armes de jet", "Lance", "Arbalète", "Baguette", "Canne à pêche"],
-            ITEM_CLASS_GEM        => ["Rouge", "Bleue", "Jaune", "Violette", "Verte", "Orange", "Méta", "Simple", "Prismatique"],
-            ITEM_CLASS_ARMOR      => ["Divers", "Tissu", "Cuir", "Mailles", "Plaques", "Targe(OBSOLETE)", "Bouclier", "Libram", "Idole", "Totem", "Cachet"],
-            ITEM_CLASS_REAGENT    => ["Réactif"],
-            ITEM_CLASS_AMMUNITION => ["Baguette(OBSOLETE)", "Carreau(OBSOLETE)", "Flèche", "Balle", "Arme de jet(OBSOLETE)"],
-            ITEM_CLASS_TRADEGOOD  => ["Artisanat", "Eléments", "Explosifs", "Appareils", "Joaillerie", "Tissu", "Cuir", "Métal & pierre", "Viande", "Herbes", "Élémentaire", "Autre", "Enchantement", "Matériaux", "Enchantement d'armure", "Enchantement d'arme"],
-            ITEM_CLASS_GENERIC    => ["Générique(OBSOLETE)"],
-            ITEM_CLASS_RECIPE     => ["Livre", "Travail du cuir", "Couture", "Ingénierie", "Forge", "Cuisine", "Alchimie", "Secourisme", "Enchantement", "Pêche", "Joaillerie", "Calligraphie"],
-            ITEM_CLASS_MONEY      => ["Argent(OBSOLETE)"],
-            ITEM_CLASS_QUIVER     => ["Carquois(OBSOLETE)", "Carquois(OBSOLETE)", "Carquois", "Giberne"],
-            ITEM_CLASS_QUEST      => ["Quête"],
-            ITEM_CLASS_KEY        => ["Clé", "Crochetage"],
-            ITEM_CLASS_PERMANENT  => ["Permanent"],
-            ITEM_CLASS_MISC       => ["Camelote", "Réactif", "Familier", "Fête", "Autre", "Monture"],
-            ITEM_CLASS_GLYPH      => [null, "Guerrier", "Paladin", "Chasseur", "Voleur", "Prêtre", "Ch. de la mort", "Chaman", "Mage", "Démoniste", null, "Druide"]
+            ITEM_CLASS_CONSUMABLE => ["Consommable",         ["Consommables", "Potion", "Élixir", "Flacon", "Parchemin", "Nourriture & boissons", "Amélioration d'objet", "Bandage", "Autre"]],
+            ITEM_CLASS_CONTAINER  => ["Conteneur",           ["Sac", "Sac d'âme", "Sac d'herbes", "Sac d'enchanteur", "Sac d'ingénieur", "Sac de gemmes", "Sac de mineur", "Sac de travail du cuir", "Sac de calligraphie"]],
+            ITEM_CLASS_WEAPON     => ["Arme",                ["Hache", "Hache", "Arc", "Arme à feu", "Masse", "Masse", "Arme d'hast", "Epée", "Epée", "Obsolète", "Bâton", "Spéciale", "Spéciale", "Arme de pugilat", "Divers", "Dague", "Armes de jet", "Lance", "Arbalète", "Baguette", "Canne à pêche"]],
+            ITEM_CLASS_GEM        => ["Gemme",               ["Rouge", "Bleue", "Jaune", "Violette", "Verte", "Orange", "Méta", "Simple", "Prismatique"]],
+            ITEM_CLASS_ARMOR      => ["Armure",              ["Divers", "Tissu", "Cuir", "Mailles", "Plaques", "Targe(OBSOLETE)", "Bouclier", "Libram", "Idole", "Totem", "Cachet"]],
+            ITEM_CLASS_REAGENT    => ["Composant",           ["Réactif"]],
+            ITEM_CLASS_AMMUNITION => ["Projectile",          ["Baguette(OBSOLETE)", "Carreau(OBSOLETE)", "Flèche", "Balle", "Arme de jet(OBSOLETE)"]],
+            ITEM_CLASS_TRADEGOOD  => ["Artisanat",           ["Artisanat", "Eléments", "Explosifs", "Appareils", "Joaillerie", "Tissu", "Cuir", "Métal & pierre", "Viande", "Herbes", "Élémentaire", "Autre", "Enchantement", "Matériaux", "Enchantement d'armure", "Enchantement d'arme"]],
+            ITEM_CLASS_GENERIC    => ["Générique(OBSOLETE)", ["Générique(OBSOLETE)"]],
+            ITEM_CLASS_RECIPE     => ["Recette",             ["Livre", "Travail du cuir", "Couture", "Ingénierie", "Forge", "Cuisine", "Alchimie", "Secourisme", "Enchantement", "Pêche", "Joaillerie", "Calligraphie"]],
+            ITEM_CLASS_MONEY      => ["Argent",              ["Argent(OBSOLETE)"]],
+            ITEM_CLASS_QUIVER     => ["Carquois",            ["Carquois(OBSOLETE)", "Carquois(OBSOLETE)", "Carquois", "Giberne"]],
+            ITEM_CLASS_QUEST      => ["Quête",               ["Quête"]],
+            ITEM_CLASS_KEY        => ["Clé",                 ["Clé", "Crochetage"]],
+            ITEM_CLASS_PERMANENT  => ["Permanent(OBSOLETE)", ["Permanent"]],
+            ITEM_CLASS_MISC       => ["Divers",              ["Camelote", "Réactif", "Familier", "Fête", "Autre", "Monture"]],
+            ITEM_CLASS_GLYPH      => ["Glyphe",              [null, "Guerrier", "Paladin", "Chasseur", "Voleur", "Prêtre", "Ch. de la mort", "Chaman", "Mage", "Démoniste", null, "Druide"]]
         ),
         'cat'           => array(
              2 => array("Armes", []),                       // filled with self::$spell['weaponSubClass'] on load
