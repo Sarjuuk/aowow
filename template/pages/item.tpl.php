@@ -58,7 +58,7 @@ if ($this->subItems):
                 <h3><?=Lang::item('_rndEnchants'); ?></h3>
 
 <?php
-    foreach (array_chunk($this->subItems['data'], ceil(count($this->subItems['data']) / 2)) as $columns):
+    foreach (array_chunk($this->subItems['data'], ceil(count($this->subItems['data']) / 2), true) as $columns):
 ?>
 
                 <div class="random-enchantments" style="margin-right: 25px">
