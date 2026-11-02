@@ -1516,7 +1516,7 @@ $lang = array(
         'notFound'      => "Cette quête n'existe pas.",
         '_transfer'     => 'Cette quête sera converti en <a href="?quest=%d" class="q1">%s</a> si vous transférez en <span class="icon-%s">%s</span>.',
         'questLevel'    => "Niveau %s",
-        'requirements'  => "Conditions",
+        'requirements'  => "Conditions :",
         'reqMoney'      => "Argent requis : %s",
         'money'         => "Argent",
         'additionalReq' => "Conditions additionnelles requises pour obtenir cette quête",

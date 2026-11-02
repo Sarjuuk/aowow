@@ -498,21 +498,21 @@ class Lang
 
     public static function formatSkillBreakpoints(array $bp, int $fmt = self::FMT_MARKUP) : string
     {
-        $tmp = self::game('difficulty');
+        $buff = [];
 
         $base = match ($fmt)
         {
-            self::FMT_HTML   => '<span class="r%1$d">%2$s</span> ',
-            self::FMT_MARKUP => '[color=r%1$d]%2$s[/color] ',
-            self::FMT_RAW    => '%2$s ',
-            default          => '%2$s '
+            self::FMT_HTML   => '<span class="%1$s">%2$s</span>',
+            self::FMT_MARKUP => '[color=%1$s]%2$s[/color]',
+            self::FMT_RAW    => '%2$s',
+            default          => '%2$s'
         };
 
-        for ($i = 0; $i < 4; $i++)
-            if (!empty($bp[$i]))
-                $tmp .= sprintf($base, $i + 1, $bp[$i]);
+        for ($i = 0; $i < 5; $i++)
+            if (isset($bp[$i]))
+                $buff[] = sprintf($base, $i ? 'r'.$i : 'q10', $bp[$i]);
 
-        return trim($tmp);
+        return self::game('difficulty').implode('[small] &nbsp;[/small]', $buff);
     }
 
     public static function makeLink(int $type, int $typeId, string $name, int $fmt = self::FMT_HTML, string $cssClass = '') : string

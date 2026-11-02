@@ -1516,7 +1516,7 @@ $lang = array(
         'notFound'      => "Такое задание не существует.",
         '_transfer'     => 'Этот предмет превратится в <a href="?quest=%d" class="q1">%s</a>, если вы перейдете за <span class="icon-%s">%s</span>.',
         'questLevel'    => "%s-го уровня",
-        'requirements'  => "Требования",
+        'requirements'  => "Требования:",
         'reqMoney'      => "Требуется денег: %s",
         'money'         => "Деньги",
         'additionalReq' => "Дополнительные условия для получения данного задания",

@@ -2070,15 +2070,15 @@ class SpellList extends DBTypeList
         $org = $this->curTpl['learnedAt'];
 
         if ($ylw < $org)
-            $ylw = 0;
+            $ylw = null;
 
         if ($grn < $org || $grn < $ylw)
-            $grn = 0;
+            $grn = null;
 
         if ($org >= $ylw || $org >= $grn || $org >= $gry)
-            $org = 0;
+            $org = null;
 
-        return $gry > 1 ? [$org, $ylw, $grn, $gry] : [];
+        return $gry > 1 ? [null, $org, $ylw, $grn, $gry] : [];
     }
 
     /**

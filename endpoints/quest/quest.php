@@ -247,31 +247,9 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         if ($_flags & QUEST_FLAG_FLAGS_PVP)
             $infobox[] = Lang::quest('keepsPvpFlag');
 
-        // difficulty (todo (low): formula unclear. seems to be [minLevel,] -4, -2, (level), +3, +(9 to 15))
-        if ($_level > 0)
-        {
-            $_ = [];
-
-            // red
-            if ($_minLevel && $_minLevel < $_level - 4)
-                $_[] = '[color=q10]'.$_minLevel.'[/color]';
-
-            // orange
-            if (!$_minLevel || $_minLevel < $_level - 2)
-                $_[] = '[color=r1]'.(!$_ && $_minLevel > $_level - 4 ? $_minLevel : $_level - 4).'[/color]';
-
-            // yellow
-            $_[] = '[color=r2]'.(!$_ && $_minLevel > $_level - 2 ? $_minLevel : $_level - 2).'[/color]';
-
-            // green
-            $_[] = '[color=r3]'.($_level + 3).'[/color]';
-
-            // grey (is about +/-1 level off)
-            $_[] = '[color=r4]'.($_level + 3 + ceil(12 * $_level / MAX_LEVEL)).'[/color]';
-
-            if ($_)
-                $infobox[] = Lang::game('difficulty').implode('[small] &nbsp;[/small]', $_);
-        }
+        // difficulty
+        if ($_ = $this->subject->getColorsForCurrent())
+            $infobox[] = Lang::formatSkillBreakpoints($_);
 
         // id
         $infobox[] = Lang::quest('id') . $this->typeId;

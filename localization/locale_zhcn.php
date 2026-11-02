@@ -1516,7 +1516,7 @@ $lang = array(
         'notFound'      => "这个任务不存在。",
         '_transfer'     => '这个任务将被转换到<a href="?quest=%d" class="q1">%s</a>，如果你转移到<span class="icon-%s">%s</span>。',
         'questLevel'    => "等级%s",
-        'requirements'  => "要求",
+        'requirements'  => "要求：",
         'reqMoney'      => "需要金钱：%s",
         'money'         => "金钱",
         'additionalReq' => "获得这个任务的额外要求",

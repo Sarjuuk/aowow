@@ -135,7 +135,13 @@ class GameObjectList extends DBTypeList
 
         # Quest Tracking Info #
 
-        // cannot display
+        // unsure, if should be displayed
+        // QUEST_TOOLTIP_REQUIREMENTS
+        // QuestTitle cssClass: 'q'
+        // " - ItemName" from gameobject_questitem
+        // QUEST_OBJECTS_FOUND_NOPROGRESS
+        // QUEST_MONSTERS_KILLED_NOPROGRESS
+        // QUEST_ITEMS_NEEDED_NOPROGRESS
 
         $x .= '</table>';
 

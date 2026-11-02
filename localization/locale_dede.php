@@ -1515,7 +1515,7 @@ $lang = array(
         'notFound'      => "Diese Quest existiert nicht.",
         '_transfer'     => 'Dieses Quest wird mit <a href="?quest=%d" class="q1">%s</a> vertauscht, wenn Ihr zur <span class="icon-%s">%s</span> wechselt.',
         'questLevel'    => "Stufe %s",
-        'requirements'  => "Anforderungen",
+        'requirements'  => "Anforderungen:",
         'reqMoney'      => "Benötigtes Geld: %s",
         'money'         => "Geld",
         'additionalReq' => "Zusätzliche Anforderungen um das Quest zu erhalten",

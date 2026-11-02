@@ -372,14 +372,23 @@ class QuestList extends DBTypeList
             $xReq .= '<br /> - '.Lang::quest('money').Lang::main('colon').Util::formatMoney(abs($_));
 
         if ($xReq)
-            $xReq = '<br /><br /><span class="q">'.Lang::quest('requirements').Lang::main('colon').'</span>'.$xReq;
-
+            $xReq = '<br /><br /><span class="q">'.Lang::quest('requirements').'</span>'.$xReq;
 
         $tooltip = '';
+
+        # Title #
+
+        // level is non-standard
         if ($level)
             $tooltip .= '<table><tr><td><table width="100%"><tr><td><b class="q">'.$title.'</b></td><th><b class="q0">'.$level.'</b></th></tr></table></td></tr></table>';
         else
             $tooltip .= '<table><tr><td><b class="q">'.$title.'</b></td></tr></table>';
+
+        # Description #
+
+        // fallback to requestItems and offerReward texts is non-standard
+
+        # Requirements #
 
         if ($text || $xReq)
             $tooltip .= '<table><tr><td>'.$text.$xReq.'</td></tr></table>';
@@ -434,6 +443,29 @@ class QuestList extends DBTypeList
         }
 
         return $data;
+    }
+
+    public function getColorsForCurrent() : array
+    {
+        if (($lvl = $this->curTpl['level']) < 0)            // -1: always at player level
+            return [];
+
+        static $questGreenRange = [4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8];
+
+        $minLvl = $this->curTpl['minLevel'];
+
+        return array(
+            // red
+            $minLvl < $lvl - 4 ?               $minLvl  : null,
+            // orange
+            $minLvl < $lvl - 2 ? max($lvl - 4, $minLvl) : null,
+            // yellow
+            $minLvl < $lvl + 3 ? max($lvl - 2, $minLvl) : null,
+            // green
+            $lvl + 3,
+            // grey
+            $lvl + 1 + $questGreenRange[ max(19, intval($lvl / 5)) ]
+        );
     }
 }
 

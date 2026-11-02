@@ -1516,7 +1516,7 @@ $lang = array(
         'notFound'      => "This quest doesn't exist.",
         '_transfer'     => 'This quest will be converted to <a href="?quest=%d" class="q1">%s</a> if you transfer to <span class="icon-%s">%s</span>.',
         'questLevel'    => "Level %s",
-        'requirements'  => "Requirements",
+        'requirements'  => "Requirements:",                 // QUEST_TOOLTIP_REQUIREMENTS
         'reqMoney'      => "Required money: %s",            // REQUIRED_MONEY
         'money'         => "Money",
         'additionalReq' => "Additional requirements to obtain this quest",
