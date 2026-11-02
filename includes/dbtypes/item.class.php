@@ -539,7 +539,7 @@ class ItemList extends DBTypeList
         ########################
 
         $extraSocket   = isset($enhance['s']) && in_array($_slot, [INVTYPE_WRISTS, INVTYPE_WAIST, INVTYPE_HANDS]);
-        $enchText      = !empty($enhance['e']) ? (DB::Aowow()->selectRow('SELECT * FROM ::itemenchantment WHERE `id` = %i', $enhance['e']) ?: []) : [];
+        $enchantment   = !empty($enhance['e']) ? (DB::Aowow()->selectRow('SELECT * FROM ::itemenchantment WHERE `id` = %i', $enhance['e']) ?: []) : [];
         $sockGems      = [];
         $randEnchant   = '';
 
@@ -856,8 +856,8 @@ class ItemList extends DBTypeList
 
         # Perm. Enchantment #
 
-        if ($enchText)
-            $x .= '<span class="q2"><!--e-->'.Util::localizedString($enchText, 'name').'</span><br />';
+        if ($enchantment)
+            $x .= '<span class="q2"><!--e-->'.Util::localizedString($enchantment, 'name').'</span><br />';
         else
             $x .= '<!--e-->';                               // enchantment placeholder
 
@@ -1212,8 +1212,34 @@ class ItemList extends DBTypeList
         # AddItemUseEnchantLine #
         #########################
 
-        // onUse effects added by enchantments
+        if ($enchantment && $enchantment['type1'] == ENCHANTMENT_TYPE_USE_SPELL && $enchantment['object1'] > 0)
+        {
+            if (!($spell = new SpellList(array(['id', $enchantment['object1']])))->error)
+            {
+                $useText = Lang::item('trigger', SPELL_TRIGGER_USE).$spell->parseText()[0];
 
+                // ITEM_COOLDOWN_TOTAL
+                if ($cd = max($spell->getField('recoveryTime'), $spell->getField('recoveryCategory')))
+                {
+                    $pt = DateTime::parse($cd);
+                    if (count(array_filter($pt)) == 1)      // simple time: use simple method
+                        $useText .= ' '.Lang::formatTime($cd, 'item', 'cooldown');
+                    else                                    // build block with generic time
+                        $useText .= ' '.Lang::item('cooldown', 0, [Lang::formatTime($cd, 'game', 'timeAbbrev', true)]);
+                }
+
+                // ITEM_SPELL_CHARGES
+                if (($ch = $enchantment['charges']) && $ch != -1)
+                    $useText = Lang::main('parensFmt', [$useText, Lang::item('charges', [$ch])]);
+
+                // no need to link spell. This can only ever be displayed in tooltip popups.
+                $x .= '<span class="q2">'.$useText.'</span><br />';
+            }
+
+            // error cases
+            // ENCHANT_ITEM_MIN_SKILL / ENCHANT_ITEM_REQ_SKILL
+            // ENCHANT_ITEM_REQ_LEVEL
+        }
 
         ###################
         # AddItemSetLines #
