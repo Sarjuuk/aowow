@@ -2771,7 +2771,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             JOIN   ::talents r1 ON  r1.`id` = t.`id` AND r1.`rank` = 1
             WHERE  t.`spell` IN %in',
             $missing
-        );
+        ) ?: [];
 
         return $ranks + $talents;
     }
