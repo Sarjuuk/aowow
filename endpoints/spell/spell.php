@@ -463,12 +463,19 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
                 if ($classSpells)
                 {
-                    foreach (self::getSpellRanks(array_keys($classSpells)) as $spellId => [$firstSpellId, $rank])
-                    {
-                        $classSpells[$firstSpellId][1][0] = min($classSpells[$firstSpellId][1][0] ?? $rank, $rank);
-                        $classSpells[$firstSpellId][1][1] = max($classSpells[$firstSpellId][1][1] ?? $rank, $rank);
+                    // fold matched ranks onto the lowest matched one; the first rank itself may not be matched
+                    $ranks = array_intersect_key(self::getSpellRanks(array_keys($classSpells)), $classSpells);
+                    uasort($ranks, fn($a, $b) => $a[1] <=> $b[1]);
 
-                        if ($spellId != $firstSpellId)
+                    $chains = [];
+                    foreach ($ranks as $spellId => [$firstSpellId, $rank])
+                    {
+                        $keepId = $chains[$firstSpellId] ??= $spellId;
+
+                        $classSpells[$keepId][1][0] = min($classSpells[$keepId][1][0] ?? $rank, $rank);
+                        $classSpells[$keepId][1][1] = max($classSpells[$keepId][1][1] ?? $rank, $rank);
+
+                        if ($spellId != $keepId)
                             unset($classSpells[$spellId]);
                     }
 
