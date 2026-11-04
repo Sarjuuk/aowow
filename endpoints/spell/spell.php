@@ -465,6 +465,10 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 {
                     foreach (self::getSpellRanks(array_keys($classSpells)) as $spellId => [$firstSpellId, $rank])
                     {
+                        // e.g. 'Pain and Suffering' Talent: only rank 2 has a (wrong) SpellFamilyMask set.
+                        if (!isset($classSpells[$firstSpellId]))
+                            continue;
+
                         $classSpells[$firstSpellId][1][0] = min($classSpells[$firstSpellId][1][0] ?? $rank, $rank);
                         $classSpells[$firstSpellId][1][1] = max($classSpells[$firstSpellId][1][1] ?? $rank, $rank);
 
@@ -2764,7 +2768,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             JOIN   ::talents r1 ON  r1.`id` = t.`id` AND r1.`rank` = 1
             WHERE  t.`spell` IN %in',
             $missing
-        );
+        ) ?: [];
 
         return $ranks + $talents;
     }
