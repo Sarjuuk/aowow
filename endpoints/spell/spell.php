@@ -3269,10 +3269,10 @@ class SpellBaseResponse extends TemplateResponse implements ICache
     {
         $nameMV = match ($effMV)                            // reuse spell catgs
         {
-            0       => Lang::spell('cat', 11, SKILL_SKINNING),
-            1       => Lang::spell('cat', 11, SKILL_HERBALISM),
-            2       => Lang::spell('cat', 11, SKILL_MINING),
-            3       => Lang::spell('cat', 11, SKILL_ENGINEERING, 0),
+            0       => Lang::spell('cat', 11, 1, SKILL_SKINNING,    0),
+            1       => Lang::spell('cat', 11, 1, SKILL_HERBALISM,   0),
+            2       => Lang::spell('cat', 11, 1, SKILL_MINING,      0),
+            3       => Lang::spell('cat', 11, 1, SKILL_ENGINEERING, 0),
             default => null
         };
 

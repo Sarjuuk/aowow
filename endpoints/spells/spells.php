@@ -395,7 +395,7 @@ class SpellsBaseResponse extends TemplateResponse implements ICache
                             else if ($relItems)
                                 $txt = Lang::spell('relItems', 'recipes', [$relItems]);
 
-                            $note = Lang::spell('cat', $this->category[0], 1, $this->category[1], 0);
+                            $note = current((array)(Lang::spell('cat', $this->category[0], 1, $this->category[1])));
 
                             $tabData['note'] = Lang::spell('relItems', 'base', [$txt, $note]);
                             $tabData['sort'] = ['skill', 'name'];
