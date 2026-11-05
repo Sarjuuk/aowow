@@ -96,7 +96,6 @@ class ItemsetList extends DBTypeList
         $x  = '<table><tr><td>';
         $x .= '<span class="q'.$this->getField('quality').'">'.$this->getField('name', true).'</span><br />';
 
-        $nCl = 0;
         if ($_ = $this->getField('classMask'))
         {
             $jsg = [];
@@ -105,11 +104,15 @@ class ItemsetList extends DBTypeList
             $x  .= Util::ucFirst($t).Lang::main('colon').$cl.'<br />';
         }
 
-        if ($_ = $this->getField('contentGroup'))
-            $x .= Lang::itemset('notes', $_).($this->getField('heroic') ? ' <i class="q2">('.Lang::item('heroic').')</i>' : '').'<br />';
-
-        if (!$nCl || !$this->getField('type'))
-            $x.= Lang::itemset('types', $this->getField('type')).'<br />';
+        if ($cg = $this->getField('contentGroup'))
+        {
+            if ($this->getField('heroic'))
+                $x .= Lang::main('parensFmt', [Lang::itemset('notes', $cg), '<i class="q2">'.Lang::item('heroic').'</i>']).'<br />';
+            else
+                $x .= Lang::itemset('notes', $cg).'<br />';
+        }
+        else if ($ty = $this->getField('type'))
+            $x.= Lang::itemset('types', $ty).'<br />';
 
         if ($bonuses = $this->getBonuses())
         {
