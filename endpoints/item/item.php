@@ -1471,7 +1471,8 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                 $desc = Lang::meta('itemCatDesc', ITEM_CLASS_GLYPH, [Lang::game('gl', $_subSubClass), Lang::game('cl', $_subClass)]);
                 break;
             case ITEM_CLASS_AMMUNITION:
-                $desc = Lang::meta('itemCatDesc', ITEM_CLASS_AMMUNITION, [$title, $this->subject->json[$this->typeId]['dps']]);
+                if ($dps = ($this->subject->json[$this->typeId]['dps'] ?? 0))
+                    $desc = Lang::meta('itemCatDesc', ITEM_CLASS_AMMUNITION, [$title, $dps]);
                 break;
             case ITEM_CLASS_TRADEGOOD:
                 if ($_subClass != 2)                        // treat explosives as consumables
