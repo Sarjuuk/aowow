@@ -472,7 +472,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         if ($_ = $this->subject->getField('sourceSpellId'))
         {
             $this->extendGlobalIds(Type::SPELL, $_);
-            $this->objectiveList[] = new IconElement(Type::SPELL, $_, SpellList::getName($_), extraText: Lang::quest('provided'), element: 'iconlist-icon', size: IconElement::SIZE_SMALL);
+            $this->objectiveList[] = new IconElement(Type::SPELL, $_, SpellList::getName($_) ?? '', extraText: Lang::quest('provided'), element: 'iconlist-icon', size: IconElement::SIZE_SMALL);
         }
 
         // required money

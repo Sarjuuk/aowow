@@ -253,7 +253,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
                 case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE:
                     $killSuffix = Lang::achievement('slain');
                 case ACHIEVEMENT_CRITERIA_TYPE_KILLED_BY_CREATURE:
-                    $crtIcon = new IconElement(Type::NPC, $obj, $crtName ?: CreatureList::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon', extraText: $crtName ? null : $killSuffix);
+                    $crtIcon = new IconElement(Type::NPC, $obj, $crtName ?: CreatureList::getName($obj) ?? '', size: IconElement::SIZE_SMALL, element: 'iconlist-icon', extraText: $crtName ? null : $killSuffix);
                     break;
                 // link to area (by map)
                 case ACHIEVEMENT_CRITERIA_TYPE_WIN_BG:
@@ -268,32 +268,32 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
                 case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUESTS_IN_ZONE:
                 case ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL_AT_AREA:
                 case ACHIEVEMENT_CRITERIA_TYPE_EXPLORE_AREA: // worldmapoverlay/id resolved to areatable/id during setup
-                    $crtIcon = new IconElement(Type::ZONE, $obj, $crtName ?: ZoneList::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
+                    $crtIcon = new IconElement(Type::ZONE, $obj, $crtName ?: ZoneList::getName($obj) ?? '', size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
                     break;
                 // link to skills
                 case ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL:
                 case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LEVEL:
                 case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILLLINE_SPELLS:
                 case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LINE:
-                    $crtIcon = new IconElement(Type::SKILL, $obj, $crtName ?: SkillList::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
+                    $crtIcon = new IconElement(Type::SKILL, $obj, $crtName ?: SkillList::getName($obj) ?? '', size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
                     $this->extendGlobalIds(Type::SKILL, $obj);
                     break;
                 // link to class
                 case ACHIEVEMENT_CRITERIA_TYPE_HK_CLASS:
-                    $crtIcon = new IconElement(Type::CHR_CLASS, $obj, $crtName ?: CharClassList::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
+                    $crtIcon = new IconElement(Type::CHR_CLASS, $obj, $crtName ?: CharClassList::getName($obj) ?? '', size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
                     break;
                 // link to race
                 case ACHIEVEMENT_CRITERIA_TYPE_HK_RACE:
-                    $crtIcon = new IconElement(Type::CHR_RACE, $obj, $crtName ?: CharRaceList::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
+                    $crtIcon = new IconElement(Type::CHR_RACE, $obj, $crtName ?: CharRaceList::getName($obj) ?? '', size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
                     break;
                 // link to achivement
                 case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ACHIEVEMENT:
-                    $crtIcon = new IconElement(Type::ACHIEVEMENT, $obj, $crtName ?: AchievementList::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
+                    $crtIcon = new IconElement(Type::ACHIEVEMENT, $obj, $crtName ?: AchievementList::getName($obj) ?? '', size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
                     $this->extendGlobalIds(Type::ACHIEVEMENT, $obj);
                     break;
                 // link to quest
                 case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST:
-                    $crtIcon = new IconElement(Type::QUEST, $obj, $crtName ?: QuestList::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
+                    $crtIcon = new IconElement(Type::QUEST, $obj, $crtName ?: QuestList::getName($obj) ?? '', size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
                     break;
                 // link to spell
                 case ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET:
@@ -301,7 +301,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
                 case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL:
                 case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL:
                 case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2:
-                    $crtIcon = new IconElement(Type::SPELL, $obj, $crtName ?: SpellList::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
+                    $crtIcon = new IconElement(Type::SPELL, $obj, $crtName ?: SpellList::getName($obj) ?? '', size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
                     $this->extendGlobalIds(Type::SPELL, $obj);
                     break;
                 // link to item
@@ -315,16 +315,16 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
                     break;
                 // link to faction (/w target reputation)
                 case ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION:
-                    $crtIcon = new IconElement(Type::FACTION, $obj, $crtName ?: FactionList::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon', extraText: '('.Lang::getReputationLevelForPoints($qty).')');
+                    $crtIcon = new IconElement(Type::FACTION, $obj, $crtName ?: FactionList::getName($obj) ?? '', size: IconElement::SIZE_SMALL, element: 'iconlist-icon', extraText: '('.Lang::getReputationLevelForPoints($qty).')');
                     break;
                 // link to GObject
                 case ACHIEVEMENT_CRITERIA_TYPE_USE_GAMEOBJECT:
                 case ACHIEVEMENT_CRITERIA_TYPE_FISH_IN_GAMEOBJECT:
-                    $crtIcon = new IconElement(Type::OBJECT, $obj, $crtName ?: GameObjectList::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
+                    $crtIcon = new IconElement(Type::OBJECT, $obj, $crtName ?: GameObjectList::getName($obj) ?? '', size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
                     break;
                 // link to emote
                 case ACHIEVEMENT_CRITERIA_TYPE_DO_EMOTE:
-                    $crtIcon = new IconElement(Type::EMOTE, $obj, $crtName ?: EmoteList::getName($obj), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
+                    $crtIcon = new IconElement(Type::EMOTE, $obj, $crtName ?: EmoteList::getName($obj) ?? '', size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
                     break;
                 default:
                     // Add a gold coin icon if required
