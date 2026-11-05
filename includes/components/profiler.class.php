@@ -436,10 +436,11 @@ class Profiler
                 $gi = DB::Aowow()->selectCol('SELECT `gemEnchantmentId` AS ARRAY_KEY, `id` FROM ::items WHERE `class` = %i AND `gemEnchantmentId` IN %in', ITEM_CLASS_GEM, $gEnch);
                 foreach ($gEnch as $eId)
                 {
-                    if (isset($gemItems[$eId]))
-                        $gemItems[$eId][1]++;
-                    else
-                        $gemItems[$eId] = [$gi[$eId], 1];
+                    if (!isset($gi[$eId]))
+                        continue;
+
+                    $gemItems[$eId] ??= [$gi[$eId], 0];
+                    $gemItems[$eId][1]++;
                 }
             }
 
@@ -489,7 +490,7 @@ class Profiler
             'hairstyle'         => $char['hairStyle'],
             'haircolor'         => $char['hairColor'],
             'features'          => $char['facialStyle'],    // maybe facetype
-            'title'             => $char['chosenTitle'] ? DB::Aowow()->selectCell('SELECT `id` FROM ::titles WHERE `bitIdx` = %i', $char['chosenTitle']) : 0,
+            'title'             => $char['chosenTitle'] ? (DB::Aowow()->selectCell('SELECT `id` FROM ::titles WHERE `bitIdx` = %i', $char['chosenTitle']) ?? 0) : 0,
             'playedtime'        => $char['totaltime'],
             'nomodelMask'       => ($char['playerFlags'] & 0x400 ? (1 << SLOT_HEAD) : 0) | ($char['playerFlags'] & 0x800 ? (1 << SLOT_BACK) : 0),
             'talenttree1'       => 0,
@@ -778,7 +779,7 @@ class Profiler
                 'date'          => array_column($achievements, 'date')
             ));
 
-            $data['achievementpoints'] = DB::Aowow()->selectCell('SELECT SUM(`points`) FROM ::achievement WHERE `id` IN %in AND (`flags` & %i) = 0', array_column($achievements, 'achievement'), ACHIEVEMENT_FLAG_COUNTER);
+            $data['achievementpoints'] = DB::Aowow()->selectCell('SELECT SUM(`points`) FROM ::achievement WHERE `id` IN %in AND (`flags` & %i) = 0', array_column($achievements, 'achievement'), ACHIEVEMENT_FLAG_COUNTER) ?? 0;
         }
 
         CLI::write(' ..achievements');
@@ -923,7 +924,7 @@ class Profiler
         if (!$guild['name'])
             return self::FETCH_RESULT_ERR_NAME_EMPTY;
 
-        // reminder: this query should not fail: a placeholder entry is created as soon as a team listview is created or team detail page is called
+        // reminder: this query should not fail: a placeholder entry is created as soon as a guild listview is created or guild detail page is called
         $guildId = DB::Aowow()->selectCell('SELECT `id` FROM ::profiler_guild WHERE `realm` = %i AND `realmGUID` = %i', $realmId, $guild['guildId']);
 
         CLI::write('fetching guild #'.$guildGuid.' from realm #'.$realmId);
