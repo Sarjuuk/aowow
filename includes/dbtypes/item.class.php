@@ -515,9 +515,10 @@ class ItemList extends DBTypeList
      *  * s: bool (extraScoket (gloves, belt, bracers))
      *  * g: int[] itemIds - gems
      *  * r: int >0: randomPropId; <0: randomSuffixId
+     *  * x: array: if $subOf, scaling info passed back up to parent tooltip
      * @return ?string html rendered tooltip or null on error
      */
-    public function renderTooltip(bool $interactive = false, int $subOf = 0, ?array $enhance = []) : ?string
+    public function renderTooltip(bool $interactive = false, int $subOf = 0, ?array &$enhance = []) : ?string
     {
         if ($this->error)
             return null;
@@ -1188,8 +1189,9 @@ class ItemList extends DBTypeList
                 if (!$createSpell || ($craftSpell = new SpellList(array(['id', $createSpell['id']])))->error)
                     continue;
 
+                $craftItemEnh = [];
                 if (!($craftItem  = new ItemList(array(['id', $craftSpell->curTpl['effect1CreateItemId']])))->error)
-                    if ($itemTT = $craftItem->renderTooltip($interactive, $this->id))
+                    if ($itemTT = $craftItem->renderTooltip($interactive, $this->id, $craftItemEnh))
                         $x .= '<div><br />'.$itemTT.'</div>';
 
                 # Reagents #
@@ -1402,27 +1404,25 @@ class ItemList extends DBTypeList
 
 
         // tooltip scaling
-        if (!isset($xCraft))
-        {
-            $itemId = $subOf ?: $this->id;
-
-            $x .= '<!--?';
+        $scale = array(
             // itemId
-            $x .= $itemId;
+            $this->id,
             // scaleMinLevel
-            $x .= ':1';
+            1,
             // scaleMaxLevel
-            $x .= ':' . ($this->ssd[$itemId]['maxLevel'] ?? ($causesScaling ? MAX_LEVEL : 1));
+            max($craftItemEnh['x'][2] ?? 1, $this->ssd[$this->id]['maxLevel'] ?? ($causesScaling ? MAX_LEVEL : 1)),
             // scaleCurLevel
-            $x .= ':' . ($this->ssd[$itemId]['maxLevel'] ?? ($_reqLvl ?: MAX_LEVEL));
-            // scaleDist
-            if ($this->curTpl['scalingStatDistribution'])
-                $x .= ':' . $this->curTpl['scalingStatDistribution'];
-            // scaleFlags
-            if ($this->curTpl['scalingStatValue'])
-                $x .= ':' . $this->curTpl['scalingStatValue'];
-            $x .= '-->';
-        }
+            min($craftItemEnh['x'][3] ?? MAX_LEVEL, $this->ssd[$this->id]['maxLevel'] ?? ($_reqLvl ?: MAX_LEVEL)),
+            // scaleDist (may be omitted)
+            $craftItemEnh['x'][4] ?? $this->curTpl['scalingStatDistribution'],
+            // scaleFlags (may be omitted)
+            $craftItemEnh['x'][5] ?? $this->curTpl['scalingStatValue']
+        );
+
+        if ($subOf)
+            $enhance['x'] = array_slice($scale, 2, null, true);
+        else
+            $x .= '<!--?'.implode(':', array_filter($scale)).'-->';
 
         return $x;
     }
