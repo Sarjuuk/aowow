@@ -27,6 +27,8 @@ class SpellList extends DBTypeList
         11 => SKILLS_TRADE_PRIMARY                                                                        // prim. Professions
     );
 
+    public const array POWER_DISPLAY_MOD = [1, 10, 1, 1, 1000, 1, 10]; // client magic numbers
+
     public const array MOD_AURAS                = array(
         SPELL_AURA_ADD_FLAT_MODIFIER,      SPELL_AURA_ADD_PCT_MODIFIER,                 SPELL_AURA_NO_REAGENT_USE,
         SPELL_AURA_ABILITY_PERIODIC_CRIT,  SPELL_AURA_MOD_TARGET_ABILITY_ABSORB_SCHOOL, SPELL_AURA_ABILITY_IGNORE_AURASTATE,
@@ -129,11 +131,13 @@ class SpellList extends DBTypeList
 
     protected string $queryBase = 'SELECT s.*, s.`id` AS ARRAY_KEY FROM ::spell s';
     protected array  $queryOpts = array(
-                        's'   => [['src', 'sr', 'ic', 'ica']],  //  6: Type::SPELL
+                        's'   => [['src', 'sr', 'sd', 'sct', 'ic', 'ica']],  //  6: Type::SPELL
                         'nml' => ['j' => ['::spell_search nml ON nml.`id` = s.`id` AND nml.`locale` = DB_LOC_I']],
                         'ic'  => ['j' => ['::icons ic  ON ic.`id`  = s.`iconId`',    true], 's' => ', ic.`name` AS "iconString"'],
                         'ica' => ['j' => ['::icons ica ON ica.`id` = s.`iconIdAlt`', true], 's' => ', ica.`name` AS "iconStringAlt"'],
-                        'sr'  => ['j' => ['::spellrange sr ON sr.`id` = s.`rangeId`'], 's' => ', sr.`rangeMinHostile`, sr.`rangeMinFriend`, sr.`rangeMaxHostile`, sr.`rangeMaxFriend`, sr.`name_loc0` AS "rangeText_loc0", sr.`name_loc2` AS "rangeText_loc2", sr.`name_loc3` AS "rangeText_loc3", sr.`name_loc4` AS "rangeText_loc4", sr.`name_loc6` AS "rangeText_loc6", sr.`name_loc8` AS "rangeText_loc8"'],
+                        'sr'  => ['j' => ['::spellrange sr ON sr.`id` = s.`rangeId`', true], 's' => ', sr.`rangeMinHostile`, sr.`rangeMinFriend`, sr.`rangeMaxHostile`, sr.`rangeMaxFriend`, sr.`rangeType`, sr.`name_loc0` AS "rangeText_loc0", sr.`name_loc2` AS "rangeText_loc2", sr.`name_loc3` AS "rangeText_loc3", sr.`name_loc4` AS "rangeText_loc4", sr.`name_loc6` AS "rangeText_loc6", sr.`name_loc8` AS "rangeText_loc8"'],
+                        'sd'  => ['j' => ['::spellduration sd ON sd.`id` = s.`durationId`', true], 's' => ', sd.`duration`, sd.`durationPerLevel`, sd.`maxDuration`'],
+                        'sct' => ['j' => ['::spellcasttimes sct ON sct.`id` = s.`castTimeId`', true], 's' => ', sct.`castTime`, sct.`castTimePerLevel`, sct.`minCastTime`'],
                         'src' => ['j' => ['::source src ON `type` = 6 AND `typeId` = s.`id`', true], 's' => ', `moreType`, `moreTypeId`, `moreZoneId`, `moreMask`, `src1`, `src2`, `src3`, `src4`, `src5`, `src6`, `src7`, `src8`, `src9`, `src10`, `src11`, `src12`, `src13`, `src14`, `src15`, `src16`, `src17`, `src18`, `src19`, `src20`, `src21`, `src22`, `src23`, `src24`']
                     );
 
@@ -477,33 +481,21 @@ class SpellList extends DBTypeList
             if ($_ = $this->curTpl['toolCategory'.$i])
             {
                 $tc = DB::Aowow()->selectRow('SELECT * FROM ::totemcategory WHERE `id` = %i', $_);
-                $tools[$i + 1] = array(
+                $tools[$i + 2] = array(
                     'id'   => $_,
                     'name' => Util::localizedString($tc, 'name'));
             }
 
             // Tools
-            if (!$this->curTpl['tool'.$i])
-                continue;
-
-            foreach ($this->relItems->iterate() as $relId => $__)
-            {
-                if ($relId != $this->curTpl['tool'.$i])
-                    continue;
-
-                $tools[$i - 1] = array(
-                    'itemId'  => $relId,
+            if (($iId = $this->curTpl['tool'.$i]) && $this->relItems?->getEntry($iId))
+                $tools[$i] = array(
+                    'itemId'  => $iId,
                     'name'    => $this->relItems->getField('name', true),
                     'quality' => $this->relItems->getField('quality')
                 );
-
-                break;
-            }
         }
 
-        $this->tools = array_reverse($tools);
-
-        return $this->tools;
+        return $this->tools = array_values($tools);
     }
 
     public function getModelInfo(int $spellId = 0, int $effIdx = 0) : array
@@ -632,24 +624,35 @@ class SpellList extends DBTypeList
         if (!$this->curTpl['rangeMaxHostile'])
             return '';
 
-        if ($this->curTpl['attributes3'] & SPELL_ATTR3_DONT_DISPLAY_RANGE)
+        if (($this->curTpl['attributes3'] & SPELL_ATTR3_DONT_DISPLAY_RANGE) || $this->replacesAutohit())
             return '';
 
-        // minRange exists; show as range
-        if ($this->curTpl['rangeMinHostile'])
-            return Lang::spell('range', [$this->curTpl['rangeMinHostile'].' - '.$this->curTpl['rangeMaxHostile']]);
-        // friend and hostile differ; do color
-        else if ($this->curTpl['rangeMaxHostile'] != $this->curTpl['rangeMaxFriend'])
-            return Lang::spell('range', ['<span class="q10">'.$this->curTpl['rangeMaxHostile'].'</span> - <span class="q2">'.$this->curTpl['rangeMaxFriend']. '</span>']);
-        // hardcode: "melee range"
-        else if ($this->curTpl['rangeMaxHostile'] == 5)
+        if ($this->curTpl['rangeType'] == SPELL_RANGE_MELEE)
             return Lang::spell('meleeRange');
-        // hardcode "unlimited range"
-        else if ($this->curTpl['rangeMaxHostile'] == 50000)
+
+        if ($this->curTpl['rangeMaxHostile'] >= 50000)
             return Lang::spell('unlimRange');
-        // regular case
-        else
-            return Lang::spell('range', [$this->curTpl['rangeMaxHostile']]);
+
+        $enemyMin    = $this->curTpl['rangeMinHostile'];
+        $enemyMax    = $this->curTpl['rangeMaxHostile'];
+        $friendlyMax = $this->curTpl['rangeMaxFriend'];
+
+        if ($this->curTpl['rangeType'] == SPELL_RANGE_RANGED)
+            $enemyMin += 5;                                 // MELEE_RANGE_MIN
+
+        // minRange exists; show as range
+        if ($enemyMin)
+            return Lang::spell('range', [$enemyMin.'-'.$enemyMax]);
+
+        // friend and hostile differ; do color - single-line display non-standard. keep for now
+        if ($enemyMax != $friendlyMax)
+            return Lang::spell('range', ['<span class="q10">'.$enemyMax.'</span>-<span class="q2">'.$friendlyMax. '</span>']);
+
+        // <empty>      SPELL_RANGE_DUAL(ENEMY, ranges)
+        // <cost>       SPELL_RANGE_DUAL(FRIEND, ranges)
+
+        // default case
+        return Lang::spell('range', [$enemyMax]);
     }
 
     public function createPowerCostForCurrent() : string
@@ -657,17 +660,15 @@ class SpellList extends DBTypeList
         $str = '';
 
         $pt   = $this->curTpl['powerType'];
-        $pc   = $this->curTpl['powerCost'];
+        $pc   = $this->curTpl['powerCost'] / (self::POWER_DISPLAY_MOD[$pt] ?? 1);
         $pcp  = $this->curTpl['powerCostPercent'];
-        $pps  = $this->curTpl['powerPerSecond'];
+        $pps  = $this->curTpl['powerPerSecond'] / (self::POWER_DISPLAY_MOD[$pt] ?? 1);
         $pcpl = $this->curTpl['powerCostPerLevel'];
 
         // some potion effects have this set, but it's not displayed by client (or enforced by core)
+        // decomp client doesn't explicitly check for POWER_HAPPINESS
         if ($pt == POWER_HAPPINESS)
             return '';
-
-        if ($pt == POWER_RAGE || $pt == POWER_RUNIC_POWER)
-            $pc /= 10;
 
         if ($pt == POWER_RUNE && ($rCost = ($this->curTpl['powerCostRunes'] & 0x333)))
         {   // Blood 2|1 - Unholy 2|1 - Frost 2|1
@@ -681,9 +682,11 @@ class SpellList extends DBTypeList
                 $rCost >>= 4;
             }
 
-            $str .= implode(' ', $runes);
+            return implode(' ', $runes);
         }
-        else if ($pcp > 0)                                  // power cost: pct over static
+
+        // one spell (62522) has both set and seems to treat them both as flat values added together..?
+        if ($pcp > 0)                                       // power cost: pct over static
             $str .= $pcp."% ".Lang::spell('pctCostOf', [mb_strtolower(Lang::spell('powerTypes', $pt))]);
         else if ($pc > 0 || $pps > 0 || $pcpl > 0)
         {
@@ -703,28 +706,74 @@ class SpellList extends DBTypeList
         return $str;
     }
 
-    public function createCastTimeForCurrent(bool $short = true, bool $noInstant = true) : string
+    public function createCastTimeForCurrent(bool $forTooltip = true) : string
     {
-        // passives (talents, equip spells) don't have a cast time
-        if ($noInstant && $this->curTpl['attributes0'] & SPELL_ATTR0_PASSIVE)
+        if ($forTooltip && ($this->curTpl['effect1Id'] == SPELL_EFFECT_TRADE_SKILL || ($this->curTpl['attributes0'] & SPELL_ATTR0_PASSIVE)))
             return '';
-        if (!$this->curTpl['castTime'] && $this->isChanneledSpell())
-            return Lang::spell('channeled');
-        // SPELL_ATTR0_ABILITY instant ability.. yeah, wording thing only (todo (low): rule is imperfect)
-        if (!$this->curTpl['castTime'] && ($this->curTpl['damageClass'] != SPELL_DAMAGE_CLASS_MAGIC || $this->curTpl['attributes0'] & SPELL_ATTR0_ABILITY))
-            return Lang::spell('instantPhys');
 
-        return $short ? Lang::formatTime($this->curTpl['castTime'] * 1000, 'spell', 'castTime') : DateTime::formatTimeElapsedFloat($this->curTpl['castTime'] * 1000);
+        if ($forTooltip && ($this->curTpl['effect1Id'] == SPELL_EFFECT_ATTACK))
+            return '';
+
+        $ct   = $this->curTpl['castTime'];
+        $mct  = $this->curTpl['minCastTime'];
+        $ctpl = $this->curTpl['castTimePerLevel'];
+        $max  = $this->curTpl['maxLevel'] ?: MAX_LEVEL;
+        $base = $this->curTpl['baseLevel'];
+        $lvl  = clamp($this->charLevel, $base, $max);
+
+        $time = $this->curTpl['castTime'] + ($ctpl * (min($max, $lvl) - $base));
+        if ($time < $this->curTpl['minCastTime'])
+            $time = $this->curTpl['minCastTime'];
+
+        if ($this->curTpl['attributes0'] & SPELL_ATTR0_REQ_AMMO)
+            $time += 500;                                   // SPELL_RANGED_CAST_TIME_EXTRA_MS
+
+        // enable modifying cast time via js
+        if ($time > 0)
+        {
+            if (!$forTooltip)
+                return DateTime::formatTimeElapsedFloat($time);
+
+            $timeStr = Lang::formatTime($time, 'spell', 'castTime');
+
+            if ($ct > $mct && $max > $base)
+            {
+                $ctMax   = intval(($ct - $mct) / $ctpl) + $base;
+                $modStr  = '<!--ppl'.$base.':'.abs($ctMax).':'.($this->curTpl['castTime'] / 1000).':'.floor($ctpl / 10).'-->$1';
+                $timeStr = preg_replace('/\b(\d)/', $modStr, $timeStr);
+
+                $this->scaling[$this->id] = true;
+            }
+
+            return $timeStr;
+        }
+
+        if ($this->isChanneledSpell())
+            return Lang::spell('channeled');
+
+        if ($time < 0)
+            return Lang::spell('castTime', 0);
+
+        if ($this->replacesAutoHit())
+            return Lang::spell('onNextMelee');
+
+        // not possible? Would require a SpellCastTimesEntry with -500ms
+        if ($this->curTpl['attributes0'] & SPELL_ATTR0_REQ_AMMO)
+            return Lang::spell('onNextRanged');
+
+        if (!$this->curTpl['powerType'] && $this->curTpl['powerCost'] > 0)
+            return Lang::spell('castTime', 0);              // SPELL_CAST_TIME_INSTANT
+
+        return Lang::spell('instantPhys');
     }
 
     private function createCooldownForCurrent() : string
     {
         if ($this->curTpl['attributes6'] & SPELL_ATTR6_DONT_DISPLAY_COOLDOWN)
             return '';
-        else if ($this->curTpl['recoveryTime'])
-            return Lang::formatTime($this->curTpl['recoveryTime'], 'spell', 'cooldown');
-        else if ($this->curTpl['recoveryCategory'])
-            return Lang::formatTime($this->curTpl['recoveryCategory'], 'spell', 'cooldown');
+
+        if ($cd = max($this->curTpl['recoveryTime'], $this->curTpl['recoveryCategory']))
+            return Lang::formatTime($cd, 'spell', 'cooldown');
 
         return '';
     }
@@ -848,6 +897,11 @@ class SpellList extends DBTypeList
     public function isChanneledSpell() : bool
     {
         return $this->curTpl['attributes1'] & (SPELL_ATTR1_CHANNELED_1 | SPELL_ATTR1_CHANNELED_2);
+    }
+
+    public function replacesAutoHit() : bool
+    {
+        return $this->curTpl['attributes0'] & (SPELL_ATTR0_ON_NEXT_SWING | SPELL_ATTR0_ON_NEXT_SWING_2);
     }
 
     public function isScalableHealingSpell() : bool
@@ -1378,7 +1432,7 @@ class SpellList extends DBTypeList
                 $minPoints = $base;
                 break;
             case 'd':                                       // SpellDuration
-            case 'D':                                       // todo (med): min/max?; /w unit?
+            case 'D':
                 $base = $srcSpell->getField('duration');
 
                 $fmtStringMin = Lang::formatTime($base, 'spell', 'duration');
@@ -1827,10 +1881,10 @@ class SpellList extends DBTypeList
 
         $x = '<table><tr>';
 
-        // spellName
+        # Name + Dispel #
+
         $x .= '<td><b class="q">'.$this->getField('name', true).'</b></td>';
 
-        // dispelType (if applicable)
         if ($this->curTpl['dispelType'])
             if ($dispel = Lang::game('dt', $this->curTpl['dispelType']))
                 $x .= '<th><b class="q">'.$dispel.'</b></th>';
@@ -1839,16 +1893,45 @@ class SpellList extends DBTypeList
 
         $x .= '<table><tr><td>';
 
-        // parse Buff-Text
+        # Aura Description #
+
         [$buffTT, $buffSpells, ] = $this->parseText('buff');
 
         array_walk_recursive($buffSpells, fn(&$x) => $x = UIText::format($x, Lang::FMT_HTML));
 
         $x .= $buffTT.'<br />';
 
-        // duration
-        if ($this->curTpl['duration'] > 0 && !($this->curTpl['attributes5'] & SPELL_ATTR5_HIDE_DURATION))
-            $x .= '<span class="q">'.Lang::formatTime($this->curTpl['duration'], 'spell', 'timeRemaining').'<span>';
+        # Duration #
+
+        // client checks AFLAG_DURATION, which is set by TC based on SPELL_ATTR5_HIDE_DURATION
+        if (!($this->curTpl['attributes5'] & SPELL_ATTR5_HIDE_DURATION))
+        {
+            $dpl  = $this->curTpl['durationPerLevel'];
+            $d    = $this->curTpl['duration'];
+            $md   = $this->curTpl['maxDuration'];
+            $max  = $this->curTpl['maxLevel'] ?: MAX_LEVEL;
+            $base = $this->curTpl['baseLevel'];
+            $lvl  = clamp($this->charLevel, $base, $max);
+
+            $time = $d + ($dpl * (min($max, $lvl) - $base));
+            if ($time > $md)
+                $time = $md;
+
+            // enable modifying duration via js (only spell 15007 will ever trigger this)
+            if ($dpl && $md > $d)
+            {
+                $div  = $md > 60000 ? 60000 : 1000;         // buff text shows minutes or seconds. JS only sees the final result.
+                $dMax = intval(($d - $md) / $dpl) + $base;
+                $dMin = intval($d / $dpl) + $base;
+                $modStr = '<!--ppl'.abs($dMin).':'.abs($dMax).':'.max(0, $d / $div).':'.floor(($dpl * 100) / $div).'-->$1';
+
+                $x .= '<span class="q">'.preg_replace('/\b(\d)/', $modStr, Lang::formatTime($time, 'spell', 'timeRemaining')).'<span>';
+
+                $this->scaling[$this->id] = true;
+            }
+            else if ($md > 0)
+                $x .= '<span class="q">'.($modStr ?? '').Lang::formatTime($md, 'spell', 'timeRemaining').'<span>';
+        }
 
         $x .= '</td></tr></table>';
 
@@ -1868,157 +1951,220 @@ class SpellList extends DBTypeList
         $this->interactive = $interactive;
         $this->charLevel   = $level;
 
-        // fetch needed texts
-        $name  = $this->getField('name', true);
-        $rank  = $this->getField('rank', true);
-        $tools = $this->getToolsForCurrent();
-        $cool  = $this->createCooldownForCurrent();
-        $cast  = $this->createCastTimeForCurrent();
-        $cost  = $this->createPowerCostForCurrent();
-        $range = $this->createRangesForCurrent();
+        $tradeSkill  = false;
+        $createsItem = 0;
 
-        [$desc, $ttSpells, ] = $this->parseText('description');
-
-        array_walk_recursive($ttSpells, fn(&$x) => $x = UIText::format($x, Lang::FMT_HTML));
-
-        // get reagents
-        $reagents = $this->getReagentsForCurrent();
-        foreach ($reagents as $k => $r)
+        if ($this->curTpl['attributes0'] & SPELL_ATTR0_TRADESPELL)
         {
-            if ($item = $this->relItems->getEntry($r[0]))
-                $reagents[$k][2] = '<a href="?item='.$r[0].'">'.new LocString($item).'</a>';
-            else
-                $reagents[$k][2] = 'Item #'.$r[0];
-        }
-
-        $reagents = array_reverse($reagents);
-
-        // get stances
-        $stances = '';
-        if ($this->curTpl['stanceMask'] && !($this->curTpl['attributes2'] & SPELL_ATTR2_NOT_NEED_SHAPESHIFT))
-            $stances = Lang::game('requires2').' '.Lang::getStances($this->curTpl['stanceMask']);
-
-        // get item requirement (skip for professions)
-        $reqItems = '';
-        if ($this->curTpl['typeCat'] != 11)
-        {
-            $class    = $this->getField('equippedItemClass');
-            $mask     = $this->getField('equippedItemSubClassMask');
-            $reqItems = Lang::getRequiredItems($class, $mask);
-        }
-
-        // get created items (may need improvement)
-        $createItem = '';
-        if (in_array($this->curTpl['typeCat'], [9, 11]))    // only Professions
-        {
-            foreach ($this->canCreateItem() as $idx)
+            for ($i = 1; $i <= 3; $i++)
             {
-                // has createItem Scroll of Enchantment
-                if ($this->curTpl['effect'.$idx.'Id'] == SPELL_EFFECT_ENCHANT_ITEM)
-                    continue;
-
-                foreach ($this->relItems->iterate() as $cId => $__)
+                if ($this->curTpl['effect'.$i.'Id'] == SPELL_EFFECT_ENCHANT_ITEM)
                 {
-                    if ($cId != $this->curTpl['effect'.$idx.'CreateItemId'])
-                        continue;
+                    $tradeSkill = true;
+                    break;
+                }
 
-                    $createItem = $this->relItems->renderTooltip(true, $this->id);
-                    break 2;
+                if ($this->curTpl['effect'.$i.'Id'] == SPELL_EFFECT_CREATE_ITEM || $this->curTpl['effect'.$i.'Id'] == SPELL_EFFECT_CREATE_ITEM_2 || $this->curTpl['effect'.$i.'Id'] == SPELL_EFFECT_CREATE_RANDOM_ITEM)
+                {
+                    $tradeSkill = true;
+                    $createsItem = $i;
+                    break;
                 }
             }
         }
 
-        $x = '';
-        $x .= '<table><tr><td>';
+        $x = '<table><tr><td>';
 
-        // name & rank
-        if ($rank)
+        # Name #
+
+        $name = $this->getField('name', true);
+        $rank = $this->getField('rank', true);
+
+        if ($tradeSkill && ($sk = $this->curTpl['skillLines'][0] ?? 0) > 0)
+            $x .= '<b>'.SkillList::getName($sk).Lang::main('colon').$name.'</b><br />';
+        else if ($rank)
             $x .= '<table width="100%"><tr><td><b>'.$name.'</b></td><th><b class="q0">'.$rank.'</b></th></tr></table>';
         else
             $x .= '<b>'.$name.'</b><br />';
 
-        // powerCost & ranges
+
+        ######################
+        # AddSpellRangeLines #
+        ######################
+
+        $cost  = $this->createPowerCostForCurrent();
+        $range = $this->createRangesForCurrent();
+
         if ($range && $cost)
             $x .= '<table width="100%"><tr><td>'.$cost.'</td><th>'.$range.'</th></tr></table>';
         else if ($cost || $range)
             $x .= $range.$cost.'<br />';
 
-        // castTime & cooldown
+
+        ########################
+        # AddSpellCastTimeLine #
+        ########################
+
+        $cool = $this->createCooldownForCurrent();
+        $cast = $this->createCastTimeForCurrent();
+
         if ($cast && $cool)                                 // tabled layout
-        {
-            $x .= '<table width="100%">';
-            $x .= '<tr><td>'.$cast.'</td><th>'.$cool.'</th></tr>';
-            if ($stances)
-                $x.= '<tr><td colspan="2">'.$stances.'</td></tr>';
-
-            $x .= '</table>';
-        }
+            $x .= '<table width="100%"><tr><td>'.$cast.'</td><th>'.$cool.'</th></tr></table>';
         else if ($cast || $cool)                            // line-break layout
-        {
             $x .= $cast.$cool;
-
-            if ($stances)
-                $x .= '<br />'.$stances;
-        }
 
         $x .= '</td></tr></table>';
 
+
+        ####################
+        # AddSpellToolLine #
+        ####################
+
         $xTmp = [];
 
-        if ($tools)
+        if ($tools = $this->getToolsForCurrent())
         {
-            $_ = Lang::spell('tools').':<br/><div class="indent q1">';
-            while ($tool = array_pop($tools))
+            array_walk($tools, function (&$x)
             {
-                if (isset($tool['itemId']))
-                    $_ .= '<a href="?item='.$tool['itemId'].'">'.$tool['name'].'</a>';
-                else if (isset($tool['id']))
-                    $_ .= '<a href="?items&filter=cr=91;crs='.$tool['id'].';crv=0">'.$tool['name'].'</a>';
+                if (isset($x['itemId']))
+                    $x = '<a href="?item='.$x['itemId'].'">'.$x['name'].'</a>';
+                else if (isset($x['id']))
+                    $x = '<a href="?items&filter=cr=91;crs='.$x['id'].';crv=0">'.$x['name'].'</a>';
                 else
-                    $_ .= $tool['name'];
+                    $x = $x['name'];
+            });
 
-                $_ .= empty($tools) ? '<br />' : Lang::main('comma');
-            }
+            $xTmp[] = Lang::spell('tools').Lang::main('colon').'<br/><div class="indent q1">'.Lang::concat($tools, Lang::CONCAT_NONE).'</div>';
+        }
 
-            $xTmp[] = $_.'</div>';
+
+        ############################
+        # AddSpellEquippedItemLine #
+        ############################
+
+        $class = $this->getField('equippedItemClass');
+        $mask  = $this->getField('equippedItemSubClassMask');
+
+        // SPELL_TARGET_TYPE::TARGET_FLAG_ITEM
+        if (!($this->curTpl['targets'] & 0x10) && $class >= 0 && $mask)
+            if ($ri = Lang::getRequiredItems($class, $mask))
+                $xTmp[] = '<div>'.Lang::spell('reqEquipItem', [$ri]).'</div>';
+
+
+        ####################
+        # AddSpellFormLine #
+        ####################
+
+        if ($this->curTpl['stanceMask'] && !($this->curTpl['attributes2'] & SPELL_ATTR2_NOT_NEED_SHAPESHIFT))
+            if ($fo = Lang::getStances($this->curTpl['stanceMask']))
+                $xTmp[] = '<div>'.Lang::spell('reqForm', [$fo]).'</div>';
+
+
+        ##########################
+        # AddSpellReputationLine #
+        ##########################
+
+        if ($reqFac = $this->curTpl['minFactionId'])
+            $xTmp[] = '<div>'.Lang::item('reqReputation', ['<a class="q1" href="?faction='.$reqFac.'">'.FactionList::getName($reqFac).'</a>', Lang::game('rep', $this->curTpl['minReputation'])]).'</div>';
+
+        # Required Level #
+
+        $passiveOrTradeSkill = $this->curTpl['effect1Id'] == SPELL_EFFECT_TRADE_SKILL || ($this->curTpl['attributes0'] & SPELL_ATTR0_PASSIVE);
+        // if passiveortradeskill && playLevel < baseLevel
+        // ITEM_MIN_LEVEL(baseLevel)
+
+
+        #######################
+        # AddSpellReagentLine #
+        #######################
+
+        $reagents = $this->getReagentsForCurrent();
+        foreach ($reagents as $k => [$iId, $qty])
+        {
+            if ($item = $this->relItems->getEntry($iId))
+                $_ = '<a href="?item='.$iId.'">'.new LocString($item).'</a>';
+            else
+                $_ = 'Item #'.$iId;
+
+            $reagents[$k] = ($qty > 1) ? Lang::main('parensFmt', [$_, $qty]) : $_;
         }
 
         if ($reagents)
-        {
-            $_  = Lang::spell('reagents').':<br/><div class="indent q1">';
-            $_ .= Lang::concat($reagents, Lang::CONCAT_NONE, fn($x) => $x[1] > 1 ? Lang::main('parensFmt', [$x[2], $x[1]]) : $x[2]); // [itemId, qty, text]
-            $_ .= '<br />';
+            $xTmp[] = Lang::spell('reagents').Lang::main('colon').'<br/><div class="indent q1">'.Lang::concat($reagents, Lang::CONCAT_NONE).'</div>';
 
-            $xTmp[] = $_.'</div>';
+        # Remaining Cooldown #
+
+        // not applicable
+
+
+        ############################
+        # AddSpellEffectChanceLine #
+        ############################
+
+        if ($this->curTpl['effect1Id'] == SPELL_EFFECT_ATTACK || ($passiveOrTradeSkill && ($this->curTpl['effect1Id'] == SPELL_EFFECT_DODGE || $this->curTpl['effect1Id'] == SPELL_EFFECT_BLOCK || $this->curTpl['effect1Id'] == SPELL_EFFECT_PARRY)))
+        {
+            $line = match($this->curTpl['effect1Id'])
+            {
+                SPELL_EFFECT_DODGE  => Lang::spell('chanceToDodge', [0.0]),
+                SPELL_EFFECT_PARRY  => Lang::spell('chanceToParry', [0.0]),
+                SPELL_EFFECT_BLOCK  => Lang::spell('chanceToBlock', [0.0]),
+                SPELL_EFFECT_ATTACK => Lang::spell('chanceToCrit',  [0.0]),
+                default             => null
+            };
+
+            if ($line)
+                $xTmp[] = '<div>'.$line.'</div>';
         }
 
-        if ($reqItems)
-            $xTmp[] = Lang::game('requires2').' '.$reqItems;
+
+        ############################
+        # AddSpellUseAllPowerLine #
+        ############################
+
+        if ($this->curTpl['attributes1'] & SPELL_ATTR1_DRAIN_ALL_POWER)
+        {
+            $pt = $this->curTpl['powerType'];
+            if (Lang::exist('spell', 'powerCost', $pt))
+                $xTmp[] = '<div>'.Lang::spell('powerCost', $pt,   2).'</div>';
+            else
+                $xTmp[] = '<div>'.Lang::spell('powerDisplayCost', 2, [Lang::spell('powerTypes', $pt)]).'</div>';
+        }
+
+        # Description #
+
+        [$desc, $ttSpells, ] = $this->parseText('description');
+        array_walk_recursive($ttSpells, fn(&$x) => $x = UIText::format($x, Lang::FMT_HTML));
 
         if ($desc)
-            $xTmp[] = '<span class="q">'.$desc.'</span>';
+            $xTmp[] = '<div class="q">'.$desc.'</div>';
 
-        if ($createItem)
-            $xTmp[] = $createItem;
+        # Item Tooltip #
+
+        $itemTTEnh = [];
+        if ($createsItem && $this->relItems->getEntry($this->curTpl['effect'.$createsItem.'CreateItemId']))
+        {
+            $xTmp[] = '<br />';
+            $xTmp[] = $this->relItems->renderTooltip(true, $this->id, $itemTTEnh);
+        }
 
         if ($xTmp)
-            $x .= '<table><tr><td>'.implode('<br />', $xTmp).'</td></tr></table>';
+            $x .= '<table><tr><td>'.implode('', $xTmp).'</td></tr></table>';
 
         // scaling information - spellId:min:max:curr[:scalingDistribution:ScalingFlags]
         $scalingInfo = array(
             $this->id,
             $this->scaling[$this->id] ? ($this->getField('baseLevel') ?: 1) : 1,
-            $this->scaling[$this->id] ? ($this->getField('maxLevel') ?: MAX_LEVEL) : 1
+            max($itemTTEnh['x'][2] ?? 1, $this->scaling[$this->id] ? ($this->getField('maxLevel') ?: MAX_LEVEL) : 1)
         );
 
         if ($this->getField('attributes0') & SPELL_ATTR0_LEVEL_DAMAGE_CALCULATION)
         {
-            $scalingInfo[] = $this->getField('spellLevel') ?: 1;
+            $scalingInfo[] = min($itemTTEnh['x'][3] ?? MAX_LEVEL, $this->getField('spellLevel') ?: 1);
             $scalingInfo[] = 1;                             // in 4.x+ proper scaling information; for us just to flag a npc spell as level damage scaling
             $scalingInfo[] = 1;
         }
         else
-            $scalingInfo[] = min($this->charLevel, $scalingInfo[2]);
+            $scalingInfo[] = min($itemTTEnh['x'][3] ?? MAX_LEVEL, $this->charLevel, $scalingInfo[2]);
 
         $x .= '<!--?'.implode(':', $scalingInfo).'-->';
 
@@ -2595,7 +2741,7 @@ class SpellListFilter extends Filter
      // 121 => [parent::CR_NYI_PH,    null                                                                                        ], // inMyFavorites_stc [yn]
         129 => [parent::CR_CALLBACK,  'cbGivePower'                                                                               ], // givesResourceType_stc [resourcetype]
         200 => [parent::CR_CALLBACK,  'cbSecToMsec',        'recoveryTime'                                                        ], // cooldown [num] (custom)
-        201 => [parent::CR_CALLBACK,  'cbSecToMsec',        'duration'                                                            ]  // duration [num] (custom)
+        201 => [parent::CR_CALLBACK,  'cbSecToMsec',        'sd.maxDuration'                                                      ]  // duration [num] (custom)
     );
 
     protected static array $inputFields = array(
@@ -2719,8 +2865,9 @@ class SpellListFilter extends Filter
             return null;
 
         return [DB::OR,
-            [DB::AND, ['powerType', [POWER_RAGE, POWER_RUNIC_POWER]], ['powerCost', (10 * $crv), $crs]],
-            [DB::AND, ['powerType', [POWER_RAGE, POWER_RUNIC_POWER], '!'], ['powerCost', $crv, $crs]]
+            [DB::AND, ['powerType', [POWER_RAGE, POWER_RUNIC_POWER]],                       ['powerCost', (10   * $crv), $crs]],
+            [DB::AND, ['powerType', [POWER_HAPPINESS]],                                     ['powerCost', (1000 * $crv), $crs]],
+            [DB::AND, ['powerType', [POWER_RAGE, POWER_RUNIC_POWER, POWER_HAPPINESS], '!'], ['powerCost',         $crv,  $crs]]
         ];
     }
 

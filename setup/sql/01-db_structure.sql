@@ -2837,7 +2837,7 @@ CREATE TABLE `aowow_spell` (
   `targetAuraSpell` mediumint(8) unsigned NOT NULL,
   `casterAuraSpellNot` mediumint(8) unsigned NOT NULL,
   `targetAuraSpellNot` mediumint(8) unsigned NOT NULL,
-  `castTime` float unsigned NOT NULL,
+  `castTimeId` smallint(5) unsigned NOT NULL,
   `recoveryTime` int(10) unsigned NOT NULL,
   `recoveryCategory` int(10) unsigned NOT NULL,
   `startRecoveryTime` mediumint(8) unsigned NOT NULL,
@@ -2850,7 +2850,7 @@ CREATE TABLE `aowow_spell` (
   `baseLevel` smallint(5) unsigned NOT NULL,
   `spellLevel` smallint(5) unsigned NOT NULL,
   `talentLevel` tinyint(3) unsigned NOT NULL,
-  `duration` int(11) NOT NULL DEFAULT 0,
+  `durationId` smallint(5) unsigned NOT NULL,
   `powerType` smallint(6) NOT NULL,
   `powerCost` smallint(5) unsigned NOT NULL,
   `powerCostPerLevel` tinyint(3) unsigned NOT NULL,
@@ -2989,6 +2989,8 @@ CREATE TABLE `aowow_spell` (
   `spellFamilyFlags3` int(11) unsigned NOT NULL,
   `maxAffectedTargets` tinyint(3) unsigned NOT NULL,
   `damageClass` tinyint(3) unsigned NOT NULL,
+  `minFactionId` smallint(6) unsigned NOT NULL,
+  `minReputation` tinyint(3) unsigned NOT NULL,
   `skillLine1` smallint(6) NOT NULL DEFAULT 0,
   `skillLine2OrMask` bigint(20) NOT NULL DEFAULT 0,
   `reqRaceMask` smallint(5) unsigned NOT NULL DEFAULT 0,
@@ -3038,6 +3040,8 @@ CREATE TABLE `aowow_spell` (
   KEY `idx_typecat` (`typeCat`),
   KEY `idx_category` (`category`),
   KEY `idx_toolcategory1` (`toolCategory1`),
+  KEY `idx_casttime` (`castTimeId`),
+  KEY `idx_duration` (`durationId`),
   KEY `idx_toolcategory2` (`toolCategory2`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;

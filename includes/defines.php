@@ -1687,6 +1687,10 @@ define('SPELL_TRIGGER_LEARN',       6);
 // learn trigger spells on items - 483: learn recipe; 55884: learn mount/pet
 define('LEARN_SPELLS', [483, 55884]);
 
+// SpellRange.dbc flags
+define('SPELL_RANGE_MELEE',  1);
+define('SPELL_RANGE_RANGED', 2);
+
 define('SPELL_ATTR0_PROC_FAILURE_BURNS_CHARGE',     0x00000001); // [WoWDev Wiki] The spell will consume a charge that is natural or procced even if it fails to apply it's effect.
 define('SPELL_ATTR0_REQ_AMMO',                      0x00000002); // Treat as ranged attack DESCRIPTION Use ammo, ranged attack range modifiers, ranged haste, etc.
 define('SPELL_ATTR0_ON_NEXT_SWING',                 0x00000004); // On next melee (type 1) DESCRIPTION Both "on next swing" attributes have identical handling in server & client

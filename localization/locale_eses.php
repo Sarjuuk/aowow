@@ -1799,12 +1799,16 @@ $lang = array(
         '_seeMore'      => "Más información",
         '_rankRange'    => "Rango:&nbsp;%d&nbsp;-&nbsp;%d",
         '_showXmore'    => "Mostrar %d más",
+        'chanceToBlock' => "Probabilidad de bloquear: %.2f%%",
+        'chanceToCrit'  => "Probabilidad de dar un golpe crítico: %.2f%%",
+        'chanceToDodge' => "Probabilidad de esquivar: %.2f%%",
+        'chanceToParry' => "Probabilidad de parar: %.2f%%",
         'casterAura'    => "Aura del lanzador",
         'targetAura'    => "Aura del objetivo",
-
         'normal'        => "Normal",
         'special'       => "Especial",
-
+        'onNextMelee'   => "Siguiente cuerpo a cuerpo",
+        'onNextRanged'  => "Velocidad de ataque",
         'currentArea'   => '&lt;área actual&gt;',
         'durabilityItems' => [-2 => '&lt;todos los objetos, equipados y en bolsas&gt;', -1 => '&lt;todos los objetos equipados&gt;'],
         'discovered'    => "Aprendido via descubrimiento",
@@ -1812,6 +1816,8 @@ $lang = array(
         'procChance'    => "Probabilidad de que accione: %.4g%%",
         'starter'       => "Hechizo inicial",
         'trainingCost'  => "Costo de enseñanza: ",
+        'reqEquipItem'  => "Requiere %s",
+        'reqForm'       => "Requiere %s",
         'channeled'     => "Canalizado",
         'range'         => "Alcance de %s m",
         'meleeRange'    => "Alcance de ataques cuerpo a cuerpo",
@@ -1856,14 +1862,14 @@ $lang = array(
             "%d |4día restante:días restantes;"
         ),
         'powerCost'     => array(
-            POWER_HEALTH      => ["Salud %d",         "%d p. de salud, más %d p. por segundo"],
-            POWER_MANA        => ["%d p. de maná",    "%d p. de maná, más %d por s"],
-            POWER_RAGE        => ["%d p. de ira",     "%d Ira, más %d por s"],
-            POWER_FOCUS       => ["%d p. de enfoque", "%d enfoque, más %d por s"],
-            POWER_ENERGY      => ["%d p. de energía", "%d energía, más %d por s"],
-            POWER_RUNIC_POWER => ["%d Poder rúnico",  "%d poder rúnico, más %d por segundo"]
+            POWER_HEALTH      => ["Salud %d",         "%d p. de salud, más %d p. por segundo", "Usa 100% salud"        ],
+            POWER_MANA        => ["%d p. de maná",    "%d p. de maná, más %d por s",           "Usa 100% de maná"      ],
+            POWER_RAGE        => ["%d p. de ira",     "%d Ira, más %d por s",                  "Usa 100% ira"          ],
+            POWER_FOCUS       => ["%d p. de enfoque", "%d enfoque, más %d por s",              "Usa 100% de enfoque"   ],
+            POWER_ENERGY      => ["%d p. de energía", "%d energía, más %d por s",              "Usa el 100% de energía"],
+            POWER_RUNIC_POWER => ["%d Poder rúnico",  "%d poder rúnico, más %d por segundo",   ""                      ]
         ),
-        'powerDisplayCost' => ["%d %s", "%d %s, más %d por seg."],
+        'powerDisplayCost' => ["%d %s", "%d %s, más %d por seg.", "Usa el 100% de %s"],
         'powerCostRunes'=> ["%d sangre", "%d Profano", "%d Escarcha"],
         'powerRunes'    => ["Sangre", "Profano", "Escarcha", "Muerte"],
         'powerTypes'    => array(                           // POWER_TYPE_*

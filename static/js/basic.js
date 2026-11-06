@@ -1538,7 +1538,9 @@ $WH.g_setTooltipLevel = function(tooltip, level) {
     }
 
     // Points per level
-    tooltip = tooltip.replace(/<!--ppl(\d+):(\d+):(\d+):(\d+)-->\s*\d+/gi, function(_all, minLvl, maxLvl, base, ppl) {
+    // aowow - custom: allow negative base and ppl
+    // tooltip = tooltip.replace(/<!--ppl(\d+):(\d+):(\d+):(\d+)-->\s*\d+/gi, function(_all, minLvl, maxLvl, base, ppl) {
+    tooltip = tooltip.replace(/<!--ppl(\d+):(\d+):(-?\d+):(-?\d+)-->\s*\d+/gi, function(_all, minLvl, maxLvl, base, ppl) {
         return '<!--ppl' + minLvl + ':' + maxLvl + ':' + base + ':' + ppl + '-->' + Math.round(parseInt(base) + (Math.min(Math.max(level, minLvl), maxLvl) - minLvl) * ppl / 100);
     });
 

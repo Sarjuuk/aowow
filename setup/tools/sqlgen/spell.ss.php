@@ -17,9 +17,9 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         'spell' => [[], CLISetup::ARGV_PARAM, 'Compiles data for type: Spell from dbc and world db.']
     );
 
-    protected array $dbcSourceFiles  = ['spell', 'spellradius', 'spellduration', 'spellrunecost', 'spellcasttimes', 'skillline', 'skilllineability', 'skillraceclassinfo', 'talent', 'talenttab', 'glyphproperties', 'spellicon', 'itemdisplayinfo'];
+    protected array $dbcSourceFiles  = ['spell', 'spellradius', 'spellduration', 'spellrange', 'spellrunecost', 'spellcasttimes', 'skillline', 'skilllineability', 'skillraceclassinfo', 'talent', 'talenttab', 'glyphproperties', 'spellicon', 'itemdisplayinfo'];
     protected array $worldDependency = ['item_template', 'creature_template', 'creature_template_addon', 'creature_template_spell', 'smart_scripts', 'trainer_spell', 'disables', 'spell_ranks', 'spell_dbc', 'skill_discovery_template'];
-    protected array $setupAfter      = [['icons', 'spellrange'], []]; // spellrange required to use SpellList
+    protected array $setupAfter      = [['icons'], []];
 
     public function generate() : bool
     {
@@ -41,7 +41,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                            ProcChance,         ProcCharges,
                            0 AS procCustom,    0 AS procCooldown,
                            MaxLevel,           BaseLevel,          SpellLevel,         0 AS talentLevel,
-                           DurationIndex AS duration,
+                           DurationIndex AS durationId,
                            0 AS powerType,
                            0 AS powerCost,
                            0 AS powerCostPerLevel,
@@ -94,6 +94,8 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                            SpellFamilyFlags1,                      SpellFamilyFlags2,                      SpellFamilyFlags3,
                            MaxAffectedTargets,
                            DmgClass,
+                           0 AS minFactionId,
+                           0 AS minReputation,
                            0 AS skillLine1,
                            0 AS skillLine2OrMask,
                            0 AS reqRaceMask,
@@ -121,13 +123,13 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                               spellFocus,
                               casterAuraSpell,    targetAuraSpell,
                               casterAuraSpellNot, targetAuraSpellNot,
-                              GREATEST(IFNULL(sct.baseTime, 0), 0) / 1000 AS castTime,
+                              castTimeId,
                               recoveryTime,       recoveryTimeCategory,
                               startRecoveryTime,  startRecoveryCategory,
                               procChance,         IF(procCharges > 255, 0, procCharges),
                               0 AS procCustom,    0 AS procCooldown,
                               maxLevel,           baseLevel,          spellLevel,         0 AS talentLevel,
-                              IF (sd.baseTime <> -1, ABS(sd.baseTime), -1) AS duration,
+                              durationId,
                               IF (powerDisplayId, -powerDisplayId, powerType) AS powerType,
                               powerCost,
                               powerCostPerLevel,
@@ -180,6 +182,8 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                               spellFamilyFlags1,                      spellFamilyFlags2,                      spellFamilyFlags3,
                               maxAffectedTargets,
                               damageClass,
+                              minFactionId,
+                              minReputation,
                               0 AS skillLine1,
                               0 AS skillLine2OrMask,
                               0 AS reqRaceMask,
@@ -193,21 +197,24 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                               GREATEST(spellDescriptionVariable, 0),
                               0 AS trainingCost
                     FROM      dbc_spell s
-                    LEFT JOIN dbc_spellcasttimes sct ON s.castTimeId      = sct.id
                     LEFT JOIN dbc_spellrunecost  src ON s.runeCostId      = src.id
-                    LEFT JOIN dbc_spellduration   sd ON s.durationId      = sd.id
                     LEFT JOIN dbc_spellradius    sr1 ON s.effect1RadiusId = sr1.id
                     LEFT JOIN dbc_spellradius    sr2 ON s.effect2RadiusId = sr2.id
                     LEFT JOIN dbc_spellradius    sr3 ON s.effect3RadiusId = sr3.id
                     LIMIT     %i,%i';
 
+        CLI::write('[spell] - copying aux spell DBCs into tables');
 
-        DB::Aowow()->qry('TRUNCATE ::spell');
+        (new DBCReader('spellrange',     ['temporary' => false, 'tableName' => 'aowow_spellrange']))->readFile();
+        (new DBCReader('spellduration',  ['temporary' => false, 'tableName' => 'aowow_spellduration']))->readFile();
+        (new DBCReader('spellcasttimes', ['temporary' => false, 'tableName' => 'aowow_spellcasttimes']))->readFile();
 
-        // merge serverside spells into aowow_spell
+        CLI::write('[spell] - copying serverside spells into aowow_spell');
+
         $lastMax = 0;
         $n = 0;
-        CLI::write('[spell] - copying serverside spells into aowow_spell');
+        DB::Aowow()->qry('TRUNCATE ::spell');
+
         while ($spells = DB::World()->selectAssoc($ssQuery, CUSTOM_SERVERSIDE, $n++ * CLISetup::SQL_BATCH, CLISetup::SQL_BATCH))
         {
             $newMax = max(array_column($spells, 'id'));
@@ -221,11 +228,9 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         }
 
         // apply spell radii, duration & casting time
-        DB::Aowow()->qry('UPDATE ::spell s LEFT JOIN dbc_spellradius    sr  ON s.`effect1RadiusMin` = sr.`id`  SET s.`effect1RadiusMin` = IFNULL(sr.`radiusMin`, 0), s.`effect1RadiusMax` = IFNULL(sr.`radiusMax`, 0)');
-        DB::Aowow()->qry('UPDATE ::spell s LEFT JOIN dbc_spellradius    sr  ON s.`effect2RadiusMin` = sr.`id`  SET s.`effect2RadiusMin` = IFNULL(sr.`radiusMin`, 0), s.`effect2RadiusMax` = IFNULL(sr.`radiusMax`, 0)');
-        DB::Aowow()->qry('UPDATE ::spell s LEFT JOIN dbc_spellradius    sr  ON s.`effect3RadiusMin` = sr.`id`  SET s.`effect3RadiusMin` = IFNULL(sr.`radiusMin`, 0), s.`effect3RadiusMax` = IFNULL(sr.`radiusMax`, 0)');
-        DB::Aowow()->qry('UPDATE ::spell s LEFT JOIN dbc_spellduration  sd  ON s.`duration`         = sd.`id`  SET s.`duration` = IF(sd.`baseTime` iS NULL, -1, IF(sd.`baseTime` <> -1, ABS(sd.`baseTime`), -1))');
-        DB::Aowow()->qry('UPDATE ::spell s LEFT JOIN dbc_spellcasttimes sct ON s.`castTime`         = sct.`id` SET s.`castTime` = GREATEST(IFNULL(sct.`baseTime`, 0), 0) / 1000');
+        DB::Aowow()->qry('UPDATE ::spell s LEFT JOIN dbc_spellradius sr ON s.`effect1RadiusMin` = sr.`id`  SET s.`effect1RadiusMin` = IFNULL(sr.`radiusMin`, 0), s.`effect1RadiusMax` = IFNULL(sr.`radiusMax`, 0)');
+        DB::Aowow()->qry('UPDATE ::spell s LEFT JOIN dbc_spellradius sr ON s.`effect2RadiusMin` = sr.`id`  SET s.`effect2RadiusMin` = IFNULL(sr.`radiusMin`, 0), s.`effect2RadiusMax` = IFNULL(sr.`radiusMax`, 0)');
+        DB::Aowow()->qry('UPDATE ::spell s LEFT JOIN dbc_spellradius sr ON s.`effect3RadiusMin` = sr.`id`  SET s.`effect3RadiusMin` = IFNULL(sr.`radiusMin`, 0), s.`effect3RadiusMax` = IFNULL(sr.`radiusMax`, 0)');
 
         // merge spell.dbc into aowow_spell
         $lastMax = 0;

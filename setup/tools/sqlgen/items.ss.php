@@ -19,7 +19,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
     protected array $dbcSourceFiles  = ['gemproperties', 'itemdisplayinfo', 'spell', 'glyphproperties', 'durabilityquality', 'durabilitycosts'];
     protected array $worldDependency = ['item_template', 'item_template_locale', 'spell_group', 'game_event'];
-    protected array $setupAfter      = [['icons', 'spell', 'spellvariables', 'spellrange'], []];
+    protected array $setupAfter      = [['icons', 'spell', 'spellvariables'], []];
 
     private const array SKILL_CATG = array(
         SKILL_INSCRIPTION => 11,

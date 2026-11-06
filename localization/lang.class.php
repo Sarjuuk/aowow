@@ -416,17 +416,18 @@ class Lang
 
         if (!$tmp && $class == ITEM_CLASS_ARMOR)
             return self::spell('cat', -11, 1, 8);
-        else if (!$tmp && $class == ITEM_CLASS_WEAPON)
+
+        if (!$tmp && $class == ITEM_CLASS_WEAPON)
             return self::spell('cat', -11, 1, 6);
-        else
-            return implode(self::main('comma'), $tmp);
+
+        return self::concat($tmp, self::CONCAT_NONE);
     }
 
     public static function getStances(int $stanceMask) : string
     {
         $stanceMask &= 0xFF37F6FF;                          // clamp to available stances/forms..
 
-        return implode(self::main('comma'), array_intersect_key(self::game('st'), Util::mask2bits($stanceMask, 1)));
+        return self::concat(array_intersect_key(self::game('st'), Util::mask2bits($stanceMask, 1)), self::CONCAT_NONE);
     }
 
     public static function getMagicSchools(int $schoolMask, bool $short = false) : string
@@ -439,7 +440,7 @@ class Lang
         if ($short && $schoolMask == SPELL_MAGIC_SCHOOLS)
             return self::main('parensFmt', [self::main('all'), self::game('dt', 1)]);;
 
-        return implode(self::main('comma'), array_intersect_key(self::game('sc'), Util::mask2bits($schoolMask)));
+        return self::concat(array_intersect_key(self::game('sc'), Util::mask2bits($schoolMask)), self::CONCAT_NONE);
     }
 
     public static function getClassString(int $classMask, array &$ids = [], int $fmt = self::FMT_HTML) : string
@@ -463,7 +464,7 @@ class Lang
 
         $ids = array_keys($tmp);
 
-        return implode(self::main('comma'), $tmp);
+        return self::concat($tmp, self::CONCAT_NONE);
     }
 
     public static function getRaceString(int $raceMask, array &$ids = [], int $fmt = self::FMT_HTML) : string
@@ -493,7 +494,7 @@ class Lang
 
         $ids = array_keys($tmp);
 
-        return implode(self::main('comma'), $tmp);
+        return self::concat($tmp, self::CONCAT_NONE);
     }
 
     public static function formatSkillBreakpoints(array $bp, int $fmt = self::FMT_MARKUP) : string

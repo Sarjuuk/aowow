@@ -1799,12 +1799,16 @@ $lang = array(
         '_seeMore'      => "See more",
         '_rankRange'    => "Rank:&nbsp;%d&nbsp;-&nbsp;%d",
         '_showXmore'    => "Show %d More",
+        'chanceToBlock' => "%.2f%% chance to block",        // CHANCE_TO_BLOCK
+        'chanceToCrit'  => "%.2f%% chance to crit",         // CHANCE_TO_CRIT
+        'chanceToDodge' => "%.2f%% chance to dodge",        // CHANCE_TO_DODGE
+        'chanceToParry' => "%.2f%% chance to parry",        // CHANCE_TO_PARRY
         'casterAura'    => "Caster Aura",
         'targetAura'    => "Target Aura",
-
         'normal'        => "Normal",
         'special'       => "Special",
-
+        'onNextMelee'   => "Next melee",                    // SPELL_ON_NEXT_SWING
+        'onNextRanged'  => "Attack speed",                  // SPELL_ON_NEXT_RANGED
         'currentArea'   => '&lt;current area&gt;',
         'durabilityItems' => [-2 => '&lt;all items, equipped and in bags&gt;', -1 => '&lt;all equipped items&gt;'],
         'discovered'    => "Learned via discovery",
@@ -1812,12 +1816,14 @@ $lang = array(
         'procChance'    => "Proc chance: %.4g%%",
         'starter'       => "Starter spell",
         'trainingCost'  => "Training cost: ",
+        'reqEquipItem'  => "Requires %s",                   // SPELL_EQUIPPED_ITEM
+        'reqForm'       => "Requires %s",                   // SPELL_REQUIRED_FORM
         'channeled'     => "Channeled",                     // SPELL_CAST_CHANNELED
         'range'         => "%s yd range",                   // SPELL_RANGE / SPELL_RANGE_DUAL
         'meleeRange'    => "Melee Range",                   // MELEE_RANGE
         'unlimRange'    => "Unlimited Range",               // SPELL_RANGE_UNLIMITED
-        'reagents'      => "Reagents",                      // SPELL_REAGENTS
-        'tools'         => "Tools",                         // SPELL_TOTEMS
+        'reagents'      => "Reagents",                      // SPELL_REAGENTS (should be "Reagents: |n")
+        'tools'         => "Tools",                         // SPELL_TOTEMS (should be "Tools:\32")
         'home'          => "&lt;Inn&gt;",
         'pctCostOf'     => "of base %s",
         'costPerSec'    => ", plus %s per sec",             // see 'powerTypes'
@@ -1856,14 +1862,14 @@ $lang = array(
             "%d |4day:days; remaining"
         ),
         'powerCost'     => array(
-            POWER_HEALTH      => ["%d Health",      "%d Health, plus %d per sec"     ],    // HEALTH_COST        HEALTH_COST_PER_TIME
-            POWER_MANA        => ["%d Mana",        "%d Mana, plus %d per sec"       ],    // MANA_COST          MANA_COST_PER_TIME
-            POWER_RAGE        => ["%d Rage",        "%d Rage, plus %d per sec"       ],    // RAGE_COST          RAGE_COST_PER_TIME
-            POWER_FOCUS       => ["%d Focus",       "%d Focus, plus %d per sec"      ],    // FOCUS_COST         FOCUS_COST_PER_TIME
-            POWER_ENERGY      => ["%d Energy",      "%d Energy, plus %d per sec"     ],    // ENERGY_COST        ENERGY_COST_PER_TIME
-            POWER_RUNIC_POWER => ["%d Runic Power", "%d Runic Power, plus %d per sec"],    // RUNIC_POWER_COST   RUNIC_POWER_COST_PER_TIME
+            POWER_HEALTH      => ["%d Health",      "%d Health, plus %d per sec",      "Uses 100% health"  ], // HEALTH_COST        HEALTH_COST_PER_TIME       SPELL_USE_ALL_HEALTH
+            POWER_MANA        => ["%d Mana",        "%d Mana, plus %d per sec",        "Uses 100% mana"    ], // MANA_COST          MANA_COST_PER_TIME         SPELL_USE_ALL_MANA
+            POWER_RAGE        => ["%d Rage",        "%d Rage, plus %d per sec",        "Uses 100% rage"    ], // RAGE_COST          RAGE_COST_PER_TIME         SPELL_USE_ALL_RAGE
+            POWER_FOCUS       => ["%d Focus",       "%d Focus, plus %d per sec",       "Uses 100% focus"   ], // FOCUS_COST         FOCUS_COST_PER_TIME        SPELL_USE_ALL_FOCUS
+            POWER_ENERGY      => ["%d Energy",      "%d Energy, plus %d per sec",      "Uses 100% Energy"  ], // ENERGY_COST        ENERGY_COST_PER_TIME       SPELL_USE_ALL_ENERGY
+            POWER_RUNIC_POWER => ["%d Runic Power", "%d Runic Power, plus %d per sec", ""                  ]  // RUNIC_POWER_COST   RUNIC_POWER_COST_PER_TIME  null
         ),
-        'powerDisplayCost' => ["%d %s", "%d %s, plus %d per sec"],          // POWER_DISPLAY_COST POWER_DISPLAY_COST_PER_TIME
+        'powerDisplayCost' => ["%d %s", "%d %s, plus %d per sec", "Uses 100% %s"], // POWER_DISPLAY_COST    POWER_DISPLAY_COST_PER_TIME     SPELL_USE_ALL_POWER_DISPLAY
         'powerCostRunes'=> ["%d Blood", "%d Unholy", "%d Frost"],   // RUNE_COST_*
         'powerRunes'    => ["Blood", "Unholy", "Frost", "Death"],   // COMBAT_TEXT_RUNE_*
         'powerTypes'    => array(

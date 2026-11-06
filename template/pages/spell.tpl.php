@@ -130,7 +130,7 @@ endif;
                     </tr>
                     <tr>
                         <th><?=Lang::spell('_range');?></th>
-                        <td><?=$this->range.' <small>('.$this->rangeName.')</small>';?></td>
+                        <td><?=$this->range.' <small>('.($this->rangeName ?: '<span class="q0">'.Lang::main('n_a').'</span>').')</small>';?></td>
                     </tr>
                     <tr>
                         <th><?=Lang::spell('_castTime');?></th>
