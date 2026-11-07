@@ -964,7 +964,7 @@ class ItemList extends DBTypeList
         # Required Holiday #
 
         if ($eId = $this->curTpl['eventId'])
-            $x .= Lang::item('reqSkill', [WorldeventList::makeLink($eId, cssClass: 'q2')]).'<br />';
+            $x .= Lang::item('reqSkill', [WorldeventList::makeLink($eId, cssClass: 'q1')]).'<br />';
 
 
         #########################
