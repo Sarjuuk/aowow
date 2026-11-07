@@ -762,11 +762,11 @@ class QuestListFilter extends Filter
         if (!$this->int2Bool($crs))
             return null;
 
-        $missing = DB::Aowow()->selectCol('SELECT `questId`, BIT_OR(`method`) AS "se" FROM ::quests_startend GROUP BY `questId` HAVING "se" <> 3');
+        $hasBoth = DB::Aowow()->selectCol('SELECT `questId` FROM ::quests_startend GROUP BY `questId` HAVING BIT_OR(`method`) = 3');
         if ($crs)
-            return ['id', $missing];
+            return ['id', $hasBoth, '!'];
         else
-            return ['id', $missing, '!'];
+            return ['id', $hasBoth];
     }
 }
 
