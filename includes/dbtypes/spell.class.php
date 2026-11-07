@@ -2290,7 +2290,7 @@ class SpellList extends DBTypeList
                 else if (($la = $this->curTpl['reqSkillLevel']) > 1)
                     $data[$this->id]['learnedat'] = $la;
 
-                $data[$this->id]['colors'] = $this->getColorsForCurrent();
+                $data[$this->id]['colors'] = array_slice($this->getColorsForCurrent(), 1);
             }
 
             // pet types
