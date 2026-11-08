@@ -366,11 +366,7 @@ class Lang
                         $ids[Type::SPELL][] = $prop;
                     }
 
-<<<<<<< HEAD
-                    $locks[] = [LOCK_TYPE_SPELL, $prop, $name, $spell->getReagentsForCurrent()];
-=======
-                    $locks[] = [$name, Type::SPELL, $spell->getReagents()];
->>>>>>> c0ad6e7ed ([WIP] DBType split)
+                    $locks[] = [LOCK_TYPE_SPELL, $prop, $name, $spell->getReagents()];
                     break;
             }
 
