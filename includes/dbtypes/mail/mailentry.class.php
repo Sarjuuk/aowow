@@ -20,21 +20,21 @@ class MailEntry extends DBTypeEntry
 
     public const string QUERY_BASE = 'SELECT m.*, m.`id` AS ARRAY_KEY FROM ::mails m';
 
-    public function applyInitData(array $initData, array $opts) : bool
+    public function applyInitData(\Dibi\Row $dbRow, array $opts) : bool
     {
-        parent::applyInitData($initData, $opts);
+        parent::applyInitData($dbRow, $opts);
 
-        $this->cuFlags    = $initData['cuFlags'];
-        $this->attachment = $initData['attachment'];
+        $this->cuFlags    = $dbRow->cuFlags;
+        $this->attachment = $dbRow->attachment;
 
-        $nameBak = ['name_loc0' => Lang::mail('untitled', [$initData['id']])];
-        $subject = new LocString($initData, 'subject');
+        $nameBak = ['name_loc0' => Lang::mail('untitled', [$dbRow->id])];
+        $subject = new LocString($dbRow, 'subject');
         if ($subject->isEmpty())
             $subject = new LocString($nameBak);
 
         $this->name    = $subject;
         $this->subject = $subject;
-        $this->text    = new LocString($initData, 'text');
+        $this->text    = new LocString($dbRow, 'text');
 
         return true;
     }

@@ -22,11 +22,11 @@ abstract class GuildEntry extends DBTypeEntry
     public static int $contribute = CONTRIBUTE_NONE;
 
 
-    public function applyInitData(array $initData, array $opts) : bool
+    public function applyInitData(\Dibi\Row $dbRow, array $opts) : bool
     {
-        parent::applyInitData($initData, $opts);
+        parent::applyInitData($dbRow, $opts);
 
-        $this->name = $initData['name'];
+        $this->name = $dbRow->name;
 
         return true;
     }
@@ -123,7 +123,7 @@ class RemoteGuildEntry extends GuildEntry
         'c'  => ['j' => 'characters c ON c.`guid` = gm.`guid`', 's' => ', BIT_OR(IF(c.`race` IN (1, 3, 4, 7, 11), 1, 2)) - 1 AS "faction"']
     );
 
-    public function __construct(int|array $initData, array $extraOpts = [])
+    public function __construct(\Dibi\Row|int $initData, array $extraOpts = [])
     {
         // if id lookup, select DB by realm
         $targetDBs = Profiler::getRealmDBs($extraOpts['rg'] ?? null, $extraOpts['sv'] ?? null);
@@ -135,36 +135,41 @@ class RemoteGuildEntry extends GuildEntry
         }
 
         // warning: jank! - realmId is not already set by container only if the user preselected just the region in the search from and the region only contains a single realm
-        if (is_array($initData) && $targetDBs && !isset($initData['realmId']))
-            $initData['realmId'] = key($targetDBs);
+        if ($initData instanceof \Dibi\Row && !isset($initData['realmId']))
+        {
+            if (isset($extraOpts['realmId']))
+                $initData['realmId'] = $extraOpts['realmId'];
+            elseif ($targetDBs)
+                $initData['realmId'] = key($targetDBs);
+        }
 
         parent::__construct($initData, $extraOpts, $targetDBs);
     }
 
-    public function applyInitData(array $initData, array $opts) : bool
+    public function applyInitData(\Dibi\Row $dbRow, array $opts) : bool
     {
-        if (!$initData['name'])
+        if (!$dbRow->name)
         {
-            trigger_error('char #'.$initData['guildid'].' on realm #'.$initData['realmId'].' has empty name.', E_USER_WARNING);
+            trigger_error('char #'.$dbRow->guildid.' on realm #'.$dbRow->realmId.' has empty name.', E_USER_WARNING);
             return false;
         }
 
-        if (!(['name' => $realmName, 'region' => $region] = Profiler::getRealms()[$initData['realmId']] ?? null))
+        if (!(['name' => $realmName, 'region' => $region] = Profiler::getRealms()[$dbRow->realmId] ?? null))
         {
-            trigger_error(__METHOD__.' realm #'.$initData['realmId'].' is inaccessible or does not exist.', E_USER_WARNING);
+            trigger_error(__METHOD__.' realm #'.$dbRow->realmId.' is inaccessible or does not exist.', E_USER_WARNING);
             return false;
         }
 
         $this->region    = $region;
-        $this->realmId   = $initData['realmId'];
-        $this->realmGUID = $initData['guildid'];
+        $this->realmId   = $dbRow->realmId;
+        $this->realmGUID = $dbRow->guildid;
         $this->realmName = $realmName;
 
         // rename to fit our structure
-        $initData['cuFlags']       = 0;
-        $initData['id']            = $this->subjectGUID;
+        $dbRow['cuFlags']       = 0;
+        $dbRow['id']            = $this->subjectGUID;
 
-        return parent::applyInitData($initData, $opts);
+        return parent::applyInitData($dbRow, $opts);
     }
 }
 
@@ -173,22 +178,22 @@ class LocalGuildEntry extends GuildEntry
 {
     public const string QUERY_BASE = 'SELECT g.*, g.`id` AS ARRAY_KEY FROM ::profiler_guild g';
 
-    public function applyInitData(array $initData, array $opts) : bool
+    public function applyInitData(\Dibi\Row $dbRow, array $opts) : bool
     {
-        if ($initData['realm'] && !(['name' => $realmName, 'region' => $region] = Profiler::getRealms()[$initData['realm']] ?? null))
+        if ($dbRow->realm && !(['name' => $realmName, 'region' => $region] = Profiler::getRealms()[$dbRow->realm] ?? null))
         {
-            trigger_error(__METHOD__.' realm #'.$initData['realm'].' is inaccessible or does not exist.', E_USER_WARNING);
+            trigger_error(__METHOD__.' realm #'.$dbRow->realm.' is inaccessible or does not exist.', E_USER_WARNING);
             return false;
         }
 
-        $this->region    = $region                ?? '';
-        $this->realmId   = $initData['realm']     ?? 0;
-        $this->realmGUID = $initData['realmGUID'] ?? 0;
-        $this->realmName = $realmName             ?? '';
+        $this->region    = $region           ?? '';
+        $this->realmId   = $dbRow->realm     ?? 0;
+        $this->realmGUID = $dbRow->realmGUID ?? 0;
+        $this->realmName = $realmName        ?? '';
 
         // rename to fit our structure
 
-        return parent::applyInitData($initData, $opts);
+        return parent::applyInitData($dbRow, $opts);
     }
 }
 

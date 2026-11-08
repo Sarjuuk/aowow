@@ -48,7 +48,7 @@ abstract class ProfileEntry extends DBTypeEntry implements ITooltip
 
     private array $extraColData = [];
 
-    public function __construct(int|array $initData, array $extraOpts = [], array $targetDBs = ['Aowow'])
+    public function __construct(\Dibi\Row|int $initData, array $extraOpts = [], array $targetDBs = ['Aowow'])
     {
         parent::__construct($initData, $extraOpts, $targetDBs);
 
@@ -56,43 +56,43 @@ abstract class ProfileEntry extends DBTypeEntry implements ITooltip
             $this->setRenameItr();
     }
 
-    public function applyInitData(array $initData, array $opts) : bool
+    public function applyInitData(\Dibi\Row $dbRow, array $opts) : bool
     {
-        parent::applyInitData($initData, $opts);
+        parent::applyInitData($dbRow, $opts);
 
-        $this->name    = $initData['name'];
-        $this->cuFlags = $initData['cuFlags'];
-        $this->race    = $initData['race'];
-        $this->class   = $initData['class'];
-        $this->gender  = $initData['gender'];
-        $this->level   = $initData['level'];
-        $this->title   = $initData['title'];
+        $this->name    = $dbRow->name;
+        $this->cuFlags = $dbRow->cuFlags;
+        $this->race    = $dbRow->race;
+        $this->class   = $dbRow->class;
+        $this->gender  = $dbRow->gender;
+        $this->level   = $dbRow->level;
+        $this->title   = $dbRow->title;
 
         // todo - currently only provided for local entries
-        if (isset($initData['talenttree1']))
-            $this->talenttree        = [$initData['talenttree1'], $initData['talenttree2'], $initData['talenttree3']];
+        if (isset($dbRow->talenttree1))
+            $this->talenttree        = [$dbRow->talenttree1, $dbRow->talenttree2, $dbRow->talenttree3];
 
-        $this->activespec        = $initData['activespec']        ?? 0;
-        $this->achievementpoints = $initData['achievementpoints'] ?? 0;
-        $this->gearscore         = $initData['gearscore']         ?? 0;
+        $this->activespec        = $dbRow->activespec        ?? 0;
+        $this->achievementpoints = $dbRow->achievementpoints ?? 0;
+        $this->gearscore         = $dbRow->gearscore         ?? 0;
 
-        $this->guild     = $initData['guild']     ?? null;
-        $this->guildname = $initData['guildname'] ?? null;
-        $this->guildrank = $initData['guildrank'] ?? null;
+        $this->guild     = $dbRow->guild     ?? null;
+        $this->guildname = $dbRow->guildname ?? null;
+        $this->guildrank = $dbRow->guildrank ?? null;
 
-        $this->arenateam   = $initData['arenateam']   ?? null;
-        $this->rating      = $initData['rating']      ?? null;
-        $this->captain     = $initData['captain']     ?? null;
-        $this->seasonGames = $initData['seasonGames'] ?? null;
-        $this->seasonWins  = $initData['seasonWins']  ?? null;
+        $this->arenateam   = $dbRow->arenateam   ?? null;
+        $this->rating      = $dbRow->rating      ?? null;
+        $this->captain     = $dbRow->captain     ?? null;
+        $this->seasonGames = $dbRow->seasonGames ?? null;
+        $this->seasonWins  = $dbRow->seasonWins  ?? null;
 
-        $this->user        = $initData['user']        ?? null;
-        $this->description = $initData['description'] ?? null;
-        $this->icon        = $initData['icon']        ?? null;
-        $this->deleted     = $initData['deleted']     ?? false;
-        $this->custom      = $initData['custom']      ?? false;
+        $this->user        = $dbRow->user        ?? null;
+        $this->description = $dbRow->description ?? null;
+        $this->icon        = $dbRow->icon        ?? null;
+        $this->deleted     = $dbRow->deleted     ?? false;
+        $this->custom      = $dbRow->custom      ?? false;
 
-        $this->renamePending = $initData['renamePending'] ?? false;
+        $this->renamePending = $dbRow->renamePending ?? false;
 
         return true;
     }
@@ -336,7 +336,7 @@ class RemoteProfileEntry extends ProfileEntry
         'at'  => [['atm'], 'j' => 'arena_team at ON atm.`arenaTeamId` = at.`arenaTeamId`', 's' => ', at.`name` AS "arenateamname", at.`arenaTeamId` AS "arenateam", IF(at.`captainGuid` = c.`guid`, 1, 0) AS "captain"']
     );
 
-    public function __construct(int|array $initData, array $extraOpts = [])
+    public function __construct(\Dibi\Row|int $initData, array $extraOpts = [])
     {
         // if id lookup, select DB by realm
         $targetDBs = Profiler::getRealmDBs($extraOpts['rg'] ?? null, $extraOpts['sv'] ?? null);
@@ -348,39 +348,44 @@ class RemoteProfileEntry extends ProfileEntry
         }
 
         // warning: jank! - realmId is not already set by container only if the user preselected just the region in the search from and the region only contains a single realm
-        if (is_array($initData) && $targetDBs && !isset($initData['realmId']))
-            $initData['realmId'] = key($targetDBs);
+        if ($initData instanceof \Dibi\Row && !isset($initData['realmId']))
+        {
+            if (isset($extraOpts['realmId']))
+                $initData['realmId'] = $extraOpts['realmId'];
+            elseif ($targetDBs)
+                $initData['realmId'] = key($targetDBs);
+        }
 
         parent::__construct($initData, $extraOpts, $targetDBs);
     }
 
-    public function applyInitData(array $initData, array $opts) : bool
+    public function applyInitData(\Dibi\Row $dbRow, array $opts) : bool
     {
-        if (!$initData['name'])
+        if (!$dbRow->name)
         {
-            trigger_error('char #'.$initData['guid'].' on realm #'.$initData['realmId'].' has empty name.', E_USER_WARNING);
+            trigger_error('char #'.$dbRow->guid.' on realm #'.$dbRow->realmId.' has empty name.', E_USER_WARNING);
             return false;
         }
 
-        if (!(['name' => $realmName, 'region' => $region] = Profiler::getRealms()[$initData['realmId']] ?? null))
+        if (!(['name' => $realmName, 'region' => $region] = Profiler::getRealms()[$dbRow->realmId] ?? null))
         {
-            trigger_error(__METHOD__.' realm #'.$initData['realmId'].' is inaccessible or does not exist.', E_USER_WARNING);
+            trigger_error(__METHOD__.' realm #'.$dbRow->realmId.' is inaccessible or does not exist.', E_USER_WARNING);
             return false;
         }
 
         $this->region    = $region;
-        $this->realmId   = $initData['realmId'];
-        $this->realmGUID = $initData['guid'];
+        $this->realmId   = $dbRow->realmId;
+        $this->realmGUID = $dbRow->guid;
         $this->realmName = $realmName;
 
         // rename to fit our structure
-        $initData['renamePending'] = $initData['at_login'] & 0x1 ? 1 : 0;
-        $initData['cuFlags']       = 0;
-        $initData['activespec']    = $initData['activeTalentGroup'];
-        $initData['id']            = $this->subjectGUID;
-        $initData['title']         = $initData['chosenTitle'];
+        $dbRow['renamePending'] = $dbRow->at_login & 0x1 ? 1 : 0;
+        $dbRow['cuFlags']       = 0;
+        $dbRow['activespec']    = $dbRow->activeTalentGroup;
+        $dbRow['id']            = $this->subjectGUID;
+        $dbRow['title']         = $dbRow->chosenTitle;
 
-        return parent::applyInitData($initData, $opts);
+        return parent::applyInitData($dbRow, $opts);
     }
 
     public function amendLocalData(array $localData) : void
@@ -407,23 +412,23 @@ class LocalProfileEntry extends ProfileEntry
         'g'   => ['j' => ['::profiler_guild g ON g.`id` = p.`guild`', true], 's' => ', g.`name` AS "guildname"']
     );
 
-    public function applyInitData(array $initData, array $opts) : bool
+    public function applyInitData(\Dibi\Row $dbRow, array $opts) : bool
     {
-        if (($initData['realm'] && !(['name' => $realmName, 'region' => $region] = Profiler::getRealms()[$initData['realm']] ?? null)) && empty($initData['custom']))
+        if (($dbRow->realm && !(['name' => $realmName, 'region' => $region] = Profiler::getRealms()[$dbRow->realm] ?? null)) && empty($dbRow->custom))
         {
-            trigger_error(__METHOD__.' realm #'.$initData['realm'].' is inaccessible or does not exist.', E_USER_WARNING);
+            trigger_error(__METHOD__.' realm #'.$dbRow->realm.' is inaccessible or does not exist.', E_USER_WARNING);
             return false;
         }
 
-        $this->region    = $region                ?? '';
-        $this->realmId   = $initData['realm']     ?? 0;
-        $this->realmGUID = $initData['realmGUID'] ?? 0;
-        $this->realmName = $realmName             ?? '';
+        $this->region    = $region           ?? '';
+        $this->realmId   = $dbRow->realm     ?? 0;
+        $this->realmGUID = $dbRow->realmGUID ?? 0;
+        $this->realmName = $realmName        ?? '';
 
         // rename to fit our structure
-        $initData['renamePending'] = 0;
+        $dbRow['renamePending'] = 0;
 
-        return parent::applyInitData($initData, $opts);
+        return parent::applyInitData($dbRow, $opts);
     }
 }
 

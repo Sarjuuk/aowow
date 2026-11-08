@@ -27,18 +27,18 @@ class CurrencyEntry extends DBTypeEntry implements ITooltip
         'ic' => ['j' => ['::icons ic ON ic.`id` = c.`iconId`', true], 's' => ', ic.`name` AS "icon"']
     );
 
-    public function applyInitData(array $initData, array $opts) : bool
+    public function applyInitData(\Dibi\Row $dbRow, array $opts) : bool
     {
-        parent::applyInitData($initData, $opts);
+        parent::applyInitData($dbRow, $opts);
 
-        $this->cuFlags     = $initData['cuFlags'];
-        $this->name        = new LocString($initData, 'name');
-        $this->description = new LocString($initData, 'description');
-        $this->category    = $initData['category'];
-        $this->cap         = $initData['cap'];
-        $this->itemId      = $initData['itemId'];
-        $this->iconId      = $initData['iconId'];
-        $this->icon        = $initData['icon'] ?: DEFAULT_ICON;
+        $this->cuFlags     = $dbRow->cuFlags;
+        $this->name        = new LocString($dbRow, 'name');
+        $this->description = new LocString($dbRow, 'description');
+        $this->category    = $dbRow->category;
+        $this->cap         = $dbRow->cap;
+        $this->itemId      = $dbRow->itemId;
+        $this->iconId      = $dbRow->iconId;
+        $this->icon        = $dbRow->icon ?: DEFAULT_ICON;
 
         return true;
     }

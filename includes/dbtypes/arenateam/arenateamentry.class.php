@@ -68,7 +68,7 @@ class RemoteArenateamEntry extends ArenateamEntry
 
     private array $rankOrder = [];
 
-    public function __construct(int|array $initData, array $extraOpts = [])
+    public function __construct(\Dibi\Row|int $initData, array $extraOpts = [])
     {
         // if id lookup, select DB by realm
         if (is_int($initData) && (!$targetDBs = Profiler::getRealmDBs($extraOpts['rg'] ?? null, $extraOpts['sv'] ?? null)))
@@ -183,7 +183,7 @@ class LocalArenateamEntry extends ArenateamEntry
     );
 
     public function __construct(
-                  int|array $initData,
+                  \Dibi\Row|int $initData,
         protected array     $extraOpts = [],
                   array     $targetDBs = ['Aowow']
     )

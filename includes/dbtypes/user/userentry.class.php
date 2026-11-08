@@ -33,18 +33,18 @@ class UserEntry extends DBTypeEntry
         'r' => ['j' => ['::account_reputation r ON r.`userId` = a.`id`', true], 's' => ', IFNULL(SUM(r.`amount`), 0) AS "reputation"', 'g' => 'a.`id`']
     );
 
-    public function applyInitData(array $initData, array $opts) : bool
+    public function applyInitData(\Dibi\Row $dbRow, array $opts) : bool
     {
-        parent::applyInitData($initData, $opts);
+        parent::applyInitData($dbRow, $opts);
 
-        $this->username     = $initData['username'];
-        $this->joinDate     = $initData['joinDate'];
-        $this->userGroups   = $initData['userGroups'];
-        $this->avatar       = $initData['avatar'] ?? 0;     // can be null for some reason
-        $this->avatarborder = $initData['avatarborder'];
-        $this->wowicon      = $initData['wowicon'];
-        $this->title        = $initData['title'];
-        $this->reputation   = $initData['reputation'];
+        $this->username     = $dbRow->username;
+        $this->joinDate     = $dbRow->joinDate;
+        $this->userGroups   = $dbRow->userGroups;
+        $this->avatar       = $dbRow->avatar ?? 0;          // can be null for some reason
+        $this->avatarborder = $dbRow->avatarborder;
+        $this->wowicon      = $dbRow->wowicon;
+        $this->title        = $dbRow->title;
+        $this->reputation   = $dbRow->reputation;
 
         return true;
     }

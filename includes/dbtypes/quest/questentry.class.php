@@ -120,109 +120,109 @@ class QuestEntry extends DBTypeEntry implements ISource, ITooltip
         'e'   => ['j' => ['::events e ON e.`id` = q.`eventId`', true], 's' => ', e.`holidayId`']
     );
 
-    public function applyInitData(array $initData, array $opts) : bool
+    public function applyInitData(\Dibi\Row $dbRow, array $opts) : bool
     {
-        parent::applyInitData($initData, $opts);
+        parent::applyInitData($dbRow, $opts);
 
-        $this->cuFlags       = $initData['cuFlags'];
-        $this->name          = new LocString($initData, 'name');
-        $this->objectives    = new LocString($initData, 'objectives');
-        $this->details       = new LocString($initData, 'details');
-        $this->end           = new LocString($initData, 'end');
-        $this->offerReward   = new LocString($initData, 'offerReward');
-        $this->requestItems  = new LocString($initData, 'requestItems');
-        $this->completed     = new LocString($initData, 'completed');
+        $this->cuFlags       = $dbRow->cuFlags;
+        $this->name          = new LocString($dbRow, 'name');
+        $this->objectives    = new LocString($dbRow, 'objectives');
+        $this->details       = new LocString($dbRow, 'details');
+        $this->end           = new LocString($dbRow, 'end');
+        $this->offerReward   = new LocString($dbRow, 'offerReward');
+        $this->requestItems  = new LocString($dbRow, 'requestItems');
+        $this->completed     = new LocString($dbRow, 'completed');
         $this->objectiveText = array(
-            new LocString($initData, 'objectiveText1'),
-            new LocString($initData, 'objectiveText2'),
-            new LocString($initData, 'objectiveText3'),
-            new LocString($initData, 'objectiveText4')
+            new LocString($dbRow, 'objectiveText1'),
+            new LocString($dbRow, 'objectiveText2'),
+            new LocString($dbRow, 'objectiveText3'),
+            new LocString($dbRow, 'objectiveText4')
         );
-        $this->questType            = $initData['questType'];
-        $this->level                = $initData['level'];
-        $this->minLevel             = $initData['minLevel'];
-        $this->maxLevel             = $initData['maxLevel'];
-        $this->questSortId          = $initData['questSortId'];
-        $this->questSortIdBak       = $initData['questSortIdBak'];
-        $this->questInfoId          = $initData['questInfoId'];
-        $this->suggestedPlayers     = $initData['suggestedPlayers'];
-        $this->timeLimit            = $initData['timeLimit'];
-        $this->eventId              = $initData['eventId'];
-        $this->prevQuestId          = $initData['prevQuestId'];
-        $this->nextQuestId          = $initData['nextQuestId'];
-        $this->breadcrumbForQuestId = $initData['breadcrumbForQuestId'];
-        $this->exclusiveGroup       = $initData['exclusiveGroup'];
-        $this->nextQuestIdChain     = $initData['nextQuestIdChain'];
-        $this->flags                = $initData['flags'];
-        $this->specialFlags         = $initData['specialFlags'];
+        $this->questType            = $dbRow->questType;
+        $this->level                = $dbRow->level;
+        $this->minLevel             = $dbRow->minLevel;
+        $this->maxLevel             = $dbRow->maxLevel;
+        $this->questSortId          = $dbRow->questSortId;
+        $this->questSortIdBak       = $dbRow->questSortIdBak;
+        $this->questInfoId          = $dbRow->questInfoId;
+        $this->suggestedPlayers     = $dbRow->suggestedPlayers;
+        $this->timeLimit            = $dbRow->timeLimit;
+        $this->eventId              = $dbRow->eventId;
+        $this->prevQuestId          = $dbRow->prevQuestId;
+        $this->nextQuestId          = $dbRow->nextQuestId;
+        $this->breadcrumbForQuestId = $dbRow->breadcrumbForQuestId;
+        $this->exclusiveGroup       = $dbRow->exclusiveGroup;
+        $this->nextQuestIdChain     = $dbRow->nextQuestIdChain;
+        $this->flags                = $dbRow->flags;
+        $this->specialFlags         = $dbRow->specialFlags;
 
-        $this->method    = $initData['method']    ?? null;
-        $this->holidayId = $initData['holidayId'] ?? null;
+        $this->method    = $dbRow->method    ?? null;
+        $this->holidayId = $dbRow->holidayId ?? null;
 
-        $this->sourceItemId    = $initData['sourceItemId'];
-        $this->sourceItemCount = $initData['sourceItemCount'];
-        $this->sourceSpellId   = $initData['sourceSpellId'];
+        $this->sourceItemId    = $dbRow->sourceItemId;
+        $this->sourceItemCount = $dbRow->sourceItemCount;
+        $this->sourceSpellId   = $dbRow->sourceSpellId;
 
-        $this->reqClassMask     = $initData['reqClassMask'];
-        $this->reqRaceMask      = $initData['reqRaceMask'];
-        $this->reqSkillId       = $initData['reqSkillId'];
-        $this->reqSkillPoints   = $initData['reqSkillPoints'];
-        $this->reqMinRepFaction = $initData['reqMinRepFaction'];
-        $this->reqMaxRepFaction = $initData['reqMaxRepFaction'];
-        $this->reqMinRepValue   = $initData['reqMinRepValue'];
-        $this->reqMaxRepValue   = $initData['reqMaxRepValue'];
+        $this->reqClassMask     = $dbRow->reqClassMask;
+        $this->reqRaceMask      = $dbRow->reqRaceMask;
+        $this->reqSkillId       = $dbRow->reqSkillId;
+        $this->reqSkillPoints   = $dbRow->reqSkillPoints;
+        $this->reqMinRepFaction = $dbRow->reqMinRepFaction;
+        $this->reqMaxRepFaction = $dbRow->reqMaxRepFaction;
+        $this->reqMinRepValue   = $dbRow->reqMinRepValue;
+        $this->reqMaxRepValue   = $dbRow->reqMaxRepValue;
 
-        $this->rewardXPId            = $initData['rewardXPId'];
-        $this->rewardXP              = $initData['rewardXP'];
-        $this->rewardOrReqMoney      = $initData['rewardOrReqMoney'];
-        $this->rewardMoneyMaxLevel   = $initData['rewardMoneyMaxLevel'];
-        $this->rewardSpell           = $initData['rewardSpell'];
-        $this->rewardSpellCast       = $initData['rewardSpellCast'];
-        $this->rewardHonorPoints     = $initData['rewardHonorPoints'];
-        $this->rewardMailTemplateId  = $initData['rewardMailTemplateId'];
-        $this->rewardMailDelay       = $initData['rewardMailDelay'];
-        $this->rewardTitleId         = $initData['rewardTitleId'];
-        $this->rewardTalents         = $initData['rewardTalents'];
-        $this->rewardArenaPoints     = $initData['rewardArenaPoints'];
-        $this->rewardItemId          = [$initData['rewardItemId1'],          $initData['rewardItemId2'],          $initData['rewardItemId3'],          $initData['rewardItemId4']];
-        $this->rewardItemCount       = [$initData['rewardItemCount1'],       $initData['rewardItemCount2'],       $initData['rewardItemCount3'],       $initData['rewardItemCount4']];
-        $this->rewardChoiceItemId    = [$initData['rewardChoiceItemId1'],    $initData['rewardChoiceItemId2'],    $initData['rewardChoiceItemId3'],    $initData['rewardChoiceItemId4'],    $initData['rewardChoiceItemId5'],    $initData['rewardChoiceItemId6']];
-        $this->rewardChoiceItemCount = [$initData['rewardChoiceItemCount1'], $initData['rewardChoiceItemCount2'], $initData['rewardChoiceItemCount3'], $initData['rewardChoiceItemCount4'], $initData['rewardChoiceItemCount5'], $initData['rewardChoiceItemCount6']];
-        $this->rewardFactionId       = [$initData['rewardFactionId1'],       $initData['rewardFactionId2'],       $initData['rewardFactionId3'],       $initData['rewardFactionId4'],       $initData['rewardFactionId5']];
-        $this->rewardFactionValue    = [$initData['rewardFactionValue1'],    $initData['rewardFactionValue2'],    $initData['rewardFactionValue3'],    $initData['rewardFactionValue4'],    $initData['rewardFactionValue5']];
-        $this->reqPlayerKills        = $initData['reqPlayerKills'];
+        $this->rewardXPId            = $dbRow->rewardXPId;
+        $this->rewardXP              = $dbRow->rewardXP;
+        $this->rewardOrReqMoney      = $dbRow->rewardOrReqMoney;
+        $this->rewardMoneyMaxLevel   = $dbRow->rewardMoneyMaxLevel;
+        $this->rewardSpell           = $dbRow->rewardSpell;
+        $this->rewardSpellCast       = $dbRow->rewardSpellCast;
+        $this->rewardHonorPoints     = $dbRow->rewardHonorPoints;
+        $this->rewardMailTemplateId  = $dbRow->rewardMailTemplateId;
+        $this->rewardMailDelay       = $dbRow->rewardMailDelay;
+        $this->rewardTitleId         = $dbRow->rewardTitleId;
+        $this->rewardTalents         = $dbRow->rewardTalents;
+        $this->rewardArenaPoints     = $dbRow->rewardArenaPoints;
+        $this->rewardItemId          = [$dbRow->rewardItemId1,          $dbRow->rewardItemId2,          $dbRow->rewardItemId3,          $dbRow->rewardItemId4];
+        $this->rewardItemCount       = [$dbRow->rewardItemCount1,       $dbRow->rewardItemCount2,       $dbRow->rewardItemCount3,       $dbRow->rewardItemCount4];
+        $this->rewardChoiceItemId    = [$dbRow->rewardChoiceItemId1,    $dbRow->rewardChoiceItemId2,    $dbRow->rewardChoiceItemId3,    $dbRow->rewardChoiceItemId4,    $dbRow->rewardChoiceItemId5,    $dbRow->rewardChoiceItemId6];
+        $this->rewardChoiceItemCount = [$dbRow->rewardChoiceItemCount1, $dbRow->rewardChoiceItemCount2, $dbRow->rewardChoiceItemCount3, $dbRow->rewardChoiceItemCount4, $dbRow->rewardChoiceItemCount5, $dbRow->rewardChoiceItemCount6];
+        $this->rewardFactionId       = [$dbRow->rewardFactionId1,       $dbRow->rewardFactionId2,       $dbRow->rewardFactionId3,       $dbRow->rewardFactionId4,       $dbRow->rewardFactionId5];
+        $this->rewardFactionValue    = [$dbRow->rewardFactionValue1,    $dbRow->rewardFactionValue2,    $dbRow->rewardFactionValue3,    $dbRow->rewardFactionValue4,    $dbRow->rewardFactionValue5];
+        $this->reqPlayerKills        = $dbRow->reqPlayerKills;
 
-        $this->reqItemId          = [$initData['reqItemId1'],          $initData['reqItemId2'],          $initData['reqItemId3'],          $initData['reqItemId4'],         $initData['reqItemId5'],         $initData['reqItemId6']];
-        $this->reqItemCount       = [$initData['reqItemCount1'],       $initData['reqItemCount2'],       $initData['reqItemCount3'],       $initData['reqItemCount4'],      $initData['reqItemCount5'],      $initData['reqItemCount6']];
-        $this->reqNpcOrGo         = [$initData['reqNpcOrGo1'],         $initData['reqNpcOrGo2'],         $initData['reqNpcOrGo3'],         $initData['reqNpcOrGo4']];
-        $this->reqNpcOrGoCount    = [$initData['reqNpcOrGoCount1'],    $initData['reqNpcOrGoCount2'],    $initData['reqNpcOrGoCount3'],    $initData['reqNpcOrGoCount4']];
-        $this->reqSourceItemId    = [$initData['reqSourceItemId1'],    $initData['reqSourceItemId2'],    $initData['reqSourceItemId3'],    $initData['reqSourceItemId4']];
-        $this->reqSourceItemCount = [$initData['reqSourceItemCount1'], $initData['reqSourceItemCount2'], $initData['reqSourceItemCount3'], $initData['reqSourceItemCount4']];
-        $this->reqFactionId       = [$initData['reqFactionId1'],       $initData['reqFactionId2']];
-        $this->reqFactionValue    = [$initData['reqFactionValue1'],    $initData['reqFactionValue2']];
+        $this->reqItemId          = [$dbRow->reqItemId1,          $dbRow->reqItemId2,          $dbRow->reqItemId3,          $dbRow->reqItemId4,         $dbRow->reqItemId5,         $dbRow->reqItemId6];
+        $this->reqItemCount       = [$dbRow->reqItemCount1,       $dbRow->reqItemCount2,       $dbRow->reqItemCount3,       $dbRow->reqItemCount4,      $dbRow->reqItemCount5,      $dbRow->reqItemCount6];
+        $this->reqNpcOrGo         = [$dbRow->reqNpcOrGo1,         $dbRow->reqNpcOrGo2,         $dbRow->reqNpcOrGo3,         $dbRow->reqNpcOrGo4];
+        $this->reqNpcOrGoCount    = [$dbRow->reqNpcOrGoCount1,    $dbRow->reqNpcOrGoCount2,    $dbRow->reqNpcOrGoCount3,    $dbRow->reqNpcOrGoCount4];
+        $this->reqSourceItemId    = [$dbRow->reqSourceItemId1,    $dbRow->reqSourceItemId2,    $dbRow->reqSourceItemId3,    $dbRow->reqSourceItemId4];
+        $this->reqSourceItemCount = [$dbRow->reqSourceItemCount1, $dbRow->reqSourceItemCount2, $dbRow->reqSourceItemCount3, $dbRow->reqSourceItemCount4];
+        $this->reqFactionId       = [$dbRow->reqFactionId1,       $dbRow->reqFactionId2];
+        $this->reqFactionValue    = [$dbRow->reqFactionValue1,    $dbRow->reqFactionValue2];
 
         // category
         $cat2 = 0;
         foreach (Game::QUEST_CLASSES as $c2 => $c1)
         {
-            if (!in_array($initData['questSortId'], $c1))
+            if (!in_array($dbRow->questSortId, $c1))
                 continue;
 
             $cat2 = $c2;
             break;
         }
-        $this->category1 = $initData['questSortId'];
+        $this->category1 = $dbRow->questSortId;
         $this->category2 = $cat2;
 
         // sort rewards into item + currency
         static::$currencyItemPairs ??= (DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, `itemId` FROM ::currencies') ?: []);
 
-        if ($_ = $initData['rewardTitleId'])
+        if ($_ = $dbRow->rewardTitleId)
             $rewards[Type::TITLE][] = $_;
 
-        if ($_ = $initData['rewardHonorPoints'])
+        if ($_ = $dbRow->rewardHonorPoints)
             $this->rewardCurrencies[CURRENCY_HONOR_POINTS] = $_;
-        if ($_ = $initData['rewardArenaPoints'])
+        if ($_ = $dbRow->rewardArenaPoints)
             $this->rewardCurrencies[CURRENCY_ARENA_POINTS] = $_;
 
         foreach (array_filter($this->rewardItemId) as $i => $rewItem)

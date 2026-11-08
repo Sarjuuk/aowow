@@ -294,7 +294,7 @@ class SpellEntry extends DBTypeEntry implements ISource, ITooltip
         'src' => ['j' => ['::source src ON `type` = 6 AND `typeId` = s.`id`', true], 's' => ', `moreType`, `moreTypeId`, `moreZoneId`, `moreMask`, `src1`, `src2`, `src3`, `src4`, `src5`, `src6`, `src7`, `src8`, `src9`, `src10`, `src11`, `src12`, `src13`, `src14`, `src15`, `src16`, `src17`, `src18`, `src19`, `src20`, `src21`, `src22`, `src23`, `src24`']
     );
 
-    public function __construct(int|array $initData, array $extraOpts = [])
+    public function __construct(\Dibi\Row|int $initData, array $extraOpts = [])
     {
         $this->refSpells = new SpellContainer(null);        // initialize empty container
 
@@ -308,143 +308,143 @@ class SpellEntry extends DBTypeEntry implements ISource, ITooltip
 
     }
 
-    public function applyInitData(array $initData, array $opts) : bool
+    public function applyInitData(\Dibi\Row $dbRow, array $opts) : bool
     {
-        parent::applyInitData($initData, $opts);
+        parent::applyInitData($dbRow, $opts);
 
-        $this->cuFlags                    = $initData['cuFlags'];
-        $this->name                       = new LocString($initData, 'name');
-        $this->rank                       = new LocString($initData, 'rank');
-        $this->buff                       = new LocString($initData, 'buff');
-        $this->description                = new LocString($initData, 'description');
-        $this->category                   = $initData['category'];
-        $this->dispelType                 = $initData['dispelType'];
-        $this->mechanic                   = $initData['mechanic'];
-        $this->attributes                 = [$initData['attributes0'], $initData['attributes1'], $initData['attributes2'], $initData['attributes3'], $initData['attributes4'], $initData['attributes5'], $initData['attributes6'], $initData['attributes7']];
-        $this->typeCat                    = $initData['typeCat'];
-        $this->targets                    = $initData['targets'];
-        $this->spellFocusObject           = $initData['spellFocusObject'];
-        $this->stackAmount                = $initData['stackAmount'];
-        $this->spellVisualId              = $initData['spellVisualId'];
-        $this->maxTargetLevel             = $initData['maxTargetLevel'];
-        $this->maxAffectedTargets         = $initData['maxAffectedTargets'];
-        $this->damageClass                = $initData['damageClass'];
-        $this->learnedAt                  = $initData['learnedAt'];
-        $this->skillLevelGrey             = $initData['skillLevelGrey'];
-        $this->skillLevelYellow           = $initData['skillLevelYellow'];
-        $this->trainingCost               = $initData['trainingCost'];
-        $this->schoolMask                 = $initData['schoolMask'];
-        $this->spellDescriptionVariableId = $initData['spellDescriptionVariableId'];
+        $this->cuFlags                    = $dbRow->cuFlags;
+        $this->name                       = new LocString($dbRow, 'name');
+        $this->rank                       = new LocString($dbRow, 'rank');
+        $this->buff                       = new LocString($dbRow, 'buff');
+        $this->description                = new LocString($dbRow, 'description');
+        $this->category                   = $dbRow->category;
+        $this->dispelType                 = $dbRow->dispelType;
+        $this->mechanic                   = $dbRow->mechanic;
+        $this->attributes                 = [$dbRow->attributes0, $dbRow->attributes1, $dbRow->attributes2, $dbRow->attributes3, $dbRow->attributes4, $dbRow->attributes5, $dbRow->attributes6, $dbRow->attributes7];
+        $this->typeCat                    = $dbRow->typeCat;
+        $this->targets                    = $dbRow->targets;
+        $this->spellFocusObject           = $dbRow->spellFocusObject;
+        $this->stackAmount                = $dbRow->stackAmount;
+        $this->spellVisualId              = $dbRow->spellVisualId;
+        $this->maxTargetLevel             = $dbRow->maxTargetLevel;
+        $this->maxAffectedTargets         = $dbRow->maxAffectedTargets;
+        $this->damageClass                = $dbRow->damageClass;
+        $this->learnedAt                  = $dbRow->learnedAt;
+        $this->skillLevelGrey             = $dbRow->skillLevelGrey;
+        $this->skillLevelYellow           = $dbRow->skillLevelYellow;
+        $this->trainingCost               = $dbRow->trainingCost;
+        $this->schoolMask                 = $dbRow->schoolMask;
+        $this->spellDescriptionVariableId = $dbRow->spellDescriptionVariableId;
 
-        $this->castTime         = $initData['castTime']         ?? 0;
-        $this->castTimePerLevel = $initData['castTimePerLevel'] ?? 0;
-        $this->minCastTime      = $initData['minCastTime']      ?? 0;
+        $this->castTime         = $dbRow->castTime         ?? 0;
+        $this->castTimePerLevel = $dbRow->castTimePerLevel ?? 0;
+        $this->minCastTime      = $dbRow->minCastTime      ?? 0;
 
-        $this->duration         = $initData['duration']         ?? 0;
-        $this->durationPerLevel = $initData['durationPerLevel'] ?? 0;
-        $this->maxDuration      = $initData['maxDuration']      ?? 0;
+        $this->duration         = $dbRow->duration         ?? 0;
+        $this->durationPerLevel = $dbRow->durationPerLevel ?? 0;
+        $this->maxDuration      = $dbRow->maxDuration      ?? 0;
 
-        $this->casterAuraSpell    = $initData['casterAuraSpell'];
-        $this->casterAuraSpellNot = $initData['casterAuraSpellNot'];
-        $this->targetAuraSpell    = $initData['targetAuraSpell'];
-        $this->targetAuraSpellNot = $initData['targetAuraSpellNot'];
+        $this->casterAuraSpell    = $dbRow->casterAuraSpell;
+        $this->casterAuraSpellNot = $dbRow->casterAuraSpellNot;
+        $this->targetAuraSpell    = $dbRow->targetAuraSpell;
+        $this->targetAuraSpellNot = $dbRow->targetAuraSpellNot;
 
-        $this->recoveryTime          = $initData['recoveryTime'];
-        $this->recoveryCategory      = $initData['recoveryCategory'];
-        $this->startRecoveryTime     = $initData['startRecoveryTime'];
-        $this->startRecoveryCategory = $initData['startRecoveryCategory'];
+        $this->recoveryTime          = $dbRow->recoveryTime;
+        $this->recoveryCategory      = $dbRow->recoveryCategory;
+        $this->startRecoveryTime     = $dbRow->startRecoveryTime;
+        $this->startRecoveryCategory = $dbRow->startRecoveryCategory;
 
-        $this->procChance   = $initData['procChance'];
-        $this->procCharges  = $initData['procCharges'];
-        $this->procCustom   = $initData['procCustom'];
-        $this->procCooldown = $initData['procCooldown'];
+        $this->procChance   = $dbRow->procChance;
+        $this->procCharges  = $dbRow->procCharges;
+        $this->procCustom   = $dbRow->procCustom;
+        $this->procCooldown = $dbRow->procCooldown;
 
-        $this->maxLevel    = $initData['maxLevel'];
-        $this->baseLevel   = $initData['baseLevel'];
-        $this->spellLevel  = $initData['spellLevel'];
-        $this->talentLevel = $initData['talentLevel'];
+        $this->maxLevel    = $dbRow->maxLevel;
+        $this->baseLevel   = $dbRow->baseLevel;
+        $this->spellLevel  = $dbRow->spellLevel;
+        $this->talentLevel = $dbRow->talentLevel;
 
-        $this->powerType              = $initData['powerType'];
-        $this->powerCost              = $initData['powerCost'];
-        $this->powerCostPerLevel      = $initData['powerCostPerLevel'];
-        $this->powerCostPercent       = $initData['powerCostPercent'];
-        $this->powerPerSecond         = $initData['powerPerSecond'];
-        $this->powerCostRunes         = $initData['powerCostRunes'];
+        $this->powerType              = $dbRow->powerType;
+        $this->powerCost              = $dbRow->powerCost;
+        $this->powerCostPerLevel      = $dbRow->powerCostPerLevel;
+        $this->powerCostPercent       = $dbRow->powerCostPercent;
+        $this->powerPerSecond         = $dbRow->powerPerSecond;
+        $this->powerCostRunes         = $dbRow->powerCostRunes;
 
-        $this->rangeType       = $initData['rangeType']       ?? 0;
-        $this->rangeMaxHostile = $initData['rangeMaxHostile'] ?? 0;
-        $this->rangeMinHostile = $initData['rangeMinHostile'] ?? 0;
-        $this->rangeMinFriend  = $initData['rangeMinFriend']  ?? 0;
-        $this->rangeMaxFriend  = $initData['rangeMaxFriend']  ?? 0;
-        $this->rangeText       = new LocString($initData, 'rangeText');
+        $this->rangeType       = $dbRow->rangeType       ?? 0;
+        $this->rangeMaxHostile = $dbRow->rangeMaxHostile ?? 0;
+        $this->rangeMinHostile = $dbRow->rangeMinHostile ?? 0;
+        $this->rangeMinFriend  = $dbRow->rangeMinFriend  ?? 0;
+        $this->rangeMaxFriend  = $dbRow->rangeMaxFriend  ?? 0;
+        $this->rangeText       = new LocString($dbRow, 'rangeText');
 
-        $this->tool         = [$initData['tool1'],         $initData['tool2']];
-        $this->toolCategory = [$initData['toolCategory1'], $initData['toolCategory2']];
-        $this->reagent      = [$initData['reagent1'],     $initData['reagent2'],     $initData['reagent3'],     $initData['reagent4'],     $initData['reagent5'],     $initData['reagent6'],     $initData['reagent7'],     $initData['reagent8']];
-        $this->reagentCount = [$initData['reagentCount1'],$initData['reagentCount2'],$initData['reagentCount3'],$initData['reagentCount4'],$initData['reagentCount5'],$initData['reagentCount6'],$initData['reagentCount7'],$initData['reagentCount8']];
+        $this->tool         = [$dbRow->tool1,         $dbRow->tool2];
+        $this->toolCategory = [$dbRow->toolCategory1, $dbRow->toolCategory2];
+        $this->reagent      = [$dbRow->reagent1,     $dbRow->reagent2,     $dbRow->reagent3,     $dbRow->reagent4,     $dbRow->reagent5,     $dbRow->reagent6,     $dbRow->reagent7,     $dbRow->reagent8];
+        $this->reagentCount = [$dbRow->reagentCount1,$dbRow->reagentCount2,$dbRow->reagentCount3,$dbRow->reagentCount4,$dbRow->reagentCount5,$dbRow->reagentCount6,$dbRow->reagentCount7,$dbRow->reagentCount8];
 
-        $this->iconId    = $initData['iconId'];
-        $this->icon      = ($initData['icon']     ?? null) ?: DEFAULT_ICON;;
-        $this->iconIdAlt = $initData['iconIdAlt'] ?? null;
-        $this->iconAlt   = $initData['iconAlt']   ?? null;
+        $this->iconId    = $dbRow->iconId;
+        $this->icon      = ($dbRow->icon     ?? null) ?: DEFAULT_ICON;;
+        $this->iconIdAlt = $dbRow->iconIdAlt ?? null;
+        $this->iconAlt   = $dbRow->iconAlt   ?? null;
 
-        $this->equippedItemClass             = $initData['equippedItemClass'];
-        $this->equippedItemSubClassMask      = $initData['equippedItemSubClassMask'];
-        $this->equippedItemInventoryTypeMask = $initData['equippedItemInventoryTypeMask'];
-        $this->reqClassMask                  = ($_ = $initData['reqClassMask'] & ChrClass::MASK_ALL) == ChrClass::MASK_ALL ? 0 : $_;
-        $this->reqRaceMask                   = ($_ = $initData['reqRaceMask']  & ChrRace::MASK_ALL)  == ChrRace::MASK_ALL  ? 0 : $_;
-        $this->reqSpellId                    = $initData['reqSpellId'];
-        $this->reqSkillLevel                 = $initData['reqSkillLevel'];
-        $this->stanceMask                    = $initData['stanceMask'];
-        $this->minFactionId                  = $initData['minFactionId'];
-        $this->minReputation                 = $initData['minReputation'];
+        $this->equippedItemClass             = $dbRow->equippedItemClass;
+        $this->equippedItemSubClassMask      = $dbRow->equippedItemSubClassMask;
+        $this->equippedItemInventoryTypeMask = $dbRow->equippedItemInventoryTypeMask;
+        $this->reqClassMask                  = ($_ = $dbRow->reqClassMask & ChrClass::MASK_ALL) == ChrClass::MASK_ALL ? 0 : $_;
+        $this->reqRaceMask                   = ($_ = $dbRow->reqRaceMask  & ChrRace::MASK_ALL)  == ChrRace::MASK_ALL  ? 0 : $_;
+        $this->reqSpellId                    = $dbRow->reqSpellId;
+        $this->reqSkillLevel                 = $dbRow->reqSkillLevel;
+        $this->stanceMask                    = $dbRow->stanceMask;
+        $this->minFactionId                  = $dbRow->minFactionId;
+        $this->minReputation                 = $dbRow->minReputation;
 
-        $this->effectId                  = [$initData['effect1Id'],                  $initData['effect2Id'],                  $initData['effect3Id']                 ];
-        $this->effectDieSides            = [$initData['effect1DieSides'],            $initData['effect2DieSides'],            $initData['effect3DieSides']           ];
-        $this->effectRealPointsPerLevel  = [$initData['effect1RealPointsPerLevel'],  $initData['effect2RealPointsPerLevel'],  $initData['effect3RealPointsPerLevel'] ];
-        $this->effectBasePoints          = [$initData['effect1BasePoints'],          $initData['effect2BasePoints'],          $initData['effect3BasePoints']         ];
-        $this->effectMechanic            = [$initData['effect1Mechanic'],            $initData['effect2Mechanic'],            $initData['effect3Mechanic']           ];
-        $this->effectImplicitTargetA     = [$initData['effect1ImplicitTargetA'],     $initData['effect2ImplicitTargetA'],     $initData['effect3ImplicitTargetA']    ];
-        $this->effectImplicitTargetB     = [$initData['effect1ImplicitTargetB'],     $initData['effect2ImplicitTargetB'],     $initData['effect3ImplicitTargetB']    ];
-        $this->effectRadiusMax           = [$initData['effect1RadiusMax'],           $initData['effect2RadiusMax'],           $initData['effect3RadiusMax']          ];
-        $this->effectAuraId              = [$initData['effect1AuraId'],              $initData['effect2AuraId'],              $initData['effect3AuraId']             ];
-        $this->effectPeriode             = [$initData['effect1Periode'],             $initData['effect2Periode'],             $initData['effect3Periode']            ];
-        $this->effectChainTarget         = [$initData['effect1ChainTarget'],         $initData['effect2ChainTarget'],         $initData['effect3ChainTarget']        ];
-        $this->effectCreateItemId        = [$initData['effect1CreateItemId'],        $initData['effect2CreateItemId'],        $initData['effect3CreateItemId']       ];
-        $this->effectMiscValue           = [$initData['effect1MiscValue'],           $initData['effect2MiscValue'],           $initData['effect3MiscValue']          ];
-        $this->effectMiscValueB          = [$initData['effect1MiscValueB'],          $initData['effect2MiscValueB'],          $initData['effect3MiscValueB']         ];
-        $this->effectTriggerSpell        = [$initData['effect1TriggerSpell'],        $initData['effect2TriggerSpell'],        $initData['effect3TriggerSpell']       ];
-        $this->effectPointsPerComboPoint = [$initData['effect1PointsPerComboPoint'], $initData['effect2PointsPerComboPoint'], $initData['effect3PointsPerComboPoint']];
-        $this->effectSpellClassMaskA     = [$initData['effect1SpellClassMaskA'],     $initData['effect2SpellClassMaskA'],     $initData['effect3SpellClassMaskA']    ];
-        $this->effectSpellClassMaskB     = [$initData['effect1SpellClassMaskB'],     $initData['effect2SpellClassMaskB'],     $initData['effect3SpellClassMaskB']    ];
-        $this->effectSpellClassMaskC     = [$initData['effect1SpellClassMaskC'],     $initData['effect2SpellClassMaskC'],     $initData['effect3SpellClassMaskC']    ];
-        $this->effectValueMultiplier     = [$initData['effect1ValueMultiplier'],     $initData['effect2ValueMultiplier'],     $initData['effect3ValueMultiplier']    ];
-        $this->effectDamageMultiplier    = [$initData['effect1DamageMultiplier'],    $initData['effect2DamageMultiplier'],    $initData['effect3DamageMultiplier']   ];
-        $this->effectBonusMultiplier     = [$initData['effect1BonusMultiplier'],     $initData['effect2BonusMultiplier'],     $initData['effect3BonusMultiplier']    ];
+        $this->effectId                  = [$dbRow->effect1Id,                  $dbRow->effect2Id,                  $dbRow->effect3Id                 ];
+        $this->effectDieSides            = [$dbRow->effect1DieSides,            $dbRow->effect2DieSides,            $dbRow->effect3DieSides           ];
+        $this->effectRealPointsPerLevel  = [$dbRow->effect1RealPointsPerLevel,  $dbRow->effect2RealPointsPerLevel,  $dbRow->effect3RealPointsPerLevel ];
+        $this->effectBasePoints          = [$dbRow->effect1BasePoints,          $dbRow->effect2BasePoints,          $dbRow->effect3BasePoints         ];
+        $this->effectMechanic            = [$dbRow->effect1Mechanic,            $dbRow->effect2Mechanic,            $dbRow->effect3Mechanic           ];
+        $this->effectImplicitTargetA     = [$dbRow->effect1ImplicitTargetA,     $dbRow->effect2ImplicitTargetA,     $dbRow->effect3ImplicitTargetA    ];
+        $this->effectImplicitTargetB     = [$dbRow->effect1ImplicitTargetB,     $dbRow->effect2ImplicitTargetB,     $dbRow->effect3ImplicitTargetB    ];
+        $this->effectRadiusMax           = [$dbRow->effect1RadiusMax,           $dbRow->effect2RadiusMax,           $dbRow->effect3RadiusMax          ];
+        $this->effectAuraId              = [$dbRow->effect1AuraId,              $dbRow->effect2AuraId,              $dbRow->effect3AuraId             ];
+        $this->effectPeriode             = [$dbRow->effect1Periode,             $dbRow->effect2Periode,             $dbRow->effect3Periode            ];
+        $this->effectChainTarget         = [$dbRow->effect1ChainTarget,         $dbRow->effect2ChainTarget,         $dbRow->effect3ChainTarget        ];
+        $this->effectCreateItemId        = [$dbRow->effect1CreateItemId,        $dbRow->effect2CreateItemId,        $dbRow->effect3CreateItemId       ];
+        $this->effectMiscValue           = [$dbRow->effect1MiscValue,           $dbRow->effect2MiscValue,           $dbRow->effect3MiscValue          ];
+        $this->effectMiscValueB          = [$dbRow->effect1MiscValueB,          $dbRow->effect2MiscValueB,          $dbRow->effect3MiscValueB         ];
+        $this->effectTriggerSpell        = [$dbRow->effect1TriggerSpell,        $dbRow->effect2TriggerSpell,        $dbRow->effect3TriggerSpell       ];
+        $this->effectPointsPerComboPoint = [$dbRow->effect1PointsPerComboPoint, $dbRow->effect2PointsPerComboPoint, $dbRow->effect3PointsPerComboPoint];
+        $this->effectSpellClassMaskA     = [$dbRow->effect1SpellClassMaskA,     $dbRow->effect2SpellClassMaskA,     $dbRow->effect3SpellClassMaskA    ];
+        $this->effectSpellClassMaskB     = [$dbRow->effect1SpellClassMaskB,     $dbRow->effect2SpellClassMaskB,     $dbRow->effect3SpellClassMaskB    ];
+        $this->effectSpellClassMaskC     = [$dbRow->effect1SpellClassMaskC,     $dbRow->effect2SpellClassMaskC,     $dbRow->effect3SpellClassMaskC    ];
+        $this->effectValueMultiplier     = [$dbRow->effect1ValueMultiplier,     $dbRow->effect2ValueMultiplier,     $dbRow->effect3ValueMultiplier    ];
+        $this->effectDamageMultiplier    = [$dbRow->effect1DamageMultiplier,    $dbRow->effect2DamageMultiplier,    $dbRow->effect3DamageMultiplier   ];
+        $this->effectBonusMultiplier     = [$dbRow->effect1BonusMultiplier,     $dbRow->effect2BonusMultiplier,     $dbRow->effect3BonusMultiplier    ];
 
-        $this->spellFamilyId    = $initData['spellFamilyId'];
-        $this->spellFamilyFlags = [$initData['spellFamilyFlags1'], $initData['spellFamilyFlags2'], $initData['spellFamilyFlags3']];
+        $this->spellFamilyId    = $dbRow->spellFamilyId;
+        $this->spellFamilyFlags = [$dbRow->spellFamilyFlags1, $dbRow->spellFamilyFlags2, $dbRow->spellFamilyFlags3];
 
         // unpack skillLines
         $sl = [];
-        if ($initData['skillLine1'] < 0)
+        if ($dbRow->skillLine1 < 0)
         {
-            foreach (Game::$skillLineMask[$initData['skillLine1']] as $idx => [, $skillLineId])
-                if ($initData['skillLine2OrMask'] & (1 << $idx))
+            foreach (Game::$skillLineMask[$dbRow->skillLine1] as $idx => [, $skillLineId])
+                if ($dbRow->skillLine2OrMask & (1 << $idx))
                     $sl[] = $skillLineId;
         }
         else
         {
             // note: for Basic Campfire (818) the deprecated skill Survival (142) is shown before Cooking
-            if ($_ = $initData['skillLine1'])
+            if ($_ = $dbRow->skillLine1)
                 $sl[] = $_;
-            if ($_ = $initData['skillLine2OrMask'])
+            if ($_ = $dbRow->skillLine2OrMask)
                 $sl[] = $_;
         }
 
         $this->skillLines = $sl;
 
-        $this->initSources($initData);
+        $this->initSources($dbRow);
 
         $this->error = false;                               // prematurely set as o.k. or the import fails
         $this->refSpells->import($this);

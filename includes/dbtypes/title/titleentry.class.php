@@ -34,24 +34,24 @@ class TitleEntry extends DBTypeEntry
         'src' => ['j' => ['::source src ON `type` = 11 AND `typeId` = t.`id`', true], 's' => ', `src4`, `src12`, `src13`, `moreType`, `moreTypeId`, `moreZoneId`, `moreMask`']
     );
 
-    public function applyInitData(array $initData, array $opts) : bool
+    public function applyInitData(\Dibi\Row $dbRow, array $opts) : bool
     {
-        parent::applyInitData($initData, $opts);
+        parent::applyInitData($dbRow, $opts);
 
-        $this->cuFlags   = $initData['cuFlags'];
-        $this->name      = new LocString($initData, 'male', formatter: self::trim(...));
-        $this->male      = new LocString($initData, 'male');
-        $this->female    = new LocString($initData, 'female');
-        $this->category  = $initData['category'];
-        $this->gender    = $initData['gender'];
-        $this->side      = $initData['side'];
-        $this->expansion = $initData['expansion'];
-        $this->eventId   = $initData['eventId'];
-        $this->bitIdx    = $initData['bitIdx'];
-        $this->src12Ext  = $initData['src12Ext'];
+        $this->cuFlags   = $dbRow->cuFlags;
+        $this->name      = new LocString($dbRow, 'male', formatter: self::trim(...));
+        $this->male      = new LocString($dbRow, 'male');
+        $this->female    = new LocString($dbRow, 'female');
+        $this->category  = $dbRow->category;
+        $this->gender    = $dbRow->gender;
+        $this->side      = $dbRow->side;
+        $this->expansion = $dbRow->expansion;
+        $this->eventId   = $dbRow->eventId;
+        $this->bitIdx    = $dbRow->bitIdx;
+        $this->src12Ext  = $dbRow->src12Ext;
 
         // preparse sources - notice: under this system titles can't have more than one source (or two for achivements), which is enough for standard TC cases but may break custom cases
-        $this->initSources($initData, $initData['src12Ext'] ?: 0);
+        $this->initSources($dbRow, $dbRow->src12Ext ?: 0);
 
         return true;
     }

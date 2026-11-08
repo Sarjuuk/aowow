@@ -46,26 +46,26 @@ class AchievementEntry extends DBTypeEntry implements ISource, ITooltip
         'ac' => ['j' => ['::achievementcriteria ac ON ac.`refAchievementId` = a.`id`', true], 'g' => 'a.`id`']
     );
 
-    public function applyInitData(array $initData, array $opts) : bool
+    public function applyInitData(\Dibi\Row $dbRow, array $opts) : bool
     {
-        parent::applyInitData($initData, $opts);
+        parent::applyInitData($dbRow, $opts);
 
-        $this->cuFlags          = $initData['cuFlags'];
-        $this->name             = new LocString($initData, 'name');
-        $this->description      = new LocString($initData, 'description');
-        $this->rewardText       = new LocString($initData, 'reward');
-        $this->points           = $initData['points'];
-        $this->category         = $initData['category'];
-        $this->parentCat        = $initData['parentCat'];
-        $this->iconId           = $initData['iconId'];
-        $this->icon             = $initData['icon'] ?: 'trade_engineering';
-        $this->faction          = $initData['faction'];
-        $this->refAchievement   = $initData['refAchievement'];
-        $this->flags            = $initData['flags'];
-        $this->chainId          = $initData['chainId'];
-        $this->chainPos         = $initData['chainPos'];
-        $this->reqCriteriaCount = $initData['reqCriteriaCount'];
-        $this->itemExtra        = $initData['itemExtra'] ?? 0;
+        $this->cuFlags          = $dbRow->cuFlags;
+        $this->name             = new LocString($dbRow, 'name');
+        $this->description      = new LocString($dbRow, 'description');
+        $this->rewardText       = new LocString($dbRow, 'reward');
+        $this->points           = $dbRow->points;
+        $this->category         = $dbRow->category;
+        $this->parentCat        = $dbRow->parentCat;
+        $this->iconId           = $dbRow->iconId;
+        $this->icon             = $dbRow->icon ?: 'trade_engineering';
+        $this->faction          = $dbRow->faction;
+        $this->refAchievement   = $dbRow->refAchievement;
+        $this->flags            = $dbRow->flags;
+        $this->chainId          = $dbRow->chainId;
+        $this->chainPos         = $dbRow->chainPos;
+        $this->reqCriteriaCount = $dbRow->reqCriteriaCount;
+        $this->itemExtra        = $dbRow->itemExtra ?? 0;
 
         return true;
     }

@@ -43,35 +43,35 @@ class EnchantmentEntry extends DBTypeEntry
         'is' => ['j' => ['::item_stats `is`  ON `is`.`type` = 502 AND `is`.`typeId` = `ie`.`id`', true], 's' => ', `is`.*'],
     );
 
-    public function applyInitData(array $initData, array $opts) : bool
+    public function applyInitData(\Dibi\Row $dbRow, array $opts) : bool
     {
-        parent::applyInitData($initData, $opts);
+        parent::applyInitData($dbRow, $opts);
 
-        $this->cuFlags       = $initData['cuFlags'];
-        $this->name          = new LocString($initData, 'name');
-        $this->charges       = $initData['charges'];
-        $this->procChance    = $initData['procChance'];
-        $this->ppmRate       = $initData['ppmRate'];
-        $this->type          = [$initData['type1'],   $initData['type2'],   $initData['type3']];
-        $this->amount        = [$initData['amount1'], $initData['amount2'], $initData['amount3']];
-        $this->object        = [$initData['object1'], $initData['object2'], $initData['object3']];
-        $this->conditionId   = $initData['conditionId'];
-        $this->skillLine     = $initData['skillLine'];
-        $this->skillLevel    = $initData['skillLevel'];
-        $this->requiredLevel = $initData['requiredLevel'];
-        $this->itemStats     = (new StatsContainer)->fromJson($initData, true);
+        $this->cuFlags       = $dbRow->cuFlags;
+        $this->name          = new LocString($dbRow, 'name');
+        $this->charges       = $dbRow->charges;
+        $this->procChance    = $dbRow->procChance;
+        $this->ppmRate       = $dbRow->ppmRate;
+        $this->type          = [$dbRow->type1,   $dbRow->type2,   $dbRow->type3];
+        $this->amount        = [$dbRow->amount1, $dbRow->amount2, $dbRow->amount3];
+        $this->object        = [$dbRow->object1, $dbRow->object2, $dbRow->object3];
+        $this->conditionId   = $dbRow->conditionId;
+        $this->skillLine     = $dbRow->skillLine;
+        $this->skillLevel    = $dbRow->skillLevel;
+        $this->requiredLevel = $dbRow->requiredLevel;
+        $this->itemStats     = (new StatsContainer)->fromJson($dbRow, true);
 
         $spells = [];
         for ($i = 1; $i < 4; $i++)
         {
-            if ($initData['object'.$i] <= 0)
+            if ($dbRow['object'.$i] <= 0)
                 continue;
 
-            $spells[] = match ($initData['type'.$i])        // SPELL_TRIGGER_* just reused for wording
+            $spells[] = match ($dbRow['type'.$i])        // SPELL_TRIGGER_* just reused for wording
             {
-                ENCHANTMENT_TYPE_EQUIP_SPELL  => [$initData['object'.$i], SPELL_TRIGGER_EQUIP, $initData['charges'], 0],
-                ENCHANTMENT_TYPE_USE_SPELL    => [$initData['object'.$i], SPELL_TRIGGER_USE,   $initData['charges'], 0],
-                ENCHANTMENT_TYPE_COMBAT_SPELL => [$initData['object'.$i], SPELL_TRIGGER_HIT,   $initData['charges'], -$initData['ppmRate'] ?: ($initData['procChance'] ?: $initData['amount'.$i])],
+                ENCHANTMENT_TYPE_EQUIP_SPELL  => [$dbRow['object'.$i], SPELL_TRIGGER_EQUIP, $dbRow->charges, 0],
+                ENCHANTMENT_TYPE_USE_SPELL    => [$dbRow['object'.$i], SPELL_TRIGGER_USE,   $dbRow->charges, 0],
+                ENCHANTMENT_TYPE_COMBAT_SPELL => [$dbRow['object'.$i], SPELL_TRIGGER_HIT,   $dbRow->charges, -$dbRow->ppmRate ?: ($dbRow->procChance ?: $dbRow['amount'.$i])],
                 default                       => null
             };
         }

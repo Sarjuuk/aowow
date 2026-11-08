@@ -10,7 +10,7 @@ class LocString implements \JsonSerializable
 {
     private \WeakMap $store;
 
-    public function __construct(array &$data, string $key = 'name',  private ?\Closure $formatter = null, bool $pruneFromSrc = false)
+    public function __construct(\Dibi\Row|array &$data, string $key = 'name',  private ?\Closure $formatter = null, bool $pruneFromSrc = false)
     {
         $this->store = new \WeakMap();
 

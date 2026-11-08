@@ -35,21 +35,21 @@ class CharRaceEntry extends DBTypeEntry
         'ic1' => ['j' => ['::icons ic1 ON ic1.`id` = r.`iconId1`', true], 's' => ', ic1.`name` AS "iconFemale"']
     );
 
-    public function applyInitData(array $initData, array $opts) : bool
+    public function applyInitData(\Dibi\Row $dbRow, array $opts) : bool
     {
-        parent::applyInitData($initData, $opts);
+        parent::applyInitData($dbRow, $opts);
 
-        $this->cuFlags     = $initData['cuFlags'];
-        $this->name        = new LocString($initData, 'name');
-        $this->classMask   = $initData['classMask'];
-        $this->factionId   = $initData['factionId'];
-        $this->startAreaId = $initData['startAreaId'];
-        $this->leader      = $initData['leader'];
-        $this->side        = $initData['side'];
-        $this->fileString  = $initData['fileString'];
-        $this->iconId      = [$initData['iconId0'], $initData['iconId1']];
-        $this->icon        = [$initData['iconMale'], $initData['iconFemale']];
-        $this->expansion   = $initData['expansion'];
+        $this->cuFlags     = $dbRow->cuFlags;
+        $this->name        = new LocString($dbRow, 'name');
+        $this->classMask   = $dbRow->classMask;
+        $this->factionId   = $dbRow->factionId;
+        $this->startAreaId = $dbRow->startAreaId;
+        $this->leader      = $dbRow->leader;
+        $this->side        = $dbRow->side;
+        $this->fileString  = $dbRow->fileString;
+        $this->iconId      = [$dbRow->iconId0,  $dbRow->iconId1];
+        $this->icon        = [$dbRow->iconMale, $dbRow->iconFemale];
+        $this->expansion   = $dbRow->expansion;
 
         return true;
     }

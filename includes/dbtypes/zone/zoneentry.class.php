@@ -37,41 +37,41 @@ class ZoneEntry extends DBTypeEntry
 
     public const string QUERY_BASE = 'SELECT z.*, z.`id` AS ARRAY_KEY FROM ::zones z';
 
-    public function applyInitData(array $initData, array $opts) : bool
+    public function applyInitData(\Dibi\Row $dbRow, array $opts) : bool
     {
-        parent::applyInitData($initData, $opts);
+        parent::applyInitData($dbRow, $opts);
 
-        $this->cuFlags       = $initData['cuFlags'];
-        $this->name          = new LocString($initData, 'name');
-        $this->mapId         = $initData['mapId'];
-        $this->mapIdBak      = $initData['mapIdBak'];
-        $this->parentArea    = $initData['parentArea'];
-        $this->category      = $initData['category'];
-        $this->flags         = $initData['flags'];
-        $this->faction       = $initData['faction'];
-        $this->expansion     = $initData['expansion'];
-        $this->type          = $initData['type'];
-        $this->maxPlayer     = $initData['maxPlayer'];
-        $this->itemLevelReqN = $initData['itemLevelReqN'];
-        $this->itemLevelReqH = $initData['itemLevelReqH'];
-        $this->levelReq      = $initData['levelReq'];
-        $this->levelReqLFG   = $initData['levelReqLFG'];
-        $this->levelHeroic   = $initData['levelHeroic'];
-        $this->levelMin      = $initData['levelMin'];
-        $this->levelMax      = $initData['levelMax'];
-        $this->parentMapId   = $initData['parentMapId'];
-        $this->parentX       = $initData['parentX'];
-        $this->parentY       = $initData['parentY'];
+        $this->cuFlags       = $dbRow->cuFlags;
+        $this->name          = new LocString($dbRow, 'name');
+        $this->mapId         = $dbRow->mapId;
+        $this->mapIdBak      = $dbRow->mapIdBak;
+        $this->parentArea    = $dbRow->parentArea;
+        $this->category      = $dbRow->category;
+        $this->flags         = $dbRow->flags;
+        $this->faction       = $dbRow->faction;
+        $this->expansion     = $dbRow->expansion;
+        $this->type          = $dbRow->type;
+        $this->maxPlayer     = $dbRow->maxPlayer;
+        $this->itemLevelReqN = $dbRow->itemLevelReqN;
+        $this->itemLevelReqH = $dbRow->itemLevelReqH;
+        $this->levelReq      = $dbRow->levelReq;
+        $this->levelReqLFG   = $dbRow->levelReqLFG;
+        $this->levelHeroic   = $dbRow->levelHeroic;
+        $this->levelMin      = $dbRow->levelMin;
+        $this->levelMax      = $dbRow->levelMax;
+        $this->parentMapId   = $dbRow->parentMapId;
+        $this->parentX       = $dbRow->parentX;
+        $this->parentY       = $dbRow->parentY;
 
         // unpack attunements
         $attnmt = [];
-        foreach (array_filter(explode(' ', $initData['attunementsN'])) as $req)
+        foreach (array_filter(explode(' ', $dbRow->attunementsN)) as $req)
         {
             [$type, $typeId] = explode(':', $req);
             $attnmt[$type] ??= [];
             $attnmt[$type][] = $typeId;
         }
-        foreach (array_filter(explode(' ', $initData['attunementsH'])) as $req)
+        foreach (array_filter(explode(' ', $dbRow->attunementsH)) as $req)
         {
             [$type, $typeId] = explode(':', $req);
             $attnmt[$type] ??= [];

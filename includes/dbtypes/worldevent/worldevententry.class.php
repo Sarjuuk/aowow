@@ -38,33 +38,33 @@ class WorldeventEntry extends DBTypeEntry implements ITooltip
         'ic' => ['j' => ['::icons ic ON ic.`id` = h.`iconId`',     true], 's' => ', ic.`name` AS "icon"']
     );
 
-    public function applyInitData(array $initData, array $opts) : bool
+    public function applyInitData(\Dibi\Row $dbRow, array $opts) : bool
     {
-        parent::applyInitData($initData, $opts);
+        parent::applyInitData($dbRow, $opts);
 
         // not linked to holiday > fix name
-        if (!$initData['holidayId'])
-            $initData['name_loc'.Lang::getLocale()->value] = $initData['nameINT'];
+        if (!$dbRow->holidayId)
+            $dbRow['name_loc'.Lang::getLocale()->value] = $dbRow->nameINT;
 
-        $this->cuFlags            = $initData['cuFlags'];
-        $this->name               = new LocString($initData, 'name');
-        $this->description        = new LocString($initData, 'description');
-        $this->holidayId          = $initData['holidayId'];
-        $this->startTime          = $initData['startTime'];
-        $this->endTime            = $initData['endTime'];
-        $this->occurence          = $initData['occurence'];
-        $this->length             = $initData['length'];
-        $this->requires           = explode(' ', $initData['requires']);
-        $this->bossCreature       = $initData['bossCreature'];
-        $this->achievementCatOrId = $initData['achievementCatOrId'];
-        $this->looping            = $initData['looping'];
-        $this->scheduleType       = $initData['scheduleType'];
-        $this->textureString      = $initData['textureString'];
-        $this->iconId             = $initData['iconId'];
-        $this->icon               = $initData['icon'] ?: 'trade_engineering';
+        $this->cuFlags            = $dbRow->cuFlags;
+        $this->name               = new LocString($dbRow, 'name');
+        $this->description        = new LocString($dbRow, 'description');
+        $this->holidayId          = $dbRow->holidayId;
+        $this->startTime          = $dbRow->startTime;
+        $this->endTime            = $dbRow->endTime;
+        $this->occurence          = $dbRow->occurence;
+        $this->length             = $dbRow->length;
+        $this->requires           = explode(' ', $dbRow->requires);
+        $this->bossCreature       = $dbRow->bossCreature;
+        $this->achievementCatOrId = $dbRow->achievementCatOrId;
+        $this->looping            = $dbRow->looping;
+        $this->scheduleType       = $dbRow->scheduleType;
+        $this->textureString      = $dbRow->textureString;
+        $this->iconId             = $dbRow->iconId;
+        $this->icon               = $dbRow->icon ?: 'trade_engineering';
 
         // emulate category
-        $this->category = match($initData['scheduleType'])
+        $this->category = match($dbRow->scheduleType)
         {
             -1      => 1,                                   // Holidays
              0, 1   => 2,                                   // Recurring

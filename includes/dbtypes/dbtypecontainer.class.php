@@ -44,31 +44,29 @@ abstract class DBTypeContainer
         // try to distribute found results equally across all dbs (realms)
         foreach ($conditions as $c)
             if (is_int($c))
-                $limit = $c;
+                $totalLimit = $c;
 
-        $limit ??= Listview::DEFAULT_SIZE;
+        $totalLimit ??= Listview::DEFAULT_SIZE;
 
-        if (count($targetDBs) > 1 && $limit)
+        if (count($targetDBs) > 1 && $totalLimit)
         {
-            $resultCache = [];
+            $realmLimits = [];
             foreach ($dbQuery->results() as $realmId => $result)
-                $resultCache[$realmId] = array(
-                    $result->getRowCount(),
-                    $result
-                );
+                $realmLimits[$realmId] = $result->getRowCount();
 
-            $total = array_sum(array_column($resultCache, 0));
-            foreach ($resultCache as [&$count, ])
-                $count = ceil($limit * $count / $total);
+            $total = array_sum($realmLimits);
+            foreach ($realmLimits as $k => $count)
+                $realmLimits[$k] = ceil($totalLimit * $count / $total);
 
-            foreach ($resultCache as $realmId => [$max, $result])
+            foreach ($dbQuery->results() as $realmId => $result)
             {
+                $perRealm = $realmLimits[$realmId];
                 foreach ($result->getIterator() as $row)
                 {
-                    if ($max-- <= 0 || $limit-- <= 0)
+                    if ($perRealm-- <= 0 || $totalLimit-- <= 0)
                         break;
 
-                    if (!($entry = new $entityClass((array)$row + ['realmId' => $realmId], $miscData))->error)
+                    if (!($entry = new $entityClass($row, ['realmId' => $realmId] + $miscData))->error)
                         $this->import($entry);
                 }
 
@@ -80,7 +78,7 @@ abstract class DBTypeContainer
             foreach ($dbQuery->results() as $result)
             {
                 foreach ($result->getIterator() as $row)
-                    if (!($entry = new $entityClass((array)$row, $miscData))->error)
+                    if (!($entry = new $entityClass($row, $miscData))->error)
                         $this->import($entry);
                 $result->free();
             }

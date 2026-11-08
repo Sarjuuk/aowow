@@ -33,20 +33,20 @@ class SkillEntry extends DBTypeEntry
         'ic' => ['j' => ['::icons ic ON ic.`id` = sl.`iconId`', true], 's' => ', ic.`name` AS "icon"'],
     );
 
-    public function applyInitData(array $initData, array $opts) : bool
+    public function applyInitData(\Dibi\Row $dbRow, array $opts) : bool
     {
-        parent::applyInitData($initData, $opts);
+        parent::applyInitData($dbRow, $opts);
 
-        $this->cuFlags         = $initData['cuFlags'];
-        $this->name            = new LocString($initData, 'name');
-        $this->description     = new LocString($initData, 'description');
-        $this->typeCat         = $initData['typeCat'];
-        $this->categoryId      = $initData['categoryId'];
-        $this->iconId          = $initData['iconId'];
-        $this->icon            = $initData['icon'] ?: DEFAULT_ICON;;
-        $this->professionMask  = $initData['professionMask'];
-        $this->recipeSubClass  = $initData['recipeSubClass'];
-        $this->specializations = array_pad(explode(' ', $initData['specializations']), 5, 0);
+        $this->cuFlags         = $dbRow->cuFlags;
+        $this->name            = new LocString($dbRow, 'name');
+        $this->description     = new LocString($dbRow, 'description');
+        $this->typeCat         = $dbRow->typeCat;
+        $this->categoryId      = $dbRow->categoryId;
+        $this->iconId          = $dbRow->iconId;
+        $this->icon            = $dbRow->icon ?: DEFAULT_ICON;;
+        $this->professionMask  = $dbRow->professionMask;
+        $this->recipeSubClass  = $dbRow->recipeSubClass;
+        $this->specializations = array_pad(explode(' ', $dbRow->specializations), 5, 0);
         $this->expansion       = EXP_CLASSIC;               // todo: not yet set in DB
 
         return true;

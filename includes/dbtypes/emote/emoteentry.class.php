@@ -31,25 +31,25 @@ class EmoteEntry extends DBTypeEntry
 
     public const string QUERY_BASE = 'SELECT e.*, e.`id` AS ARRAY_KEY FROM ::emotes e';
 
-    public function applyInitData(array $initData, array $opts) : bool
+    public function applyInitData(\Dibi\Row $dbRow, array $opts) : bool
     {
-        parent::applyInitData($initData, $opts);
+        parent::applyInitData($dbRow, $opts);
 
-        $this->cuFlags     = $initData['cuFlags'];
-        $this->cmd         = $initData['cmd'];
-        $this->name        = $initData['cmd'];              // remap for generic access
-        $this->flags       = $initData['flags'];
-        $this->isAnimated  = $initData['isAnimated'];
-        $this->state       = $initData['state'];
-        $this->stateParam  = $initData['stateParam'];
-        $this->parentEmote = $initData['parentEmote'];
-        $this->soundId     = $initData['soundId'];
+        $this->cuFlags     = $dbRow->cuFlags;
+        $this->cmd         = $dbRow->cmd;
+        $this->name        = $dbRow->cmd;                 // remap for generic access
+        $this->flags       = $dbRow->flags;
+        $this->isAnimated  = $dbRow->isAnimated;
+        $this->state       = $dbRow->state;
+        $this->stateParam  = $dbRow->stateParam;
+        $this->parentEmote = $dbRow->parentEmote;
+        $this->soundId     = $dbRow->soundId;
 
-        $this->meToExt   = new LocString($initData, 'meToExt',   UIText::formatMarkup(...));
-        $this->meToNone  = new LocString($initData, 'meToNone',  UIText::formatMarkup(...));
-        $this->extToMe   = new LocString($initData, 'extToMe',   UIText::formatMarkup(...));
-        $this->extToExt  = new LocString($initData, 'extToExt',  UIText::formatMarkup(...));
-        $this->extToNone = new LocString($initData, 'extToNone', UIText::formatMarkup(...));
+        $this->meToExt   = new LocString($dbRow, 'meToExt',   UIText::formatMarkup(...));
+        $this->meToNone  = new LocString($dbRow, 'meToNone',  UIText::formatMarkup(...));
+        $this->extToMe   = new LocString($dbRow, 'extToMe',   UIText::formatMarkup(...));
+        $this->extToExt  = new LocString($dbRow, 'extToExt',  UIText::formatMarkup(...));
+        $this->extToNone = new LocString($dbRow, 'extToNone', UIText::formatMarkup(...));
 
         return true;
     }

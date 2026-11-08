@@ -127,7 +127,7 @@ abstract class Type
     /* Field Operations */
     /********************/
 
-    public static function newEntry(int $type, int|array $initData, array $opts = []) : ?DBTypeEntry
+    public static function newEntry(int $type, \Dibi\Row|int $initData, array $opts = []) : ?DBTypeEntry
     {
         if (!self::exists($type))
             return null;

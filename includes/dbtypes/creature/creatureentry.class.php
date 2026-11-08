@@ -20,7 +20,7 @@ class CreatureEntry extends DBTypeEntry implements ISource, ITooltip
     public readonly  int       $npcflag;
     public readonly  int       $flagsExtra;
     public readonly  int       $pvpFlags;
-    public readonly  int       $factionTemplateFlags;
+    public readonly  int       $factionTplFlags;
     public readonly  int       $vehicleId;
     public readonly  bool      $humanoid;
     public readonly  bool      $racialLeader;
@@ -97,74 +97,74 @@ class CreatureEntry extends DBTypeEntry implements ISource, ITooltip
         's'    => ['j' => ['::spawns s ON s.`type` = 1 AND s.`typeId` = ct.`id`', true]]
     );
 
-    public function applyInitData(array $initData, array $opts) : bool
+    public function applyInitData(\Dibi\Row $dbRow, array $opts) : bool
     {
-        parent::applyInitData($initData, $opts);
+        parent::applyInitData($dbRow, $opts);
 
-        $this->cuFlags      = $initData['cuFlags'];
-        $this->name         = new LocString($initData, 'name');
-        $this->subname      = new LocString($initData, 'subname');
-        $this->family       = $initData['family'];
-        $this->minLevel     = $initData['minLevel'];
-        $this->maxLevel     = $initData['maxLevel'];
-        $this->rank         = $initData['rank'];
-        $this->type         = $initData['type'];
-        $this->typeFlags    = $initData['typeFlags'];
-        $this->npcflag      = $initData['npcflag'];
-        $this->flagsExtra   = $initData['flagsExtra'];
-        $this->pvpFlags     = $initData['pvpFlags'];
-        $this->factionTemplateFlags = $initData['ftFlags'];
-        $this->vehicleId    = $initData['vehicleId'];
-        $this->humanoid     = $initData['humanoid'];
-        $this->racialLeader = $initData['racialLeader'];
-        $this->ScriptOrAI   = $initData['ScriptOrAI'];
-        $this->StringId     = $initData['StringId'];
-        $this->killCredit   = [$initData['KillCredit1'], $initData['KillCredit2']];
+        $this->cuFlags      = $dbRow->cuFlags;
+        $this->name         = new LocString($dbRow, 'name');
+        $this->subname      = new LocString($dbRow, 'subname');
+        $this->family       = $dbRow->family;
+        $this->minLevel     = $dbRow->minLevel;
+        $this->maxLevel     = $dbRow->maxLevel;
+        $this->rank         = $dbRow->rank;
+        $this->type         = $dbRow->type;
+        $this->typeFlags    = $dbRow->typeFlags;
+        $this->npcflag      = $dbRow->npcflag;
+        $this->flagsExtra   = $dbRow->flagsExtra;
+        $this->pvpFlags     = $dbRow->pvpFlags;
+        $this->factionTplFlags = $dbRow->ftFlags;
+        $this->vehicleId    = $dbRow->vehicleId;
+        $this->humanoid     = $dbRow->humanoid;
+        $this->racialLeader = $dbRow->racialLeader;
+        $this->ScriptOrAI   = $dbRow->ScriptOrAI;
+        $this->StringId     = $dbRow->StringId;
+        $this->killCredit   = [$dbRow->KillCredit1, $dbRow->KillCredit2];
 
-        $this->minGold          = $initData['minGold'];
-        $this->maxGold          = $initData['maxGold'];
-        $this->lootId           = $initData['lootId'];
-        $this->skinLootId       = $initData['skinLootId'];
-        $this->pickpocketLootId = $initData['pickpocketLootId'];
+        $this->minGold          = $dbRow->minGold;
+        $this->maxGold          = $dbRow->maxGold;
+        $this->lootId           = $dbRow->lootId;
+        $this->skinLootId       = $dbRow->skinLootId;
+        $this->pickpocketLootId = $dbRow->pickpocketLootId;
 
-        $this->modelId       = $initData['modelId'];
-        $this->textureString = $initData['textureString'];
-        $this->displayIds    = [$initData['displayId1'], $initData['displayId2'], $initData['displayId3'], $initData['displayId4']];
+        $this->modelId       = $dbRow->modelId;
+        $this->textureString = $dbRow->textureString;
+        $this->displayIds    = [$dbRow->displayId1, $dbRow->displayId2, $dbRow->displayId3, $dbRow->displayId4];
 
-        $this->healthMin          = $initData['healthMin'];
-        $this->healthMax          = $initData['healthMax'];
-        $this->manaMin            = $initData['manaMin'];
-        $this->manaMax            = $initData['manaMax'];
-        $this->armorMin           = $initData['armorMin'];
-        $this->armorMax           = $initData['armorMax'];
-        $this->dmgMin             = $initData['dmgMin'];
-        $this->dmgMax             = $initData['dmgMax'];
-        $this->mleAtkPwrMin       = $initData['mleAtkPwrMin'];
-        $this->mleAtkPwrMax       = $initData['mleAtkPwrMax'];
-        $this->mleVariance        = $initData['mleVariance'];
-        $this->atkSpeed           = ($initData['atkSpeed'] ?: 2000) / 1000;
-        $this->rngAtkPwrMin       = $initData['rngAtkPwrMin'];
-        $this->rngAtkPwrMax       = $initData['rngAtkPwrMax'];
-        $this->rngVariance        = $initData['rngVariance'];
-        $this->rngAtkSpeed        = ($initData['rngAtkSpeed'] ?: 2000) / 1000;
-        $this->dmgMultiplier      = $initData['dmgMultiplier'];
-        $this->dmgSchool          = $initData['dmgSchool'];
-        $this->resistances        = [$initData['resistance1'], $initData['resistance2'], $initData['resistance3'], $initData['resistance4'], $initData['resistance5'], $initData['resistance6']];
-        $this->schoolImmuneMask   = $initData['schoolImmuneMask'];
-        $this->mechanicImmuneMask = $initData['mechanicImmuneMask'];
-        $this->spells             = [$initData['spell1'], $initData['spell2'], $initData['spell3'], $initData['spell4'], $initData['spell5'], $initData['spell6'], $initData['spell7'], $initData['spell8']];
+        $this->healthMin          = $dbRow->healthMin;
+        $this->healthMax          = $dbRow->healthMax;
+        $this->manaMin            = $dbRow->manaMin;
+        $this->manaMax            = $dbRow->manaMax;
+        $this->armorMin           = $dbRow->armorMin;
+        $this->armorMax           = $dbRow->armorMax;
+        $this->dmgMin             = $dbRow->dmgMin;
+        $this->dmgMax             = $dbRow->dmgMax;
+        $this->mleAtkPwrMin       = $dbRow->mleAtkPwrMin;
+        $this->mleAtkPwrMax       = $dbRow->mleAtkPwrMax;
+        $this->mleVariance        = $dbRow->mleVariance;
+        $this->atkSpeed           = ($dbRow->atkSpeed ?: 2000) / 1000;
+        $this->rngAtkPwrMin       = $dbRow->rngAtkPwrMin;
+        $this->rngAtkPwrMax       = $dbRow->rngAtkPwrMax;
+        $this->rngVariance        = $dbRow->rngVariance;
+        $this->rngAtkSpeed        = ($dbRow->rngAtkSpeed ?: 2000) / 1000;
+        $this->dmgMultiplier      = $dbRow->dmgMultiplier;
+        $this->dmgSchool          = $dbRow->dmgSchool;
+        $this->resistances        = [$dbRow->resistance1, $dbRow->resistance2, $dbRow->resistance3, $dbRow->resistance4, $dbRow->resistance5, $dbRow->resistance6];
+        $this->schoolImmuneMask   = $dbRow->schoolImmuneMask;
+        $this->mechanicImmuneMask = $dbRow->mechanicImmuneMask;
+        $this->spells             = [$dbRow->spell1, $dbRow->spell2, $dbRow->spell3, $dbRow->spell4, $dbRow->spell5, $dbRow->spell6, $dbRow->spell7, $dbRow->spell8];
 
-        $this->parentId          = $initData['parentId'];
-        $this->parent            = new LocString($initData, 'parent',  pruneFromSrc: true);
-        $this->difficultyEntries = [$initData['difficultyEntry1'] => 1, $initData['difficultyEntry2'] => 2, $initData['difficultyEntry3'] => 3];
+        $this->parentId          = $dbRow->parentId;
+        $this->parent            = new LocString($dbRow, 'parent');
+        $this->difficultyEntries = [$dbRow->difficultyEntry1 => 1, $dbRow->difficultyEntry2 => 2, $dbRow->difficultyEntry3 => 3];
 
-        $this->faction   = $initData['faction'];
-        $this->factionId = $initData['factionId'];
-        $this->A         = $initData['A'];
-        $this->H         = $initData['H'];
+        $this->faction   = $dbRow->faction;
+        $this->factionId = $dbRow->factionId;
+        $this->A         = $dbRow->A;
+        $this->H         = $dbRow->H;
 
-        $this->startsQuests = $initData['startsQuests'];
- //     $this->endsQuests   = $initData['endsQuests'];
+        $this->startsQuests = $dbRow->startsQuests;
+ //     $this->endsQuests   = $dbRow->endsQuests;
 
         return true;
     }
@@ -304,7 +304,7 @@ class CreatureEntry extends DBTypeEntry implements ISource, ITooltip
 
         // Bit is set from FactionTemplate.dbc/Flags & FACTION_TEMPLATE_FLAG_PVP and overridden by cta.PvPFlags which are weird.
         // npcs being simultaneously flagged as civillian and for pvp.
-        $pvpFlags = $this->pvpFlags ?: (($this->ftFlags & FACTION_TEMPLATE_FLAG_PVP) ? 1 : 0);
+        $pvpFlags = $this->pvpFlags ?: (($this->factionTplFlags & FACTION_TEMPLATE_FLAG_PVP) ? 1 : 0);
 
         if ($pvpFlags & UNIT_BYTE2_FLAG_PVP)
             $x .= '<tr><td>'.Lang::game('pvp').'</td></tr>';

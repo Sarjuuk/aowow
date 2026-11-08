@@ -36,26 +36,26 @@ class PetEntry extends DBTypeEntry
         'ic' => ['j' => ['::icons ic ON p.`iconId` = ic.`id`', true], 's' => ', ic.`name` AS "icon"'],
     );
 
-    public function applyInitData(array $initData, array $opts) : bool
+    public function applyInitData(\Dibi\Row $dbRow, array $opts) : bool
     {
-        parent::applyInitData($initData, $opts);
+        parent::applyInitData($dbRow, $opts);
 
-        $this->cuFlags     = $initData['cuFlags'];
-        $this->name        = new LocString($initData, 'name');
-        $this->category    = $initData['category'];
-        $this->minLevel    = $initData['minLevel'];
-        $this->maxLevel    = $initData['maxLevel'];
-        $this->foodMask    = $initData['foodMask'];
-        $this->type        = $initData['type'];
-        $this->exotic      = $initData['exotic'];
-        $this->expansion   = $initData['expansion'];
-        $this->iconId      = $initData['iconId'];
-        $this->icon        = $initData['icon'];
-        $this->skillLineId = $initData['skillLineId'];
-        $this->spells      = [$initData['spellId1'], $initData['spellId2'], $initData['spellId3'], $initData['spellId4']];
-        $this->armor       = $initData['armor'];
-        $this->damage      = $initData['damage'];
-        $this->health      = $initData['health'];
+        $this->cuFlags     = $dbRow->cuFlags;
+        $this->name        = new LocString($dbRow, 'name');
+        $this->category    = $dbRow->category;
+        $this->minLevel    = $dbRow->minLevel;
+        $this->maxLevel    = $dbRow->maxLevel;
+        $this->foodMask    = $dbRow->foodMask;
+        $this->type        = $dbRow->type;
+        $this->exotic      = $dbRow->exotic;
+        $this->expansion   = $dbRow->expansion;
+        $this->iconId      = $dbRow->iconId;
+        $this->icon        = $dbRow->icon;
+        $this->skillLineId = $dbRow->skillLineId;
+        $this->spells      = [$dbRow->spellId1, $dbRow->spellId2, $dbRow->spellId3, $dbRow->spellId4];
+        $this->armor       = $dbRow->armor;
+        $this->damage      = $dbRow->damage;
+        $this->health      = $dbRow->health;
 
         return true;
     }

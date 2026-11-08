@@ -47,15 +47,15 @@ trait TrSourceHelper
     /**
      * titles are special and can have an additional achievement source (12) stored in titles table
      */
-    private function initSources(array &$initData, int $extSrc12 = 0) : void
+    private function initSources(\Dibi\Row &$dbRow, int $extSrc12 = 0) : void
     {
         $src = [];
         for ($i = SRC_CRAFTED; $i < MAX_SOURCES; $i++)
         {
-            if ($_ = ($initData['src'.$i] ?? null))
+            if ($_ = ($dbRow['src'.$i] ?? null))
                 $src[$i] = $_;
 
-            unset($initData['src'.$i]);
+            unset($dbRow['src'.$i]);
         }
 
         if ($extSrc12)
@@ -63,12 +63,12 @@ trait TrSourceHelper
 
         $this->sources = $src;
 
-        $this->moreType   = $initData['moreType']   ?? ($extSrc12 ? Type::ACHIEVEMENT : null);
-        $this->moreTypeId = $initData['moreTypeId'] ?? ($extSrc12 ?: null);
-        $this->moreZoneId = $initData['moreZoneId'] ?? null;
-        $this->moreMask   = $initData['moreMask']   ?? null;
+        $this->moreType   = $dbRow->moreType   ?? ($extSrc12 ? Type::ACHIEVEMENT : null);
+        $this->moreTypeId = $dbRow->moreTypeId ?? ($extSrc12 ?: null);
+        $this->moreZoneId = $dbRow->moreZoneId ?? null;
+        $this->moreMask   = $dbRow->moreMask   ?? null;
 
-        unset($initData['moreType'], $initData['moreTypeId'], $initData['moreZoneId'], $initData['moreMask']);
+        unset($dbRow->moreType, $dbRow->moreTypeId, $dbRow->moreZoneId, $dbRow->moreMask);
     }
 
     public function getRawSource(int $src) : ?int
@@ -330,9 +330,9 @@ abstract class DBTypeEntry
     public const string QUERY_BASE = '';
     public const array  QUERY_OPTS = [];
 
-    public function __construct(int|array $initData, array $extraOpts = [], array $targetDBs = ['Aowow'])
+    public function __construct(\Dibi\Row|int $initData, array $extraOpts = [], array $targetDBs = ['Aowow'])
     {
-        if (is_array($initData))
+        if ($initData instanceof \Dibi\Row)
         {
             if ($this->applyInitData($initData, $extraOpts['apply'] ?? []))
                 $this->error = false;
@@ -348,7 +348,7 @@ abstract class DBTypeEntry
         {
             foreach ($result->getIterator() as $data)
             {
-                if ($this->applyInitData((array)$data, $extraOpts['apply'] ?? []))
+                if ($this->applyInitData($data, $extraOpts['apply'] ?? []))
                     $this->error = false;
                 break;                                  // should only ever be one row
             }
@@ -359,9 +359,9 @@ abstract class DBTypeEntry
     }
 
     // readonly props may only be written like they were private; so force per DBTypeEntry implementation
-    public function applyInitData(array $initData, array $opts) : bool
+    public function applyInitData(\Dibi\Row $dbRow, array $opts) : bool
     {
-        $this->id = $initData['id'];
+        $this->id = $dbRow->id;
         return true;
     }
 

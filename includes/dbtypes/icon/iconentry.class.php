@@ -75,13 +75,13 @@ class IconEntry extends DBTypeEntry
   * );
   */
 
-    public function applyInitData(array $initData, array $opts) : bool
+    public function applyInitData(\Dibi\Row $dbRow, array $opts) : bool
     {
-        parent::applyInitData($initData, $opts);
+        parent::applyInitData($dbRow, $opts);
 
-        $this->cuFlags     = $initData['cuFlags'];
-        $this->name        = $initData['name'];
-        $this->name_source = $initData['name_source'];
+        $this->cuFlags     = $dbRow->cuFlags;
+        $this->name        = $dbRow->name;
+        $this->name_source = $dbRow->name_source;
 
         return true;
     }
