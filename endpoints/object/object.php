@@ -147,26 +147,34 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                 $infobox[] = Lang::game('requires', [Lang::main('parensFmt', [Lang::spell('lockType', 1), $this->subject->getField('reqSkill')])]);
                 $infobox[] = Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill(SKILL_LOCKPICKING, $this->subject->getField('reqSkill')));
                 break;
-            default:                                        // requires key .. maybe
+        }
+
+        // requires key .. maybe
+        $ids = [];
+        if (($lockId = $this->subject->getField('lockId')) && ($locks = Lang::getLocks($lockId, $ids, $_, true, Lang::FMT_MARKUP)))
+        {
+            foreach ($ids as $type => $typeIds)
+                $this->extendGlobalIds($type, ...$typeIds);
+
+            $l = [];
+            foreach ($locks as [$type, $property, $str, $reqSkill])
             {
-                $ids = $l = [];
-                $locks = Lang::getLocks($this->subject->getField('lockId'), $ids, $_, true, Lang::FMT_MARKUP);
-
-                foreach ($ids as $type => $typeIds)
-                    $this->extendGlobalIds($type, ...$typeIds);
-
-                foreach ($locks as [$str, $type, ])
+                switch($type)
                 {
-                    $l[] = match($type)
-                    {
-                        Type::ITEM => Lang::gameObject('key').Lang::main('colon').$str,
-                        default    => Lang::game('requires', [$str])
-                    };
+                    case LOCK_TYPE_ITEM:
+                        $l[] = Lang::gameObject('key').Lang::main('colon').$str;
+                        break;
+                    case LOCK_TYPE_SKILL:                   // don't display lockpicking twice
+                        if ($this->subject->getField('typeCat') != -5 || $property != 1)
+                            $l[] = Lang::item($reqSkill ? 'reqSkillValue' : 'reqSkill', [$str, $reqSkill]);
+                        break;
+                    default:
+                        $l[] = Lang::item('reqSkill', [$str]);
                 }
-
-                if ($l)
-                    $infobox[] = implode('[br]', $l);
             }
+
+            if ($l)
+                $infobox[] = implode('[br]', $l);
         }
 
         // linked trap

@@ -670,12 +670,12 @@ class ItemList extends DBTypeList
         {
             $x .= '<span class="q0">'.Lang::item($encrypted ? 'encrypted' : 'locked');
 
-            foreach ($locks as [$str, $type, $miscInfo])
+            foreach ($locks as [$type, , $str, $miscInfo])
                 $x .= '<br />'.match($type)
                 {
-                    Type::ITEM  => Lang::item('lockedByItem',  [$str]),
-                    TYPE::SPELL => Lang::item('lockedBySpell', [$str]),
-                    Type::SKILL => Lang::item('reqSkillValue', [$str, $miscInfo ?: ($_itemLevel * 5)])
+                    LOCK_TYPE_ITEM  => Lang::item('lockedByItem',  [$str]),
+                    LOCK_TYPE_SPELL => Lang::item('lockedBySpell', [$str]),
+                    LOCK_TYPE_SKILL => Lang::item('reqSkillValue', [$str, $miscInfo ?: ($_itemLevel * 5)])
                 };
 
             $x .= '</span><br />';

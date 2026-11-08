@@ -277,7 +277,7 @@ class Lang
      * @param bool      $interactive    whether to generate interactive links for HTML/markup output
      * @param int       $fmt            set output format
      *
-     * @return array{string, int, array|int}[]  [label, type, miscInfo]
+     * @return array{int, int, string, array|int}[]  [lockType, lockProperty, label, miscInfo]
      *  miscInfo per type:
      *  * `Type::SKILL` - required skill value
      *  * `Type::SPELL` - required reagents as `[itemId, qty]` pairs
@@ -309,7 +309,7 @@ class Lang
                         $ids[Type::ITEM][] = $prop;
                     }
 
-                    $locks[] = [$name, Type::ITEM, 0];
+                    $locks[] = [LOCK_TYPE_ITEM, $prop, $name, 0];
                     break;
                 case LOCK_TYPE_SKILL:
                     if (!($name = self::spell('lockType', $prop)))
@@ -352,7 +352,7 @@ class Lang
                     else
                         break;
 
-                    $locks[] = [$name, Type::SKILL, $lock['reqSkill'.$i]];
+                    $locks[] = [LOCK_TYPE_SKILL, $prop, $name, $lock['reqSkill'.$i]];
                     break;
                 case LOCK_TYPE_SPELL:
                     if (($spell = new SpellList(array(['id', $prop])))->error)
@@ -366,7 +366,7 @@ class Lang
                         $ids[Type::SPELL][] = $prop;
                     }
 
-                    $locks[] = [$name, Type::SPELL, $spell->getReagentsForCurrent()];
+                    $locks[] = [LOCK_TYPE_SPELL, $prop, $name, $spell->getReagentsForCurrent()];
                     break;
             }
 
