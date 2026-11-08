@@ -1196,17 +1196,18 @@ class ItemList extends DBTypeList
 
                 # Reagents #
 
-                $reagentItems = [];
-                for ($j = 1; $j <= 8; $j++)
-                    if ($rId = $craftSpell->getField('reagent'.$j))
-                        $reagentItems[$rId] = $craftSpell->getField('reagentCount'.$j);
-
-                if ($reagentItems && !($reagents = new ItemList(array(['id', array_keys($reagentItems)])))->error)
+                if ($reagents = $craftSpell->getReagentsForCurrent())
                 {
-                    $reqReag  = [];
-                    foreach ($reagentItems as $itemId => $qty)
-                        if ($reagents->getEntry($itemId))
-                            $reqReag[] = Lang::main('parensFmt', ['<a href="?item='.$itemId.'">'.$reagents->getField('name', true).'</a>', $qty]);
+                    $reqReag = [];
+                    foreach ($reagents as [$iId, $qty])
+                    {
+                        if ($item = $craftSpell->relItems->getEntry($iId))
+                            $_ = '<a href="?item='.$iId.'">'.new LocString($item).'</a>';
+                        else
+                            $_ = 'Item #'.$iId;
+
+                        $reqReag[] = ($qty > 1) ? Lang::main('parensFmt', [$_, $qty]) : $_;
+                    }
 
                     $x .= '<div class="q1 whtt-reagents"><br />'.Lang::item('reqSkill', [Lang::concat($reqReag, Lang::CONCAT_NONE)]).'</div>';
                 }

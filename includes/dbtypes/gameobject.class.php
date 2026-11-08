@@ -119,15 +119,21 @@ class GameObjectList extends DBTypeList
             {
                 Type::ITEM  => Lang::item('lockedByItem',  [$str]),
                 TYPE::SPELL => Lang::item('lockedBySpell', [$str]),
-                Type::SKILL => Lang::item('reqSkillValue', [$str, $miscInfo])
+                Type::SKILL => Lang::item($miscInfo ? 'reqSkillValue' : 'reqSkill', [$str, $miscInfo])
             }.'</td></tr>';
 
             if ($type == Type::SPELL && $miscInfo && !($reagents = new ItemList(array(['id', array_keys($miscInfo)])))->error)
             {
                 $reqReag  = [];
                 foreach ($miscInfo as [$itemId, $qty])
-                    if ($reagents->getEntry($itemId))
-                        $reqReag[] = Lang::main('parensFmt', ['<a href="?item='.$itemId.'">'.$reagents->getField('name', true).'</a>', $qty]);
+                {
+                    if ($item = $reagents->getEntry($itemId))
+                        $_ = '<a href="?item='.$itemId.'">'.new LocString($item).'</a>';
+                    else
+                        $_ = 'Item #'.$itemId;
+
+                    $reqReag[] = ($qty > 1) ? Lang::main('parensFmt', [$_, $qty]) : $_;
+                }
 
                 $x .= '<tr class="q1 whtt-reagents"><td><br />'.Lang::item('reqSkill', [Lang::concat($reqReag, Lang::CONCAT_NONE)]).'</td></tr>';
             }
