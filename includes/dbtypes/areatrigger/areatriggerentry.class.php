@@ -27,16 +27,16 @@ class AreatriggerEntry extends DBTypeEntry
         's' => ['j' => ['::areatrigger_spawns s ON s.`typeId` = a.`id` AND (s.`flags` & 0x1) = 0', true], 's' => ', GROUP_CONCAT(s.`areaId`) AS "location"', 'g' => 'a.`id`']
     );
 
-    public function applyInitData(array $initData, array $opts) : bool
+    public function applyInitData(\Dibi\Row $dbRow, array $opts) : bool
     {
-        parent::applyInitData($initData, $opts);
+        parent::applyInitData($dbRow, $opts);
 
-        $this->cuFlags     = $initData['cuFlags'];
-        $this->name        = $initData['name'] ?: Lang::areatrigger('unnamed', [$initData['id']]);
-        $this->type        = $initData['type'];
-        $this->quest       = $initData['quest'];
-        $this->orientation = $initData['orientation'];
-        $this->location    = explode(',', $initData['location']);
+        $this->cuFlags     = $dbRow->cuFlags;
+        $this->name        = $dbRow->name ?: Lang::areatrigger('unnamed', [$dbRow->id]);
+        $this->type        = $dbRow->type;
+        $this->quest       = $dbRow->quest;
+        $this->orientation = $dbRow->orientation;
+        $this->location    = explode(',', $dbRow->location);
 
         return true;
     }

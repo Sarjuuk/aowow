@@ -147,7 +147,7 @@ class ItemEntry extends DBTypeEntry implements ISource, ITooltip
      *  * g: int[] itemIds - gems
      *  * r: int >0: randomPropId; <0: randomSuffixId
      */
-    public function __construct(int|array $initData, array $extraOpts = [])
+    public function __construct(\Dibi\Row|int $initData, array $extraOpts = [])
     {
         parent::__construct($initData, $extraOpts);
 
@@ -158,138 +158,138 @@ class ItemEntry extends DBTypeEntry implements ISource, ITooltip
         $this->enhance = ($extraOpts['enhance'] ?? []) + ['e' => 0, 's' => false, 'g' => [], 'r' => 0];
     }
 
-    public function applyInitData(array $initData, array $opts) : bool
+    public function applyInitData(\Dibi\Row $dbRow, array $opts) : bool
     {
-        parent::applyInitData($initData, $opts);            // id
+        parent::applyInitData($dbRow, $opts);            // id
 
-        $this->cuFlags               = $initData['cuFlags'];
-        $this->name                  = new LocString($initData, 'name');
-        $this->description           = new LocString($initData, 'description');
-        $this->class                 = $initData['class'];
-        $this->classBak              = $initData['classBak'];
-        $this->subClass              = $initData['subClass'];
-        $this->subClassBak           = $initData['subClassBak'];
-        $this->soundOverrideSubclass = $initData['soundOverrideSubclass'];
-        $this->subSubClass           = $initData['subSubClass'];
-        $this->quality               = $initData['quality'];
-        $this->flags                 = $initData['flags'];
-        $this->flagsExtra            = $initData['flagsExtra'];
-        $this->buyCount              = $initData['buyCount'];
-        $this->buyPrice              = $initData['buyPrice'];
-        $this->sellPrice             = $initData['sellPrice'];
-        $this->repairPrice           = $initData['repairPrice'];
-        $this->slot                  = $initData['slot'];
-        $this->slotBak               = $initData['slotBak'];
-        $this->itemLevel             = $initData['itemLevel'];
-        $this->maxCount              = $initData['maxCount'];
-        $this->stackable             = $initData['stackable'];
-        $this->slots                 = $initData['slots'];
-        $this->bonding               = $initData['bonding'];
-        $this->pageTextId            = $initData['pageTextId'];
-        $this->languageId            = $initData['languageId'];
-        $this->startQuest            = $initData['startQuest'];
-        $this->lockId                = $initData['lockId'];
-        $this->material              = $initData['material'];
-        $this->randomEnchant         = $initData['randomEnchant'];
-        $this->itemset               = $initData['itemset'];
-        $this->durability            = $initData['durability'];
-        $this->bagFamily             = $initData['bagFamily'];
-        $this->totemCategory         = $initData['totemCategory'];
-        $this->duration              = $initData['duration'];
-        $this->itemLimitCategory     = $initData['itemLimitCategory'];
-        $this->scriptName            = $initData['scriptName'];
-        $this->foodType              = $initData['foodType'];
-        $this->flagsCustom           = $initData['flagsCustom'];
+        $this->cuFlags               = $dbRow->cuFlags;
+        $this->name                  = new LocString($dbRow, 'name');
+        $this->description           = new LocString($dbRow, 'description');
+        $this->class                 = $dbRow->class;
+        $this->classBak              = $dbRow->classBak;
+        $this->subClass              = $dbRow->subClass;
+        $this->subClassBak           = $dbRow->subClassBak;
+        $this->soundOverrideSubclass = $dbRow->soundOverrideSubclass;
+        $this->subSubClass           = $dbRow->subSubClass;
+        $this->quality               = $dbRow->quality;
+        $this->flags                 = $dbRow->flags;
+        $this->flagsExtra            = $dbRow->flagsExtra;
+        $this->buyCount              = $dbRow->buyCount;
+        $this->buyPrice              = $dbRow->buyPrice;
+        $this->sellPrice             = $dbRow->sellPrice;
+        $this->repairPrice           = $dbRow->repairPrice;
+        $this->slot                  = $dbRow->slot;
+        $this->slotBak               = $dbRow->slotBak;
+        $this->itemLevel             = $dbRow->itemLevel;
+        $this->maxCount              = $dbRow->maxCount;
+        $this->stackable             = $dbRow->stackable;
+        $this->slots                 = $dbRow->slots;
+        $this->bonding               = $dbRow->bonding;
+        $this->pageTextId            = $dbRow->pageTextId;
+        $this->languageId            = $dbRow->languageId;
+        $this->startQuest            = $dbRow->startQuest;
+        $this->lockId                = $dbRow->lockId;
+        $this->material              = $dbRow->material;
+        $this->randomEnchant         = $dbRow->randomEnchant;
+        $this->itemset               = $dbRow->itemset;
+        $this->durability            = $dbRow->durability;
+        $this->bagFamily             = $dbRow->bagFamily;
+        $this->totemCategory         = $dbRow->totemCategory;
+        $this->duration              = $dbRow->duration;
+        $this->itemLimitCategory     = $dbRow->itemLimitCategory;
+        $this->scriptName            = $dbRow->scriptName;
+        $this->foodType              = $dbRow->foodType;
+        $this->flagsCustom           = $dbRow->flagsCustom;
 
-        $this->side = ($fe = $initData['flagsExtra'] & 0x3) ? SIDE_BOTH - $fe : ChrRace::sideFromMask($initData['requiredRace']);
+        $this->side = ($fe = $dbRow->flagsExtra & 0x3) ? SIDE_BOTH - $fe : ChrRace::sideFromMask($dbRow->requiredRace);
 
-        $this->disenchantId = $initData['disenchantId'];
-        $this->minMoneyLoot = $initData['minMoneyLoot'];
-        $this->maxMoneyLoot = $initData['maxMoneyLoot'];
+        $this->disenchantId = $dbRow->disenchantId;
+        $this->minMoneyLoot = $dbRow->minMoneyLoot;
+        $this->maxMoneyLoot = $dbRow->maxMoneyLoot;
 
-        $this->iconId           = $initData['iconId'];
-        $this->icon             = $initData['icon'] ?: DEFAULT_ICON;
-        $this->displayId        = $initData['displayId'];
-        $this->model            = $initData['model'];
-        $this->spellVisualId    = $initData['spellVisualId'];
-        $this->pickUpSoundId    = $initData['pickUpSoundId'];
-        $this->dropDownSoundId  = $initData['dropDownSoundId'];
-        $this->sheatheSoundId   = $initData['sheatheSoundId'];
-        $this->unsheatheSoundId = $initData['unsheatheSoundId'];
+        $this->iconId           = $dbRow->iconId;
+        $this->icon             = $dbRow->icon ?: DEFAULT_ICON;
+        $this->displayId        = $dbRow->displayId;
+        $this->model            = $dbRow->model;
+        $this->spellVisualId    = $dbRow->spellVisualId;
+        $this->pickUpSoundId    = $dbRow->pickUpSoundId;
+        $this->dropDownSoundId  = $dbRow->dropDownSoundId;
+        $this->sheatheSoundId   = $dbRow->sheatheSoundId;
+        $this->unsheatheSoundId = $dbRow->unsheatheSoundId;
 
-        $this->requiredClass           = ($_ = $initData['requiredClass'] & ChrClass::MASK_ALL) == ChrClass::MASK_ALL ? 0 : $_;
-        $this->requiredRace            = ($_ = $initData['requiredRace']  & ChrRace::MASK_ALL)  == ChrRace::MASK_ALL  ? 0 : $_;
-        $this->requiredLevel           = $initData['requiredLevel'];
-        $this->requiredSkill           = $initData['requiredSkill'];
-        $this->requiredSkillRank       = $initData['requiredSkillRank'];
-        $this->requiredSpell           = $initData['requiredSpell'];
-        $this->requiredHonorRank       = $initData['requiredHonorRank'];
-        $this->requiredCityRank        = $initData['requiredCityRank'];
-        $this->requiredFaction         = $initData['requiredFaction'];
-        $this->requiredFactionRank     = $initData['requiredFactionRank'];
-        $this->requiredDisenchantSkill = $initData['requiredDisenchantSkill'];
-        $this->area                    = $initData['area'];
-        $this->map                     = $initData['map'];
-        $this->eventId                 = $initData['eventId'];
+        $this->requiredClass           = ($_ = $dbRow->requiredClass & ChrClass::MASK_ALL) == ChrClass::MASK_ALL ? 0 : $_;
+        $this->requiredRace            = ($_ = $dbRow->requiredRace  & ChrRace::MASK_ALL)  == ChrRace::MASK_ALL  ? 0 : $_;
+        $this->requiredLevel           = $dbRow->requiredLevel;
+        $this->requiredSkill           = $dbRow->requiredSkill;
+        $this->requiredSkillRank       = $dbRow->requiredSkillRank;
+        $this->requiredSpell           = $dbRow->requiredSpell;
+        $this->requiredHonorRank       = $dbRow->requiredHonorRank;
+        $this->requiredCityRank        = $dbRow->requiredCityRank;
+        $this->requiredFaction         = $dbRow->requiredFaction;
+        $this->requiredFactionRank     = $dbRow->requiredFactionRank;
+        $this->requiredDisenchantSkill = $dbRow->requiredDisenchantSkill;
+        $this->area                    = $dbRow->area;
+        $this->map                     = $dbRow->map;
+        $this->eventId                 = $dbRow->eventId;
 
-        $this->socketColor      = [$initData['socketColor1'],   $initData['socketColor2'],   $initData['socketColor3']];
-        $this->socketContent    = [$initData['socketContent1'], $initData['socketContent2'], $initData['socketContent3']];
-        $this->socketBonus      = $initData['socketBonus'];
-        $this->gemColorMask     = $initData['gemColorMask'];
-        $this->gemEnchantmentId = $initData['gemEnchantmentId'];
+        $this->socketColor      = [$dbRow->socketColor1,   $dbRow->socketColor2,   $dbRow->socketColor3];
+        $this->socketContent    = [$dbRow->socketContent1, $dbRow->socketContent2, $dbRow->socketContent3];
+        $this->socketBonus      = $dbRow->socketBonus;
+        $this->gemColorMask     = $dbRow->gemColorMask;
+        $this->gemEnchantmentId = $dbRow->gemEnchantmentId;
 
-        $this->scalingStatDistribution = $initData['scalingStatDistribution'];
-        $this->scalingStatValue        = $initData['scalingStatValue'];
+        $this->scalingStatDistribution = $dbRow->scalingStatDistribution;
+        $this->scalingStatValue        = $dbRow->scalingStatValue;
 
         $spells   = [];
         $cooldown = 0;
         for ($i = 1; $i < 6; $i++)
         {
-            if (!$initData['spellId'.$i])
+            if (!$dbRow['spellId'.$i])
                 continue;
 
-            if (in_array($initData['spellTrigger'.$i], [SPELL_TRIGGER_USE, SPELL_TRIGGER_USE_NODELAY, SPELL_TRIGGER_HIT]))
-                $cooldown = max($cooldown, $initData['spellCooldown'.$i], $initData['spellCategoryCooldown'.$i]);
+            if (in_array($dbRow['spellTrigger'.$i], [SPELL_TRIGGER_USE, SPELL_TRIGGER_USE_NODELAY, SPELL_TRIGGER_HIT]))
+                $cooldown = max($cooldown, $dbRow['spellCooldown'.$i], $dbRow['spellCategoryCooldown'.$i]);
 
             $spells[$i - 1] = array(
-                $initData['spellId'.$i],
-                $initData['spellTrigger'.$i],
-                $initData['spellCharges'.$i] ?? 0,          // can be null from db
-                $initData['spellppmRate'.$i],
-                $initData['spellCooldown'.$i],
-                $initData['spellCategory'.$i],
-                $initData['spellCategoryCooldown'.$i]
+                $dbRow['spellId'.$i],
+                $dbRow['spellTrigger'.$i],
+                $dbRow['spellCharges'.$i] ?? 0,          // can be null from db
+                $dbRow['spellppmRate'.$i],
+                $dbRow['spellCooldown'.$i],
+                $dbRow['spellCategory'.$i],
+                $dbRow['spellCategoryCooldown'.$i]
             );
         }
 
         $this->spells              = $spells;
         $this->cooldown            = $cooldown;
-        $this->delay               = $initData['delay'];
-        $this->armorDamageModifier = $initData['armorDamageModifier'];
-        $this->resistance          = [null, $initData['resHoly'], $initData['resFire'], $initData['resNature'], $initData['resFrost'], $initData['resShadow'], $initData['resArcane']];
-        $this->ammoType            = $initData['ammoType'];
-        $this->rangedModRange      = $initData['rangedModRange'];
+        $this->delay               = $dbRow->delay;
+        $this->armorDamageModifier = $dbRow->armorDamageModifier;
+        $this->resistance          = [null, $dbRow->resHoly, $dbRow->resFire, $dbRow->resNature, $dbRow->resFrost, $dbRow->resShadow, $dbRow->resArcane];
+        $this->ammoType            = $dbRow->ammoType;
+        $this->rangedModRange      = $dbRow->rangedModRange;
 
         if (isset($opts['skipStats']))
             $this->itemStats = null;
         else
-            $this->itemStats = (new StatsContainer)->fromJson($initData, true);
+            $this->itemStats = (new StatsContainer)->fromJson($dbRow, true);
 
         // item is scaling; overwrite other values
-        if ($initData['scalingStatDistribution'] > 0 && $initData['scalingStatValue'] > 0)
+        if ($dbRow->scalingStatDistribution > 0 && $dbRow->scalingStatValue > 0)
             [$statTypes, $statValues, $armor, $dmg] = $this->initScalingStats();
 
         // stats
-        $this->statType  = $statTypes  ?? [$initData['statType1'],  $initData['statType2'],  $initData['statType3'],  $initData['statType4'],  $initData['statType5'],  $initData['statType6'],  $initData['statType7'],  $initData['statType8'],  $initData['statType9'],  $initData['statType10']];
-        $this->statValue = $statValues ?? [$initData['statValue1'], $initData['statValue2'], $initData['statValue3'], $initData['statValue4'], $initData['statValue5'], $initData['statValue6'], $initData['statValue7'], $initData['statValue8'], $initData['statValue9'], $initData['statValue10']];
+        $this->statType  = $statTypes  ?? [$dbRow->statType1,  $dbRow->statType2,  $dbRow->statType3,  $dbRow->statType4,  $dbRow->statType5,  $dbRow->statType6,  $dbRow->statType7,  $dbRow->statType8,  $dbRow->statType9,  $dbRow->statType10];
+        $this->statValue = $statValues ?? [$dbRow->statValue1, $dbRow->statValue2, $dbRow->statValue3, $dbRow->statValue4, $dbRow->statValue5, $dbRow->statValue6, $dbRow->statValue7, $dbRow->statValue8, $dbRow->statValue9, $dbRow->statValue10];
 
         // restore stats from table naming conflict
-        $this->block = $initData['tplBlock'];
-        $this->armor = $armor ?? $initData['tplArmor'];
-        $this->dmg1  = $dmg ?? [$initData['tplDmgMin1'], $initData['tplDmgMax1'], $initData['dmgType1']];
-        $this->dmg2  =         [$initData['dmgMin2'],    $initData['dmgMax2'],    $initData['dmgType2']];
+        $this->block = $dbRow->tplBlock;
+        $this->armor = $armor ?? $dbRow->tplArmor;
+        $this->dmg1  = $dmg ?? [$dbRow->tplDmgMin1, $dbRow->tplDmgMax1, $dbRow->dmgType1];
+        $this->dmg2  =         [$dbRow->dmgMin2,    $dbRow->dmgMax2,    $dbRow->dmgType2];
 
-        $this->initSources($initData);
+        $this->initSources($dbRow);
 
         $this->initJsonStats();
 

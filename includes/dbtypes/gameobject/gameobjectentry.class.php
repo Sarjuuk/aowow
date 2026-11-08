@@ -63,45 +63,45 @@ class GameobjectEntry extends DBTypeEntry implements ISource, ITooltip
         's'   => ['j' => '::objects_spawns s ON s.`typeId` = o.`id`']
     );
 
-    public function applyInitData(array $initData, array $opts) : bool
+    public function applyInitData(\Dibi\Row $dbRow, array $opts) : bool
     {
-        parent::applyInitData($initData, $opts);
+        parent::applyInitData($dbRow, $opts);
 
-        $this->cuFlags      = $initData['cuFlags'];
-        $this->type         = $initData['type'];
-        $this->typeCat      = $initData['typeCat'];
-        $this->event        = $initData['event'];
-        $this->displayId    = $initData['displayId'];
-        $this->faction      = $initData['faction'];
-        $this->flags        = $initData['flags'];
-        $this->lootId       = $initData['lootId'];
-        $this->lockId       = $initData['lockId'];
-        $this->reqSkill     = $initData['reqSkill'];
-        $this->pageTextId   = $initData['pageTextId'];
-        $this->linkedTrap   = $initData['linkedTrap'];
-        $this->reqQuest     = $initData['reqQuest'];
-        $this->spellFocusId = $initData['spellFocusId'];
-        $this->ScriptOrAI   = $initData['ScriptOrAI'];
-        $this->StringId     = $initData['StringId'];
+        $this->cuFlags      = $dbRow->cuFlags;
+        $this->type         = $dbRow->type;
+        $this->typeCat      = $dbRow->typeCat;
+        $this->event        = $dbRow->event;
+        $this->displayId    = $dbRow->displayId;
+        $this->faction      = $dbRow->faction;
+        $this->flags        = $dbRow->flags;
+        $this->lootId       = $dbRow->lootId;
+        $this->lockId       = $dbRow->lockId;
+        $this->reqSkill     = $dbRow->reqSkill;
+        $this->pageTextId   = $dbRow->pageTextId;
+        $this->linkedTrap   = $dbRow->linkedTrap;
+        $this->reqQuest     = $dbRow->reqQuest;
+        $this->spellFocusId = $dbRow->spellFocusId;
+        $this->ScriptOrAI   = $dbRow->ScriptOrAI;
+        $this->StringId     = $dbRow->StringId;
 
-        $this->factionId = $initData['factionId'];
-        $this->A         = $initData['A'];
-        $this->H         = $initData['H'];
+        $this->factionId = $dbRow->factionId;
+        $this->A         = $dbRow->A;
+        $this->H         = $dbRow->H;
 
-        $this->startsQuests = $initData['startsQuests'];
+        $this->startsQuests = $dbRow->startsQuests;
 
-        $nameBak = ['name_loc'.Lang::getLocale()->value => Lang::gameobject('unnamed', [$initData['id']])];
-        $n = new LocString($initData, 'name');
+        $nameBak = ['name_loc'.Lang::getLocale()->value => Lang::gameobject('unnamed', [$dbRow->id])];
+        $n = new LocString($dbRow, 'name');
         $this->name = !$n->isEmpty() ? $n : new LocString($nameBak);
 
-        if (!in_array($initData['type'], [OBJECT_GOOBER, OBJECT_RITUAL, OBJECT_SPELLCASTER, OBJECT_FLAGSTAND, OBJECT_FLAGDROP, OBJECT_AURA_GENERATOR, OBJECT_TRAP]))
+        if (!in_array($dbRow->type, [OBJECT_GOOBER, OBJECT_RITUAL, OBJECT_SPELLCASTER, OBJECT_FLAGSTAND, OBJECT_FLAGDROP, OBJECT_AURA_GENERATOR, OBJECT_TRAP]))
             $this->spells = null;
         else
             $this->spells = array(
-                'onUse'     => $initData['onUseSpell'],
-                'onSuccess' => $initData['onSuccessSpell'],
-                'aura'      => $initData['auraSpell'],
-                'triggered' => $initData['triggeredSpell']
+                'onUse'     => $dbRow->onUseSpell,
+                'onSuccess' => $dbRow->onSuccessSpell,
+                'aura'      => $dbRow->auraSpell,
+                'triggered' => $dbRow->triggeredSpell
             );
 
         // unpack miscInfo
@@ -110,8 +110,8 @@ class GameobjectEntry extends DBTypeEntry implements ISource, ITooltip
         $lootStack =
         $transport = null;
 
-        if ($data = $initData['miscInfo'] ? explode(' ', $initData['miscInfo']) : null)
-            match ($initData['type'])
+        if ($data = $dbRow->miscInfo ? explode(' ', $dbRow->miscInfo) : null)
+            match ($dbRow->type)
             {
                 OBJECT_CHEST,
                 OBJECT_FISHINGHOLE   => $lootStack = array_pad($data, 5, 0),

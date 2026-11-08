@@ -29,22 +29,22 @@ class SoundEntry extends DBTypeEntry
 
     private const array FILE_TYPES = [SOUND_TYPE_OGG => MIME_TYPE_OGG, SOUND_TYPE_MP3 => MIME_TYPE_MP3];
 
-    public function applyInitData(array $initData, array $opts) : bool
+    public function applyInitData(\Dibi\Row $dbRow, array $opts) : bool
     {
-        parent::applyInitData($initData, $opts);
+        parent::applyInitData($dbRow, $opts);
 
-        $this->cuFlags = $initData['cuFlags'];
-        $this->name    = $initData['name'];
-        $this->cat     = $initData['cat'];
-        $this->flags   = $initData['flags'];
+        $this->cuFlags = $dbRow->cuFlags;
+        $this->name    = $dbRow->name;
+        $this->cat     = $dbRow->cat;
+        $this->flags   = $dbRow->flags;
 
         $fileIds = [];
         for ($i = 1; $i < 11; $i++)
         {
-            if ($initData['soundFile'.$i])
-                $fileIds[] = $initData['soundFile'.$i];
+            if ($dbRow['soundFile'.$i])
+                $fileIds[] = $dbRow['soundFile'.$i];
 
-            unset($initData['soundFile'.$i]);
+            unset($dbRow['soundFile'.$i]);
         }
         $this->fileIds = $fileIds;
 

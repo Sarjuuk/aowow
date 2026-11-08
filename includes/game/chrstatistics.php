@@ -450,7 +450,7 @@ class StatsContainer implements \Countable
         return $this;
     }
 
-    public function fromJson(array &$json, bool $pruneFromSrc = false) : self
+    public function fromJson(\Dibi\Row|array &$json, bool $pruneFromSrc = false) : self
     {
         if (!$json)
             return $this;

@@ -33,23 +33,23 @@ class CharClassEntry extends DBTypeEntry
         'ic' => ['j' => ['::icons ic ON ic.`id` = c.`iconId`', true], 's' => ', ic.`name` AS "icon"']
     );
 
-    public function applyInitData(array $initData, array $opts) : bool
+    public function applyInitData(\Dibi\Row $dbRow, array $opts) : bool
     {
-        parent::applyInitData($initData, $opts);
+        parent::applyInitData($dbRow, $opts);
 
-        $this->cuFlags        = $initData['cuFlags'];
-        $this->name           = new LocString($initData, 'name');
-        $this->fileString     = $initData['fileString'];
-        $this->iconId         = $initData['iconId'];
-        $this->icon           = $initData['icon'] ?: 'trade_engineering';
-        $this->powerType      = $initData['powerType'];
-        $this->raceMask       = $initData['raceMask'];
-        $this->roles          = $initData['roles'];
-        $this->skills         = explode(' ', $initData['skills']);
-        $this->flags          = $initData['flags'];
-        $this->weaponTypeMask = $initData['weaponTypeMask'];
-        $this->armorTypeMask  = $initData['armorTypeMask'];
-        $this->expansion      = $initData['expansion'];
+        $this->cuFlags        = $dbRow->cuFlags;
+        $this->name           = new LocString($dbRow, 'name');
+        $this->fileString     = $dbRow->fileString;
+        $this->iconId         = $dbRow->iconId;
+        $this->icon           = $dbRow->icon ?: 'trade_engineering';
+        $this->powerType      = $dbRow->powerType;
+        $this->raceMask       = $dbRow->raceMask;
+        $this->roles          = $dbRow->roles;
+        $this->skills         = explode(' ', $dbRow->skills);
+        $this->flags          = $dbRow->flags;
+        $this->weaponTypeMask = $dbRow->weaponTypeMask;
+        $this->armorTypeMask  = $dbRow->armorTypeMask;
+        $this->expansion      = $dbRow->expansion;
 
         return true;
     }

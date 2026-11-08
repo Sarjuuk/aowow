@@ -51,28 +51,28 @@ class GuideEntry extends DBTypeEntry implements ITooltip
         'ar' => ['j' => ['::articles ar ON ar.`type` = 300 AND ar.`typeId` = g.`id`'], 's' => ', MAX(ar.`rev`) AS "latest"']
     );
 
-    public function applyInitData(array $initData, array $opts) : bool
+    public function applyInitData(\Dibi\Row $dbRow, array $opts) : bool
     {
-        parent::applyInitData($initData, $opts);
+        parent::applyInitData($dbRow, $opts);
 
-        $this->cuFlags     = $initData['cuFlags'];
-        $this->title       = $initData['title'];
-        $this->name        = $initData['name'];
-        $this->description = $initData['description'];
-        $this->category    = $initData['category'];
-        $this->classId     = $initData['classId'];
-        $this->specId      = $initData['specId'];
-        $this->url         = $initData['url'];
-        $this->locale      = $initData['locale'];
-        $this->status      = $initData['status'];
-        $this->rev         = $initData['rev'];
-        $this->latest      = $initData['latest'];
-        $this->roles       = $initData['roles'];
-        $this->views       = $initData['views'];
-        $this->comments    = $initData['comments'];
-        $this->userId      = $initData['userId'];
-        $this->author      = $initData['author'];
-        $this->date        = $initData['date'];
+        $this->cuFlags     = $dbRow->cuFlags;
+        $this->title       = $dbRow->title;
+        $this->name        = $dbRow->name;
+        $this->description = $dbRow->description;
+        $this->category    = $dbRow->category;
+        $this->classId     = $dbRow->classId;
+        $this->specId      = $dbRow->specId;
+        $this->url         = $dbRow->url;
+        $this->locale      = $dbRow->locale;
+        $this->status      = $dbRow->status;
+        $this->rev         = $dbRow->rev;
+        $this->latest      = $dbRow->latest;
+        $this->roles       = $dbRow->roles;
+        $this->views       = $dbRow->views;
+        $this->comments    = $dbRow->comments;
+        $this->userId      = $dbRow->userId;
+        $this->author      = $dbRow->author;
+        $this->date        = $dbRow->date;
 
         return true;
      }

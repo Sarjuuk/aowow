@@ -35,27 +35,27 @@ class FactionEntry extends DBTypeEntry
         'ft' => ['j' => '::factiontemplate ft ON ft.`factionId` = f.`id`']
     );
 
-    public function applyInitData(array $initData, array $opts) : bool
+    public function applyInitData(\Dibi\Row $dbRow, array $opts) : bool
     {
-        parent::applyInitData($initData, $opts);
+        parent::applyInitData($dbRow, $opts);
 
-        $this->cuFlags         = $initData['cuFlags'];
-        $this->name            = new LocString($initData, 'name');
-        $this->parentFactionId = $initData['parentFactionId'];
-        $this->reputationIndex = $initData['repIdx'];
-        $this->expansion       = $initData['expansion'];
-        $this->side            = $initData['side'];
+        $this->cuFlags         = $dbRow->cuFlags;
+        $this->name            = new LocString($dbRow, 'name');
+        $this->parentFactionId = $dbRow->parentFactionId;
+        $this->reputationIndex = $dbRow->repIdx;
+        $this->expansion       = $dbRow->expansion;
+        $this->side            = $dbRow->side;
 
         // why.? who the fuck knows at this point!
-        $this->category  = $initData['category2'] ? $initData['category']  : 0;
-        $this->category2 = $initData['category2'] ? $initData['category2'] : $initData['category'];
+        $this->category  = $dbRow->category2 ? $dbRow->category  : 0;
+        $this->category2 = $dbRow->category2 ? $dbRow->category2 : $dbRow->category;
 
-        $this->spilloverRateIn  = $initData['spilloverRateIn'];
-        $this->spilloverRateOut = $initData['spilloverRateOut'];
-        $this->spilloverMaxRank = $initData['spilloverMaxRank'];
+        $this->spilloverRateIn  = $dbRow->spilloverRateIn;
+        $this->spilloverRateOut = $dbRow->spilloverRateOut;
+        $this->spilloverMaxRank = $dbRow->spilloverMaxRank;
 
-        $this->templateIds = explode(' ', $initData['templateIds']);
-        $this->qmNpcIds    = explode(' ', $initData['qmNpcIds']);
+        $this->templateIds = explode(' ', $dbRow->templateIds);
+        $this->qmNpcIds    = explode(' ', $dbRow->qmNpcIds);
 
         return true;
     }
