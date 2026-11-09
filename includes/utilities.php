@@ -84,7 +84,7 @@ abstract class Util
         self::$notes[] = [$note, $uGroupMask, $level];
     }
 
-    public static function getNotes() : array
+    public static function getNotes() : ?array
     {
         $notes = [];
         $severity = LOG_LEVEL_INFO;
@@ -100,7 +100,7 @@ abstract class Util
             unset(self::$notes[$k]);
         }
 
-        return [$notes, $severity];
+        return $notes ? [$notes, $severity] : null;
     }
 
     public static function formatMoney(int $qty) : string

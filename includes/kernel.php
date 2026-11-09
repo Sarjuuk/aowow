@@ -203,8 +203,8 @@ set_exception_handler(function (\Throwable $e) : void
 register_shutdown_function(function() : void
 {
     // defer undisplayed error/exception notes
-    if (!CLI && ($n = Util::getNotes()))
-        $_SESSION['notes'][] = [$n[0], $n[1], 'Deferred issues from previous request'];
+    if (!CLI && ([$msg, $severity] = Util::getNotes()))
+        $_SESSION['notes'][] = [$msg, $severity, 'Deferred issues from previous request'];
 
     if ($e = error_get_last())
     {
