@@ -736,7 +736,7 @@ class SpellList extends DBTypeList
 
             $timeStr = Lang::formatTime($time, 'spell', 'castTime');
 
-            if ($ct > $mct && $max > $base)
+            if ($ctpl && $ct > $mct && $max > $base)
             {
                 $ctMax   = intval(($ct - $mct) / $ctpl) + $base;
                 $modStr  = '<!--ppl'.$base.':'.abs($ctMax).':'.($this->curTpl['castTime'] / 1000).':'.floor($ctpl / 10).'-->$1';
@@ -1433,7 +1433,7 @@ class SpellList extends DBTypeList
                 break;
             case 'd':                                       // SpellDuration
             case 'D':
-                $base = $srcSpell->getField('duration');
+                $base = $srcSpell->getField('duration') ?: 0;
 
                 $fmtStringMin = Lang::formatTime($base, 'spell', 'duration');
 
