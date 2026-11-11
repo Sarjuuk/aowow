@@ -47,7 +47,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
             $this->generateNotFound(Lang::game('npc'), Lang::npc('notFound'));
 
         $this->h1      = Util::htmlEscape($this->subject->getField('name', true));
-        $this->subname = $this->subject->getField('subname', true);
+        $this->subname = Util::htmlEscape($this->subject->getField('subname', true));
 
         $this->gPageInfo += array(
             'type'   => $this->type,
