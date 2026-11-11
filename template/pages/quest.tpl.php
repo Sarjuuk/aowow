@@ -192,12 +192,12 @@ if ([$xp, $rep, $title, $tp, $honor, $arena] = $this->gains):
         echo '                        <li><div>'.Lang::quest('bonusTalents', [$tp]).'</div></li>'.PHP_EOL;
     endif;
 
-    if ($arena || $honor):
+    if (([$hPoints, $hSide] = $honor) || $arena):
         echo '                        <li><div>';
-        if ($honor[0]):
-            $a = '<a href="?currency=104">'.$honor[0].'</a>';
-            $a = $honor[1] == SIDE_BOTH ? '<span class="moneyalliance">'.$a.'</span>' : $a;
-            echo '<span class="money'.($honor[1] == SIDE_ALLIANCE ? 'alliance' : 'horde').' tip q1" onmouseover="Listview.funcBox.moneyHonorOver(event)" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">'.$a.'</span>';
+        if ($hPoints):
+            $a = '<a href="?currency=104">'.$hPoints.'</a>';
+            $a = $hSide == SIDE_BOTH ? '<span class="moneyalliance">'.$a.'</span>' : $a;
+            echo '<span class="money'.($hSide == SIDE_ALLIANCE ? 'alliance' : 'horde').' tip q1" onmouseover="Listview.funcBox.moneyHonorOver(event)" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">'.$a.'</span>';
         endif;
         if ($arena):
             echo ' <span class="moneyarena tip q1" onmouseover="Listview.funcBox.moneyArenaOver(event)" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()"><a href="?currency=103">'.$arena.'</a></span>';
