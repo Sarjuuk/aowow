@@ -170,10 +170,6 @@
                 $WH.ae(d, $WH.ct(String.fromCharCode(160, 160)));
                 $WH.ae(d, this.createControl(LANG.firemove, '', '', this.deleteWeight.bind(this, c)));
 
-                if (e) {
-                    $WH.sp($WH.$E(e));
-                }
-
                 return c;
             },
 
@@ -220,10 +216,6 @@
                 var a = $WH.ge('su_addweight');
                 if (c.childNodes.length < 15) {
                     a.style.display = '';
-                }
-
-                if (e) {
-                    $WH.sp($WH.$E(e));
                 }
             },
 

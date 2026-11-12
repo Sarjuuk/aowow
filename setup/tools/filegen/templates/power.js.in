@@ -447,8 +447,7 @@ if (typeof $WowheadPower == "undefined") {
         }
 
         function onMouseOver(e) {
-            e = $WH.$E(e);
-            var t = e._target;
+            var t = e.target;
             var i = 0;
             while (t != null && i < 5 && scanElement(t, e) == -2323) {
                 t = t.parentNode;
@@ -457,7 +456,6 @@ if (typeof $WowheadPower == "undefined") {
         }
 
         function onMouseMove(e) {
-            e = $WH.$E(e);
             updateCursorPos(e);
             $WH.Tooltip.move(cursorX, cursorY, 0, 0, CURSOR_HSPACE, CURSOR_VSPACE);
         }

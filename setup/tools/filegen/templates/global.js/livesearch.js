@@ -289,9 +289,7 @@ var LiveSearch = new function()
 
     function onKeyUp(e)
     {
-        e = $WH.$E(e);
-
-        var textbox = e._target;
+        var textbox = e.target;
         var search  = $WH.trim(textbox.value.replace(/\s+/g, ' '));
 
         if (search == lastSearch[textbox.id])
@@ -307,8 +305,7 @@ var LiveSearch = new function()
 
     function onKeyDown(e)
     {
-        e = $WH.$E(e);
-        var textbox = e._target;
+        var textbox = e.target;
 
         switch (e.keyCode)
         {
@@ -328,8 +325,7 @@ var LiveSearch = new function()
 
     function onFocus(e)
     {
-        e = $WH.$E(e);
-        var textbox = e._target;
+        var textbox = e.target;
 
         if (textbox != document)
             currentTextbox = textbox;

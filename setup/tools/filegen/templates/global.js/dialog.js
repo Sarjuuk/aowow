@@ -327,7 +327,6 @@ var
                     if (field.submitOnEnter)
                     {
                         f.onkeypress = function(e) {
-                            e = $WH.$E(e);
                             if (e.keyCode == 13)
                                 _processForm();
                         };

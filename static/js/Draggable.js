@@ -8,11 +8,9 @@ var Draggable = new function()
 
     function onMouseDown(e)
     {
-        e = $WH.$E(e);
-
         if (this._handle)
         {
-            var _     = e._target,
+            var _     = e.target,
                 found = false,
                 i     = 0;
 
@@ -47,8 +45,6 @@ var Draggable = new function()
 
     function onMouseMove(e)
     {
-        e = $WH.$E(e);
-
         var pos = $WH.g_getCursorPos(e);
 
         if (clickObj)
@@ -78,8 +74,6 @@ var Draggable = new function()
 
     function onMouseUp(e)
     {
-        e = $WH.$E(e);
-
         clickObj = null;
 
         if (dragObj)

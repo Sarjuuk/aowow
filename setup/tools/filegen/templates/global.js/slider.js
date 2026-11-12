@@ -7,8 +7,6 @@ var Slider = new function()
 
     function onMouseDown(e)
     {
-        e = $WH.$E(e);
-
         handleObj = this;
         start     = $WH.g_getCursorPos(e);
 
@@ -20,8 +18,6 @@ var Slider = new function()
 
     function onMouseMove(e)
     {
-        e = $WH.$E(e);
-
         if (!start || !handleObj)
             return;
 
@@ -43,8 +39,6 @@ var Slider = new function()
 
     function onMouseUp(e)
     {
-        e = $WH.$E(e);
-
         if (handleObj.onMove)
             handleObj.onMove(e, handleObj, getCurrentPosition(handleObj));
 
@@ -59,8 +53,6 @@ var Slider = new function()
 
     function onClick(obj, e)
     {
-        e = $WH.$E(e);
-
         handleObj = obj;
         start     = $WH.g_getCursorPos(e);
 

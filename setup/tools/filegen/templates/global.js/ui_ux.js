@@ -535,9 +535,7 @@ function g_getMoneyHtml(money, side, costItems, costCurrency, achievementPoints)
 
 function g_pickerWheel(e)
 {
-    e = $WH.$E(e);
-
-    if (e._wheelDelta < 0)
+    if (e.wheelDelta < 0)
         this.scrollTop += 27;
     else
         this.scrollTop -= 27;

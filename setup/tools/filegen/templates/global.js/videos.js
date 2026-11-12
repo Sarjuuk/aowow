@@ -351,8 +351,6 @@ var VideoViewer = new function()
 
     function onKeyUp(e)
     {
-        e = $WH.$E(e);
-
         switch (e.keyCode)
         {
             case 37: // Left

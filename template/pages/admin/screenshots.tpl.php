@@ -99,7 +99,6 @@
 
                     $WH.ge('usermanage').onkeydown = function(e)
                     {
-                        e = $WH.$E(e);
                         if (e.keyCode != 13)
                             return;
 
@@ -108,7 +107,6 @@
 
                     $WH.ge('pagetypeid').onkeydown = function(e)
                     {
-                        e = $WH.$E(e);
                         var validKeys = [8, 9, 13, 35, 36, 37, 38, 39, 40, 46, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 173];
                         if (!e.ctrlKey && $WH.in_array(validKeys, e.keyCode) == -1)
                             return false;

@@ -7,7 +7,7 @@ function MessageBox(parent, text) {
     box.click(function () { $(this).fadeOut(); });
 
     box.click(function (e) {
-        $WH.sp(e);                                          // aowow - custom: without this, the comment-header would also register the click
+        e.stopPropagation();                                // aowow - custom: without this, the comment-header would also register the click
         $(this).fadeOut();
     });
 

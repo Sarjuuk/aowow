@@ -147,8 +147,6 @@ Cropper.lock = function (locked) {
 };
 
 Cropper.mouseDown = function (ev) {
-    ev = $WH.$E(ev);
-
     this.drag = 1;
     this.anchorX = ev.clientX;
     this.anchorY = ev.clientY;
@@ -156,15 +154,11 @@ Cropper.mouseDown = function (ev) {
 };
 
 Cropper.mouseUp = function (ev) {
-    ev = $WH.$E(ev);
-
     this.drag = this.locked = 0;
 };
 
 Cropper.mouseMove = function (ev) {
     if (this.drag && this.locked) {
-        ev = $WH.$E(ev);
-
         var
             left   = this.selection.coords[0] - this.canvas.coords[0],
             top    = this.selection.coords[1] - this.canvas.coords[1],

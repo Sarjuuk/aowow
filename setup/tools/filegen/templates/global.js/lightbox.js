@@ -51,7 +51,6 @@ var Lightbox = new function()
 
     function onKeyDown(e)
     {
-        e = $WH.$E(e);
         switch (e.keyCode)
         {
             case 27: // Escape

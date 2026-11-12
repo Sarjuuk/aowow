@@ -531,7 +531,7 @@ Summary.prototype = {
         $WH.ae(d, this.createControl(LANG.firemove, '', '', this.deleteWeight.bind(this, c)));
 
         if (e) {
-            $WH.sp($WH.$E(e));
+            e.stopPropagation();
         }
 
         return c;
@@ -564,7 +564,7 @@ Summary.prototype = {
         }
 
         if (e) {
-            $WH.sp($WH.$E(e));
+            e.stopPropagation();
         }
     },
 
@@ -2206,9 +2206,7 @@ Summary.prototype = {
     },
 
     toggleOptions: function(popupId, link, e) {
-        e = $WH.$E(e);
-
-        if (e && e._button >= 2) {
+        if (e && e.button >= 1) {
             return false;
         }
 
@@ -2229,7 +2227,7 @@ Summary.prototype = {
             }
         }
         else if (e) {
-            var p = e._target;
+            var p = e.target;
 
             if (!p.parentNode) {
                 return;
@@ -2264,7 +2262,7 @@ Summary.prototype = {
         }
 
         if (e && popupId && link) {
-            $WH.sp(e);
+            e.stopPropagation();
         }
     },
 
@@ -2323,8 +2321,6 @@ Summary.prototype = {
 
     deleteColumn: function(col, e) {
         $WH.Tooltip.hide();
-
-        e = $WH.$E(e);
 
         if (!e.shiftKey) {
             this.groups.splice(col.i, 1);
@@ -3145,17 +3141,14 @@ Summary.prototype = {
     },
 
     onMouseClick: function(a, e) {
-        e = $WH.$E(e);
-
-        if (e._button == 3 || e.shiftKey || e.ctrlKey) {
+        if (e.button == 2 || e.shiftKey || e.ctrlKey) {
             return false;
         }
     },
 
-    onMouseUp: function(event) {
-        event = $WH.$E(event);
-        if (event._button == 3 || event.shiftKey || event.ctrlKey) { // Right click
-            var pos = $WH.g_getCursorPos(event);
+    onMouseUp: function(e) {
+        if (e.button == 2 || e.shiftKey || e.ctrlKey) { // Right click
+            var pos = $WH.g_getCursorPos(e);
             setTimeout(Menu.showAtXY.bind(null, this.menu, pos.x, pos.y), 1); // Timeout needed for the context menu to be disabled
 
             $WH.Tooltip.hide();
@@ -3176,8 +3169,6 @@ Summary.prototype = {
     },
 
     onSearchKeyDown: function(e) {
-        e = $WH.$E(e);
-
         switch (e.keyCode) {
         case 13: // Enter
             g_listviews.items.submitSearch(e);
@@ -4460,8 +4451,7 @@ Listview.templates.compare = {
                 $WH.ae(td, a);
 
                 tr.onclick = function(e) {
-                    e = $WH.$E(e);
-                    if (e._button != 2 || e._target != a) {
+                    if (e.button != 1 || e.target != a) {
                         e.preventDefault();
                         (Summary.addGroupItem.bind(item._summary, item._type, item))();
                     }
@@ -4667,8 +4657,7 @@ Listview.templates.subitempicker = {
                 $WH.ae(td, a);
 
                 tr.onclick = function(e) {
-                    e = $WH.$E(e);
-                    if (e._button != 2 || e._target != a) {
+                    if (e.button != 1 || e.target != a) {
                         e.preventDefault();
                         (Summary.addItemSubitem.bind(subitem._summary, subitem.id))();
                     }
@@ -4798,8 +4787,7 @@ Listview.templates.enchantpicker = {
                 $WH.ae(td, a);
 
                 tr.onclick = function(e) {
-                    e = $WH.$E(e);
-                    if (e._button != 2 || e._target != a) {
+                    if (e.button != 1 || e.target != a) {
                         e.preventDefault();
                         (Summary.addItemEnchant.bind(enchant._summary, enchant.id))();
                     }
@@ -4974,8 +4962,7 @@ Listview.templates.gempicker = {
                 $WH.ae(td, a);
 
                 tr.onclick = function(e) {
-                    e = $WH.$E(e);
-                    if (e._button != 2 || e._target != a) {
+                    if (e.button != 1 || e.target != a) {
                         e.preventDefault();
                         (Summary.addItemGem.bind(gem._summary, gem.id))();
                     }

@@ -269,7 +269,7 @@ function vim_UpdateList(k) {
       *     a.href = $WH.sprintf(vi_siteurls[video.videoType], video.videoId);
       *     a.target = '_blank';
       *     a.onclick = function (id, e) {
-      *         $WH.sp(e);
+      *         e.stopPropagation();
       *         (vim_View.bind(null, this, id))();
       *         return false;
       *     }.bind(tr, video.id);
@@ -288,7 +288,7 @@ function vim_UpdateList(k) {
             var a = $WH.ce('a');
             a.href = '?' + g_types[video.type] + '=' + video.typeId + '#videos:id=' + video.id;
             a.target = '_blank';
-            a.onclick = function (a) { $WH.sp(a); };
+            a.onclick = (e) => e.stopPropagation();
             $WH.ae(a, $WH.ct(video.id));
             $WH.ae(td, a);
         }
@@ -324,7 +324,7 @@ function vim_UpdateList(k) {
         var a = $WH.ce('a');
         a.href = 'javascript:;';
         a.onclick = function (vi, e) {
-            $WH.sp(e);
+            e.stopPropagation();
             (vim_ShowEdit.bind(this, vi))();
         }.bind(a, video);
         $WH.ae(a, $WH.ct('Edit'));
@@ -334,7 +334,7 @@ function vim_UpdateList(k) {
         a = $WH.ce('a');
         a.href = 'javascript:;';
         a.onclick = function (vi, e) {
-            $WH.sp(e);
+            e.stopPropagation();
             (vim_Clear.bind(this, vi))();
         }.bind(a, video);
         $WH.ae(a, $WH.ct('Clear'));
@@ -351,7 +351,7 @@ function vim_UpdateList(k) {
         a = $WH.ce('a');
         a.href = '?user=' + video.user;
         a.target = '_blank';
-        a.onclick = function (a) { $WH.sp(a); };
+        a.onclick = (e) => e.stopPropagation();
         $WH.ae(a, $WH.ct(video.user));
         $WH.ae(td, a);
         $WH.ae(tr, td);
@@ -365,7 +365,7 @@ function vim_UpdateList(k) {
         cb.type = 'checkbox';
         cb.value = video.id;
         cb.onclick = function (e) {
-            $WH.sp(e);
+            e.stopPropagation();
             (vim_UpdateMassLinks.bind(this))();
         }.bind(cb);
         $WH.ae(td, cb);
@@ -385,7 +385,7 @@ function vim_UpdateList(k) {
                 a = $WH.ce('a');
                 a.href = 'javascript:;';
                 a.onclick = function (e) {
-                    $WH.sp(e);
+                    e.stopPropagation();
                     (vim_Approve.bind(this, false))();
                 }.bind(video);
                 $WH.ae(a, $WH.ct('Approve'));
@@ -400,7 +400,7 @@ function vim_UpdateList(k) {
                 a = $WH.ce('a');
                 a.href = 'javascript:;';
                 a.onclick = function (e) {
-                    $WH.sp(e);
+                    e.stopPropagation();
                     (vim_Sticky.bind(this, false))();
                 }.bind(video);
                 $WH.ae(a, $WH.ct('Make sticky'));
@@ -414,7 +414,7 @@ function vim_UpdateList(k) {
             a = $WH.ce('a');
             a.href = 'javascript:;';
             a.onclick = function (e) {
-                $WH.sp(e);
+                e.stopPropagation();
                 (vim_Delete.bind(this, false))();
             }.bind(video);
             $WH.ae(a, $WH.ct('Delete'));
@@ -425,7 +425,7 @@ function vim_UpdateList(k) {
             a = $WH.ce('a');
             a.href = 'javascript:;';
             a.onclick = function (e) {
-                $WH.sp(e);
+                e.stopPropagation();
                 var a = prompt('Enter the ID to move this video to:');
                 (vim_Relocate.bind(this, a))();
             }.bind(video);
@@ -438,7 +438,7 @@ function vim_UpdateList(k) {
                 a = $WH.ce('a');
                 a.href = 'javascript:;';
                 a.onclick = function (e) {
-                    $WH.sp(e);
+                    e.stopPropagation();
                     (vim_Move.bind(this, -1))()
                 }.bind(video);
                 $WH.ae(a, $WH.ct('Move up'));
@@ -453,7 +453,7 @@ function vim_UpdateList(k) {
                 a = $WH.ce('a');
                 a.href = 'javascript:;';
                 a.onclick = function (e) {
-                    $WH.sp(e);
+                    e.stopPropagation();
                     (vim_Move.bind(this, 1))();
                 }.bind(video);
                 $WH.ae(a, $WH.ct('Move down'));
@@ -552,7 +552,7 @@ function vim_ShowEdit(video, isAlt) {
     iCaption.value = video.caption;
     iCaption.maxLength = 200;
     iCaption.size = 35;
-    iCaption.onclick = function (e) { $WH.sp(e); }          // aowow - custom to inhibit screenshot popup, when clicking into input element
+    iCaption.onclick = (e) => e.stopPropagation();          // aowow - custom to inhibit screenshot popup, when clicking into input element
     div.appendChild(iCaption);
 
     var btn = $WH.ce('input');
@@ -560,7 +560,7 @@ function vim_ShowEdit(video, isAlt) {
     btn.value = 'Update';
     btn.onclick = function (vi, isAlt, e) {
         if (!isAlt)
-            $WH.sp(e);
+            e.stopPropagation();
 
         (vim_Edit.bind(this, vi, isAlt))();
     }.bind(btn, video, isAlt);
@@ -575,7 +575,7 @@ function vim_ShowEdit(video, isAlt) {
     btn.value = 'Cancel';
     btn.onclick = function (vi, isAlt, e) {
         if (!isAlt)
-            $WH.sp(e);
+            e.stopPropagation();
 
         (vim_CancelEdit.bind(this, vi, isAlt))();
     }.bind(btn, video, isAlt);

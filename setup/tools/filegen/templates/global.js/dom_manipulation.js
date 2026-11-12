@@ -207,9 +207,7 @@ function g_onClick(el, func)
 
     el.onclick = function(e)
     {
-        e = $WH.$E(e);
-
-        if (e._button == 2) // middle click
+        if (e.button == 1) // middle click
             return true;
 
         return false;
@@ -224,13 +222,11 @@ function g_onClick(el, func)
 
     el.onmouseup = function(e)
     {
-        e = $WH.$E(e);
-
-        if (e._button == 3 || e.shiftKey || e.ctrlKey) // Right/Shift/Ctrl
+        if (e.button == 2 || e.shiftKey || e.ctrlKey) // Right/Shift/Ctrl
         {
             rightClk(2);
         }
-        else if (e._button == 1) // Left
+        else if (e.button === 0) // Left
         {
             func(false);
         }
@@ -241,8 +237,7 @@ function g_onClick(el, func)
 
 function g_isLeftClick(e)
 {
-    e = $WH.$E(e);
-    return (e && e._button == 1);
+    return (e && e.button === 0);
 }
 
 function g_preventEmptyFormSubmission() // Used on the homepage and in the top bar
