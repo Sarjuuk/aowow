@@ -136,7 +136,7 @@ class SpellList extends DBTypeList
                         'ic'  => ['j' => ['::icons ic  ON ic.`id`  = s.`iconId`',    true], 's' => ', ic.`name` AS "iconString"'],
                         'ica' => ['j' => ['::icons ica ON ica.`id` = s.`iconIdAlt`', true], 's' => ', ica.`name` AS "iconStringAlt"'],
                         'sr'  => ['j' => ['::spellrange sr ON sr.`id` = s.`rangeId`', true], 's' => ', sr.`rangeMinHostile`, sr.`rangeMinFriend`, sr.`rangeMaxHostile`, sr.`rangeMaxFriend`, sr.`rangeType`, sr.`name_loc0` AS "rangeText_loc0", sr.`name_loc2` AS "rangeText_loc2", sr.`name_loc3` AS "rangeText_loc3", sr.`name_loc4` AS "rangeText_loc4", sr.`name_loc6` AS "rangeText_loc6", sr.`name_loc8` AS "rangeText_loc8"'],
-                        'sd'  => ['j' => ['::spellduration sd ON sd.`id` = s.`durationId`', true], 's' => ', sd.`duration`, sd.`durationPerLevel`, sd.`maxDuration`'],
+                        'sd'  => ['j' => ['::spellduration sd ON sd.`id` = s.`durationId`', true], 's' => ', IFNULL(sd.`duration`, 0) AS "duration", IFNULL(sd.`durationPerLevel`, 0) AS "durationPerLevel", IFNULL(sd.`maxDuration`, 0) AS "maxDuration"'],
                         'sct' => ['j' => ['::spellcasttimes sct ON sct.`id` = s.`castTimeId`', true], 's' => ', sct.`castTime`, sct.`castTimePerLevel`, sct.`minCastTime`'],
                         'src' => ['j' => ['::source src ON `type` = 6 AND `typeId` = s.`id`', true], 's' => ', `moreType`, `moreTypeId`, `moreZoneId`, `moreMask`, `src1`, `src2`, `src3`, `src4`, `src5`, `src6`, `src7`, `src8`, `src9`, `src10`, `src11`, `src12`, `src13`, `src14`, `src15`, `src16`, `src17`, `src18`, `src19`, `src20`, `src21`, `src22`, `src23`, `src24`']
                     );
@@ -1433,7 +1433,7 @@ class SpellList extends DBTypeList
                 break;
             case 'd':                                       // SpellDuration
             case 'D':
-                $base = $srcSpell->getField('duration') ?: 0;
+                $base = $srcSpell->getField('duration');
 
                 $fmtStringMin = Lang::formatTime($base, 'spell', 'duration');
 
