@@ -1029,15 +1029,15 @@ var mn_reputation = [
 ];
 
 var mn_community = [
-    [3,"Foros","http://forums.battle.net",null,{tinyIcon: g_staticUrl + "/images/icons/forum.png"}],
-    [7,"Blog","http://worldpress.com",null,{tinyIcon: g_staticUrl + "/images/icons/blog.png"}],
-    [4,"Canal de IRC","http://webchat.quakenet.org/",null,{tinyIcon: g_staticUrl + "/images/icons/irc.png"}],
+    // [3,"Foros","http://forums.battle.net",null,{tinyIcon: g_staticUrl + "/images/icons/forum.png"}],
+    // [7,"Blog","http://wordpress.com",null,{tinyIcon: g_staticUrl + "/images/icons/blog.png"}],
+    // [4,"Canal de IRC","http://webchat.quakenet.org/",null,{tinyIcon: g_staticUrl + "/images/icons/irc.png"}],
     [,"Comunidad"],
     [10, "Reputación en la web", "?reputation", mn_reputation],
     [11, "Usuarios más populares", "?top-users"],
-    [,"Social"],
-    [6,"Página de Facebook","http://facebook.com",null,{tinyIcon: g_staticUrl + "/images/icons/facebook.png"}],
-    [5,"Página de Twitter","http://twitter.com",null,{tinyIcon: g_staticUrl + "/images/icons/twitter.png"}]
+    // [,"Social"],
+    // [6,"Página de Facebook","http://facebook.com",null,{tinyIcon: g_staticUrl + "/images/icons/facebook.png"}],
+    // [5,"Página de Twitter","http://twitter.com",null,{tinyIcon: g_staticUrl + "/images/icons/twitter.png"}]
 ];
 var mn_more = [
     [,"Todo sobre AoWoW"],

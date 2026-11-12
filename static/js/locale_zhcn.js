@@ -1075,15 +1075,15 @@ var mn_reputation = [
 ];
 
 var mn_community = [
-    [3,"论坛","http://forums.battle.net",null,{tinyIcon: g_staticUrl + "/images/icons/forum.png"}],
-    [7,"博客","http://worldpress.com",null,{tinyIcon: g_staticUrl + "/images/icons/blog.png"}],
-    [4,"IRC频道","http://webchat.quakenet.org/",null,{tinyIcon: g_staticUrl + "/images/icons/irc.png"}],
+    // [3,"论坛","http://forums.battle.net",null,{tinyIcon: g_staticUrl + "/images/icons/forum.png"}],
+    // [7,"博客","http://wordpress.com",null,{tinyIcon: g_staticUrl + "/images/icons/blog.png"}],
+    // [4,"IRC频道","http://webchat.quakenet.org/",null,{tinyIcon: g_staticUrl + "/images/icons/irc.png"}],
     [,"社区"],
     [10, "网站声望", "?reputation", mn_reputation],
     [11, "用户排行榜", "?top-users"],
-    [,"社交"],
-    [6,"Facebook页面","http://www.facebook.com",null,{tinyIcon: g_staticUrl + "/images/icons/facebook.png"}],
-    [5,"推特页面","http://twitter.com",null,{tinyIcon: g_staticUrl + "/images/icons/twitter.png"}]
+    // [,"社交"],
+    // [6,"Facebook页面","http://www.facebook.com",null,{tinyIcon: g_staticUrl + "/images/icons/facebook.png"}],
+    // [5,"推特页面","http://twitter.com",null,{tinyIcon: g_staticUrl + "/images/icons/twitter.png"}]
 ];
 var mn_more = [
     [,"关于AoWoW"],
