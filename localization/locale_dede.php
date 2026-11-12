@@ -1345,7 +1345,7 @@ $lang = array(
         ),
         'extraFlags'    => array(
             CREATURE_FLAG_EXTRA_INSTANCE_BIND                   => 'Bindet Angreifer im Tod an die Instanz',
-            CREATURE_FLAG_EXTRA_CIVILIAN                        => "[tooltip name=civilian]- hat keine Aggro\n- Tod kostet Ehre[/tooltip][span class=tip tooltip=civilian]Zivilist[/span]",
+            CREATURE_FLAG_EXTRA_CIVILIAN                        => "[tooltip name=civilian]hat keine Aggro[/tooltip][span class=tip tooltip=civilian]Zivilist[/span]",
             CREATURE_FLAG_EXTRA_NO_PARRY                        => 'Kann nicht [spell=3127]',
             CREATURE_FLAG_EXTRA_NO_PARRY_HASTEN                 => 'Erhält keine Eile nach [spell=3127]',
             CREATURE_FLAG_EXTRA_NO_BLOCK                        => 'Kann nicht [spell=107]',
