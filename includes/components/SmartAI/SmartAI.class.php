@@ -351,10 +351,10 @@ class SmartAI
         $result = self::getActionOwner($lookup, $typeFilter);
 
         // can skip lookups for SmartAction::ACTION_SUMMON_CREATURE_GROUP as creature_summon_groups already contains summoner info
-        // summonerType is a SUMMONER_TYPE_*, not a Type; a map summoner has no entity to list
+        $summonTypeMap = [SUMMONER_TYPE_CREATURE => Type::NPC, SUMMONER_TYPE_GAMEOBJECT => Type::OBJECT];
         if ($sgs = DB::World()->selectAssoc('SELECT `summonerType` AS "0", `summonerId` AS "1" FROM creature_summon_groups WHERE `entry` = %i', $npcId))
             foreach ($sgs as [$type, $typeId])
-                if ($t = match ((int)$type) { SUMMONER_TYPE_CREATURE => Type::NPC, SUMMONER_TYPE_GAMEOBJECT => Type::OBJECT, default => 0 })
+                if ($t = $summonTypeMap[$type] ?? 0)
                     $result[$t][] = $typeId;
 
         return $result;
