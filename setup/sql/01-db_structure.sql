@@ -1697,6 +1697,7 @@ CREATE TABLE `aowow_objectdifficulty` (
   `heroic10` mediumint(8) unsigned NOT NULL,
   `heroic25` mediumint(8) unsigned NOT NULL,
   `mapType` tinyint(3) unsigned NOT NULL,
+  `comment` varchar(100) NOT NULL,
   KEY `normal10` (`normal10`),
   KEY `normal25` (`normal25`),
   KEY `heroic10` (`heroic10`),
