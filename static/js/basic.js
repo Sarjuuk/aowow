@@ -1634,7 +1634,8 @@ $WH.g_enhanceTooltip = function(tooltip, isStatic, useGets, showSlider, buff, kn
             // Retrieve tooltip's global information
             var _ = tooltip.match(/<!--\?(\d+):(\d+):(\d+):(\d+)/);
             if (_ && _[2] != _[3]) {
-                this.slider = Slider.init(showSlider, { minValue: parseInt(_[2]), maxValue: parseInt(_[3]), onMove: $WH.g_tooltipSliderMove.bind(this) });
+                this.slider = Slider.init(showSlider, { minValue: parseInt(_[2]), maxValue: parseInt(_[3]), onMove: $WH.g_tooltipSliderMove.bind(this), title: LANG.level });
+
                 Slider.setValue(this.slider, parseInt(_[4]));
 
                 this.slider.onmousemove = $WH.Tooltip.cursorUpdate;
@@ -1642,6 +1643,7 @@ $WH.g_enhanceTooltip = function(tooltip, isStatic, useGets, showSlider, buff, kn
                 this.slider.onmouseover = function(e) {
                     $WH.Tooltip.showAtCursor(e, LANG.tooltip_changelevel2, 0, 0, 'q2');
                 };
+                $WH.Tooltip.simple(Slider.getInput(this.slider), LANG.tooltip_changelevel, 'q2', true);
             }
         }
     }
