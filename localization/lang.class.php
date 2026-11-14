@@ -501,19 +501,19 @@ class Lang
     {
         $buff = [];
 
-        $base = match ($fmt)
+        [$base, $spacer] = match ($fmt)
         {
-            self::FMT_HTML   => '<span class="%1$s">%2$s</span>',
-            self::FMT_MARKUP => '[color=%1$s]%2$s[/color]',
-            self::FMT_RAW    => '%2$s',
-            default          => '%2$s'
+            self::FMT_HTML   => ['<span class="%1$s">%2$s</span>', '<small> &nbsp;</small>'],
+            self::FMT_MARKUP => ['[color=%1$s]%2$s[/color]', '[small] &nbsp;[/small]'],
+            self::FMT_RAW    => ['%2$s', ' '],
+            default          => ['%2$s', ' ']
         };
 
         for ($i = 0; $i < 5; $i++)
             if (isset($bp[$i]))
                 $buff[] = sprintf($base, $i ? 'r'.$i : 'q10', $bp[$i]);
 
-        return self::game('difficulty').implode('[small] &nbsp;[/small]', $buff);
+        return self::game('difficulty').implode($spacer, $buff);
     }
 
     public static function makeLink(int $type, int $typeId, string $name, int $fmt = self::FMT_HTML, string $cssClass = '') : string

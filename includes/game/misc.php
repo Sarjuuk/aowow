@@ -305,6 +305,7 @@ class Game
     {
         if ($skillId == SKILL_FISHING)
             return array(
+                null,                                       // red .. not set
                 round(sqrt(.25) * $reqLevel),               //  25% valid catches
                 round(sqrt(.50) * $reqLevel),               //  50% valid catches
                 round(sqrt(.75) * $reqLevel),               //  75% valid catches
@@ -322,20 +323,20 @@ class Game
             case SKILL_INSCRIPTION:
             case SKILL_MINING:
             case SKILL_ENGINEERING:
-                $points = [$reqLevel];                      // red/orange
+                $points = [null, $reqLevel];                // red, orange
 
-                if ($reqLevel + 25 <= MAX_SKILL)            // orange/yellow
+                if ($reqLevel + 25 <= MAX_SKILL)            // yellow
                     $points[] = $reqLevel + 25;
 
-                if ($reqLevel + 50 <= MAX_SKILL)            // yellow/green
+                if ($reqLevel + 50 <= MAX_SKILL)            // green
                     $points[] = $reqLevel + 50;
 
-                if ($reqLevel + 100 <= MAX_SKILL)           // green/grey
+                if ($reqLevel + 100 <= MAX_SKILL)           // grey
                     $points[] = $reqLevel + 100;
 
                 return $points;
             default:
-                return [$reqLevel];
+                return [null, $reqLevel];
         }
     }
 
