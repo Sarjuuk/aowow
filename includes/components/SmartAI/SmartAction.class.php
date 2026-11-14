@@ -704,12 +704,14 @@ class SmartAction
                 $playerSrc = false;
                 if ($npcId = $this->smartAI->getTarget()->getTalkSource($playerSrc))
                 {
+                    $this->param[10]  = 0;
                     if ($quotes = $this->smartAI->getQuote($npcId, $this->param[0], $npcSrc))
                     {
                         foreach ($quotes as ['text' => $text])
                         {
                             $talkTarget = ($talkTarget ?? true) ? Lang::game('target') : $npcSrc;
-                            $this->param[10] .= self::escapeForConditional(sprintf($text, $playerSrc ? Lang::main('thePlayer') : $npcSrc, $talkTarget));
+                            $this->param[10]  = 1;
+                            $this->param[11] .= self::escapeForConditional(sprintf($text, $playerSrc ? Lang::main('thePlayer') : $npcSrc, $talkTarget));
                         }
                     }
                 }

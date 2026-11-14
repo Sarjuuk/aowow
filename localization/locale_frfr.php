@@ -781,7 +781,7 @@ $lang = array(
         'actionTT'      => '[b class=q1]ActionType %d[/b][br][table][tr][td]Param1[/td][td=header]%d[/td][/tr][tr][td]Param2[/td][td=header]%d[/td][/tr][tr][td]Param3[/td][td=header]%d[/td][/tr][tr][td]Param4[/td][td=header]%d[/td][/tr][tr][td]Param5[/td][td=header]%d[/td][/tr][tr][td]Param6[/td][td=header]%d[/td][/tr][/table]',
         'actions'       => array(                           // [body, footer]
             null,
-            SmartAction::ACTION_TALK                               => ['(%3$d)?Say:#target# says; (%11$s)?TextGroup:[span class=q10]unknown text[/span]; #[b]%1$d[/b] to (%3$d)?#target#:invoker;%11$s', 'Duration: %s'],
+            SmartAction::ACTION_TALK                               => ['(%3$d)?Say:#target# says; (%11$d)?TextGroup:[span class=q10]unknown text[/span]; #[b]%1$d[/b] to (%3$d)?#target#:invoker;%12$s', 'Duration: %s'],
             SmartAction::ACTION_SET_FACTION                        => ['(%1$d)?Set faction of #target# to [faction=%11$d]:Reset faction of #target#;.', ''],
             SmartAction::ACTION_MORPH_TO_ENTRY_OR_MODEL            => ['(%11$d)?Reset apperance.:Take the appearance of;(%1$d)? [npc=%1$d].:;(%2$d)?[model npc=%2$d border=1 float=right][/model]:;', ''],
             SmartAction::ACTION_SOUND                              => ['Play sound to (%2$d)?invoking player:all players in sight;:[div][sound=%1$d][/div]', 'Played by environment.'],
@@ -864,7 +864,7 @@ $lang = array(
             SmartAction::ACTION_SET_NPC_FLAG                       => ['Set #target#\'s npc flags to %11$s.', ''],
             SmartAction::ACTION_ADD_NPC_FLAG                       => ['Add %11$s npc flags to #target#.', ''],
             SmartAction::ACTION_REMOVE_NPC_FLAG                    => ['Remove %11$s npc flags from #target#.', ''],
-            SmartAction::ACTION_SIMPLE_TALK                        => ['#target# says (%11$s)?TextGroup:[span class=q10]unknown text[/span]; #[b]%1$d[/b] %11$s', ''],
+            SmartAction::ACTION_SIMPLE_TALK                        => ['#target# says (%11$d)?TextGroup:[span class=q10]unknown text[/span]; #[b]%1$d[/b] %12$s', ''],
             SmartAction::ACTION_SELF_CAST                          => ['#target# casts [spell=%1$d] at #target#.(%4$d)? (max. %4$d |4target:targets;):;', '%1$s'],
             SmartAction::ACTION_CROSS_CAST                         => ['%11$s casts [spell=%1$d] at #target#.', '%1$s'],
             SmartAction::ACTION_CALL_RANDOM_TIMED_ACTIONLIST       => ['Call Timed Actionlist at random: %11$s', ''],
