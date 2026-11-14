@@ -5152,6 +5152,11 @@ var LANG = {
 
     /* AoWoW: start custom */
 
+    // Quest Detail Page
+    atlevel_format:    '($1 au niveau $2)',      // WH.TERMS.atlevel_format
+    experience_format: "%s points d'expérience", // WH.TERMS.experience_format
+    minimum_abbrev:    'Min',                    // WH.TERMS.minimum_abbrev
+
     // Profiler completions import
     completion:    'Achèvement', // WH.TERMS.completion
     complete:      'Complète',   // WH.TERMS.complete

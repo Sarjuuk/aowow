@@ -74,6 +74,11 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
         return Util::toJSON($result);
     }
+
+    private function maxLevel()
+    {
+        return MAX_LEVEL;
+    }
 });
 
 ?>

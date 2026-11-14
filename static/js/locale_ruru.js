@@ -5153,6 +5153,11 @@ var LANG = {
 
     /* AoWoW: start custom */
 
+    // Quest Detail Page
+    atlevel_format:    '($1 на $2-м ур.)', // WH.TERMS.atlevel_format
+    experience_format: '%s ед. опыта',     // WH.TERMS.experience_format
+    minimum_abbrev:    'Мин',              // WH.TERMS.minimum_abbrev
+
     // Profiler completions import
     completion:    'Завершено',    // WH.TERMS.completion
     complete:      'Завершено',    // WH.TERMS.complete

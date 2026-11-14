@@ -134,7 +134,7 @@ if ($this->offerReward && ($this->requestItems || $this->objectives)):
 <?php
 endif;
 
-if ([$spells, $items, $choice, $money] = $this->rewards):
+if ([$spells, $items, $choice, $hasMoney] = $this->rewards):
     echo '                <h3>'.Lang::main('rewards').'</h3>'.PHP_EOL;
 
     if ($choice):
@@ -151,7 +151,7 @@ if ([$spells, $items, $choice, $money] = $this->rewards):
         $iconOffset += count($spells['cast']);
     endif;
 
-    if ($items || $money):
+    if ($items || $hasMoney):
         if ($choice || $spells):
             echo '                        <div class="pad"></div>'.PHP_EOL;
         endif;
@@ -160,13 +160,13 @@ if ([$spells, $items, $choice, $money] = $this->rewards):
             'rewTitle' => $choice ? Lang::quest('rewardAlso') : Lang::quest('rewardItems'),
             'rewards'  => $items ?: null,
             'offset'   => $iconOffset,
-            'extra'    => $money ?: null
+            'extra'    => $hasMoney ? '<span id="quest-reward-coin"></span>' : null
         ));
     endif;
 
 endif;
 
-if ([$xp, $rep, $title, $tp, $honor, $arena] = $this->gains):
+if ([$hasXP, $rep, $title, $tp, $honor, $arena] = $this->gains):
 ?>
 
                     <h3><?=Lang::main('gains'); ?></h3>
@@ -174,8 +174,8 @@ if ([$xp, $rep, $title, $tp, $honor, $arena] = $this->gains):
                     <ul>
 
 <?php
-    if ($xp):
-        echo '                        <li><div>'.Lang::nf($xp).' '.Lang::quest('experience').'</div></li>'.PHP_EOL;
+    if ($hasXP):
+        echo '                        <li><div id="quest-reward-xp"></div></li>'.PHP_EOL;
     endif;
 
     if ($rep):
@@ -204,8 +204,13 @@ if ([$xp, $rep, $title, $tp, $honor, $arena] = $this->gains):
         endif;
         echo                         '</div></li>'.PHP_EOL;
     endif;
+?>
+                    </ul>
 
-    echo '                    </ul>'.PHP_EOL;
+                    <div id="quest-reward-slider" style="max-width:300px"></div>
+                    <script>$WH.Wow.Quest.setupScalingRewards(<?=$this->json('rewardsScaler', varRef: true); ?>);</script>
+                    <div class="pad3"></div>
+<?php
 endif;
 
 $this->brickIf($this->mail, 'mail', ['offset' => ++$iconOffset]);

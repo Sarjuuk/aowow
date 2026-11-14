@@ -5193,11 +5193,16 @@ var LANG = {
 
     /* AoWoW: start custom */
 
+    // Quest Detail Page
+    atlevel_format:    '（$2 级可获取 $1）',
+    experience_format: '%s经验',
+    minimum_abbrev:    '最低',
+
     // Profiler completions import
-    completion:    '达成',     // WH.TERMS.completion
-    complete:      '完成',     // WH.TERMS.complete
-    incomplete:    '未完成',   // WH.TERMS.incomplete
-    parens_format: '$1（$2）', // WH.TERMS.parens_format
+    completion:    '达成',
+    complete:      '完成',
+    incomplete:    '未完成',
+    parens_format: '$1（$2）',
 
     // click to copy fn
     copied:            '已复制',

@@ -58,6 +58,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                       IFNULL(qa.ProvidedItemCount, 0),
                       IFNULL(qa.SourceSpellId, 0),
                       RewardXPDifficulty,                             -- QuestXP.dbc x level
+                      0 AS "RewardXP",
                       RewardMoney,
                       RewardBonusMoney,
                       RewardDisplaySpell,                 RewardSpell,
@@ -139,20 +140,23 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
         CLI::write(' * unpacking XP rewards (1/4)', CLI::LOG_BLANK, true, true);
 
-        // unpack XP-reward
+        // for scaling quest rewards (level < 0)
+        (new DBCReader('questxp', ['temporary' => false, 'tableName' => 'aowow_questxp']))->readFile();
+
+        // for static lookups
         DB::Aowow()->qry(
-           'UPDATE ::quests q, dbc_questxp xp
-            SET    `rewardXP` = (CASE `rewardXP`
+           'UPDATE ::quests q, ::questxp xp
+            SET    `rewardXP` = (CASE `rewardXPId`
                        WHEN 0 THEN xp.`Field1` WHEN 1 THEN xp.`Field2` WHEN 2 THEN xp.`Field3` WHEN 3 THEN xp.`Field4` WHEN 4 THEN xp.`Field5`
                        WHEN 5 THEN xp.`Field6` WHEN 6 THEN xp.`Field7` WHEN 7 THEN xp.`Field8` WHEN 8 THEN xp.`Field9` WHEN 9 THEN xp.`Field10`
                        ELSE 0 END)
-            WHERE  xp.`id` = q.`level`',
+            WHERE  xp.`id` = IF (q.`level` < 0, %i, q.`level`)',
+            MAX_LEVEL
         );
 
 
         CLI::write(' * unpacking reputation gains (2/4)', CLI::LOG_BLANK, true, true);
 
-        // unpack Rep-rewards
         for ($i = 1; $i < 6; $i++)
             DB::Aowow()->qry(
                'UPDATE    ::quests q
@@ -168,7 +172,6 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
         CLI::write(' * flagging quests series (3/4)', CLI::LOG_BLANK, true, true);
 
-        // set series flags
         DB::Aowow()->qry(
            'UPDATE    ::quests q
             LEFT JOIN ::quests q2 ON q2.`NextQuestIdChain` = q.id

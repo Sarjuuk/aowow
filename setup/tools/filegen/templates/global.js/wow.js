@@ -421,3 +421,43 @@ function g_getIngameLink(color, id, name)
     //prompt(LANG.prompt_ingamelink, '/script DEFAULT_CHAT_FRAME:AddMessage("\\124c' + color + '\\124H' + id + '\\124h[' + name + ']\\124h\\124r");');
     return '/script DEFAULT_CHAT_FRAME:AddMessage("\\124c' + color + '\\124H' + id + '\\124h[' + name + ']\\124h\\124r");';
 }
+
+$WH.Wow = new function()
+{
+    const _self = this;
+
+    this.getMaxPlayerLevel = x => /*setup:maxLevel*/;
+};
+
+$WH.Wow.Quest = new function()
+{
+    const Categories = g_quest_categories; // WH.getPageData("wow.quest.categoryNames") || {};
+    const QuestTypes = g_quest_types; // WH.getPageData("wow.quest.types") || {};
+
+    this.getCategoryName = function(catg)
+    {
+        return Categories[catg];
+    };
+
+    this.getQuestClass = function(iconType, startend)
+    {
+        if (startend)
+            return `quest-${startend}-${iconType}`;
+
+        return null;
+    };
+
+    this.getTypeName = function(type)
+    {
+        return QuestTypes[type] || null;
+    };
+
+    this.roundQuestXp = function(xp)
+    {
+        if (xp == undefined)
+            return xp;
+
+        let mod = xp < 1000 ? 10 : 50;
+        return Math.round(xp / mod) * mod;
+    };
+};

@@ -2229,6 +2229,7 @@ CREATE TABLE `aowow_quests` (
   `sourceItemId` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `sourceItemCount` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `sourceSpellId` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `rewardXPId` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `rewardXP` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `rewardOrReqMoney` int(11) NOT NULL DEFAULT 0,
   `rewardMoneyMaxLevel` int(10) unsigned NOT NULL DEFAULT 0,
