@@ -1876,8 +1876,11 @@ class SpellList extends DBTypeList
         if (!$this->getField('buff', true))
             return null;
 
+        $baseLevel = $this->curTpl['baseLevel'] ?: 1;
+        $maxLevel  = $this->curTpl['maxLevel']  ?: MAX_LEVEL;
+
+        $this->charLevel   = clamp($level, $baseLevel, $maxLevel);
         $this->interactive = $interactive;
-        $this->charLevel   = $level;
 
         $x = '<table><tr>';
 
@@ -1906,14 +1909,11 @@ class SpellList extends DBTypeList
         // client checks AFLAG_DURATION, which is set by TC based on SPELL_ATTR5_HIDE_DURATION
         if (!($this->curTpl['attributes5'] & SPELL_ATTR5_HIDE_DURATION))
         {
-            $dpl  = $this->curTpl['durationPerLevel'];
-            $d    = $this->curTpl['duration'];
-            $md   = $this->curTpl['maxDuration'];
-            $max  = $this->curTpl['maxLevel'] ?: MAX_LEVEL;
-            $base = $this->curTpl['baseLevel'];
-            $lvl  = clamp($this->charLevel, $base, $max);
+            $dpl = $this->curTpl['durationPerLevel'];
+            $d   = $this->curTpl['duration'];
+            $md  = $this->curTpl['maxDuration'];
 
-            $time = $d + ($dpl * (min($max, $lvl) - $base));
+            $time = $d + ($dpl * (min($maxLevel, $this->charLevel) - $baseLevel));
             if ($time > $md)
                 $time = $md;
 
@@ -1921,8 +1921,8 @@ class SpellList extends DBTypeList
             if ($dpl && $md > $d)
             {
                 $div  = $md > 60000 ? 60000 : 1000;         // buff text shows minutes or seconds. JS only sees the final result.
-                $dMax = intval(($d - $md) / $dpl) + $base;
-                $dMin = intval($d / $dpl) + $base;
+                $dMax = intval(($d - $md) / $dpl) + $baseLevel;
+                $dMin = intval($d / $dpl) + $baseLevel;
                 $modStr = '<!--ppl'.abs($dMin).':'.abs($dMax).':'.max(0, $d / $div).':'.floor(($dpl * 100) / $div).'-->$1';
 
                 $x .= '<span class="q">'.preg_replace('/\b(\d)/', $modStr, Lang::formatTime($time, 'spell', 'timeRemaining')).'<span>';
@@ -1935,10 +1935,11 @@ class SpellList extends DBTypeList
 
         $x .= '</td></tr></table>';
 
-        $min = $this->scaling[$this->id] ? ($this->getField('baseLevel') ?: 1) : 1;
-        $max = $this->scaling[$this->id] ? MAX_LEVEL : 1;
         // scaling information - spellId:min:max:curr
-        $x .= '<!--?'.$this->id.':'.$min.':'.$max.':'.min($this->charLevel, $max).'-->';
+        $min = $this->scaling[$this->id] ? $baseLevel : 1;
+        $max = $this->scaling[$this->id] ? $maxLevel  : 1;
+
+        $x .= '<!--?'.$this->id.':'.$min.':'.$max.':'.clamp($this->charLevel, $min, $max).'-->';
 
         return $x;
     }
@@ -1948,8 +1949,11 @@ class SpellList extends DBTypeList
         if (!$this->curTpl)
             return null;
 
+        $baseLevel = $this->curTpl['baseLevel'] ?: 1;
+        $maxLevel  = $this->curTpl['maxLevel']  ?: MAX_LEVEL;
+
+        $this->charLevel   = clamp($level, $baseLevel, $maxLevel);
         $this->interactive = $interactive;
-        $this->charLevel   = $level;
 
         $tradeSkill  = false;
         $createsItem = 0;
@@ -2151,20 +2155,20 @@ class SpellList extends DBTypeList
             $x .= '<table><tr><td>'.implode('', $xTmp).'</td></tr></table>';
 
         // scaling information - spellId:min:max:curr[:scalingDistribution:ScalingFlags]
+        $min = $this->scaling[$this->id] ? $baseLevel : 1;
+        $max = $this->scaling[$this->id] ? $maxLevel  : 1;
+
         $scalingInfo = array(
             $this->id,
-            $this->scaling[$this->id] ? ($this->getField('baseLevel') ?: 1) : 1,
-            max($itemTTEnh['x'][2] ?? 1, $this->scaling[$this->id] ? ($this->getField('maxLevel') ?: MAX_LEVEL) : 1)
+            $min,
+            $itemTTEnh['x'][2] ?? $max,
+            $itemTTEnh['x'][3] ?? clamp($this->charLevel, $min, $max)
         );
 
+        // in 4.x+ proper scaling information; for us just to flag a npc spell as level damage scaling
+        // also; we're only exposing npcmanacostscaler to js, so calculated values are always at base level
         if ($this->getField('attributes0') & SPELL_ATTR0_LEVEL_DAMAGE_CALCULATION)
-        {
-            $scalingInfo[] = min($itemTTEnh['x'][3] ?? MAX_LEVEL, $this->getField('spellLevel') ?: 1);
-            $scalingInfo[] = 1;                             // in 4.x+ proper scaling information; for us just to flag a npc spell as level damage scaling
-            $scalingInfo[] = 1;
-        }
-        else
-            $scalingInfo[] = min($itemTTEnh['x'][3] ?? MAX_LEVEL, $this->charLevel, $scalingInfo[2]);
+            array_splice($scalingInfo, 3, replacement: [$baseLevel, 1, 1]);
 
         $x .= '<!--?'.implode(':', $scalingInfo).'-->';
 
