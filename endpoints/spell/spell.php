@@ -977,19 +977,15 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         if (!DB::World()->selectCell('SELECT 1 FROM spell_group WHERE `spell_id` = %i', $this->firstRank))
             return [];
 
-        // unpack recursion
+        // unpack recursion (circular references are the responsibility of the server core *waves hand*)
         $groups = DB::World()->selectCol('SELECT `id` AS ARRAY_KEY, `spell_id` AS ARRAY_KEY2, `spell_id` FROM spell_group');
-        foreach ($groups as $i => $group)
+        $refs   = [];
+        while ($i = array_find_key($groups, function($grp) use (&$refs) { return $refs = array_filter($grp, fn($x) => $x < 0); }))
         {
-            foreach ($group as $j => $g)
+            foreach ($refs as $j => $ref)
             {
-                if ($g > 0)
-                    continue;
-
-                foreach ($groups[-$g] ?? [] as $new)
-                    $groups[$i][] = $new;
-
-                unset($group[$j]);
+                unset($groups[$i][$j]);
+                $groups[$i] = array_replace($groups[$i], $groups[-$ref] ?? []);
             }
         }
 
