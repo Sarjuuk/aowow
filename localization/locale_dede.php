@@ -647,7 +647,7 @@ $lang = array(
                 UNIT_STAND_STATE_SIT_MEDIUM_CHAIR => 'Auf mittlerem Stuhl sitzend',
                 UNIT_STAND_STATE_SIT_HIGH_CHAIR   => 'Auf hohem Stuhl sitzend',
                 UNIT_STAND_STATE_DEAD             => 'Tot',
-                UNIT_STAND_STATE_KNEEL            => 'Kniehend',
+                UNIT_STAND_STATE_KNEEL            => 'Kniend',
                 UNIT_STAND_STATE_SUBMERGED        => 'Untergetaucht'
             ),
             null,
