@@ -1494,18 +1494,22 @@ $WH.g_setTooltipLevel = function(tooltip, level) {
             // tooltip = tooltip.replace(/<!--cast-->\d+\.\d+/, '<!--cast-->' + json.cast);
 
             // Spell effects
-            // aowow - custom: spell level damage calculation
+            // aowow - custom:
+            //  * spell level damage calculation
+            //  * dont prefix scaling info comment to output; so ratings can be calculated
             tooltip = tooltip.replace(/<!--pts(\d+):(\d+)-->\s*\d+/gi, function(_all, spellLvl, base) {
-                return '<!--pts' + spellLvl + ':' + base + '-->' + Math.round($WH.g_convertScalingSpell(base, parseInt(spellLvl), parseInt(level)));
+                return /* '<!--pts' + spellLvl + ':' + base + '-->' + */ Math.round($WH.g_convertScalingSpell(base, parseInt(spellLvl), parseInt(level)));
             });
         }
     }
 
     // Points per level
-    // aowow - custom: allow negative base and ppl
+    // aowow - custom:
+    //  * allow negative base and ppl
+    //  * dont prefix scaling info comment to output; so ratings can be calculated
     // tooltip = tooltip.replace(/<!--ppl(\d+):(\d+):(\d+):(\d+)-->\s*\d+/gi, function(_all, minLvl, maxLvl, base, ppl) {
     tooltip = tooltip.replace(/<!--ppl(\d+):(\d+):(-?\d+):(-?\d+)-->\s*\d+/gi, function(_all, minLvl, maxLvl, base, ppl) {
-        return '<!--ppl' + minLvl + ':' + maxLvl + ':' + base + ':' + ppl + '-->' + Math.round(parseInt(base) + (Math.min(Math.max(level, minLvl), maxLvl) - minLvl) * ppl / 100);
+        return /* '<!--ppl' + minLvl + ':' + maxLvl + ':' + base + ':' + ppl + '-->' + */ Math.round(parseInt(base) + (Math.min(Math.max(level, minLvl), maxLvl) - minLvl) * ppl / 100);
     });
 
     // Rating to percent
