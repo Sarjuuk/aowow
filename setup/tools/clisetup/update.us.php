@@ -92,10 +92,15 @@ CLISetup::registerUtility(new class extends UtilityScript
 
                 foreach ($queries as $i => $q)
                 {
-                    if (DB::Aowow()->nativeQuery($q) === null)
+                    try
+                    {
+                        DB::Aowow()->nativeQuery($q);
+                    }
+                    catch (\Dibi\DriverException $e)
                     {
                         DB::Aowow()->rollback();
                         CLI::write('[update] failed to apply query #'.(++$i).' from file '.CLI::bold($file), CLI::LOG_ERROR);
+                        CLI::write($e->getMessage(), CLI::LOG_ERROR);
                         return false;
                     }
                 }
