@@ -792,7 +792,7 @@ $lang = array(
             SmartAction::ACTION_ACTIVATE_GOBJECT                   => ['#target# es activado.', ''],
 /* 10*/     SmartAction::ACTION_RANDOM_EMOTE                       => ['Emote %11$s a #target#.', ''],
             SmartAction::ACTION_CAST                               => ['Lanzar [spell=%1$d] a #target#.', '%1$s'],
-            SmartAction::ACTION_SUMMON_CREATURE                    => ['Invocar [npc=%1$d](%3$d)? para %11$s:;(%4$d)?, atacando al invocador.:;', '%1$s'],
+            SmartAction::ACTION_SUMMON_CREATURE                    => ['Invocar [npc=%1$d](%3$d)? para %11$s:;(%4$d)?, atacando al invocador:; a #target#.', '%1$s'],
             SmartAction::ACTION_THREAT_SINGLE_PCT                  => ['Modificar la amenaza de #target# en %11$+d%%.', ''],
             SmartAction::ACTION_THREAT_ALL_PCT                     => ['Modificar la amenaza de todos los oponentes en %11$+d%%.', ''],
             SmartAction::ACTION_CALL_AREAEXPLOREDOREVENTHAPPENS    => ['Satisfacer evento de exploración de [quest=%1$d] para #target#.', ''],

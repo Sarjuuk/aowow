@@ -791,7 +791,7 @@ $lang = array(
             SmartAction::ACTION_ACTIVATE_GOBJECT                   => ['#target# wird aktiviert.', ''],
 /* 10*/     SmartAction::ACTION_RANDOM_EMOTE                       => ['Emote %11$s zu #target#.', ''],
             SmartAction::ACTION_CAST                               => ['Wirke [spell=%1$d] auf #target#.', '%1$s'],
-            SmartAction::ACTION_SUMMON_CREATURE                    => ['Beschwöre [npc=%1$d](%4$d)?, den Auslöser angreifend:;(%3$d)? für %11$s:.;', '%1$s'],
+            SmartAction::ACTION_SUMMON_CREATURE                    => ['Beschwöre [npc=%1$d](%4$d)?, den Auslöser angreifend:;(%3$d)? für %11$s:; bei #target#.', '%1$s'],
             SmartAction::ACTION_THREAT_SINGLE_PCT                  => ['Ändere Bedrohung von #target# um %11$+d%%.', ''],
             SmartAction::ACTION_THREAT_ALL_PCT                     => ['Ändere Bedrohung aller Gegner um %11$+d%%.', ''],
             SmartAction::ACTION_CALL_AREAEXPLOREDOREVENTHAPPENS    => ['Erfülle Entdeckungsereignis von [quest=%1$d] für #target#.', ''],
