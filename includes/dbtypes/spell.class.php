@@ -16,7 +16,7 @@ class SpellList extends DBTypeList
 
     private const int TOOLTIP_SCALING_NONE    = 0;          // no scaling
     private const int TOOLTIP_SCALING_GENERIC = 1;          // buff duration or cast time scaling
-    private const int TOOLTIP_SCALING_LDS     = 2;          // use Level Damage Scaling from gtNPCManaCostScaler.dbc
+    private const int TOOLTIP_SCALING_LDC     = 2;          // use Level Damage Calculation from gtNPCManaCostScaler.dbc
     private const int TOOLTIP_SCALING_RPPL    = 3;          // use Effect Real Points Per Level for scaling
 
     public static  int      $type       = Type::SPELL;
@@ -696,7 +696,11 @@ class SpellList extends DBTypeList
         else if ($pc > 0 || $pps > 0 || $pcpl > 0)
         {
             if ($this->curTpl['attributes0'] & SPELL_ATTR0_LEVEL_DAMAGE_CALCULATION)
+            {
                 $str .= '<!--pts'.$this->curTpl['baseLevel'].':'.$pc.'-->';
+                if ($this->scaling[$this->id] < self::TOOLTIP_SCALING_LDC)
+                    $this->scaling[$this->id] = self::TOOLTIP_SCALING_LDC;
+            }
 
             if (Lang::exist('spell', 'powerCost', $pt))
                 $str .= Lang::spell('powerCost', $pt,   intVal($pps > 0), [$pc, $pps]);
@@ -793,7 +797,7 @@ class SpellList extends DBTypeList
         $maxLvl   = $this->getField('maxLevel');
         $baseLvl  = $this->getField('baseLevel');
         $spellLvl = $this->getField('spellLevel');
-        $LDSEffs  = $this->canLevelDamageScale();
+        $LDCEffs  = $this->canLevelDamageScale();
         $modMin   =
         $modMax   = null;
         $scaling  = self::TOOLTIP_SCALING_NONE;
@@ -829,12 +833,12 @@ class SpellList extends DBTypeList
 
             $scaling = self::TOOLTIP_SCALING_RPPL;
         }
-        else if ($this->getField('attributes0') & SPELL_ATTR0_LEVEL_DAMAGE_CALCULATION && in_array($effIdx, $LDSEffs) && $spellLvl)
+        else if ($this->getField('attributes0') & SPELL_ATTR0_LEVEL_DAMAGE_CALCULATION && in_array($effIdx, $LDCEffs) && $spellLvl)
         {
             $modMin = '<!--pts'.$spellLvl.':'.abs(floor($min)).'-->';
             $modMax = '<!--pts'.$spellLvl.':'.abs(ceil($max)).'-->';
 
-            $scaling = self::TOOLTIP_SCALING_LDS;
+            $scaling = self::TOOLTIP_SCALING_LDC;
         }
 
         return [$min + $maxBase, $max + $maxBase, $modMin, $modMax, $scaling];
@@ -1942,7 +1946,8 @@ class SpellList extends DBTypeList
 
                 $x .= '<span class="q">'.preg_replace('/\b(\d)/', $modStr, Lang::formatTime($time, 'spell', 'timeRemaining')).'<span>';
 
-                $this->scaling[$this->id] = self::TOOLTIP_SCALING_GENERIC;
+                if ($this->scaling[$this->id] < self::TOOLTIP_SCALING_GENERIC)
+                    $this->scaling[$this->id] = self::TOOLTIP_SCALING_GENERIC;
             }
             else if ($md > 0)
                 $x .= '<span class="q">'.($modStr ?? '').Lang::formatTime($md, 'spell', 'timeRemaining').'<span>';
@@ -1963,7 +1968,7 @@ class SpellList extends DBTypeList
 
         // in 4.x+ proper scaling information; for us just to flag a npc spell as level damage scaling
         // also; we're only exposing npcmanacostscaler to js, so calculated values are always at base level
-        if ($this->scaling[$this->id] == self::TOOLTIP_SCALING_LDS)
+        if ($this->scaling[$this->id] == self::TOOLTIP_SCALING_LDC)
             array_splice($scalingInfo, 3, replacement: [$baseLevel, 1, 1]);
 
         $x .= '<!--?'.implode(':', $scalingInfo).'-->';
@@ -2194,7 +2199,7 @@ class SpellList extends DBTypeList
 
         // in 4.x+ proper scaling information; for us just to flag a npc spell as level damage scaling
         // also; we're only exposing npcmanacostscaler to js, so calculated values are always at base level
-        if ($this->scaling[$this->id] == self::TOOLTIP_SCALING_LDS)
+        if ($this->scaling[$this->id] == self::TOOLTIP_SCALING_LDC)
             array_splice($scalingInfo, 3, replacement: [$baseLevel, 1, 1]);
 
         $x .= '<!--?'.implode(':', $scalingInfo).'-->';
