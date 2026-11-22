@@ -172,13 +172,18 @@ final class UIText
 
     /**
      * for `$`-prefix variables. Most frames bar tooltips seem to accept these
-     * * `$g` gender
-     * * `$t` pvp rank
-     * * `$w` world state
-     * * `$c` player class
-     * * `$r` player race
-     * * `$n` player name
+     * Client QuestTextParser : QuestParserParseToken()
+     * * `$a` achievement hyperlink
      * * `$b` line break
+     * * `$c` unit class
+     * * `$d` WorldState duration
+     * * `$e` WorldState int value
+     * * `$g` gender conditional
+     * * `$k` WorldState countdown
+     * * `$n` unit name
+     * * `$r` unit race
+     * * `$t` pvp rank conditional
+     * * `$w` WorldState int value
      *
      * @param string    $text   text to format
      * @param int       $fmt    target output format
@@ -191,47 +196,74 @@ final class UIText
     private static function replaceTextVariables(string $text, int $fmt = Lang::FMT_HTML) : string
     {
         $from = array(
-            '/\$g *([^:;]*) *: *([^:;]*) *(:?[^:;]*);/ui',  // $g<male>:<female>:<refVariable>
-            '/\$t([^;]+);/ui',                              // $t<male>:<female>; (maybe male/female if pvp unranked? Gets replaced with current HK rank.)
-            '/\$(\d+)w/ui',                                 // $<id>w
+            // only triggered by System Chat Messages; achievemntId provided by chat context
+            '/\$a/i',
+            //
+            '/\$b/i',
+            // lowercase *c* casts unit class name to lowercase
             '/\$c/i',
-            '/\$r/i',
+            // uses negated world state id for hash table lookup. not used?
+            '/\$(\d+)d/i',
+            // uses negated world state id for hash table lookup. not used?
+            '/\$(\d+)e/i',
+            // $g<male>:<female>:<refVariable>; (refVar is optional and can be *C*lass or *R*ace)
+            '/\$g *([^:;]*?) *: *([^:;]*?) *(?::[^:;]*)?;/ui',
+            // uses negated world state id for hash table lookup. not used?
+            '/\$(\d+)k/i',
+            //
             '/\$n/i',
-            '/\$b/i'
+            // lowercase *r* casts unit race name to lowercase
+            '/\$r/i',
+            // $t<male>:<female>; male/female if pvp unranked, otherwise replaced with current PVP rank; lowercase *t* casts PVP rank to lowercase
+            '/\$t *([^:;]*?) *: *([^:;]*?) *;/ui',
+            //
+            '/\$(\d+)w/i',
         );
 
         $to[Lang::FMT_MARKUP] = array(
-            '<\1/\2>',
-            '<'.implode('/', Lang::game('pvpRank', 1)).'>',
-            '[span class=q0]WorldState #\1[/span]',
+            '<'.Lang::game('achievement').'>',
+            '[br]',
             '<'.Lang::game('class').'>',
-            '<'.Lang::game('race').'>',
+            '[span class=q0]'.Lang::main('parensFmt', ['WorldState -#\1', Lang::game('duration')]).'[/span]',
+            '[span class=q0]WorldState -#\1[/span]',
+            '<\1/\2>',
+            '[span class=q0]'.Lang::main('parensFmt', ['WorldState -#\1', 'Countdown']).'[/span]',
             '<'.Lang::main('name').'>',
-            '[br]'
+            '<'.Lang::game('race').'>',
+            '<\1/\2>',
+            '[span class=q0]WorldState #\1[/span]'
         );
 
         $to[Lang::FMT_HTML] = array(
-            '&lt;\1/\2&gt;',
-            '&lt;'.implode('/', Lang::game('pvpRank', 1)).'&gt;',
-            '<span class="q0">WorldState #\1</span>',
+            '&lt;'.Lang::game('achievement').'&gt;',
+            '<br />',
             '&lt;'.Lang::game('class').'&gt;',
-            '&lt;'.Lang::game('race').'&gt;',
+            '<span class="q0">'.Lang::main('parensFmt', ['WorldState -#\1', Lang::game('duration')]).'</span>',
+            '<span class="q0">WorldState -#\1</span>',
+            '&lt;\1/\2&gt;',
+            '[span class=q0]'.Lang::main('parensFmt', ['WorldState -#\1', 'Countdown']).'[/span]',
             '&lt;'.Lang::main('name').'&gt;',
-            '<br />'
+            '&lt;'.Lang::game('race').'&gt;',
+            '&lt;\1/\2&gt;',
+            '<span class="q0">WorldState #\1</span>'
         );
 
         $to[Lang::FMT_RAW] =
         $to[-1] = array(
-            '<\1/\2>',
-            '<'.implode('/', Lang::game('pvpRank', 1)).'>',
-            'WorldState #\1',
+            '<'.Lang::game('achievement').'>',
+            "\n",
             '<'.Lang::game('class').'>',
-            '<'.Lang::game('race').'>',
+            Lang::main('parensFmt', ['WorldState -#\1', Lang::game('duration')]),
+            'WorldState -#\1',
+            '<\1/\2>',
+            Lang::main('parensFmt', ['WorldState -#\1', 'Countdown']),
             '<'.Lang::main('name').'>',
-            "\n"
+            '<'.Lang::game('race').'>',
+            '<\1/\2>',
+            'WorldState #\1'
         );
 
-        return preg_replace($from, $to[$fmt], $text);
+        return preg_replace($from, $to[$fmt] ?? $to[Lang::FMT_RAW], $text);
     }
 
     /**
