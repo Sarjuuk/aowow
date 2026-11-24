@@ -158,7 +158,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
         $condition = array(
             [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0],
             ['typeCat', -5],
-            ['castTime', 0, '!']
+            ['castTimeId', 0, '!']
         );
         $mountz = new SpellList($condition);
 
