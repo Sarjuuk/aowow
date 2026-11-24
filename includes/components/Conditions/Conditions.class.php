@@ -617,16 +617,16 @@ class Conditions
     {
         if ($cVal1 == self::TYPEID_UNIT)
         {
-            if ($cVal3 && ($_ = DB::Aowow()->selectCell('SELECT `typeId` FROM ::spawns WHERE `type` = %i AND `guid` = %i', Type::NPC, $cVal3)))
-                $cVal2 = intVal($_);
+            if ($cVal3 && ($_ = DB::Aowow()->selectCell('SELECT `typeId` FROM ::creature_spawns WHERE `guid` = %i', $cVal3)))
+                $cVal2 = $_;
 
             if ($cVal2)
                 $this->jsGlobals[Type::NPC][$cVal2] = $cVal2;
         }
         else if ($cVal1 == self::TYPEID_GAMEOBJECT)
         {
-            if ($cVal3 && ($_ = DB::Aowow()->selectCell('SELECT `typeId` FROM ::spawns WHERE `type` = %i AND `guid` = %i', Type::OBJECT, $cVal3)))
-                $cVal2 = intVal($_);
+            if ($cVal3 && ($_ = DB::Aowow()->selectCell('SELECT `typeId` FROM ::objects_spawns WHERE `guid` = %i', $cVal3)))
+                $cVal2 = $_;
 
             if ($cVal2)
                 $this->jsGlobals[Type::OBJECT][$cVal2] = $cVal2;

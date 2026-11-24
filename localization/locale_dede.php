@@ -570,6 +570,34 @@ $lang = array(
             "Rächer von Gnomeregan",
             "Voodooboss von Senjin"
         ),
+        'transports'    => array(                           // Map.dbc/name
+            582 => "Transport: Rut'theran nach Auberdine",
+            584 => "Transport: Menethil nach Theramore",
+            586 => "Transport: Exodar nach Auberdine",
+            587 => "Transport: Mondfederfähre",
+            588 => "Transport: Menethil nach Auberdine",
+            589 => "Transport: Orgrimmar nach Grom'Gol",
+            590 => "Transport: Grom'Gol nach Unterstadt",
+            591 => "Transport: Unterstadt nach Orgrimmar",
+            593 => "Transport: Beutebucht nach Ratschet",
+            594 => "Transport: Heulender Fjord Barmherzige Schwester",
+            610 => "Transport: Tirisfal zum Hafen der Vergeltung",
+            612 => "Transport: Menethil nach Valgarde",
+            613 => "Transport: Orgrimmar zur Kriegshymnenfeste",
+            614 => "Transport: Sturmwind zur Valianzfeste",
+            620 => "Transport: Moa'ki nach Unu'pe",
+            621 => "Transport: Moa'ki nach Kamagua",
+            622 => "Transport: Orgrims Hammer",
+            623 => "Transport: Die Himmelsbrecher",
+            641 => "Transport: Allianz Luftschiff SF",
+            642 => "Transport: Horde Luftschiff SF",
+            647 => "Transport: Orgrimmar nach Donnerfels",
+            672 => "Transport: Die Himmelsbrecher",
+            673 => "Transport: Die Orgrims Hammer",
+            712 => "Transport: Die Himmelsbrecher",
+            713 => "Transport: Die Orgrims Hammer",
+            718 => "Transport: Die Stürmische Macht",
+        ),
         'orientation'   => ['Nord', 'Nordost', 'Ost', 'Südost', 'Süd', 'Südwest', 'West', 'Nordwest']
     ),
     'unit' => array(
@@ -1235,11 +1263,11 @@ $lang = array(
         'notFound'      => "Dieses Objekt existiert nicht.",
         'unnamed'       => "Unbenanntes Objekt #%d",
         'cat'           => array(
-             0 => "Anderes", 3 => "Behälter", 6 => "Fallen", 9 => "Bücher", 19 => "Briefkästen", 25 => "Fischschwärme",
+             0 => "Anderes", 3 => "Behälter", 6 => "Fallen", 9 => "Bücher", 15 => "Transporter", 19 => "Briefkästen", 25 => "Fischschwärme",
             -5 => "Truhen", -3 => "Kräuter", -4 => "Erzadern", -2 => "Quests", -6 => "Werkzeuge", -9 => "Interaktive Objekte"
         ),
         'type'          => array(                           // used for tooltip
-             3 => "Behälter", 6 => "", 9 => "Buch",  19 => "", 25 => "",
+             3 => "Behälter", 6 => "", 9 => "Buch", 15 => "",  19 => "", 25 => "",
             -5 => "Truhe", -3 => "Kraut", -4 => "Erzvorkommen", -2 => "Quest", -6 => "", -9 => ""
         ),
         'unkPosition'   => "Der Standort dieses Objekts ist nicht bekannt.",
@@ -1299,7 +1327,8 @@ $lang = array(
         'waypoint'      => "Wegpunkt",
         'wait'          => "Wartezeit",
         'respawnIn'     => "Respawn in: %s",
-        'despawnAfter'  => "Gespawnt durch Script<br />Despawn nach: %s",
+        'scriptedSpawn' => "Gespawned durch Skript",
+        'despawnAfter'  => "Despawn nach: %s",
         'rank'          => [0 => "Normal", 1 => "Elite", 4 => "Rar", 2 => "Rar Elite", 3 => "Boss"],
         'textRanges'    => [null, "an das Gebiet gesendet", "an die Zone gesendet", "an die Map gesendet", "an die Welt gesendet"],
         'textTypes'     => [null, "schreit", "sagt", "flüstert"],

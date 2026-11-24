@@ -17,8 +17,8 @@ class AreaTriggerList extends DBTypeList
 
     protected string $queryBase = 'SELECT a.*, a.id AS ARRAY_KEY FROM ::areatrigger a';
     protected array  $queryOpts = array(
-                        'a' => [['s']],                     // guid < 0 are teleporter targets, so exclude them here
-                        's' => ['j' => ['::spawns s ON s.`type` = 503 AND s.`typeId` = a.`id` AND s.`guid` > 0', true], 's' => ', GROUP_CONCAT(s.`areaId`) AS "areaId"', 'g' => 'a.`id`']
+                        'a' => [['s']],                     // flags & 0x1: are teleporter targets, so exclude them here
+                        's' => ['j' => ['::areatrigger_spawns s ON s.`typeId` = a.`id` AND (s.`flags` & 0x1) = 0', true], 's' => ', GROUP_CONCAT(s.`areaId`) AS "areaId"', 'g' => 'a.`id`']
                     );
 
     public function __construct(array $conditions = [], array $miscData = [])

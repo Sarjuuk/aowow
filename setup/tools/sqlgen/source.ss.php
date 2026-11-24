@@ -334,7 +334,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         );
 
         $linkedNpcs = DB::Aowow()->selectCol('SELECT l1.`objectId` AS ARRAY_KEY, IFNULL(l2.`npcId`, l1.`npcId`) FROM ::loot_link l1 LEFT JOIN ::loot_link l2 ON l1.`objectId` = l2.`objectId` AND l2.`priority` = 1 GROUP BY l1.`objectid`');
-        $npcSpawns  = DB::Aowow()->selectAssoc('SELECT `typeId` AS ARRAY_KEY, IF(COUNT(DISTINCT s.`areaId`) > 1, 0, s.`areaId`) AS "areaId", z.`type` FROM ::spawns s JOIN ::zones z ON z.`id` = s.`areaId` WHERE s.`type` = %i AND `typeId` IN %in GROUP BY `typeId`', Type::NPC, array_merge($linkedNpcs, array_filter(array_column($creatureLoot, 'entry'))));
+        $npcSpawns  = DB::Aowow()->selectAssoc('SELECT `typeId` AS ARRAY_KEY, IF(COUNT(DISTINCT s.`areaId`) > 1, 0, s.`areaId`) AS "areaId", z.`type` FROM ::creature_spawns s JOIN ::zones z ON z.`id` = s.`areaId` WHERE s.`typeId` IN %in GROUP BY `typeId`', array_merge($linkedNpcs, array_filter(array_column($creatureLoot, 'entry'))));
         $bosses     = DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, IF(`cuFlags` & %i, 1, IF(`typeFlags` & 0x4 AND `rank` > 0, 1, 0)) FROM ::creature WHERE `id` IN %in', NPC_CU_INSTANCE_BOSS, array_filter(array_column($creatureLoot, 'entry')));
 
         foreach ($creatureLoot as $l)
@@ -402,7 +402,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             DB::Aowow()->selectCol('SELECT `id` FROM dbc_lock WHERE `properties1` IN %in', [LOCK_PROPERTY_HERBALISM, LOCK_PROPERTY_MINING])
         );
 
-        $goSpawns = DB::Aowow()->selectAssoc('SELECT `typeId` AS ARRAY_KEY, IF(COUNT(DISTINCT s.`areaId`) > 1, 0, s.`areaId`) AS "areaId", z.`type` FROM ::spawns s JOIN ::zones z ON z.`id` = s.`areaId` WHERE s.`type` = %i AND `typeId`IN %in GROUP BY `typeId`', Type::OBJECT, array_filter(array_column($objectLoot, 'entry')));
+        $goSpawns = DB::Aowow()->selectAssoc('SELECT `typeId` AS ARRAY_KEY, IF(COUNT(DISTINCT s.`areaId`) > 1, 0, s.`areaId`) AS "areaId", z.`type` FROM ::objects_spawns s JOIN ::zones z ON z.`id` = s.`areaId` WHERE s.`typeId` IN %in GROUP BY `typeId`', array_filter(array_column($objectLoot, 'entry')));
 
         foreach ($objectLoot as $l)
         {
@@ -653,7 +653,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             $xCostIds, $xCostIds, $xCostIds
         );
 
-        $spawns = DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, IF(COUNT(DISTINCT `areaId`) > 1, 0, `areaId`) FROM ::spawns WHERE `type` = %i AND `typeId`IN %in GROUP BY `typeId`', Type::NPC, array_column($vendors, 'npc'));
+        $spawns = DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, IF(COUNT(DISTINCT `areaId`) > 1, 0, `areaId`) FROM ::creature_spawns WHERE `typeId` IN %in GROUP BY `typeId`', array_column($vendors, 'npc'));
 
         foreach ($vendors as $v)
         {
@@ -772,7 +772,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             return;
         }
 
-        $goSpawns   = DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, IF(COUNT(DISTINCT `areaId`) > 1, 0, `areaId`) FROM ::spawns WHERE `type` = %i AND `typeId`IN %in GROUP BY `typeId`', Type::OBJECT, array_filter(array_column($fishLoot, 'entry')));
+        $goSpawns   = DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, IF(COUNT(DISTINCT `areaId`) > 1, 0, `areaId`) FROM ::objects_spawns WHERE `typeId` IN %in GROUP BY `typeId`', array_filter(array_column($fishLoot, 'entry')));
         $areaParent = DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, `parentArea` FROM ::zones WHERE `id` IN %in AND `parentArea` > 0', array_filter(array_column($fishLoot, 'zone')));
 
         foreach ($fishLoot as $l)
@@ -823,8 +823,8 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             return;
         }
 
-        $spawns[Type::OBJECT] = DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, IF(COUNT(DISTINCT `areaId`) > 1, 0, `areaId`) FROM ::spawns WHERE `type` = %i AND `typeId` IN %in GROUP BY `typeId`', Type::OBJECT, array_column(array_filter($herbLoot, fn($x) => $x['srcType'] == Type::OBJECT), 'entry'));
-        $spawns[Type::NPC]    = DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, IF(COUNT(DISTINCT `areaId`) > 1, 0, `areaId`) FROM ::spawns WHERE `type` = %i AND `typeId` IN %in GROUP BY `typeId`', Type::NPC,    array_column(array_filter($herbLoot, fn($x) => $x['srcType'] == Type::NPC), 'entry'));
+        $spawns[Type::OBJECT] = DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, IF(COUNT(DISTINCT `areaId`) > 1, 0, `areaId`) FROM ::objects_spawns  WHERE `typeId` IN %in GROUP BY `typeId`', array_column(array_filter($herbLoot, fn($x) => $x['srcType'] == Type::OBJECT), 'entry'));
+        $spawns[Type::NPC]    = DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, IF(COUNT(DISTINCT `areaId`) > 1, 0, `areaId`) FROM ::creature_spawns WHERE `typeId` IN %in GROUP BY `typeId`', array_column(array_filter($herbLoot, fn($x) => $x['srcType'] == Type::NPC), 'entry'));
 
         foreach ($herbLoot as $l)
         {
@@ -912,8 +912,8 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             return;
         }
 
-        $spawns[Type::OBJECT] = DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, IF(COUNT(DISTINCT `areaId`) > 1, 0, `areaId`) FROM ::spawns WHERE `type` = %i AND `typeId`IN %in GROUP BY `typeId`', Type::OBJECT, array_column(array_filter($mineLoot, fn($x) => $x['srcType'] == Type::OBJECT), 'entry'));
-        $spawns[Type::NPC]    = DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, IF(COUNT(DISTINCT `areaId`) > 1, 0, `areaId`) FROM ::spawns WHERE `type` = %i AND `typeId`IN %in GROUP BY `typeId`', Type::NPC,    array_column(array_filter($mineLoot, fn($x) => $x['srcType'] == Type::NPC), 'entry'));
+        $spawns[Type::OBJECT] = DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, IF(COUNT(DISTINCT `areaId`) > 1, 0, `areaId`) FROM ::objects_spawns WHERE `typeId` IN %in GROUP BY `typeId`', array_column(array_filter($mineLoot, fn($x) => $x['srcType'] == Type::OBJECT), 'entry'));
+        $spawns[Type::NPC]    = DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, IF(COUNT(DISTINCT `areaId`) > 1, 0, `areaId`) FROM ::creature_spawns WHERE `typeId` IN %in GROUP BY `typeId`',    array_column(array_filter($mineLoot, fn($x) => $x['srcType'] == Type::NPC), 'entry'));
 
         foreach ($mineLoot as $l)
         {
@@ -998,7 +998,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             return;
         }
 
-        $spawns = DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, IF(COUNT(DISTINCT `areaId`) > 1, 0, `areaId`) FROM ::spawns WHERE `type` = %i AND `typeId`IN %in GROUP BY `typeId`', Type::NPC, array_filter(array_column($theftLoot, 'entry')));
+        $spawns = DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, IF(COUNT(DISTINCT `areaId`) > 1, 0, `areaId`) FROM ::creature_spawns WHERE `typeId` IN %in GROUP BY `typeId`', array_filter(array_column($theftLoot, 'entry')));
 
         foreach ($theftLoot as $l)
         {
@@ -1048,7 +1048,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             return;
         }
 
-        $spawns = DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, IF(COUNT(DISTINCT `areaId`) > 1, 0, `areaId`) FROM ::spawns WHERE `type` = %i AND `typeId`IN %in GROUP BY `typeId`', Type::NPC, array_filter(array_column($salvageLoot, 'entry')));
+        $spawns = DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, IF(COUNT(DISTINCT `areaId`) > 1, 0, `areaId`) FROM ::creature_spawns WHERE `typeId` IN %in GROUP BY `typeId`', array_filter(array_column($salvageLoot, 'entry')));
 
         foreach ($salvageLoot as $l)
         {
@@ -1098,7 +1098,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             return;
         }
 
-        $spawns = DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, IF(COUNT(DISTINCT `areaId`) > 1, 0, `areaId`) FROM ::spawns WHERE `type` = %i AND `typeId`IN %in GROUP BY `typeId`', Type::NPC, array_filter(array_column($skinLoot, 'entry')));
+        $spawns = DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, IF(COUNT(DISTINCT `areaId`) > 1, 0, `areaId`) FROM ::creature_spawns WHERE `typeId` IN %in GROUP BY `typeId`', array_filter(array_column($skinLoot, 'entry')));
 
         foreach ($skinLoot as $l)
         {

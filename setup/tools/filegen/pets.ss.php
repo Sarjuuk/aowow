@@ -59,7 +59,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             NPC_CU_DIFFICULTY_DUMMY
         );
 
-        $locations = DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, `areaId` AS ARRAY_KEY2, `areaId` FROM ::spawns WHERE `type` = %i AND `typeId` IN %in GROUP BY `typeId`, `areaId`', Type::NPC, array_column($petList, 'id'));
+        $locations = DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, `areaId` AS ARRAY_KEY2, `areaId` FROM ::creature_spawns WHERE `typeId` IN %in AND (`flags` & %i) = 0 GROUP BY `typeId`, `areaId`', array_column($petList, 'id'), SPAWNTYPE_VEHICLE_ACCESSORY);
 
         foreach (CLISetup::$locales as $loc)
         {
@@ -73,7 +73,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                     'name'           => Util::localizedString($pet, 'name'),
                     'minlevel'       => $pet['minLevel'],
                     'maxlevel'       => $pet['maxLevel'],
-                    'location'       => $locations[$pet['id']] ?? [],
+                    'location'       => array_values($locations[$pet['id']] ?? []),
                     'react'          => [$pet['A'], $pet['H']],
                     'classification' => $pet['classification'],
                     'family'         => $pet['family'],

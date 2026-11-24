@@ -103,10 +103,12 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         /* Determine Map Type */
         /**********************/
 
+        $spawnData = DB::Aowow()->selectAssoc('SELECT `guid` AS "0", `ScriptName` AS "1", `StringId` AS "2", `areaId` AS "3" FROM ::creature_spawns WHERE `typeId` = %i ORDER BY `guid` ASC', $this->typeId);
+
         $mapType = 0;
-        if ($maps = DB::Aowow()->selectCell('SELECT IF(COUNT(DISTINCT `areaId`) > 1, 0, `areaId`) FROM ::spawns WHERE `type` = %i AND `typeId` = %i', Type::NPC, $this->typeId))
+        if (count($areaId = array_unique(array_column($spawnData, 3))) == 1)
         {
-            $mapType = match (DB::Aowow()->selectCell('SELECT `type` FROM ::zones WHERE `id` = %i', $maps))
+            $mapType = match (DB::Aowow()->selectCell('SELECT `type` FROM ::zones WHERE `id` = %i', ...$areaId))
             {
                 // MAP_TYPE_DUNGEON,
                 MAP_TYPE_DUNGEON_HC    => 1,
@@ -207,8 +209,6 @@ class NpcBaseResponse extends TemplateResponse implements ICache
 
         if (User::isInGroup(U_GROUP_EMPLOYEE))
         {
-            $spawnData = DB::Aowow()->selectAssoc('SELECT `guid` AS "0", `ScriptName` AS "1", `StringId` AS "2" FROM ::spawns WHERE `type` = %i AND `typeId` = %i AND `ScriptName` IS NOT NULL ORDER BY `guid` ASC', Type::NPC, $this->typeId);
-
             // AI
             $scripts = null;
             if ($_ = $this->subject->getField('ScriptOrAI'))
@@ -303,7 +303,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         /****************/
 
         // get spawns and path
-        if ($spawns = $this->subject->getSpawns(SPAWNINFO_FULL))
+        if ($spawns = $this->subject->getSpawns(SPAWNINFO_FULL, false, false, true, false))
         {
             $this->addDataLoader('zones');
             $this->map = array(

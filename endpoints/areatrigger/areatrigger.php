@@ -67,7 +67,7 @@ class AreatriggerBaseResponse extends TemplateResponse implements ICache
         $_type = $this->subject->getField('type');
 
         // get spawns
-        if ($spawns = $this->subject->getSpawns(SPAWNINFO_FULL))
+        if ($spawns = $this->subject->getSpawns(SPAWNINFO_FULL, false, false, true, false))
         {
             $this->addDataLoader('zones');
             $this->map = array(
@@ -81,9 +81,9 @@ class AreatriggerBaseResponse extends TemplateResponse implements ICache
         }
 
         // Smart AI
-        if ($_type == AT_TYPE_SMART)
+        if ($this->subject->getField('cuFlags') & AREATRIGGER_CU_SMART)
         {
-            $sai = new SmartAI(SmartAI::SRC_TYPE_AREATRIGGER, $this->typeId, ['teleportTargetArea' => $this->subject->getField('areaId')]);
+            $sai = new SmartAI(SmartAI::SRC_TYPE_AREATRIGGER, $this->typeId, ['teleportTargetArea' => $this->subject->getField('areaId') ?: 0]);
             if ($sai->prepare())
             {
                 $this->extendGlobalData($sai->getJSGlobals());

@@ -329,6 +329,7 @@ var mn_objects = [
     [-4, "Mineral Veins"],
     [-2, "Quests"],
     [-6, "Tools"],
+    [15, "Transports"],
     [ 6, "Traps"]
 ];
 
@@ -1515,6 +1516,7 @@ var g_object_types = {
        3: 'Container',
        9: 'Book',
        6: 'Trap',
+      15: 'Transport',
       19: 'Mailbox',
       25: 'Fishing Pool',
     '-2': 'Quest',

@@ -66,7 +66,7 @@ class SoundBaseResponse extends TemplateResponse implements ICache
         /****************/
 
         // get spawns
-        if ($spawns = $this->subject->getSpawns(SPAWNINFO_FULL))
+        if ($spawns = $this->subject->getSpawns(SPAWNINFO_FULL, true, false, true, false))
         {
             $this->addDataLoader('zones');
             $this->map = array(

@@ -12,7 +12,9 @@ trait SmartHelper
 {
     private function resolveGuid(int $type, int $guid) : ?int
     {
-        if ($_ = DB::Aowow()->selectCell('SELECT `typeId` FROM ::spawns WHERE `type` = %i AND `guid` = %i', $type, $guid))
+        if ($type == Type::NPC && ($_ = DB::Aowow()->selectCell('SELECT `typeId` FROM ::creature_spawns WHERE `guid` = %i', $guid)))
+            return $_;
+        else if ($type == Type::OBJECT && ($_ = DB::Aowow()->selectCell('SELECT `typeId` FROM ::objects_spawns WHERE `guid` = %i', $guid)))
             return $_;
 
         trigger_error('SmartAI::resolveGuid - failed to resolve guid '.$guid.' of type '.$type, E_USER_WARNING);
@@ -343,7 +345,7 @@ class SmartAI
             SmartAction::ACTION_MOUNT_TO_ENTRY_OR_MODEL => [1 => $npcId]
         );
 
-        if ($npcGuids = DB::Aowow()->selectCol('SELECT `guid` FROM ::spawns WHERE `type` = %i AND `typeId` = %i', Type::NPC, $npcId))
+        if ($npcGuids = DB::Aowow()->selectCol('SELECT `guid` FROM ::creature_spawns WHERE `typeId` = %i', $npcId))
             if ($groups = DB::World()->selectCol('SELECT `groupId` FROM spawn_group WHERE `spawnType` = 0 AND `spawnId` IN %in', $npcGuids))
                 foreach ($groups as $g)
                     $lookup[SmartAction::ACTION_SPAWN_SPAWNGROUP][1] = $g;
@@ -369,7 +371,7 @@ class SmartAI
             SmartAction::ACTION_SUMMON_GO => [1 => $objectId]
         );
 
-        if ($objGuids = DB::Aowow()->selectCol('SELECT `guid` FROM ::spawns WHERE `type` = %i AND `typeId` = %i', Type::OBJECT, $objectId))
+        if ($objGuids = DB::Aowow()->selectCol('SELECT `guid` FROM ::objects_spawns WHERE `type` = %i AND `typeId` = %i', $objectId))
             if ($groups = DB::World()->selectCol('SELECT `groupId` FROM spawn_group WHERE `spawnType` = 1 AND `spawnId` IN %in', $objGuids))
                 foreach ($groups as $g)
                     $lookup[SmartAction::ACTION_SPAWN_SPAWNGROUP][1] = $g;
@@ -491,21 +493,19 @@ class SmartAI
         {
             $smartS = array_diff_key($smartS, $smartG);
 
-            $where = [];
+            $npcGuids = $objectGuids = [];
             foreach ($smartG as [$st, $eog])
             {
                 if ($st == self::SRC_TYPE_CREATURE)
-                    $where[] = [DB::AND, [['`type` = %i', Type::NPC],    ['`guid` = %i', -$eog]]];
+                    $npcGuids[] = -$eog;
                 else if ($st == self::SRC_TYPE_OBJECT)
-                    $where[] = [DB::AND, [['`type` = %i', Type::OBJECT], ['`guid` = %i', -$eog]]];
+                    $objectGuids[] = -$eog;
             }
 
-            if ($where)
-            {
-                $owner = DB::Aowow()->selectAssoc('SELECT `type`, `typeId` FROM ::spawns WHERE %or', $where);
-                foreach ($owner as $o)
-                    $result[$o['type']][] = $o['typeId'];
-            }
+            if ($npcGuids && ($_ = DB::Aowow()->selectCol('SELECT `typeId` FROM ::creature_spawns WHERE `guid` IN %in', $npcGuids)))
+                $result[Type::NPC] = $_;
+            if ($objectGuids && ($_ = DB::Aowow()->selectCol('SELECT `typeId` FROM ::objects_spawns WHERE `guid` IN %in', $objectGuids)))
+                $result[Type::OBJECT] = $_;
         }
 
         foreach ($smartS as [$st, $eog])
@@ -550,7 +550,7 @@ class SmartAI
         {
             $grp = $moreInfo[SmartAction::ACTION_SPAWN_SPAWNGROUP];
             if ($sgs = DB::World()->selectCol('SELECT `spawnId` FROM spawn_group WHERE `spawnType` = %i AND `groupId` IN %in', SUMMONER_TYPE_CREATURE, $grp))
-                if ($ids = DB::Aowow()->selectCol('SELECT DISTINCT `typeId` FROM ::spawns WHERE `type` = %i AND `guid` IN %in', Type::NPC, $sgs))
+                if ($ids = DB::Aowow()->selectCol('SELECT DISTINCT `typeId` FROM ::creature_spawns WHERE `guid` IN %in', $sgs))
                     $result = array_merge($result, $ids);
         }
 
@@ -572,7 +572,7 @@ class SmartAI
         {
             $grp = $moreInfo[SmartAction::ACTION_SPAWN_SPAWNGROUP];
             if ($sgs = DB::World()->selectCol('SELECT `spawnId` FROM spawn_group WHERE `spawnType` = %i AND `groupId` IN %in', SUMMONER_TYPE_GAMEOBJECT, $grp))
-                if ($ids = DB::Aowow()->selectCol('SELECT DISTINCT `typeId` FROM ::spawns WHERE `type` = %i AND `guid` IN %in', Type::OBJECT, $sgs))
+                if ($ids = DB::Aowow()->selectCol('SELECT DISTINCT `typeId` FROM ::objects_spawns WHERE `guid` IN %in', $sgs))
                     $result = array_merge($result, $ids);
         }
 

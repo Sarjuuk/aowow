@@ -592,25 +592,34 @@ trait listviewHelper
 */
 trait spawnHelper
 {
-    private array $spawnResult = array(
+    private string $spawnsTable = '';
+    private array  $spawnResult = array(
         SPAWNINFO_FULL  => null,
         SPAWNINFO_SHORT => null,
         SPAWNINFO_ZONES => null,
         SPAWNINFO_QUEST => null
     );
 
+    private function setSpawnsTable() : bool
+    {
+        if (empty(self::$type))
+            return false;
+
+        return !!($this->spawnsTable = WorldPosition::getStorageByType(self::$type));
+    }
+
     private function createShortSpawns() : void             // [zoneId, floor, [[x1, y1], [x2, y2], ..]] as tooltip2 if enabled by <a rel="map" ...> or anchor #map (one area, one floor, one creature, no survivors)
     {
         $this->spawnResult[SPAWNINFO_SHORT] = new \StdClass;
 
         // first get zone/floor with the most spawns
-        if ($res = DB::Aowow()->selectRow('SELECT `areaId`, `floor` FROM ::spawns WHERE `type` = %i AND `typeId` = %i AND `posX` > 0 AND `posY` > 0 GROUP BY `areaId`, `floor` ORDER BY COUNT(1) DESC LIMIT 1', self::$type, $this->id))
+        if ($res = DB::Aowow()->selectRow('SELECT `areaId`, `floor` FROM %n WHERE `typeId` = %i AND `areaX` > 0 AND `areaY` > 0 GROUP BY `areaId`, `floor` ORDER BY COUNT(1) DESC LIMIT 1', $this->spawnsTable, $this->id))
         {
             // get relevant spawn points
-            $points = DB::Aowow()->selectAssoc('SELECT `posX`, `posY` FROM ::spawns WHERE `type` = %i AND `typeId` = %i AND `areaId` = %i AND `floor` = %i AND `posX` > 0 AND `posY` > 0', self::$type, $this->id, $res['areaId'], $res['floor']);
+            $points = DB::Aowow()->selectAssoc('SELECT `areaX`, `areaY` FROM %n WHERE `typeId` = %i AND `areaId` = %i AND `floor` = %i AND `areaX` > 0 AND `areaY` > 0', $this->spawnsTable, $this->id, $res['areaId'], $res['floor']);
             $spawns = [];
             foreach ($points as $p)
-                $spawns[] = [$p['posX'], $p['posY']];
+                $spawns[] = [$p['areaX'], $p['areaY']];
 
             $this->spawnResult[SPAWNINFO_SHORT]->zone   = $res['areaId'];
             $this->spawnResult[SPAWNINFO_SHORT]->coords = [$res['floor'] => $spawns];
@@ -630,103 +639,136 @@ trait spawnHelper
                         WHEN z.`type` = %i THEN 2
                         ELSE 0
                    END AS "mapType", s.*
-            FROM   ::spawns s
+            FROM   %n s
             JOIN   ::zones z ON s.areaId = z.id
-            WHERE s.`type` = %i AND s.`typeId` IN %in AND s.`posX` > 0 AND s.`posY` > 0',
+            WHERE s.`typeId` IN %in AND s.`areaX` > 0 AND s.`areaY` > 0',
             MAP_TYPE_DUNGEON_HC, MAP_TYPE_MMODE_RAID, MAP_TYPE_MMODE_RAID_HC,
-            self::$type, $this->getFoundIDs()
+            $this->spawnsTable, $this->getFoundIDs()
         ) ?: [];
 
+        // vehicle accessories and transport passengers are moved with their parent
         if (!$skipAdmin && User::isInGroup(U_GROUP_MODERATOR))
-            if ($guids = array_column(array_filter($spawns, fn($x) => $x['guid'] > 0 || $x['type'] != Type::NPC), 'guid'))
+            if ($guids = array_column(array_filter($spawns, fn($x) => !($x['flags'] & (0xFFF00 | SPAWNTYPE_VEHICLE_ACCESSORY))), 'guid'))
                 $worldPos = WorldPosition::getForGUID(self::$type, ...$guids);
 
         foreach ($spawns as $s)
         {
-            $isAccessory = $s['guid'] < 0 && $s['type'] == Type::NPC;
+            $typeId     = $s['typeId'];
+            $flags      = $s['flags'];
+            $areaId     = $s['areaId'];
+            $floor      = $s['floor'];
+            $posX       = $s['areaX'];
+            $posY       = $s['areaY'];
+            $mapType    = $s['mapType'];
+            $guid       = $s['guid']       ?? $typeId;
+            $respawn    = $s['respawn']    ?? 0;
+            $spawnMask  = $s['spawnMask']  ?? 0;
+            $phaseMask  = $s['phaseMask']  ?? 0;
+            $pathId     = $s['pathId']     ?? 0;
+            $scriptName = $s['ScriptName'] ?? null;
+            $stringId   = $s['StringId']   ?? null;
 
             // check, if we can attach waypoints to creature
             // we will get a nice clusterfuck of dots if we do this for more GUIDs, than we have colors though
-            if (!$skipWPs && count($spawns) < 6 && $s['type'] == Type::NPC)
+            if (!$skipWPs && count($spawns) < 6 && $pathId)
             {
-                if ($wPoints = DB::Aowow()->selectAssoc('SELECT * FROM ::creature_waypoints WHERE creatureOrPath = %i AND floor = %i', $s['pathId'] ? -$s['pathId'] : $this->id, $s['floor']))
+                $wPoints = match (self::$type)
                 {
-                    foreach ($wPoints as $i => $p)
-                    {
-                        $label = [Lang::npc('waypoint').Lang::main('colon').$p['point']];
+                    Type::NPC    => DB::Aowow()->selectAssoc('SELECT * FROM ::creature_waypoints WHERE `pathId` = %i AND `floor` = %i', $pathId, $floor),
+                    Type::OBJECT => DB::Aowow()->selectAssoc('SELECT * FROM ::objects_waypoints  WHERE `pathId` = %i AND `floor` = %i', $pathId, $floor),
+                    default      => []
 
-                        if ($p['wait'])
-                            $label[] = Lang::npc('wait').Lang::main('colon').DateTime::formatTimeElapsedFloat($p['wait']);
+                };
 
-                        $opts = array(                      // \0 doesn't get printed and tricks Util::toJSON() into handling this as a string .. i feel slightly dirty now
-                            'label' => "\0$<br /><span class=\"q0\">".implode('<br />', $label).'</span>',
-                            'type'  => $wpIdx
-                        );
+                foreach ($wPoints as $i => $p)
+                {
+                    $label = [Lang::npc('waypoint').Lang::main('colon').$p['point']];
 
-                        // connective line
-                        if ($i > 0 && $wPoints[$i - 1]['areaId'] == $p['areaId'])
-                            $opts['lines'] = [[$wPoints[$i - 1]['posX'], $wPoints[$i - 1]['posY']]];
+                    if ($p['wait'])
+                        $label[] = Lang::npc('wait').Lang::main('colon').DateTime::formatTimeElapsedFloat($p['wait']);
+                    if (!empty($p['arrivalEventId']))       // gameobjects
+                        $label[] = 'on arrival: emit event #'.$p['arrivalEventId'];
+                    if (!empty($p['departureEventId']))     // gameobjects
+                        $label[] = 'on departure: emit event #'.$p['departureEventId'];
+                    if (!empty($p['action']))               // creatures
+                        $label[] = lang::main('parensFmt', ['emit event #'.$p['action'], $p['actionChance']]);
 
-                        $data[$p['areaId']][$p['floor']]['coords'][] = [$p['posX'], $p['posY'], $opts];
-                        if (empty($wpSum[$p['areaId']][$p['floor']]))
-                            $wpSum[$p['areaId']][$p['floor']] = 1;
-                        else
-                            $wpSum[$p['areaId']][$p['floor']]++;
-                    }
-                    $wpIdx++;
+                    $opts = array(                          // \0 doesn't get printed and tricks Util::toJSON() into handling this as a string .. i feel slightly dirty now
+                        'label' => "\0$<br /><span class=\"q0\">".implode('<br />', $label).'</span>',
+                        'type'  => $wpIdx
+                    );
+
+                    // connective line
+                    if ($i > 0 && $wPoints[$i - 1]['areaId'] == $p['areaId'])
+                        $opts['lines'] = [[$wPoints[$i - 1]['areaX'], $wPoints[$i - 1]['areaY']]];
+
+                    $data[$p['areaId']][$p['floor']]['coords'][] = [$p['areaX'], $p['areaY'], $opts];
+                    if (empty($wpSum[$p['areaId']][$p['floor']]))
+                        $wpSum[$p['areaId']][$p['floor']] = 1;
+                    else
+                        $wpSum[$p['areaId']][$p['floor']]++;
                 }
+
+                if ($wPoints)
+                    $wpIdx++;
             }
 
             $opts   = $menu = $tt = $info = [];
             $footer = '';
 
-            if ($s['respawn'] > 0)
-                $info[1] = '<span class="q0">'.Lang::npc('respawnIn', [Lang::formatTime($s['respawn'] * 1000, 'game', 'timeAbbrev', true)]).'</span>';
-            else if ($s['respawn'] < 0)
+            if ($respawn > 0)
+                $info[1] = '<span class="q0">'.Lang::npc('respawnIn', [Lang::formatTime($respawn * 1000, 'game', 'timeAbbrev', true)]).'</span>';
+            else if ($respawn < 0)
             {
-                $info[1] = '<span class="q0">'.Lang::npc('despawnAfter', [Lang::formatTime(-$s['respawn'] * 1000, 'game', 'timeAbbrev', true)]).'</span>';
-                $opts['type'] = 4;                          // make pip purple
+                $info[0] = '<span class="q0">'.Lang::npc('scriptedSpawn').'</span>';
+                $info[1] = '<span class="q0">'.Lang::npc('despawnAfter', [Lang::formatTime(-$respawn * 1000, 'game', 'timeAbbrev', true)]).'</span>';
             }
 
             if (!$skipAdmin && User::isInGroup(U_GROUP_STAFF))
             {
-                if ($isAccessory)
-                    $info[0] = 'Vehicle Accessory';
-                else if ($s['guid'] > 0 && ($s['type'] == Type::NPC || $s['type'] == Type::OBJECT))
-                    $info[0] = 'GUID'.Lang::main('colon').$s['guid'];
-
-                if ($s['phaseMask'] > 1 && ($s['phaseMask'] & 0xFFFF) != 0xFFFF)
-                    $info[2] = Lang::game('phases').Lang::main('colon').Util::asHex($s['phaseMask']);
-
-                if ($s['spawnMask'] == 15)
-                    $info[3] = Lang::game('mode').Lang::game('modes', 0, -1);
-                else if ($s['spawnMask'])
-                    if ($_ = array_intersect_key(Lang::game('modes', $s['mapType']), Util::mask2bits($s['spawnMask'])))
-                        $info[4] = Lang::game('mode').implode(', ', $_);
-
-                if ($s['ScriptName'])
-                    $info[5] = 'ScriptName'.Lang::main('colon').$s['ScriptName'];
-                if ($s['StringId'])
-                    $info[6] = 'StringId'.Lang::main('colon').$s['StringId'];
-
-                if ($s['type'] == Type::AREATRIGGER)
+                $vSpawn = match ($flags & 0xFF)
                 {
-                    // teleporter endpoint
-                    if ($s['guid'] < 0)
-                    {
-                        $opts['type'] = 4;
-                        $info[7] = 'Teleport Destination';
-                    }
-                    else
-                    {
-                        $o = Util::O2Deg($this->getField('orientation'));
-                        $info[7] = 'Orientation'.Lang::main('colon').$o[0].'° ('.$o[1].')';
-                    }
+                    SPAWNTYPE_VEHICLE_ACCESSORY => '* Vehicle Accessory',
+                    SPAWNTYPE_SUMMON_GROUPS     => '* Creature Summon Group',
+                    SPAWNTYPE_SMART_SCRIPTS     => '* Smart AI summon',
+                    SPAWNTYPE_TELEPORTER_DEST   => '* Teleporter Destination',
+                    SPAWNTYPE_MO_TRANSPORT      => '* Transport',
+                    default                     => $info[0] ?? null
+                };
+
+                if ($vSpawn)
+                {
+                    $info[0] = $vSpawn;
+                    $opts['type'] = 4;                      // make pip purple
+                }
+                else if (self::$type == Type::NPC || self::$type == Type::OBJECT)
+                    $info[0] = 'GUID'.Lang::main('colon').$guid;
+
+                if ($_ = (($flags >> 8) & 0xFFF))
+                    $info[] = Lang::game('transports', $_) ?? 'UNK transport #'.$_;
+
+                if (!empty($phaseMask) && ($phaseMask & 0xFFFF) != 0xFFFF)
+                    $info[] = Lang::game('phases').Lang::main('colon').Util::asHex($phaseMask);
+
+                if ($spawnMask == 0xF)
+                    $info[] = Lang::game('mode').Lang::game('modes', 0, -1);
+                else if ($spawnMask)
+                    if ($_ = array_intersect_key(Lang::game('modes', $mapType), Util::mask2bits($spawnMask)))
+                        $info[] = Lang::game('mode').implode(', ', $_);
+
+                if ($scriptName)
+                    $info[] = 'ScriptName'.Lang::main('colon').$scriptName;
+                if ($stringId)
+                    $info[] = 'StringId'.Lang::main('colon').$stringId;
+
+                if (self::$type == Type::AREATRIGGER && !($flags & SPAWNTYPE_TELEPORTER_DEST))
+                {
+                    [$deg, $dir] = Util::O2Deg($this->getField('orientation'));
+                    $info[] = 'Orientation'.Lang::main('colon').$deg.'° ('.$dir.')';
                 }
 
-                // guid < 0 are vehicle accessories. those are moved by moving the vehicle
-                if (User::isInGroup(U_GROUP_MODERATOR) && $worldPos && !$isAccessory && isset($worldPos[$s['guid']]))
-                    $menu = Util::buildPosFixMenu($worldPos[$s['guid']]['mapId'], $worldPos[$s['guid']]['posX'], $worldPos[$s['guid']]['posY'], $s['type'], $s['guid'], $s['areaId'], $s['floor']);
+                if (isset($worldPos[$guid]))
+                    $menu = Util::buildPosFixMenu($worldPos[$guid]['mapId'], $worldPos[$guid]['mapX'], $worldPos[$guid]['mapY'], self::$type, $guid, $areaId, $floor);
 
                 if ($menu)
                     $footer = '<br /><span class="q2">Click to move pin</span>';
@@ -747,19 +789,20 @@ trait spawnHelper
             if ($footer)
                 $tt['footer'] = $footer;
 
-            if ($tt && $this->getEntry($s['typeId']))
+            if ($tt && $this->getEntry($typeId))
                 $opts['tooltip'] = [$this->getField('name', true) => $tt];
-            else if ($hasLabel && $this->getEntry($s['typeId']))
-                $opts['label'] = $this->getField('name', true);
+            else if ($hasLabel && $this->getEntry($typeId))
+                $opts['label'] = sprintf('<span class="q">%1$s</span> ($)', $this->getField('name', true));
 
             if ($hasLink)
-                $opts['url'] = '?' . Type::getFileString(self::$type) . '=' . $s['typeId'];
+                $opts['url'] = '?' . Type::getFileString(self::$type) . '=' . $typeId;
 
             if ($menu)
                 $opts['menu'] = $menu;
 
-            $data[$s['areaId']] [$s['floor']] ['coords'] [] = [$s['posX'], $s['posY'], $opts];
+            $data[$areaId] [$floor] ['coords'] [] = [$posX, $posY, $opts];
         }
+
         foreach ($data as $a => &$areas)
             foreach ($areas as $f => &$floor)
                 $floor['count'] = count($floor['coords']) - ($wpSum[$a][$f] ?? 0);
@@ -780,9 +823,9 @@ trait spawnHelper
     {
         $res = DB::Aowow()->selectCol(
            'SELECT `typeId` AS ARRAY_KEY, GROUP_CONCAT(`areaId` ORDER BY `n` DESC)
-            FROM (SELECT `typeId`, `areaId`, COUNT(1) AS "n" FROM ::spawns WHERE `type` = %i AND `typeId` IN %in AND `posX` > 0 AND `posY` > 0 GROUP BY `typeId`, `areaId`) x
+            FROM (SELECT `typeId`, `areaId`, COUNT(1) AS "n" FROM %n WHERE `typeId` IN %in AND `areaX` > 0 AND `areaY` > 0 GROUP BY `typeId`, `areaId`) x
             GROUP BY `typeId`',
-            self::$type, $this->getfoundIDs()
+            $this->spawnsTable, $this->getfoundIDs()
         ) ?: [];
 
         foreach ($res as &$r)
@@ -796,7 +839,7 @@ trait spawnHelper
         if (self::$type == Type::SOUND)
             return;
 
-        $res    = DB::Aowow()->selectAssoc('SELECT `areaId`, `floor`, `typeId`, `posX`, `posY` FROM ::spawns WHERE `type` = %i AND `typeId` IN %in AND `posX` > 0 AND `posY` > 0', self::$type, $this->getFoundIDs());
+        $res    = DB::Aowow()->selectAssoc('SELECT `areaId`, `floor`, `typeId`, `areaX`, `areaY` FROM %n WHERE `typeId` IN %in AND `areaX` > 0 AND `areaY` > 0', $this->spawnsTable, $this->getFoundIDs());
         $spawns = [];
         foreach ($res as $data)
         {
@@ -809,15 +852,15 @@ trait spawnHelper
                     'id'            => $data['typeId'],
                     'point'         => null,                // tbd later (start, end, requirement, sourcestart, sourceend, sourcerequirement)
                     'name'          => Util::localizedString($this->templates[$data['typeId']], 'name'),
-                    'coord'         => [$data['posX'], $data['posY']],
-                    'coords'        => [[$data['posX'], $data['posY']]],
+                    'coord'         => [$data['areaX'], $data['areaY']],
+                    'coords'        => [[$data['areaX'], $data['areaY']]],
                     'objective'     => null,                // tbd later (1-4 set a color; id of creature this entry gives credit for)
                     'reactalliance' => $this->templates[$data['typeId']]['A'] ?: 0,
                     'reacthorde'    => $this->templates[$data['typeId']]['H'] ?: 0
                 );
             }
             else
-                $spawns[$data['areaId']][$data['floor']][$data['typeId']]['coords'][] = [$data['posX'], $data['posY']];
+                $spawns[$data['areaId']][$data['floor']][$data['typeId']]['coords'][] = [$data['areaX'], $data['areaY']];
         }
 
         $this->spawnResult[SPAWNINFO_QUEST] = $spawns;
@@ -825,8 +868,7 @@ trait spawnHelper
 
     public function getSpawns(int $mode, bool ...$info) : array|\StdClass
     {
-        // only Creatures, GOs and SoundEmitters can be spawned
-        if (!self::$type || !$this->getfoundIDs() || (self::$type != Type::NPC && self::$type != Type::OBJECT && self::$type != Type::SOUND && self::$type != Type::AREATRIGGER))
+        if (!$this->getfoundIDs() || !$this->setSpawnsTable())
             return [];
 
         switch ($mode)

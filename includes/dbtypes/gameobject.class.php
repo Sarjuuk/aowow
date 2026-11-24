@@ -21,7 +21,7 @@ class GameObjectList extends DBTypeList
                         'ft'  => ['j' => ['::factiontemplate ft ON ft.`id` = o.`faction`', true], 's' => ', ft.`factionId`, IFNULL(ft.`A`, 0) AS "A", IFNULL(ft.`H`, 0) AS "H"'],
                         'qse' => ['j' => ['::quests_startend qse ON qse.`type` = 2 AND qse.`typeId` = o.id', true], 's' => ', IF(MIN(qse.`method`) = 1 OR MAX(qse.`method`) = 3, 1, 0) AS "startsQuests", IF(MIN(qse.`method`) = 2 OR MAX(qse.`method`) = 3, 1, 0) AS "endsQuests"', 'g' => 'o.`id`'],
                         'qt'  => ['j' => '::quests qt ON qse.`questId` = qt.`id`'],
-                        's'   => ['j' => '::spawns s ON s.`type` = 2 AND s.`typeId` = o.`id`']
+                        's'   => ['j' => '::objects_spawns s ON s.`typeId` = o.`id`']
                     );
 
     public function __construct(array $conditions = [], array $miscData = [])

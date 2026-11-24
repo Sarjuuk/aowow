@@ -612,25 +612,23 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         if ($_specialFlags & QUEST_FLAG_SPECIAL_EXT_COMPLETE)
         {
             // areatrigger
-            if ($atir = DB::Aowow()->selectCol('SELECT `id` FROM ::areatrigger WHERE `type` = %i AND `quest` = %i', AT_TYPE_OBJECTIVE, $this->typeId))
+            if ($atSpawns = DB::AoWoW()->selectAssoc('SELECT a.`id` AS ARRAY_KEY, s.`areaId`, s.`areaX`, s.`areaY`, s.`floor` FROM ::areatrigger_spawns s JOIN ::areatrigger a ON a.`id` = s.`typeId` AND s.`flags` = 0 WHERE a.`type` = %i AND a.`quest` = %i',
+                AT_TYPE_OBJECTIVE, $this->typeId))
             {
-                if ($atSpawns = DB::AoWoW()->selectAssoc('SELECT `typeId` AS ARRAY_KEY, `posX`, `posY`, `floor`, `areaId` FROM ::spawns WHERE `type` = %i AND `typeId` IN %in', Type::AREATRIGGER, $atir))
-                {
-                    if (User::isInGroup(U_GROUP_STAFF))
-                        $endText = '<a href="?areatrigger='.$atir[0].'">'.($endText ?: Lang::areatrigger('unnamed', [$atir[0]])).'</a>';
+                if (User::isInGroup(U_GROUP_STAFF))
+                    $endText = '<a href="?areatrigger='.key($atSpawns).'">'.($endText ?: Lang::areatrigger('unnamed', [key($atSpawns)])).'</a>';
 
-                    foreach ($atSpawns as $atId => $atsp)
-                    {
-                        $addObjectiveSpawns([$atsp['areaId'] => [$atsp['floor'] => [$atId => array(
-                            'type'      => User::isInGroup(U_GROUP_STAFF) ? Type::AREATRIGGER : -1,
-                            'id'        => $atId,
-                            'point'     => 'requirement',
-                            'name'      => $this->subject->parseText('end', false) ?: Lang::areatrigger('unnamed', [$atir[0]]),
-                            'coord'     => [$atsp['posX'], $atsp['posY']],
-                            'coords'    => [[$atsp['posX'], $atsp['posY']]],
-                            'objective' => $objectiveIdx++
-                        )]]]);
-                    }
+                foreach ($atSpawns as $atId => $atsp)
+                {
+                    $addObjectiveSpawns([$atsp['areaId'] => [$atsp['floor'] => [$atId => array(
+                        'type'      => User::isInGroup(U_GROUP_STAFF) ? Type::AREATRIGGER : -1,
+                        'id'        => $atId,
+                        'point'     => 'requirement',
+                        'name'      => $endText ?: Lang::areatrigger('unnamed', [$atId]),
+                        'coord'     => [$atsp['areaX'], $atsp['areaY']],
+                        'coords'    => [[$atsp['areaX'], $atsp['areaY']]],
+                        'objective' => $objectiveIdx++
+                    )]]]);
                 }
             }
             // complete-spell

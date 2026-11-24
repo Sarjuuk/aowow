@@ -571,6 +571,34 @@ $lang = array(
             "Vengador de Gnomeregan",
             "Jefe vudú de Sen'jin"
         ),
+        'transports'    => array(                           // Map.dbc/name
+            582 => "Transporte: de Rut'theran a Auberdine",
+            584 => "Transporte: de Menethil a Theramore",
+            586 => "Transporte: de El Exodar a Auberdine",
+            587 => "Transporte: Transbordador de Plumaluna",
+            588 => "Transporte: de Menethil a Auberdine",
+            589 => "Transporte: de Orgrimmar a Grom'Gol",
+            590 => "Transporte: de Grom'Gol a Entrañas",
+            591 => "Transporte: de Entrañas a Orgrimmar",
+            593 => "Transporte: Bahía del Botín a Trinquete",
+            594 => "Transporte: Fiordo Aquilonal Hermana Misericordia",
+            610 => "Transporte: Tirisfal al Campo Venganza",
+            612 => "Transporte: Menethil a Valgarde",
+            613 => "Transporte: Orgrimmar al Bastión Grito de Guerra",
+            614 => "Transporte: Ventormenta a la Fortaleza Denuedo",
+            620 => "Transporte: Moa'ki a Unu'pe",
+            621 => "Transporte: Moa'ki a Komawa",
+            622 => "Transporte: Martillo de Orgrim",
+            623 => "Transporte: El Rompecielos",
+            641 => "Transporte: Alliance Airship BG",
+            642 => "Transporte: Horde Airship BG",
+            647 => "Transporte: Orgrimmar a Cima del Trueno",
+            672 => "Transporte: El Rompecielos",
+            673 => "Transporte: Martillo de Orgrim",
+            712 => "Transporte: El Rompecielos",
+            713 => "Transporte: Martillo de Orgrim",
+            718 => "Transporte: El Viento Poderoso",
+        ),
         'orientation'   => ['Norte', 'Noreste', 'Este', 'Sureste', 'Sur', 'Suroeste', 'Oeste', 'Noroeste']
     ),
     'unit' => array(
@@ -1236,11 +1264,11 @@ $lang = array(
         'notFound'      => "Esta entidad no existe.",
         'unnamed'       => "[Unnamed object] #%d",
         'cat'           => array(
-             0 => "Otros", 3 => "Contenedores", 6 => "Trampas", 9 => "Libros", 19 => "Buzones de correo", 25 => "Bancos de peces",
+             0 => "Otros", 3 => "Contenedores", 6 => "Trampas", 9 => "Libros", 15 => "Transportes", 19 => "Buzones de correo", 25 => "Bancos de peces",
             -5 => "Cofres", -3 => "Hierbas", -4 => "Venas de minerales", -2 => "Misiones", -6 => "Herramientas", -9 => "Objetos interactivos"
         ),
         'type'          => array(                           // used for tooltip
-             3 => "Contenedore",  6 => "", 9 => "Libro", 19 => "", 25 => "",
+             3 => "Contenedore",  6 => "", 9 => "Libro", 15 => "", 19 => "", 25 => "",
             -5 => "Cofre", -3 => "Hierba", -4 => "Veta de minería", -2 => "Misión", -6 => "", -9 => ""
         ),
         'unkPosition'   => "No se conoce la ubicación de esta entidad.",
@@ -1300,7 +1328,8 @@ $lang = array(
         'waypoint'      => "punto de recorrido",
         'wait'          => "Tiempo de espera",
         'respawnIn'     => "Reingreso en: %s",
-        'despawnAfter'  => "Generado por script<br />Desaparece después: %s",
+        'scriptedSpawn' => "Generado por script",
+        'despawnAfter'  => "Desaparece después: %s",
         'rank'          => [0 => "Normal", 1 => "Élite", 4 => "Raro", 2 => "Élite raro", 3 => "Jefe"],
         'textRanges'    => [null, "Mandar al área", "Mandar a zona", "Mandar al mapa", "Mandar al mundo"],
         'textTypes'     => [null, "grita", "dice", "susurra"],

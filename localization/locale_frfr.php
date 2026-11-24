@@ -571,6 +571,34 @@ $lang = array(
             "Vengeur de Gnomeregan",
             "Chef Vaudou de Sen'jin"
         ),
+        'transports'    => array(                           // Map.dbc/name
+            582 => "Transport : de Rut'theran à Auberdine",
+            584 => "Transport : de Menethil à Theramore",
+            586 => "Transport : de l'Exodar à Auberdine",
+            587 => "Transport : bac de Pennelune",
+            588 => "Transport : de Menethil à Auberdine",
+            589 => "Transport : d'Orgrimmar à Grom'Gol",
+            590 => "Transport : de Grom'Gol à Fossoyeuse",
+            591 => "Transport : de Fossoyeuse à Orgrimmar",
+            593 => "Transport : Baie-du-Butin à Cabestan",
+            594 => "Transport : Fjord hurlant Sœur Miséricorde",
+            610 => "Transport : de Tirisfal à l'accostage de la Vengeance",
+            612 => "Transport : de Menethil à Valgarde",
+            613 => "Transport : d'Orgrimmar au bastion Chanteguerre",
+            614 => "Transport : de Hurlevent au donjon de la Bravoure",
+            620 => "Transport : Moa'ki à Unu'pe",
+            621 => "Transport : Moa'ki à Kamagua",
+            622 => "Transport : le Marteau d'Orgrim",
+            623 => "Transport : le Brise-ciel",
+            641 => "Transport : CB Vaisseau de l'Alliance",
+            642 => "Transport : CB Vaisseau de la Horde",
+            647 => "Transport : d'Orgrimmar aux Pitons du Tonnerre",
+            672 => "Transport : le Brise-ciel",
+            673 => "Transport : le Marteau d'Orgrim",
+            712 => "Transport : le Brise-ciel",
+            713 => "Transport : le Marteau d'Orgrim",
+            718 => "Transport : le Grand vent",
+        ),
         'orientation'   => ['North', 'Northeast', 'East', 'Southeast', 'South', 'Southwest', 'West', 'Northwest']
     ),
     'unit' => array(
@@ -1236,11 +1264,11 @@ $lang = array(
         'notFound'      => "Cette entité n'existe pas.",
         'unnamed'       => "[Unnamed object] #%d",
         'cat'           => array(
-             0 => "Autre", 3 => "Conteneurs", 6 => "Pièges", 9 => "Livres", 19 => "Boîtes aux lettres", 25 => "Bancs de poissons",
+             0 => "Autre", 3 => "Conteneurs", 6 => "Pièges", 9 => "Livres", 15 => "Transports", 19 => "Boîtes aux lettres", 25 => "Bancs de poissons",
             -5 => "Coffres", -3 => "Herbes", -4 => "Filons de minerai", -2 => "Quêtes", -6 => "Outils", -9 => "Objets interactifs"
         ),
         'type'          => array(                           // used for tooltip
-             3 => "Conteneur",  6 => "", 9 => "Livre", 19 => "", 25 => "",
+             3 => "Conteneur",  6 => "", 9 => "Livre", 15 => "", 19 => "", 25 => "",
             -5 => "Coffre", -3 => "Herbe", -4 => "Filon de minerai", -2 => "Quête", -6 => "", -9 => ""
         ),
         'unkPosition'   => "L'emplacement de cette entité est inconnu.",
@@ -1300,7 +1328,8 @@ $lang = array(
         'waypoint'      => "Point de route",
         'wait'          => "Période d'attente",
         'respawnIn'     => "Rentrée en : %s",
-        'despawnAfter'  => "[Spawned by Script<br />Despawn after] : %s",
+        'scriptedSpawn' => "[Spawned by script]",
+        'despawnAfter'  => "[Despawn after] : %s",
         'rank'          => [0 => "Standard", 1 => "Élite", 4 => "Rare", 2 => "Élite rare", 3 =>"Boss"],
         'textRanges'    => [null, "[sent to area]", "[sent to zone]", "[sent to map]", "[sent to world]"],
         'textTypes'     => [null, "crie", "dit", "chuchote"],

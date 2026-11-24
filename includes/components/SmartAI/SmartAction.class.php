@@ -467,11 +467,8 @@ class SmartAction
                 break;
             case self::ACTION_TELEPORT:                     // 62 -> invoker
                 [$x, $y, $z, $o] = $this->smartAI->getTarget()->getWorldPos();
-                // try from areatrigger setup data
-                if ($this->smartAI->teleportTargetArea)
-                    $this->param[10] = $this->smartAI->teleportTargetArea;
                 // try calc from SmartTarget data
-                else if ($pos = WorldPosition::toZonePos($this->param[0], $x, $y))
+                if ($pos = WorldPosition::toZonePos($this->param[0], $x, $y, $this->smartAI->teleportTargetArea))
                 {
                     $this->param[10] = $pos[0]['areaId'];
                     $this->param[11] = sprintf('%03d%03d', $pos[0]['posX'] * 10, $pos[0]['posY'] * 10);

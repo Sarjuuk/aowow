@@ -329,7 +329,8 @@ var mn_objects = [
     [-9, "Objets interactifs"],
     [-6, "Outils"],
     [ 6, "Pièges"],
-    [-2, "Quêtes"]
+    [-2, "Quêtes"],
+    [15, "Transports"]
 ];
 
 var mn_quests = [
@@ -1468,6 +1469,7 @@ var g_object_types = {
        9: 'Livre',
        3: 'Conteneur',
        6: 'Piège',
+      15: 'Transport',
       19: 'Boîte aux lettres',
       25: 'Banc de poissons',
     '-2': 'Quête',

@@ -97,9 +97,18 @@ if ([$mapper, $mapperData, $som, $foundIn] = $this->map):
                         url: '?admin=spawn-override',
                         data: { type: type, guid: typeguid, area : area, floor: floor },
                         dataType: 'json',
-                        success: function (rsp) {
-                            if (rsp /* == x */)
-                                alert('move failed. details tbd');
+                        success: function (rsp)
+                        {
+                            if (rsp)
+                                return $WH.error('move failed. ' + ({
+                                    1: 'Failed to calculate zone coordinates.',
+                                    2: 'No world position found.',
+                                    3: 'Tried to move unsupported type.',
+                                    4: 'Failed to write to db.'
+                                }[rsp] || 'Unknown error.'));
+
+                            if (location.search.match("&refresh"))
+                                location.reload();
                             else
                                 location.search += "&refresh";
                         },

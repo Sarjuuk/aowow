@@ -40,7 +40,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                'UPDATE ::spelldifficulty sd,
                        (SELECT   c.%n AS "spell", BIT_OR(CASE WHEN z.`type` = %i THEN 1 WHEN z.`type` = %i THEN 2 WHEN z.`type` = %i THEN 2 ELSE 0 END) AS "mapType"
                         FROM     ::creature c
-                        JOIN     ::spawns s ON c.id = s.typeId AND s.type = %i
+                        JOIN     ::creature_spawns s ON c.id = s.typeId
                         JOIN     ::zones z ON z.id = s.areaId
                         WHERE    c.%n IN %in
                         GROUP BY c.%n
@@ -48,7 +48,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                 SET     sd.`mapType` = x.`mapType`
                 WHERE   sd.`normal10` = x.`spell`',
                 'spell'.$i, MAP_TYPE_DUNGEON_HC, MAP_TYPE_MMODE_RAID, MAP_TYPE_MMODE_RAID_HC,
-                Type::NPC, 'spell'.$i, $baseSpells, 'spell'.$i, 'spell'.$i
+                'spell'.$i, $baseSpells, 'spell'.$i, 'spell'.$i
             );
 
 
@@ -65,13 +65,14 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                 DB::Aowow()->qry(
                    'UPDATE ::spelldifficulty sd,
                            (SELECT BIT_OR(CASE WHEN z.`type` = %i THEN 1 WHEN z.`type` = %i THEN 2 WHEN z.`type` = %i THEN 2 ELSE 0 END) AS "mapType"
-                            FROM   ::spawns s
+                            FROM   %n s
                             JOIN   ::zones z ON z.id = s.areaId
-                            WHERE s.type = %i AND s.typeId IN %in ) sp
+                            WHERE  s.typeId IN %in ) sp
                     SET    sd.`mapType` = IF(sp.`mapType` > 2, 0, sp.`mapType`)
                     WHERE sd.`normal10` = %i',
                     MAP_TYPE_DUNGEON_HC, MAP_TYPE_MMODE_RAID, MAP_TYPE_MMODE_RAID_HC,
-                    $type, $casterEntries,
+                    $type == Type::OBJECT ? '::objects_spawns' : '::creature_spawns',
+                    $casterEntries,
                     $spellId
                 );
 

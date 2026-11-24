@@ -38,67 +38,97 @@ class AdminSpawnoverrideResponse extends TextResponse
         $area  = $this->_get['area'];
         $floor = $this->_get['floor'];
 
-        if (!in_array($type, [Type::NPC, Type::OBJECT, Type::SOUND, Type::AREATRIGGER, Type::ZONE]))
+        if (!($tbl = WorldPosition::getStorageByType($type)))
         {
             trigger_error("AdminSpawnoverrideResponse - can't move pip of type ".Type::getFileString($type), E_USER_WARNING);
             $this->result = self::ERR_WRONG_TYPE;
             return;
         }
 
-        DB::Aowow()->qry('REPLACE INTO ::spawns_override (`type`, `typeGuid`, `areaId`, `floor`, `revision`) VALUES (%i, %i, %i, %i, %i)', $type, $guid, $area, $floor, AOWOW_REVISION);
-
-        $wPos = WorldPosition::getForGUID($type, $guid);
-        if (!$wPos)
+        if (!($wPos = WorldPosition::getForGUID($type, $guid)))
         {
             $this->result = self::ERR_WORLD_POS;
             return;
         }
 
-        $point = WorldPosition::toZonePos($wPos[$guid]['mapId'], $wPos[$guid]['posX'], $wPos[$guid]['posY'], $area, $floor);
-        if (!$point)
+        if (!($point = WorldPosition::toZonePos($wPos[$guid]['mapId'], $wPos[$guid]['mapX'], $wPos[$guid]['mapY'], $area, $floor)))
         {
             $this->result = self::ERR_NO_POINTS;
             return;
         }
 
+        $flags = DB::Aowow()->selectCell('SELECT `flags` FROM %n WHERE `guid` = %i', $tbl, $guid);
+        if (($_ = $flags & 0xFFF00) || ($flags & SPAWNTYPE_VEHICLE_ACCESSORY))
+        {
+            trigger_error('AdminSpawnoverrideResponse - tried to move '.($_ ? 'transport passenger' : 'vehicle accessory').' (linked to parent spawn point) TYPE #'.$type.'; GUID #'.$guid, E_USER_WARNING);
+            $this->result = self::ERR_WRONG_TYPE;
+            return;
+        }
+
+        DB::Aowow()->qry('REPLACE INTO ::spawns_override %v', ['type' => $type, 'typeGuid' => $guid, 'areaId' => $area, 'floor' => $floor, 'revision' => AOWOW_REVISION]);
+
         $updGUIDs = [$guid];
         $newPos   = array(
-            'posX'   => $point[0]['posX'],
-            'posY'   => $point[0]['posY'],
+            'areaX'  => $point[0]['posX'],
+            'areaY'  => $point[0]['posY'],
             'areaId' => $point[0]['areaId'],
             'floor'  => $point[0]['floor']
         );
 
+        if (!DB::Aowow()->qry('UPDATE %n SET %a WHERE %n IN %in', $tbl, $newPos, 'guid', $updGUIDs))
+        {
+            $this->result = self::ERR_WRITE_DB;
+            return;
+        }
+
+        // move passengers and waypoints with transport
+        if ($type == Type::OBJECT && ($flags & SPAWNTYPE_MO_TRANSPORT))
+        {
+            $mapId  = DB::Aowow()->SelectCell('SELECT SUBSTRING_INDEX(`miscInfo`, " ", 1) FROM ::objects o JOIN ::objects_spawns s ON s.`typeId` = o.`id` WHERE s.`guid` = %i', $guid);
+            $spawns = DB::Aowow()->selectAssoc(
+               'SELECT `guid`, `mapId`, `mapX`, `mapY`, %i AS "type" FROM ::creature_spawns WHERE (`flags` & %i) = %i UNION
+                SELECT `guid`, `mapId`, `mapX`, `mapY`, %i AS "type" FROM ::objects_spawns  WHERE (`flags` & %i) = %i',
+                Type::NPC, $mapId << 8, $mapId << 8, Type::OBJECT, $mapId << 8, $mapId << 8
+            );
+            $this->updatePoints(false, $spawns, $area, $floor);
+
+            if ($wps = DB::Aowow()->selectAssoc('SELECT w.`pathId`, w.`point`, w.`mapId`, w.`mapX`, w.`mapY`, %i AS "type" FROM ::objects_waypoints w JOIN ::objects_spawns o ON o.pathId = w.pathId WHERE o.`guid` = %i', Type::OBJECT, $guid))
+                $this->updatePoints(true, $wps, $area, $floor);
+        }
+
         // if creature try for waypoints
         if ($type == Type::NPC)
         {
-            if ($swp = DB::World()->selectAssoc('SELECT -w.`id` AS "entry", w.`point` AS "pointId", w.`position_x` AS "posX", w.`position_y` AS "posY" FROM creature_addon ca JOIN waypoint_data w ON w.`id` = ca.`path_id` WHERE ca.`guid` = %i AND ca.`path_id` <> 0', $guid))
-            {
-                foreach ($swp as $w)
-                {
-                    if ($point = WorldPosition::toZonePos($wPos[$guid]['mapId'], $w['posX'], $w['posY'], $area, $floor))
-                    {
-                        $p = array(
-                            'posX'   => $point[0]['posX'],
-                            'posY'   => $point[0]['posY'],
-                            'areaId' => $point[0]['areaId'],
-                            'floor'  => $point[0]['floor']
-                        );
-
-                        DB::Aowow()->qry('UPDATE ::creature_waypoints SET %a WHERE `creatureOrPath` = %i AND `point` = %i', $p, $w['entry'], $w['pointId']);
-                    }
-                }
-            }
+            if ($wps = DB::Aowow()->selectAssoc('SELECT w.`pathId`, w.`point`, w.`mapId`, w.`mapX`, w.`mapY`, %i AS "type" FROM ::creature_waypoints w JOIN ::creature_spawns c ON c.pathId = w.pathId WHERE c.`guid` = %i', Type::NPC, $guid))
+                $this->updatePoints(true, $wps, $area, $floor);
 
             // also move linked vehicle accessories (on the very same position)
-            $updGUIDs = array_merge($updGUIDs, DB::Aowow()->selectCol('SELECT s2.`guid` FROM ::spawns s1 JOIN ::spawns s2 ON s1.`posX` = s2.`posX` AND s1.`posY` = s2.`posY` AND
-                s1.`areaId` = s2.`areaId` AND s1.`floor` = s2.`floor` AND s2.`guid` < 0 WHERE s1.`guid` = %i', $guid));
+            $updGUIDs = array_merge($updGUIDs, DB::Aowow()->selectCol('SELECT s2.`guid` FROM ::creature_spawns s1 JOIN ::creature_spawns s2 ON s1.`areaX` = s2.`areaX` AND s1.`areaY` = s2.`areaY` AND
+                s1.`areaId` = s2.`areaId` AND s1.`floor` = s2.`floor` AND (s2.`flags` & %i) WHERE s1.`guid` = %i', SPAWNTYPE_VEHICLE_ACCESSORY, $guid));
         }
 
-        if (DB::Aowow()->qry('UPDATE ::spawns SET %a WHERE `type` = %i AND `guid` IN %in', $newPos, $type, $updGUIDs))
-            $this->result = self::ERR_NONE;
-        else
-            $this->result = self::ERR_WRITE_DB;
+        $this->result = self::ERR_NONE;
+    }
+
+    private function updatePoints(bool $isWP, array $points, int $area, int $floor) : void
+    {
+        foreach ($points as $p)
+        {
+            if ($point = WorldPosition::toZonePos($p['mapId'], $p['mapX'], $p['mapY'], $area, $floor))
+            {
+                $new = array(
+                    'areaX'  => $point[0]['posX'],
+                    'areaY'  => $point[0]['posY'],
+                    'areaId' => $point[0]['areaId'],
+                    'floor'  => $point[0]['floor']
+                );
+
+                if ($isWP)
+                    DB::Aowow()->qry('UPDATE %n SET %a WHERE `pathId` = %i AND `point` = %i', $p['type'] == Type::NPC ? '::creature_waypoints' : '::objects_waypoints', $new, $p['pathId'], $p['point']);
+                else
+                    DB::Aowow()->qry('UPDATE %n SET %a WHERE `guid` = %i', $p['type'] == Type::NPC ? '::creature_spawns' : '::objects_spawns', $new, $p['guid']);
+            }
+        }
     }
 }
 

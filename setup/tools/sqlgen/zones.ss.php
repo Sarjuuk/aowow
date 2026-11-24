@@ -46,9 +46,6 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                       IF(a.`flags` & 0x8, %i, IFNULL(bm.`maxLevel`, IFNULL(lfgIni.`levelMax`, IFNULL(lfgOpen.`levelMax`, 0)))) AS "levelMax",
                       "" AS "attunementsN",
                       "" AS "attunementsH",
-                      GREATEST(m.`parentMapId`, 0),
-                      m.`parentX`,
-                      m.`parentY`,
                       IF(wma.`id` IS NULL OR m.`areaType` = 0 OR a.`mapId` IN (269, 560) OR a.`areaTable`, a.`name_loc0`, m.`name_loc0`),
                       IF(wma.`id` IS NULL OR m.`areaType` = 0 OR a.`mapId` IN (269, 560) OR a.`areaTable`, a.`name_loc2`, m.`name_loc2`),
                       IF(wma.`id` IS NULL OR m.`areaType` = 0 OR a.`mapId` IN (269, 560) OR a.`areaTable`, a.`name_loc3`, m.`name_loc3`),
@@ -79,15 +76,6 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
         // attach DeathknightStart dungeon to Eastern Kingdoms
         DB::Aowow()->query('UPDATE ::zones SET `category` = 0 WHERE `parentArea` = 4298 OR `id` = 4298');
-
-        // set missing graveyards from areatrigger data (auto-resurrect map or just plain errors)
-        // grouped because naxxramas _just has_ to be special with 4 entrances...
-        if ($missingMaps = DB::Aowow()->selectCol('SELECT `id` FROM dbc_map WHERE `parentX` = 0 AND `parentY` = 0 AND `parentMapId` > -1 AND `areaType` NOT IN (0, 3, 4)'))
-            if ($triggerIds = DB::World()->selectCol('SELECT `target_map`, `id` AS ARRAY_KEY FROM areatrigger_teleport WHERE `target_map` IN %in GROUP BY `target_map`', $missingMaps))
-                if ($positions = DB::Aowow()->selectAssoc('SELECT `id` AS ARRAY_KEY, `mapId` AS "parentMapId", `posX` AS "parentX", `posY` AS "parentY" FROM dbc_areatrigger WHERE `id` IN %in', array_keys($triggerIds)))
-                    foreach ($positions as $atId => $parentPos)
-                        DB::Aowow()->qry('UPDATE ::zones SET %a WHERE `mapId` = %i', $parentPos, $triggerIds[$atId]);
-
 
         // get requirements from world.access_requirement
         $zoneReq = DB::World()->selectAssoc(

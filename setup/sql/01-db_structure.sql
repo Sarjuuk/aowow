@@ -395,9 +395,6 @@ CREATE TABLE `aowow_areatrigger` (
   `id` int(10) unsigned NOT NULL,
   `cuFlags` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'see defines.php for flags',
   `type` smallint(5) unsigned NOT NULL,
-  `mapId` smallint(5) unsigned NOT NULL COMMENT 'world pos. from dbc',
-  `posX` float NOT NULL COMMENT 'world pos. from dbc',
-  `posY` float NOT NULL COMMENT 'world pos. from dbc',
   `orientation` float NOT NULL,
   `name` varchar(100) DEFAULT NULL,
   `quest` mediumint(8) unsigned DEFAULT NULL,
@@ -405,6 +402,30 @@ CREATE TABLE `aowow_areatrigger` (
   KEY `quest` (`quest`),
   KEY `type` (`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `aowow_areatrigger_spawns`
+--
+
+DROP TABLE IF EXISTS `aowow_areatrigger_spawns`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `aowow_areatrigger_spawns` (
+  `guid` int(11) NOT NULL COMMENT '< 0: teleporter endpoint',
+  `typeId` int(10) unsigned NOT NULL,
+  `flags` int(10) unsigned NOT NULL,
+  `areaId` smallint(5) unsigned NOT NULL,
+  `areaX` float unsigned NOT NULL,
+  `areaY` float unsigned NOT NULL,
+  `floor` tinyint(3) unsigned NOT NULL,
+  `mapId` smallint(5) unsigned NOT NULL,
+  `mapX` float NOT NULL,
+  `mapY` float NOT NULL,
+  PRIMARY KEY (`guid`),
+  KEY `idx_type` (`typeId`),
+  KEY `idx_area` (`areaId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -690,6 +711,36 @@ CREATE TABLE `aowow_creature_sounds` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `aowow_creature_spawns`
+--
+
+DROP TABLE IF EXISTS `aowow_creature_spawns`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `aowow_creature_spawns` (
+  `guid` int(11) NOT NULL COMMENT '< 0: virtual (not spawned by default)',
+  `typeId` int(10) unsigned NOT NULL,
+  `flags` int(10) unsigned NOT NULL,
+  `areaId` smallint(5) unsigned NOT NULL,
+  `areaX` float unsigned NOT NULL,
+  `areaY` float unsigned NOT NULL,
+  `floor` tinyint(3) unsigned NOT NULL,
+  `mapId` smallint(5) unsigned NOT NULL,
+  `mapX` float NOT NULL,
+  `mapY` float NOT NULL,
+  `respawn` mediumint(9) NOT NULL DEFAULT 0 COMMENT 'in seconds',
+  `spawnMask` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `phaseMask` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `pathId` int(10) unsigned NOT NULL DEFAULT 0,
+  `ScriptName` varchar(64) DEFAULT NULL,
+  `StringId` varchar(64) DEFAULT NULL,
+  PRIMARY KEY (`guid`),
+  KEY `idx_type` (`typeId`),
+  KEY `idx_area` (`areaId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `aowow_creature_waypoints`
 --
 
@@ -697,14 +748,20 @@ DROP TABLE IF EXISTS `aowow_creature_waypoints`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_creature_waypoints` (
-  `creatureOrPath` int(11) NOT NULL,
+  `pathId` int(10) unsigned NOT NULL,
   `point` smallint(5) unsigned NOT NULL,
   `areaId` smallint(5) unsigned NOT NULL,
+  `areaX` float unsigned NOT NULL,
+  `areaY` float unsigned NOT NULL,
   `floor` tinyint(4) NOT NULL DEFAULT -1,
-  `posX` float unsigned NOT NULL,
-  `posY` float unsigned NOT NULL,
+  `mapId` smallint(5) unsigned NOT NULL,
+  `mapX` float NOT NULL,
+  `mapY` float NOT NULL,
   `wait` int(10) unsigned NOT NULL DEFAULT 0,
-  PRIMARY KEY (`creatureOrPath`,`point`,`areaId`,`floor`)
+  `action` int(10) unsigned NOT NULL,
+  `actionChance` smallint(5) unsigned NOT NULL,
+  PRIMARY KEY (`pathId`,`point`),
+  KEY `idx_map` (`mapId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1304,7 +1361,7 @@ CREATE TABLE `aowow_itemenchantment` (
   `name_loc4` varchar(84) DEFAULT NULL,
   `name_loc6` varchar(89) DEFAULT NULL,
   `name_loc8` varchar(96) DEFAULT NULL,
-  `itemVisualId` smallint unsigned NOT NULL,
+  `itemVisualId` smallint(5) unsigned NOT NULL,
   `conditionId` tinyint(3) unsigned NOT NULL,
   `skillLine` smallint(5) unsigned NOT NULL,
   `skillLevel` smallint(5) unsigned NOT NULL,
@@ -1367,7 +1424,7 @@ CREATE TABLE `aowow_items` (
   `iconId` smallint(5) unsigned NOT NULL DEFAULT 0,
   `displayId` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `spellVisualId` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `itemVisualId` smallint unsigned NOT NULL DEFAULT 0,
+  `itemVisualId` smallint(5) unsigned NOT NULL DEFAULT 0,
   `quality` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `flags` int(10) unsigned NOT NULL DEFAULT 0,
   `flagsExtra` int(10) unsigned NOT NULL DEFAULT 0,
@@ -1768,6 +1825,61 @@ CREATE TABLE `aowow_objects_search` (
   `nName` varchar(127) DEFAULT NULL,
   PRIMARY KEY (`id`,`locale`),
   FULLTEXT KEY `idx_ft_na` (`nName`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `aowow_objects_spawns`
+--
+
+DROP TABLE IF EXISTS `aowow_objects_spawns`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `aowow_objects_spawns` (
+  `guid` int(11) NOT NULL COMMENT '< 0: virtual (not spawned by default)',
+  `typeId` int(10) unsigned NOT NULL,
+  `flags` int(10) unsigned NOT NULL,
+  `areaId` smallint(5) unsigned NOT NULL,
+  `areaX` float unsigned NOT NULL,
+  `areaY` float unsigned NOT NULL,
+  `floor` tinyint(3) unsigned NOT NULL,
+  `mapId` smallint(5) unsigned NOT NULL,
+  `mapX` float NOT NULL,
+  `mapY` float NOT NULL,
+  `respawn` mediumint(9) NOT NULL DEFAULT 0 COMMENT 'in seconds',
+  `spawnMask` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `phaseMask` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `pathId` int(10) unsigned NOT NULL DEFAULT 0,
+  `ScriptName` varchar(64) DEFAULT NULL,
+  `StringId` varchar(64) DEFAULT NULL,
+  PRIMARY KEY (`guid`),
+  KEY `idx_type` (`typeId`),
+  KEY `idx_area` (`areaId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `aowow_objects_waypoints`
+--
+
+DROP TABLE IF EXISTS `aowow_objects_waypoints`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `aowow_objects_waypoints` (
+  `pathId` int(10) unsigned NOT NULL,
+  `point` smallint(5) unsigned NOT NULL,
+  `areaId` smallint(5) unsigned NOT NULL,
+  `areaX` float unsigned NOT NULL,
+  `areaY` float unsigned NOT NULL,
+  `floor` tinyint(4) NOT NULL DEFAULT -1,
+  `mapId` smallint(5) unsigned NOT NULL,
+  `mapX` float NOT NULL,
+  `mapY` float NOT NULL,
+  `wait` int(10) unsigned NOT NULL DEFAULT 0,
+  `arrivalEventId` smallint(5) unsigned NOT NULL,
+  `departureEventId` smallint(5) unsigned NOT NULL,
+  PRIMARY KEY (`pathId`,`point`),
+  KEY `idx_map` (`mapId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -2723,6 +2835,30 @@ CREATE TABLE `aowow_sounds_files` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `aowow_sounds_spawns`
+--
+
+DROP TABLE IF EXISTS `aowow_sounds_spawns`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `aowow_sounds_spawns` (
+  `guid` int(10) unsigned NOT NULL COMMENT 'SoundEmitter.dbc/id',
+  `typeId` int(10) unsigned NOT NULL COMMENT 'SoundEmitter.dbc/soundId',
+  `flags` int(10) unsigned NOT NULL,
+  `areaId` smallint(5) unsigned NOT NULL,
+  `areaX` float unsigned NOT NULL,
+  `areaY` float unsigned NOT NULL,
+  `floor` tinyint(3) unsigned NOT NULL,
+  `mapId` smallint(5) unsigned NOT NULL,
+  `mapX` float NOT NULL,
+  `mapY` float NOT NULL,
+  PRIMARY KEY (`guid`),
+  KEY `idx_type` (`typeId`),
+  KEY `idx_area` (`areaId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `aowow_source`
 --
 
@@ -2761,34 +2897,6 @@ CREATE TABLE `aowow_source` (
   `src23` tinyint(3) unsigned DEFAULT NULL COMMENT 'Skinned',
   `src24` tinyint(3) unsigned DEFAULT NULL COMMENT 'In-Game Store [not used]',
   PRIMARY KEY (`type`,`typeId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `aowow_spawns`
---
-
-DROP TABLE IF EXISTS `aowow_spawns`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `aowow_spawns` (
-  `guid` int(11) NOT NULL COMMENT '< 0: vehicle accessory',
-  `type` smallint(5) unsigned NOT NULL,
-  `typeId` int(10) unsigned NOT NULL,
-  `respawn` int(11) NOT NULL DEFAULT 0 COMMENT 'in seconds',
-  `spawnMask` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `phaseMask` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `areaId` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `floor` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `posX` float unsigned NOT NULL,
-  `posY` float unsigned NOT NULL,
-  `pathId` int(10) unsigned NOT NULL DEFAULT 0,
-  `ScriptName` varchar(64) DEFAULT NULL,
-  `StringId` varchar(64) DEFAULT NULL,
-  PRIMARY KEY (`guid`,`type`,`floor`),
-  KEY `type_idx` (`typeId`,`type`),
-  KEY `zone_idx` (`areaId`),
-  KEY `guid` (`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -3294,9 +3402,6 @@ CREATE TABLE `aowow_zones` (
   `levelMax` tinyint(3) unsigned NOT NULL,
   `attunementsN` text NOT NULL COMMENT 'space separated; type:typeId',
   `attunementsH` text NOT NULL COMMENT 'space separated; type:typeId',
-  `parentMapId` smallint(5) unsigned NOT NULL,
-  `parentX` float NOT NULL,
-  `parentY` float NOT NULL,
   `name_loc0` varchar(120) DEFAULT NULL COMMENT 'Map Name',
   `name_loc2` varchar(120) DEFAULT NULL,
   `name_loc3` varchar(120) DEFAULT NULL,
@@ -3327,11 +3432,37 @@ CREATE TABLE `aowow_zones_sounds` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+--
+-- Table structure for table `aowow_zones_spawns`
+--
+
+DROP TABLE IF EXISTS `aowow_zones_spawns`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `aowow_zones_spawns` (
+  `guid` int(10) unsigned NOT NULL,
+  `typeId` int(11) GENERATED ALWAYS AS (`guid`) VIRTUAL,
+  `flags` int(10) unsigned NOT NULL,
+  `areaId` smallint(5) unsigned NOT NULL,
+  `areaX` float unsigned NOT NULL,
+  `areaY` float unsigned NOT NULL,
+  `floor` tinyint(3) unsigned NOT NULL,
+  `mapId` smallint(5) unsigned NOT NULL,
+  `mapX` float NOT NULL,
+  `mapY` float NOT NULL,
+  PRIMARY KEY (`guid`),
+  KEY `idx_type` (`typeId`),
+  KEY `idx_area` (`areaId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-09-22 23:29:16
+-- Dump completed on 2026-11-22  0:59:09

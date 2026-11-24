@@ -571,6 +571,34 @@ $lang = array(
             "诺莫瑞根复仇者",
             "巫毒领袖森金"
         ),
+        'transports'    => array(                           // Map.dbc/name
+            582 => "运输 - 鲁瑟兰到奥伯丁",
+            584 => "运输 - 米奈希尔到塞拉摩",
+            586 => "运输 - 埃索达到奥伯丁",
+            587 => "运输 - 羽月渡口",
+            588 => "运输 - 米奈希尔到奥伯丁",
+            589 => "运输 - 奥格瑞玛到格罗姆高",
+            590 => "运输 - 格罗姆高到幽暗城",
+            591 => "运输 - 幽暗城到奥格瑞玛",
+            593 => "运输 - 藏宝海湾到棘齿城",
+            594 => "Transport: Howling Fjord Sister Mercy",
+            610 => "Transport: Tirisfal to Vengeance Landing",
+            612 => "Transport: Menethil to Valgarde",
+            613 => "Transport: Orgrimmar to Warsong Hold",
+            614 => "Transport: Stormwind to Valiance Keep",
+            620 => "Transport: Moa'ki to Unu'pe",
+            621 => "Transport: Moa'ki to Kamagua",
+            622 => "Transport: Orgrim's Hammer",
+            623 => "Transport: The Skybreaker",
+            641 => "Transport: Alliance Airship BG",
+            642 => "Transport: Horde Airship BG",
+            647 => "运输 - 奥格瑞玛到雷霆崖",
+            672 => "Transport: The Skybreaker",
+            673 => "Transport: Orgrim's Hammer",
+            712 => "Transport: The Skybreaker",
+            713 => "Transport: Orgrim's Hammer",
+            718 => "Trasnport: The Mighty Wind",
+        ),
         'orientation'   => ['North', 'Northeast', 'East', 'Southeast', 'South', 'Southwest', 'West', 'Northwest']
     ),
     'unit' => array(
@@ -1236,11 +1264,11 @@ $lang = array(
         'notFound'      => "这个对象不存在。",
         'unnamed'       => "[Unnamed object] #%d",
         'cat'           => array(
-             0 => "其他",  3 => "容器",  6 => "陷阱",  9 => "书籍", 19 => "邮箱", 25 => "钓鱼点",
+             0 => "其他",  3 => "容器",  6 => "陷阱",  9 => "书籍", 15 => "运输", 19 => "邮箱", 25 => "钓鱼点",
             -5 => "宝箱", -3 => "草药", -4 => "矿脉", -2 => "任务", -6 => "工具", -9 => "可交互目标"
         ),
         'type'          => array(                           // used for tooltip
-             3 => "容器",  6 => "", 9 => "书籍", 19 => "", 25 => "",
+             3 => "容器",  6 => "", 9 => "书籍", 15 => "", 19 => "", 25 => "",
             -5 => "宝箱", -3 => "草药", -4 => "矿脉", -2 => "任务", -6 => "", -9 => ""
         ),
         'unkPosition'   => "这个对象的位置未知。",
@@ -1300,7 +1328,8 @@ $lang = array(
         'waypoint'      => "路径点",
         'wait'          => "等待",
         'respawnIn'     => "重生：%s",
-        'despawnAfter'  => "[Spawned by Script<br />Despawn after]：%s",
+        'scriptedSpawn' => "[Spawned by script]",
+        'despawnAfter'  => "[Despawn after]：%s",
         'rank'          => [0 => "普通", 1 => "稀有", 4 => "精英", 2 => "稀有精英", 3 => "首领"],
         'textRanges'    => [null, "发送到地区", "发送到区域", "发送到地图", "发送到世界"],
         'textTypes'     => [null, "喊道", "说", "悄悄地说"],

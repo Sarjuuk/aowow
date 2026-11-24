@@ -21,7 +21,7 @@ CLISetup::registerSetup('sql', new class extends SetupScript
     public function generate() : bool
     {
         DB::Aowow()->qry('TRUNCATE ::areatrigger');
-        DB::Aowow()->qry('INSERT INTO ::areatrigger SELECT `id`, 0, 0, `mapId`, `posX`, `posY`, `orientation`, NULL, NULL FROM dbc_areatrigger');
+        DB::Aowow()->qry('INSERT INTO ::areatrigger SELECT `id`, 0, 0, `orientation`, NULL, NULL FROM dbc_areatrigger');
 
         /* notes:
          * while areatrigger DO have dimensions, displaying them on a map is almost always futile,
@@ -31,27 +31,15 @@ CLISetup::registerSetup('sql', new class extends SetupScript
         // 1: Taverns
         CLI::write('[areatrigger] - fetching taverns');
 
-        $addData = DB::World()->selectAssoc('SELECT `id` AS ARRAY_KEY, `name`, %i AS `type` FROM areatrigger_tavern', AT_TYPE_TAVERN);
+        $addData = DB::World()->selectAssoc('SELECT `id` AS ARRAY_KEY, `name`, %i AS "type" FROM areatrigger_tavern', AT_TYPE_TAVERN);
         foreach ($addData as $id => $ad)
             DB::Aowow()->qry('UPDATE ::areatrigger SET %a WHERE `id` = %i', $ad, $id);
 
 
-        // 2: Teleporter
-        CLI::write('[areatrigger] - teleporter type and name');
-
-        $addData = DB::World()->selectAssoc(
-           'SELECT `ID`          AS ARRAY_KEY, `Name`         AS `name` FROM areatrigger_teleport UNION
-            SELECT `entryorguid` AS ARRAY_KEY, "SAI Teleport" AS `name` FROM smart_scripts WHERE `source_type` = %i AND `action_type` = %i',
-            SmartAI::SRC_TYPE_AREATRIGGER, SmartAction::ACTION_TELEPORT
-        );
-        foreach ($addData as $id => $ad)
-            DB::Aowow()->qry('UPDATE ::areatrigger SET `name` = %s, `type` = %i WHERE `id` = %i', $ad['name'], AT_TYPE_TELEPORT, $id);
-
-
-        // 3: Quest Objectives
+        // 2: Quest Objectives
         CLI::write('[areatrigger] - satisfying quest objectives');
 
-        $addData = DB::World()->selectAssoc('SELECT atir.`id` AS ARRAY_KEY, `qt`.ID AS `quest`, NULLIF(qt.`AreaDescription`, "") AS `name`, qta.`SpecialFlags` FROM quest_template qt LEFT JOIN quest_template_addon qta ON qta.`ID` = qt.`ID` JOIN areatrigger_involvedrelation atir ON atir.`quest` = qt.`ID`');
+        $addData = DB::World()->selectAssoc('SELECT atir.`id` AS ARRAY_KEY, `qt`.ID AS "quest", NULLIF(qt.`AreaDescription`, "") AS "name", qta.`SpecialFlags` FROM quest_template qt LEFT JOIN quest_template_addon qta ON qta.`ID` = qt.`ID` JOIN areatrigger_involvedrelation atir ON atir.`quest` = qt.`ID`');
         foreach ($addData as $id => $ad)
         {
             if (!($ad['SpecialFlags'] & QUEST_FLAG_SPECIAL_EXT_COMPLETE))
@@ -61,12 +49,27 @@ CLISetup::registerSetup('sql', new class extends SetupScript
         }
 
 
+        // 3: Teleporter
+        CLI::write('[areatrigger] - teleporter type and name');
+
+        $addData = DB::World()->selectAssoc(
+           'SELECT   `ID`          AS ARRAY_KEY,  0 AS "cuFlags", `Name`         AS "name" FROM areatrigger_teleport UNION
+            SELECT s.`entryorguid` AS ARRAY_KEY, %i AS "cuFlags", "SAI Teleport" AS "name" FROM smart_scripts s JOIN areatrigger_scripts a ON a.`entry` = s.`entryorguid` WHERE a.`ScriptName` = "SmartTrigger" AND s.`source_type` = %i AND s.`action_type` = %i',
+            AREATRIGGER_CU_SMART, SmartAI::SRC_TYPE_AREATRIGGER, SmartAction::ACTION_TELEPORT
+        );
+        foreach ($addData as $id => $ad)
+            DB::Aowow()->qry('UPDATE ::areatrigger SET `name` = %s, `type` = %i, `cuFlags`= `cuFlags` | %i WHERE `id` = %i', $ad['name'], AT_TYPE_TELEPORT, $ad['cuFlags'], $id);
+
+
         // 4/5 Scripted
         CLI::write('[areatrigger] - assigning scripts');
 
-        $addData = DB::World()->selectAssoc('SELECT `entry` AS ARRAY_KEY, IF(`ScriptName` = "SmartTrigger", NULL, `ScriptName`) AS `name`, IF(`ScriptName` = "SmartTrigger", 4, 5) AS `type` FROM areatrigger_scripts');
-        foreach ($addData as $id => $ad)
-            DB::Aowow()->qry('UPDATE ::areatrigger SET %a WHERE `id` = %i', $ad, $id);
+        $addData = DB::World()->selectAssoc(
+           'SELECT `entry` AS ARRAY_KEY, IF(`ScriptName` = "SmartTrigger", NULL, `ScriptName`) AS "0", IF(`ScriptName` = "SmartTrigger", %i, %i) AS "1", IF(`ScriptName` = "SmartTrigger", %i, 0) AS "2" FROM areatrigger_scripts WHERE `entry` NOT IN %in',
+            AT_TYPE_SMART, AT_TYPE_SCRIPT, AREATRIGGER_CU_SMART, array_keys($addData)
+        );
+        foreach ($addData as $id => [$name, $type, $cuFlags])
+            DB::Aowow()->qry('UPDATE ::areatrigger SET `name` = %s, `type` = %i, `cuFlags` = `cuFLags` | %i WHERE `id` = %i', $name, $type, $cuFlags, $id);
 
         $this->reapplyCCFlags('areatrigger', Type::AREATRIGGER);
 

@@ -213,6 +213,13 @@ define('SPAWNINFO_SHORT',                   2);
 define('SPAWNINFO_FULL',                    3);
 define('SPAWNINFO_QUEST',                   4);
 
+define('SPAWNTYPE_TELEPORTER_DEST',         0x0001);        // entry is destination of a teleporter areatrigger (with the same typeId)
+define('SPAWNTYPE_SMART_SCRIPTS',           0x0002);        // entry is summoned by smart_scripts (gameobject or creature)
+define('SPAWNTYPE_VEHICLE_ACCESSORY',       0x0004);        // entry is a vehicle accessory (only creatures)
+define('SPAWNTYPE_SUMMON_GROUPS',           0x0008);        // entry is from creature_summon_groups (only creatures)
+define('SPAWNTYPE_MO_TRANSPORT',            0x0010);        // entry is object on TaxiPathNode.dbc node (only gameobjects)
+define('SPAWNTYPE_FAKE',                    0x0080);        // entry was manually added (NYI)
+
 
 // Community Content
 define('CC_FLAG_STICKY',                    0x1);
@@ -357,6 +364,8 @@ define('ITEM_CU_OT_ITEMLOOT',               0x01);          // there are no sour
 define('ITEM_CU_OT_OBJECTLOOT',             0x02);
 
 define('EMOTE_CU_MISSING_CMD',              0x01);          // no alias in Globalstrings.lua and thus unusable
+
+define('AREATRIGGER_CU_SMART',              0x01);          // scripted with SAI
 
 // as seen in wFlags
 define('QUEST_CU_REPEATABLE',               0x0001);

@@ -19,7 +19,21 @@ abstract class WorldPosition
     );
 
     private static array $zoneMapCache  = [];
+    private static array $transportInfo = [];
     private static array $alphaMapCache = [];
+
+    public static function getStorageByType(int $type) : ?string
+    {
+        return match ($type)
+        {
+            Type::NPC         => '::creature_spawns',
+            Type::OBJECT      => '::objects_spawns',
+            Type::ZONE        => '::zones_spawns',
+            Type::SOUND       => '::sounds_spawns',
+            Type::AREATRIGGER => '::areatrigger_spawns',
+            default           => null
+        };
+    }
 
     /**
      * test zone positions for placability and select most centered position
@@ -73,7 +87,7 @@ abstract class WorldPosition
      * * Gameobject
      * * Areatrigger
      * * Sound (emitter)
-     * * Zone (instance teleporter coords)
+     * * Zone (instance entrance coords)
      * @param  int[]    $guids          guids to look up
      * @return array                    [worldPosSet, ...]
      * * int id DBTypeEntry id
@@ -83,40 +97,18 @@ abstract class WorldPosition
      */
     public static function getForGUID(int $type, int ...$guids) : array
     {
-        $result = [];
-
-        switch ($type)
+        if ($tbl = self::getStorageByType($type))
         {
-            case Type::NPC:
-                $result = DB::World()->selectAssoc('SELECT `guid` AS ARRAY_KEY,              `id`, `map`         AS `mapId`, `position_x` AS `posX`, `position_y` AS `posY` FROM creature        WHERE `guid` IN %in', $guids);
-                break;
-            case Type::OBJECT:
-                $result = DB::World()->selectAssoc('SELECT `guid` AS ARRAY_KEY,              `id`, `map`         AS `mapId`, `position_x` AS `posX`, `position_y` AS `posY` FROM gameobject      WHERE `guid` IN %in', $guids);
-                break;
-            case Type::SOUND:
-                $result = DB::AoWoW()->selectAssoc('SELECT `id`   AS ARRAY_KEY, `soundId` AS `id`,                  `mapId`,                 `posX`,                 `posY` FROM ::soundemitters WHERE `id`   IN %in', $guids);
-                break;
-            case Type::ZONE:
-                $result = DB::Aowow()->selectAssoc('SELECT -`id`  AS ARRAY_KEY,              `id`, `parentMapId` AS `mapId`, `parentX`    AS `posX`, `parentY`    AS `posY` FROM ::zones         WHERE -`id`  IN %in', $guids);
-                break;
-            case Type::AREATRIGGER:
-                if ($base = array_filter($guids, fn($x) => $x > 0))
-                    $result = array_replace($result, DB::AoWoW()->selectAssoc('SELECT `id`   AS ARRAY_KEY, `id`,    `mapId`,                 `posX`,                 `posY` FROM ::areatrigger   WHERE `id`   IN %in', $base));
-                if ($endpoints = array_filter($guids, fn($x) => $x < 0))
-                    $result = array_replace($result, DB::World()->selectAssoc(
-                       'SELECT -`ID`          AS ARRAY_KEY, ID          AS `id`,    `target_map` AS `mapId`, `target_position_x` AS `posX`, `target_position_y` AS `posY` FROM areatrigger_teleport WHERE -`id`          IN %in UNION
-                        SELECT -`entryorguid` AS ARRAY_KEY, entryorguid AS `id`, `action_param1` AS `mapId`, `target_x`          AS `posX`, `target_y`          AS `posY` FROM smart_scripts        WHERE -`entryorguid` IN %in AND `source_type` = %i AND `action_type` = %i',
-                        $endpoints, $endpoints, SmartAI::SRC_TYPE_AREATRIGGER, SmartAction::ACTION_TELEPORT
-                     ));
-                break;
-            default:
-                trigger_error('WorldPosition::getForGUID - unsupported TYPE #'.$type, E_USER_WARNING);
+            $result = DB::AoWoW()->selectAssoc('SELECT `guid` AS ARRAY_KEY, `mapId`, `mapX`, `mapY` FROM %n WHERE `guid` IN %in', $tbl, $guids);
+
+            if ($diff = array_diff($guids, array_keys($result)))
+                trigger_error('WorldPosition::getForGUID - no spawn points for TYPE #'.$type.' GUIDS: '.implode(', ', $diff), E_USER_WARNING);
+
+            return $result;
         }
 
-        if ($diff = array_diff($guids, array_keys($result)))
-            trigger_error('WorldPosition::getForGUID - no spawn points for TYPE #'.$type.' GUIDS: '.implode(', ', $diff), E_USER_WARNING);
-
-        return $result;
+        trigger_error('WorldPosition::getForGUID - unsupported TYPE #'.$type, E_USER_WARNING);
+        return [];
     }
 
     /**
@@ -143,12 +135,11 @@ abstract class WorldPosition
         if (!$mapId < 0)
             return [];
 
-        self::$zoneMapCache[$mapId] ??= self::loadZones($mapId);
-
         $points = [];
+        $areas  = self::fetchZones($mapId, $mapX, $mapY);   // mapXY is being modified, so keep it outside of the loop to avoid stacking modifications
         for ($i = 0; $i < 2; $i++)
         {
-            foreach (self::$zoneMapCache[$mapId] as $area)
+            foreach ($areas as $area)
             {
                 if (!$i && $preferedAreaId != 0 && $area['areaId'] != $preferedAreaId)
                     continue;
@@ -234,18 +225,29 @@ abstract class WorldPosition
      * * bool srcPrio takes precedence over similar zone definitions (dungeonmap over worldmaparea)
      * * bool multifloor zone has multiple floors
      */
-    private static function loadZones(int $mapId) : array
+    private static function fetchZones(int $mapId, float &$mapX, float &$mapY) : array
     {
-        return DB::Aowow()->selectAssoc(
+        if (self::$transportInfo[$mapId] ??= (DB::Aowow()->selectCell('SELECT `miscInfo` FROM ::objects WHERE `type` = %i AND SUBSTRING_INDEX(`miscInfo`, " ", 1) <> 0 AND `miscInfo` LIKE %like~', OBJECT_MO_TRANSPORT, $mapId.' ') ?? []))
+        {
+            [$transMapId, , $parentMap, $parentX, $parentY] = array_pad(explode(' ', self::$transportInfo[$mapId]), 5, 0);
+            if ($transMapId)
+            {
+                $mapLookup = $parentMap;
+                $mapX += $parentX;
+                $mapY += $parentY;
+            }
+        }
+
+        self::$zoneMapCache[$mapId] ??= DB::Aowow()->selectAssoc(
            'SELECT
                 x.`id`,
                 x.`areaId`,
                 x.`minX`, x.`maxX`, x.`minY`, x.`maxY`,
-                IF(x.`defaultDungeonMapId` < 0, x.`floor` + 1, x.`floor`) AS `floor`,
-                IF(useDM.`id`   IS NOT NULL OR x.`defaultDungeonMapId` < 0, 1, 0) AS `srcPrio`,
-                IF(multiDM.`id` IS NOT NULL OR x.`defaultDungeonMapId` < 0, 1, 0) AS `multifloor`
+                IF(x.`defaultDungeonMapId` < 0, x.`floor` + 1, x.`floor`) AS "floor",
+                IF(useDM.`id`   IS NOT NULL OR x.`defaultDungeonMapId` < 0, 1, 0) AS "srcPrio",
+                IF(multiDM.`id` IS NOT NULL OR x.`defaultDungeonMapId` < 0, 1, 0) AS "multifloor"
             FROM
-                (SELECT 0 AS `id`, `areaId`,     `mapId`, `right` AS `minY`, `left` AS `maxY`, `top` AS `maxX`, `bottom` AS `minX`, 0 AS `floor`, 0 AS `worldMapAreaId`, `defaultDungeonMapId` FROM ::worldmaparea wma UNION
+                (SELECT 0 AS "id", `areaId`,     `mapId`, `right` AS "minY", `left` AS "maxY", `top` AS "maxX", `bottom` AS "minX", 0 AS "floor", 0 AS "worldMapAreaId", `defaultDungeonMapId` FROM ::worldmaparea wma UNION
                  SELECT   dm.`id`, `areaId`, wma.`mapId`,            `minY`,           `maxY`,          `maxX`,             `minX`,      `floor`,      `worldMapAreaId`, `defaultDungeonMapId` FROM ::worldmaparea wma
                  JOIN   ::dungeonmap dm ON dm.`mapId` = wma.`mapId` WHERE wma.`mapId` NOT IN (0, 1, 530, 571) OR wma.`areaId` = 4395) x
             LEFT JOIN
@@ -257,8 +259,10 @@ abstract class WorldPosition
                 x.`minX` <> 0 AND x.`maxX` <> 0 AND x.`minY` <> 0 AND x.`maxY` <> 0
             GROUP BY
                 x.`id`, x.`areaId`',
-            $mapId
+            $mapLookup ?? $mapId
         ) ?: [];
+
+        return self::$zoneMapCache[$mapId];
     }
 }
 

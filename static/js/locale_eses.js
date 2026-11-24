@@ -329,6 +329,7 @@ var mn_objects = [
     [-2, "Misiones"],
     [-9, "Objetos interactivos"],
     [ 6, "Trampas"],
+    [15, "Transportes"],
     [-4, "Venas de minerales"]
 ];
 
@@ -1468,6 +1469,7 @@ var g_object_types = {
        3: 'Contenedore',
        6: 'Trampa',
        9: 'Libro',
+      15: 'Transporte',
       19: 'Buzón de correo',
       25: 'Banco de peces',
     '-2': 'Misión',

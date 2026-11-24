@@ -328,6 +328,7 @@ var mn_objects = [
     [-9, "Interaktive Objekte"],
     [-3, "Kräuter"],
     [-2, "Quests"],
+    [15, "Transporter"],
     [-5, "Truhen"],
     [-6, "Werkzeuge"],
 ];
@@ -1468,6 +1469,7 @@ var g_object_types = {
        3: 'Behälter',
        6: 'Falle',
        9: 'Buch',
+      15: 'Transporter',
       19: 'Briefkasten',
       25: 'Fischschwarm',
     '-2': 'Quest',

@@ -15,7 +15,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         'objects' => [[], CLISetup::ARGV_PARAM, 'Compiles data for type: Gameobject from dbc and world db.']
     );
 
-    protected array $dbcSourceFiles  = ['lock'];
+    protected array $dbcSourceFiles  = ['lock', 'taxipathnode'];
     protected array $worldDependency = ['gameobject_template', 'gameobject_template_addon', 'gameobject_template_locale', 'gameobject_questitem'];
 
     public function generate() : bool
@@ -26,7 +26,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                       IF(`type` = 2,                                       -2,     -- cat: questgiver > quests
                           IF(`type` = 3 AND IFNULL(gqi.`ItemId`, 0) <> 0,  -2,     -- cat: contains any questitem > quests
                           IF(`type` = 8 AND `data0` IN (1, 2, 3, 4, 1552), -6,     -- cat: spellfocus subgroup > tools
-                          IF(`type` IN (3, 6, 9, 19, 25),                  `type`, -- cat: is of type "regular chest, trap, book, mailbox, fish swarm" > keep type as cat
+                          IF(`type` IN (3, 6, 9, 15, 19, 25),              `type`, -- cat: is of type "regular chest, trap, book, transport, mailbox, fish swarm" > keep type as cat
                                                                            0       -- cat: default - none
                       )))),
                       0 AS "event",                                                -- linked worldevent
@@ -55,8 +55,9 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                           IF(`type` = 3, CONCAT_WS(" ", `data4`, `data5`, `data2`),                                                        -- miscInfo: loot (chest)
                               IF(`type` = 25, CONCAT_WS(" ", `data2`, `data3`, 0),                                                         -- miscInfo: loot (fishing)
                                   IF(`type` = 23, CONCAT_WS(" ", `data0`, `data1`, `data2`),                                               -- miscInfo: meetingStone
-                                      ""                                                                                                   -- miscInfo: <none>
-                      ))))                                                                                                                 AS "miscInfo",
+                                      IF(`type` = 15, CONCAT_WS(" ", `data6`, `data0`),                                                    -- miscInfo: mo transport (transMapId, pathId, pathNodeMap, pathNodeX, pathNodeY)
+                                          ""                                                                                               -- miscInfo: <none>
+                      )))))                                                                                                                AS "miscInfo",
                       NULLIF(IF(`ScriptName` <> "", `ScriptName`, `AIName`), ""),
                       `StringId`
             FROM      gameobject_template go
@@ -82,6 +83,16 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         }
 
         CLI::write('[objects] - updating categories..');
+
+        // update mo transport miscinfo
+        DB::Aowow()->qry(
+           'UPDATE ::objects o
+            JOIN   (SELECT n.`mapId`, n.`posX`, n.`posY`, n.`pathId` FROM dbc_taxipathnode n JOIN dbc_taxipathnode x ON x.`pathId` = n.`pathId` AND x.`nodeIdx` = n.`nodeIdx` + 1 AND x.`flags` & 2 GROUP BY n.`pathId` ORDER BY n.nodeIdx ASC) tpn
+                ON tpn.`pathId` = SUBSTRING_INDEX(o.`miscInfo`, " ", -1)
+            SET    o.`miscInfo` = CONCAT_WS(" ", o.`miscInfo`, `mapId`, `posX`, `posY`)
+            WHERE  o.`type` =  %i',
+            OBJECT_MO_TRANSPORT
+        );
 
         // update chests typeCat and reqSkill depending on locks
         DB::Aowow()->qry(
