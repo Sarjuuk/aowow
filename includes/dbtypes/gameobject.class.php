@@ -38,6 +38,7 @@ class GameObjectList extends DBTypeList
                 $curTpl['name_loc'.Lang::getLocale()->value] = Lang::gameObject('unnamed', [$_id]);
 
             // unpack miscInfo
+            $curTpl['transport'] =
             $curTpl['mStone']    =
             $curTpl['capture']   =
             $curTpl['lootStack'] = null;
@@ -61,7 +62,12 @@ class GameObjectList extends DBTypeList
                 case OBJECT_MEETINGSTONE:
                     $curTpl['mStone'] = explode(' ', $curTpl['miscInfo']);
                     break;
+                case OBJECT_MO_TRANSPORT:
+                    $curTpl['transport'] = explode(' ', $curTpl['miscInfo']);
+                    break;
             }
+
+            unset($curTpl['miscInfo']);
         }
     }
 

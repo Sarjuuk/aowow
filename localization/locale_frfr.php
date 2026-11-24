@@ -1281,6 +1281,7 @@ $lang = array(
         'capturePoint'  => "Point de capture",
         'foundIn'       => "Cette entité se trouve dans",
         'restock'       => "Se remplit toutes les %s.",
+        'passengers'    => "Passagères",
         'goFlags'       => array(
             GO_FLAG_IN_USE           => 'In use',
             GO_FLAG_LOCKED           => 'Locked',

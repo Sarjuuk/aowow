@@ -1281,6 +1281,7 @@ $lang = array(
         'capturePoint'  => "Точка захвата",
         'foundIn'       => "Этот НИП может быть найден в следующих зонах:",
         'restock'       => "[Restocks every %s.]",
+        'passengers'    => "Пассажиры",
         'goFlags'       => array(
             GO_FLAG_IN_USE           => 'In use',
             GO_FLAG_LOCKED           => 'Locked',

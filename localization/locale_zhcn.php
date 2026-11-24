@@ -1281,6 +1281,7 @@ $lang = array(
         'capturePoint'  => "占领点",
         'foundIn'       => "这个游戏对象可以在以下地区找到：",
         'restock'       => "每%s重新补给一次。",
+        'passengers'    => "乘客",
         'goFlags'       => array(
             GO_FLAG_IN_USE           => '正在使用',
             GO_FLAG_LOCKED           => '已锁定',

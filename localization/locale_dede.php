@@ -1280,6 +1280,7 @@ $lang = array(
         'capturePoint'  => "Eroberungspunkt",
         'foundIn'       => "Dieses Objekt befindet sich in",
         'restock'       => "Wird alle %s wieder aufgefüllt.",
+        'passengers'    => "Passagiere",
         'goFlags'       => array(
             GO_FLAG_IN_USE           => 'In Benutzung',
             GO_FLAG_LOCKED           => 'Verschlossen',

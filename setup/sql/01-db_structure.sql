@@ -736,7 +736,8 @@ CREATE TABLE `aowow_creature_spawns` (
   `StringId` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`guid`),
   KEY `idx_type` (`typeId`),
-  KEY `idx_area` (`areaId`)
+  KEY `idx_area` (`areaId`),
+  KEY `idx_map` (`mapId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1854,7 +1855,8 @@ CREATE TABLE `aowow_objects_spawns` (
   `StringId` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`guid`),
   KEY `idx_type` (`typeId`),
-  KEY `idx_area` (`areaId`)
+  KEY `idx_area` (`areaId`),
+  KEY `idx_map` (`mapId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

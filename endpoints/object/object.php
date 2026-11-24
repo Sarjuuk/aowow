@@ -50,12 +50,14 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
             'name'   => UIText::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_RAW)
         );
 
+        $_typeCat = $this->subject->getField('typeCat');
+
 
         /*************/
         /* Menu Path */
         /*************/
 
-        $this->breadcrumb[] = $this->subject->getField('typeCat');
+        $this->breadcrumb[] = $_typeCat;
 
 
         /**************/
@@ -132,7 +134,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         $infobox[] = Lang::npc('react', ['[color='.$color($this->subject->getField('A')).']A[/color] [color='.$color($this->subject->getField('H')).']H[/color]']);
 
         // reqSkill +  difficulty
-        switch ($this->subject->getField('typeCat'))
+        switch ($_typeCat)
         {
             case -3:                                        // Herbalism
                 $this->metaReqSkill =
@@ -167,7 +169,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                         $l[] = Lang::gameObject('key').Lang::main('colon').$str;
                         break;
                     case LOCK_TYPE_SKILL:                   // don't display lockpicking twice
-                        if ($this->subject->getField('typeCat') != -5 || $property != 1)
+                        if ($_typeCat != -5 || $property != 1)
                             $l[] = Lang::item($reqSkill ? 'reqSkillValue' : 'reqSkill', [$str, $reqSkill]);
                         break;
                     default:
@@ -636,6 +638,39 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                 'name' => '$LANG.tab_samemodelas',
                 'id'   => 'same-model-as'
             ), GameObjectList::$brickFile));
+        }
+
+        // tab: npc-passengers
+        [$tMap, , , , ] = $this->subject->getField('transport');
+        if ($_typeCat == OBJECT_MO_TRANSPORT && $_ = DB::Aowow()->selectCol('SELECT DISTINCT `typeId` FROM ::creature_spawns WHERE `mapId` = %i', $tMap))
+        {
+            if (!($passengers = new CreatureList(array(['id', $_])))->error)
+            {
+                $this->extendGlobalData($passengers->getJSGlobals());
+
+                $this->addDataLoader('zones');
+                $this->lvTabs->addListviewTab(new Listview(array(
+                    'data' => $passengers->getListviewData(),
+                    'name' => Lang::gameObject('passengers'),
+                    'id'   => 'npc-passengers'
+                ), CreatureList::$brickFile));
+            }
+        }
+
+        // tab: object-passengers
+        if ($_typeCat == OBJECT_MO_TRANSPORT && $_ = DB::Aowow()->selectCol('SELECT DISTINCT `typeId` FROM ::objects_spawns WHERE `mapId` = %i', $tMap))
+        {
+            if (!($passengers = new GameObjectList(array(['id', $_])))->error)
+            {
+                $this->extendGlobalData($passengers->getJSGlobals());
+
+                $this->addDataLoader('zones');
+                $this->lvTabs->addListviewTab(new Listview(array(
+                    'data' => $passengers->getListviewData(),
+                    'name' => Lang::gameObject('passengers'),
+                    'id'   => 'object-passengers'
+                ), GameObjectList::$brickFile));
+            }
         }
 
         // tab: condition-for
