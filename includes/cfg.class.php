@@ -61,10 +61,10 @@ class Cfg
         'locales'                  => ['globaljs']
     );
 
-    public static function load() : void
+    public static function load() : bool
     {
         if (!DB::isConnected(DB_AOWOW))
-            return;
+            return false;
 
         $sets = DB::Aowow()->selectAssoc('SELECT `key` AS ARRAY_KEY, `value` AS "0", `flags` AS "1", `cat` AS "2", `default` AS "3", `comment` AS "4" FROM ::config ORDER BY `key` ASC');
         foreach ($sets as $key => [$value, $flags, $catg, $default, $comment])
@@ -100,10 +100,10 @@ class Cfg
         if (CLI && !count(self::$store))
         {
             CLI::write('Cfg::load - aowow_config unexpectedly empty.', CLI::LOG_WARN);
-            return;
+            return false;
         }
 
-        self::$isLoaded = true;
+        return self::$isLoaded = true;
     }
 
     public static function add(string $key, /*int|string*/ $value) : string

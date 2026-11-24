@@ -29,6 +29,8 @@ if (version_compare(PHP_VERSION, '8.4.0') < 0)
 if ($error)
     die(CLI ? strip_tags($error).PHP_EOL.PHP_EOL : $error);
 
+if (CLI)
+    require_once 'includes/setup/cli.class.php';
 
 require_once 'includes/defines.php';
 require_once 'includes/locale.class.php';
@@ -252,7 +254,8 @@ $AoWoWconf = null;                                          // empty auths
 Lang::load(Locale::EN);
 
 // load config from DB
-Cfg::load();
+if (!Cfg::load())
+    exit;
 
 
 if (!CLI)

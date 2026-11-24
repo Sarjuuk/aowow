@@ -9,7 +9,6 @@ if (!CLI)
     die('not in cli mode');
 
 
-require_once 'includes/setup/cli.class.php';
 require_once 'includes/setup/timer.class.php';
 require_once 'includes/setup/datatypes/primitives.php';
 require_once 'includes/setup/files/binaryfile.class.php';
