@@ -522,7 +522,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                 $selectedP = 0;
                 foreach ($paths as $p)
                 {
-                    if (($_ = sqrt(($n['mapX'] - $p['position_x']) ** 2 + ($n['mapY'] - $p['position_y']) ** 2)) > $maxDist && $selectedP)
+                    if (($_ = sqrt(($n['mapX'] - $p['mapX']) ** 2 + ($n['mapY'] - $p['mapY']) ** 2)) > $maxDist && $selectedP)
                         continue;
 
                     $selectedP = $p['pathId'];
