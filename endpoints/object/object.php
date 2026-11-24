@@ -642,7 +642,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
 
         // tab: npc-passengers
         [$tMap, , , , ] = $this->subject->getField('transport');
-        if ($_typeCat == OBJECT_MO_TRANSPORT && $_ = DB::Aowow()->selectCol('SELECT DISTINCT `typeId` FROM ::creature_spawns WHERE `mapId` = %i', $tMap))
+        if ($_typeCat == OBJECT_MO_TRANSPORT && $tMap && $_ = DB::Aowow()->selectCol('SELECT DISTINCT `typeId` FROM ::creature_spawns WHERE `mapId` = %i', $tMap))
         {
             if (!($passengers = new CreatureList(array(['id', $_])))->error)
             {
@@ -658,7 +658,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: object-passengers
-        if ($_typeCat == OBJECT_MO_TRANSPORT && $_ = DB::Aowow()->selectCol('SELECT DISTINCT `typeId` FROM ::objects_spawns WHERE `mapId` = %i', $tMap))
+        if ($_typeCat == OBJECT_MO_TRANSPORT && $tMap && $_ = DB::Aowow()->selectCol('SELECT DISTINCT `typeId` FROM ::objects_spawns WHERE `mapId` = %i', $tMap))
         {
             if (!($passengers = new GameObjectList(array(['id', $_])))->error)
             {
