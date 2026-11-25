@@ -336,7 +336,7 @@ class Lang
                             $ids[Type::SKILL][] = $skills[$prop];
                         }
                         else
-                            $name = SkillList::getName($prop);
+                            $name = SkillList::getName($skills[$prop]) ?? $name;
                     }
                     // resolve as spell (mostly generic player spells; also: we know effect open lock only exists on effect idx 0)
                     else if ($spellId = DB::Aowow()->selectCell('SELECT `id` FROM ::spell WHERE `effect1Id` = %i AND `effect1MiscValue` = %i AND `skillLine1` <> 0 ORDER BY `id` ASC', SPELL_EFFECT_OPEN_LOCK, $prop))
@@ -358,8 +358,10 @@ class Lang
                     if (($spell = new SpellList(array(['id', $prop])))->error)
                         continue 2;
 
+                    $name = $spell->getField('name', true);
+
                     if ($fmt == self::FMT_HTML)
-                        $name = $interactive ? '<a class="q1" href="?spell='.$prop.'">'.$spell->getField('name', true).'</a>' : '<span class="q1">'.$spell->getField('name', true).'</span>';
+                        $name = $interactive ? '<a class="q1" href="?spell='.$prop.'">'.$name.'</a>' : '<span class="q1">'.$name.'</span>';
                     else if ($interactive && $fmt == self::FMT_MARKUP)
                     {
                         $name = '[spell='.$prop.']';

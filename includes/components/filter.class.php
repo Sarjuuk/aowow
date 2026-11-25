@@ -594,7 +594,7 @@ abstract class Filter
         // otherwise escaped by \Dibi
         $str = str_replace(['\\', '%'], '', $string);
 
-        if ($string === '')
+        if ($str === '')
             return null;
 
         if ($neg = ($str[0] === '-'))

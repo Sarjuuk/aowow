@@ -474,7 +474,7 @@ class QuestList extends DBTypeList
             // green
             $lvl + 3,
             // grey
-            $lvl + 1 + $questGreenRange[ max(19, intval($lvl / 5)) ]
+            $lvl + 1 + $questGreenRange[ min(19, intval($lvl / 5)) ]
         );
     }
 }

@@ -241,7 +241,7 @@ final class UIText
             '<span class="q0">'.Lang::main('parensFmt', ['WorldState -#\1', Lang::game('duration')]).'</span>',
             '<span class="q0">WorldState -#\1</span>',
             '&lt;\1/\2&gt;',
-            '[span class=q0]'.Lang::main('parensFmt', ['WorldState -#\1', 'Countdown']).'[/span]',
+            '<span class="q0">'.Lang::main('parensFmt', ['WorldState -#\1', 'Countdown']).'</span>',
             '&lt;'.Lang::main('name').'&gt;',
             '&lt;'.Lang::game('race').'&gt;',
             '&lt;\1/\2&gt;',
@@ -428,7 +428,7 @@ final class UIText
                     if (str_starts_with($word, $find))
                         return $pad . substr_replace($word, $replace, 0, strlen($find));
 
-                if (self::languageRule2IsVowel($word[0]) || $word[0] == 'h' || $word[0] == 'H' ||
+                if (self::languageRule2IsVowel(mb_substr($word, 0, 1)) || $word[0] == 'h' || $word[0] == 'H' ||
                     ($word[0] == 'y' && self::languageRule2IsVowel($word[1])) ||
                     ($word[0] == 'Y' && self::languageRule2IsVowel($word[1])))
                     return "d'" . $pad . $word;
@@ -521,7 +521,7 @@ final class UIText
         }
 
         // ASCII number offset
-        if ($lastChar - 48 <= 9)
+        if (($lastChar - 48) <= 9)
             return self::DIGIT_HAS_FINAL_CONSONANT[$lastChar - 48] ? $consonantForm : $vowelForm;
 
         // ASCII letter offsets lc

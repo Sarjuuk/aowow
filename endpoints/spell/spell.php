@@ -2991,7 +2991,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         // TC uses hardcoded summon property 67
         if ($effIdOrAura == SPELL_EFFECT_SUMMON || $effIdOrAura == SPELL_EFFECT_SUMMON_PET)
             if (($sp = DB::Aowow()->selectRow('SELECT `control`, `slot` FROM ::summonproperties WHERE `id` = %i', $effIdOrAura == SPELL_EFFECT_SUMMON_PET ? 67 : $effMVB)))
-                    $nameMVB = $this->fmtStaffTip(Lang::spell('summonControl', $sp['control']).' &ndash; '.Lang::spell('summonSlot', $sp['slot']) , 'SummonProperty: '.$effIdOrAura == SPELL_EFFECT_SUMMON_PET ? 67 : $effMVB);
+                    $nameMVB = $this->fmtStaffTip(Lang::spell('summonControl', $sp['control']).' &ndash; '.Lang::spell('summonSlot', $sp['slot']) , 'SummonProperty: '.($effIdOrAura == SPELL_EFFECT_SUMMON_PET ? 67 : $effMVB));
 
         if ($_ = CreatureList::makeLink($effMV))
             $nameMV = $_;
@@ -3042,8 +3042,6 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
         return [$nameMV, null, null, $values];
     }
-
-
 
     private function effectPreventPowerRegen(int $effIdOrAura, int $effMin, int $effMax, int $effMV, int $effMVB) : array
     {
