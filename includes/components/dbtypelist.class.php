@@ -813,8 +813,8 @@ trait spawnHelper
 
     private function sortBySpawnCount(array $a, array $b) : int
     {
-        $aCount = current($a)['count'];
-        $bCount = current($b)['count'];
+        $aCount = array_sum(array_column($a, 'count'));     // sum over all floors
+        $bCount = array_sum(array_column($b, 'count'));
 
         return $bCount <=> $aCount;                         // sort descending
     }
