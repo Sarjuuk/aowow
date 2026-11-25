@@ -596,6 +596,11 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         if (Lang::getLocale() != Locale::EN)
             $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.$this->subject->getField('name_loc0').'[/copy][/li]';
 
+        // script
+        if (User::isInGroup(U_GROUP_STAFF))
+            if ($_ = $this->subject->getField('scriptName'))
+                $infobox[] = 'Script'.Lang::main('colon').$_;
+
         return $infobox;
     }
 

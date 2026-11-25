@@ -291,6 +291,9 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
 
                 $stringIDs .= '[/ul][/div]';
             }
+
+            if ($stringIDs)
+                $infobox[] = $stringIDs;
         }
 
         if ($infobox)
