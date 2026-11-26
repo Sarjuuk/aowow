@@ -228,7 +228,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                         $matches++;
                         foreach ($vehicles as $v)           // if there is more than one vehicle, its probably due to overlapping zones
                             for ($i = 0; $i < $data['nSeats']; $i++)
-                                DB::Aowow()->qry('INSERT INTO ::creature_spawns %a', $v + ['guid' => --$this->vGUIDSs[Type::NPC], 'flags' => SPAWNTYPE_VEHICLE_ACCESSORY, 'typeId' => $data['typeId']]);
+                                DB::Aowow()->qry('INSERT INTO ::creature_spawns %v', $v + ['guid' => --$this->vGUIDSs[Type::NPC], 'flags' => SPAWNTYPE_VEHICLE_ACCESSORY, 'typeId' => $data['typeId']]);
 
                         unset($accessories[$idx]);
                     }
