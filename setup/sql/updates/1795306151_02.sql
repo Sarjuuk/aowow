@@ -15,6 +15,11 @@ ALTER TABLE `aowow_zones`
 ;
 
 -- indexing changed for virtual guids
+-- type: zone (7) (instance entrances) was negative for all cases
+UPDATE `aowow_spawns_override` SET `typeGuid` = ABS(`typeGuid`) WHERE `typeGuid` < 0 AND `type` = 7;
+-- type: areatrigger (503) (teleporter destinations) depend on not yet determined vGUIDs
+CREATE TABLE `aowow_spawns_override_DEPRECATED` LIKE `aowow_spawns_override`;
+INSERT INTO `aowow_spawns_override_DEPRECATED` SELECT * FROM `aowow_spawns_override` WHERE `typeGUID` < 0;
 DELETE FROM `aowow_spawns_override` WHERE `typeGuid` < 0;
 
 UPDATE `aowow_dbversion` SET `sql` = CONCAT(IFNULL(`sql`, ''), ' spawns objects areatrigger');
