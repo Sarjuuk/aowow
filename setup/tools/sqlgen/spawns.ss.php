@@ -269,7 +269,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         CLI::write(' * (2/4) creatures spawned directly through SAI', CLI::LOG_BLANK, true, true);
 
         $smartS = DB::World()->selectAssoc(
-           'SELECT    s.`action_param1` AS "typeId", %i AS "flags", x.`zoneId` AS "areaId", IF(s.`source_type` = %i, -s.`entryOrGUID`, x.`map`) AS "mapId", s.`target_x` AS "mapX",  s.`target_y` AS "mapY", -s.`action_param2` AS "respawn", 0 AS "pathId", 0 AS "spawnMask", 0 AS "phaseMask", NULL AS "ScriptName", NULL AS "StringId"
+           'SELECT    s.`action_param1` AS "typeId", %i AS "flags", x.`zoneId` AS "areaId", IF(s.`source_type` = %i, -s.`entryOrGUID`, x.`map`) AS "mapId", s.`target_x` AS "mapX",  s.`target_y` AS "mapY", -s.`action_param3` / 1000 AS "respawn", 0 AS "pathId", 0 AS "spawnMask", 0 AS "phaseMask", NULL AS "ScriptName", NULL AS "StringId"
             FROM      smart_scripts s
             LEFT JOIN ( SELECT 0 AS "sType", `guid`, `id`, `zoneId`, `map` FROM creature    c UNION
                         SELECT 1 AS "sType", `guid`, `id`, `zoneId`, `map` FROM gameobject go ) x
@@ -282,7 +282,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         CLI::write(' * (3/4) creatures spawned indirectly through SAI TALs', CLI::LOG_BLANK, true, true);
 
         $smartS = array_merge($smartS, DB::World()->selectAssoc(
-           'SELECT    tal.`action_param1` AS "typeId", %i AS "flags", x.`zoneId` AS "areaId", IF(s.`source_type` = %i, -s.`entryOrGUID`, x.`map`) AS "mapId", tal.`target_x` AS "mapX", tal.`target_y` AS "mapY", -tal.`action_param2` AS "respawn", 0 AS "pathId", 0 AS "spawnMask", 0 AS "phaseMask", NULL AS "ScriptName", NULL AS "StringId"
+           'SELECT    tal.`action_param1` AS "typeId", %i AS "flags", x.`zoneId` AS "areaId", IF(s.`source_type` = %i, -s.`entryOrGUID`, x.`map`) AS "mapId", tal.`target_x` AS "mapX", tal.`target_y` AS "mapY", -tal.`action_param3` / 1000 AS "respawn", 0 AS "pathId", 0 AS "spawnMask", 0 AS "phaseMask", NULL AS "ScriptName", NULL AS "StringId"
             FROM      smart_scripts tal
             JOIN      smart_scripts s
                       ON (s.`action_type` = %i AND tal.`entryOrGUID` = s.`action_param1`) OR
@@ -300,7 +300,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         CLI::write(' * (4/4) creatures spawned from summon groups', CLI::LOG_BLANK, true, true);
 
         $sGroups = DB::World()->selectAssoc(
-           'SELECT    csg.`entry` AS "typeId", %i AS "flags", x.`zoneId` AS "areaId", IF(csg.`summonerType` = 2, csg.`summonerId`, x.`map`) AS "mapId", csg.`position_x` AS "mapX", csg.`position_y` AS "mapY", IF(csg.`summonType` IN (1, 2, 3, 4, 6), -csg.`summonTime`, 0) AS "respawn", 0 AS "pathId", 0 AS "spawnMask", 0 AS "phaseMask", NULL AS "ScriptName", NULL AS "StringId"
+           'SELECT    csg.`entry` AS "typeId", %i AS "flags", x.`zoneId` AS "areaId", IF(csg.`summonerType` = 2, csg.`summonerId`, x.`map`) AS "mapId", csg.`position_x` AS "mapX", csg.`position_y` AS "mapY", IF(csg.`summonType` IN (1, 2, 3, 4, 6), -csg.`summonTime` / 1000, 0) AS "respawn", 0 AS "pathId", 0 AS "spawnMask", 0 AS "phaseMask", NULL AS "ScriptName", NULL AS "StringId"
             FROM      creature_summon_groups csg
             LEFT JOIN ( SELECT 0 AS "sType", `id`, `zoneId`, IF(COUNT(DISTINCT `map`) = 1, `map`, NULL) AS "map" FROM creature   GROUP BY `id` UNION
                         SELECT 1 AS "sType", `id`, `zoneId`, IF(COUNT(DISTINCT `map`) = 1, `map`, NULL) AS "map" FROM gameobject GROUP BY `id` ) x
