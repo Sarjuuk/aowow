@@ -371,7 +371,7 @@ class SmartAI
             SmartAction::ACTION_SUMMON_GO => [1 => $objectId]
         );
 
-        if ($objGuids = DB::Aowow()->selectCol('SELECT `guid` FROM ::objects_spawns WHERE `type` = %i AND `typeId` = %i', $objectId))
+        if ($objGuids = DB::Aowow()->selectCol('SELECT `guid` FROM ::objects_spawns WHERE `typeId` = %i', $objectId))
             if ($groups = DB::World()->selectCol('SELECT `groupId` FROM spawn_group WHERE `spawnType` = 1 AND `spawnId` IN %in', $objGuids))
                 foreach ($groups as $g)
                     $lookup[SmartAction::ACTION_SPAWN_SPAWNGROUP][1] = $g;
