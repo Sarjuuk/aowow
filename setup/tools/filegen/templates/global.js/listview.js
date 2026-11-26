@@ -2318,7 +2318,7 @@ Listview.headerClick = function(col, i, e)
     if (this.tabClick)
         this.tabClick();
 
-    if (e.button == 1 || e.shiftKey || e.ctrlKey)
+    if (e.button == 2 || e.shiftKey || e.ctrlKey)
     {
         $WH.Tooltip.hide();
         setTimeout(Listview.headerFilter.bind(this, col, null), 1);
