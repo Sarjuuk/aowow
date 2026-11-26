@@ -57,7 +57,7 @@ class AdminSpawnoverrideResponse extends TextResponse
             return;
         }
 
-        $flags = DB::Aowow()->selectCell('SELECT `flags` FROM %n WHERE `guid` = %i', $tbl, $guid);
+        [$flags, $srcA, $srcX, $srcY, $srcF] = DB::Aowow()->selectRow('SELECT `flags` AS "0", `areaId` AS "1", `areaX` AS "2", `areaY` AS "3", `floor` AS "4" FROM %n WHERE `guid` = %i', $tbl, $guid) ?: null;
         if (($_ = $flags & 0xFFF00) || ($flags & SPAWNTYPE_VEHICLE_ACCESSORY))
         {
             trigger_error('AdminSpawnoverrideResponse - tried to move '.($_ ? 'transport passenger' : 'vehicle accessory').' (linked to parent spawn point) TYPE #'.$type.'; GUID #'.$guid, E_USER_WARNING);
@@ -67,7 +67,6 @@ class AdminSpawnoverrideResponse extends TextResponse
 
         DB::Aowow()->qry('REPLACE INTO ::spawns_override %v', ['type' => $type, 'typeGuid' => $guid, 'areaId' => $area, 'floor' => $floor, 'revision' => AOWOW_REVISION]);
 
-        $updGUIDs = [$guid];
         $newPos   = array(
             'areaX'  => $point[0]['posX'],
             'areaY'  => $point[0]['posY'],
@@ -75,7 +74,7 @@ class AdminSpawnoverrideResponse extends TextResponse
             'floor'  => $point[0]['floor']
         );
 
-        if (!DB::Aowow()->qry('UPDATE %n SET %a WHERE %n IN %in', $tbl, $newPos, 'guid', $updGUIDs))
+        if (!DB::Aowow()->qry('UPDATE %n SET %a WHERE `guid` = %i', $tbl, $newPos, $guid))
         {
             $this->result = self::ERR_WRITE_DB;
             return;
@@ -103,8 +102,8 @@ class AdminSpawnoverrideResponse extends TextResponse
                 $this->updatePoints(true, $wps, $area, $floor);
 
             // also move linked vehicle accessories (on the very same position)
-            $updGUIDs = array_merge($updGUIDs, DB::Aowow()->selectCol('SELECT s2.`guid` FROM ::creature_spawns s1 JOIN ::creature_spawns s2 ON s1.`areaX` = s2.`areaX` AND s1.`areaY` = s2.`areaY` AND
-                s1.`areaId` = s2.`areaId` AND s1.`floor` = s2.`floor` AND (s2.`flags` & %i) WHERE s1.`guid` = %i', SPAWNTYPE_VEHICLE_ACCESSORY, $guid));
+            DB::Aowow()->qry('UPDATE %n SET %a WHERE (`flags` & %i) AND `areaId` = %i AND CAST(`areaX` * 10 AS SIGNED) = %i AND CAST(`areaY` * 10 AS SIGNED) = %i AND `floor` = %i',
+                $tbl, $newPos, SPAWNTYPE_VEHICLE_ACCESSORY, $srcA, $srcX * 10, $srcY * 10, $srcF);
         }
 
         $this->result = self::ERR_NONE;
