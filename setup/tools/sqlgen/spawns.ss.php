@@ -567,11 +567,12 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         // note that the transports on map 631 (ICC) get reused, effectively duplicating the entities on them
         if (($stepFlags & self::STEP_FLAG_TRANSPORTABLE) && $point['mapId'] > 0 && $mots = array_filter($this->transports, fn($x) => $point['mapId'] == $x['moMapId']))
         {
+            $basePoint = $point;                            // each copy needs the original transport-local coordinates
             $i = -1;
             while ($mot = array_pop($mots))
             {
                 if (!isset($points[++$i]))
-                    $points[$i] = $points[0];
+                    $points[$i] = $basePoint;
 
                 $points[$i]['mapX']  += $mot['mapX'];
                 $points[$i]['mapY']  += $mot['mapY'];
