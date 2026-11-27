@@ -468,6 +468,25 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                 ), QuestList::$brickFile));
         }
 
+        // tab: objective of quest (a gameobject objective is stored negated)
+        $objectiveOf = new QuestList(array(
+            DB::OR,
+            [DB::AND, ['reqNpcOrGo1', -$this->typeId], ['reqNpcOrGoCount1', 0, '>']],
+            [DB::AND, ['reqNpcOrGo2', -$this->typeId], ['reqNpcOrGoCount2', 0, '>']],
+            [DB::AND, ['reqNpcOrGo3', -$this->typeId], ['reqNpcOrGoCount3', 0, '>']],
+            [DB::AND, ['reqNpcOrGo4', -$this->typeId], ['reqNpcOrGoCount4', 0, '>']]
+        ));
+        if (!$objectiveOf->error)
+        {
+            $this->extendGlobalData($objectiveOf->getJSGlobals());
+
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data' => $objectiveOf->getListviewData(),
+                'name' => '$LANG.tab_objectiveof',
+                'id'   => 'objective-of'
+            ), QuestList::$brickFile));
+        }
+
         // tab: related quests
         if ($_ = $this->subject->getField('reqQuest'))
         {
