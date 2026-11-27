@@ -28,6 +28,17 @@ CLISetup::registerSetup("sql", new class extends SetupScript
     protected array $worldDependency = ['creature', 'creature_addon', 'creature_template_addon', 'gameobject', 'gameobject_template', 'vehicle_accessory', 'vehicle_accessory_template', 'waypoint_data', 'smart_scripts', 'areatrigger_teleport'];
     protected array $setupAfter      = [['dungeonmap', 'worldmaparea', 'zones'], ['img-maps']];
 
+    private const int S_CREATURES    = (1 << 0);
+    private const int S_GAMEOBJECTS  = (1 << 1);
+    private const int S_SOUNDEMITTER = (1 << 2);
+    private const int S_AREATRIGGER  = (1 << 3);
+    private const int S_INSTANCES    = (1 << 4);
+    private const int W_CREATURES    = (1 << 5);
+    private const int W_GAMEOBJECTS  = (1 << 6);
+
+    private const int STEP_FLAG_WAYPOINT      = 0x1;
+    private const int STEP_FLAG_TRANSPORTABLE = 0x2;
+
     private array $transports   = [];
     private array $overrideData = [];
     private array $mapToArea    = [];
@@ -39,17 +50,14 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         get => $this->areatrigger ??= DB::Aowow()->selectAssoc('SELECT `id` AS "guid", `id` AS ARRAY_KEY, `id` AS "typeId", 0 AS "flags", `mapId`, `posX` AS "mapX", `posY` AS "mapY" FROM dbc_areatrigger');
     }
 
-    private const STEP_FLAG_WAYPOINT      = 0x1;
-    private const STEP_FLAG_TRANSPORTABLE = 0x2;
-
     private array $steps = array(
-        0x01 => ['creature',     Type::NPC,         self::STEP_FLAG_TRANSPORTABLE,                            'creature spawns',                                  ],
-        0x02 => ['gameobject',   Type::OBJECT,      self::STEP_FLAG_TRANSPORTABLE,                            'gameobject spawns',                                ],
-        0x04 => ['soundemitter', Type::SOUND,       self::STEP_FLAG_TRANSPORTABLE,                            'SoundEmitters.dbc positions',                      ],
-        0x08 => ['areatrigger',  Type::AREATRIGGER, 0x0,                                                      'AreaTrigger.dbc positions and teleporter endpoints'],
-        0x10 => ['instances',    Type::ZONE,        0x0,                                                      'Map.dbc instance portals positions'                ],
-        0x20 => ['waypoints',    Type::NPC,         self::STEP_FLAG_WAYPOINT | self::STEP_FLAG_TRANSPORTABLE, 'NPC waypoints from `waypoint_data`'                ],
-        0x40 => ['motransports', Type::OBJECT,      self::STEP_FLAG_WAYPOINT,                                 'MO Transport waypoints from TaxiPathNode.dbc'      ]
+        self::S_CREATURES    => ['creatures',    Type::NPC,         self::STEP_FLAG_TRANSPORTABLE,                            'creature spawns',                                  ],
+        self::S_GAMEOBJECTS  => ['objects',      Type::OBJECT,      self::STEP_FLAG_TRANSPORTABLE,                            'gameobject spawns',                                ],
+        self::S_SOUNDEMITTER => ['soundemitter', Type::SOUND,       self::STEP_FLAG_TRANSPORTABLE,                            'SoundEmitters.dbc positions',                      ],
+        self::S_AREATRIGGER  => ['areatrigger',  Type::AREATRIGGER, 0x0,                                                      'AreaTrigger.dbc positions and teleporter endpoints'],
+        self::S_INSTANCES    => ['instances',    Type::ZONE,        0x0,                                                      'Map.dbc instance portals positions'                ],
+        self::W_CREATURES    => ['waypoints',    Type::NPC,         self::STEP_FLAG_WAYPOINT | self::STEP_FLAG_TRANSPORTABLE, 'NPC waypoints from `waypoint_data`'                ],
+        self::W_GAMEOBJECTS  => ['motransports', Type::OBJECT,      self::STEP_FLAG_WAYPOINT,                                 'MO Transport waypoints from TaxiPathNode.dbc'      ]
     );
 
     public function generate() : bool
@@ -60,27 +68,24 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
         $opts     = array_slice(array_keys($this->info), 1);
         $getOpt   = CLISetup::getOpt(...$opts);
-        $todoMask = 0x0;
+        $todoMask = null;
 
         if ($getOpt['creatures'])
-            $todoMask |= 0x01;
+            $todoMask |= self::S_CREATURES;
         if ($getOpt['objects'])
-            $todoMask |= 0x02;
+            $todoMask |= self::S_GAMEOBJECTS;
         if ($getOpt['soundemitter'])
-            $todoMask |= 0x04;
+            $todoMask |= self::S_SOUNDEMITTER;
         if ($getOpt['areatrigger'])
-            $todoMask |= 0x08;
+            $todoMask |= self::S_AREATRIGGER;
         if ($getOpt['instances'])
-            $todoMask |= 0x10;
+            $todoMask |= self::S_INSTANCES;
         if ($getOpt['waypoints'])
-            $todoMask |= 0x20;
+            $todoMask |= self::W_CREATURES;
         if ($getOpt['motransports'])
-            $todoMask |= 0x40;
+            $todoMask |= self::W_GAMEOBJECTS;
 
-        if ($todoMask)
-            foreach ($this->steps as $idx => $_)
-                if (!($todoMask & $idx))
-                    unset($this->steps[$idx]);
+        $todoMask ??= array_reduce(array_keys($this->steps), fn($c, $x) => $c |= $x);
 
 
         /*********************************/
@@ -88,12 +93,20 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         /*********************************/
 
         foreach ($this->steps as $idx => [, $type, $stepFlags, ])
-            if (!($stepFlags & self::STEP_FLAG_WAYPOINT) && (!$todoMask || ($idx & $todoMask)) && ($tbl = WorldPosition::getStorageByType($type)))
-                DB::Aowow()->qry('TRUNCATE TABLE %n', $tbl);
+        {
+            if (!($idx & $todoMask))
+            {
+                unset($this->steps[$idx]);
+                continue;
+            }
 
-        if (!$todoMask || ($todoMask & 0x20))
+            if (!($stepFlags & self::STEP_FLAG_WAYPOINT) && ($idx & $todoMask) && ($tbl = WorldPosition::getStorageByType($type)))
+                DB::Aowow()->qry('TRUNCATE TABLE %n', $tbl);
+        }
+
+        if ($todoMask & self::W_CREATURES)
             DB::Aowow()->qry('TRUNCATE TABLE ::creature_waypoints');
-        if (!$todoMask || ($todoMask & 0x40))
+        if ($todoMask & self::W_GAMEOBJECTS)
             DB::Aowow()->qry('TRUNCATE TABLE ::objects_waypoints');
 
 
@@ -200,7 +213,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         /* spawn vehicle accessories */
         /*****************************/
 
-        if ($todoMask & 0x01)                               // only when creature is set
+        if ($todoMask & self::S_CREATURES)
         {
             // get vehicle template accessories
             $accessories = DB::World()->selectAssoc(
@@ -253,7 +266,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
     }
 
     // {guid, }typeId, flags, {areaId, areaX, areaY, floor, }mapId, mapX, mapY, respawn, spawnMask, phaseMask, pathId, ScriptName, StringId
-    private function creature() : array
+    private function creatures() : array
     {
         // todo? - spawns from spell with SPELL_EFFECT_SUMMON (28) and spellFocusId > 0, if only one location and not a trigger creature?
 
@@ -327,7 +340,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
     }
 
     // {guid, }typeId, flags, {areaId, areaX, areaY, floor, }mapId, mapX, mapY, respawn, spawnMask, phaseMask, pathId, ScriptName, StringId
-    private function gameobject() : array
+    private function objects() : array
     {
         // todo? - spawns from spell with SPELL_EFFECT_SUMMON_OBJECT_WILD (76) and spellFocusId > 0, if only one location
 
