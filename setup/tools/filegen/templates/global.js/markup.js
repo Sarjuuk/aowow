@@ -2599,7 +2599,7 @@ var Markup = {
                 str += ">";
 
                 if (!(/^(https?:)?\/\//).test(src))
-                    src = g_staticUrl + "/wowsounds" + src;
+                    src = g_staticUrl + '/wowsounds/' + Locale.getName() + src;
 
                 str += '<source src="' + src + '"';
                 if (type)

@@ -75,6 +75,7 @@ Extract the following directories from the client archives into `setup/mpqdata/`
    > \<localeCode>/DBFilesClient/  
    > \<localeCode>/Interface/WorldMap/  
    > \<localeCode>/Interface/FrameXML/GlobalStrings.lua  
+   > \<localeCode>/Sound/
    
    .. once is enough (still apply the localeCode though):
    > \<localeCode>/Interface/TalentFrame/  
@@ -86,7 +87,8 @@ Extract the following directories from the client archives into `setup/mpqdata/`
    > \<localeCode>/Interface/PvPRankBadges  
    > \<localeCode>/Interface/FlavorImages  
    > \<localeCode>/Interface/Calendar/Holidays/  
-   > \<localeCode>/Sound/  
+
+   Sound data missing in a locale falls back to the English audio.
 
 #### 5. Reencode the audio files
 WAV-files need to be reencoded as `ogg/vorbis` and some MP3s may identify themselves as `application/octet-stream` instead of `audio/mpeg`.  
