@@ -67,6 +67,8 @@ See to it, that the web server is able to write the following directories and th
  * `static/images/wow/`
  * `datasets/`  
  
+The soundfile generator links shared audio with symlinks in `static/wowsounds/`; the web server must be allowed to follow them (Apache: `Options +FollowSymLinks`, or `SymLinksIfOwnerMatch` with matching ownership).
+
 #### 4. Extract the client archives (MPQs)
 Extract the following directories from the client archives into `setup/mpqdata/`, while maintaining patch order (named MPQs first -> patch.mpq -> patch-[2 -> 9].mpq -> patch-[A -> Z].mpq). Replace files from previous patches if asked to.  
 ⚠ DO NOT change the case of the extracted files. (i.e. don't use the `-c` switch when using the MPQExtractor)  
@@ -88,7 +90,7 @@ Extract the following directories from the client archives into `setup/mpqdata/`
    > \<localeCode>/Interface/FlavorImages  
    > \<localeCode>/Interface/Calendar/Holidays/  
 
-   Sound data missing in a locale falls back to the English audio.
+   Sound data missing in a locale falls back to the English audio. Extract `enus/Sound/` as well to get that fallback; if it is absent, the first locale that has the sound is used instead.
 
 #### 5. Reencode the audio files
 WAV-files need to be reencoded as `ogg/vorbis` and some MP3s may identify themselves as `application/octet-stream` instead of `audio/mpeg`.  

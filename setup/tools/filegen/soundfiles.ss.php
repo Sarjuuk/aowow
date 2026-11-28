@@ -69,11 +69,12 @@ CLISetup::registerSetup("build", new class extends SetupScript
         if (!CLISetup::writeDir($commonDir))
             return false;
 
-        // always ensure the EN fallback directory exists
+        // EN is always searched and generated as the fallback source, but a partial run must not rewrite its audio
         $targetLocales = CLISetup::$locales;
         $searchLocales = $targetLocales;
         if (!isset($searchLocales[Locale::EN->value]))
             $searchLocales[Locale::EN->value] = Locale::EN;
+        $requestedKeys = array_map(fn(Locale $l) => $l->json(), $targetLocales);
 
         // URLs are built for every config-enabled locale, even when --locales limits which sources are built
         $outputLocales = [];
@@ -129,17 +130,11 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 $locKey = $loc->json();
                 foreach ($loc->gameDirs() as $dir)
                 {
-                    $p       = CLI::nicePath($filePath, CLISetup::$srcDir, $dir);
-                    $lower_p = CLI::nicePath(strtolower($filePath), CLISetup::$srcDir, $dir);
+                    $p = CLI::nicePath($filePath, CLISetup::$srcDir, $dir);
 
                     if (CLISetup::fileExists($p))
                     {
                         $foundByLoc[$locKey] = $p;
-                        break;
-                    }
-                    if (CLISetup::fileExists($lower_p))
-                    {
-                        $foundByLoc[$locKey] = $lower_p;
                         break;
                     }
                 }
@@ -205,8 +200,11 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 $fallbackKey = isset($foundByLoc['enus']) ? 'enus' : array_key_first($foundByLoc);
                 $fallbackAbs = 'static/wowsounds/'.$fallbackKey.'/'.$fileId;
 
+                // a partial rebuild keeps audio that was not requested, including the force-added EN fallback
+                $keepFallback = !in_array($fallbackKey, $requestedKeys, true) && (file_exists($fallbackAbs) || is_link($fallbackAbs));
+
                 // copy the fallback first, so locales without their own file can link to it
-                if (!$this->safeCopy($foundByLoc[$fallbackKey], $fallbackAbs))
+                if (!$keepFallback && !$this->safeCopy($foundByLoc[$fallbackKey], $fallbackAbs))
                 {
                     $this->success = false;
                     $fileOk        = false;
@@ -223,8 +221,8 @@ CLISetup::registerSetup("build", new class extends SetupScript
                         if ($locKey === $fallbackKey)
                             continue;
 
-                        // partial rebuilds must not replace existing audio in locales that were not searched
-                        if (!isset($searchLocales[$loc->value]) && (file_exists($dstFile) || is_link($dstFile)))
+                        // partial rebuilds must not replace existing audio in locales that were not requested
+                        if (!in_array($locKey, $requestedKeys, true) && (file_exists($dstFile) || is_link($dstFile)))
                             continue;
 
                         if (isset($foundByLoc[$locKey]))
