@@ -630,7 +630,6 @@ trait spawnHelper
     private function createFullSpawns(bool $skipWPs = false, bool $skipAdmin = false, bool $hasLabel = false, bool $hasLink = false) : void
     {
         $data     = [];
-        $wpSum    = [];
         $wpIdx    = 0;
         $worldPos = [];
         $spawns   = DB::Aowow()->selectAssoc(
@@ -703,10 +702,6 @@ trait spawnHelper
                         $opts['lines'] = [[$wPoints[$i - 1]['areaX'], $wPoints[$i - 1]['areaY']]];
 
                     $data[$p['areaId']][$p['floor']]['coords'][] = [$p['areaX'], $p['areaY'], $opts];
-                    if (empty($wpSum[$p['areaId']][$p['floor']]))
-                        $wpSum[$p['areaId']][$p['floor']] = 1;
-                    else
-                        $wpSum[$p['areaId']][$p['floor']]++;
                 }
 
                 if ($wPoints)
@@ -800,14 +795,14 @@ trait spawnHelper
             if ($menu)
                 $opts['menu'] = $menu;
 
-            $data[$areaId] [$floor] ['coords'] [] = [$posX, $posY, $opts];
+            $data[$areaId][$floor]['coords'][] = [$posX, $posY, $opts];
+            $data[$areaId][$floor]['count'] ??= 0;
+
+            if (!($flags & SPAWNTYPE_TELEPORTER_DEST))
+                $data[$areaId][$floor]['count']++;
         }
 
-        foreach ($data as $a => &$areas)
-            foreach ($areas as $f => &$floor)
-                $floor['count'] = count($floor['coords']) - ($wpSum[$a][$f] ?? 0);
-
-        uasort($data, [$this, 'sortBySpawnCount']);
+        uasort($data, self::sortBySpawnCount(...));
         $this->spawnResult[SPAWNINFO_FULL] = $data;
     }
 
