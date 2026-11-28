@@ -627,11 +627,11 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
         // cannot be placed on a map, try to reuse TC assigned areaId (note: area has been invalid in the past)
         if ($point['areaId'] && isset($this->areaParents[$point['areaId']]))
-            return [[$this->areaParents[$point['areaId']], 0, 0, 0, 0, $point['guid']]];
+            return [[$this->areaParents[$point['areaId']], 0, 0, 0, $point['flags'], $point['guid']]];
 
         // we know the instanced map; try to assign a zone this way
         if (!in_array($point['mapId'], [0, 1, 530, 571]) && isset($this->mapToArea[$point['mapId']]))
-            return [[$this->mapToArea[$point['mapId']], 0, 0, 0, 0, $point['guid']]];
+            return [[$this->mapToArea[$point['mapId']], 0, 0, 0, $point['flags'], $point['guid']]];
 
         return null;
     }
