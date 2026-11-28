@@ -92,7 +92,6 @@ class GameObjectList extends DBTypeList
 
             if ($this->curTpl['startsQuests'])
                 $data[$this->id]['hasQuests'] = 1;
-
         }
 
         return $data;

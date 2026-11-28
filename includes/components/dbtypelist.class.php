@@ -818,9 +818,9 @@ trait spawnHelper
     {
         $res = DB::Aowow()->selectCol(
            'SELECT `typeId` AS ARRAY_KEY, GROUP_CONCAT(`areaId` ORDER BY `n` DESC)
-            FROM (SELECT `typeId`, `areaId`, COUNT(1) AS "n" FROM %n WHERE `typeId` IN %in AND `areaX` > 0 AND `areaY` > 0 GROUP BY `typeId`, `areaId`) x
+            FROM (SELECT `typeId`, `areaId`, COUNT(1) AS "n" FROM %n WHERE `typeId` IN %in AND (`flags` & %i) = 0 GROUP BY `typeId`, `areaId`) x
             GROUP BY `typeId`',
-            $this->spawnsTable, $this->getfoundIDs()
+            $this->spawnsTable, $this->getfoundIDs(), SPAWNTYPE_TELEPORTER_DEST
         ) ?: [];
 
         foreach ($res as &$r)

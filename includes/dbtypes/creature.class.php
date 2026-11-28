@@ -315,7 +315,6 @@ class CreatureList extends DBTypeList
                     'react'          => [$this->curTpl['A'], $this->curTpl['H']],
                 );
 
-
                 if ($this->getField('startsQuests'))
                     $data[$this->id]['hasQuests'] = 1;
 

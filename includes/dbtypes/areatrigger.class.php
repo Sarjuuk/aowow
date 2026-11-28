@@ -16,9 +16,8 @@ class AreaTriggerList extends DBTypeList
     public static int    $contribute = CONTRIBUTE_CO;
 
     protected string $queryBase = 'SELECT a.*, a.id AS ARRAY_KEY FROM ::areatrigger a';
-    protected array  $queryOpts = array(
-                        'a' => [['s']],                     // flags & 0x1: are teleporter targets, so exclude them here
-                        's' => ['j' => ['::areatrigger_spawns s ON s.`typeId` = a.`id` AND (s.`flags` & 0x1) = 0', true], 's' => ', GROUP_CONCAT(s.`areaId`) AS "areaId"', 'g' => 'a.`id`']
+    protected array  $queryOpts = array(                    // flags & 0x1: are teleporter targets, so exclude them here
+                        's' => ['j' => ['::areatrigger_spawns s ON s.`typeId` = a.`id` AND (s.`flags` & 0x1) = 0', true]]
                     );
 
     public function __construct(array $conditions = [], array $miscData = [])
@@ -40,17 +39,18 @@ class AreaTriggerList extends DBTypeList
     public function getListviewData() : array
     {
         $data = [];
-
         foreach ($this->iterate() as $__)
         {
-            $data[$this->id] = array(
-                'id'      => $this->curTpl['id'],
-                'type'    => $this->curTpl['type'],
-                'name'    => $this->curTpl['name'],
-            );
+            if ($location = $this->getSpawns(SPAWNINFO_ZONES))
+                if (count($location) > 3)
+                    array_splice($location, 3, replacement: -1);
 
-            if ($_ = $this->curTpl['areaId'])
-                $data[$this->id]['location'] = explode(',', $_);
+            $data[$this->id] = array(
+                'id'       => $this->curTpl['id'],
+                'type'     => $this->curTpl['type'],
+                'name'     => $this->curTpl['name'],
+                'location' => $location
+            );
         }
 
         return $data;
